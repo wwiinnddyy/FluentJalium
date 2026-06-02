@@ -224,6 +224,9 @@ public static class FluentThemeManager
         AliasStyle<FWToolTip, ToolTip>(dictionary);
         AliasStyle<FWContentDialog, ContentDialog>(dictionary);
         AliasStyle<FWGroupBox, GroupBox>(dictionary);
+        AliasStyle<FWScrollViewer, ScrollViewer>(dictionary);
+        AliasStyle<FWSwipeControl, SwipeControl>(dictionary);
+        AliasStyle<FWGridSplitter, GridSplitter>(dictionary);
         AliasStyle<FWImage, Image>(dictionary);
         AliasStyle<FWFontIcon, FontIcon>(dictionary);
         AliasStyle<FWSymbolIcon, SymbolIcon>(dictionary);

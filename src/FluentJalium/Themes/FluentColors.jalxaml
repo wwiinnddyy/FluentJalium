@@ -109,6 +109,27 @@
             <SolidColorBrush x:Key="LabelForeground" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarTrack" Color="#05FFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarThumb" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarArrow" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FF107C10" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FF0078D4" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
@@ -309,6 +330,27 @@
             <SolidColorBrush x:Key="LabelForeground" Color="#9E000000" />
             <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarTrack" Color="#05000000" />
+            <SolidColorBrush x:Key="ScrollBarThumb" Color="#72000000" />
+            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#9E000000" />
+            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#E4000000" />
+            <SolidColorBrush x:Key="ScrollBarArrow" Color="#9E000000" />
+            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#E4000000" />
+            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#E4000000" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#09000000" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FF107C10" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#72000000" />
+            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FF0078D4" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
@@ -477,6 +519,27 @@
             <SolidColorBrush x:Key="LabelForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="LabelBorderBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarTrack" Color="#FF000000" />
+            <SolidColorBrush x:Key="ScrollBarThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ScrollBarArrow" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="GridSplitterBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#FF000000" />

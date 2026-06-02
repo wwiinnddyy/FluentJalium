@@ -74,6 +74,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
+            AssertBasedOnStyle<FWScrollViewer, ScrollViewer>(app.Resources);
+            AssertBasedOnStyle<FWSwipeControl, SwipeControl>(app.Resources);
+            AssertBasedOnStyle<FWGridSplitter, GridSplitter>(app.Resources);
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
             AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
             AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
@@ -230,6 +233,10 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<ToolTip>(dictionary);
         AssertContainsStyle<ContentDialog>(dictionary);
         AssertContainsStyle<GroupBox>(dictionary);
+        AssertContainsStyle<ScrollViewer>(dictionary);
+        AssertContainsStyle<ScrollBar>(dictionary);
+        AssertContainsStyle<SwipeControl>(dictionary);
+        AssertContainsStyle<GridSplitter>(dictionary);
         AssertContainsStyle<Image>(dictionary);
         AssertContainsStyle<FontIcon>(dictionary);
         AssertContainsStyle<SymbolIcon>(dictionary);
@@ -301,6 +308,14 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ContentDialogBackground"));
         Assert.True(dictionary.Contains("ContentDialogOverlayBackground"));
         Assert.True(dictionary.Contains("ContentDialogAccentButtonStyle"));
+        Assert.True(dictionary.Contains("ScrollBarStyle"));
+        Assert.True(dictionary.Contains("ScrollBarThumbStyle"));
+        Assert.True(dictionary.Contains("ScrollBarTrack"));
+        Assert.True(dictionary.Contains("ScrollBarThumbHover"));
+        Assert.True(dictionary.Contains("ScrollBarArrowHover"));
+        Assert.True(dictionary.Contains("SwipeControlBackground"));
+        Assert.True(dictionary.Contains("SwipeItemBackgroundDestructive"));
+        Assert.True(dictionary.Contains("GridSplitterGripBrushHover"));
         Assert.True(dictionary.Contains("ImageBackground"));
         Assert.True(dictionary.Contains("ImageBorderBrush"));
         Assert.True(dictionary.Contains("IconForeground"));
@@ -456,6 +471,32 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWViewbox, Viewbox>(app.Resources);
             AssertBasedOnStyle<FWLabel, Label>(app.Resources);
             AssertBasedOnStyle<FWSeparator, Separator>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void InteractionBatch_ShouldExposeFwStylesForScrollAndGestureControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWScrollViewer, ScrollViewer>(app.Resources);
+            AssertBasedOnStyle<FWSwipeControl, SwipeControl>(app.Resources);
+            AssertBasedOnStyle<FWGridSplitter, GridSplitter>(app.Resources);
+            Assert.IsType<Style>(app.Resources["ScrollBarStyle"]);
+            Assert.IsType<Style>(app.Resources["ScrollBarThumbStyle"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["SwipeItemBackground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["GridSplitterGripBrush"]);
         }
         finally
         {
@@ -663,6 +704,14 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWViewbox, Viewbox>();
         AssertFluentControl<FWLabel, Label>();
         AssertFluentControl<FWSeparator, Separator>();
+    }
+
+    [Fact]
+    public void FluentInteractionControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWScrollViewer, ScrollViewer>();
+        AssertFluentControl<FWSwipeControl, SwipeControl>();
+        AssertFluentControl<FWGridSplitter, GridSplitter>();
     }
 
     [Fact]
@@ -1123,6 +1172,136 @@ public sealed class FluentThemeManagerTests
         Assert.Equal(Stretch.Uniform, viewbox.Stretch);
         Assert.Equal(StretchDirection.Both, viewbox.StretchDirection);
         Assert.Equal(1, viewbox.VisualChildrenCount);
+    }
+
+    [Fact]
+    public void FWScrollViewer_ShouldTrackScrollOffsetsAndRaiseScrollChanged()
+    {
+        var content = new StackPanel
+        {
+            Orientation = Orientation.Vertical
+        };
+        for (var index = 0; index < 12; index++)
+        {
+            content.Children.Add(new Border
+            {
+                Height = 24,
+                Child = new TextBlock { Text = $"Item {index}" }
+            });
+        }
+
+        var viewer = new FWScrollViewer
+        {
+            Width = 120,
+            Height = 72,
+            Content = content,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            IsScrollInertiaEnabled = false,
+            IsScrollBarAutoHideEnabled = false
+        };
+        var changed = 0;
+        ScrollChangedEventArgs? lastArgs = null;
+        viewer.ScrollChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+
+        viewer.Measure(new Size(120, 72));
+        viewer.Arrange(new Rect(0, 0, 120, 72));
+        viewer.ScrollToVerticalOffset(36);
+
+        Assert.True(viewer.ExtentHeight > viewer.ViewportHeight);
+        Assert.Equal(36, viewer.VerticalOffset);
+        Assert.True(viewer.ScrollableHeight > 0);
+        Assert.Equal(1, changed);
+        Assert.NotNull(lastArgs);
+        Assert.Equal(36, lastArgs!.VerticalOffset);
+        Assert.True(lastArgs.VerticalChange > 0);
+    }
+
+    [Fact]
+    public void FWSwipeControl_ShouldRetainSwipeItemsAndInvokeCommands()
+    {
+        var archiveCommand = new RecordingCommand();
+        var deleteCommand = new RecordingCommand();
+        var archiveItem = new SwipeItem
+        {
+            Text = "Archive",
+            IconSource = "\uE8C3",
+            Background = new SolidColorBrush(Color.FromRgb(0x10, 0x7C, 0x10)),
+            Foreground = new SolidColorBrush(Color.White),
+            Command = archiveCommand,
+            CommandParameter = "message-1"
+        };
+        var deleteItem = new SwipeItem
+        {
+            Text = "Delete",
+            IconSource = "\uE74D",
+            BehaviorOnInvoked = BehaviorOnInvoked.Close,
+            Command = deleteCommand,
+            CommandParameter = "message-1"
+        };
+        var leftItems = new SwipeItems
+        {
+            Mode = SwipeMode.Reveal,
+            archiveItem
+        };
+        var rightItems = new SwipeItems
+        {
+            Mode = SwipeMode.Execute,
+            deleteItem
+        };
+        var swipe = new FWSwipeControl
+        {
+            LeftItems = leftItems,
+            RightItems = rightItems,
+            Content = new TextBlock { Text = "Message" },
+            Background = new SolidColorBrush(Color.FromRgb(0x22, 0x22, 0x22)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0x44, 0x44, 0x44)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6)
+        };
+
+        InvokeSwipeItem(archiveItem);
+        InvokeSwipeItem(deleteItem);
+        swipe.Close();
+
+        Assert.Same(leftItems, swipe.LeftItems);
+        Assert.Same(rightItems, swipe.RightItems);
+        Assert.Equal(SwipeMode.Reveal, swipe.LeftItems!.Mode);
+        Assert.Equal(SwipeMode.Execute, swipe.RightItems!.Mode);
+        Assert.Equal("Archive", swipe.LeftItems[0].Text);
+        Assert.Equal("\uE8C3", swipe.LeftItems[0].IconSource);
+        Assert.Equal(BehaviorOnInvoked.Close, swipe.RightItems[0].BehaviorOnInvoked);
+        Assert.Equal(1, archiveCommand.ExecuteCount);
+        Assert.Equal("message-1", archiveCommand.LastParameter);
+        Assert.Equal(1, deleteCommand.ExecuteCount);
+    }
+
+    [Fact]
+    public void FWGridSplitter_ShouldExposeResizeDirectionBehaviorAndIncrements()
+    {
+        var splitter = new FWGridSplitter
+        {
+            ResizeDirection = GridResizeDirection.Columns,
+            ResizeBehavior = GridResizeBehavior.PreviousAndNext,
+            ShowsPreview = true,
+            DragIncrement = 4,
+            KeyboardIncrement = 16,
+            Width = 6
+        };
+
+        splitter.Measure(new Size(6, 120));
+
+        Assert.Equal(GridResizeDirection.Columns, splitter.ResizeDirection);
+        Assert.Equal(GridResizeBehavior.PreviousAndNext, splitter.ResizeBehavior);
+        Assert.True(splitter.ShowsPreview);
+        Assert.Equal(4, splitter.DragIncrement);
+        Assert.Equal(16, splitter.KeyboardIncrement);
+        Assert.True(splitter.Focusable);
+        Assert.Equal(6, splitter.DesiredSize.Width);
     }
 
     [Fact]
@@ -2157,6 +2336,13 @@ public sealed class FluentThemeManagerTests
     {
         typeof(MenuFlyoutItem)
             .GetMethod("InvokeItem", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(item, null);
+    }
+
+    private static void InvokeSwipeItem(SwipeItem item)
+    {
+        typeof(SwipeItem)
+            .GetMethod("RaiseInvoked", BindingFlags.Instance | BindingFlags.NonPublic)!
             .Invoke(item, null);
     }
 

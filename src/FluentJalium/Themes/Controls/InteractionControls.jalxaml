@@ -1,0 +1,194 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="ScrollBarLineButtonStyle" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{ThemeResource ScrollBarArrow}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RepeatButton">
+                <Border Name="PART_ButtonRoot"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Path Name="PART_Arrow"
+                          Data="M 841.90,426.67 L 273.07,0 A 170.67,170.67,0,0,0,0,136.53 V 989.87 A 170.67,170.67,0,0,0,273.07,1126.40 L 841.90,699.73 A 170.67,170.67,0,0,0,841.90,426.67 Z"
+                          Fill="{TemplateBinding Foreground}"
+                          Width="7"
+                          Height="7"
+                          Stretch="Uniform"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Tag" Value="Up">
+                <Setter TargetName="PART_Arrow" Property="Data" Value="M 733.87,0 L 1160.54,568.83 A 170.67,170.67,0,0,1,1024.00,841.90 H 170.67 A 170.67,170.67,0,0,1,34.14,568.83 L 460.80,0 A 170.67,170.67,0,0,1,733.87,0 Z" />
+            </Trigger>
+            <Trigger Property="Tag" Value="Down">
+                <Setter TargetName="PART_Arrow" Property="Data" Value="M 733.87,841.90 L 1160.54,273.07 A 170.67,170.67,0,0,0,1024.00,0 H 170.67 A 170.67,170.67,0,0,0,34.14,273.07 L 460.80,841.90 A 170.67,170.67,0,0,0,733.87,841.90 Z" />
+            </Trigger>
+            <Trigger Property="Tag" Value="Left">
+                <Setter TargetName="PART_Arrow" Property="Data" Value="M 0,426.67 L 568.83,0 A 170.67,170.67,0,0,1,841.90,136.53 V 989.87 A 170.67,170.67,0,0,1,568.83,1126.40 L 0,699.73 A 170.67,170.67,0,0,1,0,426.67 Z" />
+            </Trigger>
+            <Trigger Property="Tag" Value="Right">
+                <Setter TargetName="PART_Arrow" Property="Data" Value="M 841.90,426.67 L 273.07,0 A 170.67,170.67,0,0,0,0,136.53 V 989.87 A 170.67,170.67,0,0,0,273.07,1126.40 L 841.90,699.73 A 170.67,170.67,0,0,0,841.90,426.67 Z" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ScrollBarButtonBackgroundPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource ScrollBarArrowHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ScrollBarButtonBackgroundPressed}" />
+                <Setter Property="Foreground" Value="{ThemeResource ScrollBarArrowPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="PART_Arrow" Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ScrollBarPageButtonStyle" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Opacity" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RepeatButton">
+                <Border Background="Transparent" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ScrollBarThumbStyle" TargetType="Thumb">
+        <Setter Property="Background" Value="{ThemeResource ScrollBarThumb}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="ShowGrip" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Thumb">
+                <Border Name="ThumbBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ScrollBarThumbHover}" />
+            </Trigger>
+            <Trigger Property="IsDragging" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ScrollBarThumbActive}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="ScrollBarStyle" TargetType="ScrollBar">
+        <Setter Property="Background" Value="{ThemeResource ScrollBarTrack}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ThumbStyle" Value="{ThemeResource ScrollBarThumbStyle}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="12" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="{ThemeResource ScrollBarTrack}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ThumbStyle" Value="{ThemeResource ScrollBarThumbStyle}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="12" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.45" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ScrollViewer">
+        <Setter Property="Background" Value="{ThemeResource ScrollViewerBackground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ScrollViewerBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="IsScrollBarAutoHideEnabled" Value="True" />
+        <Setter Property="PanningMode" Value="VerticalFirst" />
+    </Style>
+
+    <Style TargetType="SwipeControl">
+        <Setter Property="Background" Value="{ThemeResource SwipeControlBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource SwipeControlBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinHeight" Value="48" />
+    </Style>
+
+    <Style TargetType="GridSplitter">
+        <Setter Property="Background" Value="{ThemeResource GridSplitterBackground}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinWidth" Value="5" />
+        <Setter Property="MinHeight" Value="5" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="GridSplitter">
+                <Border Name="PART_Root"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border Name="PART_Grip"
+                            Background="{ThemeResource GridSplitterGripBrush}"
+                            CornerRadius="2"
+                            Width="3"
+                            Height="32"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource GridSplitterBackgroundHover}" />
+                <Setter TargetName="PART_Grip" Property="Background" Value="{ThemeResource GridSplitterGripBrushHover}" />
+            </Trigger>
+            <Trigger Property="ResizeDirection" Value="Rows">
+                <Setter TargetName="PART_Grip" Property="Width" Value="32" />
+                <Setter TargetName="PART_Grip" Property="Height" Value="3" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter TargetName="PART_Grip" Property="Background" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

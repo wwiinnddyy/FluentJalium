@@ -35,6 +35,8 @@ The eleventh FW batch covers disclosure, tooltip, dialog, and lightweight contai
 
 The twelfth FW batch covers visual and icon foundation controls: `FWImage`, `FWFontIcon`, `FWSymbolIcon`, `FWPathIcon`, `FWViewbox`, `FWLabel`, and `FWSeparator`.
 
+The thirteenth FW batch covers interaction and scrolling controls: `FWScrollViewer`, `FWSwipeControl`, and `FWGridSplitter`. `SwipeItem` and `SwipeItems` remain Jalium.UI sealed behavior types, so FluentJalium styles and hosts them through `FWSwipeControl` rather than wrapping them.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -84,6 +86,9 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWViewbox Stretch="Uniform" />
 <fluent:FWLabel Content="Name" />
 <fluent:FWSeparator />
+<fluent:FWScrollViewer VerticalScrollBarVisibility="Auto" />
+<fluent:FWSwipeControl />
+<fluent:FWGridSplitter ResizeDirection="Columns" />
 <fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
 <fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
 <fluent:FWCalendar FirstDayOfWeek="Monday" />

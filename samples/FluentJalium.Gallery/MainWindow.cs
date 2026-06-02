@@ -26,6 +26,7 @@ using FWImage = FluentJalium.Controls.FWImage;
 using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
 using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
+using FWGridSplitter = FluentJalium.Controls.FWGridSplitter;
 using FWLabel = FluentJalium.Controls.FWLabel;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListView = FluentJalium.Controls.FWListView;
@@ -53,8 +54,10 @@ using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
+using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWSymbolIcon = FluentJalium.Controls.FWSymbolIcon;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
+using FWSwipeControl = FluentJalium.Controls.FWSwipeControl;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
 using FWTabItem = FluentJalium.Controls.FWTabItem;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
@@ -110,6 +113,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateVisualsSection());
+        page.Children.Add(CreateInteractionSection());
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateMenusSection());
@@ -140,7 +144,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, visual, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, visual, interaction, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -717,6 +721,95 @@ public sealed class MainWindow : Window
         return panel;
     }
 
+    private UIElement CreateInteractionSection()
+    {
+        var panel = CreateSection("Interaction and Scrolling");
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 16
+        };
+
+        var scrollColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 300
+        };
+        scrollColumn.Children.Add(new FWLabel { Content = "FWScrollViewer" });
+        scrollColumn.Children.Add(new FWScrollViewer
+        {
+            Width = 280,
+            Height = 150,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Background = ThemeBrush("SwipeControlBackground"),
+            BorderBrush = ThemeBrush("SwipeControlBorderBrush"),
+            BorderThickness = new Thickness(1),
+            Padding = new Thickness(12),
+            IsScrollBarAutoHideEnabled = false,
+            Content = CreateScrollableItems()
+        });
+        row.Children.Add(scrollColumn);
+
+        var swipeColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 330
+        };
+        swipeColumn.Children.Add(new FWLabel { Content = "FWSwipeControl" });
+        swipeColumn.Children.Add(new FWSwipeControl
+        {
+            Width = 310,
+            Height = 68,
+            LeftItems = CreateSwipeItems(SwipeMode.Reveal,
+                ("Archive", "\uE8C3", "SwipeItemBackgroundSecondary"),
+                ("Flag", "\uE7C1", "SwipeItemBackground")),
+            RightItems = CreateSwipeItems(SwipeMode.Execute,
+                ("Delete", "\uE74D", "SwipeItemBackgroundDestructive")),
+            Content = new Border
+            {
+                Background = ThemeBrush("SwipeControlBackground"),
+                Padding = new Thickness(14, 8, 14, 8),
+                Child = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 2,
+                    Children =
+                    {
+                        new TextBlock
+                        {
+                            Text = "Swipe action row",
+                            Foreground = ThemeBrush("TextPrimary")
+                        },
+                        new TextBlock
+                        {
+                            Text = "Reveal from the left, execute from the right.",
+                            Foreground = ThemeBrush("TextSecondary"),
+                            FontSize = 12
+                        }
+                    }
+                }
+            }
+        });
+        row.Children.Add(swipeColumn);
+
+        var splitterColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390
+        };
+        splitterColumn.Children.Add(new FWLabel { Content = "FWGridSplitter" });
+        splitterColumn.Children.Add(CreateSplitterPreview());
+        row.Children.Add(splitterColumn);
+
+        panel.Children.Add(row);
+        return panel;
+    }
+
     private UIElement CreateMenusSection()
     {
         var panel = CreateSection("Menus and Flyouts");
@@ -1225,6 +1318,129 @@ public sealed class MainWindow : Window
             Width = 112,
             FontSize = 12,
             Foreground = ThemeBrush("TextSecondary")
+        };
+    }
+
+    private static StackPanel CreateScrollableItems()
+    {
+        var stack = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 6
+        };
+
+        for (var index = 1; index <= 9; index++)
+        {
+            stack.Children.Add(new Border
+            {
+                Height = 28,
+                Background = index % 2 == 0 ? ThemeBrush("ControlBackground") : ThemeBrush("SelectionBackgroundWeak"),
+                BorderBrush = ThemeBrush("ControlBorder"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                Padding = new Thickness(8, 0, 8, 0),
+                Child = new TextBlock
+                {
+                    Text = $"Scrollable item {index}",
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            });
+        }
+
+        return stack;
+    }
+
+    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, string Icon, string BackgroundKey)[] items)
+    {
+        var swipeItems = new SwipeItems
+        {
+            Mode = mode
+        };
+
+        foreach (var item in items)
+        {
+            swipeItems.Add(new SwipeItem
+            {
+                Text = item.Text,
+                IconSource = item.Icon,
+                Background = ThemeBrush(item.BackgroundKey),
+                Foreground = ThemeBrush("SwipeItemForeground")
+            });
+        }
+
+        return swipeItems;
+    }
+
+    private static Grid CreateSplitterPreview()
+    {
+        var grid = new Grid
+        {
+            Width = 370,
+            Height = 150,
+            Background = ThemeBrush("SwipeControlBackground")
+        };
+        grid.ColumnDefinitions.Add(new ColumnDefinition
+        {
+            Width = new GridLength(150),
+            MinWidth = 96
+        });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition
+        {
+            Width = new GridLength(1, GridUnitType.Star),
+            MinWidth = 140
+        });
+
+        var left = CreateSplitterPane("Outline", "Theme tokens\nFW controls\nGallery states");
+        Grid.SetColumn(left, 0);
+        grid.Children.Add(left);
+
+        var splitter = new FWGridSplitter
+        {
+            Width = 6,
+            ResizeDirection = GridResizeDirection.Columns,
+            ResizeBehavior = GridResizeBehavior.PreviousAndNext,
+            KeyboardIncrement = 12,
+            DragIncrement = 1
+        };
+        Grid.SetColumn(splitter, 1);
+        grid.Children.Add(splitter);
+
+        var right = CreateSplitterPane("Preview", "Drag the splitter to resize this Fluent layout.");
+        Grid.SetColumn(right, 2);
+        grid.Children.Add(right);
+
+        return grid;
+    }
+
+    private static Border CreateSplitterPane(string title, string text)
+    {
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8
+        };
+        panel.Children.Add(new TextBlock
+        {
+            Text = title,
+            Foreground = ThemeBrush("TextPrimary"),
+            FontSize = 14
+        });
+        panel.Children.Add(new TextBlock
+        {
+            Text = text,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        return new Border
+        {
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            Padding = new Thickness(12),
+            Child = panel
         };
     }
 
