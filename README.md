@@ -15,6 +15,8 @@ The first FW batch covers button and command-button controls: `FWButton`, `FWRep
 
 The second FW batch covers switch controls: `FWToggleButton` and `FWToggleSwitch`.
 
+The third FW batch covers drag and range controls: `FWSlider`, `FWRangeSlider`, `FWProgressBar`, and `FWProgressRing`. `FWProgressRing` is owned by FluentJalium because Jalium.UI does not currently expose a concrete ProgressRing control.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -36,6 +38,7 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWButton Content="Save" />
 <fluent:FWDropDownButton Content="More" />
 <fluent:FWToggleSwitch Header="Sync" IsOn="True" />
+<fluent:FWProgressRing IsIndeterminate="False" Value="72" />
 ```
 
 ## Build

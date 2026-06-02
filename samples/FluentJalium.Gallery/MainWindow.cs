@@ -9,7 +9,11 @@ using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
+using FWProgressBar = FluentJalium.Controls.FWProgressBar;
+using FWProgressRing = FluentJalium.Controls.FWProgressRing;
+using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
+using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
@@ -76,7 +80,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button and switch controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, and range controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -281,14 +285,23 @@ public sealed class MainWindow : Window
             Spacing = 18
         };
 
-        row.Children.Add(new Slider
+        row.Children.Add(new FWSlider
         {
             Width = 260,
             Minimum = 0,
             Maximum = 100,
             Value = 64
         });
-        row.Children.Add(new ProgressBar
+        row.Children.Add(new FWRangeSlider
+        {
+            Width = 260,
+            Minimum = 0,
+            Maximum = 100,
+            RangeStart = 24,
+            RangeEnd = 76,
+            MinimumRange = 8
+        });
+        row.Children.Add(new FWProgressBar
         {
             Width = 220,
             Height = 8,
@@ -296,14 +309,43 @@ public sealed class MainWindow : Window
             Maximum = 100,
             Value = 72
         });
-        row.Children.Add(new ProgressBar
+        row.Children.Add(new FWProgressBar
         {
             Width = 220,
             Height = 8,
             IsIndeterminate = true
         });
 
+        var ringRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 18,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        ringRow.Children.Add(new FWProgressRing
+        {
+            Width = 36,
+            Height = 36,
+            IsIndeterminate = true
+        });
+        ringRow.Children.Add(new FWProgressRing
+        {
+            Width = 36,
+            Height = 36,
+            IsIndeterminate = false,
+            Value = 72
+        });
+        ringRow.Children.Add(new FWProgressRing
+        {
+            Width = 36,
+            Height = 36,
+            IsActive = false,
+            IsIndeterminate = false,
+            Value = 30
+        });
+
         panel.Children.Add(row);
+        panel.Children.Add(ringRow);
         return panel;
     }
 

@@ -41,6 +41,10 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
             AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
             AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
+            AssertBasedOnStyle<FWSlider, Slider>(app.Resources);
+            AssertBasedOnStyle<FWRangeSlider, RangeSlider>(app.Resources);
+            AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
+            AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
             AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
@@ -133,6 +137,10 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<HyperlinkButton>(dictionary);
         AssertContainsStyle<ToggleButton>(dictionary);
         AssertContainsStyle<ToggleSwitch>(dictionary);
+        AssertContainsStyle<Slider>(dictionary);
+        AssertContainsStyle<RangeSlider>(dictionary);
+        AssertContainsStyle<ProgressBar>(dictionary);
+        AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
         AssertContainsStyle<FWToggleSplitButton>(dictionary);
@@ -145,6 +153,9 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ToggleCheckedBackground"));
         Assert.True(dictionary.Contains("ToggleUncheckedBackground"));
         Assert.True(dictionary.Contains("ToggleDisabledBackground"));
+        Assert.True(dictionary.Contains("SliderTrack"));
+        Assert.True(dictionary.Contains("SliderThumb"));
+        Assert.True(dictionary.Contains("ProgressRingForeground"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
@@ -194,6 +205,28 @@ public sealed class FluentThemeManagerTests
 
             AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
             AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void RangeBatch_ShouldExposeFwStylesForRangeControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWSlider, Slider>(app.Resources);
+            AssertBasedOnStyle<FWRangeSlider, RangeSlider>(app.Resources);
+            AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
+            AssertOwnedStyle<FWProgressRing>(app.Resources);
         }
         finally
         {
@@ -272,6 +305,85 @@ public sealed class FluentThemeManagerTests
         Assert.False(toggleSwitch.IsOn);
         Assert.Equal(2, toggled);
         Assert.Equal("Off", toggleSwitch.OffContent);
+    }
+    [Fact]
+    public void FluentRangeControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWSlider, Slider>();
+        AssertFluentControl<FWRangeSlider, RangeSlider>();
+        AssertFluentControl<FWProgressBar, ProgressBar>();
+        AssertFluentControl<FWProgressRing, RangeBase>();
+    }
+
+    [Fact]
+    public void FWRangeControls_ShouldCoerceValuesAndRaiseEvents()
+    {
+        var slider = new FWSlider
+        {
+            Minimum = 0,
+            Maximum = 10
+        };
+        var sliderChanged = 0;
+        slider.ValueChanged += (_, _) => sliderChanged++;
+
+        slider.Value = 15;
+
+        Assert.Equal(10, slider.Value);
+        Assert.Equal(1, sliderChanged);
+
+        var progressBar = new FWProgressBar
+        {
+            Minimum = 0,
+            Maximum = 100
+        };
+        var progressChanged = 0;
+        progressBar.ValueChanged += (_, _) => progressChanged++;
+
+        progressBar.Value = 250;
+
+        Assert.Equal(100, progressBar.Value);
+        Assert.Equal(1, progressChanged);
+
+        var rangeSlider = new FWRangeSlider
+        {
+            Minimum = 0,
+            Maximum = 100,
+            RangeStart = 20,
+            RangeEnd = 80,
+            MinimumRange = 10
+        };
+
+        rangeSlider.RangeStart = 95;
+        Assert.Equal(70, rangeSlider.RangeStart);
+
+        rangeSlider.RangeEnd = 50;
+        Assert.Equal(80, rangeSlider.RangeEnd);
+    }
+
+    [Fact]
+    public void FWProgressRing_ShouldUseRangeStateAndProgressProperties()
+    {
+        var ring = new FWProgressRing
+        {
+            Minimum = 0,
+            Maximum = 100,
+            StrokeThickness = 6,
+            IsIndeterminate = false
+        };
+        var changed = 0;
+        ring.ValueChanged += (_, _) => changed++;
+
+        ring.Value = 128;
+
+        Assert.Equal(100, ring.Value);
+        Assert.Equal(1, changed);
+        Assert.Equal(6, ring.StrokeThickness);
+
+        ring.IsActive = false;
+        ring.IsIndeterminate = true;
+
+        Assert.False(ring.IsActive);
+        Assert.True(ring.IsIndeterminate);
     }
     [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()

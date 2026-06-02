@@ -85,6 +85,7 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#28FFFFFF" />
             <SolidColorBrush x:Key="SliderTrack" Color="#2AFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
@@ -184,6 +185,7 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#37000000" />
             <SolidColorBrush x:Key="SliderTrack" Color="#15000000" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#09000000" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
@@ -251,6 +253,7 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="SliderTrack" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#FFFFFF00" />
