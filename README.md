@@ -31,6 +31,8 @@ The ninth FW batch covers text input controls: `FWTextBox`, `FWPasswordBox`, `FW
 
 The tenth FW batch covers menu and popup command controls: `FWMenuBar`, `FWMenuBarItem`, `FWMenu`, `FWMenuItem`, `FWContextMenu`, `FWMenuFlyoutItem`, `FWToggleMenuFlyoutItem`, and `FWMenuFlyoutSeparator`. `MenuFlyout`, `MenuFlyoutSubItem`, and `CommandBarFlyout` remain Jalium.UI sealed flyout types, so FluentJalium styles their item surface instead of pretending to inherit them.
 
+The eleventh FW batch covers disclosure, tooltip, dialog, and lightweight container controls: `FWExpander`, `FWToolTip`, `FWContentDialog`, and `FWGroupBox`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -69,6 +71,10 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWContextMenu />
 <fluent:FWMenuFlyoutItem Text="Open" />
 <fluent:FWToggleMenuFlyoutItem Text="Show details" IsChecked="True" />
+<fluent:FWExpander Header="Details" IsExpanded="True" />
+<fluent:FWToolTip Content="Helpful detail" />
+<fluent:FWContentDialog Title="Save changes?" PrimaryButtonText="Save" CloseButtonText="Cancel" />
+<fluent:FWGroupBox Header="Options" />
 <fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
 <fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
 <fluent:FWCalendar FirstDayOfWeek="Monday" />

@@ -140,6 +140,24 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF202020" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="GroupBoxBackground" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="ExpanderBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#3FFFFFFF" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#330078D4" />
+            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#99000000" />
+            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF2D2D37" />
             <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF243A28" />
             <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF3F351C" />
@@ -313,6 +331,24 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="GroupBoxBackground" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="ExpanderBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#44000000" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#330078D4" />
+            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#66000000" />
+            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#80F9F9F9" />
             <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#80F6F6F6" />
             <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FFDFF6DD" />
             <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FFFFF4CE" />
@@ -454,6 +490,24 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="GroupBoxBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ExpanderBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#CC000000" />
+            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF000000" />

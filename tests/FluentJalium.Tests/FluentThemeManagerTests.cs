@@ -70,6 +70,10 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
+            AssertBasedOnStyle<FWExpander, Expander>(app.Resources);
+            AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
+            AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
             AssertBasedOnStyle<FWMenuBar, MenuBar>(app.Resources);
             AssertBasedOnStyle<FWMenuBarItem, MenuBarItem>(app.Resources);
             AssertBasedOnStyle<FWMenu, Menu>(app.Resources);
@@ -215,6 +219,10 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TabControl>(dictionary);
         AssertContainsStyle<TabItem>(dictionary);
         AssertContainsStyle<Frame>(dictionary);
+        AssertContainsStyle<Expander>(dictionary);
+        AssertContainsStyle<ToolTip>(dictionary);
+        AssertContainsStyle<ContentDialog>(dictionary);
+        AssertContainsStyle<GroupBox>(dictionary);
         AssertContainsStyle<MenuBar>(dictionary);
         AssertContainsStyle<MenuBarItem>(dictionary);
         AssertContainsStyle<Menu>(dictionary);
@@ -271,6 +279,14 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("TabStripBackground"));
         Assert.True(dictionary.Contains("TabItemIndicator"));
         Assert.True(dictionary.Contains("FrameBackground"));
+        Assert.True(dictionary.Contains("ToolTipBackground"));
+        Assert.True(dictionary.Contains("ToolTipBorderBrush"));
+        Assert.True(dictionary.Contains("ExpanderHeaderBackground"));
+        Assert.True(dictionary.Contains("ExpanderHeaderBackgroundExpanded"));
+        Assert.True(dictionary.Contains("GroupBoxBorderBrush"));
+        Assert.True(dictionary.Contains("ContentDialogBackground"));
+        Assert.True(dictionary.Contains("ContentDialogOverlayBackground"));
+        Assert.True(dictionary.Contains("ContentDialogAccentButtonStyle"));
         Assert.True(dictionary.Contains("InfoBarForeground"));
         Assert.True(dictionary.Contains("InfoBarSuccessBackground"));
         Assert.True(dictionary.Contains("ToastForeground"));
@@ -483,6 +499,29 @@ public sealed class FluentThemeManagerTests
 
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void DisclosureDialogBatch_ShouldExposeFwStylesForDisclosureAndDialogControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWExpander, Expander>(app.Resources);
+            AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
+            AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void DateTimeBatch_ShouldExposeFwStylesForDateTimeControls()
     {
         ResetApplicationState();
@@ -604,6 +643,15 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWMenuFlyoutItem, MenuFlyoutItem>();
         AssertFluentControl<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>();
         AssertFluentControl<FWMenuFlyoutSeparator, MenuFlyoutSeparator>();
+    }
+
+    [Fact]
+    public void FluentDisclosureDialogControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWExpander, Expander>();
+        AssertFluentControl<FWToolTip, ToolTip>();
+        AssertFluentControl<FWContentDialog, ContentDialog>();
+        AssertFluentControl<FWGroupBox, GroupBox>();
     }
 
     [Fact]
@@ -1431,6 +1479,124 @@ public sealed class FluentThemeManagerTests
         InvokeMenuFlyoutItem(toggle);
 
         Assert.True(toggle.IsChecked);
+    }
+
+    [Fact]
+    public void FWExpander_ShouldRaiseExpandCollapseEventsAndKeepHeaderState()
+    {
+        var expander = new FWExpander
+        {
+            Header = "Advanced options",
+            Content = new TextBlock { Text = "Nested content" },
+            ExpandDirection = ExpandDirection.Down
+        };
+        var expanded = 0;
+        var collapsed = 0;
+        expander.Expanded += (_, _) => expanded++;
+        expander.Collapsed += (_, _) => collapsed++;
+
+        expander.IsExpanded = true;
+        expander.IsExpanded = false;
+
+        Assert.False(expander.IsExpanded);
+        Assert.Equal("Advanced options", expander.Header);
+        Assert.Equal(ExpandDirection.Down, expander.ExpandDirection);
+        Assert.Equal(1, expanded);
+        Assert.Equal(1, collapsed);
+    }
+
+    [Fact]
+    public void FWToolTip_ShouldRaiseOpenCloseEventsAndPreservePlacementState()
+    {
+        var owner = new FWButton { Content = "Target" };
+        var toolTip = new FWToolTip
+        {
+            Content = "Details",
+            PlacementTarget = owner,
+            Placement = PlacementMode.Bottom,
+            HorizontalOffset = 6,
+            VerticalOffset = 10,
+            InitialShowDelay = 150,
+            ShowDuration = int.MaxValue
+        };
+        var opened = 0;
+        var closed = 0;
+        toolTip.Opened += (_, _) => opened++;
+        toolTip.Closed += (_, _) => closed++;
+
+        toolTip.IsOpen = true;
+        toolTip.IsOpen = false;
+
+        Assert.False(toolTip.IsOpen);
+        Assert.Same(owner, toolTip.PlacementTarget);
+        Assert.Equal(PlacementMode.Bottom, toolTip.Placement);
+        Assert.Equal(6, toolTip.HorizontalOffset);
+        Assert.Equal(10, toolTip.VerticalOffset);
+        Assert.Equal(150, toolTip.InitialShowDelay);
+        Assert.Equal(int.MaxValue, toolTip.ShowDuration);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWGroupBox_ShouldTrackHeaderBackgroundAndContent()
+    {
+        var headerBackground = new SolidColorBrush(Color.FromRgb(0x22, 0x22, 0x22));
+        var content = new StackPanel();
+        var groupBox = new FWGroupBox
+        {
+            Header = "Settings",
+            HeaderBackground = headerBackground,
+            Content = content,
+            Padding = new Thickness(12)
+        };
+
+        Assert.Equal("Settings", groupBox.Header);
+        Assert.Same(headerBackground, groupBox.HeaderBackground);
+        Assert.Same(content, groupBox.Content);
+        Assert.Equal(12, groupBox.Padding.Left);
+    }
+
+    [Fact]
+    public void FWContentDialog_ShouldExposeButtonConfigurationAndCommands()
+    {
+        var primaryCommand = new RecordingCommand();
+        var secondaryCommand = new RecordingCommand();
+        var closeCommand = new RecordingCommand();
+        var dialog = new FWContentDialog
+        {
+            Title = "Replace file?",
+            Content = "A file with this name already exists.",
+            PrimaryButtonText = "Replace",
+            SecondaryButtonText = "Keep both",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            IsPrimaryButtonEnabled = false,
+            IsSecondaryButtonEnabled = true,
+            PrimaryButtonCommand = primaryCommand,
+            PrimaryButtonCommandParameter = "replace",
+            SecondaryButtonCommand = secondaryCommand,
+            SecondaryButtonCommandParameter = "keep",
+            CloseButtonCommand = closeCommand,
+            CloseButtonCommandParameter = "cancel",
+            FullSizeDesired = true
+        };
+
+        Assert.Equal("Replace file?", dialog.Title);
+        Assert.Equal("A file with this name already exists.", dialog.Content);
+        Assert.Equal("Replace", dialog.PrimaryButtonText);
+        Assert.Equal("Keep both", dialog.SecondaryButtonText);
+        Assert.Equal("Cancel", dialog.CloseButtonText);
+        Assert.Equal(ContentDialogButton.Primary, dialog.DefaultButton);
+        Assert.False(dialog.IsPrimaryButtonEnabled);
+        Assert.True(dialog.IsSecondaryButtonEnabled);
+        Assert.Same(primaryCommand, dialog.PrimaryButtonCommand);
+        Assert.Equal("replace", dialog.PrimaryButtonCommandParameter);
+        Assert.Same(secondaryCommand, dialog.SecondaryButtonCommand);
+        Assert.Equal("keep", dialog.SecondaryButtonCommandParameter);
+        Assert.Same(closeCommand, dialog.CloseButtonCommand);
+        Assert.Equal("cancel", dialog.CloseButtonCommandParameter);
+        Assert.True(dialog.FullSizeDesired);
     }
 
     [Fact]

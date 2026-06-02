@@ -13,10 +13,13 @@ using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWCalendar = FluentJalium.Controls.FWCalendar;
+using FWContentDialog = FluentJalium.Controls.FWContentDialog;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
+using FWExpander = FluentJalium.Controls.FWExpander;
 using FWFrame = FluentJalium.Controls.FWFrame;
+using FWGroupBox = FluentJalium.Controls.FWGroupBox;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
 using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
@@ -52,6 +55,7 @@ using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWTimePicker = FluentJalium.Controls.FWTimePicker;
 using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
 using FWToastNotificationItem = FluentJalium.Controls.FWToastNotificationItem;
+using FWToolTip = FluentJalium.Controls.FWToolTip;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
@@ -101,6 +105,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateMenusSection());
+        page.Children.Add(CreateDisclosureDialogsSection());
         page.Children.Add(CreateDateTimeSection());
         page.Children.Add(CreateStatusSection());
         page.Children.Add(CreateRangeSection());
@@ -127,7 +132,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, collection, navigation, date/time, notification, and status controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -642,6 +647,107 @@ public sealed class MainWindow : Window
         return panel;
     }
 
+    private UIElement CreateDisclosureDialogsSection()
+    {
+        var panel = CreateSection("Disclosure and Dialogs");
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 16
+        };
+
+        var expanderColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 330
+        };
+        expanderColumn.Children.Add(new FWExpander
+        {
+            Header = "FWExpander",
+            IsExpanded = true,
+            Content = new TextBlock
+            {
+                Text = "Expanded content keeps a subtle Fluent surface and accent chevron state.",
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = ThemeBrush("TextPrimary")
+            }
+        });
+        expanderColumn.Children.Add(new FWExpander
+        {
+            Header = "Disabled",
+            IsExpanded = false,
+            IsEnabled = false,
+            Content = new TextBlock
+            {
+                Text = "Disabled expander",
+                Foreground = ThemeBrush("TextSecondary")
+            }
+        });
+        row.Children.Add(expanderColumn);
+
+        var groupBox = new FWGroupBox
+        {
+            Header = "FWGroupBox",
+            Width = 300,
+            Content = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    new FWCheckBox { Content = "Group option", IsChecked = true },
+                    new FWTextBox { Text = "Grouped text", Width = 240 },
+                    new FWButton { Content = "Apply" }
+                }
+            }
+        };
+        row.Children.Add(groupBox);
+
+        var actionColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Width = 270
+        };
+        var tipButton = new FWButton
+        {
+            Content = "Hover for FWToolTip",
+            Width = 190,
+            ToolTip = new FWToolTip
+            {
+                Content = new TextBlock
+                {
+                    Text = "FWToolTip follows Fluent popup resources.",
+                    Foreground = ThemeBrush("ToolTipForeground")
+                },
+                Placement = PlacementMode.Top,
+                InitialShowDelay = 200
+            }
+        };
+        var dialogResult = new TextBlock
+        {
+            Text = "Dialog result: not shown",
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+        var dialogButton = new FWButton
+        {
+            Content = "Show FWContentDialog",
+            Width = 190
+        };
+        dialogButton.Click += async (_, _) => await ShowDisclosureDialogAsync(dialogResult);
+
+        actionColumn.Children.Add(tipButton);
+        actionColumn.Children.Add(dialogButton);
+        actionColumn.Children.Add(dialogResult);
+        row.Children.Add(actionColumn);
+
+        panel.Children.Add(row);
+        return panel;
+    }
+
     private UIElement CreateDateTimeSection()
     {
         var panel = CreateSection("Date and Time");
@@ -935,6 +1041,28 @@ public sealed class MainWindow : Window
             IsClosable = false,
             Width = 460
         };
+    }
+
+    private static async Task ShowDisclosureDialogAsync(TextBlock resultText)
+    {
+        var dialog = new FWContentDialog
+        {
+            Title = "Save gallery changes?",
+            PrimaryButtonText = "Save",
+            SecondaryButtonText = "Review",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = new TextBlock
+            {
+                Text = "FWContentDialog uses the Fluent dialog card, overlay, title, and command button resources.",
+                Foreground = ThemeBrush("TextPrimary"),
+                TextWrapping = TextWrapping.Wrap,
+                Width = 340
+            }
+        };
+
+        var result = await dialog.ShowAsync();
+        resultText.Text = $"Dialog result: {result}";
     }
 
     private StackPanel CreateSection(string title)

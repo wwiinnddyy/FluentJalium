@@ -220,6 +220,10 @@ public static class FluentThemeManager
         AliasStyle<FWTabControl, TabControl>(dictionary);
         AliasStyle<FWTabItem, TabItem>(dictionary);
         AliasStyle<FWFrame, Frame>(dictionary);
+        AliasStyle<FWExpander, Expander>(dictionary);
+        AliasStyle<FWToolTip, ToolTip>(dictionary);
+        AliasStyle<FWContentDialog, ContentDialog>(dictionary);
+        AliasStyle<FWGroupBox, GroupBox>(dictionary);
         AliasStyle<FWMenuBar, MenuBar>(dictionary);
         AliasStyle<FWMenuBarItem, MenuBarItem>(dictionary);
         AliasStyle<FWMenu, Menu>(dictionary);
