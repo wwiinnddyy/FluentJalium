@@ -23,6 +23,8 @@ The fifth FW batch covers collection and table controls: `FWListBox`, `FWListBox
 
 The sixth FW batch covers navigation controls: `FWNavigationView`, `FWNavigationViewItem`, `FWNavigationViewItemHeader`, `FWNavigationViewItemSeparator`, `FWTabControl`, `FWTabItem`, and `FWFrame`.
 
+The seventh FW batch covers date and time controls: `FWDatePicker`, `FWTimePicker`, and `FWCalendar`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -51,6 +53,9 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWNavigationView PaneTitle="FluentJalium" />
 <fluent:FWTabControl SelectedIndex="0" />
 <fluent:FWFrame />
+<fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
+<fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
+<fluent:FWCalendar FirstDayOfWeek="Monday" />
 ```
 
 ## Build

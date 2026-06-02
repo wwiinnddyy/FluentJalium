@@ -215,6 +215,9 @@ public static class FluentThemeManager
         AliasStyle<FWTabControl, TabControl>(dictionary);
         AliasStyle<FWTabItem, TabItem>(dictionary);
         AliasStyle<FWFrame, Frame>(dictionary);
+        AliasStyle<FWDatePicker, DatePicker>(dictionary);
+        AliasStyle<FWTimePicker, TimePicker>(dictionary);
+        AliasStyle<FWCalendar, Calendar>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);

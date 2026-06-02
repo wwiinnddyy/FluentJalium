@@ -64,6 +64,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
+            AssertBasedOnStyle<FWDatePicker, DatePicker>(app.Resources);
+            AssertBasedOnStyle<FWTimePicker, TimePicker>(app.Resources);
+            AssertBasedOnStyle<FWCalendar, Calendar>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
@@ -187,6 +190,13 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TabControl>(dictionary);
         AssertContainsStyle<TabItem>(dictionary);
         AssertContainsStyle<Frame>(dictionary);
+        AssertContainsStyle<DatePicker>(dictionary);
+        AssertContainsStyle<TimePicker>(dictionary);
+        AssertContainsStyle<Calendar>(dictionary);
+        AssertContainsStyle<CalendarButton>(dictionary);
+        AssertContainsStyle<CalendarDayButton>(dictionary);
+        AssertContainsStyle<CalendarItem>(dictionary);
+        AssertContainsStyle<DatePickerTextBox>(dictionary);
         AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
@@ -366,6 +376,28 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void DateTimeBatch_ShouldExposeFwStylesForDateTimeControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWDatePicker, DatePicker>(app.Resources);
+            AssertBasedOnStyle<FWTimePicker, TimePicker>(app.Resources);
+            AssertBasedOnStyle<FWCalendar, Calendar>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
         AssertFluentControl<FWButton, Button>();
@@ -418,6 +450,14 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTabControl, TabControl>();
         AssertFluentControl<FWTabItem, TabItem>();
         AssertFluentControl<FWFrame, Frame>();
+    }
+
+    [Fact]
+    public void FluentDateTimeControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWDatePicker, DatePicker>();
+        AssertFluentControl<FWTimePicker, TimePicker>();
+        AssertFluentControl<FWCalendar, Calendar>();
     }
 
     [Fact]
@@ -952,6 +992,122 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    public void FWDatePicker_ShouldRaiseSelectionAndCalendarOpenCloseEvents()
+    {
+        var picker = new FWDatePicker
+        {
+            Header = "Date",
+            PlaceholderText = "Select a date",
+            DisplayDate = new DateTime(2026, 6, 1),
+            DisplayDateStart = new DateTime(2026, 1, 1),
+            DisplayDateEnd = new DateTime(2026, 12, 31),
+            SelectedDateFormat = DatePickerFormat.Long
+        };
+        var selectedChanged = 0;
+        var opened = 0;
+        var closed = 0;
+        SelectionChangedEventArgs? lastSelectionArgs = null;
+
+        picker.SelectedDateChanged += (_, args) =>
+        {
+            selectedChanged++;
+            lastSelectionArgs = args;
+        };
+        picker.CalendarOpened += (_, _) => opened++;
+        picker.CalendarClosed += (_, _) => closed++;
+
+        picker.SelectedDate = new DateTime(2026, 6, 3);
+        picker.IsDropDownOpen = true;
+        picker.IsDropDownOpen = false;
+
+        Assert.Equal(new DateTime(2026, 6, 3), picker.SelectedDate);
+        Assert.Equal(DatePickerFormat.Long, picker.SelectedDateFormat);
+        Assert.Equal(1, selectedChanged);
+        Assert.NotNull(lastSelectionArgs);
+        Assert.Contains(new DateTime(2026, 6, 3), lastSelectionArgs!.AddedItems);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWTimePicker_ShouldRaiseSelectedTimeChangedAndHonorClockIdentifier()
+    {
+        var picker = new FWTimePicker
+        {
+            Header = "Time",
+            ClockIdentifier = "24HourClock",
+            MinuteIncrement = 15,
+            PlaceholderText = "Select a time"
+        };
+        var changed = 0;
+        TimePickerSelectedValueChangedEventArgs? lastArgs = null;
+        picker.SelectedTimeChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+
+        picker.SelectedTime = new TimeSpan(18, 45, 0);
+
+        Assert.Equal("24HourClock", picker.ClockIdentifier);
+        Assert.Equal(15, picker.MinuteIncrement);
+        Assert.Equal(new TimeSpan(18, 45, 0), picker.SelectedTime);
+        Assert.Equal(1, changed);
+        Assert.NotNull(lastArgs);
+        Assert.Null(lastArgs!.OldTime);
+        Assert.Equal(new TimeSpan(18, 45, 0), lastArgs.NewTime);
+    }
+
+    [Fact]
+    public void FWCalendar_ShouldTrackSelectionDisplayDateAndSelectableBounds()
+    {
+        var calendar = new FWCalendar
+        {
+            DisplayDate = new DateTime(2026, 6, 1),
+            DisplayDateStart = new DateTime(2026, 6, 1),
+            DisplayDateEnd = new DateTime(2026, 6, 30),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        var selectedChanged = 0;
+        var displayChanged = 0;
+        SelectionChangedEventArgs? lastSelectionArgs = null;
+        CalendarDateChangedEventArgs? lastDisplayArgs = null;
+        calendar.SelectedDateChanged += (_, args) =>
+        {
+            selectedChanged++;
+            lastSelectionArgs = args;
+        };
+        calendar.DisplayDateChanged += (_, args) =>
+        {
+            displayChanged++;
+            lastDisplayArgs = args;
+        };
+
+        calendar.BlackoutDates.Add(new DateTime(2026, 6, 10));
+
+        InvokeCalendarSelectDate(calendar, new DateTime(2026, 6, 8));
+        InvokeCalendarSelectDate(calendar, new DateTime(2026, 6, 10));
+        InvokeCalendarSelectDate(calendar, new DateTime(2026, 7, 1));
+        calendar.DisplayDate = new DateTime(2026, 7, 1);
+
+        Assert.Equal(new DateTime(2026, 6, 8), calendar.SelectedDate);
+        Assert.Single(calendar.SelectedDates);
+        Assert.Equal(new DateTime(2026, 6, 8), calendar.SelectedDates[0]);
+        Assert.Contains(new DateTime(2026, 6, 10), calendar.BlackoutDates);
+        Assert.Equal(CalendarSelectionMode.SingleDate, calendar.SelectionMode);
+        Assert.Equal(DayOfWeek.Monday, calendar.FirstDayOfWeek);
+        Assert.Equal(1, selectedChanged);
+        Assert.NotNull(lastSelectionArgs);
+        Assert.Contains(new DateTime(2026, 6, 8), lastSelectionArgs!.AddedItems);
+        Assert.Equal(1, displayChanged);
+        Assert.NotNull(lastDisplayArgs);
+        Assert.Equal(new DateTime(2026, 6, 1), lastDisplayArgs!.RemovedDate);
+        Assert.Equal(new DateTime(2026, 7, 1), lastDisplayArgs.AddedDate);
+    }
+
+    [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
     {
         var oldFlyout = new MenuFlyout();
@@ -1095,6 +1251,13 @@ public sealed class FluentThemeManagerTests
         typeof(SplitButton)
             .GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!
             .Invoke(button, [new SplitButtonClickEventArgs()]);
+    }
+
+    private static void InvokeCalendarSelectDate(Calendar calendar, DateTime date)
+    {
+        typeof(Calendar)
+            .GetMethod("SelectDate", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(calendar, [date]);
     }
 
     private static Color GetBrushColor(object? value)

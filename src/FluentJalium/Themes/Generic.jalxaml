@@ -30,6 +30,7 @@
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/SelectionControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/CollectionControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/NavigationControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DateTimeControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/AdvancedControls.jalxaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

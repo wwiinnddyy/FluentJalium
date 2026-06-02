@@ -11,7 +11,9 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
+using FWCalendar = FluentJalium.Controls.FWCalendar;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
+using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWFrame = FluentJalium.Controls.FWFrame;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
@@ -30,6 +32,7 @@ using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
 using FWTabItem = FluentJalium.Controls.FWTabItem;
+using FWTimePicker = FluentJalium.Controls.FWTimePicker;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
@@ -77,6 +80,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
+        page.Children.Add(CreateDateTimeSection());
         page.Children.Add(CreateRangeSection());
         page.Children.Add(CreateStateMatrix());
 
@@ -101,7 +105,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, and navigation controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, navigation, and date/time controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -512,6 +516,63 @@ public sealed class MainWindow : Window
         row.Children.Add(comboBox);
 
         panel.Children.Add(row);
+        return panel;
+    }
+
+    private UIElement CreateDateTimeSection()
+    {
+        var panel = CreateSection("Date and Time");
+
+        var pickerRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 14
+        };
+
+        pickerRow.Children.Add(new FWDatePicker
+        {
+            Header = "Date",
+            Width = 220,
+            SelectedDate = DateTime.Today,
+            SelectedDateFormat = DatePickerFormat.Long
+        });
+        pickerRow.Children.Add(new FWDatePicker
+        {
+            Header = "Disabled date",
+            Width = 220,
+            PlaceholderText = "Select a date",
+            IsEnabled = false
+        });
+        pickerRow.Children.Add(new FWTimePicker
+        {
+            Header = "Time",
+            Width = 180,
+            SelectedTime = new TimeSpan(10, 30, 0),
+            MinuteIncrement = 15
+        });
+        pickerRow.Children.Add(new FWTimePicker
+        {
+            Header = "24 hour",
+            Width = 180,
+            ClockIdentifier = "24HourClock",
+            SelectedTime = new TimeSpan(18, 45, 0),
+            MinuteIncrement = 15
+        });
+
+        var calendar = new FWCalendar
+        {
+            DisplayDate = DateTime.Today,
+            DisplayDateStart = DateTime.Today.AddDays(-14),
+            DisplayDateEnd = DateTime.Today.AddDays(45),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectedDate = DateTime.Today.AddDays(1),
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        calendar.BlackoutDates.Add(DateTime.Today.AddDays(2).Date);
+
+        panel.Children.Add(pickerRow);
+        panel.Children.Add(calendar);
         return panel;
     }
 
