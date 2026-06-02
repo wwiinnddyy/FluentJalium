@@ -19,11 +19,14 @@ using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWExpander = FluentJalium.Controls.FWExpander;
 using FWFrame = FluentJalium.Controls.FWFrame;
+using FWFontIcon = FluentJalium.Controls.FWFontIcon;
 using FWGroupBox = FluentJalium.Controls.FWGroupBox;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
+using FWImage = FluentJalium.Controls.FWImage;
 using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
 using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
+using FWLabel = FluentJalium.Controls.FWLabel;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListView = FluentJalium.Controls.FWListView;
 using FWContextMenu = FluentJalium.Controls.FWContextMenu;
@@ -42,12 +45,15 @@ using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
+using FWPathIcon = FluentJalium.Controls.FWPathIcon;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
+using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
+using FWSymbolIcon = FluentJalium.Controls.FWSymbolIcon;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
 using FWTabItem = FluentJalium.Controls.FWTabItem;
@@ -63,6 +69,7 @@ using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleMenuFlyoutItem = FluentJalium.Controls.FWToggleMenuFlyoutItem;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
+using FWViewbox = FluentJalium.Controls.FWViewbox;
 using GridViewColumn = Jalium.UI.Controls.GridViewColumn;
 
 namespace FluentJalium.Gallery;
@@ -102,6 +109,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateSwitchesSection());
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
+        page.Children.Add(CreateVisualsSection());
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateMenusSection());
@@ -132,7 +140,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, visual, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -578,6 +586,132 @@ public sealed class MainWindow : Window
         comboBox.Items.Add(new FWComboBoxItem { Content = "Gallery sample" });
         comboBox.SelectedIndex = 1;
         row.Children.Add(comboBox);
+
+        panel.Children.Add(row);
+        return panel;
+    }
+
+    private UIElement CreateVisualsSection()
+    {
+        var panel = CreateSection("Visuals and Icons");
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 16
+        };
+
+        var iconColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 260
+        };
+        iconColumn.Children.Add(new FWLabel { Content = "IconElement variants" });
+        iconColumn.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 18,
+            Children =
+            {
+                new FWSymbolIcon
+                {
+                    Symbol = Symbol.Save,
+                    Width = 24,
+                    Height = 24
+                },
+                new FWFontIcon
+                {
+                    Glyph = "\uE72D",
+                    FontFamily = "Segoe Fluent Icons",
+                    FontSize = 24
+                },
+                new FWPathIcon
+                {
+                    Data = Geometry.Parse("M 0,10 L 8,0 L 16,10 L 12,10 L 12,18 L 4,18 L 4,10 Z"),
+                    Width = 24,
+                    Height = 24
+                }
+            }
+        });
+        iconColumn.Children.Add(new FWSeparator());
+        iconColumn.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children =
+            {
+                new FWLabel { Content = "Target label", Width = 96 },
+                new FWTextBox { Text = "FWLabel", Width = 140 }
+            }
+        });
+        row.Children.Add(iconColumn);
+
+        var imageColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 260
+        };
+        imageColumn.Children.Add(new FWLabel { Content = "FWImage stretch" });
+        imageColumn.Children.Add(new FWImage
+        {
+            Width = 220,
+            Height = 120,
+            Source = CreateSampleBitmap(),
+            Stretch = Stretch.UniformToFill,
+            IsZoomEnabled = true
+        });
+        imageColumn.Children.Add(new TextBlock
+        {
+            Text = "UniformToFill with Fluent border and clipping.",
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        });
+        row.Children.Add(imageColumn);
+
+        var viewboxColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 260
+        };
+        viewboxColumn.Children.Add(new FWLabel { Content = "FWViewbox" });
+        viewboxColumn.Children.Add(new FWViewbox
+        {
+            Width = 220,
+            Height = 120,
+            Stretch = Stretch.Uniform,
+            Child = new Border
+            {
+                Width = 140,
+                Height = 70,
+                Background = ThemeBrush("SelectionBackgroundWeak"),
+                BorderBrush = ThemeBrush("AccentBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(12),
+                Child = new TextBlock
+                {
+                    Text = "Scaled Fluent surface",
+                    Foreground = ThemeBrush("TextPrimary"),
+                    TextWrapping = TextWrapping.Wrap,
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
+        });
+        viewboxColumn.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children =
+            {
+                new TextBlock { Text = "Left", Foreground = ThemeBrush("TextSecondary") },
+                new FWSeparator { Orientation = Orientation.Vertical, Height = 18 },
+                new TextBlock { Text = "Right", Foreground = ThemeBrush("TextSecondary") }
+            }
+        });
+        row.Children.Add(viewboxColumn);
 
         panel.Children.Add(row);
         return panel;
@@ -1208,6 +1342,27 @@ public sealed class MainWindow : Window
                 ]),
             new GalleryTreeRow("Gallery", "Visible", [])
         ];
+    }
+
+    private static BitmapImage CreateSampleBitmap()
+    {
+        const int width = 96;
+        const int height = 64;
+        var pixels = new byte[width * height * 4];
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var index = ((y * width) + x) * 4;
+                pixels[index] = (byte)(0x72 + (x * 0x30 / width));
+                pixels[index + 1] = (byte)(0x45 + (y * 0x70 / height));
+                pixels[index + 2] = (byte)(0xD4 - (x * 0x60 / width));
+                pixels[index + 3] = 0xFF;
+            }
+        }
+
+        return BitmapImage.FromPixels(pixels, width, height);
     }
 
     private void ApplyTheme(FluentThemeVariant theme)

@@ -100,6 +100,15 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
+            <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="LabelBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="LabelForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
@@ -291,6 +300,15 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#09000000" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
+            <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="IconForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#9E000000" />
+            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="LabelBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="LabelForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15000000" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
@@ -450,6 +468,15 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="LabelBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="LabelForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="LabelBorderBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuBarBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuBarItemBackground" Color="#FF000000" />

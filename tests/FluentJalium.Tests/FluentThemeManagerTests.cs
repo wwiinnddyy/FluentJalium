@@ -74,6 +74,13 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
+            AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
+            AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
+            AssertBasedOnStyle<FWPathIcon, PathIcon>(app.Resources);
+            AssertBasedOnStyle<FWViewbox, Viewbox>(app.Resources);
+            AssertBasedOnStyle<FWLabel, Label>(app.Resources);
+            AssertBasedOnStyle<FWSeparator, Separator>(app.Resources);
             AssertBasedOnStyle<FWMenuBar, MenuBar>(app.Resources);
             AssertBasedOnStyle<FWMenuBarItem, MenuBarItem>(app.Resources);
             AssertBasedOnStyle<FWMenu, Menu>(app.Resources);
@@ -223,6 +230,13 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<ToolTip>(dictionary);
         AssertContainsStyle<ContentDialog>(dictionary);
         AssertContainsStyle<GroupBox>(dictionary);
+        AssertContainsStyle<Image>(dictionary);
+        AssertContainsStyle<FontIcon>(dictionary);
+        AssertContainsStyle<SymbolIcon>(dictionary);
+        AssertContainsStyle<PathIcon>(dictionary);
+        AssertContainsStyle<Viewbox>(dictionary);
+        AssertContainsStyle<Label>(dictionary);
+        AssertContainsStyle<Separator>(dictionary);
         AssertContainsStyle<MenuBar>(dictionary);
         AssertContainsStyle<MenuBarItem>(dictionary);
         AssertContainsStyle<Menu>(dictionary);
@@ -287,6 +301,12 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ContentDialogBackground"));
         Assert.True(dictionary.Contains("ContentDialogOverlayBackground"));
         Assert.True(dictionary.Contains("ContentDialogAccentButtonStyle"));
+        Assert.True(dictionary.Contains("ImageBackground"));
+        Assert.True(dictionary.Contains("ImageBorderBrush"));
+        Assert.True(dictionary.Contains("IconForeground"));
+        Assert.True(dictionary.Contains("IconForegroundDisabled"));
+        Assert.True(dictionary.Contains("LabelForeground"));
+        Assert.True(dictionary.Contains("SeparatorStrokeBrush"));
         Assert.True(dictionary.Contains("InfoBarForeground"));
         Assert.True(dictionary.Contains("InfoBarSuccessBackground"));
         Assert.True(dictionary.Contains("ToastForeground"));
@@ -410,6 +430,32 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void VisualBatch_ShouldExposeFwStylesForVisualAndIconControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
+            AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
+            AssertBasedOnStyle<FWPathIcon, PathIcon>(app.Resources);
+            AssertBasedOnStyle<FWViewbox, Viewbox>(app.Resources);
+            AssertBasedOnStyle<FWLabel, Label>(app.Resources);
+            AssertBasedOnStyle<FWSeparator, Separator>(app.Resources);
         }
         finally
         {
@@ -605,6 +651,18 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWRadioButton, RadioButton>();
         AssertFluentControl<FWComboBox, ComboBox>();
         AssertFluentControl<FWComboBoxItem, ComboBoxItem>();
+    }
+
+    [Fact]
+    public void FluentVisualControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWImage, Image>();
+        AssertFluentControl<FWFontIcon, FontIcon>();
+        AssertFluentControl<FWSymbolIcon, SymbolIcon>();
+        AssertFluentControl<FWPathIcon, PathIcon>();
+        AssertFluentControl<FWViewbox, Viewbox>();
+        AssertFluentControl<FWLabel, Label>();
+        AssertFluentControl<FWSeparator, Separator>();
     }
 
     [Fact]
@@ -988,6 +1046,120 @@ public sealed class FluentThemeManagerTests
 
         Assert.True(item.IsSelected);
         Assert.Equal("Option", item.Content);
+    }
+
+    [Fact]
+    public void FWImage_ShouldTrackSourceStretchAndZoomSettings()
+    {
+        var source = BitmapImage.FromPixels(CreateSamplePixels(12, 8), 12, 8);
+        var image = new FWImage
+        {
+            Source = source,
+            Stretch = Stretch.UniformToFill,
+            StretchDirection = StretchDirection.DownOnly,
+            IsZoomEnabled = true,
+            MinZoom = 0.5,
+            MaxZoom = 4.0
+        };
+
+        image.ApplyTemplate();
+
+        Assert.Same(source, image.Source);
+        Assert.Equal(Stretch.UniformToFill, image.Stretch);
+        Assert.Equal(StretchDirection.DownOnly, image.StretchDirection);
+        Assert.True(image.IsZoomEnabled);
+        Assert.Equal(0.5, image.MinZoom);
+        Assert.Equal(4.0, image.MaxZoom);
+        Assert.Equal(1.0, image.CurrentZoom);
+    }
+
+    [Fact]
+    public void FWIconControls_ShouldExposeGlyphSymbolAndPathData()
+    {
+        var fontIcon = new FWFontIcon
+        {
+            Glyph = "\uE72D",
+            FontFamily = "Segoe Fluent Icons",
+            FontSize = 24
+        };
+        var symbolIcon = new FWSymbolIcon(Symbol.Save);
+        var geometry = Geometry.Parse("M 0,0 L 20,0 L 20,20 L 0,20 Z");
+        var pathIcon = new FWPathIcon
+        {
+            Data = geometry,
+            Width = 24,
+            Height = 24
+        };
+
+        Assert.Equal("\uE72D", fontIcon.Glyph);
+        Assert.Equal("Segoe Fluent Icons", fontIcon.FontFamily?.ToString());
+        Assert.Equal(24, fontIcon.FontSize);
+        Assert.Equal(Symbol.Save, symbolIcon.Symbol);
+        Assert.Same(geometry, pathIcon.Data);
+        Assert.Equal(24, pathIcon.Width);
+        Assert.Equal(24, pathIcon.Height);
+    }
+
+    [Fact]
+    public void FWViewbox_ShouldHostChildAndHonorStretchSettings()
+    {
+        var child = new TextBlock
+        {
+            Text = "Scaled"
+        };
+        var viewbox = new FWViewbox
+        {
+            Child = child,
+            Stretch = Stretch.Uniform,
+            StretchDirection = StretchDirection.Both,
+            Width = 120,
+            Height = 60
+        };
+
+        viewbox.Measure(new Size(120, 60));
+        viewbox.Arrange(new Rect(0, 0, 120, 60));
+
+        Assert.Same(child, viewbox.Child);
+        Assert.Equal(Stretch.Uniform, viewbox.Stretch);
+        Assert.Equal(StretchDirection.Both, viewbox.StretchDirection);
+        Assert.Equal(1, viewbox.VisualChildrenCount);
+    }
+
+    [Fact]
+    public void FWLabel_ShouldKeepTargetAccessKeyAndSelectionState()
+    {
+        var target = new FWTextBox();
+        var label = new FWLabel
+        {
+            Content = "Name",
+            Target = target,
+            AccessKey = 'N',
+            IsTextSelectionEnabled = true
+        };
+
+        Assert.Equal("Name", label.Content);
+        Assert.Same(target, label.Target);
+        Assert.Equal('N', label.AccessKey);
+        Assert.True(label.IsTextSelectionEnabled);
+        Assert.Equal(string.Empty, label.SelectedText);
+    }
+
+    [Fact]
+    public void FWSeparator_ShouldTrackOrientationStrokeAndThickness()
+    {
+        var stroke = new SolidColorBrush(Color.FromRgb(0xAA, 0xAA, 0xAA));
+        var separator = new FWSeparator
+        {
+            Orientation = Orientation.Vertical,
+            StrokeBrush = stroke,
+            StrokeThickness = 2
+        };
+
+        Assert.Equal(Orientation.Vertical, separator.Orientation);
+        Assert.Same(stroke, separator.StrokeBrush);
+        Assert.Equal(2, separator.StrokeThickness);
+        Assert.False(separator.Focusable);
+        Assert.False(separator.IsHitTestVisible);
     }
 
     [Fact]
@@ -1998,6 +2170,24 @@ public sealed class FluentThemeManagerTests
     private static Color GetBrushColor(object? value)
     {
         return Assert.IsType<SolidColorBrush>(value).Color;
+    }
+
+    private static byte[] CreateSamplePixels(int width, int height)
+    {
+        var pixels = new byte[width * height * 4];
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var index = ((y * width) + x) * 4;
+                pixels[index] = (byte)(0x40 + x);
+                pixels[index + 1] = (byte)(0x80 + y);
+                pixels[index + 2] = 0xC0;
+                pixels[index + 3] = 0xFF;
+            }
+        }
+
+        return pixels;
     }
 
     private sealed record CollectionRow(string Name, string State, int Count);

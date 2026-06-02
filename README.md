@@ -33,6 +33,8 @@ The tenth FW batch covers menu and popup command controls: `FWMenuBar`, `FWMenuB
 
 The eleventh FW batch covers disclosure, tooltip, dialog, and lightweight container controls: `FWExpander`, `FWToolTip`, `FWContentDialog`, and `FWGroupBox`.
 
+The twelfth FW batch covers visual and icon foundation controls: `FWImage`, `FWFontIcon`, `FWSymbolIcon`, `FWPathIcon`, `FWViewbox`, `FWLabel`, and `FWSeparator`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -75,6 +77,13 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWToolTip Content="Helpful detail" />
 <fluent:FWContentDialog Title="Save changes?" PrimaryButtonText="Save" CloseButtonText="Cancel" />
 <fluent:FWGroupBox Header="Options" />
+<fluent:FWImage Stretch="UniformToFill" />
+<fluent:FWFontIcon Glyph="&#xE72D;" />
+<fluent:FWSymbolIcon Symbol="Save" />
+<fluent:FWPathIcon />
+<fluent:FWViewbox Stretch="Uniform" />
+<fluent:FWLabel Content="Name" />
+<fluent:FWSeparator />
 <fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
 <fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
 <fluent:FWCalendar FirstDayOfWeek="Monday" />
