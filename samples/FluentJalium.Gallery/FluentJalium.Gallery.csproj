@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>FluentJalium.Gallery</RootNamespace>
+    <AssemblyName>FluentJalium.Gallery</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
+    <ProjectReference Include="$(JaliumSourceRoot)src\packaging\Jalium.UI.Desktop\Jalium.UI.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseJaliumSourceReferences)' != 'true'">
+    <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
+  </ItemGroup>
+
+</Project>

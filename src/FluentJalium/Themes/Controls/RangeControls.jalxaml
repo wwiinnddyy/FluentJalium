@@ -1,0 +1,77 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="ProgressBar">
+        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
+        <Setter Property="Foreground" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="ProgressBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="MinHeight" Value="4" />
+        <Setter Property="Height" Value="4" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ProgressBar">
+                <Grid>
+                    <Border Name="PART_Track"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}" />
+                    <Border Name="PART_Indicator"
+                            Background="{TemplateBinding ProgressBrush}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            HorizontalAlignment="Left" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="ProgressBrush" Value="{ThemeResource AccentBrushDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Slider">
+        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
+        <Setter Property="Foreground" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="TrackBrush" Value="{ThemeResource SliderTrack}" />
+        <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Slider">
+                <Grid>
+                    <Border Name="PART_Track"
+                            Background="{TemplateBinding Background}"
+                            Height="4"
+                            CornerRadius="2"
+                            VerticalAlignment="Center"
+                            Margin="8,0,8,0" />
+                    <Border Name="PART_SelectionRange"
+                            Background="{TemplateBinding Foreground}"
+                            Height="4"
+                            CornerRadius="2"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Margin="8,0,8,0" />
+                    <Border Name="PART_Thumb"
+                            Width="18"
+                            Height="18"
+                            CornerRadius="9"
+                            Background="{TemplateBinding ThumbBrush}"
+                            BorderBrush="{ThemeResource SurfaceBackground}"
+                            BorderThickness="2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrushDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
+

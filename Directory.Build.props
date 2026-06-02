@@ -1,0 +1,35 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework Condition="'$(JaliumPlatform)' == ''">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(JaliumPlatform)' == 'windows'">net10.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <UseJaliumSourceReferences Condition="'$(UseJaliumSourceReferences)' == ''">true</UseJaliumSourceReferences>
+    <JaliumSourceRoot Condition="'$(JaliumSourceRoot)' == ''">$(MSBuildThisFileDirectory)..\Jalium.UI\</JaliumSourceRoot>
+    <JaliumPackageVersion Condition="'$(JaliumPackageVersion)' == ''">26.10.4</JaliumPackageVersion>
+    <Version>0.1.0-preview.1</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Authors>Jal</Authors>
+    <Company>Jal</Company>
+    <Product>FluentJalium</Product>
+    <PackageProjectUrl>https://github.com/jalium/fluent-jalium</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jalium/fluent-jalium</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>jalium;fluent;ui;xaml;dotnet</PackageTags>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591;1573;1574;1584</NoWarn>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**\artifacts\**\*;**\bin\**\*;**\obj\**\*</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <CompilerVisibleProperty Include="AssemblyName" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="JalxamlSourceRelativePath" />
+  </ItemGroup>
+</Project>
+

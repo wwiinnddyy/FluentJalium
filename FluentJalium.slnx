@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FluentJalium/FluentJalium.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FluentJalium.Tests/FluentJalium.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/FluentJalium.Gallery/FluentJalium.Gallery.csproj" />
+  </Folder>
+</Solution>
+

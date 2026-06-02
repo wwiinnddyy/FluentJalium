@@ -1,0 +1,25 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <x:String x:Key="FluentDisplayFontFamily">Segoe UI Variable Display</x:String>
+    <x:String x:Key="FluentBodyFontFamily">Segoe UI Variable Text</x:String>
+    <x:String x:Key="FluentMonoFontFamily">Cascadia Code</x:String>
+    <x:String x:Key="FluentIconFontFamily">Segoe Fluent Icons</x:String>
+
+    <x:String x:Key="DisplayFontFamily">Segoe UI Variable Display</x:String>
+    <x:String x:Key="BodyFontFamily">Segoe UI Variable Text</x:String>
+    <x:String x:Key="MonoFontFamily">Cascadia Code</x:String>
+
+    <system:Double x:Key="FluentCaptionFontSize"
+                   xmlns:system="clr-namespace:System;assembly=System.Runtime">12</system:Double>
+    <system:Double x:Key="FluentBodyFontSize"
+                   xmlns:system="clr-namespace:System;assembly=System.Runtime">14</system:Double>
+    <system:Double x:Key="FluentSubtitleFontSize"
+                   xmlns:system="clr-namespace:System;assembly=System.Runtime">20</system:Double>
+    <system:Double x:Key="FluentTitleFontSize"
+                   xmlns:system="clr-namespace:System;assembly=System.Runtime">28</system:Double>
+    <system:Double x:Key="ControlContentThemeFontSize"
+                   xmlns:system="clr-namespace:System;assembly=System.Runtime">14</system:Double>
+</ResourceDictionary>
+

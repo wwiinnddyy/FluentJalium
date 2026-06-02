@@ -1,0 +1,184 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,5,12,6" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="MinWidth" Value="64" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True" />
+                    <Condition Property="IsEnabled" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsPressed" Value="True" />
+                    <Condition Property="IsEnabled" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="AccentButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextOnAccent}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,5,12,6" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="MinWidth" Value="64" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsMouseOver" Value="True" />
+                    <Condition Property="IsEnabled" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource AccentBrushHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrushHover}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsPressed" Value="True" />
+                    <Condition Property="IsEnabled" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource AccentBrushPressed}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrushPressed}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrushDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="RepeatButton">
+        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8,4,8,4" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="RepeatButton">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ButtonBackgroundPressed}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="HyperlinkButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource HyperlinkForeground}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="HyperlinkButton">
+                <Grid>
+                    <ContentPresenter
+                        Margin="{TemplateBinding Padding}"
+                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    <Border Name="UnderlineBorder"
+                            Height="1"
+                            Background="{TemplateBinding Foreground}"
+                            VerticalAlignment="Bottom" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{ThemeResource HyperlinkForegroundHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Foreground" Value="{ThemeResource HyperlinkForegroundPressed}" />
+            </Trigger>
+            <Trigger Property="IsUnderlined" Value="False">
+                <Setter TargetName="UnderlineBorder" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
+

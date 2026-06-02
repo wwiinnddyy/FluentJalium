@@ -1,0 +1,89 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+    </Style>
+
+    <Style TargetType="TextBox">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,6,10,6" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource SelectionBackground}" />
+        <Setter Property="CaretBrush" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TextBox">
+                <Border Name="OuterBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid>
+                        <Border Name="PART_ContentHost"
+                                Padding="{TemplateBinding Padding}" />
+                        <Border Name="FocusAccent"
+                                Height="2"
+                                Background="{ThemeResource AccentBrush}"
+                                CornerRadius="1"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Bottom"
+                                Opacity="0" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter TargetName="FocusAccent" Property="Opacity" Value="1" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="PasswordBox">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,6,10,6" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="PasswordChar" Value="*" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource SelectionBackground}" />
+        <Setter Property="CaretBrush" Value="{ThemeResource TextPrimary}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
+
