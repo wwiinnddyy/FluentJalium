@@ -3,6 +3,15 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
+using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
+using FWAppBarSeparator = FluentJalium.Controls.FWAppBarSeparator;
+using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
+using FWButton = FluentJalium.Controls.FWButton;
+using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
+using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
+using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
+using FWSplitButton = FluentJalium.Controls.FWSplitButton;
+using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 
 namespace FluentJalium.Gallery;
 
@@ -36,7 +45,8 @@ public sealed class MainWindow : Window
 
         page.Children.Add(CreateHeader());
         page.Children.Add(CreateThemeControls());
-        page.Children.Add(CreateBasicsSection());
+        page.Children.Add(CreateButtonsSection());
+        page.Children.Add(CreateCommandButtonsSection());
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateRangeSection());
@@ -63,7 +73,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent Design resources and core Jalium control styles.",
+            Text = "Fluent theme overlay plus FW-prefixed button controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -92,7 +102,7 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private UIElement CreateBasicsSection()
+    private UIElement CreateButtonsSection()
     {
         var panel = CreateSection("Buttons");
         var row = new StackPanel
@@ -101,13 +111,54 @@ public sealed class MainWindow : Window
             Spacing = 12
         };
 
-        row.Children.Add(new Button { Content = "Button" });
-        row.Children.Add(new RepeatButton { Content = "Repeat" });
-        row.Children.Add(new HyperlinkButton { Content = "Hyperlink" });
-        row.Children.Add(new ToggleButton { Content = "Toggle", IsChecked = true });
-        row.Children.Add(new Button { Content = "Disabled", IsEnabled = false });
+        row.Children.Add(new FWButton { Content = "FWButton" });
+        row.Children.Add(new FWRepeatButton { Content = "FWRepeat" });
+        row.Children.Add(new FWHyperlinkButton { Content = "FWHyperlink" });
+        row.Children.Add(new FWDropDownButton
+        {
+            Content = "FWDropDown",
+            Flyout = CreateSampleFlyout()
+        });
+        row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
 
         panel.Children.Add(row);
+        return panel;
+    }
+
+    private UIElement CreateCommandButtonsSection()
+    {
+        var panel = CreateSection("Command Buttons");
+
+        var splitRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+        splitRow.Children.Add(new FWSplitButton
+        {
+            Content = "FWSplitButton",
+            Width = 170,
+            Flyout = CreateSampleFlyout()
+        });
+        splitRow.Children.Add(new FWToggleSplitButton
+        {
+            Content = "FWToggleSplit",
+            Width = 180,
+            IsChecked = true,
+            Flyout = CreateSampleFlyout()
+        });
+
+        var commandBar = new CommandBar
+        {
+            Width = 420
+        };
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon("\uE74E") });
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon("\uE72D") });
+        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
+        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon("\uE718"), IsChecked = true });
+
+        panel.Children.Add(splitRow);
+        panel.Children.Add(commandBar);
         return panel;
     }
 
@@ -217,7 +268,7 @@ public sealed class MainWindow : Window
             Margin = new Thickness(0, 0, 0, 4)
         };
         header.Children.Add(CreateCaption("Normal"));
-        header.Children.Add(CreateCaption("Pressed"));
+        header.Children.Add(CreateCaption("DropDown"));
         header.Children.Add(CreateCaption("Selected"));
         header.Children.Add(CreateCaption("Disabled"));
         panel.Children.Add(header);
@@ -228,23 +279,11 @@ public sealed class MainWindow : Window
             Spacing = 12
         };
 
-        row.Children.Add(new Button { Content = "Normal" });
-        row.Children.Add(new Button { Content = "Press me" });
-        row.Children.Add(new ToggleButton { Content = "Selected", IsChecked = true });
-        row.Children.Add(new Button { Content = "Disabled", IsEnabled = false });
+        row.Children.Add(new FWButton { Content = "Normal" });
+        row.Children.Add(new FWDropDownButton { Content = "Open", Flyout = CreateSampleFlyout() });
+        row.Children.Add(new FWToggleSplitButton { Content = "Selected", IsChecked = true, Flyout = CreateSampleFlyout() });
+        row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
         panel.Children.Add(row);
-
-        var checkRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 24,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        checkRow.Children.Add(new CheckBox { Content = "Unchecked" });
-        checkRow.Children.Add(new CheckBox { Content = "Checked", IsChecked = true });
-        checkRow.Children.Add(new RadioButton { Content = "Selected", IsChecked = true });
-        checkRow.Children.Add(new ToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
-        panel.Children.Add(checkRow);
 
         return panel;
     }
@@ -288,6 +327,15 @@ public sealed class MainWindow : Window
         return button;
     }
 
+    private static MenuFlyout CreateSampleFlyout()
+    {
+        var flyout = new MenuFlyout();
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Create" });
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Open" });
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Export" });
+        return flyout;
+    }
+
     private void ApplyTheme(FluentThemeVariant theme)
     {
         FluentThemeManager.ApplyTheme(theme);
@@ -307,5 +355,15 @@ public sealed class MainWindow : Window
         }
 
         return new SolidColorBrush(Colors.Transparent);
+    }
+
+    private static FontIcon CreateIcon(string glyph)
+    {
+        return new FontIcon
+        {
+            Glyph = glyph,
+            FontFamily = "Segoe Fluent Icons",
+            Foreground = ThemeBrush("TextPrimary")
+        };
     }
 }

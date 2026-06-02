@@ -91,6 +91,15 @@
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF2C2C2C" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#33000000" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="CommandBarBackground" Color="#FF1C1C1C" />
+            <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="AppBarButtonBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#19000000" />
+            <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#15FFFFFF" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -181,6 +190,15 @@
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#0F000000" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="CommandBarBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FFF9F9F9" />
+            <SolidColorBrush x:Key="AppBarButtonBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="AppBarButtonForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#0F000000" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -239,6 +257,16 @@
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CommandBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="AppBarButtonBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#FFFFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
+

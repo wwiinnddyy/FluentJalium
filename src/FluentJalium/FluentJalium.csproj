@@ -13,8 +13,9 @@
     <IsAotCompatible>true</IsAotCompatible>
     <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
     <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">false</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath Condition="'$(CompilerGeneratedFilesOutputPath)' == ''">$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
     <_JalxamlTasksPath Condition="'$(UseJaliumSourceReferences)' == 'true'">$(JaliumSourceRoot)src\managed\Jalium.UI.Build\bin\$(Configuration)\net10.0\Jalium.UI.Build.dll</_JalxamlTasksPath>
     <JalxamlCompilerPath Condition="'$(UseJaliumSourceReferences)' == 'true'">$(JaliumSourceRoot)src\managed\Jalium.UI.Build\tools\jalxamlc.exe</JalxamlCompilerPath>
   </PropertyGroup>
@@ -50,12 +51,16 @@
     <PackageReference Include="Jalium.UI.Build" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
+    <PackageReference Update="Jalium.UI.Xaml.SourceGenerator" ExcludeAssets="all" />
+    <PackageReference Update="Jalium.UI.Build" ExcludeAssets="all" />
+  </ItemGroup>
+
   <ItemGroup>
-    <AdditionalFiles Include="Themes\**\*.jalxaml" />
+    <JalxamlPage Include="Themes\**\*.jalxaml" />
   </ItemGroup>
 
   <Import Project="$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets"
           Condition="'$(UseJaliumSourceReferences)' == 'true' and Exists('$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets')" />
 
 </Project>
-

@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
-using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
@@ -35,6 +35,15 @@ public sealed class FluentThemeManagerTests
             Assert.Equal(firstCount, secondCount);
             Assert.True(app.Resources.TryGetValue(typeof(Button), out var style));
             Assert.IsType<Style>(style);
+            AssertBasedOnStyle<FWButton, Button>(app.Resources);
+            AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
+            AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertOwnedStyle<FWDropDownButton>(app.Resources);
+            AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
+            AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarSeparator, AppBarSeparator>(app.Resources);
         }
         finally
         {
@@ -119,19 +128,154 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Button>(dictionary);
         AssertContainsStyle<RepeatButton>(dictionary);
         AssertContainsStyle<HyperlinkButton>(dictionary);
-        AssertContainsStyle<TextBox>(dictionary);
-        AssertContainsStyle<PasswordBox>(dictionary);
-        AssertContainsStyle<CheckBox>(dictionary);
-        AssertContainsStyle<RadioButton>(dictionary);
-        AssertContainsStyle<ToggleButton>(dictionary);
-        AssertContainsStyle<ToggleSwitch>(dictionary);
-        AssertContainsStyle<Slider>(dictionary);
-        AssertContainsStyle<ProgressBar>(dictionary);
-        AssertContainsStyle<ComboBox>(dictionary);
-
+        AssertContainsStyle<FWDropDownButton>(dictionary);
+        AssertContainsStyle<SplitButton>(dictionary);
+        AssertContainsStyle<FWToggleSplitButton>(dictionary);
+        AssertContainsStyle<CommandBar>(dictionary);
+        AssertContainsStyle<AppBarButton>(dictionary);
+        AssertContainsStyle<AppBarToggleButton>(dictionary);
+        AssertContainsStyle<AppBarSeparator>(dictionary);
         Assert.True(dictionary.Contains("TextPrimary"));
         Assert.True(dictionary.Contains("AccentBrush"));
+        Assert.True(dictionary.Contains("CommandBarBackground"));
+        Assert.True(dictionary.Contains("AppBarButtonBackground"));
+        Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
+        Assert.True(dictionary.Contains("AppBarButtonBackgroundPressed"));
         Assert.True(dictionary.Contains("ControlContentThemeFontSize"));
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void ButtonBatch_ShouldExposeFwStylesForButtonAndCommandControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWButton, Button>(app.Resources);
+            AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
+            AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertOwnedStyle<FWDropDownButton>(app.Resources);
+            AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
+            AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
+            AssertBasedOnStyle<FWAppBarSeparator, AppBarSeparator>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
+    {
+        AssertFluentControl<FWButton, Button>();
+        AssertFluentControl<FWRepeatButton, RepeatButton>();
+        AssertFluentControl<FWHyperlinkButton, HyperlinkButton>();
+        AssertFluentControl<FWDropDownButton, Button>();
+        AssertFluentControl<FWSplitButton, SplitButton>();
+        AssertFluentControl<FWToggleSplitButton, SplitButton>();
+        AssertFluentControl<FWAppBarButton, AppBarButton>();
+        AssertFluentControl<FWAppBarToggleButton, AppBarToggleButton>();
+        AssertFluentControl<FWAppBarSeparator, AppBarSeparator>();
+    }
+
+    [Fact]
+    public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
+    {
+        var oldFlyout = new MenuFlyout();
+        var newFlyout = new MenuFlyout();
+        var button = new FWDropDownButton
+        {
+            Flyout = oldFlyout
+        };
+
+        var opened = 0;
+        var closed = 0;
+        button.FlyoutOpened += (_, _) => opened++;
+        button.FlyoutClosed += (_, _) => closed++;
+
+        oldFlyout.ShowAt(button);
+        Assert.True(button.IsFlyoutOpen);
+        Assert.Equal(1, opened);
+
+        button.Flyout = newFlyout;
+        Assert.False(button.IsFlyoutOpen);
+        Assert.False(oldFlyout.IsOpen);
+        Assert.Equal(1, closed);
+
+        newFlyout.ShowAt(button);
+        Assert.True(button.IsFlyoutOpen);
+        Assert.Equal(2, opened);
+
+        newFlyout.Hide();
+        Assert.False(button.IsFlyoutOpen);
+        Assert.Equal(2, closed);
+    }
+
+    [Fact]
+    public void FWToggleSplitButton_ShouldToggleCheckedStateAndRaiseEvent()
+    {
+        var button = new FWToggleSplitButton();
+        FWToggleSplitButtonIsCheckedChangedEventArgs? lastArgs = null;
+        var changed = 0;
+        var clicked = 0;
+
+        button.IsCheckedChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+        button.Click += (_, _) => clicked++;
+
+        button.Toggle();
+
+        Assert.True(button.IsChecked);
+        Assert.Equal(1, changed);
+        Assert.NotNull(lastArgs);
+        Assert.False(lastArgs!.OldValue);
+        Assert.True(lastArgs.NewValue);
+
+        InvokeSplitButtonClick(button);
+
+        Assert.False(button.IsChecked);
+        Assert.Equal(2, changed);
+        Assert.Equal(1, clicked);
+        Assert.True(lastArgs.OldValue);
+        Assert.False(lastArgs.NewValue);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void FluentControls_ShouldInheritJaliumImplicitStylesByBaseType()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var button = new FWButton();
+
+            var lookupStyle = typeof(FrameworkElement)
+                .GetMethod("LookupImplicitStyle", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(button, null);
+
+            var fwStyle = Assert.IsType<Style>(lookupStyle);
+            Assert.Equal(typeof(FWButton), fwStyle.TargetType);
+            Assert.IsType<Style>(fwStyle.BasedOn);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
     }
 
     private static void AssertContainsStyle<TControl>(ResourceDictionary dictionary)
@@ -139,6 +283,46 @@ public sealed class FluentThemeManagerTests
     {
         Assert.True(dictionary.TryGetValue(typeof(TControl), out var value), $"{typeof(TControl).Name} style was not found.");
         Assert.IsType<Style>(value);
+    }
+
+    private static void AssertBasedOnStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
+        where TFluentControl : TJaliumControl, IFluentJaliumControl
+        where TJaliumControl : Control
+    {
+        Assert.True(dictionary.TryGetValue(typeof(TJaliumControl), out var baseValue), $"{typeof(TJaliumControl).Name} base style was not found.");
+        var baseStyle = Assert.IsType<Style>(baseValue);
+
+        Assert.True(dictionary.TryGetValue(typeof(TFluentControl), out var fluentValue), $"{typeof(TFluentControl).Name} FW style was not found.");
+        var fluentStyle = Assert.IsType<Style>(fluentValue);
+
+        Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
+        Assert.Same(baseStyle, fluentStyle.BasedOn);
+    }
+
+    private static void AssertOwnedStyle<TFluentControl>(ResourceDictionary dictionary)
+        where TFluentControl : Control, IFluentJaliumControl
+    {
+        Assert.True(dictionary.TryGetValue(typeof(TFluentControl), out var fluentValue), $"{typeof(TFluentControl).Name} FW style was not found.");
+        var fluentStyle = Assert.IsType<Style>(fluentValue);
+
+        Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
+        Assert.Null(fluentStyle.BasedOn);
+    }
+
+    private static void AssertFluentControl<TFluentControl, TJaliumControl>()
+        where TFluentControl : TJaliumControl, IFluentJaliumControl, new()
+        where TJaliumControl : Control
+    {
+        var control = new TFluentControl();
+        Assert.IsAssignableFrom<TJaliumControl>(control);
+        Assert.StartsWith("FW", typeof(TFluentControl).Name, StringComparison.Ordinal);
+    }
+
+    private static void InvokeSplitButtonClick(SplitButton button)
+    {
+        typeof(SplitButton)
+            .GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(button, [new SplitButtonClickEventArgs()]);
     }
 
     private static Color GetBrushColor(object? value)

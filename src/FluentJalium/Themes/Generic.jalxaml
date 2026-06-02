@@ -28,5 +28,6 @@
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ToggleControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/RangeControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/SelectionControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/AdvancedControls.jalxaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

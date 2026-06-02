@@ -1,6 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using FluentJalium.Controls;
 using Jalium.UI;
+using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Controls.Themes;
@@ -170,13 +173,38 @@ public static class FluentThemeManager
         var owner = new ResourceDictionary();
         var loaded = ResourceDictionary.SourceLoader?.Invoke(owner, source, ThemeAssembly);
         if (loaded != null)
+        {
+            AddFluentControlStyleAliases(loaded);
             return loaded;
+        }
 
         var fallback = new ResourceDictionary
         {
             Source = source
         };
+        AddFluentControlStyleAliases(fallback);
         return fallback;
+    }
+
+    private static void AddFluentControlStyleAliases(ResourceDictionary dictionary)
+    {
+        AliasStyle<FWButton, Button>(dictionary);
+        AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
+        AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
+        AliasStyle<FWSplitButton, SplitButton>(dictionary);
+        AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
+        AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
+        AliasStyle<FWAppBarSeparator, AppBarSeparator>(dictionary);
+    }
+
+    private static void AliasStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
+        where TFluentControl : Control, IFluentJaliumControl
+        where TJaliumControl : Control
+    {
+        if (dictionary.TryGetValue(typeof(TJaliumControl), out var baseStyle) && baseStyle is Style style)
+        {
+            dictionary[typeof(TFluentControl)] = new Style(typeof(TFluentControl), style);
+        }
     }
 
     private static ResourceDictionary BuildAccentDictionary(Color accent)
@@ -294,3 +322,4 @@ public static class FluentThemeManager
             Lerp(color.B, target.B, factor));
     }
 }
+

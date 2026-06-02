@@ -8,6 +8,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <JaliumNativePackRid Condition="'$(JaliumNativePackRid)' == ''">win-x64</JaliumNativePackRid>
+    <UseJaliumPackageNativeRuntime Condition="'$(UseJaliumPackageNativeRuntime)' == '' and '$(UseJaliumSourceReferences)' == 'true'">true</UseJaliumPackageNativeRuntime>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,10 +18,31 @@
 
   <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
     <ProjectReference Include="$(JaliumSourceRoot)src\packaging\Jalium.UI.Desktop\Jalium.UI.Desktop.csproj" />
+    <PackageReference Include="Jalium.UI.Interop"
+                      Version="$(JaliumPackageVersion)"
+                      GeneratePathProperty="true"
+                      PrivateAssets="all"
+                      ExcludeAssets="compile;runtime;native;contentFiles;analyzers;build;buildTransitive" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseJaliumSourceReferences)' != 'true'">
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
   </ItemGroup>
+
+  <Target Name="CopyPackageJaliumNativeRuntimeForSourceReferences"
+          AfterTargets="CopyFilesToOutputDirectory"
+          Condition="'$(UseJaliumPackageNativeRuntime)' == 'true' and '$(UseJaliumSourceReferences)' == 'true'">
+    <ItemGroup>
+      <_PackageJaliumNativeRuntime Include="$(PkgJalium_UI_Interop)\runtimes\$(JaliumNativePackRid)\native\*.*"
+                                   Condition="'$(PkgJalium_UI_Interop)' != ''" />
+    </ItemGroup>
+
+    <Error Condition="'@(_PackageJaliumNativeRuntime)' == ''"
+           Text="Unable to locate Jalium.UI.Interop $(JaliumPackageVersion) native runtime assets for $(JaliumNativePackRid). Restore packages or set UseJaliumPackageNativeRuntime=false after rebuilding the sibling Jalium.UI native binaries." />
+
+    <Copy SourceFiles="@(_PackageJaliumNativeRuntime)"
+          DestinationFolder="$(OutDir)"
+          SkipUnchangedFiles="false" />
+  </Target>
 
 </Project>
