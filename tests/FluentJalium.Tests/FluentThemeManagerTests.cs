@@ -39,11 +39,15 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWButton, Button>(app.Resources);
             AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
             AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
+            AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
             AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
             AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
             AssertBasedOnStyle<FWSlider, Slider>(app.Resources);
             AssertBasedOnStyle<FWRangeSlider, RangeSlider>(app.Resources);
             AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
+            AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
+            AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
@@ -135,11 +139,15 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Button>(dictionary);
         AssertContainsStyle<RepeatButton>(dictionary);
         AssertContainsStyle<HyperlinkButton>(dictionary);
+        AssertContainsStyle<CheckBox>(dictionary);
+        AssertContainsStyle<RadioButton>(dictionary);
         AssertContainsStyle<ToggleButton>(dictionary);
         AssertContainsStyle<ToggleSwitch>(dictionary);
         AssertContainsStyle<Slider>(dictionary);
         AssertContainsStyle<RangeSlider>(dictionary);
         AssertContainsStyle<ProgressBar>(dictionary);
+        AssertContainsStyle<ComboBox>(dictionary);
+        AssertContainsStyle<ComboBoxItem>(dictionary);
         AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
@@ -156,6 +164,7 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("SliderTrack"));
         Assert.True(dictionary.Contains("SliderThumb"));
         Assert.True(dictionary.Contains("ProgressRingForeground"));
+        Assert.True(dictionary.Contains("SelectionBackgroundWeak"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
@@ -211,6 +220,7 @@ public sealed class FluentThemeManagerTests
             ResetApplicationState();
         }
     }
+
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void RangeBatch_ShouldExposeFwStylesForRangeControls()
@@ -233,6 +243,30 @@ public sealed class FluentThemeManagerTests
             ResetApplicationState();
         }
     }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void SelectionBatch_ShouldExposeFwStylesForSelectionControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
+            AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
+            AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
+            AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
     [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
@@ -252,6 +286,15 @@ public sealed class FluentThemeManagerTests
     {
         AssertFluentControl<FWToggleButton, ToggleButton>();
         AssertFluentControl<FWToggleSwitch, ToggleSwitch>();
+    }
+
+    [Fact]
+    public void FluentSelectionControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWCheckBox, CheckBox>();
+        AssertFluentControl<FWRadioButton, RadioButton>();
+        AssertFluentControl<FWComboBox, ComboBox>();
+        AssertFluentControl<FWComboBoxItem, ComboBoxItem>();
     }
 
     [Fact]
@@ -306,6 +349,125 @@ public sealed class FluentThemeManagerTests
         Assert.Equal(2, toggled);
         Assert.Equal("Off", toggleSwitch.OffContent);
     }
+
+    [Fact]
+    public void FWCheckBox_ShouldCycleCheckedStatesAndRaiseEvents()
+    {
+        var checkBox = new FWCheckBox
+        {
+            IsThreeState = true
+        };
+        var checkedCount = 0;
+        var uncheckedCount = 0;
+        var indeterminateCount = 0;
+
+        checkBox.Checked += (_, _) => checkedCount++;
+        checkBox.Unchecked += (_, _) => uncheckedCount++;
+        checkBox.Indeterminate += (_, _) => indeterminateCount++;
+
+        InvokeToggleButtonClick(checkBox);
+        Assert.True(checkBox.IsChecked);
+        Assert.Equal(1, checkedCount);
+
+        InvokeToggleButtonClick(checkBox);
+        Assert.Null(checkBox.IsChecked);
+        Assert.Equal(1, indeterminateCount);
+
+        InvokeToggleButtonClick(checkBox);
+        Assert.False(checkBox.IsChecked);
+        Assert.Equal(1, uncheckedCount);
+    }
+
+    [Fact]
+    public void FWRadioButton_ShouldKeepGroupSelectionExclusive()
+    {
+        var groupName = $"selection-{Guid.NewGuid():N}";
+        var first = new FWRadioButton
+        {
+            Content = "One",
+            GroupName = groupName
+        };
+        var second = new FWRadioButton
+        {
+            Content = "Two",
+            GroupName = groupName
+        };
+        var checkedCount = 0;
+
+        first.Checked += (_, _) => checkedCount++;
+        second.Checked += (_, _) => checkedCount++;
+
+        InvokeToggleButtonClick(first);
+        Assert.True(first.IsChecked);
+        Assert.False(second.IsChecked);
+
+        InvokeToggleButtonClick(second);
+        Assert.False(first.IsChecked);
+        Assert.True(second.IsChecked);
+        Assert.Equal(2, checkedCount);
+
+        InvokeToggleButtonClick(second);
+        Assert.False(first.IsChecked);
+        Assert.True(second.IsChecked);
+        Assert.Equal(2, checkedCount);
+    }
+
+    [Fact]
+    public void FWComboBox_ShouldSynchronizeSelectionTextAndDropDownEvents()
+    {
+        var comboBox = new FWComboBox
+        {
+            PlaceholderText = "Choose an item"
+        };
+        comboBox.Items.Add("Fluent tokens");
+        comboBox.Items.Add("Control styles");
+        comboBox.Items.Add("Gallery sample");
+
+        var selectionChanged = 0;
+        var opened = 0;
+        var closed = 0;
+        comboBox.SelectionChanged += (_, _) => selectionChanged++;
+        comboBox.DropDownOpened += (_, _) => opened++;
+        comboBox.DropDownClosed += (_, _) => closed++;
+
+        comboBox.SelectedIndex = 1;
+
+        Assert.Equal(1, comboBox.SelectedIndex);
+        Assert.Equal("Control styles", comboBox.SelectedItem);
+        Assert.Equal("Control styles", comboBox.SelectedValue);
+        Assert.Equal("Control styles", comboBox.SelectionBoxItem);
+        Assert.Equal(1, selectionChanged);
+
+        comboBox.IsEditable = true;
+        comboBox.Text = "Gallery sample";
+
+        Assert.Equal(2, comboBox.SelectedIndex);
+        Assert.Equal("Gallery sample", comboBox.SelectionBoxItem);
+
+        comboBox.IsDropDownOpen = true;
+        comboBox.IsDropDownOpen = false;
+
+        Assert.False(comboBox.IsDropDownOpen);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWComboBoxItem_ShouldExposeSelectionState()
+    {
+        var item = new FWComboBoxItem
+        {
+            Content = "Option"
+        };
+
+        Assert.False(item.IsSelected);
+
+        item.IsSelected = true;
+
+        Assert.True(item.IsSelected);
+        Assert.Equal("Option", item.Content);
+    }
+
     [Fact]
     public void FluentRangeControls_ShouldExposeFwPrefixedSurface()
     {

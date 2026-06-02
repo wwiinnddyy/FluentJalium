@@ -114,18 +114,68 @@
     <Style TargetType="ComboBoxItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="8,5,8,5" />
         <Setter Property="MinHeight" Value="30" />
         <Setter Property="Template">
             <ControlTemplate TargetType="ComboBoxItem">
                 <Border Name="PART_BackgroundBorder"
                         Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="4"
                         Padding="{TemplateBinding Padding}">
-                    <ContentPresenter VerticalAlignment="Center" />
+                    <Grid>
+                        <Border Name="SelectionPill"
+                                Width="3"
+                                Height="16"
+                                Background="{ThemeResource AccentBrush}"
+                                CornerRadius="2"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Opacity="0" />
+                        <ContentPresenter Margin="10,0,0,0"
+                                          VerticalAlignment="Center" />
+                    </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundPressed}" />
+            </MultiTrigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackgroundWeak}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter TargetName="SelectionPill" Property="Opacity" Value="1" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+                <Setter TargetName="SelectionPill" Property="Opacity" Value="1" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter TargetName="SelectionPill" Property="Background" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>
 

@@ -25,6 +25,20 @@ public class FWHyperlinkButton : HyperlinkButton, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium CheckBox control.
+/// </summary>
+public class FWCheckBox : CheckBox, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium RadioButton control.
+/// </summary>
+public class FWRadioButton : RadioButton, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium ToggleButton control.
 /// </summary>
 public class FWToggleButton : ToggleButton, IFluentJaliumControl
@@ -56,6 +70,20 @@ public class FWRangeSlider : RangeSlider, IFluentJaliumControl
 /// FluentJalium ProgressBar control.
 /// </summary>
 public class FWProgressBar : ProgressBar, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium ComboBox control.
+/// </summary>
+public class FWComboBox : ComboBox, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium ComboBoxItem control.
+/// </summary>
+public class FWComboBoxItem : ComboBoxItem, IFluentJaliumControl
 {
 }
 

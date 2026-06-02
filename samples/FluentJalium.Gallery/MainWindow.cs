@@ -7,11 +7,15 @@ using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
 using FWAppBarSeparator = FluentJalium.Controls.FWAppBarSeparator;
 using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWCheckBox = FluentJalium.Controls.FWCheckBox;
+using FWComboBox = FluentJalium.Controls.FWComboBox;
+using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
+using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
@@ -80,7 +84,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, and range controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, and selection controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -257,19 +261,20 @@ public sealed class MainWindow : Window
             Spacing = 16
         };
 
-        row.Children.Add(new CheckBox { Content = "CheckBox", IsChecked = true });
-        row.Children.Add(new RadioButton { Content = "RadioButton", IsChecked = true });
-        row.Children.Add(new ToggleSwitch { Header = "ToggleSwitch", IsOn = true });
+        row.Children.Add(new FWCheckBox { Content = "FWCheckBox", IsChecked = true });
+        row.Children.Add(new FWCheckBox { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
+        row.Children.Add(new FWRadioButton { Content = "Option A", GroupName = "SelectionDemo", IsChecked = true });
+        row.Children.Add(new FWRadioButton { Content = "Option B", GroupName = "SelectionDemo" });
 
-        var comboBox = new ComboBox
+        var comboBox = new FWComboBox
         {
             Width = 220,
-            PlaceholderText = "Choose an item",
-            SelectedIndex = 0
+            PlaceholderText = "Choose an item"
         };
-        comboBox.Items.Add("Fluent tokens");
-        comboBox.Items.Add("Control styles");
-        comboBox.Items.Add("Gallery sample");
+        comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent tokens" });
+        comboBox.Items.Add(new FWComboBoxItem { Content = "Control styles" });
+        comboBox.Items.Add(new FWComboBoxItem { Content = "Gallery sample" });
+        comboBox.SelectedIndex = 1;
         row.Children.Add(comboBox);
 
         panel.Children.Add(row);
@@ -389,6 +394,29 @@ public sealed class MainWindow : Window
         switchRow.Children.Add(new FWToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
         panel.Children.Add(switchRow);
 
+        var selectionRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        selectionRow.Children.Add(new FWCheckBox { Content = "Unchecked" });
+        selectionRow.Children.Add(new FWCheckBox { Content = "Checked", IsChecked = true });
+        selectionRow.Children.Add(new FWCheckBox { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
+        selectionRow.Children.Add(new FWCheckBox { Content = "Disabled", IsChecked = true, IsEnabled = false });
+        panel.Children.Add(selectionRow);
+
+        var comboRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        comboRow.Children.Add(CreateSampleComboBox("Normal", 0, true));
+        comboRow.Children.Add(CreateSampleComboBox("Selected", 1, true));
+        comboRow.Children.Add(CreateSampleComboBox("Disabled", 2, false));
+        panel.Children.Add(comboRow);
+
         return panel;
     }
 
@@ -438,6 +466,22 @@ public sealed class MainWindow : Window
         flyout.Items.Add(new MenuFlyoutItem { Text = "Open" });
         flyout.Items.Add(new MenuFlyoutItem { Text = "Export" });
         return flyout;
+    }
+
+    private static FWComboBox CreateSampleComboBox(string placeholder, int selectedIndex, bool isEnabled)
+    {
+        var comboBox = new FWComboBox
+        {
+            Width = 160,
+            PlaceholderText = placeholder,
+            IsEnabled = isEnabled
+        };
+
+        comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent" });
+        comboBox.Items.Add(new FWComboBoxItem { Content = "WinUI" });
+        comboBox.Items.Add(new FWComboBoxItem { Content = "Toolkit" });
+        comboBox.SelectedIndex = selectedIndex;
+        return comboBox;
     }
 
     private void ApplyTheme(FluentThemeVariant theme)

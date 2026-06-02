@@ -191,11 +191,15 @@ public static class FluentThemeManager
         AliasStyle<FWButton, Button>(dictionary);
         AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
+        AliasStyle<FWCheckBox, CheckBox>(dictionary);
+        AliasStyle<FWRadioButton, RadioButton>(dictionary);
         AliasStyle<FWToggleButton, ToggleButton>(dictionary);
         AliasStyle<FWToggleSwitch, ToggleSwitch>(dictionary);
         AliasStyle<FWSlider, Slider>(dictionary);
         AliasStyle<FWRangeSlider, RangeSlider>(dictionary);
         AliasStyle<FWProgressBar, ProgressBar>(dictionary);
+        AliasStyle<FWComboBox, ComboBox>(dictionary);
+        AliasStyle<FWComboBoxItem, ComboBoxItem>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
