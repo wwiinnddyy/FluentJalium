@@ -100,8 +100,18 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#19000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF2C2C2C" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#19000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF1C1C1C" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#12FFFFFF" />
@@ -263,8 +273,18 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#09000000" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#06000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#E4000000" />
+            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#15000000" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15000000" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#0F000000" />
@@ -394,8 +414,18 @@
             <SolidColorBrush x:Key="HighlightBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#FF333333" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#FFFFFFFF" />

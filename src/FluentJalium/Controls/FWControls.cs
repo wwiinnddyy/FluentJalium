@@ -239,6 +239,101 @@ public class FWFrame : Frame, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium MenuBar control.
+/// </summary>
+public class FWMenuBar : MenuBar, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium MenuBarItem control.
+/// </summary>
+public class FWMenuBarItem : MenuBarItem, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium Menu control.
+/// </summary>
+public class FWMenu : Menu, IFluentJaliumControl
+{
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+
+    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+
+    protected override void PrepareContainerForItem(FrameworkElement element, object item)
+    {
+        base.PrepareContainerForItem(element, item);
+
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        {
+            menuItem.Header = item;
+        }
+    }
+}
+
+/// <summary>
+/// FluentJalium MenuItem control.
+/// </summary>
+public class FWMenuItem : MenuItem, IFluentJaliumControl
+{
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+
+    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+
+    protected override void PrepareContainerForItem(FrameworkElement element, object item)
+    {
+        base.PrepareContainerForItem(element, item);
+
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        {
+            menuItem.Header = item;
+        }
+    }
+}
+
+/// <summary>
+/// FluentJalium ContextMenu control.
+/// </summary>
+public class FWContextMenu : ContextMenu, IFluentJaliumControl
+{
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+
+    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+
+    protected override void PrepareContainerForItem(FrameworkElement element, object item)
+    {
+        base.PrepareContainerForItem(element, item);
+
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        {
+            menuItem.Header = item;
+        }
+    }
+}
+
+/// <summary>
+/// FluentJalium MenuFlyoutItem control.
+/// </summary>
+public class FWMenuFlyoutItem : MenuFlyoutItem, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium ToggleMenuFlyoutItem control.
+/// </summary>
+public class FWToggleMenuFlyoutItem : ToggleMenuFlyoutItem, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium MenuFlyoutSeparator control.
+/// </summary>
+public class FWMenuFlyoutSeparator : MenuFlyoutSeparator, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium DatePicker control.
 /// </summary>
 public class FWDatePicker : DatePicker, IFluentJaliumControl

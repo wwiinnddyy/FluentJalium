@@ -23,6 +23,13 @@ using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListView = FluentJalium.Controls.FWListView;
+using FWContextMenu = FluentJalium.Controls.FWContextMenu;
+using FWMenu = FluentJalium.Controls.FWMenu;
+using FWMenuBar = FluentJalium.Controls.FWMenuBar;
+using FWMenuBarItem = FluentJalium.Controls.FWMenuBarItem;
+using FWMenuFlyoutItem = FluentJalium.Controls.FWMenuFlyoutItem;
+using FWMenuFlyoutSeparator = FluentJalium.Controls.FWMenuFlyoutSeparator;
+using FWMenuItem = FluentJalium.Controls.FWMenuItem;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
@@ -49,6 +56,7 @@ using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
+using FWToggleMenuFlyoutItem = FluentJalium.Controls.FWToggleMenuFlyoutItem;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
 using GridViewColumn = Jalium.UI.Controls.GridViewColumn;
@@ -92,6 +100,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
+        page.Children.Add(CreateMenusSection());
         page.Children.Add(CreateDateTimeSection());
         page.Children.Add(CreateStatusSection());
         page.Children.Add(CreateRangeSection());
@@ -569,6 +578,70 @@ public sealed class MainWindow : Window
         return panel;
     }
 
+    private UIElement CreateMenusSection()
+    {
+        var panel = CreateSection("Menus and Flyouts");
+        var menuBar = new FWMenuBar
+        {
+            Width = 520
+        };
+        menuBar.Items.Add(CreateMenuBarItem("File", ("New", "Ctrl+N"), ("Open", "Ctrl+O"), ("Save", "Ctrl+S")));
+        menuBar.Items.Add(CreateMenuBarItem("Edit", ("Undo", "Ctrl+Z"), ("Redo", "Ctrl+Y"), ("Preferences", string.Empty)));
+        menuBar.Items.Add(CreateMenuBarItem("View", ("Zoom in", "Ctrl++"), ("Zoom out", "Ctrl+-"), ("Actual size", "Ctrl+0")));
+
+        var menu = new FWMenu
+        {
+            Width = 520
+        };
+        var project = new FWMenuItem
+        {
+            Header = "Project"
+        };
+        project.Items.Add(new FWMenuItem { Header = "Build", InputGestureText = "Ctrl+B", Icon = "\uE768" });
+        project.Items.Add(new FWMenuItem { Header = "Run", InputGestureText = "F5", Icon = "\uE768" });
+        project.Items.Add(new FWMenuItem { Header = "Live preview", IsCheckable = true, IsChecked = true });
+        menu.Items.Add(project);
+        menu.Items.Add(new FWMenuItem { Header = "Tools" });
+        menu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
+
+        var flyoutButton = new FWDropDownButton
+        {
+            Content = "MenuFlyout items",
+            Width = 180,
+            Flyout = CreateMenuControlsFlyout()
+        };
+
+        var contextMenu = new FWContextMenu
+        {
+            Placement = PlacementMode.Bottom,
+            StaysOpen = true
+        };
+        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = "\uE72C" });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = "\uE70F" });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Show details", IsCheckable = true, IsChecked = true });
+
+        var contextButton = new FWButton
+        {
+            Content = "Open context menu",
+            Width = 180,
+            ContextMenu = contextMenu
+        };
+        contextButton.Click += (_, _) => ContextMenuService.Open(contextButton, contextMenu);
+
+        var topRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 16
+        };
+        topRow.Children.Add(menuBar);
+        topRow.Children.Add(flyoutButton);
+        topRow.Children.Add(contextButton);
+
+        panel.Children.Add(topRow);
+        panel.Children.Add(menu);
+        return panel;
+    }
+
     private UIElement CreateDateTimeSection()
     {
         var panel = CreateSection("Date and Time");
@@ -903,12 +976,50 @@ public sealed class MainWindow : Window
         return button;
     }
 
+    private static FWMenuBarItem CreateMenuBarItem(string title, params (string Text, string Shortcut)[] items)
+    {
+        var menuBarItem = new FWMenuBarItem
+        {
+            Title = title
+        };
+
+        for (var index = 0; index < items.Length; index++)
+        {
+            var (text, shortcut) = items[index];
+            menuBarItem.Items.Add(new FWMenuFlyoutItem
+            {
+                Text = text,
+                KeyboardAcceleratorTextOverride = shortcut,
+                Icon = index == 0 ? "\uE8A5" : null
+            });
+        }
+
+        if (items.Length > 1)
+        {
+            menuBarItem.Items.Insert(items.Length - 1, new FWMenuFlyoutSeparator());
+        }
+
+        return menuBarItem;
+    }
+
+    private static MenuFlyout CreateMenuControlsFlyout()
+    {
+        var flyout = new MenuFlyout();
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Pin", Icon = "\uE718", KeyboardAcceleratorTextOverride = "Ctrl+P" });
+        flyout.Items.Add(new FWToggleMenuFlyoutItem { Text = "Show badges", IsChecked = true });
+        flyout.Items.Add(new FWMenuFlyoutSeparator());
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Settings", Icon = "\uE713" });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Disabled", IsEnabled = false });
+        return flyout;
+    }
+
     private static MenuFlyout CreateSampleFlyout()
     {
         var flyout = new MenuFlyout();
-        flyout.Items.Add(new MenuFlyoutItem { Text = "Create" });
-        flyout.Items.Add(new MenuFlyoutItem { Text = "Open" });
-        flyout.Items.Add(new MenuFlyoutItem { Text = "Export" });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Create" });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Open" });
+        flyout.Items.Add(new FWMenuFlyoutSeparator());
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Export" });
         return flyout;
     }
 

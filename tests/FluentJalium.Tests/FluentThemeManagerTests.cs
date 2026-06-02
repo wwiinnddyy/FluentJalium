@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
@@ -69,6 +70,14 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
+            AssertBasedOnStyle<FWMenuBar, MenuBar>(app.Resources);
+            AssertBasedOnStyle<FWMenuBarItem, MenuBarItem>(app.Resources);
+            AssertBasedOnStyle<FWMenu, Menu>(app.Resources);
+            AssertBasedOnStyle<FWMenuItem, MenuItem>(app.Resources);
+            AssertBasedOnStyle<FWContextMenu, ContextMenu>(app.Resources);
+            AssertBasedOnStyle<FWMenuFlyoutItem, MenuFlyoutItem>(app.Resources);
+            AssertBasedOnStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(app.Resources);
+            AssertBasedOnStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(app.Resources);
             AssertBasedOnStyle<FWDatePicker, DatePicker>(app.Resources);
             AssertBasedOnStyle<FWTimePicker, TimePicker>(app.Resources);
             AssertBasedOnStyle<FWCalendar, Calendar>(app.Resources);
@@ -206,6 +215,14 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TabControl>(dictionary);
         AssertContainsStyle<TabItem>(dictionary);
         AssertContainsStyle<Frame>(dictionary);
+        AssertContainsStyle<MenuBar>(dictionary);
+        AssertContainsStyle<MenuBarItem>(dictionary);
+        AssertContainsStyle<Menu>(dictionary);
+        AssertContainsStyle<MenuItem>(dictionary);
+        AssertContainsStyle<ContextMenu>(dictionary);
+        AssertContainsStyle<MenuFlyoutItem>(dictionary);
+        AssertContainsStyle<ToggleMenuFlyoutItem>(dictionary);
+        AssertContainsStyle<MenuFlyoutSeparator>(dictionary);
         AssertContainsStyle<DatePicker>(dictionary);
         AssertContainsStyle<TimePicker>(dictionary);
         AssertContainsStyle<Calendar>(dictionary);
@@ -239,6 +256,11 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("SliderThumb"));
         Assert.True(dictionary.Contains("ProgressRingForeground"));
         Assert.True(dictionary.Contains("SelectionBackgroundWeak"));
+        Assert.True(dictionary.Contains("MenuBarBackground"));
+        Assert.True(dictionary.Contains("MenuBarItemBackgroundHover"));
+        Assert.True(dictionary.Contains("MenuFlyoutPresenterBackground"));
+        Assert.True(dictionary.Contains("MenuFlyoutItemBackgroundHover"));
+        Assert.True(dictionary.Contains("MenuFlyoutSeparatorForeground"));
         Assert.True(dictionary.Contains("DividerStrokeColorDefaultBrush"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
@@ -434,6 +456,33 @@ public sealed class FluentThemeManagerTests
 
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void MenuBatch_ShouldExposeFwStylesForMenuAndFlyoutControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWMenuBar, MenuBar>(app.Resources);
+            AssertBasedOnStyle<FWMenuBarItem, MenuBarItem>(app.Resources);
+            AssertBasedOnStyle<FWMenu, Menu>(app.Resources);
+            AssertBasedOnStyle<FWMenuItem, MenuItem>(app.Resources);
+            AssertBasedOnStyle<FWContextMenu, ContextMenu>(app.Resources);
+            AssertBasedOnStyle<FWMenuFlyoutItem, MenuFlyoutItem>(app.Resources);
+            AssertBasedOnStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(app.Resources);
+            AssertBasedOnStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void DateTimeBatch_ShouldExposeFwStylesForDateTimeControls()
     {
         ResetApplicationState();
@@ -542,6 +591,19 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTabControl, TabControl>();
         AssertFluentControl<FWTabItem, TabItem>();
         AssertFluentControl<FWFrame, Frame>();
+    }
+
+    [Fact]
+    public void FluentMenuControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWMenuBar, MenuBar>();
+        AssertFluentControl<FWMenuBarItem, MenuBarItem>();
+        AssertFluentControl<FWMenu, Menu>();
+        AssertFluentControl<FWMenuItem, MenuItem>();
+        AssertFluentControl<FWContextMenu, ContextMenu>();
+        AssertFluentControl<FWMenuFlyoutItem, MenuFlyoutItem>();
+        AssertFluentControl<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>();
+        AssertFluentControl<FWMenuFlyoutSeparator, MenuFlyoutSeparator>();
     }
 
     [Fact]
@@ -1241,6 +1303,137 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    public void FWMenu_ShouldGenerateFwMenuItemContainers()
+    {
+        var menu = new FWMenu();
+        menu.Items.Add("File");
+        menu.Items.Add(new FWMenuItem { Header = "Edit" });
+
+        menu.Measure(new Size(240, 32));
+
+        Assert.Equal(1, menu.VisualChildrenCount);
+        var host = Assert.IsAssignableFrom<Panel>(menu.GetVisualChild(0));
+        Assert.Equal(2, host.Children.Count);
+
+        var generated = Assert.IsType<FWMenuItem>(host.Children[0]);
+        Assert.Equal("File", generated.Header);
+        Assert.IsType<FWMenuItem>(host.Children[1]);
+    }
+
+    [Fact]
+    public void FWMenuItem_ShouldToggleCheckedStateAndRaiseSubmenuEvents()
+    {
+        var item = new FWMenuItem
+        {
+            Header = "Live preview",
+            IsCheckable = true
+        };
+        var checkedCount = 0;
+        var uncheckedCount = 0;
+        var opened = 0;
+        var closed = 0;
+
+        item.Checked += (_, _) => checkedCount++;
+        item.Unchecked += (_, _) => uncheckedCount++;
+        item.SubmenuOpened += (_, _) => opened++;
+        item.SubmenuClosed += (_, _) => closed++;
+        item.Items.Add("Nested command");
+
+        item.IsChecked = true;
+        item.IsChecked = false;
+        item.IsSubmenuOpen = true;
+        item.IsSubmenuOpen = false;
+
+        Assert.False(item.IsChecked);
+        Assert.Equal(1, checkedCount);
+        Assert.Equal(1, uncheckedCount);
+        Assert.False(item.IsSubmenuOpen);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWMenuBarItem_ShouldOpenAndCloseMenu()
+    {
+        var menuBar = new FWMenuBar();
+        var file = new FWMenuBarItem
+        {
+            Title = "File"
+        };
+        file.Items.Add(new FWMenuFlyoutItem { Text = "New" });
+        menuBar.Items.Add(file);
+
+        file.OpenMenu();
+        Assert.True(file.IsMenuOpen);
+
+        file.CloseMenu();
+        Assert.False(file.IsMenuOpen);
+        Assert.Contains(file, menuBar.Items);
+    }
+
+    [Fact]
+    public void FWContextMenu_ShouldOpenCloseAndKeepPlacementState()
+    {
+        var owner = new FWButton { Content = "Target" };
+        var menu = new FWContextMenu
+        {
+            PlacementTarget = owner,
+            Placement = PlacementMode.Bottom,
+            HorizontalOffset = 4,
+            VerticalOffset = 8,
+            StaysOpen = true
+        };
+        var opened = 0;
+        var closed = 0;
+        menu.Opened += (_, _) => opened++;
+        menu.Closed += (_, _) => closed++;
+        menu.Items.Add(new FWMenuItem { Header = "Refresh" });
+
+        menu.IsOpen = true;
+        menu.Close();
+
+        Assert.False(menu.IsOpen);
+        Assert.Same(owner, menu.PlacementTarget);
+        Assert.Equal(PlacementMode.Bottom, menu.Placement);
+        Assert.Equal(4, menu.HorizontalOffset);
+        Assert.Equal(8, menu.VerticalOffset);
+        Assert.True(menu.StaysOpen);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWMenuFlyoutItems_ShouldInvokeCommandsAndToggleState()
+    {
+        var command = new RecordingCommand();
+        var item = new FWMenuFlyoutItem
+        {
+            Text = "Open",
+            Icon = "\uE8A5",
+            Command = command,
+            CommandParameter = "file",
+            KeyboardAcceleratorTextOverride = "Ctrl+O"
+        };
+        var clicked = 0;
+        item.Click += (_, _) => clicked++;
+
+        InvokeMenuFlyoutItem(item);
+
+        Assert.Equal("Open", item.Text);
+        Assert.Equal("\uE8A5", item.Icon);
+        Assert.Equal("Ctrl+O", item.KeyboardAcceleratorTextOverride);
+        Assert.Equal(1, clicked);
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("file", command.LastParameter);
+
+        var toggle = new FWToggleMenuFlyoutItem { Text = "Show badges" };
+
+        InvokeMenuFlyoutItem(toggle);
+
+        Assert.True(toggle.IsChecked);
+    }
+
+    [Fact]
     public void FWDatePicker_ShouldRaiseSelectionAndCalendarOpenCloseEvents()
     {
         var picker = new FWDatePicker
@@ -1622,6 +1815,13 @@ public sealed class FluentThemeManagerTests
             .Invoke(button, [new SplitButtonClickEventArgs()]);
     }
 
+    private static void InvokeMenuFlyoutItem(MenuFlyoutItem item)
+    {
+        typeof(MenuFlyoutItem)
+            .GetMethod("InvokeItem", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(item, null);
+    }
+
     private static void InvokeCalendarSelectDate(Calendar calendar, DateTime date)
     {
         typeof(Calendar)
@@ -1644,6 +1844,24 @@ public sealed class FluentThemeManagerTests
 
     private sealed class SecondNavigationTestPage : Page
     {
+    }
+
+    private sealed class RecordingCommand : ICommand
+    {
+        public event EventHandler? CanExecuteChanged;
+
+        public int ExecuteCount { get; private set; }
+
+        public object? LastParameter { get; private set; }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter)
+        {
+            ExecuteCount++;
+            LastParameter = parameter;
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static void ResetApplicationState()

@@ -220,6 +220,14 @@ public static class FluentThemeManager
         AliasStyle<FWTabControl, TabControl>(dictionary);
         AliasStyle<FWTabItem, TabItem>(dictionary);
         AliasStyle<FWFrame, Frame>(dictionary);
+        AliasStyle<FWMenuBar, MenuBar>(dictionary);
+        AliasStyle<FWMenuBarItem, MenuBarItem>(dictionary);
+        AliasStyle<FWMenu, Menu>(dictionary);
+        AliasStyle<FWMenuItem, MenuItem>(dictionary);
+        AliasStyle<FWContextMenu, ContextMenu>(dictionary);
+        AliasStyle<FWMenuFlyoutItem, MenuFlyoutItem>(dictionary);
+        AliasStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(dictionary);
+        AliasStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(dictionary);
         AliasStyle<FWDatePicker, DatePicker>(dictionary);
         AliasStyle<FWTimePicker, TimePicker>(dictionary);
         AliasStyle<FWCalendar, Calendar>(dictionary);
