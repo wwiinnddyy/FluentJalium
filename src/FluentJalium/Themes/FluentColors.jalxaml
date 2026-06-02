@@ -69,6 +69,17 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#18FFFFFF" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FF323232" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorder" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderHover" Color="#3FFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#33000000" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF4CC2FF" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF8BD8FF" />
@@ -221,6 +232,17 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#29000000" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#E4000000" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#0A000000" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#4DF9F9F9" />
+            <SolidColorBrush x:Key="TextControlBorder" Color="#0F000000" />
+            <SolidColorBrush x:Key="TextControlBorderHover" Color="#44000000" />
+            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#E4000000" />
+            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#0A000000" />
+            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#09000000" />
+            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#0F000000" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#F5F5F5" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF0067C0" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF003E73" />
@@ -341,6 +363,17 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextControlBorder" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#FF333333" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF00FFFF" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF00FFFF" />

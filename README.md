@@ -27,6 +27,8 @@ The seventh FW batch covers date and time controls: `FWDatePicker`, `FWTimePicke
 
 The eighth FW batch covers notification and status controls: `FWInfoBar`, `FWInfoBadge`, `FWToastNotificationItem`, `FWToastNotificationHost`, `FWStatusBar`, and `FWStatusBarItem`.
 
+The ninth FW batch covers text input controls: `FWTextBox`, `FWPasswordBox`, `FWNumberBox`, `FWAutoCompleteBox`, and `FWRichTextBox`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -47,6 +49,11 @@ FW controls can be used from the Fluent namespace:
 ```xml
 <fluent:FWButton Content="Save" />
 <fluent:FWDropDownButton Content="More" />
+<fluent:FWTextBox PlaceholderText="Enter text" />
+<fluent:FWPasswordBox PlaceholderText="Password" />
+<fluent:FWNumberBox Minimum="0" Maximum="100" Value="42" />
+<fluent:FWAutoCompleteBox PlaceholderText="Search" />
+<fluent:FWRichTextBox />
 <fluent:FWToggleSwitch Header="Sync" IsOn="True" />
 <fluent:FWProgressRing IsIndeterminate="False" Value="72" />
 <fluent:FWComboBox PlaceholderText="Choose an item" />

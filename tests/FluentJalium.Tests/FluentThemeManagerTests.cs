@@ -40,6 +40,11 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWButton, Button>(app.Resources);
             AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
             AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertBasedOnStyle<FWTextBox, TextBox>(app.Resources);
+            AssertBasedOnStyle<FWPasswordBox, PasswordBox>(app.Resources);
+            AssertBasedOnStyle<FWNumberBox, NumberBox>(app.Resources);
+            AssertBasedOnStyle<FWAutoCompleteBox, AutoCompleteBox>(app.Resources);
+            AssertBasedOnStyle<FWRichTextBox, RichTextBox>(app.Resources);
             AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
             AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
@@ -167,6 +172,11 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Button>(dictionary);
         AssertContainsStyle<RepeatButton>(dictionary);
         AssertContainsStyle<HyperlinkButton>(dictionary);
+        AssertContainsStyle<TextBox>(dictionary);
+        AssertContainsStyle<PasswordBox>(dictionary);
+        AssertContainsStyle<NumberBox>(dictionary);
+        AssertContainsStyle<AutoCompleteBox>(dictionary);
+        AssertContainsStyle<RichTextBox>(dictionary);
         AssertContainsStyle<CheckBox>(dictionary);
         AssertContainsStyle<RadioButton>(dictionary);
         AssertContainsStyle<ToggleButton>(dictionary);
@@ -219,6 +229,9 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<AppBarSeparator>(dictionary);
         Assert.True(dictionary.Contains("TextPrimary"));
         Assert.True(dictionary.Contains("AccentBrush"));
+        Assert.True(dictionary.Contains("TextControlBackground"));
+        Assert.True(dictionary.Contains("TextControlBorderFocused"));
+        Assert.True(dictionary.Contains("TextControlFlyoutBackground"));
         Assert.True(dictionary.Contains("ToggleCheckedBackground"));
         Assert.True(dictionary.Contains("ToggleUncheckedBackground"));
         Assert.True(dictionary.Contains("ToggleDisabledBackground"));
@@ -268,6 +281,30 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarSeparator, AppBarSeparator>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void TextInputBatch_ShouldExposeFwStylesForTextInputControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWTextBox, TextBox>(app.Resources);
+            AssertBasedOnStyle<FWPasswordBox, PasswordBox>(app.Resources);
+            AssertBasedOnStyle<FWNumberBox, NumberBox>(app.Resources);
+            AssertBasedOnStyle<FWAutoCompleteBox, AutoCompleteBox>(app.Resources);
+            AssertBasedOnStyle<FWRichTextBox, RichTextBox>(app.Resources);
         }
         finally
         {
@@ -457,6 +494,16 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    public void FluentTextInputControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWTextBox, TextBox>();
+        AssertFluentControl<FWPasswordBox, PasswordBox>();
+        AssertFluentControl<FWNumberBox, NumberBox>();
+        AssertFluentControl<FWAutoCompleteBox, AutoCompleteBox>();
+        AssertFluentControl<FWRichTextBox, RichTextBox>();
+    }
+
+    [Fact]
     public void FluentSwitchControls_ShouldExposeFwPrefixedSurface()
     {
         AssertFluentControl<FWToggleButton, ToggleButton>();
@@ -514,6 +561,152 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWToastNotificationHost, ToastNotificationHost>();
         AssertFluentControl<FWStatusBar, StatusBar>();
         AssertFluentControl<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>();
+    }
+
+    [Fact]
+    public void FWTextBox_ShouldRaiseTextChangedAndKeepTextInputState()
+    {
+        var textBox = new FWTextBox
+        {
+            PlaceholderText = "Enter text",
+            AcceptsReturn = true,
+            MaxLength = 64,
+            TextWrapping = TextWrapping.Wrap
+        };
+        var changed = 0;
+        TextChangedEventArgs? lastArgs = null;
+        textBox.TextChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+
+        textBox.Text = "Fluent\r\nJalium";
+
+        Assert.Equal("Fluent\r\nJalium", textBox.Text);
+        Assert.Equal("Enter text", textBox.PlaceholderText);
+        Assert.True(textBox.AcceptsReturn);
+        Assert.Equal(TextWrapping.Wrap, textBox.TextWrapping);
+        Assert.True(textBox.LineCount >= 2);
+        Assert.Equal(1, changed);
+        Assert.NotNull(lastArgs);
+    }
+
+    [Fact]
+    public void FWPasswordBox_ShouldRaisePasswordChangedAndExposeRevealState()
+    {
+        var passwordBox = new FWPasswordBox
+        {
+            PlaceholderText = "Password",
+            MaxLength = 24,
+            RevealMode = PasswordRevealMode.Visible
+        };
+        var changed = 0;
+        passwordBox.PasswordChanged += (_, _) => changed++;
+
+        passwordBox.Password = "fluent";
+        passwordBox.IsPasswordRevealed = true;
+
+        Assert.Equal("fluent", passwordBox.Password);
+        Assert.Equal(6, passwordBox.SecurePassword.Length);
+        Assert.Equal("Password", passwordBox.PlaceholderText);
+        Assert.Equal(PasswordRevealMode.Visible, passwordBox.RevealMode);
+        Assert.True(passwordBox.IsPasswordRevealed);
+        Assert.Equal(1, changed);
+    }
+
+    [Fact]
+    public void FWNumberBox_ShouldStepCoerceWrapAndRaiseValueChanged()
+    {
+        var numberBox = new FWNumberBox
+        {
+            Minimum = 0,
+            Maximum = 10,
+            SmallChange = 2,
+            LargeChange = 5,
+            IsWrapEnabled = true,
+            Value = 8
+        };
+        var changed = 0;
+        RoutedPropertyChangedEventArgs<double>? lastArgs = null;
+        numberBox.ValueChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+
+        numberBox.StepUp();
+        numberBox.StepUp();
+        numberBox.StepDown();
+
+        Assert.Equal(10, numberBox.Value);
+        Assert.Equal("10", numberBox.Text);
+        Assert.Equal(2, numberBox.SmallChange);
+        Assert.Equal(5, numberBox.LargeChange);
+        Assert.Equal(3, changed);
+        Assert.NotNull(lastArgs);
+        Assert.Equal(0, lastArgs!.OldValue);
+        Assert.Equal(10, lastArgs.NewValue);
+    }
+
+    [Fact]
+    public void FWAutoCompleteBox_ShouldFilterSuggestionsAndRaiseTextAndDropDownEvents()
+    {
+        var autoCompleteBox = new FWAutoCompleteBox
+        {
+            ItemsSource = new[] { "Fluent tokens", "Fluent controls", "WinUI Gallery", "Community Toolkit" },
+            FilterMode = AutoCompleteFilterMode.Contains,
+            MinimumPrefixLength = 1,
+            PlaceholderText = "Search"
+        };
+        var textChanged = 0;
+        var populating = 0;
+        var opened = 0;
+        var closed = 0;
+        autoCompleteBox.TextChanged += (_, _) => textChanged++;
+        autoCompleteBox.Populating += (_, _) => populating++;
+        autoCompleteBox.DropDownOpened += (_, _) => opened++;
+        autoCompleteBox.DropDownClosed += (_, _) => closed++;
+
+        autoCompleteBox.Text = "Fluent";
+
+        Assert.Equal("Fluent", autoCompleteBox.Text);
+        Assert.Equal("Search", autoCompleteBox.PlaceholderText);
+        Assert.True(autoCompleteBox.IsDropDownOpen);
+        Assert.Equal(2, autoCompleteBox.FilteredItems.Count);
+        Assert.Contains("Fluent tokens", autoCompleteBox.FilteredItems);
+        Assert.Contains("Fluent controls", autoCompleteBox.FilteredItems);
+
+        autoCompleteBox.Text = "Nothing";
+
+        Assert.False(autoCompleteBox.IsDropDownOpen);
+        Assert.Empty(autoCompleteBox.FilteredItems);
+        Assert.Equal(2, textChanged);
+        Assert.Equal(2, populating);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWRichTextBox_ShouldSetTextSelectAndClearSelection()
+    {
+        var richTextBox = new FWRichTextBox
+        {
+            AcceptsTab = true,
+            IsSpellCheckEnabled = true
+        };
+
+        richTextBox.SetText("FluentJalium rich text");
+        richTextBox.SelectAll();
+
+        Assert.Contains("FluentJalium", richTextBox.GetText());
+        Assert.Contains("FluentJalium", richTextBox.Selection.Text);
+        Assert.True(richTextBox.AcceptsTab);
+        Assert.True(richTextBox.IsSpellCheckEnabled);
+
+        richTextBox.ClearSelection();
+
+        Assert.True(richTextBox.Selection.IsEmpty);
     }
 
     [Fact]

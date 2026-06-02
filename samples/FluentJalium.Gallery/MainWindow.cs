@@ -7,6 +7,7 @@ using Jalium.UI.Media;
 using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
 using FWAppBarSeparator = FluentJalium.Controls.FWAppBarSeparator;
 using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
+using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
@@ -26,17 +27,21 @@ using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
+using FWNumberBox = FluentJalium.Controls.FWNumberBox;
+using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
+using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
 using FWTabItem = FluentJalium.Controls.FWTabItem;
+using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWTimePicker = FluentJalium.Controls.FWTimePicker;
 using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
 using FWToastNotificationItem = FluentJalium.Controls.FWToastNotificationItem;
@@ -113,7 +118,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, navigation, date/time, notification, and status controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, collection, navigation, date/time, notification, and status controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -469,32 +474,69 @@ public sealed class MainWindow : Window
     private UIElement CreateTextSection()
     {
         var panel = CreateSection("Text Input");
-        var row = new StackPanel
+        var topRow = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 12
         };
 
-        row.Children.Add(new TextBox
+        topRow.Children.Add(new FWTextBox
         {
-            Text = "TextBox",
+            Text = "FWTextBox",
             Width = 220,
             PlaceholderText = "Enter text"
         });
-        row.Children.Add(new PasswordBox
+        topRow.Children.Add(new FWPasswordBox
         {
             Password = "fluent",
             Width = 220,
             PlaceholderText = "Password"
         });
-        row.Children.Add(new TextBox
+        topRow.Children.Add(new FWNumberBox
+        {
+            Header = "FWNumberBox",
+            Width = 180,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 42,
+            SmallChange = 2,
+            DecimalPlaces = 0
+        });
+        topRow.Children.Add(new FWTextBox
         {
             Text = "Disabled",
             Width = 220,
             IsEnabled = false
         });
 
-        panel.Children.Add(row);
+        var lowerRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+
+        var autoCompleteBox = new FWAutoCompleteBox
+        {
+            Width = 260,
+            ItemsSource = new[] { "Fluent tokens", "Fluent controls", "WinUI Gallery", "Community Toolkit" },
+            Text = "Fl",
+            PlaceholderText = "Search controls",
+            FilterMode = AutoCompleteFilterMode.Contains
+        };
+
+        var richTextBox = new FWRichTextBox
+        {
+            Width = 420,
+            Height = 96,
+            AcceptsTab = true
+        };
+        richTextBox.SetText("FWRichTextBox uses the same text input resource tokens.");
+
+        lowerRow.Children.Add(autoCompleteBox);
+        lowerRow.Children.Add(richTextBox);
+
+        panel.Children.Add(topRow);
+        panel.Children.Add(lowerRow);
         return panel;
     }
 

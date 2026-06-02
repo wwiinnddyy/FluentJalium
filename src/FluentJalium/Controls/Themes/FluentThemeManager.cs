@@ -191,6 +191,11 @@ public static class FluentThemeManager
         AliasStyle<FWButton, Button>(dictionary);
         AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
+        AliasStyle<FWTextBox, TextBox>(dictionary);
+        AliasStyle<FWPasswordBox, PasswordBox>(dictionary);
+        AliasStyle<FWNumberBox, NumberBox>(dictionary);
+        AliasStyle<FWAutoCompleteBox, AutoCompleteBox>(dictionary);
+        AliasStyle<FWRichTextBox, RichTextBox>(dictionary);
         AliasStyle<FWCheckBox, CheckBox>(dictionary);
         AliasStyle<FWRadioButton, RadioButton>(dictionary);
         AliasStyle<FWToggleButton, ToggleButton>(dictionary);
