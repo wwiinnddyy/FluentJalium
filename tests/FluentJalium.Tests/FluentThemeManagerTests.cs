@@ -67,6 +67,12 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWDatePicker, DatePicker>(app.Resources);
             AssertBasedOnStyle<FWTimePicker, TimePicker>(app.Resources);
             AssertBasedOnStyle<FWCalendar, Calendar>(app.Resources);
+            AssertBasedOnStyle<FWInfoBar, InfoBar>(app.Resources);
+            AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
+            AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
+            AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
+            AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
+            AssertOwnedStyle<FWInfoBadge>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
@@ -197,6 +203,12 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<CalendarDayButton>(dictionary);
         AssertContainsStyle<CalendarItem>(dictionary);
         AssertContainsStyle<DatePickerTextBox>(dictionary);
+        AssertContainsStyle<InfoBar>(dictionary);
+        AssertContainsStyle<ToastNotificationItem>(dictionary);
+        AssertContainsStyle<ToastNotificationHost>(dictionary);
+        AssertContainsStyle<StatusBar>(dictionary);
+        AssertContainsStyle<Jalium.UI.Controls.StatusBarItem>(dictionary);
+        AssertContainsStyle<FWInfoBadge>(dictionary);
         AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
@@ -224,6 +236,14 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("TabStripBackground"));
         Assert.True(dictionary.Contains("TabItemIndicator"));
         Assert.True(dictionary.Contains("FrameBackground"));
+        Assert.True(dictionary.Contains("InfoBarForeground"));
+        Assert.True(dictionary.Contains("InfoBarSuccessBackground"));
+        Assert.True(dictionary.Contains("ToastForeground"));
+        Assert.True(dictionary.Contains("ToastSuccessBackground"));
+        Assert.True(dictionary.Contains("InfoBadgeAttentionBackground"));
+        Assert.True(dictionary.Contains("InfoBadgeCriticalForeground"));
+        Assert.True(dictionary.Contains("StatusBarBackground"));
+        Assert.True(dictionary.Contains("StatusBarSeparatorForeground"));
         Assert.True(dictionary.Contains("ControlContentThemeFontSize"));
     }
 
@@ -398,6 +418,31 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void NotificationStatusBatch_ShouldExposeFwStylesForNotificationAndStatusControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWInfoBar, InfoBar>(app.Resources);
+            AssertOwnedStyle<FWInfoBadge>(app.Resources);
+            AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
+            AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
+            AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
+            AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
         AssertFluentControl<FWButton, Button>();
@@ -458,6 +503,17 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWDatePicker, DatePicker>();
         AssertFluentControl<FWTimePicker, TimePicker>();
         AssertFluentControl<FWCalendar, Calendar>();
+    }
+
+    [Fact]
+    public void FluentNotificationStatusControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWInfoBar, InfoBar>();
+        AssertFluentControl<FWInfoBadge, Control>();
+        AssertFluentControl<FWToastNotificationItem, ToastNotificationItem>();
+        AssertFluentControl<FWToastNotificationHost, ToastNotificationHost>();
+        AssertFluentControl<FWStatusBar, StatusBar>();
+        AssertFluentControl<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>();
     }
 
     [Fact]
@@ -1108,6 +1164,126 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    public void FWInfoBar_ShouldRaiseClosedWhenIsOpenChangesAndKeepSeverityState()
+    {
+        var infoBar = new FWInfoBar
+        {
+            Title = "Saved",
+            Message = "Changes were applied.",
+            Severity = InfoBarSeverity.Success,
+            IsClosable = true,
+            IsIconVisible = true
+        };
+        var closed = 0;
+        infoBar.Closed += (_, _) => closed++;
+
+        infoBar.IsOpen = false;
+
+        Assert.False(infoBar.IsOpen);
+        Assert.Equal(InfoBarSeverity.Success, infoBar.Severity);
+        Assert.Equal("Saved", infoBar.Title);
+        Assert.Equal("Changes were applied.", infoBar.Message);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWInfoBadge_ShouldSwitchDisplayKindAndClampDisplayValue()
+    {
+        var badge = new FWInfoBadge();
+
+        Assert.Equal(FWInfoBadgeDisplayKind.Dot, badge.DisplayKind);
+        Assert.Equal(string.Empty, badge.DisplayValueText);
+
+        badge.IconGlyph = "\uE7BA";
+
+        Assert.Equal(FWInfoBadgeDisplayKind.Icon, badge.DisplayKind);
+
+        badge.Value = 128;
+        badge.MaxValue = 99;
+        badge.Severity = FWInfoBadgeSeverity.Critical;
+
+        Assert.Equal(FWInfoBadgeDisplayKind.Value, badge.DisplayKind);
+        Assert.Equal("99+", badge.DisplayValueText);
+        Assert.Equal(FWInfoBadgeSeverity.Critical, badge.Severity);
+
+        badge.Value = 8;
+
+        Assert.Equal("8", badge.DisplayValueText);
+    }
+
+    [Fact]
+    public void FWToastNotificationItem_ShouldExposeSeverityDurationAndClosedEvent()
+    {
+        var toast = new FWToastNotificationItem
+        {
+            Title = "Build complete",
+            Message = "Static toast",
+            Severity = ToastSeverity.Warning,
+            Duration = TimeSpan.FromSeconds(7),
+            IsAutoDismissEnabled = false
+        };
+        var closed = 0;
+        toast.Closed += (_, _) => closed++;
+
+        toast.IsOpen = false;
+
+        Assert.False(toast.IsOpen);
+        Assert.Equal(ToastSeverity.Warning, toast.Severity);
+        Assert.Equal(TimeSpan.FromSeconds(7), toast.Duration);
+        Assert.False(toast.IsAutoDismissEnabled);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
+    public void FWToastNotificationHost_ShouldShowFwItemsAndLimitVisibleToasts()
+    {
+        var host = new FWToastNotificationHost
+        {
+            MaxVisibleToasts = 2,
+            Position = ToastPosition.BottomCenter,
+            ToastWidth = 320,
+            Spacing = 12
+        };
+
+        var first = host.ShowInformation("First", "Removed when the limit is exceeded", TimeSpan.FromSeconds(1));
+        var second = host.ShowSuccess("Second", "Kept", TimeSpan.FromSeconds(2));
+        var third = host.ShowError("Third", "Kept", TimeSpan.FromSeconds(3));
+
+        Assert.IsType<FWToastNotificationItem>(first);
+        Assert.Equal(2, host.Children.Count);
+        Assert.DoesNotContain(first, host.Children);
+        Assert.Contains(second, host.Children);
+        Assert.Contains(third, host.Children);
+        Assert.False(first.IsOpen);
+        Assert.Equal(ToastPosition.BottomCenter, host.Position);
+        Assert.Equal(320, host.ToastWidth);
+        Assert.Equal(12, host.Spacing);
+    }
+
+    [Fact]
+    public void FWStatusBar_ShouldHostStatusItemsAndExposeSeparatorBrush()
+    {
+        var separatorBrush = new SolidColorBrush(Color.FromRgb(0xAA, 0xAA, 0xAA));
+        var statusBar = new FWStatusBar
+        {
+            SeparatorBrush = separatorBrush
+        };
+        statusBar.Items.Add("Ready");
+        statusBar.Items.Add(new FWStatusBarItem { Content = "UTF-8" });
+
+        statusBar.Measure(new Size(320, 24));
+
+        Assert.Equal(separatorBrush, statusBar.SeparatorBrush);
+        Assert.Equal(2, statusBar.Items.Count);
+        Assert.Equal(1, statusBar.VisualChildrenCount);
+
+        var itemsHost = Assert.IsAssignableFrom<Panel>(statusBar.GetVisualChild(0));
+        Assert.Equal(2, itemsHost.Children.Count);
+        Assert.IsType<FWStatusBarItem>(itemsHost.Children[0]);
+        Assert.IsType<FWStatusBarItem>(itemsHost.Children[1]);
+    }
+
+    [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
     {
         var oldFlyout = new MenuFlyout();
@@ -1200,7 +1376,7 @@ public sealed class FluentThemeManagerTests
     }
 
     private static void AssertContainsStyle<TControl>(ResourceDictionary dictionary)
-        where TControl : Control
+        where TControl : FrameworkElement
     {
         Assert.True(dictionary.TryGetValue(typeof(TControl), out var value), $"{typeof(TControl).Name} style was not found.");
         Assert.IsType<Style>(value);
@@ -1208,7 +1384,7 @@ public sealed class FluentThemeManagerTests
 
     private static void AssertBasedOnStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
         where TFluentControl : TJaliumControl, IFluentJaliumControl
-        where TJaliumControl : Control
+        where TJaliumControl : FrameworkElement
     {
         Assert.True(dictionary.TryGetValue(typeof(TJaliumControl), out var baseValue), $"{typeof(TJaliumControl).Name} base style was not found.");
         var baseStyle = Assert.IsType<Style>(baseValue);
@@ -1221,7 +1397,7 @@ public sealed class FluentThemeManagerTests
     }
 
     private static void AssertOwnedStyle<TFluentControl>(ResourceDictionary dictionary)
-        where TFluentControl : Control, IFluentJaliumControl
+        where TFluentControl : FrameworkElement, IFluentJaliumControl
     {
         Assert.True(dictionary.TryGetValue(typeof(TFluentControl), out var fluentValue), $"{typeof(TFluentControl).Name} FW style was not found.");
         var fluentStyle = Assert.IsType<Style>(fluentValue);
@@ -1232,7 +1408,7 @@ public sealed class FluentThemeManagerTests
 
     private static void AssertFluentControl<TFluentControl, TJaliumControl>()
         where TFluentControl : TJaliumControl, IFluentJaliumControl, new()
-        where TJaliumControl : Control
+        where TJaliumControl : FrameworkElement
     {
         var control = new TFluentControl();
         Assert.IsAssignableFrom<TJaliumControl>(control);

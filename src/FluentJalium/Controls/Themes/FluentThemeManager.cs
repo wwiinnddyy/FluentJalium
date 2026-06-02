@@ -218,6 +218,11 @@ public static class FluentThemeManager
         AliasStyle<FWDatePicker, DatePicker>(dictionary);
         AliasStyle<FWTimePicker, TimePicker>(dictionary);
         AliasStyle<FWCalendar, Calendar>(dictionary);
+        AliasStyle<FWInfoBar, InfoBar>(dictionary);
+        AliasStyle<FWToastNotificationItem, ToastNotificationItem>(dictionary);
+        AliasStyle<FWToastNotificationHost, ToastNotificationHost>(dictionary);
+        AliasStyle<FWStatusBar, StatusBar>(dictionary);
+        AliasStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
@@ -225,8 +230,8 @@ public static class FluentThemeManager
     }
 
     private static void AliasStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
-        where TFluentControl : Control, IFluentJaliumControl
-        where TJaliumControl : Control
+        where TFluentControl : FrameworkElement, IFluentJaliumControl
+        where TJaliumControl : FrameworkElement
     {
         if (dictionary.TryGetValue(typeof(TJaliumControl), out var baseStyle) && baseStyle is Style style)
         {

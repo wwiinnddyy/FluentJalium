@@ -17,6 +17,9 @@ using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWFrame = FluentJalium.Controls.FWFrame;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
+using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
+using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
+using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListView = FluentJalium.Controls.FWListView;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
@@ -30,9 +33,13 @@ using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
+using FWStatusBar = FluentJalium.Controls.FWStatusBar;
+using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
 using FWTabItem = FluentJalium.Controls.FWTabItem;
 using FWTimePicker = FluentJalium.Controls.FWTimePicker;
+using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
+using FWToastNotificationItem = FluentJalium.Controls.FWToastNotificationItem;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
@@ -81,6 +88,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateDateTimeSection());
+        page.Children.Add(CreateStatusSection());
         page.Children.Add(CreateRangeSection());
         page.Children.Add(CreateStateMatrix());
 
@@ -105,7 +113,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, navigation, and date/time controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, navigation, date/time, notification, and status controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -576,6 +584,92 @@ public sealed class MainWindow : Window
         return panel;
     }
 
+    private UIElement CreateStatusSection()
+    {
+        var panel = CreateSection("Notifications and Status");
+
+        var infoBarColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Width = 460
+        };
+        infoBarColumn.Children.Add(CreateInfoBar("Information", "A normal FluentJalium status message.", InfoBarSeverity.Informational));
+        infoBarColumn.Children.Add(CreateInfoBar("Success", "The selected operation completed.", InfoBarSeverity.Success));
+        infoBarColumn.Children.Add(CreateInfoBar("Warning", "Review settings before continuing.", InfoBarSeverity.Warning));
+        infoBarColumn.Children.Add(CreateInfoBar("Error", "A required resource could not be loaded.", InfoBarSeverity.Error));
+
+        var badgeColumn = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 300
+        };
+        badgeColumn.Children.Add(new TextBlock
+        {
+            Text = "InfoBadge",
+            FontSize = 13,
+            Foreground = ThemeBrush("TextSecondary")
+        });
+
+        var badgeRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+        badgeRow.Children.Add(new FWInfoBadge { Severity = FWInfoBadgeSeverity.Attention });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 3, Severity = FWInfoBadgeSeverity.Informational });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 128, MaxValue = 99, Severity = FWInfoBadgeSeverity.Success });
+        badgeRow.Children.Add(new FWInfoBadge { IconGlyph = "\uE7BA", Severity = FWInfoBadgeSeverity.Caution });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 1, Severity = FWInfoBadgeSeverity.Critical });
+        badgeColumn.Children.Add(badgeRow);
+
+        var statusBar = new FWStatusBar
+        {
+            Width = 300
+        };
+        statusBar.Items.Add(new FWStatusBarItem { Content = "Ready" });
+        statusBar.Items.Add(new FWStatusBarItem { Content = "Line 42" });
+        statusBar.Items.Add(new FWStatusBarItem { Content = "UTF-8" });
+        statusBar.Items.Add(new FWStatusBarItem { Content = "Disabled", IsEnabled = false });
+        badgeColumn.Children.Add(statusBar);
+
+        var toastHost = new FWToastNotificationHost
+        {
+            Width = 460,
+            Height = 156,
+            MaxVisibleToasts = 3,
+            Position = ToastPosition.TopLeft,
+            ToastWidth = 430
+        };
+        toastHost.ShowToast(new FWToastNotificationItem
+        {
+            Title = "Toast notification",
+            Message = "FWToastNotificationItem uses Fluent severity resources.",
+            Severity = ToastSeverity.Information,
+            IsAutoDismissEnabled = false
+        });
+        toastHost.ShowToast(new FWToastNotificationItem
+        {
+            Title = "Build complete",
+            Message = "Static sample toast remains visible in the gallery.",
+            Severity = ToastSeverity.Success,
+            IsAutoDismissEnabled = false
+        });
+
+        var topRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 18
+        };
+        topRow.Children.Add(infoBarColumn);
+        topRow.Children.Add(badgeColumn);
+
+        panel.Children.Add(topRow);
+        panel.Children.Add(toastHost);
+        return panel;
+    }
+
     private UIElement CreateRangeSection()
     {
         var panel = CreateSection("Range");
@@ -713,6 +807,19 @@ public sealed class MainWindow : Window
         panel.Children.Add(comboRow);
 
         return panel;
+    }
+
+    private static FWInfoBar CreateInfoBar(string title, string message, InfoBarSeverity severity)
+    {
+        return new FWInfoBar
+        {
+            Title = title,
+            Message = message,
+            Severity = severity,
+            IsOpen = true,
+            IsClosable = false,
+            Width = 460
+        };
     }
 
     private StackPanel CreateSection(string title)

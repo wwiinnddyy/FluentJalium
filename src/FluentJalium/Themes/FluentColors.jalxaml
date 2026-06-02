@@ -119,6 +119,40 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF202020" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF2D2D37" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF243A28" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF3F351C" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FF442726" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FF6CCB5F" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FF107C10" />
+            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFD83B01" />
+            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF107C10" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#FF1C1C1C" />
+            <SolidColorBrush x:Key="StatusBarForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#15FFFFFF" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -237,6 +271,40 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#80F6F6F6" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FFDFF6DD" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FFFFF4CE" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FFFDE7E9" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#72000000" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FF0F7B0F" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FF9D5D00" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ToastForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FF107C10" />
+            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFD83B01" />
+            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF107C10" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StatusBarForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#29000000" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -323,6 +391,40 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="StatusBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="StatusBarForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#FFFFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

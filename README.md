@@ -25,6 +25,8 @@ The sixth FW batch covers navigation controls: `FWNavigationView`, `FWNavigation
 
 The seventh FW batch covers date and time controls: `FWDatePicker`, `FWTimePicker`, and `FWCalendar`.
 
+The eighth FW batch covers notification and status controls: `FWInfoBar`, `FWInfoBadge`, `FWToastNotificationItem`, `FWToastNotificationHost`, `FWStatusBar`, and `FWStatusBarItem`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -56,6 +58,13 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
 <fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
 <fluent:FWCalendar FirstDayOfWeek="Monday" />
+<fluent:FWInfoBar Title="Saved" Message="Your changes were applied." Severity="Success" />
+<fluent:FWInfoBadge Value="42" Severity="Informational" />
+<fluent:FWToastNotificationHost MaxVisibleToasts="3" />
+<fluent:FWToastNotificationItem Title="Build complete" Severity="Success" />
+<fluent:FWStatusBar>
+  <fluent:FWStatusBarItem Content="Ready" />
+</fluent:FWStatusBar>
 ```
 
 ## Build
