@@ -13,6 +13,8 @@ FluentJalium develops in two parallel tracks:
 
 The first FW batch covers button and command-button controls: `FWButton`, `FWRepeatButton`, `FWHyperlinkButton`, `FWDropDownButton`, `FWSplitButton`, `FWToggleSplitButton`, `FWAppBarButton`, `FWAppBarToggleButton`, and `FWAppBarSeparator`.
 
+The second FW batch covers switch controls: `FWToggleButton` and `FWToggleSwitch`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -33,6 +35,7 @@ FW controls can be used from the Fluent namespace:
 ```xml
 <fluent:FWButton Content="Save" />
 <fluent:FWDropDownButton Content="More" />
+<fluent:FWToggleSwitch Header="Sync" IsOn="True" />
 ```
 
 ## Build

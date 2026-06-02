@@ -4,6 +4,7 @@ using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
@@ -38,6 +39,8 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWButton, Button>(app.Resources);
             AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
             AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
+            AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
             AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
@@ -128,6 +131,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Button>(dictionary);
         AssertContainsStyle<RepeatButton>(dictionary);
         AssertContainsStyle<HyperlinkButton>(dictionary);
+        AssertContainsStyle<ToggleButton>(dictionary);
+        AssertContainsStyle<ToggleSwitch>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
         AssertContainsStyle<FWToggleSplitButton>(dictionary);
@@ -137,6 +142,9 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<AppBarSeparator>(dictionary);
         Assert.True(dictionary.Contains("TextPrimary"));
         Assert.True(dictionary.Contains("AccentBrush"));
+        Assert.True(dictionary.Contains("ToggleCheckedBackground"));
+        Assert.True(dictionary.Contains("ToggleUncheckedBackground"));
+        Assert.True(dictionary.Contains("ToggleDisabledBackground"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
@@ -173,6 +181,26 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void SwitchBatch_ShouldExposeFwStylesForSwitchControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
+            AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+    [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
         AssertFluentControl<FWButton, Button>();
@@ -186,6 +214,65 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWAppBarSeparator, AppBarSeparator>();
     }
 
+    [Fact]
+    public void FluentSwitchControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWToggleButton, ToggleButton>();
+        AssertFluentControl<FWToggleSwitch, ToggleSwitch>();
+    }
+
+    [Fact]
+    public void FWToggleButton_ShouldCycleCheckedStatesAndRaiseEvents()
+    {
+        var button = new FWToggleButton
+        {
+            IsThreeState = true
+        };
+        var checkedCount = 0;
+        var uncheckedCount = 0;
+        var indeterminateCount = 0;
+
+        button.Checked += (_, _) => checkedCount++;
+        button.Unchecked += (_, _) => uncheckedCount++;
+        button.Indeterminate += (_, _) => indeterminateCount++;
+
+        InvokeToggleButtonClick(button);
+        Assert.True(button.IsChecked);
+        Assert.Equal(1, checkedCount);
+
+        InvokeToggleButtonClick(button);
+        Assert.Null(button.IsChecked);
+        Assert.Equal(1, indeterminateCount);
+
+        InvokeToggleButtonClick(button);
+        Assert.False(button.IsChecked);
+        Assert.Equal(1, uncheckedCount);
+    }
+
+    [Fact]
+    public void FWToggleSwitch_ShouldChangeIsOnAndRaiseToggled()
+    {
+        var toggleSwitch = new FWToggleSwitch
+        {
+            OffContent = "Off",
+            OnContent = "On"
+        };
+        var toggled = 0;
+
+        toggleSwitch.Toggled += (_, _) => toggled++;
+
+        toggleSwitch.IsOn = true;
+
+        Assert.True(toggleSwitch.IsOn);
+        Assert.Equal(1, toggled);
+        Assert.Equal("On", toggleSwitch.OnContent);
+
+        toggleSwitch.IsOn = false;
+
+        Assert.False(toggleSwitch.IsOn);
+        Assert.Equal(2, toggled);
+        Assert.Equal("Off", toggleSwitch.OffContent);
+    }
     [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
     {
@@ -316,6 +403,13 @@ public sealed class FluentThemeManagerTests
         var control = new TFluentControl();
         Assert.IsAssignableFrom<TJaliumControl>(control);
         Assert.StartsWith("FW", typeof(TFluentControl).Name, StringComparison.Ordinal);
+    }
+
+    private static void InvokeToggleButtonClick(ToggleButton button)
+    {
+        typeof(ToggleButton)
+            .GetMethod("OnClick", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(button, null);
     }
 
     private static void InvokeSplitButtonClick(SplitButton button)

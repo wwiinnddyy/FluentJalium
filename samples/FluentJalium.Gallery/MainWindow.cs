@@ -11,7 +11,9 @@ using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
+using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
+using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
 
 namespace FluentJalium.Gallery;
 
@@ -47,6 +49,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateThemeControls());
         page.Children.Add(CreateButtonsSection());
         page.Children.Add(CreateCommandButtonsSection());
+        page.Children.Add(CreateSwitchesSection());
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateRangeSection());
@@ -73,7 +76,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button and switch controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -162,6 +165,53 @@ public sealed class MainWindow : Window
         return panel;
     }
 
+    private UIElement CreateSwitchesSection()
+    {
+        var panel = CreateSection("Switches");
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+
+        row.Children.Add(new FWToggleButton { Content = "FWToggleButton" });
+        row.Children.Add(new FWToggleButton { Content = "Checked", IsChecked = true });
+        row.Children.Add(new FWToggleButton { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
+        row.Children.Add(new FWToggleButton { Content = "Disabled", IsChecked = true, IsEnabled = false });
+
+        var switchRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 18
+        };
+
+        switchRow.Children.Add(new FWToggleSwitch
+        {
+            Header = "FWToggleSwitch",
+            OffContent = "Off",
+            OnContent = "On"
+        });
+        switchRow.Children.Add(new FWToggleSwitch
+        {
+            Header = "On",
+            IsOn = true,
+            OffContent = "Off",
+            OnContent = "On"
+        });
+        switchRow.Children.Add(new FWToggleSwitch
+        {
+            Header = "Disabled",
+            IsOn = true,
+            IsEnabled = false,
+            OffContent = "Off",
+            OnContent = "On"
+        });
+
+        panel.Children.Add(row);
+        panel.Children.Add(switchRow);
+        return panel;
+    }
     private UIElement CreateTextSection()
     {
         var panel = CreateSection("Text Input");
@@ -284,6 +334,18 @@ public sealed class MainWindow : Window
         row.Children.Add(new FWToggleSplitButton { Content = "Selected", IsChecked = true, Flyout = CreateSampleFlyout() });
         row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
         panel.Children.Add(row);
+
+        var switchRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Margin = new Thickness(0, 10, 0, 0)
+        };
+        switchRow.Children.Add(new FWToggleButton { Content = "Off" });
+        switchRow.Children.Add(new FWToggleButton { Content = "On", IsChecked = true });
+        switchRow.Children.Add(new FWToggleSwitch { Header = "On switch", IsOn = true });
+        switchRow.Children.Add(new FWToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
+        panel.Children.Add(switchRow);
 
         return panel;
     }

@@ -191,6 +191,8 @@ public static class FluentThemeManager
         AliasStyle<FWButton, Button>(dictionary);
         AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
+        AliasStyle<FWToggleButton, ToggleButton>(dictionary);
+        AliasStyle<FWToggleSwitch, ToggleSwitch>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);

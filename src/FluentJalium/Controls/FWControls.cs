@@ -25,6 +25,19 @@ public class FWHyperlinkButton : HyperlinkButton, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium ToggleButton control.
+/// </summary>
+public class FWToggleButton : ToggleButton, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium ToggleSwitch control.
+/// </summary>
+public class FWToggleSwitch : ToggleSwitch, IFluentJaliumControl
+{
+}
+/// <summary>
 /// FluentJalium SplitButton control.
 /// </summary>
 public class FWSplitButton : SplitButton, IFluentJaliumControl
