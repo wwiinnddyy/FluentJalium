@@ -208,6 +208,13 @@ public static class FluentThemeManager
         AliasStyle<FWTreeViewItem, TreeViewItem>(dictionary);
         AliasStyle<FWDataGrid, DataGrid>(dictionary);
         AliasStyle<FWTreeDataGrid, TreeDataGrid>(dictionary);
+        AliasStyle<FWNavigationView, NavigationView>(dictionary);
+        AliasStyle<FWNavigationViewItem, NavigationViewItem>(dictionary);
+        AliasStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(dictionary);
+        AliasStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(dictionary);
+        AliasStyle<FWTabControl, TabControl>(dictionary);
+        AliasStyle<FWTabItem, TabItem>(dictionary);
+        AliasStyle<FWFrame, Frame>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
@@ -269,6 +276,9 @@ public static class FluentThemeManager
             ["AccentFillColorDisabledBrush"] = new SolidColorBrush(disabled),
             ["SelectionBackground"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
             ["SelectionBackgroundWeak"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
+            ["TabItemIndicator"] = new SolidColorBrush(accent),
             ["ProgressRingForeground"] = new SolidColorBrush(accent),
         };
     }

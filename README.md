@@ -2,7 +2,7 @@
 
 FluentJalium is a Fluent Design System theme and control library for Jalium.UI on .NET 10.
 
-The first milestone provides a Fluent resource layer, Fluent default styles for core Jalium controls, FW-prefixed button controls, and a small gallery application for visual validation.
+The current milestone provides a Fluent resource layer, Fluent default styles for core Jalium controls, FW-prefixed controls, and a small gallery application for visual validation.
 
 ## Architecture
 
@@ -20,6 +20,8 @@ The third FW batch covers drag and range controls: `FWSlider`, `FWRangeSlider`, 
 The fourth FW batch covers selection controls: `FWCheckBox`, `FWRadioButton`, `FWComboBox`, and `FWComboBoxItem`.
 
 The fifth FW batch covers collection and table controls: `FWListBox`, `FWListBoxItem`, `FWListView`, `FWListViewItem`, `FWTreeView`, `FWTreeViewItem`, `FWDataGrid`, and `FWTreeDataGrid`.
+
+The sixth FW batch covers navigation controls: `FWNavigationView`, `FWNavigationViewItem`, `FWNavigationViewItemHeader`, `FWNavigationViewItemSeparator`, `FWTabControl`, `FWTabItem`, and `FWFrame`.
 
 ## Usage
 
@@ -46,6 +48,9 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWComboBox PlaceholderText="Choose an item" />
 <fluent:FWListBox SelectedIndex="0" />
 <fluent:FWDataGrid AutoGenerateColumns="True" />
+<fluent:FWNavigationView PaneTitle="FluentJalium" />
+<fluent:FWTabControl SelectedIndex="0" />
+<fluent:FWFrame />
 ```
 
 ## Build

@@ -57,6 +57,13 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
             AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
             AssertBasedOnStyle<FWTreeDataGrid, TreeDataGrid>(app.Resources);
+            AssertBasedOnStyle<FWNavigationView, NavigationView>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
+            AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
+            AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
+            AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
@@ -121,6 +128,9 @@ public sealed class FluentThemeManagerTests
             Assert.IsType<SolidColorBrush>(app.Resources["FluentAccentBrushHover"]);
             Assert.IsType<SolidColorBrush>(app.Resources["FluentAccentBrushPressed"]);
             Assert.IsType<SolidColorBrush>(app.Resources["FluentAccentBrushDisabled"]);
+            Assert.Equal(accent, GetBrushColor(app.Resources["TabItemIndicator"]));
+            Assert.Equal(Color.FromArgb(0x33, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["NavigationViewItemBackgroundSelected"]));
+            Assert.Equal(Color.FromArgb(0x66, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["NavigationViewItemBackgroundSelectedHover"]));
         }
         finally
         {
@@ -170,6 +180,13 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Jalium.UI.Controls.DataGridColumnHeader>(dictionary);
         AssertContainsStyle<TreeDataGrid>(dictionary);
         AssertContainsStyle<TreeDataGridRow>(dictionary);
+        AssertContainsStyle<NavigationView>(dictionary);
+        AssertContainsStyle<NavigationViewItem>(dictionary);
+        AssertContainsStyle<NavigationViewItemHeader>(dictionary);
+        AssertContainsStyle<NavigationViewItemSeparator>(dictionary);
+        AssertContainsStyle<TabControl>(dictionary);
+        AssertContainsStyle<TabItem>(dictionary);
+        AssertContainsStyle<Frame>(dictionary);
         AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
@@ -192,6 +209,11 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundPressed"));
+        Assert.True(dictionary.Contains("NavigationViewPaneBackground"));
+        Assert.True(dictionary.Contains("NavigationViewItemBackgroundSelected"));
+        Assert.True(dictionary.Contains("TabStripBackground"));
+        Assert.True(dictionary.Contains("TabItemIndicator"));
+        Assert.True(dictionary.Contains("FrameBackground"));
         Assert.True(dictionary.Contains("ControlContentThemeFontSize"));
     }
 
@@ -318,6 +340,32 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void NavigationBatch_ShouldExposeFwStylesForNavigationControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWNavigationView, NavigationView>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
+            AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
+            AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
+            AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
+            AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
         AssertFluentControl<FWButton, Button>();
@@ -358,6 +406,18 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTreeViewItem, TreeViewItem>();
         AssertFluentControl<FWDataGrid, DataGrid>();
         AssertFluentControl<FWTreeDataGrid, TreeDataGrid>();
+    }
+
+    [Fact]
+    public void FluentNavigationControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWNavigationView, NavigationView>();
+        AssertFluentControl<FWNavigationViewItem, NavigationViewItem>();
+        AssertFluentControl<FWNavigationViewItemHeader, NavigationViewItemHeader>();
+        AssertFluentControl<FWNavigationViewItemSeparator, NavigationViewItemSeparator>();
+        AssertFluentControl<FWTabControl, TabControl>();
+        AssertFluentControl<FWTabItem, TabItem>();
+        AssertFluentControl<FWFrame, Frame>();
     }
 
     [Fact]
@@ -769,6 +829,129 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    public void FWNavigationView_ShouldSynchronizeSelectionPaneAndItemEvents()
+    {
+        var navigationView = new FWNavigationView();
+        var first = new FWNavigationViewItem { Content = "Home" };
+        var second = new FWNavigationViewItem { Content = "Settings" };
+        var invoked = 0;
+        var itemInvoked = 0;
+        var selectionChanged = 0;
+        var opened = 0;
+        var closed = 0;
+
+        first.Invoked += (_, _) => invoked++;
+        second.Invoked += (_, _) => invoked++;
+        navigationView.ItemInvoked += (_, _) => itemInvoked++;
+        navigationView.SelectionChanged += (_, _) => selectionChanged++;
+        navigationView.PaneOpened += (_, _) => opened++;
+        navigationView.PaneClosed += (_, _) => closed++;
+        navigationView.MenuItems.Add(first);
+        navigationView.MenuItems.Add(second);
+
+        navigationView.SelectedItem = first;
+        navigationView.SelectedItem = second;
+        navigationView.IsPaneOpen = false;
+        navigationView.IsPaneOpen = true;
+
+        Assert.False(first.IsSelected);
+        Assert.True(second.IsSelected);
+        Assert.Equal(second, navigationView.SelectedItem);
+        Assert.Equal(2, invoked);
+        Assert.Equal(2, itemInvoked);
+        Assert.Equal(2, selectionChanged);
+        Assert.Equal(1, closed);
+        Assert.Equal(1, opened);
+    }
+
+    [Fact]
+    public void FWNavigationViewItem_ShouldExposeExpansionAndHierarchyState()
+    {
+        var item = new FWNavigationViewItem
+        {
+            Content = "Controls"
+        };
+        item.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons" });
+
+        var expansionChanged = 0;
+        item.ExpansionChanged += (_, expanded) =>
+        {
+            expansionChanged++;
+            Assert.True(expanded);
+        };
+
+        item.IsExpanded = true;
+
+        Assert.True(item.HasUnrealizedChildren);
+        Assert.True(item.IsExpanded);
+        Assert.Equal(1, expansionChanged);
+    }
+
+    [Fact]
+    public void FWTabControl_ShouldSynchronizeSelectedContentAndTabItems()
+    {
+        var first = new FWTabItem
+        {
+            Header = "Overview",
+            Content = "First content"
+        };
+        var second = new FWTabItem
+        {
+            Header = "Details",
+            Content = "Second content"
+        };
+        var tabControl = new FWTabControl();
+        var selectionChanged = 0;
+        tabControl.SelectionChanged += (_, _) => selectionChanged++;
+        tabControl.Items.Add(first);
+        tabControl.Items.Add(second);
+
+        tabControl.SelectedIndex = 1;
+
+        Assert.False(first.IsSelected);
+        Assert.True(second.IsSelected);
+        Assert.Equal(second, tabControl.SelectedItem);
+        Assert.Equal("Second content", tabControl.SelectedContent);
+        Assert.Equal(1, selectionChanged);
+
+        tabControl.SelectedIndex = 0;
+
+        Assert.True(first.IsSelected);
+        Assert.False(second.IsSelected);
+        Assert.Equal("First content", tabControl.SelectedContent);
+        Assert.Equal(2, selectionChanged);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises Frame page activation by type.")]
+    public void FWFrame_ShouldNavigateBackAndForward()
+    {
+        var frame = new FWFrame();
+        var navigated = 0;
+        frame.Navigated += (_, _) => navigated++;
+
+        Assert.True(frame.Navigate(typeof(NavigationTestPage), "first"));
+        Assert.Equal(typeof(NavigationTestPage), frame.SourcePageType);
+        Assert.IsType<NavigationTestPage>(frame.CurrentPage);
+        Assert.Equal("first", frame.CurrentPage!.NavigationParameter);
+
+        Assert.True(frame.Navigate(typeof(SecondNavigationTestPage), "second"));
+        Assert.True(frame.CanGoBack);
+        Assert.Equal(1, frame.BackStackDepth);
+        Assert.Equal(typeof(SecondNavigationTestPage), frame.SourcePageType);
+
+        Assert.True(frame.GoBack());
+        Assert.True(frame.CanGoForward);
+        Assert.Equal(typeof(NavigationTestPage), frame.SourcePageType);
+        Assert.Equal("first", frame.CurrentPage!.NavigationParameter);
+
+        Assert.True(frame.GoForward());
+        Assert.Equal(typeof(SecondNavigationTestPage), frame.SourcePageType);
+        Assert.Equal("second", frame.CurrentPage!.NavigationParameter);
+        Assert.Equal(4, navigated);
+    }
+
+    [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
     {
         var oldFlyout = new MenuFlyout();
@@ -922,6 +1105,14 @@ public sealed class FluentThemeManagerTests
     private sealed record CollectionRow(string Name, string State, int Count);
 
     private sealed record CollectionNode(string Name, string State, CollectionNode[] Children);
+
+    private sealed class NavigationTestPage : Page
+    {
+    }
+
+    private sealed class SecondNavigationTestPage : Page
+    {
+    }
 
     private static void ResetApplicationState()
     {

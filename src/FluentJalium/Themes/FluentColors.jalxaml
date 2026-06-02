@@ -101,6 +101,24 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="TabStripBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="TabStripBorder" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="TabContentBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="FrameBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="FrameBorderBrush" Color="#15FFFFFF" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -201,6 +219,24 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5C000000" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#0F000000" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#9E000000" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="TabStripBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="TabStripBorder" Color="#15000000" />
+            <SolidColorBrush x:Key="TabContentBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#09000000" />
+            <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="FrameBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="FrameBorderBrush" Color="#15000000" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -269,6 +305,24 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TabStripBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TabStripBorder" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TabContentBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#FF333333" />
+            <SolidColorBrush x:Key="TabItemIndicator" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="FrameBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="FrameBorderBrush" Color="#FFFFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

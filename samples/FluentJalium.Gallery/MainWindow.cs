@@ -13,9 +13,14 @@ using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
+using FWFrame = FluentJalium.Controls.FWFrame;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListView = FluentJalium.Controls.FWListView;
+using FWNavigationView = FluentJalium.Controls.FWNavigationView;
+using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
+using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
+using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
@@ -23,6 +28,8 @@ using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
+using FWTabControl = FluentJalium.Controls.FWTabControl;
+using FWTabItem = FluentJalium.Controls.FWTabItem;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
@@ -69,6 +76,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
         page.Children.Add(CreateCollectionsSection());
+        page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateRangeSection());
         page.Children.Add(CreateStateMatrix());
 
@@ -93,7 +101,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, and collection controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, collection, and navigation controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -209,6 +217,134 @@ public sealed class MainWindow : Window
         panel.Children.Add(topRow);
         panel.Children.Add(gridRow);
         return panel;
+    }
+
+    private UIElement CreateNavigationSection()
+    {
+        var panel = CreateSection("Navigation");
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 14
+        };
+
+        var dashboardItem = new FWNavigationViewItem
+        {
+            Content = "Dashboard",
+            Icon = CreateIcon("\uE80F")
+        };
+        var controlsItem = new FWNavigationViewItem
+        {
+            Content = "Controls",
+            Icon = CreateIcon("\uECAA"),
+            IsExpanded = true
+        };
+        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons", Icon = CreateIcon("\uE8FD") });
+        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Collections", Icon = CreateIcon("\uE8A9") });
+
+        var navigationView = new FWNavigationView
+        {
+            Width = 520,
+            Height = 230,
+            PaneTitle = "FluentJalium",
+            Header = "NavigationView",
+            SelectedItem = dashboardItem,
+            Content = CreateNavigationContent()
+        };
+        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Workspace" });
+        navigationView.MenuItems.Add(dashboardItem);
+        navigationView.MenuItems.Add(controlsItem);
+        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+        navigationView.MenuItems.Add(new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon("\uE8B7") });
+        navigationView.FooterMenuItems.Add(new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon("\uE713") });
+        navigationView.UpdateMenuItems();
+        row.Children.Add(navigationView);
+
+        var tabAndFrame = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12
+        };
+
+        var tabControl = new FWTabControl
+        {
+            Width = 430,
+            Height = 116,
+            SelectedIndex = 0
+        };
+        tabControl.Items.Add(new FWTabItem
+        {
+            Header = "Overview",
+            Content = CreateTabContent("Navigation items share the Fluent selection pill and hover states.")
+        });
+        tabControl.Items.Add(new FWTabItem
+        {
+            Header = "Details",
+            Content = CreateTabContent("Tabs use the shared accent indicator and theme-aware strip colors.")
+        });
+        tabControl.Items.Add(new FWTabItem
+        {
+            Header = "Disabled",
+            Content = CreateTabContent("Disabled tab sample"),
+            IsEnabled = false
+        });
+
+        var frame = new FWFrame
+        {
+            Width = 430,
+            Height = 98,
+            Padding = new Thickness(14),
+            BorderThickness = new Thickness(1),
+            Content = new TextBlock
+            {
+                Text = "FWFrame content host",
+                Foreground = ThemeBrush("TextPrimary"),
+                VerticalAlignment = VerticalAlignment.Center
+            }
+        };
+
+        tabAndFrame.Children.Add(tabControl);
+        tabAndFrame.Children.Add(frame);
+        row.Children.Add(tabAndFrame);
+
+        panel.Children.Add(row);
+        return panel;
+    }
+
+    private static UIElement CreateNavigationContent()
+    {
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Margin = new Thickness(18)
+        };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "NavigationView content",
+            FontSize = 18,
+            Foreground = ThemeBrush("TextPrimary")
+        });
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Selected, nested, footer, and separator states share FluentJalium tokens.",
+            Foreground = ThemeBrush("TextSecondary")
+        });
+
+        return panel;
+    }
+
+    private static UIElement CreateTabContent(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            Margin = new Thickness(12),
+            Foreground = ThemeBrush("TextPrimary"),
+            VerticalAlignment = VerticalAlignment.Center
+        };
     }
 
     private UIElement CreateButtonsSection()
