@@ -1,6 +1,7 @@
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Data;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
@@ -10,8 +11,11 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
+using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
+using FWListBox = FluentJalium.Controls.FWListBox;
+using FWListView = FluentJalium.Controls.FWListView;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
@@ -19,9 +23,13 @@ using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
+using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
+using FWTreeView = FluentJalium.Controls.FWTreeView;
+using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
+using GridViewColumn = Jalium.UI.Controls.GridViewColumn;
 
 namespace FluentJalium.Gallery;
 
@@ -60,6 +68,7 @@ public sealed class MainWindow : Window
         page.Children.Add(CreateSwitchesSection());
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
+        page.Children.Add(CreateCollectionsSection());
         page.Children.Add(CreateRangeSection());
         page.Children.Add(CreateStateMatrix());
 
@@ -84,7 +93,7 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, and selection controls.",
+            Text = "Fluent theme overlay plus FW-prefixed button, switch, range, selection, and collection controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
@@ -110,6 +119,95 @@ public sealed class MainWindow : Window
         row.Children.Add(CreateCommandButton("Green", () => ApplyAccent(Color.FromRgb(0x10, 0x7C, 0x10))));
 
         panel.Children.Add(row);
+        return panel;
+    }
+
+    private UIElement CreateCollectionsSection()
+    {
+        var panel = CreateSection("Collections and Tables");
+        var sampleRows = CreateSampleRows();
+        var sampleTree = CreateSampleTree();
+
+        var topRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 14
+        };
+
+        var listBox = new FWListBox
+        {
+            Width = 190,
+            Height = 152
+        };
+        listBox.Items.Add("Fluent tokens");
+        listBox.Items.Add("Control states");
+        listBox.Items.Add("Gallery coverage");
+        listBox.Items.Add("Disabled sample");
+        listBox.SelectedIndex = 1;
+        topRow.Children.Add(listBox);
+
+        var listView = new FWListView
+        {
+            Width = 340,
+            Height = 152,
+            ItemsSource = sampleRows,
+            View = CreateSampleGridView()
+        };
+        listView.SelectedIndex = 0;
+        topRow.Children.Add(listView);
+
+        var treeView = new FWTreeView
+        {
+            Width = 260,
+            Height = 152
+        };
+        treeView.Items.Add(new FWTreeViewItem
+        {
+            Header = "Workspace",
+            IsExpanded = true,
+            Items =
+            {
+                new FWTreeViewItem { Header = "Design" },
+                new FWTreeViewItem { Header = "Build" }
+            }
+        });
+        treeView.Items.Add(new FWTreeViewItem { Header = "Archive" });
+        topRow.Children.Add(treeView);
+
+        var dataGrid = new FWDataGrid
+        {
+            Width = 430,
+            Height = 180,
+            AutoGenerateColumns = false,
+            ItemsSource = sampleRows,
+            SelectedIndex = 1
+        };
+        dataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name"), Width = 150 });
+        dataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 110 });
+        dataGrid.Columns.Add(new DataGridTextColumn { Header = "Count", Binding = new Binding("Count"), Width = 80 });
+
+        var treeDataGrid = new FWTreeDataGrid
+        {
+            Width = 430,
+            Height = 180,
+            ChildrenSelector = item => ((GalleryTreeRow)item).Children,
+            HasChildrenSelector = item => ((GalleryTreeRow)item).Children.Length > 0
+        };
+        treeDataGrid.ItemsSource = sampleTree;
+        treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "Area", Binding = new Binding("Name"), Width = 170 });
+        treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 120 });
+        treeDataGrid.ExpandAll();
+
+        var gridRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 14
+        };
+        gridRow.Children.Add(dataGrid);
+        gridRow.Children.Add(treeDataGrid);
+
+        panel.Children.Add(topRow);
+        panel.Children.Add(gridRow);
         return panel;
     }
 
@@ -484,6 +582,49 @@ public sealed class MainWindow : Window
         return comboBox;
     }
 
+    private static GridView CreateSampleGridView()
+    {
+        var view = new GridView();
+        view.Columns.Add(new GridViewColumn
+        {
+            Header = "Name",
+            DisplayMemberBinding = new Binding("Name"),
+            Width = 150
+        });
+        view.Columns.Add(new GridViewColumn
+        {
+            Header = "State",
+            DisplayMemberBinding = new Binding("State"),
+            Width = 110
+        });
+        return view;
+    }
+
+    private static GalleryRow[] CreateSampleRows()
+    {
+        return
+        [
+            new GalleryRow("Buttons", "Complete", 9),
+            new GalleryRow("Selection", "Review", 4),
+            new GalleryRow("Collections", "Active", 8)
+        ];
+    }
+
+    private static GalleryTreeRow[] CreateSampleTree()
+    {
+        return
+        [
+            new GalleryTreeRow(
+                "FluentJalium",
+                "Active",
+                [
+                    new GalleryTreeRow("Theme resources", "Loaded", []),
+                    new GalleryTreeRow("FW controls", "Expanding", [])
+                ]),
+            new GalleryTreeRow("Gallery", "Visible", [])
+        ];
+    }
+
     private void ApplyTheme(FluentThemeVariant theme)
     {
         FluentThemeManager.ApplyTheme(theme);
@@ -514,4 +655,8 @@ public sealed class MainWindow : Window
             Foreground = ThemeBrush("TextPrimary")
         };
     }
+
+    private sealed record GalleryRow(string Name, string State, int Count);
+
+    private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
 }

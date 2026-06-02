@@ -5,6 +5,7 @@ using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Data;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
@@ -48,6 +49,14 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
+            AssertBasedOnStyle<FWListBox, ListBox>(app.Resources);
+            AssertBasedOnStyle<FWListBoxItem, ListBoxItem>(app.Resources);
+            AssertBasedOnStyle<FWListView, ListView>(app.Resources);
+            AssertBasedOnStyle<FWListViewItem, ListViewItem>(app.Resources);
+            AssertBasedOnStyle<FWTreeView, TreeView>(app.Resources);
+            AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
+            AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
+            AssertBasedOnStyle<FWTreeDataGrid, TreeDataGrid>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
@@ -148,6 +157,19 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<ProgressBar>(dictionary);
         AssertContainsStyle<ComboBox>(dictionary);
         AssertContainsStyle<ComboBoxItem>(dictionary);
+        AssertContainsStyle<ListBox>(dictionary);
+        AssertContainsStyle<ListBoxItem>(dictionary);
+        AssertContainsStyle<ListView>(dictionary);
+        AssertContainsStyle<ListViewItem>(dictionary);
+        AssertContainsStyle<GridViewColumnHeader>(dictionary);
+        AssertContainsStyle<TreeView>(dictionary);
+        AssertContainsStyle<TreeViewItem>(dictionary);
+        AssertContainsStyle<DataGrid>(dictionary);
+        AssertContainsStyle<DataGridRow>(dictionary);
+        AssertContainsStyle<DataGridCell>(dictionary);
+        AssertContainsStyle<Jalium.UI.Controls.DataGridColumnHeader>(dictionary);
+        AssertContainsStyle<TreeDataGrid>(dictionary);
+        AssertContainsStyle<TreeDataGridRow>(dictionary);
         AssertContainsStyle<FWProgressRing>(dictionary);
         AssertContainsStyle<FWDropDownButton>(dictionary);
         AssertContainsStyle<SplitButton>(dictionary);
@@ -165,6 +187,7 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("SliderThumb"));
         Assert.True(dictionary.Contains("ProgressRingForeground"));
         Assert.True(dictionary.Contains("SelectionBackgroundWeak"));
+        Assert.True(dictionary.Contains("DividerStrokeColorDefaultBrush"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
@@ -268,6 +291,33 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void CollectionsBatch_ShouldExposeFwStylesForCollectionAndTableControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWListBox, ListBox>(app.Resources);
+            AssertBasedOnStyle<FWListBoxItem, ListBoxItem>(app.Resources);
+            AssertBasedOnStyle<FWListView, ListView>(app.Resources);
+            AssertBasedOnStyle<FWListViewItem, ListViewItem>(app.Resources);
+            AssertBasedOnStyle<FWTreeView, TreeView>(app.Resources);
+            AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
+            AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
+            AssertBasedOnStyle<FWTreeDataGrid, TreeDataGrid>(app.Resources);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FluentControls_ShouldExposeFwPrefixedButtonSurface()
     {
         AssertFluentControl<FWButton, Button>();
@@ -295,6 +345,19 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWRadioButton, RadioButton>();
         AssertFluentControl<FWComboBox, ComboBox>();
         AssertFluentControl<FWComboBoxItem, ComboBoxItem>();
+    }
+
+    [Fact]
+    public void FluentCollectionControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWListBox, ListBox>();
+        AssertFluentControl<FWListBoxItem, ListBoxItem>();
+        AssertFluentControl<FWListView, ListView>();
+        AssertFluentControl<FWListViewItem, ListViewItem>();
+        AssertFluentControl<FWTreeView, TreeView>();
+        AssertFluentControl<FWTreeViewItem, TreeViewItem>();
+        AssertFluentControl<FWDataGrid, DataGrid>();
+        AssertFluentControl<FWTreeDataGrid, TreeDataGrid>();
     }
 
     [Fact]
@@ -547,6 +610,164 @@ public sealed class FluentThemeManagerTests
         Assert.False(ring.IsActive);
         Assert.True(ring.IsIndeterminate);
     }
+
+    [Fact]
+    public void FWListBox_ShouldSynchronizeSelectionAndSelectedItems()
+    {
+        var listBox = new FWListBox();
+        listBox.Items.Add("Inbox");
+        listBox.Items.Add("Archive");
+        listBox.Items.Add("Deleted");
+
+        var selectionChanged = 0;
+        listBox.SelectionChanged += (_, _) => selectionChanged++;
+
+        listBox.SelectedIndex = 1;
+
+        Assert.Equal(1, listBox.SelectedIndex);
+        Assert.Equal("Archive", listBox.SelectedItem);
+        Assert.Equal(1, selectionChanged);
+
+        listBox.SelectionMode = SelectionMode.Multiple;
+        listBox.SelectAll();
+
+        Assert.Equal(3, listBox.SelectedItems.Count);
+
+        listBox.UnselectAll();
+
+        Assert.Empty(listBox.SelectedItems);
+        Assert.Null(listBox.SelectedItem);
+    }
+
+    [Fact]
+    public void FWListView_ShouldExposeGridViewColumnsAndSelection()
+    {
+        var items = new[]
+        {
+            new CollectionRow("Mail", "Unread", 12),
+            new CollectionRow("Calendar", "Pinned", 3)
+        };
+        var view = new GridView();
+        view.Columns.Add(new GridViewColumn
+        {
+            Header = "Name",
+            DisplayMemberBinding = new Binding("Name"),
+            Width = 140
+        });
+        view.Columns.Add(new GridViewColumn
+        {
+            Header = "State",
+            DisplayMemberBinding = new Binding("State"),
+            Width = 110
+        });
+
+        var listView = new FWListView
+        {
+            View = view,
+            ItemsSource = items
+        };
+
+        listView.SelectedIndex = 1;
+
+        Assert.Equal(2, view.Columns.Count);
+        Assert.Equal("State", view.Columns[1].Header);
+        Assert.Equal(items[1], listView.SelectedItem);
+    }
+
+    [Fact]
+    public void FWTreeViewItem_ShouldExposeExpandAndSelectionState()
+    {
+        var root = new FWTreeViewItem
+        {
+            Header = "Root"
+        };
+        root.Items.Add(new FWTreeViewItem { Header = "Child" });
+
+        var treeView = new FWTreeView();
+        var selectedChanged = 0;
+        treeView.SelectedItemChanged += (_, _) => selectedChanged++;
+        treeView.Items.Add(root);
+
+        root.IsExpanded = true;
+        treeView.SelectedItem = root;
+
+        Assert.True(root.IsExpanded);
+        Assert.True(root.IsSelected);
+        Assert.Equal(root, treeView.SelectedItem);
+        Assert.Equal(1, selectedChanged);
+    }
+
+    [Fact]
+    public void FWDataGrid_ShouldGenerateColumnsAndSynchronizeSelection()
+    {
+        var rows = new[]
+        {
+            new CollectionRow("Inbox", "Unread", 12),
+            new CollectionRow("Archive", "Stored", 42)
+        };
+        var dataGrid = new FWDataGrid
+        {
+            ItemsSource = rows
+        };
+        var selectionChanged = 0;
+        dataGrid.SelectionChanged += (_, _) => selectionChanged++;
+
+        dataGrid.SelectedIndex = 1;
+
+        Assert.True(dataGrid.Columns.Count >= 3);
+        Assert.Equal(1, dataGrid.SelectedIndex);
+        Assert.Equal(rows[1], dataGrid.SelectedItem);
+        Assert.Contains(rows[1], dataGrid.SelectedItems);
+        Assert.Equal(1, selectionChanged);
+    }
+
+    [Fact]
+    public void FWTreeDataGrid_ShouldExpandCollapseAndSynchronizeSelection()
+    {
+        var rows = new[]
+        {
+            new CollectionNode(
+                "Workspace",
+                "Open",
+                [
+                    new CollectionNode("Docs", "Synced", []),
+                    new CollectionNode("Design", "Review", [])
+                ]),
+            new CollectionNode("Archive", "Closed", [])
+        };
+        var grid = new FWTreeDataGrid
+        {
+            ChildrenSelector = item => ((CollectionNode)item).Children,
+            HasChildrenSelector = item => ((CollectionNode)item).Children.Length > 0
+        };
+        grid.ItemsSource = rows;
+        grid.Columns.Add(new DataGridTextColumn
+        {
+            Header = "Name",
+            Binding = new Binding("Name"),
+            Width = 160
+        });
+        grid.Columns.Add(new DataGridTextColumn
+        {
+            Header = "State",
+            Binding = new Binding("State"),
+            Width = 120
+        });
+
+        Assert.Equal(2, grid.FlattenedCount);
+
+        grid.ExpandAll();
+        grid.SelectedIndex = 1;
+
+        Assert.Equal(4, grid.FlattenedCount);
+        Assert.Equal(rows[0].Children[0], grid.SelectedItem);
+        Assert.Contains(rows[0].Children[0], grid.SelectedItems);
+
+        grid.CollapseAll();
+
+        Assert.Equal(2, grid.FlattenedCount);
+    }
+
     [Fact]
     public void FWDropDownButton_ShouldSynchronizeFlyoutOpenState()
     {
@@ -697,6 +918,10 @@ public sealed class FluentThemeManagerTests
     {
         return Assert.IsType<SolidColorBrush>(value).Color;
     }
+
+    private sealed record CollectionRow(string Name, string State, int Count);
+
+    private sealed record CollectionNode(string Name, string State, CollectionNode[] Children);
 
     private static void ResetApplicationState()
     {

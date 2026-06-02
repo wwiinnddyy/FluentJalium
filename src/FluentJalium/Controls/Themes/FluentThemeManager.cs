@@ -200,6 +200,14 @@ public static class FluentThemeManager
         AliasStyle<FWProgressBar, ProgressBar>(dictionary);
         AliasStyle<FWComboBox, ComboBox>(dictionary);
         AliasStyle<FWComboBoxItem, ComboBoxItem>(dictionary);
+        AliasStyle<FWListBox, ListBox>(dictionary);
+        AliasStyle<FWListBoxItem, ListBoxItem>(dictionary);
+        AliasStyle<FWListView, ListView>(dictionary);
+        AliasStyle<FWListViewItem, ListViewItem>(dictionary);
+        AliasStyle<FWTreeView, TreeView>(dictionary);
+        AliasStyle<FWTreeViewItem, TreeViewItem>(dictionary);
+        AliasStyle<FWDataGrid, DataGrid>(dictionary);
+        AliasStyle<FWTreeDataGrid, TreeDataGrid>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);

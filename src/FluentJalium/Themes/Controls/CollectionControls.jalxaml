@@ -1,0 +1,586 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="ListBox">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="3" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListBox">
+                <Border Name="PART_OuterBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Padding" Value="8,6,8,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListBoxItem">
+                <Grid>
+                    <Border Name="PART_BackgroundBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Name="SelectionPill"
+                                    Grid.Column="0"
+                                    Width="3"
+                                    Height="18"
+                                    Background="{ThemeResource AccentBrush}"
+                                    CornerRadius="2"
+                                    VerticalAlignment="Center"
+                                    Opacity="0" />
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="8,0,0,0"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackgroundWeak}" />
+                <Setter TargetName="SelectionPill" Property="Opacity" Value="1" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+                <Setter TargetName="SelectionPill" Property="Opacity" Value="1" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter TargetName="SelectionPill" Property="Background" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ListView">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListView">
+                <Border Name="PART_OuterBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Name="PART_ColumnHeadersBorder"
+                                Grid.Row="0"
+                                Background="{ThemeResource ControlBackground}"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1"
+                                Visibility="Collapsed">
+                            <StackPanel Name="PART_ColumnHeadersHost"
+                                        Orientation="Horizontal" />
+                        </Border>
+                        <ScrollViewer Grid.Row="1"
+                                      Margin="3"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="ListViewItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Padding" Value="8,5,8,5" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ListViewItem">
+                <Border Name="PART_BackgroundBorder"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4"
+                        Padding="{TemplateBinding Padding}">
+                    <StackPanel Name="PART_CellsPanel"
+                                Orientation="Horizontal">
+                        <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackgroundWeak}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Background" Value="Transparent" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="GridViewColumnHeader">
+        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="Padding" Value="10,6,8,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="GridViewColumnHeader">
+                <Border Name="PART_HeaderBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,1,0"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter Grid.Column="0"
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="Center" />
+                        <TextBlock Name="PART_SortIndicator"
+                                   Grid.Column="1"
+                                   Foreground="{ThemeResource TextSecondary}"
+                                   VerticalAlignment="Center"
+                                   Margin="6,0,0,0"
+                                   Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TreeView">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="3" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeView">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ScrollViewer Name="PART_ScrollViewer"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TreeViewItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Padding" Value="8,5,8,5" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeViewItem">
+                <StackPanel>
+                    <Border Name="PART_HeaderBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            MinHeight="32">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Name="PART_IndentSpacer"
+                                    Grid.Column="0"
+                                    Width="0" />
+                            <Border Name="PART_ExpanderBorder"
+                                    Grid.Column="1"
+                                    Width="24"
+                                    Visibility="Collapsed">
+                                <Path Name="PART_ExpanderArrow"
+                                      Data="M 0,0 L 8,4 L 0,8 Z"
+                                      Fill="{ThemeResource TextSecondary}"
+                                      Width="8"
+                                      Height="8"
+                                      Stretch="Uniform"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                            </Border>
+                            <ContentPresenter Name="PART_Header"
+                                              Grid.Column="2"
+                                              Content="{TemplateBinding Header}"
+                                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Grid>
+                    </Border>
+                    <ItemsPresenter Name="PART_ItemsHost"
+                                    Visibility="Collapsed" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackgroundWeak}" />
+                <Setter TargetName="PART_ExpanderArrow" Property="Fill" Value="{ThemeResource AccentBrush}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter TargetName="PART_ExpanderArrow" Property="Fill" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="RowHeight" Value="32" />
+        <Setter Property="ColumnHeaderHeight" Value="36" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="RowBackground" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DataGrid">
+                <Border Name="PART_OuterBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Name="PART_ColumnHeadersBorder"
+                                Grid.Row="0"
+                                Background="{ThemeResource ControlBackground}"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1">
+                            <ScrollViewer Name="PART_ColumnHeadersScrollViewer"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Disabled"
+                                          Focusable="False">
+                                <StackPanel Name="PART_ColumnHeadersHost"
+                                            Orientation="Horizontal" />
+                            </ScrollViewer>
+                        </Border>
+                        <ScrollViewer Name="PART_DataScrollViewer"
+                                      Grid.Row="1"
+                                      Focusable="False"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Name="PART_RowsHost" />
+                        </ScrollViewer>
+                        <Canvas Name="PART_DragOverlay"
+                                Grid.RowSpan="2"
+                                IsHitTestVisible="False"
+                                Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="DataGridRow">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DataGridRow">
+                <Border Name="PART_RowBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel Name="PART_CellsPanel"
+                                Orientation="Horizontal" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="DataGridCell">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Padding" Value="10,5,10,5" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DataGridCell">
+                <Border Name="PART_CellBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,1,0"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="Padding" Value="10,7,6,7" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DataGridColumnHeader">
+                <Grid>
+                    <Border Name="PART_HeaderBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                            BorderThickness="0,0,1,0"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter Grid.Column="0"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center" />
+                            <TextBlock Name="PART_SortIndicator"
+                                       Grid.Column="1"
+                                       Foreground="{ThemeResource TextSecondary}"
+                                       FontSize="10"
+                                       VerticalAlignment="Center"
+                                       Margin="6,0,0,0" />
+                        </Grid>
+                    </Border>
+                    <Border Name="PART_ResizeGrip"
+                            HorizontalAlignment="Right"
+                            Width="8"
+                            Background="Transparent" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TreeDataGrid">
+        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="RowHeight" Value="32" />
+        <Setter Property="ColumnHeaderHeight" Value="36" />
+        <Setter Property="HorizontalGridLinesBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="VerticalGridLinesBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="AlternatingRowBackground" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="RowBackground" Value="Transparent" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeDataGrid">
+                <Border Name="PART_OuterBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Name="PART_ColumnHeadersBorder"
+                                Grid.Row="0"
+                                Background="{ThemeResource ControlBackground}"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1">
+                            <ScrollViewer Name="PART_ColumnHeadersScrollViewer"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Disabled"
+                                          Focusable="False">
+                                <StackPanel Name="PART_ColumnHeadersHost"
+                                            Orientation="Horizontal" />
+                            </ScrollViewer>
+                        </Border>
+                        <ScrollViewer Name="PART_DataScrollViewer"
+                                      Grid.Row="1"
+                                      Focusable="False"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Name="PART_RowsHost" />
+                        </ScrollViewer>
+                        <Canvas Name="PART_DragOverlay"
+                                Grid.RowSpan="2"
+                                IsHitTestVisible="False"
+                                Visibility="Collapsed" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TreeDataGridRow">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeDataGridRow">
+                <Border Name="PART_RowBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel Name="PART_CellsPanel"
+                                Orientation="Horizontal" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

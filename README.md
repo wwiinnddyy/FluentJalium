@@ -19,6 +19,8 @@ The third FW batch covers drag and range controls: `FWSlider`, `FWRangeSlider`, 
 
 The fourth FW batch covers selection controls: `FWCheckBox`, `FWRadioButton`, `FWComboBox`, and `FWComboBoxItem`.
 
+The fifth FW batch covers collection and table controls: `FWListBox`, `FWListBoxItem`, `FWListView`, `FWListViewItem`, `FWTreeView`, `FWTreeViewItem`, `FWDataGrid`, and `FWTreeDataGrid`.
+
 ## Usage
 
 Call `FluentThemeManager.Apply(app)` after creating your Jalium `Application`:
@@ -42,6 +44,8 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWToggleSwitch Header="Sync" IsOn="True" />
 <fluent:FWProgressRing IsIndeterminate="False" Value="72" />
 <fluent:FWComboBox PlaceholderText="Choose an item" />
+<fluent:FWListBox SelectedIndex="0" />
+<fluent:FWDataGrid AutoGenerateColumns="True" />
 ```
 
 ## Build
