@@ -94,9 +94,13 @@ namespace FluentJalium.Gallery;
 public sealed class MainWindow : Window
 {
     private readonly List<FWNavigationViewItem> _navigationItems = [];
+    private GalleryPage[] _pages = [];
     private FWNavigationView? _navigationView;
     private FWScrollViewer? _contentScrollViewer;
+    private FWTextBox? _searchBox;
     private GalleryPage? _selectedPage;
+    private string _navigationSearchText = string.Empty;
+    private bool _isShowingSearchEmptyState;
 
     public MainWindow()
     {
@@ -111,10 +115,10 @@ public sealed class MainWindow : Window
 
     private UIElement BuildShell()
     {
-        var pages = CreateGalleryPages();
+        _pages = CreateGalleryPages();
         _contentScrollViewer = new FWScrollViewer
         {
-            Background = ThemeBrush("WindowBackground"),
+            Background = ThemeBrush("NavigationViewContentBackground"),
             Padding = new Thickness(0),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
@@ -125,19 +129,19 @@ public sealed class MainWindow : Window
         {
             Background = ThemeBrush("WindowBackground"),
             PaneBackground = ThemeBrush("NavigationViewPaneBackground"),
-            ContentBackground = ThemeBrush("WindowBackground"),
+            ContentBackground = ThemeBrush("NavigationViewContentBackground"),
             PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
             IsPaneOpen = true,
-            OpenPaneLength = 292,
+            OpenPaneLength = 320,
             CompactPaneLength = 48,
             PaneHeader = CreatePaneHeader(),
             Content = _contentScrollViewer
         };
         _navigationView.SelectionChanged += OnNavigationSelectionChanged;
 
-        PopulateNavigationItems(_navigationView, pages);
+        PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
         _navigationView.SelectedItem = _navigationItems[0];
-        SelectPage(pages[0]);
+        SelectPage(_pages[0]);
         return _navigationView;
     }
 
@@ -145,79 +149,108 @@ public sealed class MainWindow : Window
     {
         return
         [
-            new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", () => CreatePageStack(CreateThemeControls())),
-            new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, and app bar buttons.", () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection())),
-            new GalleryPage("Switches", "ToggleButton and ToggleSwitch states for checked, unchecked, indeterminate, and disabled surfaces.", () => CreatePageStack(CreateSwitchesSection())),
-            new GalleryPage("Text Input", "TextBox, PasswordBox, NumberBox, AutoCompleteBox, and RichTextBox surfaces.", () => CreatePageStack(CreateTextSection())),
-            new GalleryPage("Selection", "CheckBox, RadioButton, ComboBox, and ComboBoxItem controls.", () => CreatePageStack(CreateSelectionSection())),
-            new GalleryPage("Range", "Slider, RangeSlider, ProgressBar, and ProgressRing controls.", () => CreatePageStack(CreateRangeSection())),
-            new GalleryPage("Content and Layout", "TextBlock, AccessText, Border, content hosts, StackPanel, WrapPanel, and Grid foundations.", () => CreatePageStack(CreateContentLayoutSection())),
-            new GalleryPage("Visuals", "Image, icon, label, separator, and Viewbox foundation controls.", () => CreatePageStack(CreateVisualsSection())),
-            new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", () => CreatePageStack(CreateInteractionSection())),
-            new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", () => CreatePageStack(CreateAdvancedInputMediaSection())),
-            new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", () => CreatePageStack(CreateCollectionsSection())),
-            new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", () => CreatePageStack(CreateNavigationSection())),
-            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", () => CreatePageStack(CreateMenusSection())),
-            new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", () => CreatePageStack(CreateDisclosureDialogsSection())),
-            new GalleryPage("Date and Time", "DatePicker, TimePicker, and Calendar controls.", () => CreatePageStack(CreateDateTimeSection())),
-            new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", () => CreatePageStack(CreateStatusSection())),
-            new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", () => CreatePageStack(CreateStateMatrix()))
+            new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, "\uE80F", () => CreatePageStack(CreateThemeControls()), "home design system theme typography accent light dark high contrast"),
+            new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, and app bar buttons.", GalleryNavigationGroup.ControlSurfaces, "\uE8FD", () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()), "FWButton FWRepeatButton FWHyperlinkButton FWDropDownButton FWSplitButton FWToggleSplitButton FWAppBarButton FWAppBarToggleButton FWAppBarSeparator command bar"),
+            new GalleryPage("Switches", "ToggleButton and ToggleSwitch states for checked, unchecked, indeterminate, and disabled surfaces.", GalleryNavigationGroup.ControlSurfaces, "\uE7F4", () => CreatePageStack(CreateSwitchesSection()), "FWToggleButton FWToggleSwitch checked unchecked indeterminate"),
+            new GalleryPage("Text Input", "TextBox, PasswordBox, NumberBox, AutoCompleteBox, and RichTextBox surfaces.", GalleryNavigationGroup.Input, "\uE8D2", () => CreatePageStack(CreateTextSection()), "FWTextBox FWPasswordBox FWNumberBox FWAutoCompleteBox FWRichTextBox search form input"),
+            new GalleryPage("Selection", "CheckBox, RadioButton, ComboBox, and ComboBoxItem controls.", GalleryNavigationGroup.Input, "\uE73A", () => CreatePageStack(CreateSelectionSection()), "FWCheckBox FWRadioButton FWComboBox FWComboBoxItem pick choose"),
+            new GalleryPage("Range", "Slider, RangeSlider, ProgressBar, and ProgressRing controls.", GalleryNavigationGroup.Input, "\uE9F5", () => CreatePageStack(CreateRangeSection()), "FWSlider FWRangeSlider FWProgressBar FWProgressRing value loading"),
+            new GalleryPage("Date and Time", "DatePicker, TimePicker, and Calendar controls.", GalleryNavigationGroup.Input, "\uE787", () => CreatePageStack(CreateDateTimeSection()), "FWDatePicker FWTimePicker FWCalendar schedule calendar"),
+            new GalleryPage("Content and Layout", "TextBlock, AccessText, Border, content hosts, StackPanel, WrapPanel, and Grid foundations.", GalleryNavigationGroup.LayoutAndMedia, "\uE8A9", () => CreatePageStack(CreateContentLayoutSection()), "FWTextBlock FWAccessText FWBorder FWContentControl FWContentPresenter FWStackPanel FWWrapPanel FWGrid layout"),
+            new GalleryPage("Visuals", "Image, icon, label, separator, and Viewbox foundation controls.", GalleryNavigationGroup.LayoutAndMedia, "\uE8B9", () => CreatePageStack(CreateVisualsSection()), "FWImage FWFontIcon FWSymbolIcon FWPathIcon FWLabel FWSeparator FWViewbox visual icon"),
+            new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", GalleryNavigationGroup.LayoutAndMedia, "\uE7C9", () => CreatePageStack(CreateInteractionSection()), "FWScrollViewer FWSwipeControl FWGridSplitter scrolling resize"),
+            new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, "\uE7FC", () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
+            new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, "\uE8A9", () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
+            new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, "\uE700", () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
+            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, "\uE8FD", () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
+            new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, "\uE70E", () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
+            new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", GalleryNavigationGroup.AppStructure, "\uE946", () => CreatePageStack(CreateStatusSection()), "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar notification message severity"),
+            new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", GalleryNavigationGroup.Diagnostics, "\uE9D9", () => CreatePageStack(CreateStateMatrix()), "states normal hover pressed selected disabled light dark high contrast", IsFooter: true)
         ];
     }
 
-    private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages)
+    private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
     {
         _navigationItems.Clear();
+        navigationView.MenuItems.Clear();
+        navigationView.FooterMenuItems.Clear();
 
-        navigationView.MenuItems.Add(CreateNavigationItem(pages[0], "\uE80F"));
-        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
-        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Controls" });
-        AddNavigationItem(navigationView, pages[1], "\uE8FD");
-        AddNavigationItem(navigationView, pages[2], "\uE7F4");
-        AddNavigationItem(navigationView, pages[3], "\uE8D2");
-        AddNavigationItem(navigationView, pages[4], "\uE73A");
-        AddNavigationItem(navigationView, pages[5], "\uE9F5");
-        AddNavigationItem(navigationView, pages[6], "\uE8A9");
-        AddNavigationItem(navigationView, pages[7], "\uE8B9");
-        AddNavigationItem(navigationView, pages[8], "\uE7C9");
-        AddNavigationItem(navigationView, pages[9], "\uE7FC");
+        var matchingPages = pages
+            .Where(page => MatchesNavigationSearch(page, searchText))
+            .ToArray();
 
-        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
-        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "App structure" });
-        AddNavigationItem(navigationView, pages[10], "\uE8A9");
-        AddNavigationItem(navigationView, pages[11], "\uE700");
-        AddNavigationItem(navigationView, pages[12], "\uE8FD");
-        AddNavigationItem(navigationView, pages[13], "\uE70E");
-        AddNavigationItem(navigationView, pages[14], "\uE787");
-        AddNavigationItem(navigationView, pages[15], "\uE946");
+        var homePage = matchingPages.FirstOrDefault(page => page.Group == GalleryNavigationGroup.Home);
+        if (homePage != null)
+        {
+            navigationView.MenuItems.Add(CreateNavigationItem(homePage));
+        }
 
-        navigationView.FooterMenuItems.Add(CreateNavigationItem(pages[16], "\uE9D9"));
+        var groupedPages = GalleryNavigationGroup.Order
+            .Select(groupName => new
+            {
+                GroupName = groupName,
+                Pages = matchingPages
+                    .Where(page => !page.IsFooter && page.Group == groupName)
+                    .ToArray()
+            })
+            .Where(group => group.Pages.Length > 0)
+            .ToArray();
+
+        if (homePage != null && groupedPages.Length > 0)
+        {
+            navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+        }
+
+        foreach (var group in groupedPages)
+        {
+            var groupItem = CreateNavigationGroupItem(group.GroupName);
+            foreach (var page in group.Pages)
+            {
+                groupItem.MenuItems.Add(CreateNavigationItem(page));
+            }
+
+            navigationView.MenuItems.Add(groupItem);
+        }
+
+        foreach (var page in matchingPages.Where(page => page.IsFooter))
+        {
+            navigationView.FooterMenuItems.Add(CreateNavigationItem(page));
+        }
+
         navigationView.UpdateMenuItems();
     }
 
-    private void AddNavigationItem(FWNavigationView navigationView, GalleryPage page, string glyph)
+    private static FWNavigationViewItem CreateNavigationGroupItem(string groupName)
     {
-        navigationView.MenuItems.Add(CreateNavigationItem(page, glyph));
+        return new FWNavigationViewItem
+        {
+            Content = groupName,
+            Icon = CreateIcon(GalleryNavigationGroup.GetGlyph(groupName)),
+            IsExpanded = true,
+            SelectsOnInvoked = false,
+            Tag = groupName
+        };
     }
 
-    private FWNavigationViewItem CreateNavigationItem(GalleryPage page, string glyph)
+    private FWNavigationViewItem CreateNavigationItem(GalleryPage page)
     {
         var item = new FWNavigationViewItem
         {
             Content = page.Title,
-            Icon = CreateIcon(glyph),
+            Icon = CreateIcon(page.Glyph),
             Tag = page
         };
         _navigationItems.Add(item);
         return item;
     }
 
-    private static UIElement CreatePaneHeader()
+    private UIElement CreatePaneHeader()
     {
         var panel = new StackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 10
+            Spacing = 10,
+            Margin = new Thickness(0, 4, 0, 2)
         };
 
         panel.Children.Add(new TextBlock
@@ -233,12 +266,16 @@ public sealed class MainWindow : Window
             FontSize = 12,
             Foreground = ThemeBrush("TextSecondary")
         });
-        panel.Children.Add(new FWTextBox
+
+        _searchBox = new FWTextBox
         {
-            PlaceholderText = "Search controls",
+            Text = _navigationSearchText,
+            PlaceholderText = "Search controls and samples",
             MinHeight = 32,
             Margin = new Thickness(0, 2, 0, 0)
-        });
+        };
+        _searchBox.TextChanged += OnNavigationSearchTextChanged;
+        panel.Children.Add(_searchBox);
         return panel;
     }
 
@@ -264,7 +301,7 @@ public sealed class MainWindow : Window
         {
             Orientation = Orientation.Vertical,
             Spacing = 18,
-            Margin = new Thickness(28, 24, 28, 28)
+            Margin = new Thickness(40, 32, 40, 40)
         };
 
         stack.Children.Add(new TextBlock
@@ -285,6 +322,100 @@ public sealed class MainWindow : Window
         return stack;
     }
 
+    private UIElement CreateSearchEmptyContent(string searchText)
+    {
+        var stack = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Margin = new Thickness(40, 36, 40, 40)
+        };
+
+        stack.Children.Add(new TextBlock
+        {
+            Text = "No results",
+            FontSize = 28,
+            FontFamily = "Segoe UI Variable Display",
+            Foreground = ThemeBrush("TextPrimary")
+        });
+        stack.Children.Add(new TextBlock
+        {
+            Text = string.IsNullOrWhiteSpace(searchText)
+                ? "No Gallery pages are available."
+                : $"No Gallery pages match \"{searchText.Trim()}\".",
+            FontSize = 14,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        return stack;
+    }
+
+    private void OnNavigationSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (sender is not FWTextBox textBox)
+        {
+            return;
+        }
+
+        var searchText = textBox.Text ?? string.Empty;
+        if (string.Equals(_navigationSearchText, searchText, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _navigationSearchText = searchText;
+        RefreshNavigationForSearch();
+    }
+
+    private void RefreshNavigationForSearch()
+    {
+        if (_navigationView == null)
+        {
+            return;
+        }
+
+        var preferredPage = _selectedPage;
+        PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
+
+        if (preferredPage != null && TrySelectNavigationPage(preferredPage))
+        {
+            return;
+        }
+
+        if (_navigationItems.Count > 0 && _navigationItems[0].Tag is GalleryPage firstPage)
+        {
+            _navigationView.SelectedItem = _navigationItems[0];
+            SelectPage(firstPage);
+            return;
+        }
+
+        _navigationView.SelectedItem = null;
+        _isShowingSearchEmptyState = true;
+        if (_contentScrollViewer != null)
+        {
+            _contentScrollViewer.Content = CreateSearchEmptyContent(_navigationSearchText);
+        }
+    }
+
+    private bool TrySelectNavigationPage(GalleryPage page)
+    {
+        if (_navigationView == null)
+        {
+            return false;
+        }
+
+        var item = _navigationItems.FirstOrDefault(navigationItem => ReferenceEquals(navigationItem.Tag, page));
+        if (item == null)
+        {
+            return false;
+        }
+
+        _navigationView.SelectedItem = item;
+        SelectPage(page);
+        return true;
+    }
+
     private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
     {
         if (e.SelectedItem?.Tag is GalleryPage page)
@@ -296,6 +427,7 @@ public sealed class MainWindow : Window
     private void SelectPage(GalleryPage page)
     {
         _selectedPage = page;
+        _isShowingSearchEmptyState = false;
 
         if (_contentScrollViewer != null)
         {
@@ -311,12 +443,21 @@ public sealed class MainWindow : Window
         {
             _navigationView.Background = ThemeBrush("WindowBackground");
             _navigationView.PaneBackground = ThemeBrush("NavigationViewPaneBackground");
-            _navigationView.ContentBackground = ThemeBrush("WindowBackground");
+            _navigationView.ContentBackground = ThemeBrush("NavigationViewContentBackground");
+            _navigationView.PaneHeader = CreatePaneHeader();
         }
-        if (_selectedPage != null && _contentScrollViewer != null)
+        if (_contentScrollViewer != null)
         {
-            _contentScrollViewer.Background = ThemeBrush("WindowBackground");
-            _contentScrollViewer.Content = CreatePageContent(_selectedPage);
+            _contentScrollViewer.Background = ThemeBrush("NavigationViewContentBackground");
+
+            if (_isShowingSearchEmptyState)
+            {
+                _contentScrollViewer.Content = CreateSearchEmptyContent(_navigationSearchText);
+            }
+            else if (_selectedPage != null)
+            {
+                _contentScrollViewer.Content = CreatePageContent(_selectedPage);
+            }
         }
     }
 
@@ -2193,5 +2334,73 @@ public sealed class MainWindow : Window
 
     private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
 
-    private sealed record GalleryPage(string Title, string Description, Func<UIElement> CreateContent);
+    private sealed record GalleryPage(
+        string Title,
+        string Description,
+        string Group,
+        string Glyph,
+        Func<UIElement> CreateContent,
+        string SearchText,
+        bool IsFooter = false);
+
+    private static bool MatchesNavigationSearch(GalleryPage page, string searchText)
+    {
+        var query = searchText.Trim();
+        if (query.Length == 0)
+        {
+            return true;
+        }
+
+        foreach (var token in query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!ContainsIgnoreCase(page.Title, token)
+                && !ContainsIgnoreCase(page.Description, token)
+                && !ContainsIgnoreCase(page.Group, token)
+                && !ContainsIgnoreCase(page.SearchText, token))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool ContainsIgnoreCase(string value, string query)
+    {
+        return value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private static class GalleryNavigationGroup
+    {
+        public const string Home = "Home";
+        public const string ControlSurfaces = "Control surfaces";
+        public const string Input = "Input";
+        public const string LayoutAndMedia = "Layout and media";
+        public const string CollectionsAndData = "Collections and data";
+        public const string AppStructure = "App structure";
+        public const string Diagnostics = "Diagnostics";
+
+        public static readonly string[] Order =
+        [
+            ControlSurfaces,
+            Input,
+            LayoutAndMedia,
+            CollectionsAndData,
+            AppStructure
+        ];
+
+        public static string GetGlyph(string groupName)
+        {
+            return groupName switch
+            {
+                ControlSurfaces => "\uE8FD",
+                Input => "\uE8D2",
+                LayoutAndMedia => "\uE8A9",
+                CollectionsAndData => "\uE8F1",
+                AppStructure => "\uE700",
+                Diagnostics => "\uE9D9",
+                _ => "\uE80F"
+            };
+        }
+    }
 }
