@@ -295,6 +295,85 @@ public sealed class FluentSelectionControlsTests
     }
 
     [Fact]
+    public void FWCheckBox_ShouldSupportSelectAllAggregateThreeStatePattern()
+    {
+        var selectAll = new FWCheckBox
+        {
+            Content = "Select all",
+            IsThreeState = true,
+            IsChecked = null
+        };
+        var fluent = new FWCheckBox { Content = "Fluent", IsChecked = true };
+        var controls = new FWCheckBox { Content = "Controls" };
+        var gallery = new FWCheckBox { Content = "Gallery", IsChecked = true };
+        var children = new[] { fluent, controls, gallery };
+
+        static void UpdateSelectAll(FWCheckBox aggregate, FWCheckBox[] items)
+        {
+            var checkedCount = items.Count(checkBox => checkBox.IsChecked == true);
+            aggregate.IsChecked = checkedCount == 0 ? false : checkedCount == items.Length ? true : null;
+        }
+
+        UpdateSelectAll(selectAll, children);
+
+        Assert.Null(selectAll.IsChecked);
+
+        foreach (var child in children)
+        {
+            child.IsChecked = true;
+        }
+        UpdateSelectAll(selectAll, children);
+
+        Assert.True(selectAll.IsChecked);
+
+        foreach (var child in children)
+        {
+            child.IsChecked = false;
+        }
+        UpdateSelectAll(selectAll, children);
+
+        Assert.False(selectAll.IsChecked);
+    }
+
+    [Fact]
+    public void FWComboBox_ShouldExposeEditableAndItemStatePropertiesForSelectionGallery()
+    {
+        var comboBox = new FWComboBox
+        {
+            PlaceholderText = "Type or select",
+            IsEditable = true,
+            StaysOpenOnEdit = true,
+            Text = "Custom value"
+        };
+        comboBox.Items.Add("Custom value");
+        comboBox.Items.Add("Preset A");
+        comboBox.Items.Add("Preset B");
+
+        var selectedItem = new FWComboBoxItem
+        {
+            Content = "Selected item",
+            IsSelected = true
+        };
+        var disabledItem = new FWComboBoxItem
+        {
+            Content = "Disabled item",
+            IsEnabled = false
+        };
+
+        Assert.True(comboBox.IsEditable);
+        Assert.True(comboBox.StaysOpenOnEdit);
+        Assert.Equal("Custom value", comboBox.Text);
+        Assert.Equal("Custom value", comboBox.SelectionBoxItem);
+
+        comboBox.SelectedIndex = 2;
+
+        Assert.Equal("Preset B", comboBox.SelectedItem);
+        Assert.Equal("Preset B", comboBox.SelectionBoxItem);
+        Assert.True(selectedItem.IsSelected);
+        Assert.False(disabledItem.IsEnabled);
+    }
+
+    [Fact]
     public void FWComboBoxItem_ShouldExposeSelectionStateAndContent()
     {
         var item = new FWComboBoxItem
