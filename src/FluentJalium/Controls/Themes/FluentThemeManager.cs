@@ -193,41 +193,82 @@ public static class FluentThemeManager
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
         AliasStyle<FWTextBox, TextBox>(dictionary);
         AliasStyle<FWPasswordBox, PasswordBox>(dictionary);
+        AliasStyle<FWNumberBox, NumberBox>(dictionary);
+        AliasStyle<FWAutoCompleteBox, AutoCompleteBox>(dictionary);
+        AliasStyle<FWRichTextBox, RichTextBox>(dictionary);
         AliasStyle<FWCheckBox, CheckBox>(dictionary);
         AliasStyle<FWRadioButton, RadioButton>(dictionary);
         AliasStyle<FWToggleButton, ToggleButton>(dictionary);
         AliasStyle<FWToggleSwitch, ToggleSwitch>(dictionary);
         AliasStyle<FWSlider, Slider>(dictionary);
+        AliasStyle<FWRangeSlider, RangeSlider>(dictionary);
         AliasStyle<FWProgressBar, ProgressBar>(dictionary);
         AliasStyle<FWComboBox, ComboBox>(dictionary);
-        AliasStyle<FWInfoBar, InfoBar>(dictionary);
-        AliasStyle<FWNumberBox, NumberBox>(dictionary);
-        AliasStyle<FWSplitButton, SplitButton>(dictionary);
-        AliasStyle<FWExpander, Expander>(dictionary);
-        AliasStyle<FWNavigationView, NavigationView>(dictionary);
-        AliasStyle<FWNavigationViewItem, NavigationViewItem>(dictionary);
-        AliasStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(dictionary);
-        AliasStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(dictionary);
-        AliasStyle<FWCommandBar, CommandBar>(dictionary);
-        AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
-        AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
-        AliasStyle<FWAppBarSeparator, AppBarSeparator>(dictionary);
-        AliasStyle<FWMenuBar, MenuBar>(dictionary);
-        AliasStyle<FWMenuBarItem, MenuBarItem>(dictionary);
-        AliasStyle<FWMenuFlyoutItem, MenuFlyoutItem>(dictionary);
-        AliasStyle<FWTabControl, TabControl>(dictionary);
+        AliasStyle<FWComboBoxItem, ComboBoxItem>(dictionary);
+        AliasStyle<FWListBox, ListBox>(dictionary);
+        AliasStyle<FWListBoxItem, ListBoxItem>(dictionary);
         AliasStyle<FWListView, ListView>(dictionary);
         AliasStyle<FWListViewItem, ListViewItem>(dictionary);
         AliasStyle<FWTreeView, TreeView>(dictionary);
         AliasStyle<FWTreeViewItem, TreeViewItem>(dictionary);
-        AliasStyle<FWCalendar, Calendar>(dictionary);
+        AliasStyle<FWDataGrid, DataGrid>(dictionary);
+        AliasStyle<FWTreeDataGrid, TreeDataGrid>(dictionary);
+        AliasStyle<FWNavigationView, NavigationView>(dictionary);
+        AliasStyle<FWNavigationViewItem, NavigationViewItem>(dictionary);
+        AliasStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(dictionary);
+        AliasStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(dictionary);
+        AliasStyle<FWTabControl, TabControl>(dictionary);
+        AliasStyle<FWTabItem, TabItem>(dictionary);
+        AliasStyle<FWFrame, Frame>(dictionary);
+        AliasStyle<FWExpander, Expander>(dictionary);
+        AliasStyle<FWToolTip, ToolTip>(dictionary);
+        AliasStyle<FWContentDialog, ContentDialog>(dictionary);
+        AliasStyle<FWGroupBox, GroupBox>(dictionary);
+        AliasStyle<FWScrollViewer, ScrollViewer>(dictionary);
+        AliasStyle<FWSwipeControl, SwipeControl>(dictionary);
+        AliasStyle<FWGridSplitter, GridSplitter>(dictionary);
+        AliasStyle<FWTextBlock, TextBlock>(dictionary);
+        AliasStyle<FWAccessText, AccessText>(dictionary);
+        AliasStyle<FWBorder, Border>(dictionary);
+        AliasStyle<FWContentControl, ContentControl>(dictionary);
+        AliasStyle<FWContentPresenter, ContentPresenter>(dictionary);
+        AliasStyle<FWStackPanel, StackPanel>(dictionary);
+        AliasStyle<FWWrapPanel, WrapPanel>(dictionary);
+        AliasStyle<FWGrid, Grid>(dictionary);
+        AliasStyle<FWColorPicker, ColorPicker>(dictionary);
+        AliasStyle<FWInkPresenter, InkPresenter>(dictionary);
+        AliasStyle<FWImage, Image>(dictionary);
+        AliasStyle<FWFontIcon, FontIcon>(dictionary);
+        AliasStyle<FWSymbolIcon, SymbolIcon>(dictionary);
+        AliasStyle<FWPathIcon, PathIcon>(dictionary);
+        AliasStyle<FWViewbox, Viewbox>(dictionary);
+        AliasStyle<FWLabel, Label>(dictionary);
+        AliasStyle<FWSeparator, Separator>(dictionary);
+        AliasStyle<FWMenuBar, MenuBar>(dictionary);
+        AliasStyle<FWMenuBarItem, MenuBarItem>(dictionary);
+        AliasStyle<FWMenu, Menu>(dictionary);
+        AliasStyle<FWMenuItem, MenuItem>(dictionary);
+        AliasStyle<FWContextMenu, ContextMenu>(dictionary);
+        AliasStyle<FWMenuFlyoutItem, MenuFlyoutItem>(dictionary);
+        AliasStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(dictionary);
+        AliasStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(dictionary);
         AliasStyle<FWDatePicker, DatePicker>(dictionary);
         AliasStyle<FWTimePicker, TimePicker>(dictionary);
+        AliasStyle<FWCalendar, Calendar>(dictionary);
+        AliasStyle<FWInfoBar, InfoBar>(dictionary);
+        AliasStyle<FWToastNotificationItem, ToastNotificationItem>(dictionary);
+        AliasStyle<FWToastNotificationHost, ToastNotificationHost>(dictionary);
+        AliasStyle<FWStatusBar, StatusBar>(dictionary);
+        AliasStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(dictionary);
+        AliasStyle<FWSplitButton, SplitButton>(dictionary);
+        AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
+        AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
+        AliasStyle<FWAppBarSeparator, AppBarSeparator>(dictionary);
     }
 
     private static void AliasStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
-        where TFluentControl : Control, IFluentJaliumControl
-        where TJaliumControl : Control
+        where TFluentControl : FrameworkElement, IFluentJaliumControl
+        where TJaliumControl : FrameworkElement
     {
         if (dictionary.TryGetValue(typeof(TJaliumControl), out var baseStyle) && baseStyle is Style style)
         {
@@ -280,6 +321,9 @@ public static class FluentThemeManager
             ["AccentFillColorDisabledBrush"] = new SolidColorBrush(disabled),
             ["SelectionBackground"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
             ["SelectionBackgroundWeak"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
+            ["TabItemIndicator"] = new SolidColorBrush(accent),
             ["ProgressRingForeground"] = new SolidColorBrush(accent),
         };
     }
@@ -350,3 +394,4 @@ public static class FluentThemeManager
             Lerp(color.B, target.B, factor));
     }
 }
+
