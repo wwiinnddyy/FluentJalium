@@ -266,6 +266,65 @@ public sealed class FluentRangeProgressTests
     }
 
     [Fact]
+    public void FWRangeControls_ShouldExposeGalleryOrientationTickAndStateProperties()
+    {
+        var slider = new FWSlider
+        {
+            Orientation = Orientation.Vertical,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true,
+            Minimum = -50,
+            Maximum = 50,
+            Value = 20
+        };
+        var rangeSlider = new FWRangeSlider
+        {
+            Orientation = Orientation.Vertical,
+            TickFrequency = 5,
+            IsSnapToTickEnabled = true,
+            Minimum = 0,
+            Maximum = 100,
+            RangeStart = 25,
+            RangeEnd = 75,
+            MinimumRange = 10
+        };
+        var progressBar = new FWProgressBar
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Value = 68,
+            IsIndeterminate = false
+        };
+        var progressRing = new FWProgressRing
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Value = 68,
+            IsActive = true,
+            IsIndeterminate = false
+        };
+
+        Assert.Equal(Orientation.Vertical, slider.Orientation);
+        Assert.Equal(10, slider.TickFrequency);
+        Assert.True(slider.IsSnapToTickEnabled);
+        Assert.Equal(20, slider.Value);
+
+        Assert.Equal(Orientation.Vertical, rangeSlider.Orientation);
+        Assert.Equal(5, rangeSlider.TickFrequency);
+        Assert.True(rangeSlider.IsSnapToTickEnabled);
+        Assert.Equal(25, rangeSlider.RangeStart);
+        Assert.Equal(75, rangeSlider.RangeEnd);
+        Assert.Equal(10, rangeSlider.MinimumRange);
+
+        Assert.False(progressBar.IsIndeterminate);
+        Assert.InRange(progressBar.Percentage, 0.6799, 0.6801);
+
+        Assert.True(progressRing.IsActive);
+        Assert.False(progressRing.IsIndeterminate);
+        Assert.Equal(68, progressRing.Value);
+    }
+
+    [Fact]
     public void FWProgressRing_ShouldCoerceRangeValuesAndKeepStateProperties()
     {
         var progressBrush = new SolidColorBrush(Color.FromRgb(0x10, 0x90, 0x68));
