@@ -1918,86 +1918,425 @@ public sealed class MainWindow : Window
     {
         var panel = CreateSection("Notifications and Status");
 
-        var infoBarColumn = new StackPanel
+        var examples = new FWWrapPanel
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 8,
-            Width = 460
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
         };
-        infoBarColumn.Children.Add(CreateInfoBar("Information", "A normal FluentJalium status message.", InfoBarSeverity.Informational));
-        infoBarColumn.Children.Add(CreateInfoBar("Success", "The selected operation completed.", InfoBarSeverity.Success));
-        infoBarColumn.Children.Add(CreateInfoBar("Warning", "Review settings before continuing.", InfoBarSeverity.Warning));
-        infoBarColumn.Children.Add(CreateInfoBar("Error", "A required resource could not be loaded.", InfoBarSeverity.Error));
+        examples.Children.Add(CreateStatusExampleCard(
+            "FWInfoBar",
+            "Severity, open state, close events, icon visibility, and long-message layouts.",
+            CreateInfoBarStatusSample()));
+        examples.Children.Add(CreateStatusExampleCard(
+            "FWInfoBadge",
+            "Dot, value, overflow, icon, and severity resources for lightweight status indicators.",
+            CreateInfoBadgeStatusSample()));
+        examples.Children.Add(CreateStatusExampleCard(
+            "FWToastNotificationHost",
+            "Interactive toast queue, severity actions, visible-count limit, position, and dismiss behavior.",
+            CreateToastNotificationStatusSample()));
+        examples.Children.Add(CreateStatusExampleCard(
+            "FWStatusBar",
+            "Bottom app status with text items, disabled items, progress content, and status badges.",
+            CreateStatusBarStatusSample()));
 
-        var badgeColumn = new StackPanel
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateInfoBarStatusSample()
+    {
+        var output = CreateStatusOutput("Closed events: 0");
+        var infoBar = CreateInfoBar("Information", "A normal FluentJalium status message.", InfoBarSeverity.Informational);
+        infoBar.IsClosable = true;
+
+        var closedEvents = 0;
+        infoBar.Closed += (_, _) =>
+        {
+            closedEvents++;
+            output.Text = $"Closed events: {closedEvents}";
+        };
+
+        void ShowInfoBar(InfoBarSeverity severity, string title, string message)
+        {
+            infoBar.Severity = severity;
+            infoBar.Title = title;
+            infoBar.Message = message;
+            infoBar.IsOpen = true;
+            output.Text = $"Showing: {severity}";
+        }
+
+        var actionRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Info", () => ShowInfoBar(InfoBarSeverity.Informational, "Information", "A normal FluentJalium status message.")),
+            CreateStatusActionButton("Success", () => ShowInfoBar(InfoBarSeverity.Success, "Success", "The selected operation completed.")),
+            CreateStatusActionButton("Warning", () => ShowInfoBar(InfoBarSeverity.Warning, "Warning", "Review settings before continuing.")),
+            CreateStatusActionButton("Error", () => ShowInfoBar(InfoBarSeverity.Error, "Error", "A required resource could not be loaded.")));
+
+        var optionRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Toggle icon", () =>
+            {
+                infoBar.IsIconVisible = !infoBar.IsIconVisible;
+                infoBar.InvalidateVisual();
+                output.Text = $"Icon visible: {infoBar.IsIconVisible}";
+            }),
+            CreateStatusActionButton("Long message", () => ShowInfoBar(
+                InfoBarSeverity.Warning,
+                "Review required",
+                "This longer message checks wrapping, icon spacing, close affordance, and the Fluent severity color resources under the current theme.")),
+            CreateStatusActionButton("Close", () => infoBar.IsOpen = false));
+
+        return new FWStackPanel
         {
             Orientation = Orientation.Vertical,
             Spacing = 10,
-            Width = 300
+            Children =
+            {
+                infoBar,
+                actionRow,
+                optionRow,
+                output
+            }
         };
-        badgeColumn.Children.Add(new TextBlock
-        {
-            Text = "InfoBadge",
-            FontSize = 13,
-            Foreground = ThemeBrush("TextSecondary")
-        });
+    }
 
-        var badgeRow = new StackPanel
+    private static UIElement CreateInfoBadgeStatusSample()
+    {
+        var output = CreateStatusOutput("Preview: Critical overflow value 99+");
+        var preview = new FWInfoBadge
+        {
+            Value = 128,
+            MaxValue = 99,
+            Severity = FWInfoBadgeSeverity.Critical
+        };
+
+        var previewRow = new FWStackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 12
+            Spacing = 12,
+            Children =
+            {
+                CreateStatusCaption("Preview"),
+                preview
+            }
         };
-        badgeRow.Children.Add(new FWInfoBadge { Severity = FWInfoBadgeSeverity.Attention });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 3, Severity = FWInfoBadgeSeverity.Informational });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 128, MaxValue = 99, Severity = FWInfoBadgeSeverity.Success });
-        badgeRow.Children.Add(new FWInfoBadge { IconGlyph = "\uE7BA", Severity = FWInfoBadgeSeverity.Caution });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 1, Severity = FWInfoBadgeSeverity.Critical });
-        badgeColumn.Children.Add(badgeRow);
 
+        void SetSeverity(FWInfoBadgeSeverity severity)
+        {
+            preview.Severity = severity;
+            output.Text = $"Preview severity: {severity}, kind: {preview.DisplayKind}";
+        }
+
+        var severityRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Attention", () => SetSeverity(FWInfoBadgeSeverity.Attention)),
+            CreateStatusActionButton("Info", () => SetSeverity(FWInfoBadgeSeverity.Informational)),
+            CreateStatusActionButton("Success", () => SetSeverity(FWInfoBadgeSeverity.Success)),
+            CreateStatusActionButton("Caution", () => SetSeverity(FWInfoBadgeSeverity.Caution)),
+            CreateStatusActionButton("Critical", () => SetSeverity(FWInfoBadgeSeverity.Critical)));
+
+        var modeRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Dot", () =>
+            {
+                preview.Value = -1;
+                preview.IconGlyph = null;
+                output.Text = $"Preview kind: {preview.DisplayKind}";
+            }),
+            CreateStatusActionButton("Value", () =>
+            {
+                preview.IconGlyph = null;
+                preview.Value = 8;
+                output.Text = $"Preview value: {preview.DisplayValueText}";
+            }),
+            CreateStatusActionButton("Overflow", () =>
+            {
+                preview.IconGlyph = null;
+                preview.Value = 128;
+                preview.MaxValue = 99;
+                output.Text = $"Preview value: {preview.DisplayValueText}";
+            }),
+            CreateStatusActionButton("Icon", () =>
+            {
+                preview.Value = -1;
+                preview.IconGlyph = "\uE7BA";
+                output.Text = $"Preview kind: {preview.DisplayKind}";
+            }));
+
+        var matrix = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8
+        };
+        matrix.Children.Add(CreateInfoBadgeSeverityRow("Attention", FWInfoBadgeSeverity.Attention));
+        matrix.Children.Add(CreateInfoBadgeSeverityRow("Info", FWInfoBadgeSeverity.Informational));
+        matrix.Children.Add(CreateInfoBadgeSeverityRow("Success", FWInfoBadgeSeverity.Success));
+        matrix.Children.Add(CreateInfoBadgeSeverityRow("Caution", FWInfoBadgeSeverity.Caution));
+        matrix.Children.Add(CreateInfoBadgeSeverityRow("Critical", FWInfoBadgeSeverity.Critical));
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                previewRow,
+                severityRow,
+                modeRow,
+                matrix,
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateToastNotificationStatusSample()
+    {
+        var output = CreateStatusOutput("Visible toasts: 0");
+        var toastHost = new FWToastNotificationHost
+        {
+            Width = 470,
+            Height = 220,
+            MaxVisibleToasts = 3,
+            Position = ToastPosition.TopLeft,
+            ToastWidth = 430,
+            Spacing = 8
+        };
+
+        void UpdateOutput(string action)
+        {
+            output.Text = $"{action}. Visible toasts: {toastHost.Children.Count}";
+        }
+
+        void ShowToast(ToastSeverity severity, string title, string message)
+        {
+            var toast = toastHost.Show(severity, title, message, TimeSpan.FromSeconds(12));
+            toast.IsAutoDismissEnabled = false;
+            toast.Closed += (_, _) => UpdateOutput($"Closed {severity}");
+            UpdateOutput($"Shown {severity}");
+        }
+
+        var actionRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Info", () => ShowToast(ToastSeverity.Information, "Information", "A normal in-app toast notification.")),
+            CreateStatusActionButton("Success", () => ShowToast(ToastSeverity.Success, "Build complete", "The latest gallery sample finished successfully.")),
+            CreateStatusActionButton("Warning", () => ShowToast(ToastSeverity.Warning, "Review settings", "MaxVisibleToasts keeps the newest three items.")),
+            CreateStatusActionButton("Error", () => ShowToast(ToastSeverity.Error, "Load failed", "A required resource could not be loaded.")));
+
+        var optionRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Top left", () =>
+            {
+                toastHost.Position = ToastPosition.TopLeft;
+                UpdateOutput("Position: TopLeft");
+            }),
+            CreateStatusActionButton("Bottom right", () =>
+            {
+                toastHost.Position = ToastPosition.BottomRight;
+                UpdateOutput("Position: BottomRight");
+            }),
+            CreateStatusActionButton("Dismiss all", () =>
+            {
+                toastHost.DismissAll();
+                UpdateOutput("Dismissed all");
+            }));
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                new FWBorder
+                {
+                    Width = 470,
+                    Height = 220,
+                    Background = ThemeBrush("SurfaceBackground"),
+                    BorderBrush = ThemeBrush("ControlBorder"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Child = toastHost
+                },
+                actionRow,
+                optionRow,
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateStatusBarStatusSample()
+    {
+        var output = CreateStatusOutput("StatusBar items: 5");
+        var disabledItem = new FWStatusBarItem { Content = "Read-only", IsEnabled = false };
         var statusBar = new FWStatusBar
         {
-            Width = 300
+            Width = 470
         };
         statusBar.Items.Add(new FWStatusBarItem { Content = "Ready" });
         statusBar.Items.Add(new FWStatusBarItem { Content = "Line 42" });
         statusBar.Items.Add(new FWStatusBarItem { Content = "UTF-8" });
-        statusBar.Items.Add(new FWStatusBarItem { Content = "Disabled", IsEnabled = false });
-        badgeColumn.Children.Add(statusBar);
-
-        var toastHost = new FWToastNotificationHost
+        statusBar.Items.Add(new FWStatusBarItem
         {
-            Width = 460,
-            Height = 156,
-            MaxVisibleToasts = 3,
-            Position = ToastPosition.TopLeft,
-            ToastWidth = 430
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    new FWInfoBadge { Severity = FWInfoBadgeSeverity.Success },
+                    new FWTextBlock { Text = "Online", FontSize = 12, Foreground = ThemeBrush("StatusBarForeground") }
+                }
+            }
+        });
+        statusBar.Items.Add(disabledItem);
+
+        var progressItem = new FWStatusBarItem
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    new FWTextBlock { Text = "Sync", FontSize = 12, Foreground = ThemeBrush("StatusBarForeground") },
+                    new FWProgressBar { Width = 64, Height = 4, Minimum = 0, Maximum = 100, Value = 72 }
+                }
+            }
         };
-        toastHost.ShowToast(new FWToastNotificationItem
-        {
-            Title = "Toast notification",
-            Message = "FWToastNotificationItem uses Fluent severity resources.",
-            Severity = ToastSeverity.Information,
-            IsAutoDismissEnabled = false
-        });
-        toastHost.ShowToast(new FWToastNotificationItem
-        {
-            Title = "Build complete",
-            Message = "Static sample toast remains visible in the gallery.",
-            Severity = ToastSeverity.Success,
-            IsAutoDismissEnabled = false
-        });
 
-        var topRow = new StackPanel
+        var optionRow = CreateStatusButtonRow(
+            CreateStatusActionButton("Toggle disabled", () =>
+            {
+                disabledItem.IsEnabled = !disabledItem.IsEnabled;
+                output.Text = $"Read-only enabled: {disabledItem.IsEnabled}";
+            }),
+            CreateStatusActionButton("Add progress", () =>
+            {
+                if (!statusBar.Items.Contains(progressItem))
+                {
+                    statusBar.Items.Add(progressItem);
+                }
+                output.Text = $"StatusBar items: {statusBar.Items.Count}";
+            }),
+            CreateStatusActionButton("Remove progress", () =>
+            {
+                statusBar.Items.Remove(progressItem);
+                output.Text = $"StatusBar items: {statusBar.Items.Count}";
+            }));
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                statusBar,
+                optionRow,
+                output
+            }
+        };
+    }
+
+    private static FWBorder CreateStatusExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateStatusButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateStatusActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static FWStackPanel CreateInfoBadgeSeverityRow(string label, FWInfoBadgeSeverity severity)
+    {
+        return new FWStackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 18
+            Spacing = 10,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = label,
+                    Width = 76,
+                    FontSize = 12,
+                    Foreground = ThemeBrush("TextSecondary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                },
+                new FWInfoBadge { Severity = severity },
+                new FWInfoBadge { Severity = severity, Value = 8 },
+                new FWInfoBadge { Severity = severity, Value = 128, MaxValue = 99 },
+                new FWInfoBadge { Severity = severity, IconGlyph = "\uE7BA" }
+            }
         };
-        topRow.Children.Add(infoBarColumn);
-        topRow.Children.Add(badgeColumn);
+    }
 
-        panel.Children.Add(topRow);
-        panel.Children.Add(toastHost);
-        return panel;
+    private static TextBlock CreateStatusCaption(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            Width = 76,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            VerticalAlignment = VerticalAlignment.Center
+        };
+    }
+
+    private static TextBlock CreateStatusOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
     }
 
     private UIElement CreateRangeSection()

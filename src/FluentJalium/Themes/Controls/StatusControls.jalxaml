@@ -24,6 +24,9 @@
     <Style TargetType="ToastNotificationHost">
         <Setter Property="IsHitTestVisible" Value="True" />
         <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="MaxVisibleToasts" Value="3" />
+        <Setter Property="Spacing" Value="8" />
+        <Setter Property="ToastWidth" Value="400" />
     </Style>
 
     <Style TargetType="StatusBar">
