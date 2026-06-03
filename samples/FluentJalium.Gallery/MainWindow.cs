@@ -5,28 +5,11 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
-using FWBorder = FluentJalium.Controls.FWBorder;
-using FWButton = FluentJalium.Controls.FWButton;
-using FWCheckBox = FluentJalium.Controls.FWCheckBox;
-using FWComboBox = FluentJalium.Controls.FWComboBox;
-using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
-using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
-using FWGrid = FluentJalium.Controls.FWGrid;
-using FWLabel = FluentJalium.Controls.FWLabel;
-using FWMenuFlyout = FluentJalium.Controls.FWMenuFlyout;
-using FWMenuFlyoutItem = FluentJalium.Controls.FWMenuFlyoutItem;
-using FWMenuFlyoutSeparator = FluentJalium.Controls.FWMenuFlyoutSeparator;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
-using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
-using FWTextBlock = FluentJalium.Controls.FWTextBlock;
-using FWToggleButton = FluentJalium.Controls.FWToggleButton;
-using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
-using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
-using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery;
 
@@ -107,7 +90,7 @@ public sealed class MainWindow : Window
             Menus: () => CreatePageStack(new GalleryMenusPage().CreateContent()),
             Disclosure: () => CreatePageStack(new GalleryDisclosurePage().CreateContent()),
             Status: () => CreatePageStack(new GalleryStatusPage().CreateContent()),
-            StateMatrix: () => CreatePageStack(CreateStateMatrix()));
+            StateMatrix: () => CreatePageStack(new GalleryStateMatrixPage().CreateContent()));
     }
 
     private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
@@ -479,72 +462,6 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private StackPanel CreateStateMatrix()
-    {
-        var panel = CreateSection("State Matrix");
-
-        var header = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 0, 0, 4)
-        };
-        header.Children.Add(CreateCaption("Normal"));
-        header.Children.Add(CreateCaption("DropDown"));
-        header.Children.Add(CreateCaption("Selected"));
-        header.Children.Add(CreateCaption("Disabled"));
-        panel.Children.Add(header);
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        row.Children.Add(new FWButton { Content = "Normal" });
-        row.Children.Add(new FWDropDownButton { Content = "Open", Flyout = CreateSampleFlyout() });
-        row.Children.Add(new FWToggleSplitButton { Content = "Selected", IsChecked = true, Flyout = CreateSampleFlyout() });
-        row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
-        panel.Children.Add(row);
-
-        var switchRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        switchRow.Children.Add(new FWToggleButton { Content = "Off" });
-        switchRow.Children.Add(new FWToggleButton { Content = "On", IsChecked = true });
-        switchRow.Children.Add(new FWToggleSwitch { Header = "On switch", IsOn = true });
-        switchRow.Children.Add(new FWToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
-        panel.Children.Add(switchRow);
-
-        var selectionRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        selectionRow.Children.Add(new FWCheckBox { Content = "Unchecked" });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Checked", IsChecked = true });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Disabled", IsChecked = true, IsEnabled = false });
-        panel.Children.Add(selectionRow);
-
-        var comboRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        comboRow.Children.Add(CreateSampleComboBox("Normal", 0, true));
-        comboRow.Children.Add(CreateSampleComboBox("Selected", 1, true));
-        comboRow.Children.Add(CreateSampleComboBox("Disabled", 2, false));
-        panel.Children.Add(comboRow);
-
-        return panel;
-    }
-
     private StackPanel CreateSection(string title)
     {
         var panel = new StackPanel
@@ -563,17 +480,6 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private TextBlock CreateCaption(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            Width = 112,
-            FontSize = 12,
-            Foreground = ThemeBrush("TextSecondary")
-        };
-    }
-
     private Button CreateCommandButton(string text, Action action)
     {
         var button = new Button
@@ -582,32 +488,6 @@ public sealed class MainWindow : Window
         };
         button.Click += (_, _) => action();
         return button;
-    }
-
-    private static FWMenuFlyout CreateSampleFlyout()
-    {
-        var flyout = new FWMenuFlyout();
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Create", Icon = IconGlyph(FluentIconRegular.Add24) });
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Open", Icon = IconGlyph(FluentIconRegular.Open24) });
-        flyout.Items.Add(new FWMenuFlyoutSeparator());
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Export", Icon = IconGlyph(FluentIconRegular.ArrowDownload24) });
-        return flyout;
-    }
-
-    private static FWComboBox CreateSampleComboBox(string placeholder, int selectedIndex, bool isEnabled)
-    {
-        var comboBox = new FWComboBox
-        {
-            Width = 160,
-            PlaceholderText = placeholder,
-            IsEnabled = isEnabled
-        };
-
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "WinUI" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Toolkit" });
-        comboBox.SelectedIndex = selectedIndex;
-        return comboBox;
     }
 
     private void ApplyTheme(FluentThemeVariant theme)
@@ -636,7 +516,5 @@ public sealed class MainWindow : Window
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
-
-    private static string IconGlyph(FluentIconRegular icon) => icon.GetString();
 
 }
