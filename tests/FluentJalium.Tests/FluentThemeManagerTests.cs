@@ -119,9 +119,12 @@ public sealed class FluentThemeManagerTests
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
             AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
+            AssertBasedOnStyle<FWCommandBar, CommandBar>(app.Resources);
             AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarSeparator, AppBarSeparator>(app.Resources);
+            AssertBasedOnStyle<FWToolBar, Jalium.UI.Controls.ToolBar>(app.Resources);
+            AssertBasedOnStyle<FWToolBarTray, ToolBarTray>(app.Resources);
         }
         finally
         {
@@ -304,6 +307,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<SplitButton>(dictionary);
         AssertContainsStyle<FWToggleSplitButton>(dictionary);
         AssertContainsStyle<CommandBar>(dictionary);
+        AssertContainsStyle<Jalium.UI.Controls.ToolBar>(dictionary);
+        AssertContainsStyle<ToolBarTray>(dictionary);
         AssertContainsStyle<AppBarButton>(dictionary);
         AssertContainsStyle<AppBarToggleButton>(dictionary);
         AssertContainsStyle<AppBarSeparator>(dictionary);
@@ -343,6 +348,12 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("MenuFlyoutSeparatorForeground"));
         Assert.True(dictionary.Contains("DividerStrokeColorDefaultBrush"));
         Assert.True(dictionary.Contains("CommandBarBackground"));
+        Assert.True(dictionary.Contains("CommandBarOverflowBackground"));
+        Assert.True(dictionary.Contains("ToolBarTrayBackground"));
+        Assert.True(dictionary.Contains("ToolBarBackground"));
+        Assert.True(dictionary.Contains("ToolBarBorderBrush"));
+        Assert.True(dictionary.Contains("ToolBarGripBrush"));
+        Assert.True(dictionary.Contains("ToolBarSeparatorForeground"));
         Assert.True(dictionary.Contains("AppBarButtonBackground"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundHover"));
         Assert.True(dictionary.Contains("AppBarButtonBackgroundPressed"));
@@ -418,9 +429,12 @@ public sealed class FluentThemeManagerTests
             AssertOwnedStyle<FWDropDownButton>(app.Resources);
             AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
             AssertOwnedStyle<FWToggleSplitButton>(app.Resources);
+            AssertBasedOnStyle<FWCommandBar, CommandBar>(app.Resources);
             AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarSeparator, AppBarSeparator>(app.Resources);
+            AssertBasedOnStyle<FWToolBar, Jalium.UI.Controls.ToolBar>(app.Resources);
+            AssertBasedOnStyle<FWToolBarTray, ToolBarTray>(app.Resources);
         }
         finally
         {
@@ -792,9 +806,12 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWDropDownButton, Button>();
         AssertFluentControl<FWSplitButton, SplitButton>();
         AssertFluentControl<FWToggleSplitButton, SplitButton>();
+        AssertFluentControl<FWCommandBar, CommandBar>();
         AssertFluentControl<FWAppBarButton, AppBarButton>();
         AssertFluentControl<FWAppBarToggleButton, AppBarToggleButton>();
         AssertFluentControl<FWAppBarSeparator, AppBarSeparator>();
+        AssertFluentControl<FWToolBar, Jalium.UI.Controls.ToolBar>();
+        AssertFluentControl<FWToolBarTray, ToolBarTray>();
     }
 
     [Fact]

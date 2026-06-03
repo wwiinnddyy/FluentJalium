@@ -22,6 +22,7 @@ using FWCalendar = FluentJalium.Controls.FWCalendar;
 using FWContentControl = FluentJalium.Controls.FWContentControl;
 using FWContentDialog = FluentJalium.Controls.FWContentDialog;
 using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
+using FWCommandBar = FluentJalium.Controls.FWCommandBar;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
@@ -78,6 +79,8 @@ using FWTimePicker = FluentJalium.Controls.FWTimePicker;
 using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
 using FWToastNotificationItem = FluentJalium.Controls.FWToastNotificationItem;
 using FWToolTip = FluentJalium.Controls.FWToolTip;
+using FWToolBar = FluentJalium.Controls.FWToolBar;
+using FWToolBarTray = FluentJalium.Controls.FWToolBarTray;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
@@ -1322,38 +1325,203 @@ public sealed class MainWindow : Window
     private UIElement CreateCommandButtonsSection()
     {
         var panel = CreateSection("Command Buttons");
-
-        var splitRow = new StackPanel
+        var examples = new FWWrapPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
         };
-        splitRow.Children.Add(new FWSplitButton
+        examples.Children.Add(CreateCommandExampleCard(
+            "Split command buttons",
+            "Split, toggle split, and drop-down command surfaces with the same flyout menu affordance.",
+            CreateSplitCommandButtonsSample()));
+        examples.Children.Add(CreateCommandExampleCard(
+            "FWCommandBar",
+            "Primary and secondary commands with labels, overflow state, toggle commands, and live output.",
+            CreateCommandBarSample()));
+        examples.Children.Add(CreateCommandExampleCard(
+            "FWToolBar and FWToolBarTray",
+            "Document and formatting command groups hosted in a tray with band, index, lock, and overflow metadata.",
+            CreateToolBarCommandSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateSplitCommandButtonsSample()
+    {
+        var output = CreateCommandOutput("Split commands: ready");
+        var splitButton = new FWSplitButton
         {
             Content = "FWSplitButton",
             Width = 170,
             Flyout = CreateSampleFlyout()
-        });
-        splitRow.Children.Add(new FWToggleSplitButton
+        };
+        var toggleSplitButton = new FWToggleSplitButton
         {
             Content = "FWToggleSplit",
             Width = 180,
             IsChecked = true,
             Flyout = CreateSampleFlyout()
-        });
-
-        var commandBar = new CommandBar
-        {
-            Width = 420
         };
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon(FluentIconRegular.Save24) });
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon(FluentIconRegular.Share24) });
-        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
-        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon(FluentIconRegular.Pin24), IsChecked = true });
+        splitButton.Click += (_, _) => output.Text = "Primary split command invoked";
+        toggleSplitButton.Click += (_, _) =>
+        {
+            toggleSplitButton.IsChecked = !toggleSplitButton.IsChecked;
+            output.Text = $"Toggle split checked: {FormatOnOff(toggleSplitButton.IsChecked == true)}";
+        };
 
-        panel.Children.Add(splitRow);
-        panel.Children.Add(commandBar);
-        return panel;
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 12,
+                    VerticalSpacing = 8,
+                    Children =
+                    {
+                        splitButton,
+                        toggleSplitButton,
+                        new FWDropDownButton
+                        {
+                            Content = "FWDropDown",
+                            Width = 150,
+                            Flyout = CreateSampleFlyout()
+                        },
+                        new FWButton
+                        {
+                            Content = "Disabled",
+                            IsEnabled = false
+                        }
+                    }
+                },
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateCommandBarSample()
+    {
+        var output = CreateCommandOutput("CommandBar: closed, 2 secondary commands");
+        var commandBar = new FWCommandBar
+        {
+            Width = 500,
+            DefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom
+        };
+        commandBar.PrimaryCommands.Add(CreateAppBarButton("Add", FluentIconRegular.Add24, output));
+        commandBar.PrimaryCommands.Add(CreateAppBarButton("Edit", FluentIconRegular.Edit24, output));
+        commandBar.PrimaryCommands.Add(CreateAppBarButton("Share", FluentIconRegular.Share24, output));
+        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
+        commandBar.PrimaryCommands.Add(CreateAppBarToggleButton("Pin", FluentIconRegular.Pin24, output, isChecked: true));
+        commandBar.SecondaryCommands.Add(CreateAppBarButton("Settings", FluentIconRegular.Settings24, output));
+        commandBar.SecondaryCommands.Add(CreateAppBarButton("Open", FluentIconRegular.Open24, output));
+        commandBar.Opening += (_, _) => output.Text = $"CommandBar: opening, {commandBar.SecondaryCommands.Count} secondary commands";
+        commandBar.Opened += (_, _) => output.Text = $"CommandBar: open, {commandBar.SecondaryCommands.Count} secondary commands";
+        commandBar.Closing += (_, _) => output.Text = "CommandBar: closing";
+        commandBar.Closed += (_, _) => output.Text = $"CommandBar: closed, {commandBar.SecondaryCommands.Count} secondary commands";
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                commandBar,
+                CreateCommandButtonRow(
+                    CreateCommandActionButton("Open", () => commandBar.IsOpen = true),
+                    CreateCommandActionButton("Close", () => commandBar.IsOpen = false),
+                    CreateCommandActionButton("Labels", () =>
+                    {
+                        commandBar.DefaultLabelPosition = commandBar.DefaultLabelPosition == CommandBarDefaultLabelPosition.Bottom
+                            ? CommandBarDefaultLabelPosition.Collapsed
+                            : CommandBarDefaultLabelPosition.Bottom;
+                        commandBar.InvalidateMeasure();
+                        output.Text = $"DefaultLabelPosition: {commandBar.DefaultLabelPosition}";
+                    }),
+                    CreateCommandActionButton("Add secondary", () =>
+                    {
+                        commandBar.SecondaryCommands.Add(CreateAppBarButton("Export", FluentIconRegular.ArrowDownload24, output));
+                        output.Text = $"Secondary commands: {commandBar.SecondaryCommands.Count}";
+                    }),
+                    CreateCommandActionButton("Remove secondary", () =>
+                    {
+                        if (commandBar.SecondaryCommands.Count > 0)
+                        {
+                            commandBar.SecondaryCommands.RemoveAt(commandBar.SecondaryCommands.Count - 1);
+                        }
+                        output.Text = $"Secondary commands: {commandBar.SecondaryCommands.Count}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateToolBarCommandSample()
+    {
+        var output = CreateCommandOutput("ToolBarTray: unlocked, horizontal, 2 bands");
+        var documentBar = new FWToolBar
+        {
+            Header = "Document",
+            Band = 0,
+            BandIndex = 0,
+            Margin = new Thickness(0, 0, 8, 8)
+        };
+        documentBar.Items.Add(CreateToolBarButton(FluentIconRegular.Save24, "Save", output));
+        documentBar.Items.Add(CreateToolBarButton(FluentIconRegular.Share24, "Share", output));
+        documentBar.Items.Add(CreateToolBarSeparator());
+        var exportButton = CreateToolBarButton(FluentIconRegular.ArrowDownload24, "Export", output);
+        Jalium.UI.Controls.ToolBar.SetOverflowMode(exportButton, OverflowMode.Always);
+        documentBar.Items.Add(exportButton);
+
+        var formattingBar = new FWToolBar
+        {
+            Header = "Formatting",
+            Band = 1,
+            BandIndex = 0,
+            Margin = new Thickness(0, 0, 8, 8)
+        };
+        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextBold24, "Bold", output));
+        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextItalic24, "Italic", output));
+        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextUnderline24, "Underline", output));
+
+        var tray = new FWToolBarTray
+        {
+            Background = ThemeBrush("ToolBarTrayBackground"),
+            Orientation = Orientation.Horizontal
+        };
+        tray.ToolBars.Add(documentBar);
+        tray.ToolBars.Add(formattingBar);
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                tray,
+                CreateCommandButtonRow(
+                    CreateCommandActionButton("Lock tray", () =>
+                    {
+                        tray.IsLocked = !tray.IsLocked;
+                        output.Text = $"ToolBarTray locked: {FormatOnOff(tray.IsLocked)}";
+                    }),
+                    CreateCommandActionButton("Vertical", () =>
+                    {
+                        tray.Orientation = tray.Orientation == Orientation.Horizontal
+                            ? Orientation.Vertical
+                            : Orientation.Horizontal;
+                        output.Text = $"ToolBarTray orientation: {tray.Orientation}";
+                    }),
+                    CreateCommandActionButton("Overflow open", () =>
+                    {
+                        documentBar.IsOverflowOpen = !documentBar.IsOverflowOpen;
+                        output.Text = $"Document toolbar overflow open: {FormatOnOff(documentBar.IsOverflowOpen)}";
+                    })),
+                output
+            }
+        };
     }
 
     private UIElement CreateSwitchesSection()
@@ -4191,6 +4359,137 @@ public sealed class MainWindow : Window
         };
         button.Click += (_, _) => action();
         return button;
+    }
+
+    private static FWBorder CreateCommandExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 560,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateCommandButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateCommandActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateCommandOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static FWAppBarButton CreateAppBarButton(string label, FluentIconRegular icon, TextBlock output)
+    {
+        var button = new FWAppBarButton
+        {
+            Label = label,
+            Icon = CreateIcon(icon)
+        };
+        button.Click += (_, _) => output.Text = $"Command invoked: {label}";
+        return button;
+    }
+
+    private static FWAppBarToggleButton CreateAppBarToggleButton(string label, FluentIconRegular icon, TextBlock output, bool isChecked = false)
+    {
+        var button = new FWAppBarToggleButton
+        {
+            Label = label,
+            Icon = CreateIcon(icon),
+            IsChecked = isChecked
+        };
+        button.Checked += (_, _) => output.Text = $"{label}: on";
+        button.Unchecked += (_, _) => output.Text = $"{label}: off";
+        return button;
+    }
+
+    private static FWButton CreateToolBarButton(FluentIconRegular icon, string label, TextBlock output)
+    {
+        var button = new FWButton
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(icon),
+                    new FWTextBlock
+                    {
+                        Text = label,
+                        Foreground = ThemeBrush("TextPrimary")
+                    }
+                }
+            },
+            MinWidth = 86
+        };
+        button.Click += (_, _) => output.Text = $"ToolBar command: {label}. OverflowMode: {Jalium.UI.Controls.ToolBar.GetOverflowMode(button)}";
+        return button;
+    }
+
+    private static FWSeparator CreateToolBarSeparator()
+    {
+        return new FWSeparator
+        {
+            Orientation = Orientation.Vertical,
+            Height = 24,
+            Margin = new Thickness(4, 4, 4, 4),
+            StrokeBrush = ThemeBrush("ToolBarSeparatorForeground")
+        };
     }
 
     private static FWBorder CreateMenuExampleCard(string title, string description, UIElement content)

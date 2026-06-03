@@ -813,6 +813,13 @@ public class FWSplitButton : SplitButton, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium CommandBar control.
+/// </summary>
+public class FWCommandBar : CommandBar, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium AppBarButton control.
 /// </summary>
 public class FWAppBarButton : AppBarButton, IFluentJaliumControl
@@ -830,5 +837,29 @@ public class FWAppBarToggleButton : AppBarToggleButton, IFluentJaliumControl
 /// FluentJalium AppBarSeparator control.
 /// </summary>
 public class FWAppBarSeparator : AppBarSeparator, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium ToolBar control.
+/// </summary>
+public class FWToolBar : Jalium.UI.Controls.ToolBar, IFluentJaliumControl
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FWToolBar"/> class.
+    /// </summary>
+    public FWToolBar()
+    {
+        var template = new ItemsPanelTemplate();
+        template.SetVisualTree(() => new StackPanel { Orientation = Orientation.Horizontal });
+        template.Seal();
+        ItemsPanel = template;
+    }
+}
+
+/// <summary>
+/// FluentJalium ToolBarTray control.
+/// </summary>
+public class FWToolBarTray : Jalium.UI.Controls.ToolBarTray, IFluentJaliumControl
 {
 }

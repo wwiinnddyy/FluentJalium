@@ -224,6 +224,11 @@
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF1C1C1C" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="ToolBarTrayBackground" Color="#FF1C1C1C" />
+            <SolidColorBrush x:Key="ToolBarBackground" Color="#FF242424" />
+            <SolidColorBrush x:Key="ToolBarBorderBrush" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="ToolBarGripBrush" Color="#45FFFFFF" />
+            <SolidColorBrush x:Key="ToolBarSeparatorForeground" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#0FFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#19000000" />
@@ -573,6 +578,11 @@
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#0F000000" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FFF9F9F9" />
+            <SolidColorBrush x:Key="ToolBarTrayBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolBarBackground" Color="#FFF9F9F9" />
+            <SolidColorBrush x:Key="ToolBarBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="ToolBarGripBrush" Color="#42000000" />
+            <SolidColorBrush x:Key="ToolBarSeparatorForeground" Color="#15000000" />
             <SolidColorBrush x:Key="AppBarButtonBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#09000000" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#06000000" />
@@ -890,6 +900,11 @@
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToolBarTrayBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToolBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToolBarBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolBarGripBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToolBarSeparatorForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundHover" Color="#FF1A1A1A" />
             <SolidColorBrush x:Key="AppBarButtonBackgroundPressed" Color="#FF333333" />

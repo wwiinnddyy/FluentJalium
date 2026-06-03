@@ -261,9 +261,12 @@ public static class FluentThemeManager
         AliasStyle<FWStatusBar, StatusBar>(dictionary);
         AliasStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
+        AliasStyle<FWCommandBar, CommandBar>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
         AliasStyle<FWAppBarToggleButton, AppBarToggleButton>(dictionary);
         AliasStyle<FWAppBarSeparator, AppBarSeparator>(dictionary);
+        AliasStyle<FWToolBar, Jalium.UI.Controls.ToolBar>(dictionary);
+        AliasStyle<FWToolBarTray, ToolBarTray>(dictionary);
     }
 
     private static void AliasStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
