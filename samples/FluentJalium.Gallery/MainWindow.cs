@@ -129,7 +129,7 @@ public sealed class MainWindow : Window
 
     private UIElement BuildShell()
     {
-        _pages = CreateGalleryPages();
+        _pages = GalleryCatalog.Create(CreateGalleryPageContentFactories());
         _contentScrollViewer = new FWScrollViewer
         {
             Background = ThemeBrush("NavigationViewContentBackground"),
@@ -159,31 +159,29 @@ public sealed class MainWindow : Window
         return _navigationView;
     }
 
-    private GalleryPage[] CreateGalleryPages()
+    private GalleryPageContentFactories CreateGalleryPageContentFactories()
     {
-        return
-        [
-            new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, FluentIconRegular.Home24, () => CreatePageStack(CreateThemeControls()), "home design system theme typography accent light dark high contrast"),
-            new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, and app bar buttons.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ControlButton24, () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()), "FWButton FWRepeatButton FWHyperlinkButton FWDropDownButton FWSplitButton FWToggleSplitButton FWAppBarButton FWAppBarToggleButton FWAppBarSeparator command bar"),
-            new GalleryPage("Switches", "ToggleButton and ToggleSwitch states for checked, unchecked, indeterminate, and disabled surfaces.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ToggleMultiple24, () => CreatePageStack(CreateSwitchesSection()), "FWToggleButton FWToggleSwitch checked unchecked indeterminate"),
-            new GalleryPage("Text Input", "TextBox, PasswordBox, NumberBox, AutoCompleteBox, and RichTextBox surfaces.", GalleryNavigationGroup.Input, FluentIconRegular.Textbox24, () => CreatePageStack(CreateTextSection()), "FWTextBox FWPasswordBox FWNumberBox FWAutoCompleteBox FWRichTextBox search form input"),
-            new GalleryPage("Selection", "CheckBox, RadioButton, ComboBox, and ComboBoxItem controls.", GalleryNavigationGroup.Input, FluentIconRegular.CheckboxChecked24, () => CreatePageStack(CreateSelectionSection()), "FWCheckBox FWRadioButton FWComboBox FWComboBoxItem pick choose"),
-            new GalleryPage("Range", "Slider, RangeSlider, ProgressBar, and ProgressRing controls.", GalleryNavigationGroup.Input, FluentIconRegular.Gauge24, () => CreatePageStack(CreateRangeSection()), "FWSlider FWRangeSlider FWProgressBar FWProgressRing value loading"),
-            new GalleryPage("Date and Time", "DatePicker, TimePicker, and Calendar controls.", GalleryNavigationGroup.Input, FluentIconRegular.CalendarLtr24, () => CreatePageStack(CreateDateTimeSection()), "FWDatePicker FWTimePicker FWCalendar schedule calendar"),
-            new GalleryPage("Content and Layout", "TextBlock, AccessText, Border, content hosts, StackPanel, WrapPanel, and Grid foundations.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.LayoutColumnTwo24, () => CreatePageStack(CreateContentLayoutSection()), "FWTextBlock FWAccessText FWBorder FWContentControl FWContentPresenter FWStackPanel FWWrapPanel FWGrid layout"),
-            new GalleryPage("Visuals", "Image, icon, label, separator, and Viewbox foundation controls.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Image24, () => CreatePageStack(CreateVisualsSection()), "FWImage FWFontIcon FWSymbolIcon FWPathIcon FWLabel FWSeparator FWViewbox visual icon"),
-            new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.CursorClick24, () => CreatePageStack(CreateInteractionSection()), "FWScrollViewer FWSwipeControl FWGridSplitter scrolling resize"),
-            new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Color24, () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
-            new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Table24, () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
-            new GalleryPage("Selectors and Properties", "TreeSelector and PropertyGrid surfaces for hierarchical selection and object editing.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.DatabaseSearch24, () => CreatePageStack(CreateAdvancedSelectionPropertiesSection()), "FWTreeSelector FWTreeSelectorItem FWPropertyGrid tree selector property grid search categorized alphabetical"),
-            new GalleryPage("Data Inspectors", "DiffViewer, HexEditor, and JsonTreeViewer developer surfaces for inspecting structured and binary data.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Code24, () => CreatePageStack(CreateDataInspectorsSection()), "FWDiffViewer FWHexEditor FWJsonTreeViewer diff hex json code data inspector"),
-            new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
-            new GalleryPage("Materials and Effects", "Window backdrops, backdrop effects, and WinUI-style material layering for FluentJalium surfaces.", GalleryNavigationGroup.MaterialsAndEffects, FluentIconRegular.TransparencySquare24, () => CreatePageStack(new GalleryMaterialsPage(this).CreateContent()), "WindowBackdropType SystemBackdrop Mica MicaAlt Acrylic BackdropEffect BlurEffect AcrylicEffect MicaEffect FrostedGlassEffect DropShadowEffect material layer reveal"),
-            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, MenuFlyout, and CommandBarFlyout surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyout FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSubItem FWMenuFlyoutSeparator FWCommandBarFlyout command menu"),
-            new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
-            new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.AlertBadge24, () => CreatePageStack(CreateStatusSection()), "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar notification message severity"),
-            new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", GalleryNavigationGroup.Diagnostics, FluentIconRegular.DataUsage24, () => CreatePageStack(CreateStateMatrix()), "states normal hover pressed selected disabled light dark high contrast", IsFooter: true)
-        ];
+        return new GalleryPageContentFactories(
+            Overview: () => CreatePageStack(CreateThemeControls()),
+            Buttons: () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()),
+            Switches: () => CreatePageStack(CreateSwitchesSection()),
+            TextInput: () => CreatePageStack(CreateTextSection()),
+            Selection: () => CreatePageStack(CreateSelectionSection()),
+            Range: () => CreatePageStack(CreateRangeSection()),
+            DateAndTime: () => CreatePageStack(CreateDateTimeSection()),
+            ContentAndLayout: () => CreatePageStack(CreateContentLayoutSection()),
+            Visuals: () => CreatePageStack(CreateVisualsSection()),
+            Interaction: () => CreatePageStack(CreateInteractionSection()),
+            InputAndMedia: () => CreatePageStack(CreateAdvancedInputMediaSection()),
+            Collections: () => CreatePageStack(CreateCollectionsSection()),
+            SelectorsAndProperties: () => CreatePageStack(CreateAdvancedSelectionPropertiesSection()),
+            DataInspectors: () => CreatePageStack(CreateDataInspectorsSection()),
+            Navigation: () => CreatePageStack(CreateNavigationSection()),
+            MaterialsAndEffects: () => CreatePageStack(new GalleryMaterialsPage(this).CreateContent()),
+            Menus: () => CreatePageStack(CreateMenusSection()),
+            Disclosure: () => CreatePageStack(CreateDisclosureDialogsSection()),
+            Status: () => CreatePageStack(CreateStatusSection()),
+            StateMatrix: () => CreatePageStack(CreateStateMatrix()));
     }
 
     private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
