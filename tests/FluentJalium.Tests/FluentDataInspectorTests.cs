@@ -219,6 +219,62 @@ public sealed class FluentDataInspectorTests
         Assert.True(viewer.ShowItemCount);
     }
 
+    [Fact]
+    public void FWDataInspectors_ShouldExposeMaterialWorkbenchState()
+    {
+        var diffViewer = new FWDiffViewer
+        {
+            OriginalText = "theme: dark\naccent: blue\nstatus: preview",
+            ModifiedText = "theme: dark\naccent: teal\nstatus: ready",
+            ViewMode = DiffViewMode.Unified,
+            ShowLineNumbers = true,
+            ShowMinimap = true,
+            GutterWidth = 48,
+            ContextLines = 1
+        };
+        var hexEditor = new FWHexEditor
+        {
+            Data = [0x46, 0x57, 0x20, 0x44, 0x61, 0x74, 0x61],
+            BytesPerRow = 8,
+            ColumnGroupSize = 4,
+            ShowAsciiColumn = true,
+            ShowOffsetColumn = true,
+            ShowDataInterpretation = true,
+            SelectionStart = 0,
+            SelectionLength = 2
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = diffViewer
+        };
+
+        Assert.Equal(DiffViewMode.Unified, diffViewer.ViewMode);
+        Assert.True(diffViewer.ShowLineNumbers);
+        Assert.True(diffViewer.ShowMinimap);
+        Assert.Equal(48, diffViewer.GutterWidth);
+        Assert.Equal(1, diffViewer.ContextLines);
+        Assert.True(diffViewer.GetChangeCount() > 0);
+        Assert.Equal(0, hexEditor.FindBytes([0x46, 0x57]));
+        Assert.Equal(8, hexEditor.BytesPerRow);
+        Assert.True(hexEditor.ShowDataInterpretation);
+        Assert.Equal(2, hexEditor.SelectionLength);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(diffViewer, surface.Child);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
