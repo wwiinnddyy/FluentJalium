@@ -4,12 +4,14 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
+using Jalium.UI.Media.Animation;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWTransitioningContentControl = FluentJalium.Controls.FWTransitioningContentControl;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
@@ -32,6 +34,11 @@ internal sealed class GalleryMotionPage
             "Connected animation",
             "Shared elements keep spatial continuity when navigation moves content between views.",
             CreateConnectedAnimationSample()));
+        examples.Children.Add(CreateMotionExampleCard(
+            FluentIconRegular.FlowSparkle24,
+            "Content transitions",
+            "FWTransitioningContentControl wraps Jalium content transitions with Fluent motion defaults.",
+            CreateContentTransitionSample()));
 
         panel.Children.Add(examples);
         return panel;
@@ -85,6 +92,38 @@ internal sealed class GalleryMotionPage
                             ? "Animating destination from the prepared source bounds."
                             : "Prepare the source before starting the motion.";
                     })),
+                CreateMotionStatus(status)
+            }
+        };
+    }
+
+    private static UIElement CreateContentTransitionSample()
+    {
+        var transitionHost = new FWTransitioningContentControl
+        {
+            Width = 456,
+            Height = 180,
+            TransitionMode = TransitionMode.Crossfade,
+            Content = CreateTransitionPanel(
+                FluentIconRegular.SlideTransition24,
+                "Crossfade",
+                "Default Fluent motion for subtle content changes.",
+                FWFluentMaterialKind.Acrylic)
+        };
+        var status = CreateMotionOutputText("Current transition: Crossfade");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                CreateTransitionHostSurface(transitionHost),
+                CreateMotionButtonRow(
+                    CreateTransitionModeButton(transitionHost, status, FluentIconRegular.SlideTransition24, TransitionMode.Crossfade, "Crossfade"),
+                    CreateTransitionModeButton(transitionHost, status, FluentIconRegular.ArrowRight24, TransitionMode.SlideLeft, "Slide"),
+                    CreateTransitionModeButton(transitionHost, status, FluentIconRegular.Glasses24, TransitionMode.LiquidMorph, "Liquid"),
+                    CreateTransitionModeButton(transitionHost, status, FluentIconRegular.Sparkle24, TransitionMode.SketchReveal, "Sketch")),
                 CreateMotionStatus(status)
             }
         };
@@ -165,6 +204,63 @@ internal sealed class GalleryMotionPage
                 }
             }
         };
+    }
+
+    private static FWBorder CreateTransitionHostSurface(FWTransitioningContentControl transitionHost)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = transitionHost
+        };
+    }
+
+    private static FWFluentMaterialSurface CreateTransitionPanel(
+        FluentIconRegular icon,
+        string title,
+        string description,
+        FWFluentMaterialKind materialKind)
+    {
+        return new FWFluentMaterialSurface
+        {
+            MaterialKind = materialKind,
+            TintColor = Color.FromArgb(180, 20, 84, 145),
+            TintOpacity = 0.24,
+            BlurRadius = 12,
+            RefractionAmount = 62,
+            ChromaticAberration = 0.38,
+            Background = new SolidColorBrush(Color.FromArgb(76, 255, 255, 255)),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Padding = new Thickness(16),
+            Child = CreateMotionSurfaceContent(icon, title, description)
+        };
+    }
+
+    private static FWButton CreateTransitionModeButton(
+        FWTransitioningContentControl transitionHost,
+        TextBlock status,
+        FluentIconRegular icon,
+        TransitionMode transitionMode,
+        string label)
+    {
+        return CreateMotionActionButton(icon, label, () =>
+        {
+            transitionHost.TransitionMode = transitionMode;
+            transitionHost.Content = CreateTransitionPanel(
+                icon,
+                transitionMode.ToString(),
+                $"TransitionMode.{transitionMode} rendered through a FluentJalium FW surface.",
+                transitionMode == TransitionMode.LiquidMorph ? FWFluentMaterialKind.LiquidGlass : FWFluentMaterialKind.Acrylic);
+            status.Text = $"Current transition: {transitionMode}";
+        });
     }
 
     private static FWBorder CreateMotionExampleCard(FluentIconRegular icon, string title, string description, UIElement content)

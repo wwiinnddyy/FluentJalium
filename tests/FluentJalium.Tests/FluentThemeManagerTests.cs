@@ -90,6 +90,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
+            AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
@@ -277,6 +278,7 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<AccessText>(dictionary);
         AssertContainsStyle<Border>(dictionary);
         AssertContainsStyle<ContentControl>(dictionary);
+        AssertContainsStyle<TransitioningContentControl>(dictionary);
         AssertContainsStyle<ContentPresenter>(dictionary);
         AssertContainsStyle<StackPanel>(dictionary);
         AssertContainsStyle<WrapPanel>(dictionary);
@@ -622,6 +624,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
+            AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
@@ -888,6 +891,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWBorder, Border>();
         AssertFluentControl<FWFluentMaterialSurface, Border>();
         AssertFluentControl<FWContentControl, ContentControl>();
+        AssertFluentControl<FWTransitioningContentControl, TransitioningContentControl>();
         AssertFluentControl<FWContentPresenter, ContentPresenter>();
         AssertFluentControl<FWStackPanel, StackPanel>();
         AssertFluentControl<FWWrapPanel, WrapPanel>();
@@ -1577,6 +1581,27 @@ public sealed class FluentThemeManagerTests
         Assert.Equal(1, contentControl.VisualChildrenCount);
         Assert.Same(presenterChild, contentPresenter.Content);
         Assert.Equal(1, contentPresenter.VisualChildrenCount);
+    }
+
+    [Fact]
+    public void FWTransitioningContentControl_ShouldExposeTransitionModeAndContent()
+    {
+        var transitionHost = new FWTransitioningContentControl
+        {
+            TransitionMode = Jalium.UI.Media.Animation.TransitionMode.SlideLeft,
+            Content = "Slide content"
+        };
+
+        transitionHost.Measure(new Size(240, 120));
+
+        Assert.Equal(Jalium.UI.Media.Animation.TransitionMode.SlideLeft, transitionHost.TransitionMode);
+        Assert.Equal("Slide content", transitionHost.Content);
+
+        transitionHost.TransitionMode = Jalium.UI.Media.Animation.TransitionMode.LiquidMorph;
+        transitionHost.Content = new FWBorder { Width = 80, Height = 40 };
+
+        Assert.Equal(Jalium.UI.Media.Animation.TransitionMode.LiquidMorph, transitionHost.TransitionMode);
+        Assert.IsType<FWBorder>(transitionHost.Content);
     }
 
     [Fact]

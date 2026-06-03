@@ -238,6 +238,7 @@ public static class FluentThemeManager
         AliasStyle<FWBorder, Border>(dictionary);
         AliasStyle<FWFluentMaterialSurface, Border>(dictionary);
         AliasStyle<FWContentControl, ContentControl>(dictionary);
+        AliasStyle<FWTransitioningContentControl, TransitioningContentControl>(dictionary);
         AliasStyle<FWContentPresenter, ContentPresenter>(dictionary);
         AliasStyle<FWStackPanel, StackPanel>(dictionary);
         AliasStyle<FWWrapPanel, WrapPanel>(dictionary);

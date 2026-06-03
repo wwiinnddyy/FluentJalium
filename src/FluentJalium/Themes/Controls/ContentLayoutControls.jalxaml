@@ -1,5 +1,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="clr-namespace:Jalium.UI.Controls;assembly=Jalium.UI"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="TextBlock">
@@ -36,6 +37,12 @@
         <Setter Property="FontSize" Value="{ThemeResource FluentBodyFontSize}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style TargetType="controls:TransitioningContentControl" BasedOn="{StaticResource {x:Type ContentControl}}">
+        <Setter Property="TransitionMode" Value="Crossfade" />
+        <Setter Property="TransitionDuration" Value="0:0:0.28" />
+        <Setter Property="TransitionTimingFunction" Value="Recommended" />
     </Style>
 
     <Style TargetType="ContentPresenter">

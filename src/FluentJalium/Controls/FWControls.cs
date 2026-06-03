@@ -397,6 +397,13 @@ public class FWContentControl : ContentControl, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium TransitioningContentControl control.
+/// </summary>
+public class FWTransitioningContentControl : TransitioningContentControl, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium ContentPresenter control.
 /// </summary>
 public class FWContentPresenter : ContentPresenter, IFluentJaliumControl
