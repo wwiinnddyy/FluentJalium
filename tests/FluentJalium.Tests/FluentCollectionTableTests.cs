@@ -231,6 +231,56 @@ public sealed class FluentCollectionTableTests
     }
 
     [Fact]
+    public void FWDataGrid_ShouldExposeMaterialSurfaceDensityAndLayeringProperties()
+    {
+        var rows = new[]
+        {
+            new CollectionRow("Buttons", "Complete", 9),
+            new CollectionRow("Selection", "Review", 4),
+            new CollectionRow("Collections", "Active", 8)
+        };
+        var alternatingBrush = new SolidColorBrush(Color.FromArgb(32, 255, 255, 255));
+        var dataGrid = new FWDataGrid
+        {
+            AutoGenerateColumns = false,
+            ItemsSource = rows,
+            RowHeight = 30,
+            ColumnHeaderHeight = 34,
+            AlternatingRowBackground = alternatingBrush,
+            GridLinesVisibility = DataGridGridLinesVisibility.All,
+            HeadersVisibility = DataGridHeadersVisibility.All
+        };
+        dataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name"), Width = 150 });
+        dataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 110 });
+        dataGrid.SelectedIndex = 2;
+
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = dataGrid
+        };
+
+        Assert.Equal(30, dataGrid.RowHeight);
+        Assert.Equal(34, dataGrid.ColumnHeaderHeight);
+        Assert.Same(alternatingBrush, dataGrid.AlternatingRowBackground);
+        Assert.Equal(rows[2], dataGrid.SelectedItem);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(dataGrid, surface.Child);
+    }
+
+    [Fact]
     public void FWTreeDataGrid_ShouldExpandCollapseAndSelectVisibleRows()
     {
         var rows = new[]
