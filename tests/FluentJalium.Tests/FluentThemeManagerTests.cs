@@ -182,6 +182,8 @@ public sealed class FluentThemeManagerTests
             Assert.Equal(accent, GetBrushColor(app.Resources["TabItemIndicator"]));
             Assert.Equal(Color.FromArgb(0x33, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["NavigationViewItemBackgroundSelected"]));
             Assert.Equal(Color.FromArgb(0x66, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["NavigationViewItemBackgroundSelectedHover"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["ToggleSwitchOnBackground"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["ToggleSwitchOnBorder"]));
         }
         finally
         {
@@ -309,6 +311,9 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ToggleCheckedBackground"));
         Assert.True(dictionary.Contains("ToggleUncheckedBackground"));
         Assert.True(dictionary.Contains("ToggleDisabledBackground"));
+        Assert.True(dictionary.Contains("ToggleSwitchOnBackground"));
+        Assert.True(dictionary.Contains("ToggleSwitchOffBackground"));
+        Assert.True(dictionary.Contains("ToggleSwitchThumb"));
         Assert.True(dictionary.Contains("SliderTrack"));
         Assert.True(dictionary.Contains("SliderThumb"));
         Assert.True(dictionary.Contains("ProgressRingForeground"));

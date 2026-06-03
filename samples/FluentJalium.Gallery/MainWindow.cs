@@ -789,26 +789,27 @@ public sealed class MainWindow : Window
     {
         var panel = CreateSection("Switches");
 
-        var row = new StackPanel
+        var toggleButtonRow = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 12
         };
 
-        row.Children.Add(new FWToggleButton { Content = "FWToggleButton" });
-        row.Children.Add(new FWToggleButton { Content = "Checked", IsChecked = true });
-        row.Children.Add(new FWToggleButton { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        row.Children.Add(new FWToggleButton { Content = "Disabled", IsChecked = true, IsEnabled = false });
+        toggleButtonRow.Children.Add(new FWToggleButton { Content = "FWToggleButton" });
+        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Checked", IsChecked = true });
+        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
+        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Disabled", IsChecked = true, IsEnabled = false });
 
         var switchRow = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 18
+            Spacing = 20,
+            Margin = new Thickness(0, 4, 0, 0)
         };
 
         switchRow.Children.Add(new FWToggleSwitch
         {
-            Header = "FWToggleSwitch",
+            Header = "Default",
             OffContent = "Off",
             OnContent = "On"
         });
@@ -821,6 +822,13 @@ public sealed class MainWindow : Window
         });
         switchRow.Children.Add(new FWToggleSwitch
         {
+            Header = "Content",
+            IsOn = true,
+            OffContent = "Paused",
+            OnContent = "Running"
+        });
+        switchRow.Children.Add(new FWToggleSwitch
+        {
             Header = "Disabled",
             IsOn = true,
             IsEnabled = false,
@@ -828,7 +836,7 @@ public sealed class MainWindow : Window
             OnContent = "On"
         });
 
-        panel.Children.Add(row);
+        panel.Children.Add(toggleButtonRow);
         panel.Children.Add(switchRow);
         return panel;
     }

@@ -97,6 +97,16 @@
             <SolidColorBrush x:Key="ToggleCheckedBorderHover" Color="#FF1683D8" />
             <SolidColorBrush x:Key="ToggleDisabledBackground" Color="#0BFFFFFF" />
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#28FFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackgroundHover" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorder" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorderHover" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackgroundHover" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorder" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorderHover" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="SliderTrack" Color="#2AFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
@@ -333,6 +343,16 @@
             <SolidColorBrush x:Key="ToggleCheckedBorderHover" Color="#FF106EBE" />
             <SolidColorBrush x:Key="ToggleDisabledBackground" Color="#4DF9F9F9" />
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#37000000" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackgroundHover" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorder" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorderHover" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackground" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackgroundHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorder" Color="#8B000000" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorderHover" Color="#E4000000" />
+            <SolidColorBrush x:Key="ToggleSwitchThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#37000000" />
             <SolidColorBrush x:Key="SliderTrack" Color="#15000000" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
@@ -537,6 +557,16 @@
             <SolidColorBrush x:Key="ToggleCheckedBorderHover" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ToggleDisabledBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBackgroundHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorder" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOnBorderHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorder" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchOffBorderHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleSwitchThumb" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="SliderTrack" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FFFFFF00" />

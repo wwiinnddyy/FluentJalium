@@ -175,10 +175,10 @@
 
     <Style TargetType="ToggleSwitch">
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Background" Value="{ThemeResource ToggleUncheckedBackground}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ToggleUncheckedBorder}" />
-        <Setter Property="OnBackground" Value="{ThemeResource AccentBrush}" />
-        <Setter Property="OffBackground" Value="{ThemeResource ToggleUncheckedBackground}" />
+        <Setter Property="Background" Value="{ThemeResource ToggleSwitchOffBackground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ToggleSwitchOffBorder}" />
+        <Setter Property="OnBackground" Value="{ThemeResource ToggleSwitchOnBackground}" />
+        <Setter Property="OffBackground" Value="{ThemeResource ToggleSwitchOffBackground}" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="Template">
             <ControlTemplate TargetType="ToggleSwitch">
@@ -201,7 +201,7 @@
                                         Width="14"
                                         Height="14"
                                         CornerRadius="7"
-                                        Background="{ThemeResource SliderThumb}"
+                                        Background="{ThemeResource ToggleSwitchThumb}"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Top"
                                         Margin="3,2,0,0" />
@@ -215,6 +215,37 @@
                 </StackPanel>
             </ControlTemplate>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsOn" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ToggleSwitchOnBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleSwitchOnBorder}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsOn" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ToggleSwitchOffBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleSwitchOffBorderHover}" />
+                <Setter Property="OffBackground" Value="{ThemeResource ToggleSwitchOffBackgroundHover}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsOn" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ToggleSwitchOnBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleSwitchOnBorderHover}" />
+                <Setter Property="OnBackground" Value="{ThemeResource ToggleSwitchOnBackgroundHover}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource ToggleDisabledBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleDisabledBorder}" />
+                <Setter Property="OnBackground" Value="{ThemeResource ToggleDisabledBackground}" />
+                <Setter Property="OffBackground" Value="{ThemeResource ToggleDisabledBackground}" />
+                <Setter TargetName="PART_SwitchThumb" Property="Background" Value="{ThemeResource ToggleSwitchThumbDisabled}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>
-
