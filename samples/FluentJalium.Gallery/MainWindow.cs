@@ -26,10 +26,12 @@ using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
 using FWCommandBar = FluentJalium.Controls.FWCommandBar;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
+using FWDiffViewer = FluentJalium.Controls.FWDiffViewer;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWExpander = FluentJalium.Controls.FWExpander;
 using FWFrame = FluentJalium.Controls.FWFrame;
 using FWGroupBox = FluentJalium.Controls.FWGroupBox;
+using FWHexEditor = FluentJalium.Controls.FWHexEditor;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWImage = FluentJalium.Controls.FWImage;
 using FWInkCanvas = FluentJalium.Controls.FWInkCanvas;
@@ -55,6 +57,7 @@ using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
+using FWJsonTreeViewer = FluentJalium.Controls.FWJsonTreeViewer;
 using FWNumberBox = FluentJalium.Controls.FWNumberBox;
 using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWPropertyGrid = FluentJalium.Controls.FWPropertyGrid;
@@ -169,6 +172,7 @@ public sealed class MainWindow : Window
             new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Color24, () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
             new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Table24, () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
             new GalleryPage("Selectors and Properties", "TreeSelector and PropertyGrid surfaces for hierarchical selection and object editing.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.DatabaseSearch24, () => CreatePageStack(CreateAdvancedSelectionPropertiesSection()), "FWTreeSelector FWTreeSelectorItem FWPropertyGrid tree selector property grid search categorized alphabetical"),
+            new GalleryPage("Data Inspectors", "DiffViewer, HexEditor, and JsonTreeViewer developer surfaces for inspecting structured and binary data.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Code24, () => CreatePageStack(CreateDataInspectorsSection()), "FWDiffViewer FWHexEditor FWJsonTreeViewer diff hex json code data inspector"),
             new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
             new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
             new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
@@ -1249,6 +1253,222 @@ public sealed class MainWindow : Window
         }
 
         return string.Join(", ", names);
+    }
+
+    private UIElement CreateDataInspectorsSection()
+    {
+        var panel = CreateSection("Data Inspectors");
+        var examples = new FWWrapPanel
+        {
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
+        };
+
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWDiffViewer",
+            "Side-by-side and unified diffs with line numbers, minimap state, and change navigation.",
+            CreateDiffViewerSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWHexEditor",
+            "Binary data surface with offset, hex, ASCII, grouping, find, and replacement state.",
+            CreateHexEditorSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWJsonTreeViewer",
+            "Searchable JSON tree with type colors, path status, expand depth, and item count display.",
+            CreateJsonTreeViewerSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateDiffViewerSample()
+    {
+        var output = CreateCollectionOutput("Mode: SideBySide. Changes: pending");
+        var viewer = new FWDiffViewer
+        {
+            Width = 520,
+            Height = 300,
+            OriginalText = "theme: dark\naccent: blue\ncontrols: 32\nstatus: preview",
+            ModifiedText = "theme: dark\naccent: teal\ncontrols: 36\nstatus: ready\nicons: fluent",
+            ViewMode = DiffViewMode.SideBySide,
+            ShowLineNumbers = true,
+            ShowMinimap = true,
+            GutterWidth = 56
+        };
+
+        void UpdateOutput()
+        {
+            output.Text = $"Mode: {viewer.ViewMode}. Line numbers: {viewer.ShowLineNumbers}. Minimap: {viewer.ShowMinimap}. Changes: {viewer.GetChangeCount()}";
+        }
+
+        viewer.DiffComputed += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                viewer,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.TextSortAscending24, "Unified", () =>
+                    {
+                        viewer.ViewMode = viewer.ViewMode == DiffViewMode.SideBySide ? DiffViewMode.Unified : DiffViewMode.SideBySide;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.NumberRow24, "Line nums", () =>
+                    {
+                        viewer.ShowLineNumbers = !viewer.ShowLineNumbers;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.DataUsage24, "Minimap", () =>
+                    {
+                        viewer.ShowMinimap = !viewer.ShowMinimap;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.ArrowDown24, "Next", () =>
+                    {
+                        viewer.NavigateToNextChange();
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateHexEditorSample()
+    {
+        var output = CreateCollectionOutput("Bytes per row: 16. ASCII: on. Interpretation: off");
+        var editor = new FWHexEditor
+        {
+            Width = 520,
+            Height = 300,
+            Data = CreateHexSampleData(),
+            BytesPerRow = 16,
+            ColumnGroupSize = 8,
+            ShowAsciiColumn = true,
+            ShowOffsetColumn = true,
+            ShowDataInterpretation = false,
+            SelectionStart = 0,
+            SelectionLength = 4
+        };
+
+        void UpdateOutput()
+        {
+            output.Text = $"Bytes per row: {editor.BytesPerRow}. ASCII: {FormatOnOff(editor.ShowAsciiColumn)}. Interpretation: {FormatOnOff(editor.ShowDataInterpretation)}. Selection: {editor.SelectionStart}+{editor.SelectionLength}";
+        }
+
+        editor.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                editor,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.TableResizeColumn24, "Rows", () =>
+                    {
+                        editor.BytesPerRow = editor.BytesPerRow == 16 ? 8 : 16;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.TextChangeCase24, "ASCII", () =>
+                    {
+                        editor.ShowAsciiColumn = !editor.ShowAsciiColumn;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.DataHistogram24, "Interpret", () =>
+                    {
+                        editor.ShowDataInterpretation = !editor.ShowDataInterpretation;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.Search24, "Find", () =>
+                    {
+                        var offset = editor.FindBytes([0x46, 0x57]);
+                        output.Text = $"Found FW at offset {offset}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateJsonTreeViewerSample()
+    {
+        var output = CreateCollectionOutput("Search: empty. Expand depth: 2");
+        var viewer = new FWJsonTreeViewer
+        {
+            Width = 520,
+            Height = 300,
+            JsonText = """
+                {
+                  "library": "FluentJalium",
+                  "theme": {
+                    "variant": "Dark",
+                    "accent": "Teal"
+                  },
+                  "controls": ["FWDiffViewer", "FWHexEditor", "FWJsonTreeViewer"],
+                  "ready": true
+                }
+                """,
+            ExpandDepth = 2,
+            SearchText = string.Empty,
+            ShowItemCount = true,
+            ShowTypeIndicators = true
+        };
+
+        void UpdateOutput()
+        {
+            output.Text = $"Search: {FormatSearchText(viewer.SearchText)}. Expand depth: {viewer.ExpandDepth}. Type indicators: {FormatOnOff(viewer.ShowTypeIndicators)}";
+        }
+
+        viewer.SelectedNodeChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                viewer,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.Search24, "Search theme", () =>
+                    {
+                        viewer.SearchText = viewer.SearchText.Length == 0 ? "theme" : string.Empty;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.ArrowExpand24, "Expand", () =>
+                    {
+                        viewer.ExpandAll();
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.ArrowCollapseAll24, "Collapse", () =>
+                    {
+                        viewer.CollapseAll();
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.Braces24, "Types", () =>
+                    {
+                        viewer.ShowTypeIndicators = !viewer.ShowTypeIndicators;
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static byte[] CreateHexSampleData()
+    {
+        return
+        [
+            0x46, 0x57, 0x20, 0x44, 0x61, 0x74, 0x61, 0x20,
+            0x49, 0x6E, 0x73, 0x70, 0x65, 0x63, 0x74, 0x6F,
+            0x72, 0x0A, 0x01, 0x02, 0x03, 0x04, 0x20, 0x26,
+            0x46, 0x6C, 0x75, 0x65, 0x6E, 0x74, 0x0D, 0x0A
+        ];
     }
 
     private UIElement CreateNavigationSection()

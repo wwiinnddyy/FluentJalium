@@ -203,6 +203,32 @@
             <SolidColorBrush x:Key="PropertyGridRowHoverBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="PropertyGridSelectionBackground" Color="#330078D4" />
             <SolidColorBrush x:Key="PropertyGridDescriptionBackground" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorBackground" Color="#FF1E1E1E" />
+            <SolidColorBrush x:Key="DataInspectorForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorForegroundSecondary" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorToolbarBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorGutterBackground" Color="#FF252526" />
+            <SolidColorBrush x:Key="DataInspectorLineNumberForeground" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorSelectionBackground" Color="#660078D4" />
+            <SolidColorBrush x:Key="DataInspectorAddedLineBackground" Color="#4025B55B" />
+            <SolidColorBrush x:Key="DataInspectorRemovedLineBackground" Color="#40C42B1C" />
+            <SolidColorBrush x:Key="DataInspectorModifiedLineBackground" Color="#40F2C811" />
+            <SolidColorBrush x:Key="DataInspectorAddedWordBackground" Color="#6625B55B" />
+            <SolidColorBrush x:Key="DataInspectorRemovedWordBackground" Color="#66C42B1C" />
+            <SolidColorBrush x:Key="DataInspectorOffsetForeground" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="DataInspectorHexForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorAsciiForeground" Color="#FFFFC27A" />
+            <SolidColorBrush x:Key="DataInspectorModifiedByteForeground" Color="#FFFF6B6B" />
+            <SolidColorBrush x:Key="DataInspectorColumnSeparatorBrush" Color="#26FFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonObjectBrush" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="DataInspectorJsonArrayBrush" Color="#FF9CDC7C" />
+            <SolidColorBrush x:Key="DataInspectorJsonStringBrush" Color="#FFFFC27A" />
+            <SolidColorBrush x:Key="DataInspectorJsonNumberBrush" Color="#FFB5CEA8" />
+            <SolidColorBrush x:Key="DataInspectorJsonBooleanBrush" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#FF8A8A8A" />
+            <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FF9CDCFE" />
+            <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFC5C5C5" />
             <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
@@ -594,6 +620,32 @@
             <SolidColorBrush x:Key="PropertyGridRowHoverBackground" Color="#09000000" />
             <SolidColorBrush x:Key="PropertyGridSelectionBackground" Color="#330078D4" />
             <SolidColorBrush x:Key="PropertyGridDescriptionBackground" Color="#4DF9F9F9" />
+            <SolidColorBrush x:Key="DataInspectorBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="DataInspectorForegroundSecondary" Color="#9E000000" />
+            <SolidColorBrush x:Key="DataInspectorBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="DataInspectorToolbarBackground" Color="#80F9F9F9" />
+            <SolidColorBrush x:Key="DataInspectorGutterBackground" Color="#FFF9F9F9" />
+            <SolidColorBrush x:Key="DataInspectorLineNumberForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="DataInspectorSelectionBackground" Color="#4D0078D4" />
+            <SolidColorBrush x:Key="DataInspectorAddedLineBackground" Color="#3325B55B" />
+            <SolidColorBrush x:Key="DataInspectorRemovedLineBackground" Color="#33C42B1C" />
+            <SolidColorBrush x:Key="DataInspectorModifiedLineBackground" Color="#33F2C811" />
+            <SolidColorBrush x:Key="DataInspectorAddedWordBackground" Color="#5525B55B" />
+            <SolidColorBrush x:Key="DataInspectorRemovedWordBackground" Color="#55C42B1C" />
+            <SolidColorBrush x:Key="DataInspectorOffsetForeground" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="DataInspectorHexForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="DataInspectorAsciiForeground" Color="#FF9B4F00" />
+            <SolidColorBrush x:Key="DataInspectorModifiedByteForeground" Color="#FFB3261E" />
+            <SolidColorBrush x:Key="DataInspectorColumnSeparatorBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="DataInspectorJsonObjectBrush" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="DataInspectorJsonArrayBrush" Color="#FF107C10" />
+            <SolidColorBrush x:Key="DataInspectorJsonStringBrush" Color="#FF9B4F00" />
+            <SolidColorBrush x:Key="DataInspectorJsonNumberBrush" Color="#FF427A17" />
+            <SolidColorBrush x:Key="DataInspectorJsonBooleanBrush" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#72000000" />
+            <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#9E000000" />
             <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="IconForeground" Color="#E4000000" />
@@ -965,6 +1017,32 @@
             <SolidColorBrush x:Key="PropertyGridRowHoverBackground" Color="#FF1A1A1A" />
             <SolidColorBrush x:Key="PropertyGridSelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="PropertyGridDescriptionBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorForegroundSecondary" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorToolbarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorGutterBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorLineNumberForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorSelectionBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorAddedLineBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorRemovedLineBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorModifiedLineBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DataInspectorAddedWordBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorRemovedWordBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorOffsetForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorHexForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorAsciiForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorModifiedByteForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorColumnSeparatorBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonObjectBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorJsonArrayBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonStringBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonNumberBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonBooleanBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />

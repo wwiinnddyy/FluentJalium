@@ -431,6 +431,188 @@
         <Setter Property="MinHeight" Value="16" />
     </Style>
 
+    <Style TargetType="DiffViewer">
+        <Setter Property="Background" Value="{ThemeResource DataInspectorBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource DataInspectorForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DataInspectorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{ThemeResource MonoFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="MinWidth" Value="240" />
+        <Setter Property="MinHeight" Value="140" />
+        <Setter Property="GutterBackground" Value="{ThemeResource DataInspectorGutterBackground}" />
+        <Setter Property="LineNumberForeground" Value="{ThemeResource DataInspectorLineNumberForeground}" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource DataInspectorSelectionBackground}" />
+        <Setter Property="CaretBrush" Value="{ThemeResource DataInspectorForeground}" />
+        <Setter Property="AddedLineBrush" Value="{ThemeResource DataInspectorAddedLineBackground}" />
+        <Setter Property="RemovedLineBrush" Value="{ThemeResource DataInspectorRemovedLineBackground}" />
+        <Setter Property="ModifiedLineBrush" Value="{ThemeResource DataInspectorModifiedLineBackground}" />
+        <Setter Property="AddedWordBrush" Value="{ThemeResource DataInspectorAddedWordBackground}" />
+        <Setter Property="RemovedWordBrush" Value="{ThemeResource DataInspectorRemovedWordBackground}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DiffViewer">
+                <Border Name="RootBorder"
+                        Background="Transparent"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        IsHitTestVisible="False" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Opacity" Value="0.65" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="HexEditor">
+        <Setter Property="Background" Value="{ThemeResource DataInspectorBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource DataInspectorForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DataInspectorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="FontFamily" Value="{ThemeResource MonoFontFamily}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="MinWidth" Value="240" />
+        <Setter Property="MinHeight" Value="140" />
+        <Setter Property="OffsetForeground" Value="{ThemeResource DataInspectorOffsetForeground}" />
+        <Setter Property="HexForeground" Value="{ThemeResource DataInspectorHexForeground}" />
+        <Setter Property="AsciiForeground" Value="{ThemeResource DataInspectorAsciiForeground}" />
+        <Setter Property="ModifiedByteBrush" Value="{ThemeResource DataInspectorModifiedByteForeground}" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource DataInspectorSelectionBackground}" />
+        <Setter Property="GutterBackground" Value="{ThemeResource DataInspectorGutterBackground}" />
+        <Setter Property="ColumnSeparatorBrush" Value="{ThemeResource DataInspectorColumnSeparatorBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="HexEditor">
+                <Border Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Opacity" Value="0.65" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="JsonTreeViewer">
+        <Setter Property="Background" Value="{ThemeResource DataInspectorBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource DataInspectorForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DataInspectorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="MinWidth" Value="240" />
+        <Setter Property="MinHeight" Value="180" />
+        <Setter Property="ObjectBrush" Value="{ThemeResource DataInspectorJsonObjectBrush}" />
+        <Setter Property="ArrayBrush" Value="{ThemeResource DataInspectorJsonArrayBrush}" />
+        <Setter Property="StringBrush" Value="{ThemeResource DataInspectorJsonStringBrush}" />
+        <Setter Property="NumberBrush" Value="{ThemeResource DataInspectorJsonNumberBrush}" />
+        <Setter Property="BooleanBrush" Value="{ThemeResource DataInspectorJsonBooleanBrush}" />
+        <Setter Property="NullBrush" Value="{ThemeResource DataInspectorJsonNullBrush}" />
+        <Setter Property="KeyBrush" Value="{ThemeResource DataInspectorJsonKeyBrush}" />
+        <Setter Property="BracketBrush" Value="{ThemeResource DataInspectorJsonBracketBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="JsonTreeViewer">
+                <Border Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0"
+                                Background="{ThemeResource DataInspectorToolbarBackground}"
+                                BorderBrush="{ThemeResource DataInspectorBorderBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="6,4,6,4">
+                            <StackPanel Name="PART_ToolBar"
+                                        Orientation="Horizontal">
+                                <Button Name="PART_ExpandAllButton"
+                                        Content="Expand All"
+                                        Margin="0,0,6,0"
+                                        Padding="8,4,8,4"
+                                        MinWidth="0"
+                                        MinHeight="0" />
+                                <Button Name="PART_CollapseAllButton"
+                                        Content="Collapse All"
+                                        Margin="0,0,6,0"
+                                        Padding="8,4,8,4"
+                                        MinWidth="0"
+                                        MinHeight="0" />
+                                <Button Name="PART_CopyPathButton"
+                                        Content="Copy Path"
+                                        Padding="8,4,8,4"
+                                        MinWidth="0"
+                                        MinHeight="0" />
+                            </StackPanel>
+                        </Border>
+
+                        <TextBox Name="PART_SearchBox"
+                                 Grid.Row="1"
+                                 Margin="6,6,6,6"
+                                 PlaceholderText="Search JSON"
+                                 BorderThickness="1" />
+
+                        <TreeView Name="PART_TreeView"
+                                  Grid.Row="2"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  Padding="2,0,2,0" />
+
+                        <Border Name="PART_StatusBar"
+                                Grid.Row="3"
+                                Background="{ThemeResource DataInspectorToolbarBackground}"
+                                BorderBrush="{ThemeResource DataInspectorBorderBrush}"
+                                BorderThickness="0,1,0,0"
+                                Padding="8,4,8,4">
+                            <TextBlock Name="PART_StatusText"
+                                       Foreground="{ThemeResource DataInspectorForegroundSecondary}"
+                                       FontSize="11" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Opacity" Value="0.65" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="fluent:FWRatingControl">
         <Setter Property="Foreground" Value="{ThemeResource RatingControlCaptionForeground}" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />

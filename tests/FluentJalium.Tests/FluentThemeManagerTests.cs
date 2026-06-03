@@ -68,6 +68,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTreeSelector, TreeSelector>(app.Resources);
             AssertBasedOnStyle<FWTreeSelectorItem, TreeSelectorItem>(app.Resources);
             AssertBasedOnStyle<FWPropertyGrid, PropertyGrid>(app.Resources);
+            AssertBasedOnStyle<FWDiffViewer, DiffViewer>(app.Resources);
+            AssertBasedOnStyle<FWHexEditor, HexEditor>(app.Resources);
+            AssertBasedOnStyle<FWJsonTreeViewer, JsonTreeViewer>(app.Resources);
             AssertBasedOnStyle<FWNavigationView, NavigationView>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
@@ -251,6 +254,9 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TreeSelector>(dictionary);
         AssertContainsStyle<TreeSelectorItem>(dictionary);
         AssertContainsStyle<PropertyGrid>(dictionary);
+        AssertContainsStyle<DiffViewer>(dictionary);
+        AssertContainsStyle<HexEditor>(dictionary);
+        AssertContainsStyle<JsonTreeViewer>(dictionary);
         AssertContainsStyle<NavigationView>(dictionary);
         AssertContainsStyle<NavigationViewItem>(dictionary);
         AssertContainsStyle<NavigationViewItemHeader>(dictionary);
@@ -676,6 +682,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTreeSelector, TreeSelector>(app.Resources);
             AssertBasedOnStyle<FWTreeSelectorItem, TreeSelectorItem>(app.Resources);
             AssertBasedOnStyle<FWPropertyGrid, PropertyGrid>(app.Resources);
+            AssertBasedOnStyle<FWDiffViewer, DiffViewer>(app.Resources);
+            AssertBasedOnStyle<FWHexEditor, HexEditor>(app.Resources);
+            AssertBasedOnStyle<FWJsonTreeViewer, JsonTreeViewer>(app.Resources);
         }
         finally
         {
@@ -905,6 +914,9 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTreeSelector, TreeSelector>();
         AssertFluentControl<FWTreeSelectorItem, TreeSelectorItem>();
         AssertFluentControl<FWPropertyGrid, PropertyGrid>();
+        AssertFluentControl<FWDiffViewer, DiffViewer>();
+        AssertFluentControl<FWHexEditor, HexEditor>();
+        AssertFluentControl<FWJsonTreeViewer, JsonTreeViewer>();
     }
 
     [Fact]

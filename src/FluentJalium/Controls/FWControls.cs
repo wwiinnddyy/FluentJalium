@@ -221,6 +221,27 @@ public class FWPropertyGrid : PropertyGrid, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium DiffViewer control.
+/// </summary>
+public class FWDiffViewer : DiffViewer, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium HexEditor control.
+/// </summary>
+public class FWHexEditor : HexEditor, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium JsonTreeViewer control.
+/// </summary>
+public class FWJsonTreeViewer : JsonTreeViewer, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium NavigationView control.
 /// </summary>
 public class FWNavigationView : NavigationView, IFluentJaliumControl

@@ -216,6 +216,9 @@ public static class FluentThemeManager
         AliasStyle<FWTreeSelector, TreeSelector>(dictionary);
         AliasStyle<FWTreeSelectorItem, TreeSelectorItem>(dictionary);
         AliasStyle<FWPropertyGrid, PropertyGrid>(dictionary);
+        AliasStyle<FWDiffViewer, DiffViewer>(dictionary);
+        AliasStyle<FWHexEditor, HexEditor>(dictionary);
+        AliasStyle<FWJsonTreeViewer, JsonTreeViewer>(dictionary);
         AliasStyle<FWNavigationView, NavigationView>(dictionary);
         AliasStyle<FWNavigationViewItem, NavigationViewItem>(dictionary);
         AliasStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(dictionary);
