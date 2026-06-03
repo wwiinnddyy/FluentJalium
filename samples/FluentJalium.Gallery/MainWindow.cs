@@ -16,11 +16,8 @@ using FWColorPicker = FluentJalium.Controls.FWColorPicker;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWContentControl = FluentJalium.Controls.FWContentControl;
-using FWContentDialog = FluentJalium.Controls.FWContentDialog;
 using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
-using FWExpander = FluentJalium.Controls.FWExpander;
-using FWGroupBox = FluentJalium.Controls.FWGroupBox;
 using FWImage = FluentJalium.Controls.FWImage;
 using FWInkCanvas = FluentJalium.Controls.FWInkCanvas;
 using FWInkPresenter = FluentJalium.Controls.FWInkPresenter;
@@ -41,7 +38,6 @@ using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWSwipeControl = FluentJalium.Controls.FWSwipeControl;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
-using FWToolTip = FluentJalium.Controls.FWToolTip;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
@@ -125,7 +121,7 @@ public sealed class MainWindow : Window
             MaterialsAndEffects: () => CreatePageStack(new GalleryMaterialsPage(this).CreateContent()),
             MotionAndTransitions: () => CreatePageStack(new GalleryMotionPage().CreateContent()),
             Menus: () => CreatePageStack(new GalleryMenusPage().CreateContent()),
-            Disclosure: () => CreatePageStack(CreateDisclosureDialogsSection()),
+            Disclosure: () => CreatePageStack(new GalleryDisclosurePage().CreateContent()),
             Status: () => CreatePageStack(new GalleryStatusPage().CreateContent()),
             StateMatrix: () => CreatePageStack(CreateStateMatrix()));
     }
@@ -995,107 +991,6 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private UIElement CreateDisclosureDialogsSection()
-    {
-        var panel = CreateSection("Disclosure and Dialogs");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var expanderColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 330
-        };
-        expanderColumn.Children.Add(new FWExpander
-        {
-            Header = "FWExpander",
-            IsExpanded = true,
-            Content = new TextBlock
-            {
-                Text = "Expanded content keeps a subtle Fluent surface and accent chevron state.",
-                TextWrapping = TextWrapping.Wrap,
-                Foreground = ThemeBrush("TextPrimary")
-            }
-        });
-        expanderColumn.Children.Add(new FWExpander
-        {
-            Header = "Disabled",
-            IsExpanded = false,
-            IsEnabled = false,
-            Content = new TextBlock
-            {
-                Text = "Disabled expander",
-                Foreground = ThemeBrush("TextSecondary")
-            }
-        });
-        row.Children.Add(expanderColumn);
-
-        var groupBox = new FWGroupBox
-        {
-            Header = "FWGroupBox",
-            Width = 300,
-            Content = new StackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 8,
-                Children =
-                {
-                    new FWCheckBox { Content = "Group option", IsChecked = true },
-                    new FWTextBox { Text = "Grouped text", Width = 240 },
-                    new FWButton { Content = "Apply" }
-                }
-            }
-        };
-        row.Children.Add(groupBox);
-
-        var actionColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 12,
-            Width = 270
-        };
-        var tipButton = new FWButton
-        {
-            Content = "Hover for FWToolTip",
-            Width = 190,
-            ToolTip = new FWToolTip
-            {
-                Content = new TextBlock
-                {
-                    Text = "FWToolTip follows Fluent popup resources.",
-                    Foreground = ThemeBrush("ToolTipForeground")
-                },
-                Placement = PlacementMode.Top,
-                InitialShowDelay = 200
-            }
-        };
-        var dialogResult = new TextBlock
-        {
-            Text = "Dialog result: not shown",
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        };
-        var dialogButton = new FWButton
-        {
-            Content = "Show FWContentDialog",
-            Width = 190
-        };
-        dialogButton.Click += async (_, _) => await ShowDisclosureDialogAsync(dialogResult);
-
-        actionColumn.Children.Add(tipButton);
-        actionColumn.Children.Add(dialogButton);
-        actionColumn.Children.Add(dialogResult);
-        row.Children.Add(actionColumn);
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
     private StackPanel CreateStateMatrix()
     {
         var panel = CreateSection("State Matrix");
@@ -1160,28 +1055,6 @@ public sealed class MainWindow : Window
         panel.Children.Add(comboRow);
 
         return panel;
-    }
-
-    private static async Task ShowDisclosureDialogAsync(TextBlock resultText)
-    {
-        var dialog = new FWContentDialog
-        {
-            Title = "Save gallery changes?",
-            PrimaryButtonText = "Save",
-            SecondaryButtonText = "Review",
-            CloseButtonText = "Cancel",
-            DefaultButton = ContentDialogButton.Primary,
-            Content = new TextBlock
-            {
-                Text = "FWContentDialog uses the Fluent dialog card, overlay, title, and command button resources.",
-                Foreground = ThemeBrush("TextPrimary"),
-                TextWrapping = TextWrapping.Wrap,
-                Width = 340
-            }
-        };
-
-        var result = await dialog.ShowAsync();
-        resultText.Text = $"Dialog result: {result}";
     }
 
     private StackPanel CreateSection(string title)
