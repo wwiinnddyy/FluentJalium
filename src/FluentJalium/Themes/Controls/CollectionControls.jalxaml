@@ -583,4 +583,554 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="TreeSelector">
+        <Setter Property="Background" Value="{ThemeResource TreeSelectorBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TreeSelectorForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TreeSelectorBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,5,8,6" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="MinWidth" Value="180" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeSelector">
+                <Grid>
+                    <Border Name="PART_TriggerBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0"
+                                  VerticalAlignment="Center">
+                                <WrapPanel Name="PART_TagsPanel"
+                                           Orientation="Horizontal"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed" />
+
+                                <TextBlock Name="PART_DisplayText"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"
+                                           Visibility="Collapsed" />
+
+                                <TextBox Name="PART_SearchTextBox"
+                                         Background="Transparent"
+                                         Foreground="{TemplateBinding Foreground}"
+                                         BorderThickness="0"
+                                         Padding="0"
+                                         MinHeight="0"
+                                         VerticalAlignment="Center"
+                                         Visibility="Collapsed" />
+
+                                <TextBlock Name="PART_PlaceholderText"
+                                           Text="{TemplateBinding PlaceholderText}"
+                                           Foreground="{ThemeResource TreeSelectorForegroundPlaceholder}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"
+                                           TextWrapping="NoWrap"
+                                           IsHitTestVisible="False" />
+                            </Grid>
+
+                            <Button Name="PART_ClearButton"
+                                    Grid.Column="1"
+                                    Width="24"
+                                    Height="24"
+                                    Margin="4,0,0,0"
+                                    Padding="0"
+                                    MinWidth="0"
+                                    MinHeight="0"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    VerticalAlignment="Center"
+                                    Visibility="Collapsed">
+                                <Path Data="M 1,1 L 9,9 M 9,1 L 1,9"
+                                      Stroke="{ThemeResource TreeSelectorForegroundPlaceholder}"
+                                      StrokeThickness="1.4"
+                                      Width="10"
+                                      Height="10"
+                                      Stretch="Uniform"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                            </Button>
+
+                            <Path Name="PART_DropDownArrow"
+                                  Grid.Column="2"
+                                  Data="M 0,0 L 5,5 L 10,0"
+                                  Stroke="{ThemeResource TreeSelectorForegroundPlaceholder}"
+                                  StrokeThickness="1.5"
+                                  Width="10"
+                                  Height="6"
+                                  Stretch="None"
+                                  Margin="10,0,2,0"
+                                  VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Border Name="FocusAccent"
+                            Height="2"
+                            Background="{ThemeResource AccentBrush}"
+                            CornerRadius="1"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Bottom"
+                            Margin="1,0,1,1"
+                            Opacity="0" />
+
+                    <Popup Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           StaysOpen="False"
+                           Placement="Bottom"
+                           PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=TreeSelector}}">
+                        <Border Background="{ThemeResource TreeSelectorPopupBackground}"
+                                BorderBrush="{ThemeResource TreeSelectorPopupBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Margin="0,4,0,0"
+                                MinWidth="220"
+                                Padding="4">
+                            <ScrollViewer MaxHeight="{Binding MaxDropDownHeight, RelativeSource={RelativeSource AncestorType=TreeSelector}}"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource TreeSelectorBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TreeSelectorBorderBrushPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource TreeSelectorBorderBrushFocused}" />
+                <Setter TargetName="FocusAccent" Property="Opacity" Value="1" />
+            </Trigger>
+            <Trigger Property="IsDropDownOpen" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource TreeSelectorBorderBrushFocused}" />
+                <Setter TargetName="FocusAccent" Property="Opacity" Value="1" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource TreeSelectorBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TreeSelectorForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TreeSelectorBorderBrushDisabled}" />
+                <Setter TargetName="PART_DropDownArrow" Property="Stroke" Value="{ThemeResource TreeSelectorForegroundDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TreeSelectorItem">
+        <Setter Property="Background" Value="{ThemeResource TreeSelectorItemBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TreeSelectorItemForeground}" />
+        <Setter Property="Padding" Value="8,5,8,5" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeSelectorItem">
+                <StackPanel>
+                    <Border Name="PART_HeaderBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            MinHeight="{TemplateBinding MinHeight}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border Name="PART_IndentSpacer"
+                                    Grid.Column="0"
+                                    Width="0" />
+
+                            <Border Name="PART_ExpanderBorder"
+                                    Grid.Column="1"
+                                    Width="24"
+                                    Visibility="Collapsed">
+                                <Path Name="PART_ExpanderArrow"
+                                      Data="M 0,0 L 8,4 L 0,8 Z"
+                                      Fill="{ThemeResource TextSecondary}"
+                                      Width="8"
+                                      Height="8"
+                                      Stretch="Uniform"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center" />
+                            </Border>
+
+                            <CheckBox Name="PART_CheckBox"
+                                      Grid.Column="2"
+                                      Margin="0,0,4,0"
+                                      VerticalAlignment="Center"
+                                      Visibility="Collapsed" />
+
+                            <Grid Grid.Column="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Name="PART_SelectedIndicator"
+                                        Grid.Column="0"
+                                        Width="3"
+                                        Height="16"
+                                        CornerRadius="1.5"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center"
+                                        Opacity="0"
+                                        Background="{ThemeResource TreeSelectorItemSelectedIndicator}" />
+                                <ContentPresenter Name="PART_Header"
+                                                  Grid.Column="1"
+                                                  Content="{TemplateBinding Header}"
+                                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                                  HorizontalAlignment="Left"
+                                                  VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <ItemsPresenter Name="PART_ItemsHost"
+                                    Visibility="Collapsed" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource TreeSelectorItemBackgroundSelected}" />
+                <Setter TargetName="PART_SelectedIndicator" Property="Opacity" Value="1" />
+                <Setter TargetName="PART_ExpanderArrow" Property="Fill" Value="{ThemeResource AccentBrush}" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource TreeSelectorItemBackgroundPointerOver}" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource TreeSelectorItemBackgroundSelectedPointerOver}" />
+                <Setter TargetName="PART_SelectedIndicator" Property="Opacity" Value="1" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TreeSelectorItemForegroundDisabled}" />
+                <Setter TargetName="PART_ExpanderArrow" Property="Fill" Value="{ThemeResource TreeSelectorItemForegroundDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PropertyGridToolbarButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource PropertyGridToolbarButtonBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource PropertyGridForegroundSecondary}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,4,10,4" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PropertyGridToolbarButtonBackgroundPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource PropertyGridForeground}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PropertyGridToolbarButtonBackgroundPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PropertyGridToolbarButtonActiveStyle" TargetType="Button">
+        <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextOnAccent}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,4,10,4" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="26" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Button">
+                <Border Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <ContentPresenter Margin="{TemplateBinding Padding}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource AccentBrushHover}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource AccentBrushPressed}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PropertyGridSearchBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="{ThemeResource PropertyGridSearchBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource PropertyGridForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="28,5,10,6" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource SelectionBackground}" />
+        <Setter Property="CaretBrush" Value="{ThemeResource PropertyGridForeground}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PropertyGridSearchBackgroundFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PropertyGridCategoryExpanderStyle" TargetType="Expander">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource PropertyGridForeground}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="HeaderBackground" Value="{ThemeResource PropertyGridCategoryHeaderBackground}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Expander">
+                <StackPanel>
+                    <Border Name="PART_HeaderBorder"
+                            Background="{TemplateBinding HeaderBackground}"
+                            Padding="10,6,10,6">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <Path Name="PART_Chevron"
+                                  Grid.Column="0"
+                                  Data="M 0,0 L 6,5 L 0,10"
+                                  Stroke="{ThemeResource PropertyGridForegroundSecondary}"
+                                  StrokeThickness="1.5"
+                                  Width="8"
+                                  Height="10"
+                                  Stretch="None"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,8,0" />
+
+                            <Border Grid.Column="1"
+                                    Width="3"
+                                    Height="14"
+                                    Background="{ThemeResource AccentBrush}"
+                                    CornerRadius="1.5"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,8,0" />
+
+                            <ContentPresenter Grid.Column="2"
+                                              Content="{TemplateBinding Header}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <Border Name="PART_ContentBorder"
+                            Visibility="Collapsed"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="PART_HeaderBorder" Property="Background" Value="{ThemeResource PropertyGridCategoryHeaderBackgroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="PropertyGridEditorTextBoxStyle" TargetType="TextBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource PropertyGridForeground}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="6,3,6,3" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="SelectionBrush" Value="{ThemeResource SelectionBackground}" />
+        <Setter Property="CaretBrush" Value="{ThemeResource PropertyGridForeground}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PropertyGridRowHoverBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+            </Trigger>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PropertyGridSearchBackgroundFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsReadOnly" Value="True">
+                <Setter Property="Foreground" Value="{ThemeResource PropertyGridForegroundTertiary}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="PropertyGrid">
+        <Setter Property="Background" Value="{ThemeResource PropertyGridBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource PropertyGridForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource PropertyGridBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="CategoryHeaderBackground" Value="{ThemeResource PropertyGridCategoryHeaderBackground}" />
+        <Setter Property="CategoryHeaderForeground" Value="{ThemeResource PropertyGridCategoryHeaderForeground}" />
+        <Setter Property="PropertyNameForeground" Value="{ThemeResource PropertyGridPropertyNameForeground}" />
+        <Setter Property="MinWidth" Value="260" />
+        <Setter Property="MinHeight" Value="220" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="PropertyGrid">
+                <Border Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        ClipToBounds="True">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border Name="PART_ToolBar"
+                                Grid.Row="0"
+                                Background="Transparent"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="8">
+                            <Border Background="{ThemeResource PropertyGridToolbarBackground}"
+                                    CornerRadius="6"
+                                    Padding="2"
+                                    HorizontalAlignment="Left">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Name="PART_CategorizedButton"
+                                            Content="Categorized"
+                                            Style="{StaticResource PropertyGridToolbarButtonStyle}" />
+                                    <Button Name="PART_AlphabeticalButton"
+                                            Content="Alphabetical"
+                                            Style="{StaticResource PropertyGridToolbarButtonStyle}"
+                                            Margin="2,0,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </Border>
+
+                        <Border Name="PART_SearchBox"
+                                Grid.Row="1"
+                                Background="Transparent"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1"
+                                Padding="8">
+                            <Grid>
+                                <TextBox Name="PART_SearchTextBox"
+                                         PlaceholderText="Search properties"
+                                         Style="{StaticResource PropertyGridSearchBoxStyle}" />
+                                <Path Data="M 5.5,0 C 8.54,0 11,2.46 11,5.5 C 11,6.75 10.58,7.9 9.88,8.82 L 14,12.94 L 12.94,14 L 8.82,9.88 C 7.9,10.58 6.75,11 5.5,11 C 2.46,11 0,8.54 0,5.5 C 0,2.46 2.46,0 5.5,0 Z M 5.5,1.5 C 3.29,1.5 1.5,3.29 1.5,5.5 C 1.5,7.71 3.29,9.5 5.5,9.5 C 7.71,9.5 9.5,7.71 9.5,5.5 C 9.5,3.29 7.71,1.5 5.5,1.5 Z"
+                                      Fill="{ThemeResource PropertyGridForegroundTertiary}"
+                                      Width="14"
+                                      Height="14"
+                                      Stretch="Uniform"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Margin="10,0,0,0"
+                                      IsHitTestVisible="False" />
+                            </Grid>
+                        </Border>
+
+                        <ScrollViewer Name="PART_PropertiesHost"
+                                      Grid.Row="2"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Padding="0,4,0,4">
+                            <StackPanel Name="PART_PropertiesPanel"
+                                        Orientation="Vertical" />
+                        </ScrollViewer>
+
+                        <Border Name="PART_DescriptionArea"
+                                Grid.Row="3"
+                                Background="{ThemeResource PropertyGridDescriptionBackground}"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,1,0,0"
+                                Padding="12,8,12,10"
+                                Height="0"
+                                ClipToBounds="True"
+                                Visibility="Collapsed">
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Top">
+                                <TextBlock Name="PART_PropertyNameText"
+                                           FontWeight="SemiBold"
+                                           FontSize="12"
+                                           Foreground="{ThemeResource PropertyGridForeground}"
+                                           Margin="0,0,0,3" />
+                                <TextBlock Name="PART_PropertyDescriptionText"
+                                           Foreground="{ThemeResource PropertyGridForegroundSecondary}"
+                                           FontSize="11"
+                                           TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Opacity" Value="0.65" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

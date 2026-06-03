@@ -65,6 +65,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
             AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
             AssertBasedOnStyle<FWTreeDataGrid, TreeDataGrid>(app.Resources);
+            AssertBasedOnStyle<FWTreeSelector, TreeSelector>(app.Resources);
+            AssertBasedOnStyle<FWTreeSelectorItem, TreeSelectorItem>(app.Resources);
+            AssertBasedOnStyle<FWPropertyGrid, PropertyGrid>(app.Resources);
             AssertBasedOnStyle<FWNavigationView, NavigationView>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
@@ -245,6 +248,9 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Jalium.UI.Controls.DataGridColumnHeader>(dictionary);
         AssertContainsStyle<TreeDataGrid>(dictionary);
         AssertContainsStyle<TreeDataGridRow>(dictionary);
+        AssertContainsStyle<TreeSelector>(dictionary);
+        AssertContainsStyle<TreeSelectorItem>(dictionary);
+        AssertContainsStyle<PropertyGrid>(dictionary);
         AssertContainsStyle<NavigationView>(dictionary);
         AssertContainsStyle<NavigationViewItem>(dictionary);
         AssertContainsStyle<NavigationViewItemHeader>(dictionary);
@@ -667,6 +673,9 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
             AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
             AssertBasedOnStyle<FWTreeDataGrid, TreeDataGrid>(app.Resources);
+            AssertBasedOnStyle<FWTreeSelector, TreeSelector>(app.Resources);
+            AssertBasedOnStyle<FWTreeSelectorItem, TreeSelectorItem>(app.Resources);
+            AssertBasedOnStyle<FWPropertyGrid, PropertyGrid>(app.Resources);
         }
         finally
         {
@@ -893,6 +902,9 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTreeViewItem, TreeViewItem>();
         AssertFluentControl<FWDataGrid, DataGrid>();
         AssertFluentControl<FWTreeDataGrid, TreeDataGrid>();
+        AssertFluentControl<FWTreeSelector, TreeSelector>();
+        AssertFluentControl<FWTreeSelectorItem, TreeSelectorItem>();
+        AssertFluentControl<FWPropertyGrid, PropertyGrid>();
     }
 
     [Fact]

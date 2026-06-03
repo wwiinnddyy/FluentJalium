@@ -1,5 +1,6 @@
 using FluentJalium.Controls.Themes;
 using FluentJalium.Icon;
+using System.ComponentModel;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Ink;
@@ -56,6 +57,7 @@ using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHea
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
 using FWNumberBox = FluentJalium.Controls.FWNumberBox;
 using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
+using FWPropertyGrid = FluentJalium.Controls.FWPropertyGrid;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
@@ -82,6 +84,8 @@ using FWToolTip = FluentJalium.Controls.FWToolTip;
 using FWToolBar = FluentJalium.Controls.FWToolBar;
 using FWToolBarTray = FluentJalium.Controls.FWToolBarTray;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
+using FWTreeSelector = FluentJalium.Controls.FWTreeSelector;
+using FWTreeSelectorItem = FluentJalium.Controls.FWTreeSelectorItem;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
@@ -164,6 +168,7 @@ public sealed class MainWindow : Window
             new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.CursorClick24, () => CreatePageStack(CreateInteractionSection()), "FWScrollViewer FWSwipeControl FWGridSplitter scrolling resize"),
             new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Color24, () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
             new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Table24, () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
+            new GalleryPage("Selectors and Properties", "TreeSelector and PropertyGrid surfaces for hierarchical selection and object editing.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.DatabaseSearch24, () => CreatePageStack(CreateAdvancedSelectionPropertiesSection()), "FWTreeSelector FWTreeSelectorItem FWPropertyGrid tree selector property grid search categorized alphabetical"),
             new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
             new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
             new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
@@ -936,6 +941,297 @@ public sealed class MainWindow : Window
         };
     }
 
+    private UIElement CreateAdvancedSelectionPropertiesSection()
+    {
+        var panel = CreateSection("Selectors and Properties");
+        var examples = new FWWrapPanel
+        {
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
+        };
+
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWTreeSelector",
+            "Searchable hierarchical picker with a path display, dropdown state, and selection output.",
+            CreateTreeSelectorSingleSelectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWTreeSelectorItem cascade",
+            "Multiple selection with checkboxes, cascade state, selected chips, and tree item expansion.",
+            CreateTreeSelectorCascadeSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWPropertyGrid",
+            "Object property editing with search, categorized/alphabetical modes, read-only state, and description area.",
+            CreatePropertyGridSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateTreeSelectorSingleSelectionSample()
+    {
+        var output = CreateCollectionOutput("Selected: none. Drop-down: closed");
+        var selector = new FWTreeSelector
+        {
+            Width = 380,
+            SelectionMode = SelectionMode.Single,
+            PlaceholderText = "Choose a workspace area",
+            IsSearchEnabled = true,
+            MaxDropDownHeight = 240
+        };
+        PopulateGalleryTreeSelector(selector);
+
+        void UpdateOutput()
+        {
+            output.Text = selector.SelectedItem == null
+                ? $"Selected: none. Search: {FormatSearchText(selector.SearchText)}. Drop-down: {FormatOpenState(selector.IsDropDownOpen)}"
+                : $"Selected: {selector.SelectedItem}. Search: {FormatSearchText(selector.SearchText)}. Drop-down: {FormatOpenState(selector.IsDropDownOpen)}";
+        }
+
+        selector.SelectionChanged += (_, _) => UpdateOutput();
+        selector.DropDownOpened += (_, _) => UpdateOutput();
+        selector.DropDownClosed += (_, _) => UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                selector,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.Search24, "Search data", () =>
+                    {
+                        selector.IsDropDownOpen = true;
+                        selector.SearchText = "data";
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.CheckmarkCircle24, "Select themes", () =>
+                    {
+                        selector.SearchText = string.Empty;
+                        selector.IsDropDownOpen = true;
+                        selector.SelectedItem = "Theme resources";
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.Dismiss24, "Clear", () =>
+                    {
+                        selector.UnselectAll();
+                        selector.SearchText = string.Empty;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.ChevronDown24, "Toggle", () =>
+                    {
+                        selector.IsDropDownOpen = !selector.IsDropDownOpen;
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateTreeSelectorCascadeSample()
+    {
+        var output = CreateCollectionOutput("Checked: none. Selected: none");
+        var selector = new FWTreeSelector
+        {
+            Width = 400,
+            SelectionMode = SelectionMode.Multiple,
+            ShowCheckBoxes = true,
+            CheckCascadeMode = TreeSelectorCheckCascadeMode.Cascade,
+            PlaceholderText = "Choose related areas",
+            MaxDropDownHeight = 260,
+            IsDropDownOpen = true
+        };
+        var foundation = CreateGalleryTreeSelectorItem("Foundation", isExpanded: true,
+            CreateGalleryTreeSelectorItem("Theme resources"),
+            CreateGalleryTreeSelectorItem("Typography"),
+            CreateGalleryTreeSelectorItem("Icon module"));
+        var controls = CreateGalleryTreeSelectorItem("Controls", isExpanded: true,
+            CreateGalleryTreeSelectorItem("Buttons"),
+            CreateGalleryTreeSelectorItem("Selectors"),
+            CreateGalleryTreeSelectorItem("Tables"));
+        selector.Items.Add(foundation);
+        selector.Items.Add(controls);
+
+        void UpdateOutput()
+        {
+            var checkedText = selector.CheckedItems.Count == 0 ? "none" : FormatCollectionItems(selector.CheckedItems);
+            var selectedText = selector.SelectedItems.Count == 0 ? "none" : FormatCollectionItems(selector.SelectedItems);
+            output.Text = $"Checked: {checkedText}. Selected: {selectedText}. Foundation: {FormatNullableBool(foundation.IsChecked)}";
+        }
+
+        selector.SelectionChanged += (_, _) => UpdateOutput();
+        selector.ItemCheckStateChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                selector,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.CheckboxChecked24, "Check root", () =>
+                    {
+                        foundation.IsChecked = true;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.CheckboxIndeterminate24, "Mix child", () =>
+                    {
+                        foundation.IsChecked = true;
+                        if (foundation.Items[1] is FWTreeSelectorItem typography)
+                        {
+                            typography.IsChecked = false;
+                        }
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.CheckboxUnchecked24, "Clear", () =>
+                    {
+                        foundation.IsChecked = false;
+                        controls.IsChecked = false;
+                        selector.UnselectAll();
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.ChevronRight24, "Collapse", () =>
+                    {
+                        foundation.IsExpanded = !foundation.IsExpanded;
+                        controls.IsExpanded = !controls.IsExpanded;
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreatePropertyGridSample()
+    {
+        var sample = new GalleryPropertySample();
+        var output = CreateCollectionOutput("Sort: Categorized. Search: empty. Read-only: false");
+        var propertyGrid = new FWPropertyGrid
+        {
+            Width = 470,
+            Height = 310,
+            SelectedObject = sample,
+            SortMode = PropertyGridSortMode.Categorized,
+            ShowSearchBox = true,
+            ShowDescription = true,
+            ShowToolBar = true,
+            NameColumnWidth = 150
+        };
+
+        void UpdateOutput()
+        {
+            output.Text = $"Sort: {propertyGrid.SortMode}. Search: {FormatSearchText(propertyGrid.SearchText)}. Read-only: {propertyGrid.IsReadOnly}. Selected: {propertyGrid.SelectedProperty?.DisplayName ?? "none"}";
+        }
+
+        propertyGrid.SelectedPropertyChanged += (_, _) => UpdateOutput();
+        propertyGrid.PropertyValueChanged += (_, args) =>
+        {
+            output.Text = $"Changed: {args.PropertyName} from {args.OldValue ?? "null"} to {args.NewValue ?? "null"}";
+        };
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                propertyGrid,
+                CreateCollectionButtonRow(
+                    CreateIconCollectionActionButton(FluentIconRegular.GroupList24, "Categorized", () =>
+                    {
+                        propertyGrid.SortMode = PropertyGridSortMode.Categorized;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.TextSortAscending24, "Alphabetical", () =>
+                    {
+                        propertyGrid.SortMode = PropertyGridSortMode.Alphabetical;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.Search24, "Search layout", () =>
+                    {
+                        propertyGrid.SearchText = propertyGrid.SearchText.Length == 0 ? "layout" : string.Empty;
+                        UpdateOutput();
+                    }),
+                    CreateIconCollectionActionButton(FluentIconRegular.EditLock24, "Read-only", () =>
+                    {
+                        propertyGrid.IsReadOnly = !propertyGrid.IsReadOnly;
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static FWButton CreateIconCollectionActionButton(FluentIconRegular icon, string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(icon),
+                    new FWTextBlock
+                    {
+                        Text = text,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static void PopulateGalleryTreeSelector(FWTreeSelector selector)
+    {
+        selector.Items.Add(CreateGalleryTreeSelectorItem("FluentJalium", isExpanded: true,
+            CreateGalleryTreeSelectorItem("Theme resources"),
+            CreateGalleryTreeSelectorItem("FW controls"),
+            CreateGalleryTreeSelectorItem("Gallery pages")));
+        selector.Items.Add(CreateGalleryTreeSelectorItem("Data surfaces", isExpanded: true,
+            CreateGalleryTreeSelectorItem("Tree selector"),
+            CreateGalleryTreeSelectorItem("Property grid"),
+            CreateGalleryTreeSelectorItem("Tables")));
+        selector.Items.Add(CreateGalleryTreeSelectorItem("Diagnostics", isExpanded: false,
+            CreateGalleryTreeSelectorItem("State matrix"),
+            CreateGalleryTreeSelectorItem("High contrast")));
+    }
+
+    private static FWTreeSelectorItem CreateGalleryTreeSelectorItem(string header, bool isExpanded = false, params FWTreeSelectorItem[] children)
+    {
+        var item = new FWTreeSelectorItem
+        {
+            Header = header,
+            IsExpanded = isExpanded
+        };
+
+        foreach (var child in children)
+        {
+            item.Items.Add(child);
+        }
+
+        return item;
+    }
+
+    private static string FormatOpenState(bool isOpen) => isOpen ? "open" : "closed";
+
+    private static string FormatSearchText(string? searchText) => string.IsNullOrWhiteSpace(searchText) ? "empty" : searchText;
+
+    private static string FormatNullableBool(bool? value)
+    {
+        return value switch
+        {
+            true => "checked",
+            false => "unchecked",
+            _ => "mixed"
+        };
+    }
+
     private static string FormatCollectionItems(System.Collections.IEnumerable items)
     {
         var names = new List<string>();
@@ -945,6 +1241,7 @@ public sealed class MainWindow : Window
             names.Add(item switch
             {
                 FWListBoxItem listBoxItem => listBoxItem.Content?.ToString() ?? string.Empty,
+                TreeSelectorItem treeSelectorItem => treeSelectorItem.Header?.ToString() ?? string.Empty,
                 GalleryRow row => row.Name,
                 GalleryTreeRow row => row.Name,
                 _ => item?.ToString() ?? string.Empty
@@ -2082,7 +2379,7 @@ public sealed class MainWindow : Window
                 FluentIconFactory.Filled(FluentIconRegular.Share24, 24, ThemeBrush("TextPrimary")),
                 new FluentIcon
                 {
-                    Icon = SegoeFluentIcon.Share,
+                    Icon = FluentIconRegular.Share24,
                     Size = 24
                 },
                 new FWPathIcon
@@ -2220,10 +2517,10 @@ public sealed class MainWindow : Window
             Width = 310,
             Height = 68,
             LeftItems = CreateSwipeItems(SwipeMode.Reveal,
-                ("Archive", SegoeFluentIcon.Archive, "SwipeItemBackgroundSecondary"),
-                ("Flag", SegoeFluentIcon.Flag, "SwipeItemBackground")),
+                ("Archive", FluentIconRegular.Archive24, "SwipeItemBackgroundSecondary"),
+                ("Flag", FluentIconRegular.Flag24, "SwipeItemBackground")),
             RightItems = CreateSwipeItems(SwipeMode.Execute,
-                ("Delete", SegoeFluentIcon.Delete, "SwipeItemBackgroundDestructive")),
+                ("Delete", FluentIconRegular.Delete24, "SwipeItemBackgroundDestructive")),
             Content = new Border
             {
                 Background = ThemeBrush("SwipeControlBackground"),
@@ -2468,14 +2765,14 @@ public sealed class MainWindow : Window
 
         var file = CreateMenuBarItem(
             "File",
-            ("New", "Ctrl+N", SegoeGlyph(SegoeFluentIcon.Document)),
-            ("Open", "Ctrl+O", SegoeGlyph(SegoeFluentIcon.FolderOpen)),
-            ("Save", "Ctrl+S", SegoeGlyph(SegoeFluentIcon.Save)));
+            ("New", "Ctrl+N", IconGlyph(FluentIconRegular.Document24)),
+            ("Open", "Ctrl+O", IconGlyph(FluentIconRegular.FolderOpen24)),
+            ("Save", "Ctrl+S", IconGlyph(FluentIconRegular.Save24)));
         var edit = CreateMenuBarItem(
             "Edit",
             ("Undo", "Ctrl+Z", null),
             ("Redo", "Ctrl+Y", null),
-            ("Preferences", string.Empty, SegoeGlyph(SegoeFluentIcon.Settings)));
+            ("Preferences", string.Empty, IconGlyph(FluentIconRegular.Settings24)));
         var view = CreateMenuBarItem(
             "View",
             ("Zoom in", "Ctrl++", null),
@@ -2532,19 +2829,19 @@ public sealed class MainWindow : Window
         var project = new FWMenuItem
         {
             Header = "Project",
-            Icon = SegoeGlyph(SegoeFluentIcon.Folder)
+            Icon = IconGlyph(FluentIconRegular.Folder24)
         };
         var build = new FWMenuItem
         {
             Header = "Build",
             InputGestureText = "Ctrl+B",
-            Icon = SegoeGlyph(SegoeFluentIcon.Play)
+            Icon = IconGlyph(FluentIconRegular.Play24)
         };
         var run = new FWMenuItem
         {
             Header = "Run",
             InputGestureText = "F5",
-            Icon = SegoeGlyph(SegoeFluentIcon.Play)
+            Icon = IconGlyph(FluentIconRegular.Play24)
         };
         var livePreview = new FWMenuItem
         {
@@ -2560,7 +2857,7 @@ public sealed class MainWindow : Window
         var tools = new FWMenuItem
         {
             Header = "Tools",
-            Icon = SegoeGlyph(SegoeFluentIcon.Settings)
+            Icon = IconGlyph(FluentIconRegular.Settings24)
         };
         tools.Items.Add(new FWMenuItem { Header = "Options" });
         tools.Items.Add(new FWMenuItem { Header = "Diagnostics", InputGestureText = "F12" });
@@ -2625,8 +2922,8 @@ public sealed class MainWindow : Window
             IsChecked = true,
             StaysOpenOnClick = true
         };
-        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = SegoeGlyph(SegoeFluentIcon.Refresh) });
-        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = SegoeGlyph(SegoeFluentIcon.Rename) });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = IconGlyph(FluentIconRegular.ArrowClockwise24) });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = IconGlyph(FluentIconRegular.Rename24) });
         contextMenu.Items.Add(detailsItem);
         contextMenu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
         contextMenu.Opened += (_, _) => output.Text = $"ContextMenu: open at {contextMenu.Placement}";
@@ -3211,7 +3508,7 @@ public sealed class MainWindow : Window
             CreateStatusActionButton("Icon", () =>
             {
                 preview.Value = -1;
-                preview.IconGlyph = SegoeGlyph(SegoeFluentIcon.Badge);
+                preview.IconGlyph = IconGlyph(FluentIconRegular.Badge24);
                 output.Text = $"Preview kind: {preview.DisplayKind}";
             }));
 
@@ -3466,7 +3763,7 @@ public sealed class MainWindow : Window
                 new FWInfoBadge { Severity = severity },
                 new FWInfoBadge { Severity = severity, Value = 8 },
                 new FWInfoBadge { Severity = severity, Value = 128, MaxValue = 99 },
-                new FWInfoBadge { Severity = severity, IconGlyph = SegoeGlyph(SegoeFluentIcon.Badge) }
+                new FWInfoBadge { Severity = severity, IconGlyph = IconGlyph(FluentIconRegular.Badge24) }
             }
         };
     }
@@ -4258,7 +4555,7 @@ public sealed class MainWindow : Window
         return stack;
     }
 
-    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, SegoeFluentIcon Icon, string BackgroundKey)[] items)
+    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, FluentIconRegular Icon, string BackgroundKey)[] items)
     {
         var swipeItems = new SwipeItems
         {
@@ -4609,7 +4906,7 @@ public sealed class MainWindow : Window
         var pin = new FWMenuFlyoutItem
         {
             Text = "Pin",
-            Icon = SegoeGlyph(SegoeFluentIcon.Pin),
+            Icon = IconGlyph(FluentIconRegular.Pin24),
             KeyboardAcceleratorTextOverride = "Ctrl+P"
         };
         var badges = new FWToggleMenuFlyoutItem
@@ -4620,7 +4917,7 @@ public sealed class MainWindow : Window
         var settings = new FWMenuFlyoutItem
         {
             Text = "Settings",
-            Icon = SegoeGlyph(SegoeFluentIcon.Settings)
+            Icon = IconGlyph(FluentIconRegular.Settings24)
         };
         var disabled = new FWMenuFlyoutItem
         {
@@ -4824,11 +5121,30 @@ public sealed class MainWindow : Window
         return FluentIconFactory.Regular(icon, foreground: ThemeBrush("TextPrimary"));
     }
 
-    private static string SegoeGlyph(SegoeFluentIcon icon) => icon.GetString();
+    private static string IconGlyph(FluentIconRegular icon) => icon.GetString();
 
     private sealed record GalleryRow(string Name, string State, int Count);
 
     private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
+
+    private sealed class GalleryPropertySample
+    {
+        [Category("Appearance")]
+        [Description("Displayed title for the selected Gallery card.")]
+        public string Title { get; set; } = "FluentJalium";
+
+        [Category("Layout")]
+        [Description("Preferred preview width in pixels.")]
+        public double PreviewWidth { get; set; } = 420;
+
+        [Category("Behavior")]
+        [Description("Whether inline editing is enabled.")]
+        public bool IsEditingEnabled { get; set; } = true;
+
+        [Category("State")]
+        [Description("Current accent sample count.")]
+        public int AccentSamples { get; set; } = 6;
+    }
 
     private sealed class GalleryNavigationOverviewPage : Page
     {

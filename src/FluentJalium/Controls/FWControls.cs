@@ -192,6 +192,35 @@ public class FWTreeDataGrid : TreeDataGrid, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium TreeSelector control.
+/// </summary>
+public class FWTreeSelector : TreeSelector, IFluentJaliumControl
+{
+    protected override FrameworkElement GetContainerForItem(object item)
+    {
+        return item is TreeSelectorItem treeSelectorItem ? treeSelectorItem : new FWTreeSelectorItem();
+    }
+}
+
+/// <summary>
+/// FluentJalium TreeSelectorItem control.
+/// </summary>
+public class FWTreeSelectorItem : TreeSelectorItem, IFluentJaliumControl
+{
+    protected override FrameworkElement GetContainerForItem(object item)
+    {
+        return item is TreeSelectorItem treeSelectorItem ? treeSelectorItem : new FWTreeSelectorItem();
+    }
+}
+
+/// <summary>
+/// FluentJalium PropertyGrid control.
+/// </summary>
+public class FWPropertyGrid : PropertyGrid, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium NavigationView control.
 /// </summary>
 public class FWNavigationView : NavigationView, IFluentJaliumControl
