@@ -1,4 +1,5 @@
 using FluentJalium.Controls.Themes;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Ink;
@@ -26,7 +27,6 @@ using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWExpander = FluentJalium.Controls.FWExpander;
 using FWFrame = FluentJalium.Controls.FWFrame;
-using FWFontIcon = FluentJalium.Controls.FWFontIcon;
 using FWGroupBox = FluentJalium.Controls.FWGroupBox;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
 using FWImage = FluentJalium.Controls.FWImage;
@@ -68,7 +68,6 @@ using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
-using FWSymbolIcon = FluentJalium.Controls.FWSymbolIcon;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
 using FWSwipeControl = FluentJalium.Controls.FWSwipeControl;
 using FWTabControl = FluentJalium.Controls.FWTabControl;
@@ -150,23 +149,23 @@ public sealed class MainWindow : Window
     {
         return
         [
-            new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, "\uE80F", () => CreatePageStack(CreateThemeControls()), "home design system theme typography accent light dark high contrast"),
-            new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, and app bar buttons.", GalleryNavigationGroup.ControlSurfaces, "\uE8FD", () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()), "FWButton FWRepeatButton FWHyperlinkButton FWDropDownButton FWSplitButton FWToggleSplitButton FWAppBarButton FWAppBarToggleButton FWAppBarSeparator command bar"),
-            new GalleryPage("Switches", "ToggleButton and ToggleSwitch states for checked, unchecked, indeterminate, and disabled surfaces.", GalleryNavigationGroup.ControlSurfaces, "\uE7F4", () => CreatePageStack(CreateSwitchesSection()), "FWToggleButton FWToggleSwitch checked unchecked indeterminate"),
-            new GalleryPage("Text Input", "TextBox, PasswordBox, NumberBox, AutoCompleteBox, and RichTextBox surfaces.", GalleryNavigationGroup.Input, "\uE8D2", () => CreatePageStack(CreateTextSection()), "FWTextBox FWPasswordBox FWNumberBox FWAutoCompleteBox FWRichTextBox search form input"),
-            new GalleryPage("Selection", "CheckBox, RadioButton, ComboBox, and ComboBoxItem controls.", GalleryNavigationGroup.Input, "\uE73A", () => CreatePageStack(CreateSelectionSection()), "FWCheckBox FWRadioButton FWComboBox FWComboBoxItem pick choose"),
-            new GalleryPage("Range", "Slider, RangeSlider, ProgressBar, and ProgressRing controls.", GalleryNavigationGroup.Input, "\uE9F5", () => CreatePageStack(CreateRangeSection()), "FWSlider FWRangeSlider FWProgressBar FWProgressRing value loading"),
-            new GalleryPage("Date and Time", "DatePicker, TimePicker, and Calendar controls.", GalleryNavigationGroup.Input, "\uE787", () => CreatePageStack(CreateDateTimeSection()), "FWDatePicker FWTimePicker FWCalendar schedule calendar"),
-            new GalleryPage("Content and Layout", "TextBlock, AccessText, Border, content hosts, StackPanel, WrapPanel, and Grid foundations.", GalleryNavigationGroup.LayoutAndMedia, "\uE8A9", () => CreatePageStack(CreateContentLayoutSection()), "FWTextBlock FWAccessText FWBorder FWContentControl FWContentPresenter FWStackPanel FWWrapPanel FWGrid layout"),
-            new GalleryPage("Visuals", "Image, icon, label, separator, and Viewbox foundation controls.", GalleryNavigationGroup.LayoutAndMedia, "\uE8B9", () => CreatePageStack(CreateVisualsSection()), "FWImage FWFontIcon FWSymbolIcon FWPathIcon FWLabel FWSeparator FWViewbox visual icon"),
-            new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", GalleryNavigationGroup.LayoutAndMedia, "\uE7C9", () => CreatePageStack(CreateInteractionSection()), "FWScrollViewer FWSwipeControl FWGridSplitter scrolling resize"),
-            new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, "\uE7FC", () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
-            new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, "\uE8A9", () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
-            new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, "\uE700", () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
-            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, "\uE8FD", () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
-            new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, "\uE70E", () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
-            new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", GalleryNavigationGroup.AppStructure, "\uE946", () => CreatePageStack(CreateStatusSection()), "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar notification message severity"),
-            new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", GalleryNavigationGroup.Diagnostics, "\uE9D9", () => CreatePageStack(CreateStateMatrix()), "states normal hover pressed selected disabled light dark high contrast", IsFooter: true)
+            new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, FluentIconRegular.Home24, () => CreatePageStack(CreateThemeControls()), "home design system theme typography accent light dark high contrast"),
+            new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, and app bar buttons.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ControlButton24, () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()), "FWButton FWRepeatButton FWHyperlinkButton FWDropDownButton FWSplitButton FWToggleSplitButton FWAppBarButton FWAppBarToggleButton FWAppBarSeparator command bar"),
+            new GalleryPage("Switches", "ToggleButton and ToggleSwitch states for checked, unchecked, indeterminate, and disabled surfaces.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ToggleMultiple24, () => CreatePageStack(CreateSwitchesSection()), "FWToggleButton FWToggleSwitch checked unchecked indeterminate"),
+            new GalleryPage("Text Input", "TextBox, PasswordBox, NumberBox, AutoCompleteBox, and RichTextBox surfaces.", GalleryNavigationGroup.Input, FluentIconRegular.Textbox24, () => CreatePageStack(CreateTextSection()), "FWTextBox FWPasswordBox FWNumberBox FWAutoCompleteBox FWRichTextBox search form input"),
+            new GalleryPage("Selection", "CheckBox, RadioButton, ComboBox, and ComboBoxItem controls.", GalleryNavigationGroup.Input, FluentIconRegular.CheckboxChecked24, () => CreatePageStack(CreateSelectionSection()), "FWCheckBox FWRadioButton FWComboBox FWComboBoxItem pick choose"),
+            new GalleryPage("Range", "Slider, RangeSlider, ProgressBar, and ProgressRing controls.", GalleryNavigationGroup.Input, FluentIconRegular.Gauge24, () => CreatePageStack(CreateRangeSection()), "FWSlider FWRangeSlider FWProgressBar FWProgressRing value loading"),
+            new GalleryPage("Date and Time", "DatePicker, TimePicker, and Calendar controls.", GalleryNavigationGroup.Input, FluentIconRegular.CalendarLtr24, () => CreatePageStack(CreateDateTimeSection()), "FWDatePicker FWTimePicker FWCalendar schedule calendar"),
+            new GalleryPage("Content and Layout", "TextBlock, AccessText, Border, content hosts, StackPanel, WrapPanel, and Grid foundations.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.LayoutColumnTwo24, () => CreatePageStack(CreateContentLayoutSection()), "FWTextBlock FWAccessText FWBorder FWContentControl FWContentPresenter FWStackPanel FWWrapPanel FWGrid layout"),
+            new GalleryPage("Visuals", "Image, icon, label, separator, and Viewbox foundation controls.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Image24, () => CreatePageStack(CreateVisualsSection()), "FWImage FWFontIcon FWSymbolIcon FWPathIcon FWLabel FWSeparator FWViewbox visual icon"),
+            new GalleryPage("Interaction", "ScrollViewer, SwipeControl, and GridSplitter controls.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.CursorClick24, () => CreatePageStack(CreateInteractionSection()), "FWScrollViewer FWSwipeControl FWGridSplitter scrolling resize"),
+            new GalleryPage("Input and Media", "ColorPicker, InkCanvas, InkPresenter, and MediaElement surfaces.", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Color24, () => CreatePageStack(CreateAdvancedInputMediaSection()), "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color ink media"),
+            new GalleryPage("Collections", "ListBox, ListView, TreeView, DataGrid, and TreeDataGrid controls.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Table24, () => CreatePageStack(CreateCollectionsSection()), "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data"),
+            new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
+            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
+            new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
+            new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.AlertBadge24, () => CreatePageStack(CreateStatusSection()), "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar notification message severity"),
+            new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", GalleryNavigationGroup.Diagnostics, FluentIconRegular.DataUsage24, () => CreatePageStack(CreateStateMatrix()), "states normal hover pressed selected disabled light dark high contrast", IsFooter: true)
         ];
     }
 
@@ -226,7 +225,7 @@ public sealed class MainWindow : Window
         return new FWNavigationViewItem
         {
             Content = groupName,
-            Icon = CreateIcon(GalleryNavigationGroup.GetGlyph(groupName)),
+            Icon = CreateIcon(GalleryNavigationGroup.GetIcon(groupName)),
             IsExpanded = true,
             SelectsOnInvoked = false,
             Tag = groupName
@@ -238,7 +237,7 @@ public sealed class MainWindow : Window
         var item = new FWNavigationViewItem
         {
             Content = page.Title,
-            Icon = CreateIcon(page.Glyph),
+            Icon = CreateIcon(page.Icon),
             Tag = page
         };
         _navigationItems.Add(item);
@@ -987,18 +986,18 @@ public sealed class MainWindow : Window
         var dashboardItem = new FWNavigationViewItem
         {
             Content = "Dashboard",
-            Icon = CreateIcon("\uE80F")
+            Icon = CreateIcon(FluentIconRegular.Home24)
         };
         var controlsItem = new FWNavigationViewItem
         {
             Content = "Controls",
-            Icon = CreateIcon("\uECAA"),
+            Icon = CreateIcon(FluentIconRegular.ControlButton24),
             IsExpanded = true
         };
-        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons", Icon = CreateIcon("\uE8FD") });
-        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Collections", Icon = CreateIcon("\uE8A9") });
-        var galleryItem = new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon("\uE8B7") };
-        var settingsItem = new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon("\uE713") };
+        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons", Icon = CreateIcon(FluentIconRegular.ControlButton24) });
+        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Collections", Icon = CreateIcon(FluentIconRegular.Table24) });
+        var galleryItem = new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon(FluentIconRegular.Folder24) };
+        var settingsItem = new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon(FluentIconRegular.Settings24) };
 
         var navigationView = new FWNavigationView
         {
@@ -1052,23 +1051,23 @@ public sealed class MainWindow : Window
     private static UIElement CreateNavigationPaneModeSample()
     {
         var output = CreateNavigationOutput("PaneDisplayMode: Left. Document options expanded: true");
-        var homeItem = new FWNavigationViewItem { Content = "Home", Icon = CreateIcon("\uE80F") };
+        var homeItem = new FWNavigationViewItem { Content = "Home", Icon = CreateIcon(FluentIconRegular.Home24) };
         var accountItem = new FWNavigationViewItem
         {
             Content = "Account",
-            Icon = CreateIcon("\uE77B")
+            Icon = CreateIcon(FluentIconRegular.Person24)
         };
-        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Mail", Icon = CreateIcon("\uE715") });
-        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Calendar", Icon = CreateIcon("\uE787") });
+        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Mail", Icon = CreateIcon(FluentIconRegular.Mail24) });
+        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Calendar", Icon = CreateIcon(FluentIconRegular.CalendarLtr24) });
         var documentOptionsItem = new FWNavigationViewItem
         {
             Content = "Document options",
-            Icon = CreateIcon("\uE8A5"),
+            Icon = CreateIcon(FluentIconRegular.Document24),
             IsExpanded = true,
             SelectsOnInvoked = false
         };
-        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Create new", Icon = CreateIcon("\uE710") });
-        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Upload file", Icon = CreateIcon("\uE898") });
+        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Create new", Icon = CreateIcon(FluentIconRegular.Add24) });
+        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Upload file", Icon = CreateIcon(FluentIconRegular.ArrowUpload24) });
 
         var navigationView = new FWNavigationView
         {
@@ -1347,10 +1346,10 @@ public sealed class MainWindow : Window
         {
             Width = 420
         };
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon("\uE74E") });
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon("\uE72D") });
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon(FluentIconRegular.Save24) });
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon(FluentIconRegular.Share24) });
         commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
-        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon("\uE718"), IsChecked = true });
+        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon(FluentIconRegular.Pin24), IsChecked = true });
 
         panel.Children.Add(splitRow);
         panel.Children.Add(commandBar);
@@ -1907,17 +1906,16 @@ public sealed class MainWindow : Window
             Spacing = 18,
             Children =
             {
-                new FWSymbolIcon
+                new FluentIcon
                 {
-                    Symbol = Symbol.Save,
-                    Width = 24,
-                    Height = 24
+                    Icon = FluentIconRegular.Save24,
+                    Size = 24
                 },
-                new FWFontIcon
+                FluentIconFactory.Filled(FluentIconRegular.Share24, 24, ThemeBrush("TextPrimary")),
+                new FluentIcon
                 {
-                    Glyph = "\uE72D",
-                    FontFamily = "Segoe Fluent Icons",
-                    FontSize = 24
+                    Icon = SegoeFluentIcon.Share,
+                    Size = 24
                 },
                 new FWPathIcon
                 {
@@ -2054,10 +2052,10 @@ public sealed class MainWindow : Window
             Width = 310,
             Height = 68,
             LeftItems = CreateSwipeItems(SwipeMode.Reveal,
-                ("Archive", "\uE8C3", "SwipeItemBackgroundSecondary"),
-                ("Flag", "\uE7C1", "SwipeItemBackground")),
+                ("Archive", SegoeFluentIcon.Archive, "SwipeItemBackgroundSecondary"),
+                ("Flag", SegoeFluentIcon.Flag, "SwipeItemBackground")),
             RightItems = CreateSwipeItems(SwipeMode.Execute,
-                ("Delete", "\uE74D", "SwipeItemBackgroundDestructive")),
+                ("Delete", SegoeFluentIcon.Delete, "SwipeItemBackgroundDestructive")),
             Content = new Border
             {
                 Background = ThemeBrush("SwipeControlBackground"),
@@ -2230,11 +2228,10 @@ public sealed class MainWindow : Window
                     VerticalAlignment = VerticalAlignment.Center,
                     Children =
                     {
-                        new FWFontIcon
+                        new FluentIcon
                         {
-                            Glyph = "\uE768",
-                            FontFamily = "Segoe Fluent Icons",
-                            FontSize = 28,
+                            Icon = FluentIconRegular.Play24,
+                            Size = 28,
                             Foreground = ThemeBrush("MediaElementForeground")
                         },
                         new TextBlock
@@ -2303,14 +2300,14 @@ public sealed class MainWindow : Window
 
         var file = CreateMenuBarItem(
             "File",
-            ("New", "Ctrl+N", "\uE8A5"),
-            ("Open", "Ctrl+O", "\uE838"),
-            ("Save", "Ctrl+S", "\uE74E"));
+            ("New", "Ctrl+N", SegoeGlyph(SegoeFluentIcon.Document)),
+            ("Open", "Ctrl+O", SegoeGlyph(SegoeFluentIcon.FolderOpen)),
+            ("Save", "Ctrl+S", SegoeGlyph(SegoeFluentIcon.Save)));
         var edit = CreateMenuBarItem(
             "Edit",
             ("Undo", "Ctrl+Z", null),
             ("Redo", "Ctrl+Y", null),
-            ("Preferences", string.Empty, "\uE713"));
+            ("Preferences", string.Empty, SegoeGlyph(SegoeFluentIcon.Settings)));
         var view = CreateMenuBarItem(
             "View",
             ("Zoom in", "Ctrl++", null),
@@ -2367,19 +2364,19 @@ public sealed class MainWindow : Window
         var project = new FWMenuItem
         {
             Header = "Project",
-            Icon = "\uE8B7"
+            Icon = SegoeGlyph(SegoeFluentIcon.Folder)
         };
         var build = new FWMenuItem
         {
             Header = "Build",
             InputGestureText = "Ctrl+B",
-            Icon = "\uE768"
+            Icon = SegoeGlyph(SegoeFluentIcon.Play)
         };
         var run = new FWMenuItem
         {
             Header = "Run",
             InputGestureText = "F5",
-            Icon = "\uE768"
+            Icon = SegoeGlyph(SegoeFluentIcon.Play)
         };
         var livePreview = new FWMenuItem
         {
@@ -2395,7 +2392,7 @@ public sealed class MainWindow : Window
         var tools = new FWMenuItem
         {
             Header = "Tools",
-            Icon = "\uE713"
+            Icon = SegoeGlyph(SegoeFluentIcon.Settings)
         };
         tools.Items.Add(new FWMenuItem { Header = "Options" });
         tools.Items.Add(new FWMenuItem { Header = "Diagnostics", InputGestureText = "F12" });
@@ -2460,8 +2457,8 @@ public sealed class MainWindow : Window
             IsChecked = true,
             StaysOpenOnClick = true
         };
-        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = "\uE72C" });
-        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = "\uE70F" });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = SegoeGlyph(SegoeFluentIcon.Refresh) });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = SegoeGlyph(SegoeFluentIcon.Rename) });
         contextMenu.Items.Add(detailsItem);
         contextMenu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
         contextMenu.Opened += (_, _) => output.Text = $"ContextMenu: open at {contextMenu.Placement}";
@@ -3046,7 +3043,7 @@ public sealed class MainWindow : Window
             CreateStatusActionButton("Icon", () =>
             {
                 preview.Value = -1;
-                preview.IconGlyph = "\uE7BA";
+                preview.IconGlyph = SegoeGlyph(SegoeFluentIcon.Badge);
                 output.Text = $"Preview kind: {preview.DisplayKind}";
             }));
 
@@ -3301,7 +3298,7 @@ public sealed class MainWindow : Window
                 new FWInfoBadge { Severity = severity },
                 new FWInfoBadge { Severity = severity, Value = 8 },
                 new FWInfoBadge { Severity = severity, Value = 128, MaxValue = 99 },
-                new FWInfoBadge { Severity = severity, IconGlyph = "\uE7BA" }
+                new FWInfoBadge { Severity = severity, IconGlyph = SegoeGlyph(SegoeFluentIcon.Badge) }
             }
         };
     }
@@ -4093,7 +4090,7 @@ public sealed class MainWindow : Window
         return stack;
     }
 
-    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, string Icon, string BackgroundKey)[] items)
+    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, SegoeFluentIcon Icon, string BackgroundKey)[] items)
     {
         var swipeItems = new SwipeItems
         {
@@ -4105,7 +4102,7 @@ public sealed class MainWindow : Window
             swipeItems.Add(new SwipeItem
             {
                 Text = item.Text,
-                IconSource = item.Icon,
+                IconSource = item.Icon.GetString(),
                 Background = ThemeBrush(item.BackgroundKey),
                 Foreground = ThemeBrush("SwipeItemForeground")
             });
@@ -4313,7 +4310,7 @@ public sealed class MainWindow : Window
         var pin = new FWMenuFlyoutItem
         {
             Text = "Pin",
-            Icon = "\uE718",
+            Icon = SegoeGlyph(SegoeFluentIcon.Pin),
             KeyboardAcceleratorTextOverride = "Ctrl+P"
         };
         var badges = new FWToggleMenuFlyoutItem
@@ -4324,7 +4321,7 @@ public sealed class MainWindow : Window
         var settings = new FWMenuFlyoutItem
         {
             Text = "Settings",
-            Icon = "\uE713"
+            Icon = SegoeGlyph(SegoeFluentIcon.Settings)
         };
         var disabled = new FWMenuFlyoutItem
         {
@@ -4523,15 +4520,12 @@ public sealed class MainWindow : Window
         return new SolidColorBrush(Colors.Transparent);
     }
 
-    private static FontIcon CreateIcon(string glyph)
+    private static FluentIcon CreateIcon(FluentIconRegular icon)
     {
-        return new FontIcon
-        {
-            Glyph = glyph,
-            FontFamily = "Segoe Fluent Icons",
-            Foreground = ThemeBrush("TextPrimary")
-        };
+        return FluentIconFactory.Regular(icon, foreground: ThemeBrush("TextPrimary"));
     }
+
+    private static string SegoeGlyph(SegoeFluentIcon icon) => icon.GetString();
 
     private sealed record GalleryRow(string Name, string State, int Count);
 
@@ -4581,7 +4575,7 @@ public sealed class MainWindow : Window
         string Title,
         string Description,
         string Group,
-        string Glyph,
+        FluentIconRegular Icon,
         Func<UIElement> CreateContent,
         string SearchText,
         bool IsFooter = false);
@@ -4632,19 +4626,18 @@ public sealed class MainWindow : Window
             AppStructure
         ];
 
-        public static string GetGlyph(string groupName)
+        public static FluentIconRegular GetIcon(string groupName)
         {
             return groupName switch
             {
-                ControlSurfaces => "\uE8FD",
-                Input => "\uE8D2",
-                LayoutAndMedia => "\uE8A9",
-                CollectionsAndData => "\uE8F1",
-                AppStructure => "\uE700",
-                Diagnostics => "\uE9D9",
-                _ => "\uE80F"
+                ControlSurfaces => FluentIconRegular.ControlButton24,
+                Input => FluentIconRegular.Textbox24,
+                LayoutAndMedia => FluentIconRegular.LayoutColumnTwo24,
+                CollectionsAndData => FluentIconRegular.Table24,
+                AppStructure => FluentIconRegular.Navigation24,
+                Diagnostics => FluentIconRegular.DataUsage24,
+                _ => FluentIconRegular.Home24
             };
         }
     }
 }
-
