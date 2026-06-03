@@ -248,6 +248,69 @@ public sealed class FluentAdvancedSelectionPropertyTests
         Assert.Equal(1, selectedEvents);
     }
 
+    [Fact]
+    public void FWAdvancedSelectionProperties_ShouldExposeMaterialEditorPanelState()
+    {
+        var sample = new PropertyGridSample();
+        var selector = new FWTreeSelector
+        {
+            SelectionMode = SelectionMode.Single,
+            PlaceholderText = "Choose a property source",
+            IsSearchEnabled = true,
+            SearchText = "theme",
+            MaxDropDownHeight = 220
+        };
+        var root = new FWTreeSelectorItem { Header = "FluentJalium", IsExpanded = true };
+        var theme = new FWTreeSelectorItem { Header = "Theme resources" };
+        root.Items.Add(theme);
+        selector.Items.Add(root);
+        selector.SelectedItem = "Theme resources";
+
+        var grid = new FWPropertyGrid
+        {
+            SelectedObject = sample,
+            SortMode = PropertyGridSortMode.Categorized,
+            ShowSearchBox = true,
+            ShowDescription = true,
+            ShowToolBar = false,
+            NameColumnWidth = 144,
+            IsReadOnly = true
+        };
+
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = grid
+        };
+
+        Assert.Equal("Theme resources", selector.SelectedItem);
+        Assert.Single(selector.SelectedItems);
+        Assert.True(theme.IsSelected);
+        Assert.Equal("theme", selector.SearchText);
+        Assert.Equal(220, selector.MaxDropDownHeight);
+        Assert.Same(sample, grid.SelectedObject);
+        Assert.Equal(PropertyGridSortMode.Categorized, grid.SortMode);
+        Assert.True(grid.ShowSearchBox);
+        Assert.True(grid.ShowDescription);
+        Assert.False(grid.ShowToolBar);
+        Assert.True(grid.IsReadOnly);
+        Assert.Equal(144, grid.NameColumnWidth);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(grid, surface.Child);
+    }
+
     private sealed class TestTreeSelector : FWTreeSelector
     {
         public FrameworkElement CreateContainer(object item) => GetContainerForItem(item);
