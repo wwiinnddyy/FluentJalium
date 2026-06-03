@@ -955,13 +955,35 @@ public sealed class MainWindow : Window
     private UIElement CreateNavigationSection()
     {
         var panel = CreateSection("Navigation");
-
-        var row = new StackPanel
+        var examples = new FWWrapPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
         };
+        examples.Children.Add(CreateNavigationExampleCard(
+            "FWNavigationView",
+            "Left navigation with pane header, footer menu items, nested items, and live selection output.",
+            CreateNavigationViewSample()));
+        examples.Children.Add(CreateNavigationExampleCard(
+            "Pane modes and hierarchy",
+            "Switch Left, LeftCompact, LeftMinimal, and Top display modes while preserving hierarchy state.",
+            CreateNavigationPaneModeSample()));
+        examples.Children.Add(CreateNavigationExampleCard(
+            "FWTabControl",
+            "Top, bottom, left, disabled, and swipe-enabled tab states with selected content output.",
+            CreateTabControlNavigationSample()));
+        examples.Children.Add(CreateNavigationExampleCard(
+            "FWFrame",
+            "Frame navigation, back stack, forward stack, and content host surface.",
+            CreateFrameNavigationSample()));
 
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateNavigationViewSample()
+    {
+        var output = CreateNavigationOutput("Selected: Dashboard");
         var dashboardItem = new FWNavigationViewItem
         {
             Content = "Dashboard",
@@ -975,36 +997,147 @@ public sealed class MainWindow : Window
         };
         controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons", Icon = CreateIcon("\uE8FD") });
         controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Collections", Icon = CreateIcon("\uE8A9") });
+        var galleryItem = new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon("\uE8B7") };
+        var settingsItem = new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon("\uE713") };
 
         var navigationView = new FWNavigationView
         {
-            Width = 520,
-            Height = 230,
+            Width = 470,
+            Height = 260,
             PaneTitle = "FluentJalium",
             Header = "NavigationView",
+            OpenPaneLength = 220,
+            CompactPaneLength = 48,
+            PaneHeader = CreateNavigationPaneHeader("Controls"),
+            PaneFooter = CreateNavigationPaneFooter("vNext"),
             SelectedItem = dashboardItem,
-            Content = CreateNavigationContent()
+            Content = CreateNavigationContent("Dashboard", "Selected, nested, footer, and separator states share FluentJalium tokens.")
         };
         navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Workspace" });
         navigationView.MenuItems.Add(dashboardItem);
         navigationView.MenuItems.Add(controlsItem);
         navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
-        navigationView.MenuItems.Add(new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon("\uE8B7") });
-        navigationView.FooterMenuItems.Add(new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon("\uE713") });
+        navigationView.MenuItems.Add(galleryItem);
+        navigationView.FooterMenuItems.Add(settingsItem);
+        navigationView.SelectionChanged += (_, e) =>
+        {
+            output.Text = $"Selected: {e.SelectedItem?.Content}";
+            navigationView.Content = CreateNavigationContent(
+                e.SelectedItem?.Content?.ToString() ?? "NavigationView",
+                $"Previous: {e.PreviousSelectedItem?.Content ?? "none"}");
+        };
         navigationView.UpdateMenuItems();
-        row.Children.Add(navigationView);
 
-        var tabAndFrame = new StackPanel
+        return new FWStackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 12
+            Spacing = 10,
+            Children =
+            {
+                navigationView,
+                CreateNavigationButtonRow(
+                    CreateNavigationActionButton("Dashboard", () => navigationView.SelectedItem = dashboardItem),
+                    CreateNavigationActionButton("Collections", () => navigationView.SelectedItem = controlsItem.MenuItems[1]),
+                    CreateNavigationActionButton("Toggle pane", () =>
+                    {
+                        navigationView.IsPaneOpen = !navigationView.IsPaneOpen;
+                        output.Text = $"Pane open: {navigationView.IsPaneOpen}";
+                    }),
+                    CreateNavigationActionButton("Footer", () => navigationView.SelectedItem = settingsItem)),
+                output
+            }
         };
+    }
 
+    private static UIElement CreateNavigationPaneModeSample()
+    {
+        var output = CreateNavigationOutput("PaneDisplayMode: Left. Document options expanded: true");
+        var homeItem = new FWNavigationViewItem { Content = "Home", Icon = CreateIcon("\uE80F") };
+        var accountItem = new FWNavigationViewItem
+        {
+            Content = "Account",
+            Icon = CreateIcon("\uE77B")
+        };
+        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Mail", Icon = CreateIcon("\uE715") });
+        accountItem.MenuItems.Add(new FWNavigationViewItem { Content = "Calendar", Icon = CreateIcon("\uE787") });
+        var documentOptionsItem = new FWNavigationViewItem
+        {
+            Content = "Document options",
+            Icon = CreateIcon("\uE8A5"),
+            IsExpanded = true,
+            SelectsOnInvoked = false
+        };
+        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Create new", Icon = CreateIcon("\uE710") });
+        documentOptionsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Upload file", Icon = CreateIcon("\uE898") });
+
+        var navigationView = new FWNavigationView
+        {
+            Width = 470,
+            Height = 250,
+            Header = "Pane modes",
+            PaneTitle = "Workspace",
+            PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
+            OpenPaneLength = 220,
+            CompactPaneLength = 48,
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Visible,
+            IsBackEnabled = true,
+            SelectedItem = homeItem,
+            Content = CreateNavigationContent("Home", "Switch the pane display mode from the options below.")
+        };
+        navigationView.MenuItems.Add(homeItem);
+        navigationView.MenuItems.Add(accountItem);
+        navigationView.MenuItems.Add(documentOptionsItem);
+        navigationView.SelectionChanged += (_, e) =>
+        {
+            output.Text = $"PaneDisplayMode: {navigationView.PaneDisplayMode}. Selected: {e.SelectedItem?.Content}";
+        };
+        navigationView.ItemInvoked += (_, e) =>
+        {
+            if (!e.InvokedItem.SelectsOnInvoked)
+            {
+                output.Text = $"Invoked non-selecting item: {e.InvokedItem.Content}. Expanded: {e.InvokedItem.IsExpanded}";
+            }
+        };
+        navigationView.UpdateMenuItems();
+
+        void SetMode(NavigationViewPaneDisplayMode mode)
+        {
+            navigationView.PaneDisplayMode = mode;
+            navigationView.IsPaneOpen = mode != NavigationViewPaneDisplayMode.LeftCompact;
+            output.Text = $"PaneDisplayMode: {mode}. Document options expanded: {documentOptionsItem.IsExpanded}";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                navigationView,
+                CreateNavigationButtonRow(
+                    CreateNavigationActionButton("Left", () => SetMode(NavigationViewPaneDisplayMode.Left)),
+                    CreateNavigationActionButton("Compact", () => SetMode(NavigationViewPaneDisplayMode.LeftCompact)),
+                    CreateNavigationActionButton("Minimal", () => SetMode(NavigationViewPaneDisplayMode.LeftMinimal)),
+                    CreateNavigationActionButton("Top", () => SetMode(NavigationViewPaneDisplayMode.Top)),
+                    CreateNavigationActionButton("Toggle tree", () =>
+                    {
+                        documentOptionsItem.IsExpanded = !documentOptionsItem.IsExpanded;
+                        output.Text = $"PaneDisplayMode: {navigationView.PaneDisplayMode}. Document options expanded: {documentOptionsItem.IsExpanded}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateTabControlNavigationSample()
+    {
+        var output = CreateNavigationOutput("Selected tab: Overview");
         var tabControl = new FWTabControl
         {
-            Width = 430,
-            Height = 116,
-            SelectedIndex = 0
+            Width = 470,
+            Height = 160,
+            SelectedIndex = 0,
+            IsSwipeEnabled = true
         };
         tabControl.Items.Add(new FWTabItem
         {
@@ -1022,51 +1155,135 @@ public sealed class MainWindow : Window
             Content = CreateTabContent("Disabled tab sample"),
             IsEnabled = false
         });
-
-        var frame = new FWFrame
+        tabControl.SelectionChanged += (_, _) =>
         {
-            Width = 430,
-            Height = 98,
-            Padding = new Thickness(14),
-            BorderThickness = new Thickness(1),
-            Content = new TextBlock
-            {
-                Text = "FWFrame content host",
-                Foreground = ThemeBrush("TextPrimary"),
-                VerticalAlignment = VerticalAlignment.Center
-            }
+            output.Text = $"Selected tab: {(tabControl.SelectedItem as FWTabItem)?.Header}";
         };
 
-        tabAndFrame.Children.Add(tabControl);
-        tabAndFrame.Children.Add(frame);
-        row.Children.Add(tabAndFrame);
-
-        panel.Children.Add(row);
-        return panel;
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                tabControl,
+                CreateNavigationButtonRow(
+                    CreateNavigationActionButton("Overview", () => tabControl.SelectedIndex = 0),
+                    CreateNavigationActionButton("Details", () => tabControl.SelectedIndex = 1),
+                    CreateNavigationActionButton("Top", () =>
+                    {
+                        tabControl.TabStripPlacement = Jalium.UI.Controls.Dock.Top;
+                        output.Text = "TabStripPlacement: Top";
+                    }),
+                    CreateNavigationActionButton("Bottom", () =>
+                    {
+                        tabControl.TabStripPlacement = Jalium.UI.Controls.Dock.Bottom;
+                        output.Text = "TabStripPlacement: Bottom";
+                    }),
+                    CreateNavigationActionButton("Left", () =>
+                    {
+                        tabControl.TabStripPlacement = Jalium.UI.Controls.Dock.Left;
+                        output.Text = "TabStripPlacement: Left";
+                    })),
+                output
+            }
+        };
     }
 
-    private static UIElement CreateNavigationContent()
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Gallery sample navigates to local Page types by typeof literals.")]
+    private static UIElement CreateFrameNavigationSample()
     {
-        var panel = new StackPanel
+        var output = CreateNavigationOutput("Frame: not navigated");
+        var frame = new FWFrame
+        {
+            Width = 470,
+            Height = 160,
+            Padding = new Thickness(14),
+            BorderThickness = new Thickness(1)
+        };
+        frame.Navigated += (_, _) =>
+        {
+            output.Text = $"Frame: {frame.SourcePageType?.Name}, BackStack: {frame.BackStackDepth}, CanGoForward: {frame.CanGoForward}";
+        };
+
+        frame.Navigate(typeof(GalleryNavigationOverviewPage), "Overview");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                frame,
+                CreateNavigationButtonRow(
+                    CreateNavigationActionButton("Overview", () => frame.Navigate(typeof(GalleryNavigationOverviewPage), "Overview")),
+                    CreateNavigationActionButton("Details", () => frame.Navigate(typeof(GalleryNavigationDetailsPage), "Details")),
+                    CreateNavigationActionButton("Back", () =>
+                    {
+                        if (!frame.GoBack())
+                        {
+                            output.Text = "Frame: no back entry";
+                        }
+                    }),
+                    CreateNavigationActionButton("Forward", () =>
+                    {
+                        if (!frame.GoForward())
+                        {
+                            output.Text = "Frame: no forward entry";
+                        }
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateNavigationContent(string title, string description)
+    {
+        return new FWStackPanel
         {
             Orientation = Orientation.Vertical,
             Spacing = 8,
-            Margin = new Thickness(18)
+            Margin = new Thickness(18),
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = title,
+                    FontSize = 18,
+                    Foreground = ThemeBrush("TextPrimary")
+                },
+                new FWTextBlock
+                {
+                    Text = description,
+                    Foreground = ThemeBrush("TextSecondary"),
+                    TextWrapping = TextWrapping.Wrap
+                }
+            }
         };
+    }
 
-        panel.Children.Add(new TextBlock
+    private static UIElement CreateNavigationPaneHeader(string text)
+    {
+        return new FWStackPanel
         {
-            Text = "NavigationView content",
-            FontSize = 18,
-            Foreground = ThemeBrush("TextPrimary")
-        });
-        panel.Children.Add(new TextBlock
+            Orientation = Orientation.Vertical,
+            Spacing = 6,
+            Children =
+            {
+                new FWTextBlock { Text = "Search", FontSize = 12, Foreground = ThemeBrush("TextSecondary") },
+                new FWTextBox { Text = text, MinHeight = 32, PlaceholderText = "Search navigation" }
+            }
+        };
+    }
+
+    private static UIElement CreateNavigationPaneFooter(string text)
+    {
+        return new FWTextBlock
         {
-            Text = "Selected, nested, footer, and separator states share FluentJalium tokens.",
+            Text = text,
+            FontSize = 12,
             Foreground = ThemeBrush("TextSecondary")
-        });
-
-        return panel;
+        };
     }
 
     private static UIElement CreateTabContent(string text)
@@ -2683,6 +2900,78 @@ public sealed class MainWindow : Window
         };
     }
 
+    private static FWBorder CreateNavigationExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateNavigationButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateNavigationActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateNavigationOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
     private static TextBlock CreateStatusOutput(string text)
     {
         return new TextBlock
@@ -3602,6 +3891,46 @@ public sealed class MainWindow : Window
     private sealed record GalleryRow(string Name, string State, int Count);
 
     private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
+
+    private sealed class GalleryNavigationOverviewPage : Page
+    {
+        public GalleryNavigationOverviewPage()
+        {
+            Content = CreateNavigationFrameContent("Overview", "Frame content can preserve navigation state and theme resources.");
+        }
+    }
+
+    private sealed class GalleryNavigationDetailsPage : Page
+    {
+        public GalleryNavigationDetailsPage()
+        {
+            Content = CreateNavigationFrameContent("Details", "Back and forward navigation update the same Fluent frame surface.");
+        }
+    }
+
+    private static UIElement CreateNavigationFrameContent(string title, string text)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = title,
+                    FontSize = 18,
+                    Foreground = ThemeBrush("TextPrimary")
+                },
+                new FWTextBlock
+                {
+                    Text = text,
+                    Foreground = ThemeBrush("TextSecondary"),
+                    TextWrapping = TextWrapping.Wrap
+                }
+            }
+        };
+    }
 
     private sealed record GalleryPage(
         string Title,
