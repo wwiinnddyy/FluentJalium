@@ -1,0 +1,301 @@
+using Jalium.UI;
+using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Media;
+using Jalium.UI.Media.Effects;
+using FWBorder = FluentJalium.Controls.FWBorder;
+using FWButton = FluentJalium.Controls.FWButton;
+using FWGrid = FluentJalium.Controls.FWGrid;
+using FWStackPanel = FluentJalium.Controls.FWStackPanel;
+using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
+using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+
+namespace FluentJalium.Gallery.Pages;
+
+internal sealed class GalleryMaterialsPage
+{
+    private readonly Window _window;
+
+    public GalleryMaterialsPage(Window window)
+    {
+        _window = window;
+    }
+
+    public UIElement CreateContent()
+    {
+        var panel = CreateSection("Materials and Effects");
+        var examples = new FWWrapPanel
+        {
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
+        };
+
+        examples.Children.Add(CreateMaterialsExampleCard(
+            "Window SystemBackdrop",
+            "Jalium windows expose WinUI-style Mica, Mica Alt, and Acrylic backdrops for app shell depth.",
+            CreateWindowBackdropMaterialSample()));
+        examples.Children.Add(CreateMaterialsExampleCard(
+            "Element BackdropEffect",
+            "Controls can blur and tint content behind the element with Acrylic, Mica, frosted glass, and color adjustment effects.",
+            CreateElementBackdropEffectsSample()));
+        examples.Children.Add(CreateMaterialsExampleCard(
+            "Layered control surfaces",
+            "Controls should sit on layered materials that echo WinUI: backdrop, layer fill, subtle border, and soft elevation.",
+            CreateLayeredMaterialControlsSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private UIElement CreateWindowBackdropMaterialSample()
+    {
+        var status = CreateMaterialOutput($"Current window backdrop: {_window.SystemBackdrop}");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                CreateBackdropPreview("System backdrop", "Mica / MicaAlt / Acrylic are window-level materials, not just panel colors.", ThemeBrush("LayerFillColorDefaultBrush")),
+                CreateMaterialButtonRow(
+                    CreateMaterialActionButton("None", () => ApplySystemBackdrop(WindowBackdropType.None, status)),
+                    CreateMaterialActionButton("Mica", () => ApplySystemBackdrop(WindowBackdropType.Mica, status)),
+                    CreateMaterialActionButton("Mica Alt", () => ApplySystemBackdrop(WindowBackdropType.MicaAlt, status)),
+                    CreateMaterialActionButton("Acrylic", () => ApplySystemBackdrop(WindowBackdropType.Acrylic, status))),
+                status
+            }
+        };
+    }
+
+    private static UIElement CreateElementBackdropEffectsSample()
+    {
+        return new FWWrapPanel
+        {
+            HorizontalSpacing = 10,
+            VerticalSpacing = 10,
+            Children =
+            {
+                CreateBackdropEffectTile("BlurEffect", "Backdrop blur", new Jalium.UI.Media.BlurEffect(18f)),
+                CreateBackdropEffectTile("AcrylicEffect", "Tint, blur, and noise", new AcrylicEffect(Color.FromArgb(180, 20, 84, 145), 0.55f, 28f)),
+                CreateBackdropEffectTile("MicaEffect", "Wallpaper-tinted material", new MicaEffect()),
+                CreateBackdropEffectTile("FrostedGlassEffect", "High diffusion glass", new FrostedGlassEffect(26f, 0.04f, Color.FromArgb(180, 245, 248, 255), 0.38f)),
+                CreateBackdropEffectTile("Grayscale", "Backdrop color adjustment", ColorAdjustmentEffect.CreateGrayscale(1.0f)),
+                CreateBackdropEffectTile("HueRotate", "Backdrop hue shift", ColorAdjustmentEffect.CreateHueRotate(72f))
+            }
+        };
+    }
+
+    private static UIElement CreateLayeredMaterialControlsSample()
+    {
+        var elevated = CreateLayeredSurface(
+            "Elevated command layer",
+            "Soft shadow plus layer fill keeps commands readable on Mica.",
+            ThemeBrush("LayerFillColorDefaultBrush"));
+        elevated.Effect = new DropShadowEffect
+        {
+            BlurRadius = 18,
+            ShadowDepth = 4,
+            Direction = 270,
+            Opacity = 0.22,
+            Color = Color.FromArgb(255, 0, 0, 0)
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                elevated,
+                new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new FWButton { Content = "Primary action" },
+                        new FWButton { Content = "Secondary" },
+                        new FWToggleSwitch { Header = "Backdrop-aware", IsOn = true }
+                    }
+                }
+            }
+        };
+    }
+
+    private void ApplySystemBackdrop(WindowBackdropType backdropType, TextBlock status)
+    {
+        _window.SystemBackdrop = backdropType;
+        status.Text = $"Current window backdrop: {backdropType}";
+    }
+
+    private static FWBorder CreateBackdropEffectTile(string title, string description, IBackdropEffect effect)
+    {
+        var preview = CreateLayeredSurface(title, description, new SolidColorBrush(Color.FromArgb(110, 255, 255, 255)));
+        preview.BackdropEffect = effect;
+        return preview;
+    }
+
+    private static FWBorder CreateLayeredSurface(string title, string description, Brush background)
+    {
+        return new FWBorder
+        {
+            Width = 236,
+            Height = 130,
+            Background = background,
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = ThemeBrush("TextSecondary")
+                    }
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateBackdropPreview(string title, string description, Brush layerBrush)
+    {
+        return new FWBorder
+        {
+            Width = 490,
+            Height = 150,
+            Background = ThemeBrush("SurfaceBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = new FWGrid
+            {
+                Children =
+                {
+                    new FWBorder
+                    {
+                        Background = ThemeBrush("AccentBrush"),
+                        CornerRadius = new CornerRadius(8),
+                        Opacity = 0.24
+                    },
+                    CreateLayeredSurface(title, description, layerBrush)
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateMaterialsExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWStackPanel CreateMaterialButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateMaterialActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateMaterialOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static FWStackPanel CreateSection(string title)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 14,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = title,
+                    FontSize = 22,
+                    Foreground = ThemeBrush("TextPrimary")
+                }
+            }
+        };
+    }
+
+    private static Brush ThemeBrush(string key)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Brush brush)
+        {
+            return brush;
+        }
+
+        return new SolidColorBrush(Colors.Transparent);
+    }
+}
