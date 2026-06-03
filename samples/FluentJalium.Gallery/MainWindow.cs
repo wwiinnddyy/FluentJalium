@@ -4,24 +4,18 @@ using FluentJalium.Gallery.Pages;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
-using Jalium.UI.Controls.Ink;
-using Jalium.UI.Input;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
-using FWColorPicker = FluentJalium.Controls.FWColorPicker;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
-using FWInkCanvas = FluentJalium.Controls.FWInkCanvas;
-using FWInkPresenter = FluentJalium.Controls.FWInkPresenter;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWLabel = FluentJalium.Controls.FWLabel;
 using FWMenuFlyout = FluentJalium.Controls.FWMenuFlyout;
 using FWMenuFlyoutItem = FluentJalium.Controls.FWMenuFlyoutItem;
 using FWMenuFlyoutSeparator = FluentJalium.Controls.FWMenuFlyoutSeparator;
-using FWMediaElement = FluentJalium.Controls.FWMediaElement;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
@@ -103,7 +97,7 @@ public sealed class MainWindow : Window
             ContentAndLayout: () => CreatePageStack(new GalleryContentLayoutPage().CreateContent()),
             Visuals: () => CreatePageStack(new GalleryVisualsPage().CreateContent()),
             Interaction: () => CreatePageStack(new GalleryInteractionPage().CreateContent()),
-            InputAndMedia: () => CreatePageStack(CreateAdvancedInputMediaSection()),
+            InputAndMedia: () => CreatePageStack(new GalleryInputMediaPage().CreateContent()),
             Collections: () => CreatePageStack(new GalleryCollectionsPage().CreateContent()),
             SelectorsAndProperties: () => CreatePageStack(new GallerySelectorsPropertiesPage().CreateContent()),
             DataInspectors: () => CreatePageStack(new GalleryDataInspectorsPage().CreateContent()),
@@ -485,170 +479,6 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private UIElement CreateAdvancedInputMediaSection()
-    {
-        var panel = CreateSection("Advanced Input and Media");
-
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var colorColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        colorColumn.Children.Add(new FWLabel { Content = "FWColorPicker" });
-        colorColumn.Children.Add(new FWColorPicker
-        {
-            Color = Color.FromRgb(0x00, 0x78, 0xD4),
-            IsAlphaEnabled = true,
-            IsColorPreviewVisible = true,
-            IsHexInputVisible = true
-        });
-        colorColumn.Children.Add(new FWColorPicker
-        {
-            Color = Color.FromRgb(0xD8, 0x3B, 0x01),
-            IsCompact = true,
-            IsAlphaEnabled = false
-        });
-        topRow.Children.Add(colorColumn);
-
-        var inkColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 320
-        };
-        inkColumn.Children.Add(new FWLabel { Content = "FWInkCanvas" });
-        inkColumn.Children.Add(new FWInkCanvas
-        {
-            Width = 300,
-            Height = 180,
-            Background = ThemeBrush("InkCanvasBackground"),
-            BorderBrush = ThemeBrush("InkCanvasBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            DefaultDrawingAttributes = CreateInkDrawingAttributes(),
-            DefaultStrokeTaperMode = StrokeTaperMode.TaperedEnd,
-            EditingMode = InkCanvasEditingMode.Ink
-        });
-        inkColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new FWButton { Content = "Draw" },
-                new FWButton { Content = "Erase" },
-                new FWButton { Content = "Clear", IsEnabled = false }
-            }
-        });
-        topRow.Children.Add(inkColumn);
-
-        var bottomRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var presenterColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        presenterColumn.Children.Add(new FWLabel { Content = "FWInkPresenter" });
-        presenterColumn.Children.Add(new Border
-        {
-            Width = 240,
-            Height = 120,
-            Background = ThemeBrush("InkCanvasBackground"),
-            BorderBrush = ThemeBrush("InkCanvasBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Child = new FWInkPresenter
-            {
-                Strokes = CreateSampleStrokes()
-            }
-        });
-        presenterColumn.Children.Add(new TextBlock
-        {
-            Text = "A presentation surface for existing stroke collections.",
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        });
-        bottomRow.Children.Add(presenterColumn);
-
-        var mediaColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 280
-        };
-        mediaColumn.Children.Add(new FWLabel { Content = "FWMediaElement" });
-        mediaColumn.Children.Add(new Grid
-        {
-            Width = 260,
-            Height = 146,
-            Children =
-            {
-                new FWMediaElement
-                {
-                    Width = 260,
-                    Height = 146,
-                    Background = ThemeBrush("MediaElementBackground"),
-                    BorderBrush = ThemeBrush("MediaElementBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(6),
-                    LoadedBehavior = MediaState.Manual,
-                    UnloadedBehavior = MediaState.Close,
-                    Stretch = Stretch.Uniform
-                },
-                new StackPanel
-                {
-                    Orientation = Orientation.Vertical,
-                    Spacing = 6,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Children =
-                    {
-                        new FluentIcon
-                        {
-                            Icon = FluentIconRegular.Play24,
-                            Size = 28,
-                            Foreground = ThemeBrush("MediaElementForeground")
-                        },
-                        new TextBlock
-                        {
-                            Text = "Media surface",
-                            Foreground = ThemeBrush("MediaElementForeground")
-                        }
-                    }
-                }
-            }
-        });
-        mediaColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new FWButton { Content = "Play" },
-                new FWButton { Content = "Pause" },
-                new FWButton { Content = "Stop", IsEnabled = false }
-            }
-        });
-        bottomRow.Children.Add(mediaColumn);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(bottomRow);
-        return panel;
-    }
-
     private StackPanel CreateStateMatrix()
     {
         var panel = CreateSection("State Matrix");
@@ -778,55 +608,6 @@ public sealed class MainWindow : Window
         comboBox.Items.Add(new FWComboBoxItem { Content = "Toolkit" });
         comboBox.SelectedIndex = selectedIndex;
         return comboBox;
-    }
-
-    private static DrawingAttributes CreateInkDrawingAttributes()
-    {
-        return new DrawingAttributes
-        {
-            Color = Color.FromRgb(0x4C, 0xC2, 0xFF),
-            Width = 3,
-            Height = 3,
-            BrushType = BrushType.Pen,
-            FitToCurve = true
-        };
-    }
-
-    private static StrokeCollection CreateSampleStrokes()
-    {
-        return new StrokeCollection
-        {
-            CreateStroke(
-                Color.FromRgb(0x4C, 0xC2, 0xFF),
-                new StylusPoint(24, 74),
-                new StylusPoint(62, 42),
-                new StylusPoint(108, 72),
-                new StylusPoint(162, 34),
-                new StylusPoint(210, 64)),
-            CreateStroke(
-                Color.FromRgb(0xD8, 0x3B, 0x01),
-                new StylusPoint(28, 92),
-                new StylusPoint(84, 102),
-                new StylusPoint(142, 90),
-                new StylusPoint(202, 104))
-        };
-    }
-
-    private static Stroke CreateStroke(Color color, params StylusPoint[] points)
-    {
-        return new Stroke(
-            new StylusPointCollection(points),
-            new DrawingAttributes
-            {
-                Color = color,
-                Width = 4,
-                Height = 4,
-                BrushType = BrushType.Pen,
-                FitToCurve = true
-            })
-        {
-            TaperMode = StrokeTaperMode.TaperedEnd
-        };
     }
 
     private void ApplyTheme(FluentThemeVariant theme)
