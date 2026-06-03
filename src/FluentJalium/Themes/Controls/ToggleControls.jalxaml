@@ -67,7 +67,7 @@
                                 <Grid>
                                     <Path Name="CheckMark"
                                           Data="M 0,5 L 3,8 L 9,1"
-                                          Stroke="{ThemeResource TextOnAccent}"
+                                          Stroke="{ThemeResource CheckBoxGlyphForeground}"
                                           StrokeThickness="2"
                                           Width="10"
                                           Height="10"
@@ -78,7 +78,7 @@
                                     <Border Name="IndeterminateMark"
                                             Width="10"
                                             Height="2"
-                                            Background="{ThemeResource TextOnAccent}"
+                                            Background="{ThemeResource CheckBoxGlyphForeground}"
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
                                             CornerRadius="1"
@@ -102,19 +102,37 @@
                 <Setter Property="BorderBrush" Value="{ThemeResource ToggleUncheckedBorderHover}" />
             </MultiTrigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorder}" />
                 <Setter TargetName="CheckMark" Property="Opacity" Value="1" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorderHover}" />
+            </MultiTrigger>
             <Trigger Property="IsChecked" Value="{x:Null}">
-                <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorder}" />
                 <Setter TargetName="IndeterminateMark" Property="Opacity" Value="1" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="{x:Null}" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorderHover}" />
+            </MultiTrigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="{ThemeResource ToggleDisabledBackground}" />
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource ToggleDisabledBorder}" />
+                <Setter TargetName="CheckMark" Property="Stroke" Value="{ThemeResource CheckBoxGlyphForegroundDisabled}" />
+                <Setter TargetName="IndeterminateMark" Property="Background" Value="{ThemeResource CheckBoxGlyphForegroundDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -139,7 +157,7 @@
                                 <Ellipse Name="RadioDot"
                                          Width="8"
                                          Height="8"
-                                         Fill="{ThemeResource TextOnAccent}"
+                                         Fill="{ThemeResource RadioButtonDotForeground}"
                                          HorizontalAlignment="Center"
                                          VerticalAlignment="Center"
                                          Opacity="0" />
@@ -161,14 +179,23 @@
                 <Setter Property="BorderBrush" Value="{ThemeResource ToggleUncheckedBorderHover}" />
             </MultiTrigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackground}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorder}" />
                 <Setter TargetName="RadioDot" Property="Opacity" Value="1" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ToggleCheckedBackgroundHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ToggleCheckedBorderHover}" />
+            </MultiTrigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="{ThemeResource ToggleDisabledBackground}" />
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource ToggleDisabledBorder}" />
+                <Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonDotForegroundDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>

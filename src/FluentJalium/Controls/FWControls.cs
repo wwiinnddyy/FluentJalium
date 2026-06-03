@@ -115,6 +115,7 @@ public class FWProgressBar : ProgressBar, IFluentJaliumControl
 /// </summary>
 public class FWComboBox : ComboBox, IFluentJaliumControl
 {
+    protected override FrameworkElement GetContainerForItem(object item) => new FWComboBoxItem();
 }
 
 /// <summary>

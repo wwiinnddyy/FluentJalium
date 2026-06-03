@@ -3,13 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="ComboBox">
-        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource ComboBoxBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ComboBoxForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="8,5,8,6" />
-        <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="10,5,8,6" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="MinHeight" Value="34" />
         <Setter Property="MinWidth" Value="120" />
         <Setter Property="Template">
             <ControlTemplate TargetType="ComboBox">
@@ -30,15 +30,27 @@
                                                   Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                   ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                                   HorizontalAlignment="Left"
-                                                  VerticalAlignment="Center" />
+                                                  VerticalAlignment="Center">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                            <Setter Property="TextWrapping" Value="NoWrap" />
+                                        </Style>
+                                        <Style TargetType="AccessText">
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                            <Setter Property="TextWrapping" Value="NoWrap" />
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
 
                                 <TextBox Name="PART_EditableTextBox"
                                          Text="{Binding Text, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                          PlaceholderText="{Binding PlaceholderText, RelativeSource={RelativeSource AncestorType=ComboBox}}"
                                          Background="Transparent"
+                                         Foreground="{TemplateBinding Foreground}"
                                          BorderThickness="0"
                                          MinHeight="0"
-                                         Padding="0"
+                                         Padding="0,1,0,1"
                                          Visibility="Collapsed"
                                          HorizontalAlignment="Stretch"
                                          VerticalAlignment="Stretch" />
@@ -47,18 +59,27 @@
                             <Grid Name="PART_DropDownArea"
                                   Grid.Column="1"
                                   Background="Transparent">
+                                <Border Name="PART_DropDownDivider"
+                                        Width="1"
+                                        Margin="0,1,0,1"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Stretch"
+                                        Opacity="0"
+                                        Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
                                 <ToggleButton Name="PART_ToggleButton"
+                                              Margin="1,0,0,0"
                                               Background="Transparent"
                                               BorderThickness="0"
                                               Padding="0"
-                                              MinWidth="28"
+                                              MinWidth="27"
                                               HorizontalAlignment="Stretch"
                                               VerticalAlignment="Stretch"
                                               IsChecked="{TemplateBinding IsDropDownOpen}">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="ToggleButton">
-                                            <Path Data="M 0,0 L 4,4 L 8,0"
-                                                  Stroke="{ThemeResource TextSecondary}"
+                                            <Path Name="PART_DropDownGlyph"
+                                                  Data="M 0,0 L 4,4 L 8,0"
+                                                  Stroke="{ThemeResource ComboBoxDropDownGlyphForeground}"
                                                   StrokeThickness="1.5"
                                                   Width="8"
                                                   Height="8"
@@ -77,8 +98,8 @@
                            StaysOpen="False"
                            Placement="Bottom"
                            PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}}">
-                        <Border Background="{ThemeResource MenuFlyoutPresenterBackground}"
-                                BorderBrush="{ThemeResource MenuFlyoutPresenterBorderBrush}"
+                        <Border Background="{ThemeResource ComboBoxDropDownBackground}"
+                                BorderBrush="{ThemeResource ComboBoxDropDownBorderBrush}"
                                 BorderThickness="1"
                                 CornerRadius="6"
                                 Margin="0,4,0,0"
@@ -94,38 +115,97 @@
             </ControlTemplate>
         </Setter>
         <Style.Triggers>
+            <Trigger Property="IsEditable" Value="True">
+                <Setter TargetName="PART_DropDownDivider" Property="Opacity" Value="1" />
+            </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter Property="Background" Value="{ThemeResource ComboBoxBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderBrushPointerOver}" />
+                <Setter TargetName="PART_DropDownGlyph" Property="Stroke" Value="{ThemeResource ComboBoxDropDownGlyphForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ComboBoxBackgroundPressed}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsDropDownOpen" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource ComboBoxBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource ComboBoxForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ComboBoxBorderBrushDisabled}" />
+                <Setter TargetName="PART_DropDownGlyph" Property="Stroke" Value="{ThemeResource ComboBoxDropDownGlyphForegroundDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="ComboBoxItem">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Padding" Value="8,5,8,5" />
-        <Setter Property="MinHeight" Value="30" />
+        <Setter Property="Background" Value="{ThemeResource ComboBoxItemBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ComboBoxItemForeground}" />
+        <Setter Property="Padding" Value="9,6,10,6" />
+        <Setter Property="MinHeight" Value="32" />
         <Setter Property="Template">
             <ControlTemplate TargetType="ComboBoxItem">
-                <Border Name="PART_BackgroundBorder"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="4"
-                        Padding="{TemplateBinding Padding}">
-                    <ContentPresenter VerticalAlignment="Center" />
-                </Border>
+                <Grid>
+                    <Border Name="PART_BackgroundBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Name="PART_SelectedIndicator"
+                                    Grid.Column="0"
+                                    Width="3"
+                                    Height="16"
+                                    CornerRadius="1.5"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Opacity="0"
+                                    Background="{ThemeResource ComboBoxItemSelectedIndicator}" />
+                            <ContentPresenter Grid.Column="1"
+                                              Margin="8,0,0,0"
+                                              VerticalAlignment="Center">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="TextWrapping" Value="NoWrap" />
+                                    </Style>
+                                    <Style TargetType="AccessText">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="TextWrapping" Value="NoWrap" />
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Grid>
+                    </Border>
+                </Grid>
             </ControlTemplate>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ComboBoxItemBackgroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ComboBoxItemBackgroundSelected}" />
+                <Setter Property="Foreground" Value="{ThemeResource ComboBoxItemForegroundSelected}" />
+                <Setter TargetName="PART_SelectedIndicator" Property="Opacity" Value="1" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsSelected" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="{ThemeResource ComboBoxItemBackgroundSelectedPointerOver}" />
+            </MultiTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource ComboBoxItemForegroundDisabled}" />
+                <Setter TargetName="PART_SelectedIndicator" Property="Background" Value="{ThemeResource ComboBoxItemForegroundDisabled}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>
-
