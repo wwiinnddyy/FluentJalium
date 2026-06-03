@@ -11,7 +11,6 @@ using Jalium.UI.Media;
 using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
 using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
 using FWAccessText = FluentJalium.Controls.FWAccessText;
-using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
@@ -44,10 +43,7 @@ using FWMediaElement = FluentJalium.Controls.FWMediaElement;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
-using FWNumberBox = FluentJalium.Controls.FWNumberBox;
-using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWPathIcon = FluentJalium.Controls.FWPathIcon;
-using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
 using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
@@ -124,7 +120,7 @@ public sealed class MainWindow : Window
             Overview: () => CreatePageStack(CreateThemeControls()),
             Buttons: () => CreatePageStack(new GalleryButtonsPage().CreateContent()),
             Switches: () => CreatePageStack(new GallerySwitchesPage().CreateContent()),
-            TextInput: () => CreatePageStack(CreateTextSection()),
+            TextInput: () => CreatePageStack(new GalleryTextInputPage().CreateContent()),
             Selection: () => CreatePageStack(new GallerySelectionPage().CreateContent()),
             Range: () => CreatePageStack(new GalleryRangePage().CreateContent()),
             DateAndTime: () => CreatePageStack(new GalleryDateTimePage().CreateContent()),
@@ -510,75 +506,6 @@ public sealed class MainWindow : Window
         row.Children.Add(CreateCommandButton("Green", () => ApplyAccent(Color.FromRgb(0x10, 0x7C, 0x10))));
 
         panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateTextSection()
-    {
-        var panel = CreateSection("Text Input");
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        topRow.Children.Add(new FWTextBox
-        {
-            Text = "FWTextBox",
-            Width = 220,
-            PlaceholderText = "Enter text"
-        });
-        topRow.Children.Add(new FWPasswordBox
-        {
-            Password = "fluent",
-            Width = 220,
-            PlaceholderText = "Password"
-        });
-        topRow.Children.Add(new FWNumberBox
-        {
-            Header = "FWNumberBox",
-            Width = 180,
-            Minimum = 0,
-            Maximum = 100,
-            Value = 42,
-            SmallChange = 2,
-            DecimalPlaces = 0
-        });
-        topRow.Children.Add(new FWTextBox
-        {
-            Text = "Disabled",
-            Width = 220,
-            IsEnabled = false
-        });
-
-        var lowerRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        var autoCompleteBox = new FWAutoCompleteBox
-        {
-            Width = 260,
-            ItemsSource = new[] { "Fluent tokens", "Fluent controls", "WinUI Gallery", "Community Toolkit" },
-            Text = "Fl",
-            PlaceholderText = "Search controls",
-            FilterMode = AutoCompleteFilterMode.Contains
-        };
-
-        var richTextBox = new FWRichTextBox
-        {
-            Width = 420,
-            Height = 96,
-            AcceptsTab = true
-        };
-        richTextBox.SetText("FWRichTextBox uses the same text input resource tokens.");
-
-        lowerRow.Children.Add(autoCompleteBox);
-        lowerRow.Children.Add(richTextBox);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(lowerRow);
         return panel;
     }
 
