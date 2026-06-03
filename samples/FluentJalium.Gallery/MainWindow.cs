@@ -1,4 +1,5 @@
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Models;
 using FluentJalium.Icon;
 using System.ComponentModel;
 using Jalium.UI;
@@ -191,7 +192,7 @@ public sealed class MainWindow : Window
         navigationView.FooterMenuItems.Clear();
 
         var matchingPages = pages
-            .Where(page => MatchesNavigationSearch(page, searchText))
+            .Where(page => page.MatchesSearch(searchText))
             .ToArray();
 
         var homePage = matchingPages.FirstOrDefault(page => page.Group == GalleryNavigationGroup.Home);
@@ -5585,73 +5586,4 @@ public sealed class MainWindow : Window
         };
     }
 
-    private sealed record GalleryPage(
-        string Title,
-        string Description,
-        string Group,
-        FluentIconRegular Icon,
-        Func<UIElement> CreateContent,
-        string SearchText,
-        bool IsFooter = false);
-
-    private static bool MatchesNavigationSearch(GalleryPage page, string searchText)
-    {
-        var query = searchText.Trim();
-        if (query.Length == 0)
-        {
-            return true;
-        }
-
-        foreach (var token in query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-            if (!ContainsIgnoreCase(page.Title, token)
-                && !ContainsIgnoreCase(page.Description, token)
-                && !ContainsIgnoreCase(page.Group, token)
-                && !ContainsIgnoreCase(page.SearchText, token))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static bool ContainsIgnoreCase(string value, string query)
-    {
-        return value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
-    }
-
-    private static class GalleryNavigationGroup
-    {
-        public const string Home = "Home";
-        public const string ControlSurfaces = "Control surfaces";
-        public const string Input = "Input";
-        public const string LayoutAndMedia = "Layout and media";
-        public const string CollectionsAndData = "Collections and data";
-        public const string AppStructure = "App structure";
-        public const string Diagnostics = "Diagnostics";
-
-        public static readonly string[] Order =
-        [
-            ControlSurfaces,
-            Input,
-            LayoutAndMedia,
-            CollectionsAndData,
-            AppStructure
-        ];
-
-        public static FluentIconRegular GetIcon(string groupName)
-        {
-            return groupName switch
-            {
-                ControlSurfaces => FluentIconRegular.ControlButton24,
-                Input => FluentIconRegular.Textbox24,
-                LayoutAndMedia => FluentIconRegular.LayoutColumnTwo24,
-                CollectionsAndData => FluentIconRegular.Table24,
-                AppStructure => FluentIconRegular.Navigation24,
-                Diagnostics => FluentIconRegular.DataUsage24,
-                _ => FluentIconRegular.Home24
-            };
-        }
-    }
 }
