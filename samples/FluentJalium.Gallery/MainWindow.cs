@@ -39,6 +39,7 @@ using FWGrid = FluentJalium.Controls.FWGrid;
 using FWGridSplitter = FluentJalium.Controls.FWGridSplitter;
 using FWLabel = FluentJalium.Controls.FWLabel;
 using FWListBox = FluentJalium.Controls.FWListBox;
+using FWListBoxItem = FluentJalium.Controls.FWListBoxItem;
 using FWListView = FluentJalium.Controls.FWListView;
 using FWContextMenu = FluentJalium.Controls.FWContextMenu;
 using FWMenu = FluentJalium.Controls.FWMenu;
@@ -511,90 +512,444 @@ public sealed class MainWindow : Window
     private UIElement CreateCollectionsSection()
     {
         var panel = CreateSection("Collections and Tables");
-        var sampleRows = CreateSampleRows();
-        var sampleTree = CreateSampleTree();
-
-        var topRow = new StackPanel
+        var examples = new FWWrapPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
         };
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWListBox",
+            "Selection modes, selected count, disabled state, and SelectAll/UnselectAll commands.",
+            CreateListBoxCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWListView",
+            "GridView columns with row selection and column-reorder option.",
+            CreateListViewCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWTreeView",
+            "Hierarchical items with expanded, collapsed, selected, and disabled states.",
+            CreateTreeViewCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWDataGrid",
+            "Manual columns with selectable rows, grid-line modes, headers, and read-only state.",
+            CreateDataGridCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            "FWTreeDataGrid",
+            "Hierarchical table rows with expand/collapse commands and flattened selection output.",
+            CreateTreeDataGridCollectionSample()));
 
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateListBoxCollectionSample()
+    {
+        var output = CreateCollectionOutput("Selected: Control states");
         var listBox = new FWListBox
         {
-            Width = 190,
-            Height = 152
+            Width = 360,
+            Height = 170,
+            SelectionMode = SelectionMode.Multiple
         };
         listBox.Items.Add("Fluent tokens");
         listBox.Items.Add("Control states");
         listBox.Items.Add("Gallery coverage");
-        listBox.Items.Add("Disabled sample");
+        listBox.Items.Add(new FWListBoxItem { Content = "Disabled item", IsEnabled = false });
         listBox.SelectedIndex = 1;
-        topRow.Children.Add(listBox);
 
+        void UpdateOutput()
+        {
+            output.Text = listBox.SelectedItems.Count == 0
+                ? "Selected: none"
+                : $"Selected ({listBox.SelectedItems.Count}): {FormatCollectionItems(listBox.SelectedItems)}";
+        }
+
+        listBox.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                listBox,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Single", () =>
+                    {
+                        listBox.SelectionMode = SelectionMode.Single;
+                        listBox.SelectedIndex = 0;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Multiple", () =>
+                    {
+                        listBox.SelectionMode = SelectionMode.Multiple;
+                        listBox.SelectAll();
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Clear", () =>
+                    {
+                        listBox.UnselectAll();
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Toggle disabled", () =>
+                    {
+                        listBox.IsEnabled = !listBox.IsEnabled;
+                        output.Text = $"ListBox enabled: {listBox.IsEnabled}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateListViewCollectionSample()
+    {
+        var rows = CreateSampleRows();
+        var output = CreateCollectionOutput("Selected: Buttons / Complete / 9");
+        var view = CreateSampleGridView();
         var listView = new FWListView
         {
-            Width = 340,
-            Height = 152,
-            ItemsSource = sampleRows,
-            View = CreateSampleGridView()
+            Width = 470,
+            Height = 170,
+            ItemsSource = rows,
+            SelectionMode = SelectionMode.Single,
+            View = view,
+            SelectedIndex = 0
         };
-        listView.SelectedIndex = 0;
-        topRow.Children.Add(listView);
 
-        var treeView = new FWTreeView
+        void UpdateOutput()
         {
-            Width = 260,
-            Height = 152
+            output.Text = listView.SelectedItem is GalleryRow row
+                ? $"Selected: {row.Name} / {row.State} / {row.Count}"
+                : "Selected: none";
+        }
+
+        listView.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                listView,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("First", () =>
+                    {
+                        listView.SelectedIndex = 0;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Next", () =>
+                    {
+                        listView.SelectedIndex = (listView.SelectedIndex + 1) % rows.Length;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Toggle reorder", () =>
+                    {
+                        view.AllowsColumnReorder = !view.AllowsColumnReorder;
+                        output.Text = $"AllowsColumnReorder: {view.AllowsColumnReorder}";
+                    }),
+                    CreateCollectionActionButton("Toggle disabled", () =>
+                    {
+                        listView.IsEnabled = !listView.IsEnabled;
+                        output.Text = $"ListView enabled: {listView.IsEnabled}";
+                    })),
+                output
+            }
         };
-        treeView.Items.Add(new FWTreeViewItem
+    }
+
+    private static UIElement CreateTreeViewCollectionSample()
+    {
+        var output = CreateCollectionOutput("Selected: Build");
+        var designItem = new FWTreeViewItem { Header = "Design" };
+        var buildItem = new FWTreeViewItem { Header = "Build", IsSelected = true };
+        var workspaceItem = new FWTreeViewItem
         {
             Header = "Workspace",
             IsExpanded = true,
             Items =
             {
-                new FWTreeViewItem { Header = "Design" },
-                new FWTreeViewItem { Header = "Build" }
+                designItem,
+                buildItem
             }
-        });
-        treeView.Items.Add(new FWTreeViewItem { Header = "Archive" });
-        topRow.Children.Add(treeView);
+        };
+        var archiveItem = new FWTreeViewItem { Header = "Archive" };
+        var disabledItem = new FWTreeViewItem { Header = "Disabled branch", IsEnabled = false };
+        var treeView = new FWTreeView
+        {
+            Width = 360,
+            Height = 170
+        };
+        treeView.Items.Add(workspaceItem);
+        treeView.Items.Add(archiveItem);
+        treeView.Items.Add(disabledItem);
+        treeView.SelectedItem = buildItem;
 
+        void UpdateOutput()
+        {
+            var selected = treeView.SelectedItem as FWTreeViewItem;
+            output.Text = selected == null
+                ? $"Selected: none. Workspace expanded: {workspaceItem.IsExpanded}"
+                : $"Selected: {selected.Header}. Workspace expanded: {workspaceItem.IsExpanded}";
+        }
+
+        treeView.SelectedItemChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                treeView,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Expand", () =>
+                    {
+                        workspaceItem.IsExpanded = true;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Collapse", () =>
+                    {
+                        workspaceItem.IsExpanded = false;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Select root", () =>
+                    {
+                        treeView.SelectedItem = workspaceItem;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Select child", () =>
+                    {
+                        workspaceItem.IsExpanded = true;
+                        treeView.SelectedItem = designItem;
+                        UpdateOutput();
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateDataGridCollectionSample()
+    {
+        var rows = CreateSampleRows();
+        var output = CreateCollectionOutput("Selected: Selection / Review / 4");
         var dataGrid = new FWDataGrid
         {
-            Width = 430,
-            Height = 180,
+            Width = 470,
+            Height = 190,
             AutoGenerateColumns = false,
-            ItemsSource = sampleRows,
-            SelectedIndex = 1
+            ItemsSource = rows,
+            SelectedIndex = 1,
+            GridLinesVisibility = DataGridGridLinesVisibility.All,
+            HeadersVisibility = DataGridHeadersVisibility.All
         };
         dataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name"), Width = 150 });
         dataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 110 });
         dataGrid.Columns.Add(new DataGridTextColumn { Header = "Count", Binding = new Binding("Count"), Width = 80 });
 
+        void UpdateOutput()
+        {
+            output.Text = dataGrid.SelectedItem is GalleryRow row
+                ? $"Selected: {row.Name} / {row.State} / {row.Count}"
+                : "Selected: none";
+        }
+
+        dataGrid.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                dataGrid,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Next row", () =>
+                    {
+                        dataGrid.SelectedIndex = (dataGrid.SelectedIndex + 1) % rows.Length;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Grid lines", () =>
+                    {
+                        dataGrid.GridLinesVisibility = dataGrid.GridLinesVisibility == DataGridGridLinesVisibility.All
+                            ? DataGridGridLinesVisibility.Horizontal
+                            : DataGridGridLinesVisibility.All;
+                        output.Text = $"GridLinesVisibility: {dataGrid.GridLinesVisibility}";
+                    }),
+                    CreateCollectionActionButton("Headers", () =>
+                    {
+                        dataGrid.HeadersVisibility = dataGrid.HeadersVisibility == DataGridHeadersVisibility.All
+                            ? DataGridHeadersVisibility.Column
+                            : DataGridHeadersVisibility.All;
+                        output.Text = $"HeadersVisibility: {dataGrid.HeadersVisibility}";
+                    }),
+                    CreateCollectionActionButton("Read-only", () =>
+                    {
+                        dataGrid.IsReadOnly = !dataGrid.IsReadOnly;
+                        output.Text = $"IsReadOnly: {dataGrid.IsReadOnly}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateTreeDataGridCollectionSample()
+    {
+        var rows = CreateSampleTree();
+        var output = CreateCollectionOutput("Visible rows: 4. Selected: Theme resources");
         var treeDataGrid = new FWTreeDataGrid
         {
-            Width = 430,
-            Height = 180,
+            Width = 470,
+            Height = 190,
             ChildrenSelector = item => ((GalleryTreeRow)item).Children,
-            HasChildrenSelector = item => ((GalleryTreeRow)item).Children.Length > 0
+            HasChildrenSelector = item => ((GalleryTreeRow)item).Children.Length > 0,
+            GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
+            HeadersVisibility = DataGridHeadersVisibility.Column
         };
-        treeDataGrid.ItemsSource = sampleTree;
+        treeDataGrid.ItemsSource = rows;
         treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "Area", Binding = new Binding("Name"), Width = 170 });
         treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 120 });
         treeDataGrid.ExpandAll();
+        treeDataGrid.SelectedIndex = 1;
 
-        var gridRow = new StackPanel
+        void UpdateOutput()
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
-        };
-        gridRow.Children.Add(dataGrid);
-        gridRow.Children.Add(treeDataGrid);
+            var selected = treeDataGrid.SelectedItem as GalleryTreeRow;
+            output.Text = selected == null
+                ? $"Visible rows: {treeDataGrid.FlattenedCount}. Selected: none"
+                : $"Visible rows: {treeDataGrid.FlattenedCount}. Selected: {selected.Name} / {selected.State}";
+        }
 
-        panel.Children.Add(topRow);
-        panel.Children.Add(gridRow);
-        return panel;
+        treeDataGrid.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                treeDataGrid,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Expand all", () =>
+                    {
+                        treeDataGrid.ExpandAll();
+                        treeDataGrid.SelectedIndex = 1;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Collapse all", () =>
+                    {
+                        treeDataGrid.CollapseAll();
+                        treeDataGrid.SelectedIndex = 0;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Next row", () =>
+                    {
+                        treeDataGrid.SelectedIndex = (treeDataGrid.SelectedIndex + 1) % treeDataGrid.FlattenedCount;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Toggle disabled", () =>
+                    {
+                        treeDataGrid.IsEnabled = !treeDataGrid.IsEnabled;
+                        output.Text = $"TreeDataGrid enabled: {treeDataGrid.IsEnabled}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static FWBorder CreateCollectionExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateCollectionButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateCollectionActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateCollectionOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static string FormatCollectionItems(System.Collections.IEnumerable items)
+    {
+        var names = new List<string>();
+
+        foreach (var item in items)
+        {
+            names.Add(item switch
+            {
+                FWListBoxItem listBoxItem => listBoxItem.Content?.ToString() ?? string.Empty,
+                GalleryRow row => row.Name,
+                GalleryTreeRow row => row.Name,
+                _ => item?.ToString() ?? string.Empty
+            });
+        }
+
+        return string.Join(", ", names);
     }
 
     private UIElement CreateNavigationSection()
