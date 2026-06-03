@@ -246,6 +246,98 @@ public sealed class FluentNotificationStatusTests
         Assert.All(itemsHost.Children, child => Assert.IsType<FWStatusBarItem>(child));
     }
 
+    [Fact]
+    public void FWNotificationStatusControls_ShouldExposeMaterialOperationsPanelState()
+    {
+        var infoBar = new FWInfoBar
+        {
+            Title = "Deployment monitor",
+            Message = "One region has elevated latency.",
+            Severity = InfoBarSeverity.Warning,
+            IsOpen = true,
+            IsClosable = true
+        };
+        var healthBadge = new FWInfoBadge
+        {
+            Severity = FWInfoBadgeSeverity.Caution,
+            IconGlyph = "\uE930"
+        };
+        var eventBadge = new FWInfoBadge
+        {
+            Severity = FWInfoBadgeSeverity.Critical,
+            Value = 128,
+            MaxValue = 99
+        };
+        var toastHost = new FWToastNotificationHost
+        {
+            MaxVisibleToasts = 3,
+            Position = ToastPosition.BottomRight,
+            ToastWidth = 400,
+            Spacing = 8
+        };
+        var success = toastHost.ShowSuccess("Deployment complete", "All services reported healthy.", TimeSpan.FromSeconds(12));
+        var warning = toastHost.ShowWarning("Latency warning", "West region is above the preferred threshold.", TimeSpan.FromSeconds(12));
+        success.IsAutoDismissEnabled = false;
+        warning.IsAutoDismissEnabled = false;
+
+        var statusBar = new FWStatusBar();
+        statusBar.Items.Add(new FWStatusBarItem { Content = "Ready" });
+        statusBar.Items.Add(new FWStatusBarItem { Content = "Region: West" });
+        statusBar.Items.Add(new FWStatusBarItem { Content = healthBadge });
+        statusBar.Items.Add(new FWStatusBarItem { Content = eventBadge });
+
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                infoBar,
+                toastHost,
+                statusBar
+            }
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = panel
+        };
+
+        Assert.Equal(InfoBarSeverity.Warning, infoBar.Severity);
+        Assert.True(infoBar.IsOpen);
+        Assert.True(infoBar.IsClosable);
+        Assert.Equal(FWInfoBadgeSeverity.Caution, healthBadge.Severity);
+        Assert.Equal(FWInfoBadgeDisplayKind.Icon, healthBadge.DisplayKind);
+        Assert.Equal(FWInfoBadgeSeverity.Critical, eventBadge.Severity);
+        Assert.Equal("99+", eventBadge.DisplayValueText);
+        Assert.Equal(ToastPosition.BottomRight, toastHost.Position);
+        Assert.Equal(400, toastHost.ToastWidth);
+        Assert.Equal(8, toastHost.Spacing);
+        Assert.Equal(2, toastHost.Children.Count);
+        Assert.Contains(success, toastHost.Children);
+        Assert.Contains(warning, toastHost.Children);
+        Assert.False(success.IsAutoDismissEnabled);
+        Assert.False(warning.IsAutoDismissEnabled);
+        Assert.Equal(4, statusBar.Items.Count);
+        Assert.Same(healthBadge, ((FWStatusBarItem)statusBar.Items[2]).Content);
+        Assert.Same(eventBadge, ((FWStatusBarItem)statusBar.Items[3]).Content);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(panel, surface.Child);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
