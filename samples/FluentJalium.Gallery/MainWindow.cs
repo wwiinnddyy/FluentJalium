@@ -178,6 +178,7 @@ public sealed class MainWindow : Window
             DataInspectors: () => CreatePageStack(CreateDataInspectorsSection()),
             Navigation: () => CreatePageStack(CreateNavigationSection()),
             MaterialsAndEffects: () => CreatePageStack(new GalleryMaterialsPage(this).CreateContent()),
+            MotionAndTransitions: () => CreatePageStack(new GalleryMotionPage().CreateContent()),
             Menus: () => CreatePageStack(CreateMenusSection()),
             Disclosure: () => CreatePageStack(CreateDisclosureDialogsSection()),
             Status: () => CreatePageStack(CreateStatusSection()),
