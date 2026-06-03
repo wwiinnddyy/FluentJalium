@@ -6,6 +6,8 @@ using Jalium.UI.Media;
 using Jalium.UI.Media.Effects;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
+using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
@@ -40,7 +42,7 @@ internal sealed class GalleryMaterialsPage
         examples.Children.Add(CreateMaterialsExampleCard(
             FluentIconRegular.TransparencySquare24,
             "Element BackdropEffect",
-            "Controls can blur and tint content behind the element with Acrylic, Mica, frosted glass, and color adjustment effects.",
+            "Controls can blur, tint, and refract content behind the element with BackdropEffect and FWFluentMaterialSurface.",
             CreateElementBackdropEffectsSample()));
         examples.Children.Add(CreateMaterialsExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
@@ -82,9 +84,10 @@ internal sealed class GalleryMaterialsPage
             Children =
             {
                 CreateBackdropEffectTile(FluentIconRegular.CircleMultipleConcentric24, "BlurEffect", "Backdrop blur", new Jalium.UI.Media.BlurEffect(18f)),
-                CreateBackdropEffectTile(FluentIconRegular.Drop24, "AcrylicEffect", "Tint, blur, and noise", new AcrylicEffect(Color.FromArgb(180, 20, 84, 145), 0.55f, 28f)),
-                CreateBackdropEffectTile(FluentIconRegular.WindowBrush24, "MicaEffect", "Wallpaper-tinted material", new MicaEffect()),
-                CreateBackdropEffectTile(FluentIconRegular.WeatherSnowflake24, "FrostedGlassEffect", "High diffusion glass", new FrostedGlassEffect(26f, 0.04f, Color.FromArgb(180, 245, 248, 255), 0.38f)),
+                CreateMaterialSurfaceTile(FluentIconRegular.Drop24, "FW Acrylic", "Tint, blur, and noise preset", FWFluentMaterialKind.Acrylic),
+                CreateMaterialSurfaceTile(FluentIconRegular.WindowBrush24, "FW Mica", "Wallpaper-tinted material preset", FWFluentMaterialKind.Mica),
+                CreateMaterialSurfaceTile(FluentIconRegular.WeatherSnowflake24, "FW FrostedGlass", "High diffusion glass preset", FWFluentMaterialKind.FrostedGlass),
+                CreateMaterialSurfaceTile(FluentIconRegular.Glasses24, "FW LiquidGlass", "HLSL refraction and highlights", FWFluentMaterialKind.LiquidGlass),
                 CreateBackdropEffectTile(FluentIconRegular.Color24, "Grayscale", "Backdrop color adjustment", ColorAdjustmentEffect.CreateGrayscale(1.0f)),
                 CreateBackdropEffectTile(FluentIconRegular.PaintBrushSparkle24, "HueRotate", "Backdrop hue shift", ColorAdjustmentEffect.CreateHueRotate(72f))
             }
@@ -142,6 +145,32 @@ internal sealed class GalleryMaterialsPage
         return preview;
     }
 
+    private static FWFluentMaterialSurface CreateMaterialSurfaceTile(FluentIconRegular icon, string title, string description, FWFluentMaterialKind materialKind)
+    {
+        var isLiquidGlass = materialKind == FWFluentMaterialKind.LiquidGlass;
+        return new FWFluentMaterialSurface
+        {
+            Width = 236,
+            Height = 130,
+            MaterialKind = materialKind,
+            TintColor = Color.FromArgb(180, 20, 84, 145),
+            TintOpacity = isLiquidGlass ? 0.22 : 0.46,
+            BlurRadius = isLiquidGlass ? 12 : 28,
+            RefractionAmount = 84,
+            ChromaticAberration = isLiquidGlass ? 0.55 : 0,
+            Background = new SolidColorBrush(isLiquidGlass
+                ? Color.FromArgb(44, 0, 120, 212)
+                : Color.FromArgb(110, 255, 255, 255)),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Shape = isLiquidGlass ? BorderShape.SuperEllipse : BorderShape.RoundedRectangle,
+            SuperEllipseN = 4,
+            Padding = new Thickness(14),
+            Child = CreateLayeredSurfaceContent(icon, title, description)
+        };
+    }
+
     private static FWBorder CreateLayeredSurface(FluentIconRegular icon, string title, string description, Brush background)
     {
         return new FWBorder
@@ -153,35 +182,40 @@ internal sealed class GalleryMaterialsPage
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(14),
-            Child = new FWStackPanel
+            Child = CreateLayeredSurfaceContent(icon, title, description)
+        };
+    }
+
+    private static FWStackPanel CreateLayeredSurfaceContent(FluentIconRegular icon, string title, string description)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
             {
-                Orientation = Orientation.Vertical,
-                Spacing = 8,
-                Children =
+                new FWStackPanel
                 {
-                    new FWStackPanel
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
                     {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
+                        CreateIcon(icon, 18, ThemeBrush("TextPrimary")),
+                        new FWTextBlock
                         {
-                            CreateIcon(icon, 18, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
+                            Text = title,
+                            FontSize = 15,
+                            Foreground = ThemeBrush("TextPrimary"),
+                            VerticalAlignment = VerticalAlignment.Center
                         }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = ThemeBrush("TextSecondary")
                     }
+                },
+                new FWTextBlock
+                {
+                    Text = description,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ThemeBrush("TextSecondary")
                 }
             }
         };

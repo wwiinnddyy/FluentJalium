@@ -88,6 +88,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTextBlock, TextBlock>(app.Resources);
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
+            AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
@@ -619,6 +620,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTextBlock, TextBlock>(app.Resources);
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
+            AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
@@ -884,6 +886,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWTextBlock, TextBlock>();
         AssertFluentControl<FWAccessText, AccessText>();
         AssertFluentControl<FWBorder, Border>();
+        AssertFluentControl<FWFluentMaterialSurface, Border>();
         AssertFluentControl<FWContentControl, ContentControl>();
         AssertFluentControl<FWContentPresenter, ContentPresenter>();
         AssertFluentControl<FWStackPanel, StackPanel>();
@@ -1574,6 +1577,38 @@ public sealed class FluentThemeManagerTests
         Assert.Equal(1, contentControl.VisualChildrenCount);
         Assert.Same(presenterChild, contentPresenter.Content);
         Assert.Equal(1, contentPresenter.VisualChildrenCount);
+    }
+
+    [Fact]
+    public void FWFluentMaterialSurface_ShouldMapMaterialKindsToJaliumEffects()
+    {
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.Acrylic,
+            TintColor = Color.FromArgb(180, 0, 120, 212),
+            TintOpacity = 0.5,
+            BlurRadius = 24,
+            NoiseIntensity = 0.04
+        };
+
+        var acrylic = Assert.IsType<AcrylicEffect>(surface.BackdropEffect);
+        Assert.False(surface.LiquidGlass);
+        Assert.Equal(24f, acrylic.BlurRadius);
+        Assert.Equal(0.5f, acrylic.TintOpacity);
+        Assert.Equal(0.04f, acrylic.NoiseIntensity);
+
+        surface.MaterialKind = FWFluentMaterialKind.LiquidGlass;
+        surface.RefractionAmount = 88;
+        surface.ChromaticAberration = 0.75;
+        surface.FusionRadius = 44;
+
+        Assert.True(surface.LiquidGlass);
+        Assert.True(surface.LiquidGlassInteractive);
+        Assert.Null(surface.BackdropEffect);
+        Assert.Equal(24.0, surface.LiquidGlassBlurRadius);
+        Assert.Equal(88.0, surface.LiquidGlassRefractionAmount);
+        Assert.Equal(0.75, surface.LiquidGlassChromaticAberration);
+        Assert.Equal(44, surface.LiquidGlassFusionRadius);
     }
 
     [Fact]

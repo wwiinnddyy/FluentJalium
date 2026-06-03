@@ -236,6 +236,7 @@ public static class FluentThemeManager
         AliasStyle<FWTextBlock, TextBlock>(dictionary);
         AliasStyle<FWAccessText, AccessText>(dictionary);
         AliasStyle<FWBorder, Border>(dictionary);
+        AliasStyle<FWFluentMaterialSurface, Border>(dictionary);
         AliasStyle<FWContentControl, ContentControl>(dictionary);
         AliasStyle<FWContentPresenter, ContentPresenter>(dictionary);
         AliasStyle<FWStackPanel, StackPanel>(dictionary);
