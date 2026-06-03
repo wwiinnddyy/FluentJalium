@@ -24,6 +24,7 @@ using FWContentControl = FluentJalium.Controls.FWContentControl;
 using FWContentDialog = FluentJalium.Controls.FWContentDialog;
 using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
 using FWCommandBar = FluentJalium.Controls.FWCommandBar;
+using FWCommandBarFlyout = FluentJalium.Controls.FWCommandBarFlyout;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWDiffViewer = FluentJalium.Controls.FWDiffViewer;
@@ -49,8 +50,10 @@ using FWContextMenu = FluentJalium.Controls.FWContextMenu;
 using FWMenu = FluentJalium.Controls.FWMenu;
 using FWMenuBar = FluentJalium.Controls.FWMenuBar;
 using FWMenuBarItem = FluentJalium.Controls.FWMenuBarItem;
+using FWMenuFlyout = FluentJalium.Controls.FWMenuFlyout;
 using FWMenuFlyoutItem = FluentJalium.Controls.FWMenuFlyoutItem;
 using FWMenuFlyoutSeparator = FluentJalium.Controls.FWMenuFlyoutSeparator;
+using FWMenuFlyoutSubItem = FluentJalium.Controls.FWMenuFlyoutSubItem;
 using FWMenuItem = FluentJalium.Controls.FWMenuItem;
 using FWMediaElement = FluentJalium.Controls.FWMediaElement;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
@@ -174,7 +177,7 @@ public sealed class MainWindow : Window
             new GalleryPage("Selectors and Properties", "TreeSelector and PropertyGrid surfaces for hierarchical selection and object editing.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.DatabaseSearch24, () => CreatePageStack(CreateAdvancedSelectionPropertiesSection()), "FWTreeSelector FWTreeSelectorItem FWPropertyGrid tree selector property grid search categorized alphabetical"),
             new GalleryPage("Data Inspectors", "DiffViewer, HexEditor, and JsonTreeViewer developer surfaces for inspecting structured and binary data.", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Code24, () => CreatePageStack(CreateDataInspectorsSection()), "FWDiffViewer FWHexEditor FWJsonTreeViewer diff hex json code data inspector"),
             new GalleryPage("Navigation", "NavigationView, TabControl, TabItem, and Frame controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, () => CreatePageStack(CreateNavigationSection()), "FWNavigationView FWNavigationViewItem FWTabControl FWTabItem FWFrame page shell"),
-            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, and MenuFlyout item surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSeparator command menu"),
+            new GalleryPage("Menus", "MenuBar, Menu, ContextMenu, MenuFlyout, and CommandBarFlyout surfaces.", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, () => CreatePageStack(CreateMenusSection()), "FWMenuBar FWMenu FWContextMenu FWMenuFlyout FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSubItem FWMenuFlyoutSeparator FWCommandBarFlyout command menu"),
             new GalleryPage("Disclosure", "Expander, ToolTip, ContentDialog, and GroupBox controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, () => CreatePageStack(CreateDisclosureDialogsSection()), "FWExpander FWToolTip FWContentDialog FWGroupBox dialog flyout disclosure"),
             new GalleryPage("Status", "InfoBar, InfoBadge, ToastNotification, and StatusBar controls.", GalleryNavigationGroup.AppStructure, FluentIconRegular.AlertBadge24, () => CreatePageStack(CreateStatusSection()), "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar notification message severity"),
             new GalleryPage("State Matrix", "Cross-control normal, selected, disabled, and flyout state checks.", GalleryNavigationGroup.Diagnostics, FluentIconRegular.DataUsage24, () => CreatePageStack(CreateStateMatrix()), "states normal hover pressed selected disabled light dark high contrast", IsFooter: true)
@@ -2967,9 +2970,17 @@ public sealed class MainWindow : Window
             "Context menu placement, open and close events, command shortcuts, disabled items, and checkable state.",
             CreateContextMenuSample()));
         examples.Children.Add(CreateMenuExampleCard(
-            "MenuFlyout items",
+            "FWMenuFlyout",
             "Drop-down command flyout using FWMenuFlyoutItem, FWToggleMenuFlyoutItem, and FWMenuFlyoutSeparator.",
             CreateMenuFlyoutItemSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            "FWMenuFlyoutSubItem",
+            "Nested flyout command menu with submenu placement, icons, shortcuts, disabled state, and open or hide actions.",
+            CreateMenuFlyoutSubItemSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            "FWCommandBarFlyout",
+            "Compact command surface with primary app bar actions, secondary commands, and a toggle command state.",
+            CreateCommandBarFlyoutSample()));
 
         panel.Children.Add(examples);
         return panel;
@@ -3254,6 +3265,174 @@ public sealed class MainWindow : Window
                     {
                         disabled.IsEnabled = !disabled.IsEnabled;
                         output.Text = $"MenuFlyout: disabled item enabled {disabled.IsEnabled}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateMenuFlyoutSubItemSample()
+    {
+        var output = CreateMenuOutput("SubMenuFlyout: ready");
+        var flyout = new FWMenuFlyout
+        {
+            Placement = FlyoutPlacementMode.Bottom
+        };
+        var export = new FWMenuFlyoutSubItem
+        {
+            Text = "Export",
+            Icon = IconGlyph(FluentIconRegular.ArrowDownload24),
+            KeyboardAcceleratorTextOverride = "Ctrl+E"
+        };
+        var pdf = new FWMenuFlyoutItem
+        {
+            Text = "PDF document",
+            Icon = IconGlyph(FluentIconRegular.DocumentPdf24)
+        };
+        var package = new FWMenuFlyoutItem
+        {
+            Text = "Project package",
+            Icon = IconGlyph(FluentIconRegular.Box24)
+        };
+        var disabled = new FWMenuFlyoutItem
+        {
+            Text = "Cloud archive",
+            IsEnabled = false
+        };
+        var recent = new FWMenuFlyoutSubItem
+        {
+            Text = "Recent formats",
+            Icon = IconGlyph(FluentIconRegular.History24)
+        };
+        recent.Items.Add(new FWMenuFlyoutItem { Text = "Markdown", Icon = IconGlyph(FluentIconRegular.TextBold24) });
+        recent.Items.Add(new FWMenuFlyoutItem { Text = "HTML", Icon = IconGlyph(FluentIconRegular.Code24) });
+        export.Items.Add(pdf);
+        export.Items.Add(package);
+        export.Items.Add(disabled);
+        export.Items.Add(recent);
+
+        var publish = new FWMenuFlyoutItem
+        {
+            Text = "Publish",
+            Icon = IconGlyph(FluentIconRegular.Send24)
+        };
+        flyout.Items.Add(export);
+        flyout.Items.Add(new FWMenuFlyoutSeparator());
+        flyout.Items.Add(publish);
+
+        pdf.Click += (_, _) => output.Text = "SubMenuFlyout: PDF selected";
+        package.Click += (_, _) => output.Text = "SubMenuFlyout: package selected";
+        publish.Click += (_, _) => output.Text = "SubMenuFlyout: publish clicked";
+
+        var button = new FWDropDownButton
+        {
+            Content = "Export options",
+            Width = 180,
+            Flyout = flyout
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                button,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("Open", () =>
+                    {
+                        flyout.ShowAt(button);
+                        output.Text = "SubMenuFlyout: open";
+                    }),
+                    CreateMenuActionButton("Submenu", () =>
+                    {
+                        flyout.ShowAt(button);
+                        export.ShowSubMenu();
+                        output.Text = "SubMenuFlyout: export submenu open";
+                    }),
+                    CreateMenuActionButton("Recent", () =>
+                    {
+                        flyout.ShowAt(button);
+                        export.ShowSubMenu();
+                        recent.ShowSubMenu();
+                        output.Text = "SubMenuFlyout: recent submenu open";
+                    }),
+                    CreateMenuActionButton("Hide", () =>
+                    {
+                        recent.HideSubMenu();
+                        export.HideSubMenu();
+                        flyout.Hide();
+                        output.Text = "SubMenuFlyout: hidden";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateCommandBarFlyoutSample()
+    {
+        var output = CreateMenuOutput("CommandBarFlyout: ready");
+        var flyout = new FWCommandBarFlyout
+        {
+            AlwaysExpanded = true
+        };
+        var button = new FWButton
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(FluentIconRegular.MoreHorizontal24),
+                    new FWTextBlock
+                    {
+                        Text = "More commands",
+                        Foreground = ThemeBrush("TextPrimary")
+                    }
+                }
+            },
+            MinWidth = 170
+        };
+
+        flyout.PrimaryCommands.Add(CreateAppBarButton("Copy", FluentIconRegular.Copy24, output));
+        flyout.PrimaryCommands.Add(CreateAppBarButton("Share", FluentIconRegular.Share24, output));
+        flyout.PrimaryCommands.Add(CreateAppBarToggleButton("Pin", FluentIconRegular.Pin24, output, isChecked: true));
+        flyout.SecondaryCommands.Add(CreateAppBarButton("Rename", FluentIconRegular.Rename24, output));
+        flyout.SecondaryCommands.Add(CreateAppBarButton("Delete", FluentIconRegular.Delete24, output));
+        button.Click += (_, _) =>
+        {
+            flyout.ShowAt(button);
+            output.Text = "CommandBarFlyout: open";
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                button,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("Open", () =>
+                    {
+                        flyout.ShowAt(button);
+                        output.Text = "CommandBarFlyout: open";
+                    }),
+                    CreateMenuActionButton("Hide", () =>
+                    {
+                        flyout.Hide();
+                        output.Text = "CommandBarFlyout: hidden";
+                    }),
+                    CreateMenuActionButton("Collapse", () =>
+                    {
+                        flyout.AlwaysExpanded = false;
+                        output.Text = "CommandBarFlyout: secondary commands collapsed on next open";
+                    }),
+                    CreateMenuActionButton("Expand", () =>
+                    {
+                        flyout.AlwaysExpanded = true;
+                        output.Text = "CommandBarFlyout: secondary commands expanded on next open";
                     })),
                 output
             }
@@ -5120,9 +5299,9 @@ public sealed class MainWindow : Window
         return menuBarItem;
     }
 
-    private static MenuFlyout CreateMenuControlsFlyout(TextBlock? output = null)
+    private static FWMenuFlyout CreateMenuControlsFlyout(TextBlock? output = null)
     {
-        var flyout = new MenuFlyout();
+        var flyout = new FWMenuFlyout();
         var pin = new FWMenuFlyoutItem
         {
             Text = "Pin",
@@ -5175,9 +5354,9 @@ public sealed class MainWindow : Window
         return flyout;
     }
 
-    private static MenuFlyout CreateSampleFlyout()
+    private static FWMenuFlyout CreateSampleFlyout()
     {
-        var flyout = new MenuFlyout();
+        var flyout = new FWMenuFlyout();
         flyout.Items.Add(new FWMenuFlyoutItem { Text = "Create" });
         flyout.Items.Add(new FWMenuFlyoutItem { Text = "Open" });
         flyout.Items.Add(new FWMenuFlyoutSeparator());

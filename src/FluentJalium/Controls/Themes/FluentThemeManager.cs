@@ -258,6 +258,7 @@ public static class FluentThemeManager
         AliasStyle<FWMenuFlyoutItem, MenuFlyoutItem>(dictionary);
         AliasStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(dictionary);
         AliasStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(dictionary);
+        AliasStyle<FWMenuFlyoutSubItem, MenuFlyoutItem>(dictionary);
         AliasStyle<FWDatePicker, DatePicker>(dictionary);
         AliasStyle<FWTimePicker, TimePicker>(dictionary);
         AliasStyle<FWCalendar, Calendar>(dictionary);

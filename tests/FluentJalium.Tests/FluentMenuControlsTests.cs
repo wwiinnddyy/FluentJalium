@@ -75,6 +75,7 @@ public sealed class FluentMenuControlsTests
             AssertBasedOnStyle<FWMenuFlyoutItem, MenuFlyoutItem>(app.Resources);
             AssertBasedOnStyle<FWToggleMenuFlyoutItem, ToggleMenuFlyoutItem>(app.Resources);
             AssertBasedOnStyle<FWMenuFlyoutSeparator, MenuFlyoutSeparator>(app.Resources);
+            AssertBasedOnStyle<FWMenuFlyoutSubItem, MenuFlyoutItem>(app.Resources);
         }
         finally
         {
@@ -133,6 +134,17 @@ public sealed class FluentMenuControlsTests
         var separatorStyle = AssertStyle<MenuFlyoutSeparator>(dictionary);
         AssertSetter(separatorStyle, Control.ForegroundProperty);
         AssertSetter(separatorStyle, FrameworkElement.MarginProperty);
+
+        var subItemStyle = AssertStyle<FWMenuFlyoutSubItem>(dictionary);
+        Assert.Equal(typeof(FWMenuFlyoutSubItem), subItemStyle.TargetType);
+        Assert.NotNull(subItemStyle.BasedOn);
+
+        Assert.True(dictionary.TryGetValue("FWMenuFlyoutPresenterStyle", out var presenterStyle));
+        var style = Assert.IsType<Style>(presenterStyle);
+        Assert.Equal(typeof(FWMenuFlyoutPresenter), style.TargetType);
+        AssertSetter(style, Control.BackgroundProperty);
+        AssertSetter(style, Control.BorderBrushProperty);
+        AssertSetter(style, Control.PaddingProperty);
 
         ResetApplicationState();
     }
@@ -276,6 +288,97 @@ public sealed class FluentMenuControlsTests
         Assert.True(toggle.IsChecked);
     }
 
+    [Fact]
+    public void FWMenuFlyout_ShouldExposeItemsPlacementAndOpenCloseEvents()
+    {
+        var target = new FWButton { Content = "Open" };
+        var flyout = new FWMenuFlyout
+        {
+            Placement = FlyoutPlacementMode.Bottom
+        };
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Pin" });
+        flyout.Items.Add(new FWMenuFlyoutSeparator());
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Settings" });
+
+        var opened = 0;
+        var closed = 0;
+        flyout.Opened += (_, _) => opened++;
+        flyout.Closed += (_, _) => closed++;
+
+        flyout.ShowAt(target);
+        flyout.Hide();
+
+        Assert.False(flyout.IsOpen);
+        Assert.Equal(FlyoutPlacementMode.Bottom, flyout.Placement);
+        Assert.Equal(3, flyout.Items.Count);
+        Assert.Equal(1, opened);
+        Assert.True(closed >= 1);
+    }
+
+    [Fact]
+    public void FWCommandBarFlyout_ShouldExposeCommandCollections()
+    {
+        var flyout = new FWCommandBarFlyout
+        {
+            AlwaysExpanded = true
+        };
+        var primary = new FWAppBarButton { Label = "Add" };
+        var secondary = new FWAppBarButton { Label = "Settings" };
+
+        flyout.PrimaryCommands.Add(primary);
+        flyout.SecondaryCommands.Add(secondary);
+
+        Assert.True(flyout.AlwaysExpanded);
+        Assert.Same(primary, Assert.Single(flyout.PrimaryCommands));
+        Assert.Same(secondary, Assert.Single(flyout.SecondaryCommands));
+    }
+
+    [Fact]
+    public void FWCommandBarFlyout_ShouldSyncPresenterCommands()
+    {
+        var target = new FWButton { Content = "More commands" };
+        var flyout = new FWCommandBarFlyout();
+        var primary = new FWAppBarButton { Label = "Copy" };
+        var secondary = new FWAppBarButton { Label = "Rename" };
+
+        flyout.PrimaryCommands.Add(primary);
+        flyout.ShowAt(target);
+
+        var commandBar = GetFlyoutPresenter<FWCommandBar>(flyout);
+        Assert.Same(primary, Assert.Single(commandBar.PrimaryCommands));
+        Assert.Empty(commandBar.SecondaryCommands);
+        Assert.False(commandBar.IsOpen);
+
+        flyout.SecondaryCommands.Add(secondary);
+        flyout.AlwaysExpanded = true;
+
+        Assert.Same(secondary, Assert.Single(commandBar.SecondaryCommands));
+        Assert.True(commandBar.IsOpen);
+
+        flyout.Hide();
+    }
+
+    [Fact]
+    public void FWMenuFlyoutSubItem_ShouldExposeSubItemsAndUseSubmenuInvocation()
+    {
+        var subItem = new FWMenuFlyoutSubItem
+        {
+            Text = "Share"
+        };
+        var copy = new FWMenuFlyoutItem { Text = "Copy link" };
+        var mail = new FWMenuFlyoutItem { Text = "Mail" };
+        subItem.Items.Add(copy);
+        subItem.Items.Add(mail);
+
+        InvokeMenuFlyoutItem(subItem);
+        subItem.HideSubMenu();
+
+        Assert.Equal("Share", subItem.Text);
+        Assert.Equal(2, subItem.Items.Count);
+        Assert.Same(copy, subItem.Items[0]);
+        Assert.Same(mail, subItem.Items[1]);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
@@ -307,6 +410,14 @@ public sealed class FluentMenuControlsTests
     private static void AssertSetter(Style style, DependencyProperty property)
     {
         Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private static TPresenter GetFlyoutPresenter<TPresenter>(FlyoutBase flyout)
+        where TPresenter : Control
+    {
+        var field = typeof(FlyoutBase).GetField("_presenter", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(field);
+        return Assert.IsType<TPresenter>(field.GetValue(flyout));
     }
 
     private static void AssertForegroundSetter(Style style)

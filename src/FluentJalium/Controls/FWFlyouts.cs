@@ -1,0 +1,492 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using Jalium.UI;
+using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Media;
+
+namespace FluentJalium.Controls;
+
+/// <summary>
+/// FluentJalium menu flyout surface.
+/// </summary>
+[ContentProperty("Items")]
+public class FWMenuFlyout : FlyoutBase, IFluentJaliumControl
+{
+    private readonly ObservableCollection<Control> _items = new();
+
+    /// <summary>
+    /// Gets the menu controls shown by the flyout.
+    /// </summary>
+    public IList<Control> Items => _items;
+
+    internal ObservableCollection<Control> ItemCollection => _items;
+
+    /// <summary>
+    /// Gets or sets an optional presenter style for the flyout chrome.
+    /// </summary>
+    public Style? MenuFlyoutPresenterStyle { get; set; }
+
+    protected override Control CreatePresenter()
+    {
+        var presenter = new FWMenuFlyoutPresenter(this);
+        var presenterStyle = MenuFlyoutPresenterStyle ?? ResolvePresenterStyle();
+        if (presenterStyle != null)
+        {
+            presenter.Style = presenterStyle;
+        }
+
+        return presenter;
+    }
+
+    private static Style? ResolvePresenterStyle()
+    {
+        var app = Application.Current;
+        if (app?.Resources != null &&
+            app.Resources.TryGetValue("FWMenuFlyoutPresenterStyle", out var resource) &&
+            resource is Style style)
+        {
+            return style;
+        }
+
+        return null;
+    }
+}
+
+/// <summary>
+/// FluentJalium command bar flyout surface.
+/// </summary>
+public class FWCommandBarFlyout : FlyoutBase, IFluentJaliumControl
+{
+    private FWCommandBar? _commandBarPresenter;
+    private bool _alwaysExpanded;
+
+    public FWCommandBarFlyout()
+    {
+        PrimaryCommands.CollectionChanged += OnCommandsChanged;
+        SecondaryCommands.CollectionChanged += OnCommandsChanged;
+    }
+
+    /// <summary>
+    /// Gets the primary command elements shown in the command bar.
+    /// </summary>
+    public ObservableCollection<ICommandBarElement> PrimaryCommands { get; } = new();
+
+    /// <summary>
+    /// Gets the secondary command elements shown in the command bar.
+    /// </summary>
+    public ObservableCollection<ICommandBarElement> SecondaryCommands { get; } = new();
+
+    /// <summary>
+    /// Gets or sets whether secondary commands are expanded when the flyout opens.
+    /// </summary>
+    public bool AlwaysExpanded
+    {
+        get => _alwaysExpanded;
+        set
+        {
+            if (_alwaysExpanded == value)
+            {
+                return;
+            }
+
+            _alwaysExpanded = value;
+            if (_commandBarPresenter != null)
+            {
+                _commandBarPresenter.IsOpen = value;
+            }
+        }
+    }
+
+    protected override Control CreatePresenter()
+    {
+        _commandBarPresenter = new FWCommandBar();
+        SyncCommandBarPresenter();
+        return _commandBarPresenter;
+    }
+
+    private void OnCommandsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        SyncCommandBarPresenter();
+    }
+
+    private void SyncCommandBarPresenter()
+    {
+        var commandBar = _commandBarPresenter;
+        if (commandBar == null)
+        {
+            return;
+        }
+
+        commandBar.PrimaryCommands.Clear();
+        foreach (var command in PrimaryCommands)
+        {
+            commandBar.PrimaryCommands.Add(command);
+        }
+
+        commandBar.SecondaryCommands.Clear();
+        foreach (var command in SecondaryCommands)
+        {
+            commandBar.SecondaryCommands.Add(command);
+        }
+
+        commandBar.IsOpen = AlwaysExpanded;
+    }
+}
+
+/// <summary>
+/// FluentJalium submenu item for menu flyouts.
+/// </summary>
+[ContentProperty("Items")]
+public class FWMenuFlyoutSubItem : FluentMenuFlyoutItemBase, IFluentJaliumControl
+{
+    private static readonly SolidColorBrush s_fallbackBackgroundBrush = new(Color.FromRgb(45, 45, 48));
+    private static readonly SolidColorBrush s_fallbackBorderBrush = new(Color.FromRgb(67, 67, 70));
+    private static readonly SolidColorBrush s_fallbackArrowBrush = new(Color.FromRgb(180, 180, 180));
+
+    private readonly List<MenuFlyoutItem> _items = new();
+    private Popup? _subPopup;
+    private Border? _subPopupBorder;
+    private FWSimpleMenuPopupScrollHost? _subPopupScrollHost;
+
+    /// <summary>
+    /// Gets the submenu items.
+    /// </summary>
+    public IList<MenuFlyoutItem> Items => _items;
+
+    public FWMenuFlyoutSubItem()
+    {
+        AddHandler(MouseEnterEvent, new Jalium.UI.Input.MouseEventHandler(OnSubItemMouseEnter));
+        AddHandler(MouseLeaveEvent, new Jalium.UI.Input.MouseEventHandler(OnSubItemMouseLeave));
+    }
+
+    protected override void OnRender(DrawingContext drawingContext)
+    {
+        base.OnRender(drawingContext);
+
+        if (RenderSize.Width <= 0 || RenderSize.Height <= 0)
+        {
+            return;
+        }
+
+        var arrowBrush = ResolveBrush("OneTextSecondary", "TextSecondary", s_fallbackArrowBrush);
+        const double arrowSize = 8.0;
+        var arrowBounds = new Rect(
+            Math.Max(0, RenderSize.Width - 16),
+            Math.Max(0, (RenderSize.Height - arrowSize) / 2),
+            arrowSize,
+            arrowSize);
+        ArrowIcons.DrawArrow(drawingContext, arrowBrush, arrowBounds, ArrowIcons.Direction.Right);
+    }
+
+    /// <summary>
+    /// Shows the submenu popup.
+    /// </summary>
+    public void ShowSubMenu()
+    {
+        if (_items.Count == 0)
+        {
+            return;
+        }
+
+        CloseSiblingSubMenus();
+        EnsureSubPopup();
+        PopulateSubPopup();
+        _subPopup!.IsOpen = true;
+    }
+
+    /// <summary>
+    /// Hides the submenu popup.
+    /// </summary>
+    public void HideSubMenu()
+    {
+        CloseDescendantSubMenus();
+        if (_subPopup != null)
+        {
+            _subPopup.IsOpen = false;
+        }
+    }
+
+    protected override void InvokeItem()
+    {
+        ShowSubMenu();
+        FocusFirstSubMenuItem();
+    }
+
+    protected override bool InvokeFromKeyboard()
+    {
+        ShowSubMenu();
+        FocusFirstSubMenuItem();
+        return true;
+    }
+
+    protected override void OnVisualParentChanged(Visual? oldParent)
+    {
+        base.OnVisualParentChanged(oldParent);
+
+        if (VisualParent == null)
+        {
+            HideSubMenu();
+        }
+    }
+
+    private void FocusFirstSubMenuItem()
+    {
+        if (_items.Count == 0)
+        {
+            return;
+        }
+
+        Dispatcher.BeginInvokeCritical(() =>
+        {
+            foreach (var item in _items)
+            {
+                if (!item.IsEnabled || item.Visibility != Visibility.Visible)
+                {
+                    continue;
+                }
+
+                if (item.Focus())
+                {
+                    return;
+                }
+            }
+        });
+    }
+
+    private void EnsureSubPopup()
+    {
+        if (_subPopup != null)
+        {
+            return;
+        }
+
+        _subPopupScrollHost = new FWSimpleMenuPopupScrollHost();
+        _subPopupBorder = new Border
+        {
+            Background = ResolveBrush("OnePopupBackground", "MenuFlyoutPresenterBackground", s_fallbackBackgroundBrush),
+            BorderBrush = ResolveBrush("OnePopupBorder", "MenuFlyoutPresenterBorderBrush", s_fallbackBorderBrush),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(4),
+            Child = _subPopupScrollHost,
+            MinWidth = 160
+        };
+
+        _subPopup = new Popup
+        {
+            PlacementTarget = this,
+            Placement = PlacementMode.Right,
+            StaysOpen = false,
+            IsLightDismissEnabled = true,
+            ShouldConstrainToRootBounds = false,
+            Child = _subPopupBorder
+        };
+        _subPopup.Closed += OnSubPopupClosed;
+    }
+
+    private void PopulateSubPopup()
+    {
+        var panel = _subPopupScrollHost?.ItemsPanel;
+        if (panel == null)
+        {
+            return;
+        }
+
+        panel.Children.Clear();
+        foreach (var item in _items)
+        {
+            FWMenuFlyoutItemHost.AttachItemToPanel(panel, item);
+        }
+    }
+
+    private void OnSubPopupClosed(object? sender, EventArgs e)
+    {
+        CloseDescendantSubMenus();
+        _subPopupScrollHost?.ItemsPanel.Children.Clear();
+    }
+
+    private void OnSubItemMouseEnter(object sender, Jalium.UI.Input.MouseEventArgs e)
+    {
+        ShowSubMenu();
+    }
+
+    private void OnSubItemMouseLeave(object sender, Jalium.UI.Input.MouseEventArgs e)
+    {
+        // Keep submenu open while pointer moves from the item into its popup.
+    }
+
+    private Brush ResolveBrush(string primaryKey, string secondaryKey, Brush fallback)
+    {
+        if (TryFindResource(primaryKey) is Brush primary)
+        {
+            return primary;
+        }
+
+        if (TryFindResource(secondaryKey) is Brush secondary)
+        {
+            return secondary;
+        }
+
+        return fallback;
+    }
+
+    private void CloseSiblingSubMenus()
+    {
+        if (VisualParent is not Panel panel)
+        {
+            return;
+        }
+
+        foreach (var child in panel.Children)
+        {
+            if (child is FWMenuFlyoutSubItem sibling && !ReferenceEquals(sibling, this))
+            {
+                sibling.HideSubMenu();
+            }
+        }
+    }
+
+    private void CloseDescendantSubMenus()
+    {
+        foreach (var item in _items)
+        {
+            if (item is not FWMenuFlyoutSubItem childSubItem)
+            {
+                continue;
+            }
+
+            childSubItem.CloseDescendantSubMenus();
+            if (childSubItem._subPopup != null)
+            {
+                childSubItem._subPopup.IsOpen = false;
+            }
+        }
+    }
+}
+
+public sealed class FWMenuFlyoutPresenter : Control
+{
+    private readonly FWMenuFlyout _flyout;
+    private readonly FWSimpleMenuPopupScrollHost _scrollHost;
+
+    public FWMenuFlyoutPresenter(FWMenuFlyout flyout)
+    {
+        _flyout = flyout;
+        _scrollHost = new FWSimpleMenuPopupScrollHost();
+
+        _flyout.ItemCollection.CollectionChanged += OnFlyoutItemsChanged;
+        RefreshItems();
+
+        AddVisualChild(_scrollHost);
+    }
+
+    public override int VisualChildrenCount => 1;
+
+    public override Visual? GetVisualChild(int index)
+    {
+        if (index == 0)
+        {
+            return _scrollHost;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(index));
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _scrollHost.Measure(availableSize);
+        return _scrollHost.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _scrollHost.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+        return finalSize;
+    }
+
+    private void OnFlyoutItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RefreshItems();
+        InvalidateMeasure();
+        InvalidateVisual();
+    }
+
+    private void RefreshItems()
+    {
+        _scrollHost.ItemsPanel.Children.Clear();
+        foreach (var item in _flyout.Items)
+        {
+            FWMenuFlyoutItemHost.AttachItemToPanel(_scrollHost.ItemsPanel, item);
+        }
+    }
+}
+
+internal static class FWMenuFlyoutItemHost
+{
+    public static void AttachItemToPanel(Panel panel, Control item)
+    {
+        if (item.VisualParent == panel)
+        {
+            return;
+        }
+
+        if (item.VisualParent is Panel oldPanel)
+        {
+            oldPanel.Children.Remove(item);
+        }
+        else if (item.VisualParent != null)
+        {
+            return;
+        }
+
+        panel.Children.Add(item);
+    }
+}
+
+internal sealed class FWSimpleMenuPopupScrollHost : Control
+{
+    private readonly StackPanel _itemsPanel;
+    private readonly ScrollViewer _scrollViewer;
+
+    public FWSimpleMenuPopupScrollHost()
+    {
+        _itemsPanel = new StackPanel { Orientation = Orientation.Vertical };
+        _scrollViewer = new ScrollViewer
+        {
+            Content = _itemsPanel,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            IsScrollBarAutoHideEnabled = true,
+            IsScrollInertiaEnabled = false
+        };
+
+        AddVisualChild(_scrollViewer);
+    }
+
+    public StackPanel ItemsPanel => _itemsPanel;
+
+    public override int VisualChildrenCount => 1;
+
+    public override Visual? GetVisualChild(int index)
+    {
+        if (index == 0)
+        {
+            return _scrollViewer;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(index));
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _scrollViewer.Measure(availableSize);
+        return _scrollViewer.DesiredSize;
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        _scrollViewer.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+        return finalSize;
+    }
+}
