@@ -164,7 +164,7 @@ public sealed class MainWindow : Window
         return new GalleryPageContentFactories(
             Overview: () => CreatePageStack(CreateThemeControls()),
             Buttons: () => CreatePageStack(CreateButtonsSection(), CreateCommandButtonsSection()),
-            Switches: () => CreatePageStack(CreateSwitchesSection()),
+            Switches: () => CreatePageStack(new GallerySwitchesPage().CreateContent()),
             TextInput: () => CreatePageStack(CreateTextSection()),
             Selection: () => CreatePageStack(CreateSelectionSection()),
             Range: () => CreatePageStack(CreateRangeSection()),
@@ -2075,61 +2075,6 @@ public sealed class MainWindow : Window
         };
     }
 
-    private UIElement CreateSwitchesSection()
-    {
-        var panel = CreateSection("Switches");
-
-        var toggleButtonRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        toggleButtonRow.Children.Add(new FWToggleButton { Content = "FWToggleButton" });
-        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Checked", IsChecked = true });
-        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        toggleButtonRow.Children.Add(new FWToggleButton { Content = "Disabled", IsChecked = true, IsEnabled = false });
-
-        var switchRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 20,
-            Margin = new Thickness(0, 4, 0, 0)
-        };
-
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "Default",
-            OffContent = "Off",
-            OnContent = "On"
-        });
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "On",
-            IsOn = true,
-            OffContent = "Off",
-            OnContent = "On"
-        });
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "Content",
-            IsOn = true,
-            OffContent = "Paused",
-            OnContent = "Running"
-        });
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "Disabled",
-            IsOn = true,
-            IsEnabled = false,
-            OffContent = "Off",
-            OnContent = "On"
-        });
-
-        panel.Children.Add(toggleButtonRow);
-        panel.Children.Add(switchRow);
-        return panel;
-    }
     private UIElement CreateTextSection()
     {
         var panel = CreateSection("Text Input");
