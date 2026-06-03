@@ -56,20 +56,6 @@ public class FWRadioButton : RadioButton, IFluentJaliumControl
 }
 
 /// <summary>
-/// FluentJalium ToggleButton control.
-/// </summary>
-public class FWToggleButton : ToggleButton, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium ToggleSwitch control.
-/// </summary>
-public class FWToggleSwitch : ToggleSwitch, IFluentJaliumControl
-{
-}
-
-/// <summary>
 /// FluentJalium ComboBox control.
 /// </summary>
 public class FWComboBox : ComboBox, IFluentJaliumControl
