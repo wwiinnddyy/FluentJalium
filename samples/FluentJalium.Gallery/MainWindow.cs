@@ -8,15 +8,12 @@ using Jalium.UI.Controls.Ink;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Input;
 using Jalium.UI.Media;
-using FWAccessText = FluentJalium.Controls.FWAccessText;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWColorPicker = FluentJalium.Controls.FWColorPicker;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
-using FWContentControl = FluentJalium.Controls.FWContentControl;
-using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWImage = FluentJalium.Controls.FWImage;
 using FWInkCanvas = FluentJalium.Controls.FWInkCanvas;
@@ -110,7 +107,7 @@ public sealed class MainWindow : Window
             Selection: () => CreatePageStack(new GallerySelectionPage().CreateContent()),
             Range: () => CreatePageStack(new GalleryRangePage().CreateContent()),
             DateAndTime: () => CreatePageStack(new GalleryDateTimePage().CreateContent()),
-            ContentAndLayout: () => CreatePageStack(CreateContentLayoutSection()),
+            ContentAndLayout: () => CreatePageStack(new GalleryContentLayoutPage().CreateContent()),
             Visuals: () => CreatePageStack(CreateVisualsSection()),
             Interaction: () => CreatePageStack(CreateInteractionSection()),
             InputAndMedia: () => CreatePageStack(CreateAdvancedInputMediaSection()),
@@ -490,124 +487,6 @@ public sealed class MainWindow : Window
         row.Children.Add(CreateCommandButton("Rose", () => ApplyAccent(Color.FromRgb(0xC2, 0x39, 0xB3))));
         row.Children.Add(CreateCommandButton("Orange", () => ApplyAccent(Color.FromRgb(0xD8, 0x3B, 0x01))));
         row.Children.Add(CreateCommandButton("Green", () => ApplyAccent(Color.FromRgb(0x10, 0x7C, 0x10))));
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateContentLayoutSection()
-    {
-        var panel = CreateSection("Content and Layout");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var textColumn = new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        textColumn.Children.Add(new FWLabel { Content = "FWTextBlock" });
-        textColumn.Children.Add(new FWTextBlock
-        {
-            Text = "Title text",
-            FontFamily = "Segoe UI Variable Display",
-            FontSize = 22,
-            Foreground = ThemeBrush("TextPrimary")
-        });
-        textColumn.Children.Add(new FWTextBlock
-        {
-            Text = "Selectable body copy follows Fluent typography and wraps inside its layout column.",
-            IsTextSelectionEnabled = true,
-            TextWrapping = TextWrapping.Wrap,
-            Foreground = ThemeBrush("TextSecondary")
-        });
-        textColumn.Children.Add(new FWAccessText
-        {
-            Text = "_Open command",
-            Foreground = ThemeBrush("TextPrimary")
-        });
-        row.Children.Add(textColumn);
-
-        var surfaceColumn = new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 280
-        };
-        surfaceColumn.Children.Add(new FWLabel { Content = "FWBorder and content hosts" });
-        surfaceColumn.Children.Add(new FWBorder
-        {
-            Background = ThemeBrush("SurfaceBackground"),
-            BorderBrush = ThemeBrush("ContentSurfaceBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWContentControl
-            {
-                Content = "FWContentControl hosts text content with inherited Fluent text styling.",
-                Foreground = ThemeBrush("TextPrimary"),
-                Padding = new Thickness(0)
-            }
-        });
-        surfaceColumn.Children.Add(new FWContentPresenter
-        {
-            Content = new FWTextBlock
-            {
-                Text = "FWContentPresenter mirrors content without adding surface chrome.",
-                Foreground = ThemeBrush("TextSecondary"),
-                TextWrapping = TextWrapping.Wrap
-            }
-        });
-        row.Children.Add(surfaceColumn);
-
-        var layoutColumn = new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 320
-        };
-        layoutColumn.Children.Add(new FWLabel { Content = "FWStackPanel, FWWrapPanel, FWGrid" });
-        layoutColumn.Children.Add(new FWWrapPanel
-        {
-            HorizontalSpacing = 8,
-            VerticalSpacing = 8,
-            Children =
-            {
-                CreateLayoutChip("Stack"),
-                CreateLayoutChip("Wrap"),
-                CreateLayoutChip("Grid"),
-                CreateLayoutChip("Content"),
-                CreateLayoutChip("Surface")
-            }
-        });
-
-        var grid = new FWGrid
-        {
-            Width = 290,
-            ColumnSpacing = 8,
-            RowSpacing = 8
-        };
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-        var cellA = CreateGridCell("Auto", "Row 0");
-        var cellB = CreateGridCell("Star", "Column 1");
-        var cellC = CreateGridCell("Span", "Two columns");
-        Grid.SetColumn(cellB, 1);
-        Grid.SetRow(cellC, 1);
-        Grid.SetColumnSpan(cellC, 2);
-        grid.Children.Add(cellA);
-        grid.Children.Add(cellB);
-        grid.Children.Add(cellC);
-        layoutColumn.Children.Add(grid);
-        row.Children.Add(layoutColumn);
 
         panel.Children.Add(row);
         return panel;
@@ -1083,56 +962,6 @@ public sealed class MainWindow : Window
             Width = 112,
             FontSize = 12,
             Foreground = ThemeBrush("TextSecondary")
-        };
-    }
-
-    private static FWBorder CreateLayoutChip(string text)
-    {
-        return new FWBorder
-        {
-            Background = ThemeBrush("SelectionBackgroundWeak"),
-            BorderBrush = ThemeBrush("AccentBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(12),
-            Padding = new Thickness(10, 4, 10, 4),
-            Child = new FWTextBlock
-            {
-                Text = text,
-                Foreground = ThemeBrush("TextPrimary"),
-                FontSize = 12
-            }
-        };
-    }
-
-    private static FWBorder CreateGridCell(string title, string detail)
-    {
-        return new FWBorder
-        {
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 3,
-                Children =
-                {
-                    new FWTextBlock
-                    {
-                        Text = title,
-                        Foreground = ThemeBrush("TextPrimary"),
-                        FontSize = 13
-                    },
-                    new FWTextBlock
-                    {
-                        Text = detail,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        FontSize = 12
-                    }
-                }
-            }
         };
     }
 
