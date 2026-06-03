@@ -299,6 +299,83 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(2, displayChanged);
     }
 
+    [Fact]
+    public void FWDateTimeControls_ShouldExposeMaterialPlanningPanelState()
+    {
+        var today = DateTime.Today;
+        var datePicker = new FWDatePicker
+        {
+            Header = "Planning date",
+            PlaceholderText = "Select",
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(60),
+            SelectedDate = today.AddDays(3),
+            SelectedDateFormat = DatePickerFormat.Short
+        };
+        var timePicker = new FWTimePicker
+        {
+            Header = "Focus block",
+            SelectedTime = new TimeSpan(14, 15, 0),
+            MinuteIncrement = 15,
+            ClockIdentifier = "24HourClock"
+        };
+        var calendar = new FWCalendar
+        {
+            DisplayDate = today,
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(60),
+            SelectedDate = datePicker.SelectedDate,
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        calendar.BlackoutDates.Add(today.AddDays(1));
+
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                datePicker,
+                timePicker,
+                calendar
+            }
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = panel
+        };
+
+        Assert.Equal(today.AddDays(3), datePicker.SelectedDate);
+        Assert.Equal(DatePickerFormat.Short, datePicker.SelectedDateFormat);
+        Assert.Equal(today, datePicker.DisplayDateStart);
+        Assert.Equal(today.AddDays(60), datePicker.DisplayDateEnd);
+        Assert.Equal(new TimeSpan(14, 15, 0), timePicker.SelectedTime);
+        Assert.Equal(15, timePicker.MinuteIncrement);
+        Assert.Equal("24HourClock", timePicker.ClockIdentifier);
+        Assert.Equal(datePicker.SelectedDate, calendar.SelectedDate);
+        Assert.Equal(DayOfWeek.Monday, calendar.FirstDayOfWeek);
+        Assert.True(calendar.IsTodayHighlighted);
+        Assert.Contains(today.AddDays(1), calendar.BlackoutDates);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(panel, surface.Child);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
