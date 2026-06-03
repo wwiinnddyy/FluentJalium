@@ -1746,75 +1746,386 @@ public sealed class MainWindow : Window
 
     private UIElement CreateRangeSection()
     {
-        var panel = CreateSection("Range");
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18
-        };
+        var panel = CreateSection("Range and Progress");
 
-        row.Children.Add(new FWSlider
+        var sliderValueOutput = CreateRangeOutput("Value: 64");
+        var slider = new FWSlider
         {
-            Width = 260,
+            Width = 320,
             Minimum = 0,
             Maximum = 100,
-            Value = 64
-        });
-        row.Children.Add(new FWRangeSlider
+            Value = 64,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true
+        };
+        slider.ValueChanged += (_, e) => sliderValueOutput.Text = FormatRangeValue("Value", e.NewValue);
+
+        var verticalSliderOutput = CreateRangeOutput("Vertical value: 20");
+        var verticalSlider = new FWSlider
         {
-            Width = 260,
+            Orientation = Orientation.Vertical,
+            Width = 36,
+            Height = 120,
+            Minimum = -50,
+            Maximum = 50,
+            Value = 20,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true
+        };
+        verticalSlider.ValueChanged += (_, e) => verticalSliderOutput.Text = FormatRangeValue("Vertical value", e.NewValue);
+
+        var sliderStates = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 20
+        };
+        sliderStates.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateRangeOutput("Stepped"),
+                new FWSlider
+                {
+                    Width = 220,
+                    Minimum = 0,
+                    Maximum = 100,
+                    Value = 40,
+                    TickFrequency = 20,
+                    IsSnapToTickEnabled = true
+                }
+            }
+        });
+        sliderStates.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateRangeOutput("Vertical"),
+                verticalSlider,
+                verticalSliderOutput
+            }
+        });
+        sliderStates.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateRangeOutput("Disabled"),
+                new FWSlider
+                {
+                    Width = 220,
+                    Minimum = 0,
+                    Maximum = 100,
+                    Value = 55,
+                    IsEnabled = false
+                }
+            }
+        });
+
+        var rangeOutput = CreateRangeOutput("Range: 24 to 76");
+        var rangeSlider = new FWRangeSlider
+        {
+            Width = 320,
             Minimum = 0,
             Maximum = 100,
             RangeStart = 24,
             RangeEnd = 76,
-            MinimumRange = 8
-        });
-        row.Children.Add(new FWProgressBar
+            MinimumRange = 8,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true
+        };
+        void UpdateRangeOutput()
         {
-            Width = 220,
+            rangeOutput.Text = $"Range: {rangeSlider.RangeStart:0} to {rangeSlider.RangeEnd:0}";
+        }
+
+        rangeSlider.RangeStartChanged += (_, _) => UpdateRangeOutput();
+        rangeSlider.RangeEndChanged += (_, _) => UpdateRangeOutput();
+
+        var rangeStates = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 20
+        };
+        rangeStates.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateRangeOutput("MinimumRange = 20"),
+                new FWRangeSlider
+                {
+                    Width = 220,
+                    Minimum = 0,
+                    Maximum = 100,
+                    RangeStart = 30,
+                    RangeEnd = 70,
+                    MinimumRange = 20,
+                    TickFrequency = 10,
+                    IsSnapToTickEnabled = true
+                }
+            }
+        });
+        rangeStates.Children.Add(new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateRangeOutput("Disabled"),
+                new FWRangeSlider
+                {
+                    Width = 220,
+                    Minimum = 0,
+                    Maximum = 100,
+                    RangeStart = 18,
+                    RangeEnd = 64,
+                    MinimumRange = 8,
+                    IsEnabled = false
+                }
+            }
+        });
+
+        var progressOutput = CreateRangeOutput("Progress: 72%");
+        var progressBar = new FWProgressBar
+        {
+            Width = 320,
             Height = 8,
             Minimum = 0,
             Maximum = 100,
             Value = 72
-        });
-        row.Children.Add(new FWProgressBar
+        };
+        var progressSlider = new FWSlider
         {
-            Width = 220,
+            Width = 320,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 72,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true
+        };
+        progressSlider.ValueChanged += (_, e) =>
+        {
+            progressBar.Value = e.NewValue;
+            progressOutput.Text = FormatRangeValue("Progress", e.NewValue) + "%";
+        };
+
+        var progressStates = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10
+        };
+        progressStates.Children.Add(CreateRangeStateRow("Determinate", new FWProgressBar
+        {
+            Width = 260,
+            Height = 8,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 35
+        }));
+        progressStates.Children.Add(CreateRangeStateRow("Indeterminate", new FWProgressBar
+        {
+            Width = 260,
             Height = 8,
             IsIndeterminate = true
-        });
+        }));
+        progressStates.Children.Add(CreateRangeStateRow("Disabled", new FWProgressBar
+        {
+            Width = 260,
+            Height = 8,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 55,
+            IsEnabled = false
+        }));
 
-        var ringRow = new StackPanel
+        var ringOutput = CreateRangeOutput("Ring value: 72%");
+        var determinateRing = new FWProgressRing
+        {
+            Width = 48,
+            Height = 48,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 72,
+            IsIndeterminate = false
+        };
+        var ringSlider = new FWSlider
+        {
+            Width = 260,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 72,
+            TickFrequency = 10,
+            IsSnapToTickEnabled = true
+        };
+        ringSlider.ValueChanged += (_, e) =>
+        {
+            determinateRing.Value = e.NewValue;
+            ringOutput.Text = FormatRangeValue("Ring value", e.NewValue) + "%";
+        };
+
+        var ringStates = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 18,
-            Margin = new Thickness(0, 10, 0, 0)
+            Spacing = 22
         };
-        ringRow.Children.Add(new FWProgressRing
+        ringStates.Children.Add(CreateRangeRingState("Indeterminate", new FWProgressRing
         {
-            Width = 36,
-            Height = 36,
+            Width = 48,
+            Height = 48,
             IsIndeterminate = true
-        });
-        ringRow.Children.Add(new FWProgressRing
+        }));
+        ringStates.Children.Add(CreateRangeRingState("Determinate", determinateRing));
+        ringStates.Children.Add(CreateRangeRingState("Inactive", new FWProgressRing
         {
-            Width = 36,
-            Height = 36,
-            IsIndeterminate = false,
-            Value = 72
-        });
-        ringRow.Children.Add(new FWProgressRing
-        {
-            Width = 36,
-            Height = 36,
+            Width = 48,
+            Height = 48,
+            Value = 42,
             IsActive = false,
+            IsIndeterminate = false
+        }));
+        ringStates.Children.Add(CreateRangeRingState("Disabled", new FWProgressRing
+        {
+            Width = 48,
+            Height = 48,
+            Value = 64,
             IsIndeterminate = false,
-            Value = 30
+            IsEnabled = false
+        }));
+
+        var examples = new FWWrapPanel
+        {
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
+        };
+        examples.Children.Add(CreateRangeExampleCard(
+            "FWSlider",
+            "Interactive value output, stepped movement, vertical orientation, and disabled state.",
+            slider,
+            sliderValueOutput,
+            sliderStates));
+        examples.Children.Add(CreateRangeExampleCard(
+            "FWRangeSlider",
+            "Two-thumb value output with snapped steps, minimum range, and disabled state.",
+            rangeSlider,
+            rangeOutput,
+            rangeStates));
+        examples.Children.Add(CreateRangeExampleCard(
+            "FWProgressBar",
+            "Determinate value driven by a slider plus indeterminate and disabled states.",
+            progressBar,
+            progressOutput,
+            progressSlider,
+            progressStates));
+        examples.Children.Add(CreateRangeExampleCard(
+            "FWProgressRing",
+            "Active indeterminate ring, determinate value output, inactive, and disabled states.",
+            ringStates,
+            ringOutput,
+            ringSlider));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static FWBorder CreateRangeExampleCard(string title, string description, params UIElement[] children)
+    {
+        var stack = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10
+        };
+        stack.Children.Add(new FWTextBlock
+        {
+            Text = title,
+            FontSize = 15,
+            Foreground = ThemeBrush("TextPrimary")
+        });
+        stack.Children.Add(new FWTextBlock
+        {
+            Text = description,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
         });
 
-        panel.Children.Add(row);
-        panel.Children.Add(ringRow);
-        return panel;
+        foreach (var child in children)
+        {
+            stack.Children.Add(child);
+        }
+
+        return new FWBorder
+        {
+            Width = 430,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = stack
+        };
+    }
+
+    private static StackPanel CreateRangeStateRow(string label, UIElement control)
+    {
+        return new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = label,
+                    Width = 96,
+                    FontSize = 12,
+                    Foreground = ThemeBrush("TextSecondary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                },
+                control
+            }
+        };
+    }
+
+    private static StackPanel CreateRangeRingState(string label, UIElement ring)
+    {
+        return new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                ring,
+                new TextBlock
+                {
+                    Text = label,
+                    Width = 80,
+                    FontSize = 12,
+                    Foreground = ThemeBrush("TextSecondary"),
+                    TextAlignment = TextAlignment.Center
+                }
+            }
+        };
+    }
+
+    private static TextBlock CreateRangeOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary")
+        };
+    }
+
+    private static string FormatRangeValue(string label, double value)
+    {
+        return $"{label}: {value:0}";
     }
 
     private StackPanel CreateStateMatrix()

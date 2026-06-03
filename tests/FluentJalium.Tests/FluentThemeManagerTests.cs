@@ -184,6 +184,10 @@ public sealed class FluentThemeManagerTests
             Assert.Equal(Color.FromArgb(0x66, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["NavigationViewItemBackgroundSelectedHover"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ToggleSwitchOnBackground"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ToggleSwitchOnBorder"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["SliderTrackValueFill"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["SliderThumbBackground"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["ProgressBarForeground"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["ProgressRingForeground"]));
         }
         finally
         {
@@ -316,7 +320,21 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ToggleSwitchThumb"));
         Assert.True(dictionary.Contains("SliderTrack"));
         Assert.True(dictionary.Contains("SliderThumb"));
+        Assert.True(dictionary.Contains("SliderTrackFill"));
+        Assert.True(dictionary.Contains("SliderTrackValueFill"));
+        Assert.True(dictionary.Contains("SliderTrackFillDisabled"));
+        Assert.True(dictionary.Contains("SliderThumbBackground"));
+        Assert.True(dictionary.Contains("SliderThumbBorderBrush"));
+        Assert.True(dictionary.Contains("SliderTickBarFill"));
+        Assert.True(dictionary.Contains("ProgressBarBackground"));
+        Assert.True(dictionary.Contains("ProgressBarForeground"));
+        Assert.True(dictionary.Contains("ProgressBarIndeterminateBackground"));
+        Assert.True(dictionary.Contains("ProgressBarPausedForeground"));
+        Assert.True(dictionary.Contains("ProgressBarErrorForeground"));
+        Assert.True(dictionary.Contains("ProgressBarDisabledForeground"));
         Assert.True(dictionary.Contains("ProgressRingForeground"));
+        Assert.True(dictionary.Contains("ProgressRingBackground"));
+        Assert.True(dictionary.Contains("ProgressRingDisabledForeground"));
         Assert.True(dictionary.Contains("SelectionBackgroundWeak"));
         Assert.True(dictionary.Contains("MenuBarBackground"));
         Assert.True(dictionary.Contains("MenuBarItemBackgroundHover"));
@@ -471,6 +489,13 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWRangeSlider, RangeSlider>(app.Resources);
             AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
             AssertOwnedStyle<FWProgressRing>(app.Resources);
+            Assert.IsType<SolidColorBrush>(app.Resources["SliderTrackFill"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["SliderTrackValueFill"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["SliderThumbBackground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["ProgressBarBackground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["ProgressBarForeground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["ProgressRingBackground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["ProgressRingForeground"]);
         }
         finally
         {

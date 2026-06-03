@@ -109,7 +109,32 @@
             <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="SliderTrack" Color="#2AFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#2AFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#36FFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#40FFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#FF0067B6" />
+            <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#FF0067B6" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrush" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrushDisabled" Color="#FF202020" />
+            <SolidColorBrush x:Key="SliderTickBarFill" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="SliderTickBarFillDisabled" Color="#28FFFFFF" />
+            <SolidColorBrush x:Key="ProgressBarBackground" Color="#2AFFFFFF" />
+            <SolidColorBrush x:Key="ProgressBarForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ProgressBarIndeterminateBackground" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="ProgressBarPausedForeground" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="ProgressBarErrorForeground" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="ProgressBarDisabledBackground" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="ProgressBarDisabledForeground" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ProgressRingBackground" Color="#2AFFFFFF" />
+            <SolidColorBrush x:Key="ProgressRingDisabledForeground" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
@@ -355,7 +380,32 @@
             <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#37000000" />
             <SolidColorBrush x:Key="SliderTrack" Color="#15000000" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#15000000" />
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#21000000" />
+            <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#2E000000" />
+            <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="#0F000000" />
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#FF005A9E" />
+            <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="#37000000" />
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#FF005A9E" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundDisabled" Color="#37000000" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrushDisabled" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="SliderTickBarFill" Color="#72000000" />
+            <SolidColorBrush x:Key="SliderTickBarFillDisabled" Color="#33000000" />
+            <SolidColorBrush x:Key="ProgressBarBackground" Color="#15000000" />
+            <SolidColorBrush x:Key="ProgressBarForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ProgressBarIndeterminateBackground" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="ProgressBarPausedForeground" Color="#FF9D5D00" />
+            <SolidColorBrush x:Key="ProgressBarErrorForeground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="ProgressBarDisabledBackground" Color="#0F000000" />
+            <SolidColorBrush x:Key="ProgressBarDisabledForeground" Color="#37000000" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ProgressRingBackground" Color="#15000000" />
+            <SolidColorBrush x:Key="ProgressRingDisabledForeground" Color="#37000000" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#09000000" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
@@ -569,7 +619,32 @@
             <SolidColorBrush x:Key="ToggleSwitchThumbDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="SliderTrack" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SliderTrackFill" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="SliderThumbBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderThumbBackgroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderThumbBorderBrushDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="SliderTickBarFill" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SliderTickBarFillDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="ProgressBarBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ProgressBarForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ProgressBarIndeterminateBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ProgressBarPausedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ProgressBarErrorForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ProgressBarDisabledBackground" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="ProgressBarDisabledForeground" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="ProgressRingForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ProgressRingBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ProgressRingDisabledForeground" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#FFFFFF00" />

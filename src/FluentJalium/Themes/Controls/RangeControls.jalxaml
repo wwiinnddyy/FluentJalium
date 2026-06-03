@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="ProgressBar">
-        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
-        <Setter Property="Foreground" Value="{ThemeResource AccentBrush}" />
-        <Setter Property="ProgressBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="Background" Value="{ThemeResource ProgressBarBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ProgressBarForeground}" />
+        <Setter Property="ProgressBrush" Value="{ThemeResource ProgressBarForeground}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CornerRadius" Value="2" />
         <Setter Property="MinHeight" Value="4" />
@@ -26,24 +26,29 @@
             </ControlTemplate>
         </Setter>
         <Style.Triggers>
+            <Trigger Property="IsIndeterminate" Value="True">
+                <Setter Property="ProgressBrush" Value="{ThemeResource ProgressBarIndeterminateBackground}" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="ProgressBrush" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource ProgressBarDisabledBackground}" />
+                <Setter Property="ProgressBrush" Value="{ThemeResource ProgressBarDisabledForeground}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="Slider">
-        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
-        <Setter Property="Foreground" Value="{ThemeResource AccentBrush}" />
-        <Setter Property="TrackBrush" Value="{ThemeResource SliderTrack}" />
-        <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="Background" Value="{ThemeResource SliderTrackFill}" />
+        <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFill}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource SliderThumbBorderBrush}" />
+        <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFill}" />
+        <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackground}" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Template">
             <ControlTemplate TargetType="Slider">
                 <Grid>
                     <Border Name="PART_Track"
-                            Background="{TemplateBinding Background}"
+                            Background="{TemplateBinding TrackBrush}"
                             Height="4"
                             CornerRadius="2"
                             VerticalAlignment="Center"
@@ -60,7 +65,7 @@
                             Height="18"
                             CornerRadius="9"
                             Background="{TemplateBinding ThumbBrush}"
-                            BorderBrush="{ThemeResource SurfaceBackground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="2"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center" />
@@ -68,25 +73,41 @@
             </ControlTemplate>
         </Setter>
         <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillPointerOver}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillPointerOver}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillPressed}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillPressed}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{ThemeResource AccentBrushDisabled}" />
-                <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource SliderThumbBorderBrushDisabled}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillDisabled}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="RangeSlider">
-        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
-        <Setter Property="Foreground" Value="{ThemeResource AccentBrush}" />
-        <Setter Property="TrackBrush" Value="{ThemeResource SliderTrack}" />
-        <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrush}" />
+        <Setter Property="Background" Value="{ThemeResource SliderTrackFill}" />
+        <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFill}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource SliderThumbBorderBrush}" />
+        <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFill}" />
+        <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackground}" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="Height" Value="32" />
         <Setter Property="Template">
             <ControlTemplate TargetType="RangeSlider">
                 <Grid>
                     <Border Name="PART_Track"
-                            Background="{TemplateBinding Background}"
+                            Background="{TemplateBinding TrackBrush}"
                             Height="4"
                             CornerRadius="2"
                             VerticalAlignment="Center"
@@ -102,7 +123,7 @@
                             Height="18"
                             CornerRadius="9"
                             Background="{TemplateBinding ThumbBrush}"
-                            BorderBrush="{ThemeResource SurfaceBackground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="2"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center" />
@@ -111,7 +132,7 @@
                             Height="18"
                             CornerRadius="9"
                             Background="{TemplateBinding ThumbBrush}"
-                            BorderBrush="{ThemeResource SurfaceBackground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="2"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center" />
@@ -119,16 +140,41 @@
             </ControlTemplate>
         </Setter>
         <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillPointerOver}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillPointerOver}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillPressed}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillPressed}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{ThemeResource AccentBrushDisabled}" />
-                <Setter Property="ThumbBrush" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFillDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource SliderThumbBorderBrushDisabled}" />
+                <Setter Property="TrackBrush" Value="{ThemeResource SliderTrackFillDisabled}" />
+                <Setter Property="ThumbBrush" Value="{ThemeResource SliderThumbBackgroundDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="TickBar">
+        <Setter Property="Fill" Value="{ThemeResource SliderTickBarFill}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="fluent:FWProgressRing">
         <Setter Property="Foreground" Value="{ThemeResource ProgressRingForeground}" />
-        <Setter Property="Background" Value="{ThemeResource SliderTrack}" />
+        <Setter Property="Background" Value="{ThemeResource ProgressRingBackground}" />
+        <Setter Property="ProgressBrush" Value="{ThemeResource ProgressRingForeground}" />
         <Setter Property="StrokeThickness" Value="4" />
         <Setter Property="Minimum" Value="0" />
         <Setter Property="Maximum" Value="100" />
@@ -138,7 +184,8 @@
         <Setter Property="IsIndeterminate" Value="True" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{ThemeResource AccentBrushDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource ProgressRingDisabledForeground}" />
+                <Setter Property="ProgressBrush" Value="{ThemeResource ProgressRingDisabledForeground}" />
             </Trigger>
         </Style.Triggers>
     </Style>
