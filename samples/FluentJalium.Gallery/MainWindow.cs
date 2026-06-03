@@ -268,12 +268,22 @@ public sealed class MainWindow : Window
             Margin = new Thickness(0, 4, 0, 2)
         };
 
-        panel.Children.Add(new TextBlock
+        panel.Children.Add(new StackPanel
         {
-            Text = "FluentJalium",
-            FontSize = 24,
-            FontFamily = "Segoe UI Variable Display",
-            Foreground = ThemeBrush("TextPrimary")
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            Children =
+            {
+                CreateIcon(FluentIconRegular.WindowBrush24, 24),
+                new TextBlock
+                {
+                    Text = "FluentJalium",
+                    FontSize = 24,
+                    FontFamily = "Segoe UI Variable Display",
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
         });
         panel.Children.Add(new TextBlock
         {
@@ -319,12 +329,22 @@ public sealed class MainWindow : Window
             Margin = new Thickness(40, 32, 40, 40)
         };
 
-        stack.Children.Add(new TextBlock
+        stack.Children.Add(new StackPanel
         {
-            Text = page.Title,
-            FontSize = 30,
-            FontFamily = "Segoe UI Variable Display",
-            Foreground = ThemeBrush("TextPrimary")
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Children =
+            {
+                CreateIcon(page.Icon, 30),
+                new TextBlock
+                {
+                    Text = page.Title,
+                    FontSize = 30,
+                    FontFamily = "Segoe UI Variable Display",
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
         });
         stack.Children.Add(new TextBlock
         {
@@ -346,12 +366,22 @@ public sealed class MainWindow : Window
             Margin = new Thickness(40, 36, 40, 40)
         };
 
-        stack.Children.Add(new TextBlock
+        stack.Children.Add(new StackPanel
         {
-            Text = "No results",
-            FontSize = 28,
-            FontFamily = "Segoe UI Variable Display",
-            Foreground = ThemeBrush("TextPrimary")
+            Orientation = Orientation.Horizontal,
+            Spacing = 12,
+            Children =
+            {
+                CreateIcon(FluentIconRegular.SearchInfo24, 28),
+                new TextBlock
+                {
+                    Text = "No results",
+                    FontSize = 28,
+                    FontFamily = "Segoe UI Variable Display",
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
         });
         stack.Children.Add(new TextBlock
         {
@@ -5490,9 +5520,9 @@ public sealed class MainWindow : Window
         return new SolidColorBrush(Colors.Transparent);
     }
 
-    private static FluentIcon CreateIcon(FluentIconRegular icon)
+    private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, foreground: ThemeBrush("TextPrimary"));
+        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
 
     private static string IconGlyph(FluentIconRegular icon) => icon.GetString();
