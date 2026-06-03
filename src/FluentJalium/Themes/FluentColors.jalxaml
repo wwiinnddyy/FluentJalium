@@ -248,6 +248,56 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF202020" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPointerOver" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackgroundDisabled" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerPlaceholderForeground" Color="#87FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrush" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushPointerOver" Color="#18FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushDisabled" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBorderBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="TimePickerBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPointerOver" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackgroundDisabled" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerPlaceholderForeground" Color="#87FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrush" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushPointerOver" Color="#18FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushDisabled" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBorderBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="TimePickerSelectedItemBackground" Color="#330078D4" />
+            <SolidColorBrush x:Key="CalendarViewBackground" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="CalendarViewBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewHeaderBackground" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewHeaderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonBackgroundPointerOver" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPointerOver" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundSelected" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundHighlighted" Color="#330078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundSelected" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundInactive" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundDisabled" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewTodayBorderBrush" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayOfWeekForeground" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="ToolTipBackground" Color="#FF2C2C2C" />
             <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#33000000" />
@@ -547,6 +597,56 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="DatePickerBackground" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPressed" Color="#80F9F9F9" />
+            <SolidColorBrush x:Key="DatePickerBackgroundDisabled" Color="#08000000" />
+            <SolidColorBrush x:Key="DatePickerForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="DatePickerForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="DatePickerPlaceholderForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="DatePickerBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushPointerOver" Color="#29000000" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushFocused" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushDisabled" Color="#0A000000" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundPointerOver" Color="#E4000000" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="TimePickerBackground" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPressed" Color="#80F9F9F9" />
+            <SolidColorBrush x:Key="TimePickerBackgroundDisabled" Color="#08000000" />
+            <SolidColorBrush x:Key="TimePickerForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="TimePickerForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="TimePickerPlaceholderForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="TimePickerBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushPointerOver" Color="#29000000" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushFocused" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushDisabled" Color="#0A000000" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundPointerOver" Color="#E4000000" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBorderBrush" Color="#0F000000" />
+            <SolidColorBrush x:Key="TimePickerSelectedItemBackground" Color="#330078D4" />
+            <SolidColorBrush x:Key="CalendarViewBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="CalendarViewHeaderBackground" Color="#80F9F9F9" />
+            <SolidColorBrush x:Key="CalendarViewHeaderForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonBackgroundPointerOver" Color="#09000000" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForegroundPointerOver" Color="#E4000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPointerOver" Color="#09000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundSelected" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundHighlighted" Color="#330078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundSelected" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundInactive" Color="#72000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundDisabled" Color="#5C000000" />
+            <SolidColorBrush x:Key="CalendarViewTodayBorderBrush" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="CalendarViewDayOfWeekForeground" Color="#72000000" />
             <SolidColorBrush x:Key="ToolTipBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ToolTipForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#0F000000" />
@@ -814,6 +914,56 @@
             <SolidColorBrush x:Key="TabItemIndicator" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="FrameBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="FrameBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPointerOver" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="DatePickerBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="DatePickerBackgroundDisabled" Color="#FF000000" />
+            <SolidColorBrush x:Key="DatePickerForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="DatePickerPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushFocused" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DatePickerBorderBrushDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="DatePickerCalendarGlyphForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="DatePickerFlyoutBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPointerOver" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="TimePickerBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="TimePickerBackgroundDisabled" Color="#FF000000" />
+            <SolidColorBrush x:Key="TimePickerForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TimePickerPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushFocused" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="TimePickerBorderBrushDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="TimePickerClockGlyphForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TimePickerFlyoutBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TimePickerSelectedItemBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="CalendarViewBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="CalendarViewBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewHeaderBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="CalendarViewHeaderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonBackgroundPointerOver" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewNavigationButtonForegroundPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPointerOver" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundSelected" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="CalendarViewDayItemBackgroundHighlighted" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundSelected" Color="#FF000000" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundInactive" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CalendarViewDayItemForegroundDisabled" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="CalendarViewTodayBorderBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="CalendarViewDayOfWeekForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ToolTipBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#FFFFFFFF" />

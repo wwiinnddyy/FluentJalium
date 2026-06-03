@@ -2432,58 +2432,226 @@ public sealed class MainWindow : Window
     private UIElement CreateDateTimeSection()
     {
         var panel = CreateSection("Date and Time");
-
-        var pickerRow = new StackPanel
+        var examples = new FWWrapPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
         };
 
-        pickerRow.Children.Add(new FWDatePicker
+        examples.Children.Add(CreateDateTimeExampleCard(
+            "FWDatePicker",
+            "Header, placeholder, long and short formats, bounded dates, dropdown events, and live selected-date output.",
+            CreateDatePickerDateTimeSample()));
+        examples.Children.Add(CreateDateTimeExampleCard(
+            "FWTimePicker",
+            "Minute increments, 12-hour and 24-hour clocks, dropdown state, keyboard-ready selection, and output.",
+            CreateTimePickerDateTimeSample()));
+        examples.Children.Add(CreateDateTimeExampleCard(
+            "FWCalendar",
+            "CalendarView-style single-date selection with first-day-of-week, today highlight, blackout, and range bounds.",
+            CreateCalendarDateTimeSample()));
+        examples.Children.Add(CreateDateTimeExampleCard(
+            "States and bounds",
+            "Disabled, placeholder, focused-border, bounded range, and high-contrast-friendly resource states.",
+            CreateDateTimeStateSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateDatePickerDateTimeSample()
+    {
+        var today = DateTime.Today;
+        var output = CreateDateTimeOutput($"Selected date: {FormatDateTimeDate(today)}");
+        var datePicker = new FWDatePicker
         {
-            Header = "Date",
-            Width = 220,
-            SelectedDate = DateTime.Today,
+            Header = "Appointment date",
+            Width = 260,
+            PlaceholderText = "Pick a date",
+            DisplayDateStart = today.AddDays(-14),
+            DisplayDateEnd = today.AddDays(45),
+            SelectedDate = today,
             SelectedDateFormat = DatePickerFormat.Long
-        });
-        pickerRow.Children.Add(new FWDatePicker
+        };
+        datePicker.SelectedDateChanged += (_, _) =>
         {
-            Header = "Disabled date",
+            output.Text = $"Selected date: {FormatDateTimeDate(datePicker.SelectedDate)}";
+        };
+        datePicker.CalendarOpened += (_, _) => output.Text = "Calendar opened";
+        datePicker.CalendarClosed += (_, _) => output.Text = $"Calendar closed. Selected date: {FormatDateTimeDate(datePicker.SelectedDate)}";
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                datePicker,
+                CreateDateTimeButtonRow(
+                    CreateDateTimeActionButton("Today", () => datePicker.SelectedDate = today),
+                    CreateDateTimeActionButton("Next week", () => datePicker.SelectedDate = today.AddDays(7)),
+                    CreateDateTimeActionButton("Short", () =>
+                    {
+                        datePicker.SelectedDateFormat = DatePickerFormat.Short;
+                        output.Text = "SelectedDateFormat: Short";
+                    }),
+                    CreateDateTimeActionButton("Long", () =>
+                    {
+                        datePicker.SelectedDateFormat = DatePickerFormat.Long;
+                        output.Text = "SelectedDateFormat: Long";
+                    }),
+                    CreateDateTimeActionButton("Toggle flyout", () => datePicker.IsDropDownOpen = !datePicker.IsDropDownOpen)),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateTimePickerDateTimeSample()
+    {
+        var output = CreateDateTimeOutput("Selected time: 10:30 AM");
+        var timePicker = new FWTimePicker
+        {
+            Header = "Arrival time",
             Width = 220,
-            PlaceholderText = "Select a date",
-            IsEnabled = false
-        });
-        pickerRow.Children.Add(new FWTimePicker
-        {
-            Header = "Time",
-            Width = 180,
+            PlaceholderText = "Pick a time",
             SelectedTime = new TimeSpan(10, 30, 0),
             MinuteIncrement = 15
-        });
-        pickerRow.Children.Add(new FWTimePicker
+        };
+        timePicker.SelectedTimeChanged += (_, e) =>
         {
-            Header = "24 hour",
-            Width = 180,
-            ClockIdentifier = "24HourClock",
-            SelectedTime = new TimeSpan(18, 45, 0),
-            MinuteIncrement = 15
-        });
+            output.Text = $"Selected time: {FormatDateTimeTime(e.NewTime, timePicker.ClockIdentifier)}";
+        };
 
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                timePicker,
+                CreateDateTimeButtonRow(
+                    CreateDateTimeActionButton("10:30", () => timePicker.SelectedTime = new TimeSpan(10, 30, 0)),
+                    CreateDateTimeActionButton("18:45", () => timePicker.SelectedTime = new TimeSpan(18, 45, 0)),
+                    CreateDateTimeActionButton("12 hour", () =>
+                    {
+                        timePicker.ClockIdentifier = "12HourClock";
+                        output.Text = $"ClockIdentifier: {timePicker.ClockIdentifier}";
+                    }),
+                    CreateDateTimeActionButton("24 hour", () =>
+                    {
+                        timePicker.ClockIdentifier = "24HourClock";
+                        output.Text = $"ClockIdentifier: {timePicker.ClockIdentifier}";
+                    }),
+                    CreateDateTimeActionButton("15 min", () =>
+                    {
+                        timePicker.MinuteIncrement = 15;
+                        output.Text = "MinuteIncrement: 15";
+                    }),
+                    CreateDateTimeActionButton("Toggle flyout", () => timePicker.IsDropDownOpen = !timePicker.IsDropDownOpen)),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateCalendarDateTimeSample()
+    {
+        var today = DateTime.Today;
+        var output = CreateDateTimeOutput($"Selected: {FormatDateTimeDate(today.AddDays(1))}");
         var calendar = new FWCalendar
         {
-            DisplayDate = DateTime.Today,
-            DisplayDateStart = DateTime.Today.AddDays(-14),
-            DisplayDateEnd = DateTime.Today.AddDays(45),
+            DisplayDate = today,
+            DisplayDateStart = today.AddDays(-14),
+            DisplayDateEnd = today.AddDays(45),
             FirstDayOfWeek = DayOfWeek.Monday,
             IsTodayHighlighted = true,
-            SelectedDate = DateTime.Today.AddDays(1),
+            SelectedDate = today.AddDays(1),
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendar.BlackoutDates.Add(DateTime.Today.AddDays(2).Date);
+        calendar.BlackoutDates.Add(today.AddDays(2).Date);
+        calendar.SelectedDateChanged += (_, _) =>
+        {
+            output.Text = $"Selected: {FormatDateTimeDate(calendar.SelectedDate)}";
+        };
+        calendar.DisplayDateChanged += (_, e) =>
+        {
+            output.Text = $"Display month: {e.AddedDate?.ToString("MMMM yyyy") ?? "none"}";
+        };
 
-        panel.Children.Add(pickerRow);
-        panel.Children.Add(calendar);
-        return panel;
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                calendar,
+                CreateDateTimeButtonRow(
+                    CreateDateTimeActionButton("Today", () => calendar.SelectedDate = today),
+                    CreateDateTimeActionButton("Next month", () => calendar.DisplayDate = calendar.DisplayDate.AddMonths(1)),
+                    CreateDateTimeActionButton("Monday", () =>
+                    {
+                        calendar.FirstDayOfWeek = DayOfWeek.Monday;
+                        output.Text = "FirstDayOfWeek: Monday";
+                    }),
+                    CreateDateTimeActionButton("Sunday", () =>
+                    {
+                        calendar.FirstDayOfWeek = DayOfWeek.Sunday;
+                        output.Text = "FirstDayOfWeek: Sunday";
+                    }),
+                    CreateDateTimeActionButton("Today ring", () =>
+                    {
+                        calendar.IsTodayHighlighted = !calendar.IsTodayHighlighted;
+                        output.Text = $"IsTodayHighlighted: {calendar.IsTodayHighlighted}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateDateTimeStateSample()
+    {
+        var today = DateTime.Today;
+        var boundedDate = new FWDatePicker
+        {
+            Header = "Bounded date",
+            Width = 240,
+            PlaceholderText = "Within the next 30 days",
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(30)
+        };
+        var disabledDate = new FWDatePicker
+        {
+            Header = "Disabled date",
+            Width = 240,
+            PlaceholderText = "Unavailable",
+            IsEnabled = false
+        };
+        var disabledTime = new FWTimePicker
+        {
+            Header = "Disabled time",
+            Width = 220,
+            SelectedTime = new TimeSpan(8, 0, 0),
+            IsEnabled = false
+        };
+        var disabledCalendar = new FWCalendar
+        {
+            DisplayDate = today,
+            SelectedDate = today,
+            IsEnabled = false
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                boundedDate,
+                disabledDate,
+                disabledTime,
+                disabledCalendar,
+                CreateDateTimeOutput("Disabled and bounded controls reuse DatePicker, TimePicker, and CalendarView tokens.")
+            }
+        };
     }
 
     private UIElement CreateStatusSection()
@@ -2898,6 +3066,104 @@ public sealed class MainWindow : Window
             Foreground = ThemeBrush("TextSecondary"),
             VerticalAlignment = VerticalAlignment.Center
         };
+    }
+
+    private static FWBorder CreateDateTimeExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateDateTimeButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateDateTimeActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateDateTimeOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static string FormatDateTimeDate(DateTime? date)
+    {
+        return date?.ToString("D") ?? "none";
+    }
+
+    private static string FormatDateTimeTime(TimeSpan? time, string clockIdentifier)
+    {
+        if (!time.HasValue)
+        {
+            return "none";
+        }
+
+        if (clockIdentifier == "24HourClock")
+        {
+            return $"{time.Value.Hours:D2}:{time.Value.Minutes:D2}";
+        }
+
+        var hour = time.Value.Hours % 12;
+        if (hour == 0)
+        {
+            hour = 12;
+        }
+
+        return $"{hour}:{time.Value.Minutes:D2} {(time.Value.Hours >= 12 ? "PM" : "AM")}";
     }
 
     private static FWBorder CreateNavigationExampleCard(string title, string description, UIElement content)

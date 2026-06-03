@@ -347,6 +347,12 @@ public static class FluentThemeManager
             ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
             ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
             ["TabItemIndicator"] = new SolidColorBrush(accent),
+            ["DatePickerBorderBrushFocused"] = new SolidColorBrush(accent),
+            ["TimePickerBorderBrushFocused"] = new SolidColorBrush(accent),
+            ["TimePickerSelectedItemBackground"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["CalendarViewDayItemBackgroundSelected"] = new SolidColorBrush(accent),
+            ["CalendarViewDayItemBackgroundHighlighted"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
+            ["CalendarViewTodayBorderBrush"] = new SolidColorBrush(accent),
             ["ProgressRingForeground"] = new SolidColorBrush(accent),
             ["ProgressRingDisabledForeground"] = new SolidColorBrush(disabled),
         };

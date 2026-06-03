@@ -3,9 +3,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="DatePicker">
-        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource DatePickerBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource DatePickerForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,5,34,6" />
         <Setter Property="CornerRadius" Value="4" />
@@ -15,27 +15,27 @@
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundHover}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter Property="Background" Value="{ThemeResource DatePickerBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushPointerOver}" />
             </Trigger>
             <Trigger Property="IsDropDownOpen" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource DatePickerBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource DatePickerForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="TimePicker">
-        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource TimePickerBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TimePickerForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TimePickerBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,5,34,6" />
         <Setter Property="CornerRadius" Value="4" />
@@ -45,27 +45,27 @@
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundHover}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter Property="Background" Value="{ThemeResource TimePickerBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TimePickerBorderBrushPointerOver}" />
             </Trigger>
             <Trigger Property="IsDropDownOpen" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TimePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TimePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource TimePickerBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource TimePickerForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TimePickerBorderBrushDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="Calendar">
-        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource CalendarViewBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CalendarViewBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="8" />
         <Setter Property="CornerRadius" Value="8" />
@@ -73,22 +73,22 @@
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushPointerOver}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource DatePickerBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="CalendarButton">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForeground}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="4" />
@@ -97,27 +97,27 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundPointerOver}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundPressed}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundPressed}" />
             </Trigger>
             <Trigger Property="HasSelectedDays" Value="True">
-                <Setter Property="Background" Value="{ThemeResource SelectionBackground}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundSelected}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundSelected}" />
             </Trigger>
             <Trigger Property="IsInactive" Value="True">
-                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundInactive}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="CalendarDayButton">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForeground}" />
         <Setter Property="BorderBrush" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="0" />
@@ -128,48 +128,48 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{ThemeResource HighlightBackground}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundPointerOver}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundPressed}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundPressed}" />
             </Trigger>
             <Trigger Property="IsToday" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource AccentBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CalendarViewTodayBorderBrush}" />
                 <Setter Property="BorderThickness" Value="2" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextOnAccent}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundSelected}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundSelected}" />
             </Trigger>
             <Trigger Property="IsBlackedOut" Value="True">
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundDisabled}" />
             </Trigger>
             <Trigger Property="IsInactive" Value="True">
-                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundInactive}" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" Value="{ThemeResource SelectionBackgroundWeak}" />
+                <Setter Property="Background" Value="{ThemeResource CalendarViewDayItemBackgroundHighlighted}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForegroundDisabled}" />
                 <Setter Property="Background" Value="Transparent" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <Style TargetType="CalendarItem">
-        <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource CalendarViewBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource CalendarViewDayItemForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CalendarViewBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4" />
         <Setter Property="CornerRadius" Value="8" />
     </Style>
 
     <Style TargetType="DatePickerTextBox">
-        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="Background" Value="{ThemeResource DatePickerBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource DatePickerForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="10,5,34,6" />
         <Setter Property="CornerRadius" Value="4" />
@@ -180,16 +180,16 @@
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundHover}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderHover}" />
+                <Setter Property="Background" Value="{ThemeResource DatePickerBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushPointerOver}" />
             </Trigger>
             <Trigger Property="IsFocused" Value="True">
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushFocused}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
-                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter Property="Background" Value="{ThemeResource DatePickerBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource DatePickerForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource DatePickerBorderBrushDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
