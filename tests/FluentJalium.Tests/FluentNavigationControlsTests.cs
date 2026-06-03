@@ -246,6 +246,76 @@ public sealed class FluentNavigationControlsTests
         Assert.Equal(4, navigated);
     }
 
+    [Fact]
+    public void FWNavigationControls_ShouldExposeMaterialShellState()
+    {
+        var overviewItem = new FWNavigationViewItem { Content = "Overview" };
+        var controlsItem = new FWNavigationViewItem { Content = "Controls" };
+        var settingsItem = new FWNavigationViewItem { Content = "Settings" };
+        var tabControl = new FWTabControl
+        {
+            IsSwipeEnabled = true,
+            TabStripPlacement = Jalium.UI.Controls.Dock.Top
+        };
+        tabControl.Items.Add(new FWTabItem
+        {
+            Header = "Overview",
+            Content = "Overview content"
+        });
+        tabControl.Items.Add(new FWTabItem
+        {
+            Header = "Details",
+            Content = "Details content"
+        });
+        tabControl.SelectedIndex = 0;
+
+        var navigationView = new FWNavigationView
+        {
+            PaneTitle = "Material shell",
+            Header = "Navigation shell",
+            PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact,
+            IsPaneOpen = false,
+            OpenPaneLength = 220,
+            CompactPaneLength = 48,
+            Content = tabControl
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(controlsItem);
+        navigationView.FooterMenuItems.Add(settingsItem);
+        navigationView.SelectedItem = overviewItem;
+
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = navigationView
+        };
+
+        Assert.Equal(NavigationViewPaneDisplayMode.LeftCompact, navigationView.PaneDisplayMode);
+        Assert.False(navigationView.IsPaneOpen);
+        Assert.Equal(220, navigationView.OpenPaneLength);
+        Assert.Equal(48, navigationView.CompactPaneLength);
+        Assert.Equal(overviewItem, navigationView.SelectedItem);
+        Assert.Single(navigationView.FooterMenuItems);
+        Assert.Equal(Jalium.UI.Controls.Dock.Top, tabControl.TabStripPlacement);
+        Assert.True(tabControl.IsSwipeEnabled);
+        Assert.Equal("Overview content", tabControl.SelectedContent);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(navigationView, surface.Child);
+    }
+
     private sealed class NavigationOverviewPage : Page
     {
     }
