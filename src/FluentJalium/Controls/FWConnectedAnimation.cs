@@ -13,7 +13,24 @@ public readonly record struct FWConnectedAnimationPlan(
     double TranslateY,
     double ScaleX,
     double ScaleY,
-    double InitialOpacity);
+    double InitialOpacity,
+    FWConnectedAnimationConfiguration Configuration);
+
+/// <summary>
+/// Describes how a prepared shared element aligns with the destination surface.
+/// </summary>
+public enum FWConnectedAnimationConfiguration
+{
+    /// <summary>
+    /// Aligns the destination to the source top-left corner and scales from the source bounds.
+    /// </summary>
+    Direct,
+
+    /// <summary>
+    /// Aligns the destination around the source center while keeping the destination natural size.
+    /// </summary>
+    Gravity
+}
 
 /// <summary>
 /// Options for <see cref="FWConnectedAnimationService"/>.
@@ -23,6 +40,7 @@ public sealed class FWConnectedAnimationOptions
     private TimeSpan _duration = TimeSpan.FromMilliseconds(320);
     private IEasingFunction _easingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
     private double _initialOpacity = 0.72;
+    private FWConnectedAnimationConfiguration _configuration;
 
     /// <summary>
     /// Gets or sets the transition duration. Defaults to 320ms, matching the snappy WinUI motion family.
@@ -68,6 +86,23 @@ public sealed class FWConnectedAnimationOptions
     /// Gets or sets whether the destination fades in while it moves into place.
     /// </summary>
     public bool AnimateOpacity { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets how the source bounds align with the destination. Defaults to <see cref="FWConnectedAnimationConfiguration.Direct"/>.
+    /// </summary>
+    public FWConnectedAnimationConfiguration Configuration
+    {
+        get => _configuration;
+        set
+        {
+            if (!Enum.IsDefined(value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Unknown connected animation configuration.");
+            }
+
+            _configuration = value;
+        }
+    }
 }
 
 /// <summary>
@@ -94,7 +129,7 @@ public sealed class FWConnectedAnimationService
             return false;
         }
 
-        _preparedAnimations[key] = new PreparedAnimation(sourceBounds, options ?? new FWConnectedAnimationOptions());
+        _preparedAnimations[key] = new PreparedAnimation(sourceBounds, CreateOptionsSnapshot(options));
         return true;
     }
 
@@ -119,6 +154,24 @@ public sealed class FWConnectedAnimationService
         _preparedAnimations.Remove(key);
         StartTransformAnimation(destination, plan, prepared.Options);
         return true;
+    }
+
+    /// <summary>
+    /// Creates a non-destructive plan for a prepared transition without consuming or starting it.
+    /// </summary>
+    /// <param name="key">The animation key passed to <see cref="PrepareToAnimate"/>.</param>
+    /// <param name="destination">The destination element to plan against.</param>
+    /// <param name="plan">The calculated shared element transform plan.</param>
+    /// <returns><see langword="true"/> when a prepared source and destination bounds can create a plan.</returns>
+    public bool TryCreatePreparedPlan(string key, UIElement destination, out FWConnectedAnimationPlan plan)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        ArgumentNullException.ThrowIfNull(destination);
+
+        plan = default;
+        return _preparedAnimations.TryGetValue(key, out var prepared) &&
+            TryGetRootBounds(destination, out var destinationBounds) &&
+            TryCreatePlan(prepared.SourceBounds, destinationBounds, prepared.Options, out plan);
     }
 
     /// <summary>
@@ -156,20 +209,30 @@ public sealed class FWConnectedAnimationService
             return false;
         }
 
-        var scaleX = resolvedOptions.AnimateScale ? sourceBounds.Width / destinationBounds.Width : 1.0;
-        var scaleY = resolvedOptions.AnimateScale ? sourceBounds.Height / destinationBounds.Height : 1.0;
+        var configuration = resolvedOptions.Configuration;
+        var useScale = resolvedOptions.AnimateScale && configuration == FWConnectedAnimationConfiguration.Direct;
+        var scaleX = useScale ? sourceBounds.Width / destinationBounds.Width : 1.0;
+        var scaleY = useScale ? sourceBounds.Height / destinationBounds.Height : 1.0;
 
         if (!double.IsFinite(scaleX) || !double.IsFinite(scaleY) || scaleX <= 0 || scaleY <= 0)
         {
             return false;
         }
 
+        var translateX = configuration == FWConnectedAnimationConfiguration.Gravity
+            ? GetCenterX(sourceBounds) - GetCenterX(destinationBounds)
+            : sourceBounds.X - destinationBounds.X;
+        var translateY = configuration == FWConnectedAnimationConfiguration.Gravity
+            ? GetCenterY(sourceBounds) - GetCenterY(destinationBounds)
+            : sourceBounds.Y - destinationBounds.Y;
+
         plan = new FWConnectedAnimationPlan(
-            sourceBounds.X - destinationBounds.X,
-            sourceBounds.Y - destinationBounds.Y,
+            translateX,
+            translateY,
             scaleX,
             scaleY,
-            resolvedOptions.AnimateOpacity ? resolvedOptions.InitialOpacity : 1.0);
+            resolvedOptions.AnimateOpacity ? resolvedOptions.InitialOpacity : 1.0,
+            configuration);
         return true;
     }
 
@@ -261,6 +324,34 @@ public sealed class FWConnectedAnimationService
     private static double Lerp(double from, double to, double progress)
     {
         return from + ((to - from) * progress);
+    }
+
+    private static FWConnectedAnimationOptions CreateOptionsSnapshot(FWConnectedAnimationOptions? options)
+    {
+        if (options == null)
+        {
+            return new FWConnectedAnimationOptions();
+        }
+
+        return new FWConnectedAnimationOptions
+        {
+            Duration = options.Duration,
+            EasingFunction = options.EasingFunction,
+            InitialOpacity = options.InitialOpacity,
+            AnimateScale = options.AnimateScale,
+            AnimateOpacity = options.AnimateOpacity,
+            Configuration = options.Configuration
+        };
+    }
+
+    private static double GetCenterX(Rect bounds)
+    {
+        return bounds.X + (bounds.Width / 2.0);
+    }
+
+    private static double GetCenterY(Rect bounds)
+    {
+        return bounds.Y + (bounds.Height / 2.0);
     }
 
     private sealed record PreparedAnimation(Rect SourceBounds, FWConnectedAnimationOptions Options);

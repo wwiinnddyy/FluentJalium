@@ -18,6 +18,7 @@ public sealed class FluentConnectedAnimationTests
         Assert.Equal(0.72, options.InitialOpacity);
         Assert.True(options.AnimateScale);
         Assert.True(options.AnimateOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, options.Configuration);
     }
 
     [Fact]
@@ -33,6 +34,8 @@ public sealed class FluentConnectedAnimationTests
 
         options.InitialOpacity = 8;
         Assert.Equal(1, options.InitialOpacity);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => options.Configuration = (FWConnectedAnimationConfiguration)42);
     }
 
     [Fact]
@@ -52,6 +55,7 @@ public sealed class FluentConnectedAnimationTests
         Assert.Equal(0.5, plan.ScaleX);
         Assert.Equal(0.4, plan.ScaleY);
         Assert.Equal(0.5, plan.InitialOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, plan.Configuration);
     }
 
     [Fact]
@@ -76,6 +80,31 @@ public sealed class FluentConnectedAnimationTests
         Assert.Equal(1, plan.ScaleX);
         Assert.Equal(1, plan.ScaleY);
         Assert.Equal(1, plan.InitialOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, plan.Configuration);
+    }
+
+    [Fact]
+    public void TryCreatePlan_ShouldUseGravityConfigurationForCenterAlignedMotion()
+    {
+        var options = new FWConnectedAnimationOptions
+        {
+            Configuration = FWConnectedAnimationConfiguration.Gravity,
+            InitialOpacity = 0.64
+        };
+
+        var created = FWConnectedAnimationService.TryCreatePlan(
+            new Rect(10, 20, 80, 40),
+            new Rect(100, 140, 160, 120),
+            options,
+            out var plan);
+
+        Assert.True(created);
+        Assert.Equal(-130, plan.TranslateX);
+        Assert.Equal(-160, plan.TranslateY);
+        Assert.Equal(1, plan.ScaleX);
+        Assert.Equal(1, plan.ScaleY);
+        Assert.Equal(0.64, plan.InitialOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Gravity, plan.Configuration);
     }
 
     [Fact]
@@ -93,6 +122,7 @@ public sealed class FluentConnectedAnimationTests
         Assert.Equal(0.5, plan.ScaleX);
         Assert.Equal(0.5, plan.ScaleY);
         Assert.Equal(0.72, plan.InitialOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, plan.Configuration);
     }
 
     [Fact]
@@ -140,6 +170,41 @@ public sealed class FluentConnectedAnimationTests
         Assert.True(service.PrepareToAnimate("hero", source));
         Assert.False(service.TryStart("hero", new Border()));
         Assert.True(service.IsPrepared("hero"));
+    }
+
+    [Fact]
+    public void TryCreatePreparedPlan_ShouldPreviewPreparedAnimationWithoutConsumingIt()
+    {
+        var service = new FWConnectedAnimationService();
+        var source = CreateArrangedElement(12, 24, 80, 40);
+        var destination = CreateArrangedElement(52, 64, 160, 100);
+
+        Assert.True(service.PrepareToAnimate("hero", source));
+        Assert.True(service.TryCreatePreparedPlan("hero", destination, out var plan));
+
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, plan.Configuration);
+        Assert.True(service.IsPrepared("hero"));
+    }
+
+    [Fact]
+    public void Service_ShouldSnapshotOptionsWhenPreparingAnimation()
+    {
+        var service = new FWConnectedAnimationService();
+        var source = CreateArrangedElement(12, 24, 80, 40);
+        var destination = CreateArrangedElement(52, 64, 160, 100);
+        var options = new FWConnectedAnimationOptions
+        {
+            Configuration = FWConnectedAnimationConfiguration.Gravity
+        };
+
+        Assert.True(service.PrepareToAnimate("hero", source, options));
+
+        options.Configuration = FWConnectedAnimationConfiguration.Direct;
+
+        Assert.True(service.TryCreatePreparedPlan("hero", destination, out var plan));
+        Assert.Equal(FWConnectedAnimationConfiguration.Gravity, plan.Configuration);
+        Assert.True(service.IsPrepared("hero"));
+        Assert.True(service.Cancel("hero"));
     }
 
     private static Border CreateArrangedElement(double x, double y, double width, double height)

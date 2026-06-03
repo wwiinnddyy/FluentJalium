@@ -48,6 +48,7 @@ internal sealed class GalleryMotionPage
     {
         const string animationKey = "motion.connected-card";
 
+        var options = new FWConnectedAnimationOptions();
         var source = CreateMotionSurface(
             FluentIconRegular.Connected24,
             "Source",
@@ -58,7 +59,7 @@ internal sealed class GalleryMotionPage
             "Destination",
             "Start transform",
             ThemeBrush("LayerFillColorDefaultBrush"));
-        var status = CreateMotionOutputText("Prepared source will move into the destination card.");
+        var status = CreateMotionOutputText("Connected animation: Direct configuration.");
 
         return new FWStackPanel
         {
@@ -80,17 +81,32 @@ internal sealed class GalleryMotionPage
                 CreateMotionButtonRow(
                     CreateMotionActionButton(FluentIconRegular.Connected24, "Prepare", () =>
                     {
-                        var prepared = _connectedAnimationService.PrepareToAnimate(animationKey, source);
-                        status.Text = prepared
-                            ? "Connected animation source prepared."
-                            : "Prepare waits until the source has layout bounds.";
+                        var prepared = _connectedAnimationService.PrepareToAnimate(animationKey, source, options);
+                        if (prepared && _connectedAnimationService.TryCreatePreparedPlan(animationKey, destination, out var plan))
+                        {
+                            status.Text = $"Prepared {plan.Configuration}: X {plan.TranslateX:0}, Y {plan.TranslateY:0}, Scale {plan.ScaleX:0.##}.";
+                        }
+                        else
+                        {
+                            status.Text = "Prepare waits until source and destination have layout bounds.";
+                        }
                     }),
                     CreateMotionActionButton(FluentIconRegular.Play24, "Start", () =>
                     {
                         var started = _connectedAnimationService.TryStart(animationKey, destination);
                         status.Text = started
-                            ? "Animating destination from the prepared source bounds."
+                            ? $"Animating destination with {options.Configuration} motion."
                             : "Prepare the source before starting the motion.";
+                    }),
+                    CreateMotionActionButton(FluentIconRegular.Target24, "Direct", () =>
+                    {
+                        options.Configuration = FWConnectedAnimationConfiguration.Direct;
+                        status.Text = "Connected animation: Direct configuration.";
+                    }),
+                    CreateMotionActionButton(FluentIconRegular.AlignCenterHorizontal24, "Gravity", () =>
+                    {
+                        options.Configuration = FWConnectedAnimationConfiguration.Gravity;
+                        status.Text = "Connected animation: Gravity configuration.";
                     })),
                 CreateMotionStatus(status)
             }
