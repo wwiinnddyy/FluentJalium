@@ -2267,65 +2267,315 @@ public sealed class MainWindow : Window
     private UIElement CreateMenusSection()
     {
         var panel = CreateSection("Menus and Flyouts");
+        var examples = new FWWrapPanel
+        {
+            HorizontalSpacing = 16,
+            VerticalSpacing = 16
+        };
+        examples.Children.Add(CreateMenuExampleCard(
+            "FWMenuBar",
+            "Top-level app commands with WinUI-style menu flyout items, separators, icons, disabled states, and shortcuts.",
+            CreateMenuBarMenuSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            "FWMenu and FWMenuItem",
+            "Classic WPF-compatible menu surface with nested headers, checkable items, icon columns, shortcuts, and submenu output.",
+            CreateTraditionalMenuSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            "FWContextMenu",
+            "Context menu placement, open and close events, command shortcuts, disabled items, and checkable state.",
+            CreateContextMenuSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            "MenuFlyout items",
+            "Drop-down command flyout using FWMenuFlyoutItem, FWToggleMenuFlyoutItem, and FWMenuFlyoutSeparator.",
+            CreateMenuFlyoutItemSample()));
+
+        panel.Children.Add(examples);
+        return panel;
+    }
+
+    private static UIElement CreateMenuBarMenuSample()
+    {
+        var output = CreateMenuOutput("MenuBar: File ready");
         var menuBar = new FWMenuBar
         {
-            Width = 520
+            Width = 480
         };
-        menuBar.Items.Add(CreateMenuBarItem("File", ("New", "Ctrl+N"), ("Open", "Ctrl+O"), ("Save", "Ctrl+S")));
-        menuBar.Items.Add(CreateMenuBarItem("Edit", ("Undo", "Ctrl+Z"), ("Redo", "Ctrl+Y"), ("Preferences", string.Empty)));
-        menuBar.Items.Add(CreateMenuBarItem("View", ("Zoom in", "Ctrl++"), ("Zoom out", "Ctrl+-"), ("Actual size", "Ctrl+0")));
 
+        var file = CreateMenuBarItem(
+            "File",
+            ("New", "Ctrl+N", "\uE8A5"),
+            ("Open", "Ctrl+O", "\uE838"),
+            ("Save", "Ctrl+S", "\uE74E"));
+        var edit = CreateMenuBarItem(
+            "Edit",
+            ("Undo", "Ctrl+Z", null),
+            ("Redo", "Ctrl+Y", null),
+            ("Preferences", string.Empty, "\uE713"));
+        var view = CreateMenuBarItem(
+            "View",
+            ("Zoom in", "Ctrl++", null),
+            ("Zoom out", "Ctrl+-", null),
+            ("Actual size", "Ctrl+0", null));
+
+        menuBar.Items.Add(file);
+        menuBar.Items.Add(edit);
+        menuBar.Items.Add(view);
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                menuBar,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("File", () =>
+                    {
+                        CloseMenuBarItems(edit, view);
+                        file.OpenMenu();
+                        output.Text = $"MenuBar: {file.Title} open";
+                    }),
+                    CreateMenuActionButton("Edit", () =>
+                    {
+                        CloseMenuBarItems(file, view);
+                        edit.OpenMenu();
+                        output.Text = $"MenuBar: {edit.Title} open";
+                    }),
+                    CreateMenuActionButton("View", () =>
+                    {
+                        CloseMenuBarItems(file, edit);
+                        view.OpenMenu();
+                        output.Text = $"MenuBar: {view.Title} open";
+                    }),
+                    CreateMenuActionButton("Close", () =>
+                    {
+                        CloseMenuBarItems(file, edit, view);
+                        output.Text = "MenuBar: all menus closed";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateTraditionalMenuSample()
+    {
+        var output = CreateMenuOutput("Menu: Project ready");
         var menu = new FWMenu
         {
-            Width = 520
+            Width = 480
         };
         var project = new FWMenuItem
         {
-            Header = "Project"
+            Header = "Project",
+            Icon = "\uE8B7"
         };
-        project.Items.Add(new FWMenuItem { Header = "Build", InputGestureText = "Ctrl+B", Icon = "\uE768" });
-        project.Items.Add(new FWMenuItem { Header = "Run", InputGestureText = "F5", Icon = "\uE768" });
-        project.Items.Add(new FWMenuItem { Header = "Live preview", IsCheckable = true, IsChecked = true });
+        var build = new FWMenuItem
+        {
+            Header = "Build",
+            InputGestureText = "Ctrl+B",
+            Icon = "\uE768"
+        };
+        var run = new FWMenuItem
+        {
+            Header = "Run",
+            InputGestureText = "F5",
+            Icon = "\uE768"
+        };
+        var livePreview = new FWMenuItem
+        {
+            Header = "Live preview",
+            IsCheckable = true,
+            IsChecked = true,
+            StaysOpenOnClick = true
+        };
+        project.Items.Add(build);
+        project.Items.Add(run);
+        project.Items.Add(livePreview);
+
+        var tools = new FWMenuItem
+        {
+            Header = "Tools",
+            Icon = "\uE713"
+        };
+        tools.Items.Add(new FWMenuItem { Header = "Options" });
+        tools.Items.Add(new FWMenuItem { Header = "Diagnostics", InputGestureText = "F12" });
+
         menu.Items.Add(project);
-        menu.Items.Add(new FWMenuItem { Header = "Tools" });
+        menu.Items.Add(tools);
+        menu.Items.Add("Generated");
         menu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
 
-        var flyoutButton = new FWDropDownButton
-        {
-            Content = "MenuFlyout items",
-            Width = 180,
-            Flyout = CreateMenuControlsFlyout()
-        };
+        build.Click += (_, _) => output.Text = "Menu: Build clicked";
+        run.Click += (_, _) => output.Text = "Menu: Run clicked";
+        project.SubmenuOpened += (_, _) => output.Text = "Menu: Project submenu opened";
+        project.SubmenuClosed += (_, _) => output.Text = "Menu: Project submenu closed";
+        livePreview.Checked += (_, _) => output.Text = "Menu: Live preview checked";
+        livePreview.Unchecked += (_, _) => output.Text = "Menu: Live preview unchecked";
 
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                menu,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("Open project", () =>
+                    {
+                        project.IsSubmenuOpen = true;
+                        output.Text = "Menu: Project submenu opened";
+                    }),
+                    CreateMenuActionButton("Close", () =>
+                    {
+                        project.IsSubmenuOpen = false;
+                        output.Text = "Menu: Project submenu closed";
+                    }),
+                    CreateMenuActionButton("Preview", () =>
+                    {
+                        livePreview.IsChecked = !livePreview.IsChecked;
+                        output.Text = $"Menu: Live preview {FormatOnOff(livePreview.IsChecked)}";
+                    }),
+                    CreateMenuActionButton("Disable run", () =>
+                    {
+                        run.IsEnabled = !run.IsEnabled;
+                        output.Text = $"Menu: Run enabled {run.IsEnabled}";
+                    })),
+                output
+            }
+        };
+    }
+
+    private static UIElement CreateContextMenuSample()
+    {
+        var output = CreateMenuOutput("ContextMenu: closed");
         var contextMenu = new FWContextMenu
         {
             Placement = PlacementMode.Bottom,
             StaysOpen = true
         };
+        var detailsItem = new FWMenuItem
+        {
+            Header = "Show details",
+            IsCheckable = true,
+            IsChecked = true,
+            StaysOpenOnClick = true
+        };
         contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = "\uE72C" });
         contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = "\uE70F" });
-        contextMenu.Items.Add(new FWMenuItem { Header = "Show details", IsCheckable = true, IsChecked = true });
+        contextMenu.Items.Add(detailsItem);
+        contextMenu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
+        contextMenu.Opened += (_, _) => output.Text = $"ContextMenu: open at {contextMenu.Placement}";
+        contextMenu.Closed += (_, _) => output.Text = "ContextMenu: closed";
+        detailsItem.Checked += (_, _) => output.Text = "ContextMenu: details checked";
+        detailsItem.Unchecked += (_, _) => output.Text = "ContextMenu: details unchecked";
 
-        var contextButton = new FWButton
+        var target = new FWBorder
         {
-            Content = "Open context menu",
-            Width = 180,
-            ContextMenu = contextMenu
+            Width = 300,
+            Height = 96,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            ContextMenu = contextMenu,
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = "Document item",
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "Open the attached context menu from the options below.",
+                        FontSize = 12,
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = ThemeBrush("TextSecondary")
+                    }
+                }
+            }
         };
-        contextButton.Click += (_, _) => ContextMenuService.Open(contextButton, contextMenu);
+        contextMenu.PlacementTarget = target;
 
-        var topRow = new StackPanel
+        return new FWStackPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                target,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("Open", () => ContextMenuService.Open(target, contextMenu)),
+                    CreateMenuActionButton("Close", () => contextMenu.Close()),
+                    CreateMenuActionButton("Details", () =>
+                    {
+                        detailsItem.IsChecked = !detailsItem.IsChecked;
+                        output.Text = $"ContextMenu: details {FormatOnOff(detailsItem.IsChecked)}";
+                    }),
+                    CreateMenuActionButton("Mouse point", () =>
+                    {
+                        contextMenu.Placement = PlacementMode.MousePoint;
+                        output.Text = $"ContextMenu placement: {contextMenu.Placement}";
+                    }),
+                    CreateMenuActionButton("Bottom", () =>
+                    {
+                        contextMenu.Placement = PlacementMode.Bottom;
+                        output.Text = $"ContextMenu placement: {contextMenu.Placement}";
+                    })),
+                output
+            }
         };
-        topRow.Children.Add(menuBar);
-        topRow.Children.Add(flyoutButton);
-        topRow.Children.Add(contextButton);
+    }
 
-        panel.Children.Add(topRow);
-        panel.Children.Add(menu);
-        return panel;
+    private static UIElement CreateMenuFlyoutItemSample()
+    {
+        var output = CreateMenuOutput("MenuFlyout: ready");
+        var flyout = CreateMenuControlsFlyout(output);
+        var button = new FWDropDownButton
+        {
+            Content = "Actions",
+            Width = 160,
+            Flyout = flyout
+        };
+        var toggle = flyout.Items.OfType<FWToggleMenuFlyoutItem>().First();
+        var disabled = flyout.Items.OfType<FWMenuFlyoutItem>().Last(item => item.Text == "Disabled");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                button,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton("Open", () =>
+                    {
+                        flyout.ShowAt(button);
+                        output.Text = "MenuFlyout: open";
+                    }),
+                    CreateMenuActionButton("Hide", () =>
+                    {
+                        flyout.Hide();
+                        output.Text = "MenuFlyout: hidden";
+                    }),
+                    CreateMenuActionButton("Badges", () =>
+                    {
+                        toggle.IsChecked = !toggle.IsChecked;
+                        output.Text = $"MenuFlyout: badges {FormatOnOff(toggle.IsChecked)}";
+                    }),
+                    CreateMenuActionButton("Disable", () =>
+                    {
+                        disabled.IsEnabled = !disabled.IsEnabled;
+                        output.Text = $"MenuFlyout: disabled item enabled {disabled.IsEnabled}";
+                    })),
+                output
+            }
+        };
     }
 
     private UIElement CreateDisclosureDialogsSection()
@@ -3946,7 +4196,92 @@ public sealed class MainWindow : Window
         return button;
     }
 
-    private static FWMenuBarItem CreateMenuBarItem(string title, params (string Text, string Shortcut)[] items)
+    private static FWBorder CreateMenuExampleCard(string title, string description, UIElement content)
+    {
+        return new FWBorder
+        {
+            Width = 520,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 15,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
+            }
+        };
+    }
+
+    private static FWWrapPanel CreateMenuButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateMenuActionButton(string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = text
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
+    private static TextBlock CreateMenuOutput(string text)
+    {
+        return new TextBlock
+        {
+            Text = text,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static void CloseMenuBarItems(params FWMenuBarItem[] items)
+    {
+        foreach (var item in items)
+        {
+            item.CloseMenu();
+        }
+    }
+
+    private static string FormatOnOff(bool value)
+    {
+        return value ? "on" : "off";
+    }
+
+    private static FWMenuBarItem CreateMenuBarItem(string title, params (string Text, string Shortcut, object? Icon)[] items)
     {
         var menuBarItem = new FWMenuBarItem
         {
@@ -3955,12 +4290,12 @@ public sealed class MainWindow : Window
 
         for (var index = 0; index < items.Length; index++)
         {
-            var (text, shortcut) = items[index];
+            var (text, shortcut, icon) = items[index];
             menuBarItem.Items.Add(new FWMenuFlyoutItem
             {
                 Text = text,
                 KeyboardAcceleratorTextOverride = shortcut,
-                Icon = index == 0 ? "\uE8A5" : null
+                Icon = icon
             });
         }
 
@@ -3972,14 +4307,58 @@ public sealed class MainWindow : Window
         return menuBarItem;
     }
 
-    private static MenuFlyout CreateMenuControlsFlyout()
+    private static MenuFlyout CreateMenuControlsFlyout(TextBlock? output = null)
     {
         var flyout = new MenuFlyout();
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Pin", Icon = "\uE718", KeyboardAcceleratorTextOverride = "Ctrl+P" });
-        flyout.Items.Add(new FWToggleMenuFlyoutItem { Text = "Show badges", IsChecked = true });
+        var pin = new FWMenuFlyoutItem
+        {
+            Text = "Pin",
+            Icon = "\uE718",
+            KeyboardAcceleratorTextOverride = "Ctrl+P"
+        };
+        var badges = new FWToggleMenuFlyoutItem
+        {
+            Text = "Show badges",
+            IsChecked = true
+        };
+        var settings = new FWMenuFlyoutItem
+        {
+            Text = "Settings",
+            Icon = "\uE713"
+        };
+        var disabled = new FWMenuFlyoutItem
+        {
+            Text = "Disabled",
+            IsEnabled = false
+        };
+
+        pin.Click += (_, _) =>
+        {
+            if (output != null)
+            {
+                output.Text = "MenuFlyout: Pin clicked";
+            }
+        };
+        badges.Click += (_, _) =>
+        {
+            if (output != null)
+            {
+                output.Text = $"MenuFlyout: badges {FormatOnOff(badges.IsChecked)}";
+            }
+        };
+        settings.Click += (_, _) =>
+        {
+            if (output != null)
+            {
+                output.Text = "MenuFlyout: Settings clicked";
+            }
+        };
+
+        flyout.Items.Add(pin);
+        flyout.Items.Add(badges);
         flyout.Items.Add(new FWMenuFlyoutSeparator());
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Settings", Icon = "\uE713" });
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Disabled", IsEnabled = false });
+        flyout.Items.Add(settings);
+        flyout.Items.Add(disabled);
         return flyout;
     }
 
@@ -4268,3 +4647,4 @@ public sealed class MainWindow : Window
         }
     }
 }
+

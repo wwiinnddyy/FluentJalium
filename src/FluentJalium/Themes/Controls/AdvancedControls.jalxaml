@@ -784,20 +784,4 @@
         <Setter Property="Margin" Value="18,6,18,6" />
     </Style>
 
-    <Style TargetType="MenuBar">
-        <Setter Property="Background" Value="{ThemeResource MenuBarBackground}" />
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="MinHeight" Value="32" />
-    </Style>
-
-    <Style TargetType="MenuBarItem">
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Padding" Value="12,4,12,4" />
-    </Style>
-
-    <Style TargetType="MenuFlyoutItem">
-        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="MinHeight" Value="32" />
-    </Style>
-
 </ResourceDictionary>
