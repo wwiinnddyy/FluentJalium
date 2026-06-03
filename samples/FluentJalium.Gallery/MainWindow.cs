@@ -70,7 +70,7 @@ public sealed class MainWindow : Window
     private GalleryPageContentFactories CreateGalleryPageContentFactories()
     {
         return new GalleryPageContentFactories(
-            Overview: () => CreatePageStack(CreateThemeControls()),
+            Overview: () => CreatePageStack(new GalleryOverviewPage(ApplyTheme, ApplyAccent).CreateContent()),
             Buttons: () => CreatePageStack(new GalleryButtonsPage().CreateContent()),
             Switches: () => CreatePageStack(new GallerySwitchesPage().CreateContent()),
             TextInput: () => CreatePageStack(new GalleryTextInputPage().CreateContent()),
@@ -413,81 +413,6 @@ public sealed class MainWindow : Window
                 _contentScrollViewer.Content = CreatePageContent(_selectedPage);
             }
         }
-    }
-
-    private UIElement CreateHeader()
-    {
-        var panel = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 6
-        };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = "FluentJalium",
-            FontSize = 30,
-            FontFamily = "Segoe UI Variable Display",
-            Foreground = ThemeBrush("TextPrimary")
-        });
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, visual, interaction, input/media, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
-            FontSize = 14,
-            Foreground = ThemeBrush("TextSecondary")
-        });
-
-        return panel;
-    }
-
-    private UIElement CreateThemeControls()
-    {
-        var panel = CreateSection("Theme");
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 10
-        };
-
-        row.Children.Add(CreateCommandButton("Light", () => ApplyTheme(FluentThemeVariant.Light)));
-        row.Children.Add(CreateCommandButton("Dark", () => ApplyTheme(FluentThemeVariant.Dark)));
-        row.Children.Add(CreateCommandButton("High Contrast", () => ApplyTheme(FluentThemeVariant.HighContrast)));
-        row.Children.Add(CreateCommandButton("Blue", () => ApplyAccent(Color.FromRgb(0x00, 0x78, 0xD4))));
-        row.Children.Add(CreateCommandButton("Rose", () => ApplyAccent(Color.FromRgb(0xC2, 0x39, 0xB3))));
-        row.Children.Add(CreateCommandButton("Orange", () => ApplyAccent(Color.FromRgb(0xD8, 0x3B, 0x01))));
-        row.Children.Add(CreateCommandButton("Green", () => ApplyAccent(Color.FromRgb(0x10, 0x7C, 0x10))));
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private StackPanel CreateSection(string title)
-    {
-        var panel = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10
-        };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = title,
-            FontSize = 18,
-            Foreground = ThemeBrush("TextPrimary")
-        });
-
-        return panel;
-    }
-
-    private Button CreateCommandButton(string text, Action action)
-    {
-        var button = new Button
-        {
-            Content = text
-        };
-        button.Click += (_, _) => action();
-        return button;
     }
 
     private void ApplyTheme(FluentThemeVariant theme)
