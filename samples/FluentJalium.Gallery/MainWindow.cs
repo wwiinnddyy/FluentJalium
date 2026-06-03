@@ -93,9 +93,9 @@ namespace FluentJalium.Gallery;
 
 public sealed class MainWindow : Window
 {
-    private readonly List<(FWButton Button, GalleryPage Page)> _navigationItems = [];
+    private readonly List<FWNavigationViewItem> _navigationItems = [];
+    private FWNavigationView? _navigationView;
     private FWScrollViewer? _contentScrollViewer;
-    private FWButton? _selectedNavigationButton;
     private GalleryPage? _selectedPage;
 
     public MainWindow()
@@ -111,18 +111,7 @@ public sealed class MainWindow : Window
 
     private UIElement BuildShell()
     {
-        var root = new Grid
-        {
-            Background = ThemeBrush("WindowBackground")
-        };
-        root.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-        root.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(236) });
-
         var pages = CreateGalleryPages();
-        var sidebar = CreateSidebar(pages);
-        Grid.SetColumn(sidebar, 1);
-        root.Children.Add(sidebar);
-
         _contentScrollViewer = new FWScrollViewer
         {
             Background = ThemeBrush("WindowBackground"),
@@ -131,11 +120,25 @@ public sealed class MainWindow : Window
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             IsScrollBarAutoHideEnabled = true
         };
-        Grid.SetColumn(_contentScrollViewer, 0);
-        root.Children.Add(_contentScrollViewer);
 
-        SelectPage(pages[0], _navigationItems[0].Button);
-        return root;
+        _navigationView = new FWNavigationView
+        {
+            Background = ThemeBrush("WindowBackground"),
+            PaneBackground = ThemeBrush("NavigationViewPaneBackground"),
+            ContentBackground = ThemeBrush("WindowBackground"),
+            PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
+            IsPaneOpen = true,
+            OpenPaneLength = 292,
+            CompactPaneLength = 48,
+            PaneHeader = CreatePaneHeader(),
+            Content = _contentScrollViewer
+        };
+        _navigationView.SelectionChanged += OnNavigationSelectionChanged;
+
+        PopulateNavigationItems(_navigationView, pages);
+        _navigationView.SelectedItem = _navigationItems[0];
+        SelectPage(pages[0]);
+        return _navigationView;
     }
 
     private GalleryPage[] CreateGalleryPages()
@@ -162,68 +165,81 @@ public sealed class MainWindow : Window
         ];
     }
 
-    private UIElement CreateSidebar(GalleryPage[] pages)
+    private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages)
     {
         _navigationItems.Clear();
 
+        navigationView.MenuItems.Add(CreateNavigationItem(pages[0], "\uE80F"));
+        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Controls" });
+        AddNavigationItem(navigationView, pages[1], "\uE8FD");
+        AddNavigationItem(navigationView, pages[2], "\uE7F4");
+        AddNavigationItem(navigationView, pages[3], "\uE8D2");
+        AddNavigationItem(navigationView, pages[4], "\uE73A");
+        AddNavigationItem(navigationView, pages[5], "\uE9F5");
+        AddNavigationItem(navigationView, pages[6], "\uE8A9");
+        AddNavigationItem(navigationView, pages[7], "\uE8B9");
+        AddNavigationItem(navigationView, pages[8], "\uE7C9");
+        AddNavigationItem(navigationView, pages[9], "\uE7FC");
+
+        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "App structure" });
+        AddNavigationItem(navigationView, pages[10], "\uE8A9");
+        AddNavigationItem(navigationView, pages[11], "\uE700");
+        AddNavigationItem(navigationView, pages[12], "\uE8FD");
+        AddNavigationItem(navigationView, pages[13], "\uE70E");
+        AddNavigationItem(navigationView, pages[14], "\uE787");
+        AddNavigationItem(navigationView, pages[15], "\uE946");
+
+        navigationView.FooterMenuItems.Add(CreateNavigationItem(pages[16], "\uE9D9"));
+        navigationView.UpdateMenuItems();
+    }
+
+    private void AddNavigationItem(FWNavigationView navigationView, GalleryPage page, string glyph)
+    {
+        navigationView.MenuItems.Add(CreateNavigationItem(page, glyph));
+    }
+
+    private FWNavigationViewItem CreateNavigationItem(GalleryPage page, string glyph)
+    {
+        var item = new FWNavigationViewItem
+        {
+            Content = page.Title,
+            Icon = CreateIcon(glyph),
+            Tag = page
+        };
+        _navigationItems.Add(item);
+        return item;
+    }
+
+    private static UIElement CreatePaneHeader()
+    {
         var panel = new StackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 6,
-            Margin = new Thickness(16)
+            Spacing = 10
         };
 
         panel.Children.Add(new TextBlock
         {
             Text = "FluentJalium",
-            FontSize = 22,
+            FontSize = 24,
             FontFamily = "Segoe UI Variable Display",
-            Foreground = ThemeBrush("TextPrimary"),
-            Margin = new Thickness(4, 0, 4, 2)
+            Foreground = ThemeBrush("TextPrimary")
         });
         panel.Children.Add(new TextBlock
         {
-            Text = "Controls",
+            Text = "Control gallery",
             FontSize = 12,
-            Foreground = ThemeBrush("TextSecondary"),
-            Margin = new Thickness(4, 0, 4, 8)
+            Foreground = ThemeBrush("TextSecondary")
         });
-
-        foreach (var page in pages)
+        panel.Children.Add(new FWTextBox
         {
-            var button = CreateNavigationButton(page);
-            _navigationItems.Add((button, page));
-            panel.Children.Add(button);
-        }
-
-        return new Border
-        {
-            Background = ThemeBrush("SurfaceBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1, 0, 0, 0),
-            Child = new FWScrollViewer
-            {
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-                Content = panel
-            }
-        };
-    }
-
-    private FWButton CreateNavigationButton(GalleryPage page)
-    {
-        var button = new FWButton
-        {
-            Content = page.Title,
-            Width = 204,
-            MinHeight = 34,
-            Padding = new Thickness(12, 6, 12, 6),
-            Background = ThemeBrush("NavigationViewItemBackground"),
-            BorderBrush = ThemeBrush("NavigationViewItemBackground"),
-            HorizontalContentAlignment = HorizontalAlignment.Left
-        };
-        button.Click += (_, _) => SelectPage(page, button);
-        return button;
+            PlaceholderText = "Search controls",
+            MinHeight = 32,
+            Margin = new Thickness(0, 2, 0, 0)
+        });
+        return panel;
     }
 
     private UIElement CreatePageStack(params UIElement[] sections)
@@ -269,11 +285,17 @@ public sealed class MainWindow : Window
         return stack;
     }
 
-    private void SelectPage(GalleryPage page, FWButton button)
+    private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
+    {
+        if (e.SelectedItem?.Tag is GalleryPage page)
+        {
+            SelectPage(page);
+        }
+    }
+
+    private void SelectPage(GalleryPage page)
     {
         _selectedPage = page;
-        _selectedNavigationButton = button;
-        RefreshNavigationSelection();
 
         if (_contentScrollViewer != null)
         {
@@ -284,23 +306,17 @@ public sealed class MainWindow : Window
     private void RefreshCurrentPage()
     {
         Background = ThemeBrush("WindowBackground");
-        RefreshNavigationSelection();
 
+        if (_navigationView != null)
+        {
+            _navigationView.Background = ThemeBrush("WindowBackground");
+            _navigationView.PaneBackground = ThemeBrush("NavigationViewPaneBackground");
+            _navigationView.ContentBackground = ThemeBrush("WindowBackground");
+        }
         if (_selectedPage != null && _contentScrollViewer != null)
         {
             _contentScrollViewer.Background = ThemeBrush("WindowBackground");
             _contentScrollViewer.Content = CreatePageContent(_selectedPage);
-        }
-    }
-
-    private void RefreshNavigationSelection()
-    {
-        foreach (var (button, _) in _navigationItems)
-        {
-            var selected = ReferenceEquals(button, _selectedNavigationButton);
-            button.Background = selected ? ThemeBrush("NavigationViewItemBackgroundSelected") : ThemeBrush("NavigationViewItemBackground");
-            button.BorderBrush = selected ? ThemeBrush("AccentBrush") : ThemeBrush("NavigationViewItemBackground");
-            button.Foreground = ThemeBrush("TextPrimary");
         }
     }
 
