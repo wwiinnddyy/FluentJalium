@@ -1,7 +1,6 @@
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Icon;
-using System.ComponentModel;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Ink;
@@ -619,7 +618,7 @@ public sealed class MainWindow : Window
 
     private static UIElement CreateListViewCollectionSample()
     {
-        var rows = CreateSampleRows();
+        var rows = GallerySampleData.CreateRows();
         var output = CreateCollectionOutput("Selected: Buttons / Complete / 9");
         var view = CreateSampleGridView();
         var listView = new FWListView
@@ -749,7 +748,7 @@ public sealed class MainWindow : Window
 
     private static UIElement CreateDataGridCollectionSample()
     {
-        var rows = CreateSampleRows();
+        var rows = GallerySampleData.CreateRows();
         var output = CreateCollectionOutput("Selected: Selection / Review / 4");
         var dataGrid = new FWDataGrid
         {
@@ -814,7 +813,7 @@ public sealed class MainWindow : Window
 
     private static UIElement CreateTreeDataGridCollectionSample()
     {
-        var rows = CreateSampleTree();
+        var rows = GallerySampleData.CreateTree();
         var output = CreateCollectionOutput("Visible rows: 4. Selected: Theme resources");
         var treeDataGrid = new FWTreeDataGrid
         {
@@ -5399,31 +5398,6 @@ public sealed class MainWindow : Window
         return view;
     }
 
-    private static GalleryRow[] CreateSampleRows()
-    {
-        return
-        [
-            new GalleryRow("Buttons", "Complete", 9),
-            new GalleryRow("Selection", "Review", 4),
-            new GalleryRow("Collections", "Active", 8)
-        ];
-    }
-
-    private static GalleryTreeRow[] CreateSampleTree()
-    {
-        return
-        [
-            new GalleryTreeRow(
-                "FluentJalium",
-                "Active",
-                [
-                    new GalleryTreeRow("Theme resources", "Loaded", []),
-                    new GalleryTreeRow("FW controls", "Expanding", [])
-                ]),
-            new GalleryTreeRow("Gallery", "Visible", [])
-        ];
-    }
-
     private static BitmapImage CreateSampleBitmap()
     {
         const int width = 96;
@@ -5522,29 +5496,6 @@ public sealed class MainWindow : Window
     }
 
     private static string IconGlyph(FluentIconRegular icon) => icon.GetString();
-
-    private sealed record GalleryRow(string Name, string State, int Count);
-
-    private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
-
-    private sealed class GalleryPropertySample
-    {
-        [Category("Appearance")]
-        [Description("Displayed title for the selected Gallery card.")]
-        public string Title { get; set; } = "FluentJalium";
-
-        [Category("Layout")]
-        [Description("Preferred preview width in pixels.")]
-        public double PreviewWidth { get; set; } = 420;
-
-        [Category("Behavior")]
-        [Description("Whether inline editing is enabled.")]
-        public bool IsEditingEnabled { get; set; } = true;
-
-        [Category("State")]
-        [Description("Current accent sample count.")]
-        public int AccentSamples { get; set; } = 6;
-    }
 
     private sealed class GalleryNavigationOverviewPage : Page
     {
