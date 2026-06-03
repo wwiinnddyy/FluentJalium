@@ -233,6 +233,100 @@ public sealed class FluentCommandToolbarTests
         Assert.Same(document, tray.ToolBars[1]);
     }
 
+    [Fact]
+    public void FWCommandControls_ShouldExposeMaterialCommandSurfaceState()
+    {
+        var run = new FWButton { Content = "Run" };
+        var split = new FWSplitButton
+        {
+            Content = "Save",
+            Flyout = new MenuFlyout()
+        };
+        var toggleSplit = new FWToggleSplitButton
+        {
+            Content = "Pinned",
+            IsChecked = true,
+            Flyout = new MenuFlyout()
+        };
+        var commandBar = new FWCommandBar
+        {
+            DefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom,
+            IsSticky = true
+        };
+        var add = new FWAppBarButton { Label = "Add" };
+        var pin = new FWAppBarToggleButton { Label = "Pin", IsChecked = true };
+        commandBar.PrimaryCommands.Add(add);
+        commandBar.PrimaryCommands.Add(pin);
+        commandBar.SecondaryCommands.Add(new FWAppBarButton { Label = "Settings" });
+
+        var bold = new FWButton { Content = "Bold" };
+        var export = new FWButton { Content = "Export" };
+        var toolBar = new FWToolBar
+        {
+            Header = "Format",
+            Band = 0,
+            BandIndex = 0
+        };
+        toolBar.Items.Add(bold);
+        toolBar.Items.Add(new FWSeparator());
+        toolBar.Items.Add(export);
+        Jalium.UI.Controls.ToolBar.SetOverflowMode(export, OverflowMode.Always);
+        var tray = new FWToolBarTray
+        {
+            Orientation = Orientation.Horizontal
+        };
+        tray.ToolBars.Add(toolBar);
+
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                run,
+                split,
+                toggleSplit,
+                commandBar,
+                tray
+            }
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = panel
+        };
+
+        Assert.Equal("Run", run.Content);
+        Assert.NotNull(split.Flyout);
+        Assert.True(toggleSplit.IsChecked);
+        Assert.Equal(CommandBarDefaultLabelPosition.Bottom, commandBar.DefaultLabelPosition);
+        Assert.True(commandBar.IsSticky);
+        Assert.Equal(2, commandBar.PrimaryCommands.Count);
+        Assert.Single(commandBar.SecondaryCommands);
+        Assert.Equal("Add", add.Label);
+        Assert.True(pin.IsChecked);
+        Assert.Equal("Format", toolBar.Header);
+        Assert.Equal(3, toolBar.Items.Count);
+        Assert.Equal(OverflowMode.Always, Jalium.UI.Controls.ToolBar.GetOverflowMode(export));
+        Assert.Equal(Orientation.Horizontal, tray.Orientation);
+        Assert.Single(tray.ToolBars);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(panel, surface.Child);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
