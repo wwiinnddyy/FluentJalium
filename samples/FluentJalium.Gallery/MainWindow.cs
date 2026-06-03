@@ -15,7 +15,6 @@ using FWColorPicker = FluentJalium.Controls.FWColorPicker;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
-using FWImage = FluentJalium.Controls.FWImage;
 using FWInkCanvas = FluentJalium.Controls.FWInkCanvas;
 using FWInkPresenter = FluentJalium.Controls.FWInkPresenter;
 using FWGrid = FluentJalium.Controls.FWGrid;
@@ -28,7 +27,6 @@ using FWMediaElement = FluentJalium.Controls.FWMediaElement;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
-using FWPathIcon = FluentJalium.Controls.FWPathIcon;
 using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
@@ -38,7 +36,6 @@ using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
-using FWViewbox = FluentJalium.Controls.FWViewbox;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery;
@@ -108,7 +105,7 @@ public sealed class MainWindow : Window
             Range: () => CreatePageStack(new GalleryRangePage().CreateContent()),
             DateAndTime: () => CreatePageStack(new GalleryDateTimePage().CreateContent()),
             ContentAndLayout: () => CreatePageStack(new GalleryContentLayoutPage().CreateContent()),
-            Visuals: () => CreatePageStack(CreateVisualsSection()),
+            Visuals: () => CreatePageStack(new GalleryVisualsPage().CreateContent()),
             Interaction: () => CreatePageStack(CreateInteractionSection()),
             InputAndMedia: () => CreatePageStack(CreateAdvancedInputMediaSection()),
             Collections: () => CreatePageStack(new GalleryCollectionsPage().CreateContent()),
@@ -487,131 +484,6 @@ public sealed class MainWindow : Window
         row.Children.Add(CreateCommandButton("Rose", () => ApplyAccent(Color.FromRgb(0xC2, 0x39, 0xB3))));
         row.Children.Add(CreateCommandButton("Orange", () => ApplyAccent(Color.FromRgb(0xD8, 0x3B, 0x01))));
         row.Children.Add(CreateCommandButton("Green", () => ApplyAccent(Color.FromRgb(0x10, 0x7C, 0x10))));
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateVisualsSection()
-    {
-        var panel = CreateSection("Visuals and Icons");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var iconColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        iconColumn.Children.Add(new FWLabel { Content = "IconElement variants" });
-        iconColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18,
-            Children =
-            {
-                new FluentIcon
-                {
-                    Icon = FluentIconRegular.Save24,
-                    Size = 24
-                },
-                FluentIconFactory.Filled(FluentIconRegular.Share24, 24, ThemeBrush("TextPrimary")),
-                new FluentIcon
-                {
-                    Icon = FluentIconRegular.Share24,
-                    Size = 24
-                },
-                new FWPathIcon
-                {
-                    Data = Geometry.Parse("M 0,10 L 8,0 L 16,10 L 12,10 L 12,18 L 4,18 L 4,10 Z"),
-                    Width = 24,
-                    Height = 24
-                }
-            }
-        });
-        iconColumn.Children.Add(new FWSeparator());
-        iconColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new FWLabel { Content = "Target label", Width = 96 },
-                new FWTextBox { Text = "FWLabel", Width = 140 }
-            }
-        });
-        row.Children.Add(iconColumn);
-
-        var imageColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        imageColumn.Children.Add(new FWLabel { Content = "FWImage stretch" });
-        imageColumn.Children.Add(new FWImage
-        {
-            Width = 220,
-            Height = 120,
-            Source = CreateSampleBitmap(),
-            Stretch = Stretch.UniformToFill,
-            IsZoomEnabled = true
-        });
-        imageColumn.Children.Add(new TextBlock
-        {
-            Text = "UniformToFill with Fluent border and clipping.",
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        });
-        row.Children.Add(imageColumn);
-
-        var viewboxColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        viewboxColumn.Children.Add(new FWLabel { Content = "FWViewbox" });
-        viewboxColumn.Children.Add(new FWViewbox
-        {
-            Width = 220,
-            Height = 120,
-            Stretch = Stretch.Uniform,
-            Child = new Border
-            {
-                Width = 140,
-                Height = 70,
-                Background = ThemeBrush("SelectionBackgroundWeak"),
-                BorderBrush = ThemeBrush("AccentBrush"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(12),
-                Child = new TextBlock
-                {
-                    Text = "Scaled Fluent surface",
-                    Foreground = ThemeBrush("TextPrimary"),
-                    TextWrapping = TextWrapping.Wrap,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            }
-        });
-        viewboxColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new TextBlock { Text = "Left", Foreground = ThemeBrush("TextSecondary") },
-                new FWSeparator { Orientation = Orientation.Vertical, Height = 18 },
-                new TextBlock { Text = "Right", Foreground = ThemeBrush("TextSecondary") }
-            }
-        });
-        row.Children.Add(viewboxColumn);
 
         panel.Children.Add(row);
         return panel;
@@ -1122,27 +994,6 @@ public sealed class MainWindow : Window
         comboBox.Items.Add(new FWComboBoxItem { Content = "Toolkit" });
         comboBox.SelectedIndex = selectedIndex;
         return comboBox;
-    }
-
-    private static BitmapImage CreateSampleBitmap()
-    {
-        const int width = 96;
-        const int height = 64;
-        var pixels = new byte[width * height * 4];
-
-        for (var y = 0; y < height; y++)
-        {
-            for (var x = 0; x < width; x++)
-            {
-                var index = ((y * width) + x) * 4;
-                pixels[index] = (byte)(0x72 + (x * 0x30 / width));
-                pixels[index + 1] = (byte)(0x45 + (y * 0x70 / height));
-                pixels[index + 2] = (byte)(0xD4 - (x * 0x60 / width));
-                pixels[index + 3] = 0xFF;
-            }
-        }
-
-        return BitmapImage.FromPixels(pixels, width, height);
     }
 
     private static DrawingAttributes CreateInkDrawingAttributes()
