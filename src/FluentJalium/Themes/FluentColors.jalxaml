@@ -69,17 +69,6 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#18FFFFFF" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#0AFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FF323232" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#0BFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorder" Color="#12FFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderHover" Color="#3FFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#0AFFFFFF" />
-            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#33000000" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF4CC2FF" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF8BD8FF" />
@@ -96,53 +85,42 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#28FFFFFF" />
             <SolidColorBrush x:Key="SliderTrack" Color="#2AFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
-            <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5DFFFFFF" />
-            <SolidColorBrush x:Key="LabelBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="LabelForeground" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarTrack" Color="#05FFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarThumb" Color="#8BFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarArrow" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FF107C10" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#8BFFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#19000000" />
+            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF2C2C2C" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#33000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#19000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#393D1B" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#433519" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#442726" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#6CCB5F" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FCE100" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FF99A4" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF60CDFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF6CCB5F" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFF99A4" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverPlaceholderForeground" Color="#87FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#87FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FF3393DD" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF1C1C1C" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF2C2C2C" />
@@ -152,76 +130,11 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF202020" />
-            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#12FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5DFFFFFF" />
-            <SolidColorBrush x:Key="TabStripBackground" Color="#FF202020" />
-            <SolidColorBrush x:Key="TabStripBorder" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="TabContentBackground" Color="#FF202020" />
-            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#12FFFFFF" />
-            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="FrameBackground" Color="#FF202020" />
-            <SolidColorBrush x:Key="FrameBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="ToolTipBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#33000000" />
-            <SolidColorBrush x:Key="GroupBoxBackground" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FF202020" />
-            <SolidColorBrush x:Key="ExpanderBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#3FFFFFFF" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#0FFFFFFF" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#330078D4" />
-            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#33000000" />
-            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#99000000" />
-            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF2D2D37" />
-            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF243A28" />
-            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF3F351C" />
-            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FF442726" />
-            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#FF4CC2FF" />
-            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FF6CCB5F" />
-            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FFFCE100" />
-            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFFF99A4" />
-            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FF107C10" />
-            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFD83B01" />
-            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF107C10" />
-            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFF99A4" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="StatusBarBackground" Color="#FF1C1C1C" />
-            <SolidColorBrush x:Key="StatusBarForeground" Color="#C5FFFFFF" />
-            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#5DFFFFFF" />
-            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#19000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#19000000" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -290,17 +203,6 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#29000000" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#E4000000" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#0A000000" />
-            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#4DF9F9F9" />
-            <SolidColorBrush x:Key="TextControlBorder" Color="#0F000000" />
-            <SolidColorBrush x:Key="TextControlBorderHover" Color="#44000000" />
-            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#E4000000" />
-            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#0A000000" />
-            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#09000000" />
-            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#0F000000" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#F5F5F5" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF0067C0" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF003E73" />
@@ -317,53 +219,42 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#37000000" />
             <SolidColorBrush x:Key="SliderTrack" Color="#15000000" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#09000000" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#660078D4" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#330078D4" />
-            <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
-            <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="IconForeground" Color="#E4000000" />
-            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#9E000000" />
-            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5C000000" />
-            <SolidColorBrush x:Key="LabelBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="LabelForeground" Color="#9E000000" />
-            <SolidColorBrush x:Key="LabelBorderBrush" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarTrack" Color="#05000000" />
-            <SolidColorBrush x:Key="ScrollBarThumb" Color="#72000000" />
-            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#9E000000" />
-            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#E4000000" />
-            <SolidColorBrush x:Key="ScrollBarArrow" Color="#9E000000" />
-            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#E4000000" />
-            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#E4000000" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#09000000" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#06000000" />
-            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FF107C10" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#09000000" />
-            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#72000000" />
-            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#09000000" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#09000000" />
+            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#06000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#0F000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#09000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#06000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#E4000000" />
-            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#15000000" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#80F6F6F6" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#DFF6DD" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FFF4CE" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FDE7E9" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#72000000" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#0F7B0F" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#9D5D00" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#C42B1C" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF0067C0" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF0F7B0F" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="RatingControlPointerOverPlaceholderForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FF0067B6" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#5C000000" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#9E000000" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#0F000000" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FFF9F9F9" />
@@ -373,76 +264,11 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5C000000" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#0F000000" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FFF3F3F3" />
-            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#09000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#06000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#E4000000" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#9E000000" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5C000000" />
-            <SolidColorBrush x:Key="TabStripBackground" Color="#FFF3F3F3" />
-            <SolidColorBrush x:Key="TabStripBorder" Color="#15000000" />
-            <SolidColorBrush x:Key="TabContentBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#09000000" />
-            <SolidColorBrush x:Key="TabItemIndicator" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="FrameBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="FrameBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="ToolTipBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToolTipForeground" Color="#E4000000" />
-            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#0F000000" />
-            <SolidColorBrush x:Key="GroupBoxBackground" Color="#80FFFFFF" />
-            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FFF3F3F3" />
-            <SolidColorBrush x:Key="ExpanderBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#44000000" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#B3FFFFFF" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#330078D4" />
-            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#9E000000" />
-            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#0F000000" />
-            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#66000000" />
-            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#E4000000" />
-            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#80F9F9F9" />
-            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#80F6F6F6" />
-            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FFDFF6DD" />
-            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FFFFF4CE" />
-            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FFFDE7E9" />
-            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#72000000" />
-            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FF0F7B0F" />
-            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FF9D5D00" />
-            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="InfoBarForeground" Color="#E4000000" />
-            <SolidColorBrush x:Key="ToastForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FF107C10" />
-            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFD83B01" />
-            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FF0078D4" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF107C10" />
-            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFCE100" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFC42B1C" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StatusBarBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StatusBarForeground" Color="#9E000000" />
-            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#5C000000" />
-            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#15000000" />
-            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#29000000" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#09000000" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#06000000" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -479,17 +305,6 @@
             <SolidColorBrush x:Key="ControlBorderHover" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ControlBorderFocused" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="ControlBorderDisabled" Color="#FF7F7F7F" />
-            <SolidColorBrush x:Key="TextControlBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="TextControlBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF000000" />
-            <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#FF000000" />
-            <SolidColorBrush x:Key="TextControlBorder" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderHover" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderFocused" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="TextControlBorderDisabled" Color="#FF7F7F7F" />
-            <SolidColorBrush x:Key="TextControlSpinButtonBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="TextControlFlyoutBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="TextControlFlyoutBorder" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#FF333333" />
             <SolidColorBrush x:Key="HyperlinkForeground" Color="#FF00FFFF" />
             <SolidColorBrush x:Key="HyperlinkForegroundHover" Color="#FF00FFFF" />
@@ -506,53 +321,42 @@
             <SolidColorBrush x:Key="ToggleDisabledBorder" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="SliderTrack" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="SliderThumb" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ProgressRingForeground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="HighlightBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="SelectionBackgroundWeak" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="IconForegroundSecondary" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="IconForegroundDisabled" Color="#FF7F7F7F" />
-            <SolidColorBrush x:Key="LabelBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="LabelForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="LabelBorderBrush" Color="#FF000000" />
-            <SolidColorBrush x:Key="SeparatorStrokeBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollViewerBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ScrollViewerBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarTrack" Color="#FF000000" />
-            <SolidColorBrush x:Key="ScrollBarThumb" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarThumbHover" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ScrollBarThumbActive" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ScrollBarArrow" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ScrollBarArrowHover" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ScrollBarArrowPressed" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#FF333333" />
-            <SolidColorBrush x:Key="SwipeControlBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="SwipeControlBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="SwipeItemBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundSecondary" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="SwipeItemBackgroundDestructive" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="SwipeItemForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="GridSplitterBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="GridSplitterBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="GridSplitterGripBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="GridSplitterGripBrushHover" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="MenuBarBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="MenuBarBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="MenuBarItemBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#FF333333" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#FF333333" />
-            <SolidColorBrush x:Key="MenuFlyoutItemForegroundChecked" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="MenuFlyoutSeparatorForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FF00FF00" />
+            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFF0000" />
+            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="CommandBarBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="CommandBarOverflowBackground" Color="#FF000000" />
@@ -562,77 +366,11 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FF333333" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#FF7F7F7F" />
-            <SolidColorBrush x:Key="TabStripBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="TabStripBorder" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="TabContentBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="TabItemHoverBackground" Color="#FF333333" />
-            <SolidColorBrush x:Key="TabItemIndicator" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="FrameBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="FrameBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToolTipBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="GroupBoxBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="GroupBoxHeaderBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ExpanderBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ExpanderBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ExpanderBorderBrushHover" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundHover" Color="#FF1A1A1A" />
-            <SolidColorBrush x:Key="ExpanderHeaderBackgroundExpanded" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogOverlayBackground" Color="#CC000000" />
-            <SolidColorBrush x:Key="ContentDialogTitleForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ContentDialogButtonPanelBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBarInformationalBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBarSuccessBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBarWarningBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBarErrorBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBarInfoBrush" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="InfoBarSuccessBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBarWarningBrush" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="InfoBarErrorBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBarForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="ToastInformationBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ToastSuccessBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastWarningBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="ToastErrorBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="ToastInformationIcon" Color="#FF000000" />
-            <SolidColorBrush x:Key="ToastSuccessIcon" Color="#FF000000" />
-            <SolidColorBrush x:Key="ToastWarningIcon" Color="#FF000000" />
-            <SolidColorBrush x:Key="ToastErrorIcon" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeCautionBackground" Color="#FFFFFF00" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="InfoBadgeAttentionForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeInformationalForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeSuccessForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeCautionForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="InfoBadgeCriticalForeground" Color="#FF000000" />
-            <SolidColorBrush x:Key="StatusBarBackground" Color="#FF000000" />
-            <SolidColorBrush x:Key="StatusBarForeground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StatusBarForegroundDisabled" Color="#FF7F7F7F" />
-            <SolidColorBrush x:Key="StatusBarBorderBrush" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="StatusBarSeparatorForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="MenuBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="#FF333333" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
-

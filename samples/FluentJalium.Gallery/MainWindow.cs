@@ -1,79 +1,39 @@
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
-using Jalium.UI.Data;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWAppBarButton = FluentJalium.Controls.FWAppBarButton;
 using FWAppBarSeparator = FluentJalium.Controls.FWAppBarSeparator;
 using FWAppBarToggleButton = FluentJalium.Controls.FWAppBarToggleButton;
-using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
-using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
-using FWCalendar = FluentJalium.Controls.FWCalendar;
-using FWContentDialog = FluentJalium.Controls.FWContentDialog;
-using FWDataGrid = FluentJalium.Controls.FWDataGrid;
-using FWDatePicker = FluentJalium.Controls.FWDatePicker;
-using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
+using FWCommandBar = FluentJalium.Controls.FWCommandBar;
 using FWExpander = FluentJalium.Controls.FWExpander;
-using FWFrame = FluentJalium.Controls.FWFrame;
-using FWFontIcon = FluentJalium.Controls.FWFontIcon;
-using FWGroupBox = FluentJalium.Controls.FWGroupBox;
+using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
 using FWHyperlinkButton = FluentJalium.Controls.FWHyperlinkButton;
-using FWImage = FluentJalium.Controls.FWImage;
 using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
 using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
-using FWGridSplitter = FluentJalium.Controls.FWGridSplitter;
-using FWLabel = FluentJalium.Controls.FWLabel;
-using FWListBox = FluentJalium.Controls.FWListBox;
-using FWListView = FluentJalium.Controls.FWListView;
-using FWContextMenu = FluentJalium.Controls.FWContextMenu;
-using FWMenu = FluentJalium.Controls.FWMenu;
 using FWMenuBar = FluentJalium.Controls.FWMenuBar;
 using FWMenuBarItem = FluentJalium.Controls.FWMenuBarItem;
 using FWMenuFlyoutItem = FluentJalium.Controls.FWMenuFlyoutItem;
-using FWMenuFlyoutSeparator = FluentJalium.Controls.FWMenuFlyoutSeparator;
-using FWMenuItem = FluentJalium.Controls.FWMenuItem;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
-using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
-using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
 using FWNumberBox = FluentJalium.Controls.FWNumberBox;
 using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
-using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
-using FWPathIcon = FluentJalium.Controls.FWPathIcon;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
+using FWRatingControl = FluentJalium.Controls.FWRatingControl;
 using FWRepeatButton = FluentJalium.Controls.FWRepeatButton;
-using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
-using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWSlider = FluentJalium.Controls.FWSlider;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
-using FWStatusBar = FluentJalium.Controls.FWStatusBar;
-using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
-using FWSymbolIcon = FluentJalium.Controls.FWSymbolIcon;
-using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
-using FWSwipeControl = FluentJalium.Controls.FWSwipeControl;
-using FWTabControl = FluentJalium.Controls.FWTabControl;
-using FWTabItem = FluentJalium.Controls.FWTabItem;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
-using FWTimePicker = FluentJalium.Controls.FWTimePicker;
-using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
-using FWToastNotificationItem = FluentJalium.Controls.FWToastNotificationItem;
-using FWToolTip = FluentJalium.Controls.FWToolTip;
-using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
-using FWTreeView = FluentJalium.Controls.FWTreeView;
-using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
-using FWToggleMenuFlyoutItem = FluentJalium.Controls.FWToggleMenuFlyoutItem;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
-using FWViewbox = FluentJalium.Controls.FWViewbox;
-using GridViewColumn = Jalium.UI.Controls.GridViewColumn;
 
 namespace FluentJalium.Gallery;
 
@@ -107,20 +67,13 @@ public sealed class MainWindow : Window
 
         page.Children.Add(CreateHeader());
         page.Children.Add(CreateThemeControls());
-        page.Children.Add(CreateButtonsSection());
-        page.Children.Add(CreateCommandButtonsSection());
-        page.Children.Add(CreateSwitchesSection());
+        page.Children.Add(CreateBasicsSection());
         page.Children.Add(CreateTextSection());
         page.Children.Add(CreateSelectionSection());
-        page.Children.Add(CreateVisualsSection());
-        page.Children.Add(CreateInteractionSection());
-        page.Children.Add(CreateCollectionsSection());
-        page.Children.Add(CreateNavigationSection());
-        page.Children.Add(CreateMenusSection());
-        page.Children.Add(CreateDisclosureDialogsSection());
-        page.Children.Add(CreateDateTimeSection());
-        page.Children.Add(CreateStatusSection());
         page.Children.Add(CreateRangeSection());
+        page.Children.Add(CreateAdvancedSection());
+        page.Children.Add(CreateCommandSection());
+        page.Children.Add(CreateNavigationSection());
         page.Children.Add(CreateStateMatrix());
 
         return page;
@@ -144,11 +97,179 @@ public sealed class MainWindow : Window
 
         panel.Children.Add(new TextBlock
         {
-            Text = "Fluent theme overlay plus FW-prefixed button, text input, switch, range, selection, visual, interaction, collection, navigation, disclosure, dialog, menu, date/time, notification, and status controls.",
+            Text = "Fluent theme overlay plus FW-prefixed FluentJalium controls.",
             FontSize = 14,
             Foreground = ThemeBrush("TextSecondary")
         });
 
+        return panel;
+    }
+
+    private UIElement CreateAdvancedSection()
+    {
+        var panel = CreateSection("Advanced Inputs");
+
+        panel.Children.Add(new FWInfoBar
+        {
+            Title = "FWInfoBar",
+            Message = "Fluent severity resources are supplied by FluentJalium.",
+            Severity = InfoBarSeverity.Success,
+            IsClosable = false
+        });
+
+        var row = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+
+        row.Children.Add(new FWNumberBox
+        {
+            Header = "FWNumberBox",
+            Width = 180,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 42,
+            PlaceholderText = "Number"
+        });
+        row.Children.Add(new FWSplitButton
+        {
+            Content = "FWSplitButton",
+            Width = 170,
+            Flyout = CreateSampleFlyout()
+        });
+        row.Children.Add(new FWToggleSplitButton
+        {
+            Content = "FWToggleSplit",
+            Width = 180,
+            IsChecked = true,
+            Flyout = CreateSampleFlyout()
+        });
+        row.Children.Add(new FWExpander
+        {
+            Header = "FWExpander",
+            IsExpanded = true,
+            Width = 320,
+            Content = new TextBlock
+            {
+                Text = "Expanded content uses the same Fluent surface and border tokens.",
+                Foreground = ThemeBrush("TextSecondary")
+            }
+        });
+
+        panel.Children.Add(row);
+
+        var badgeRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10
+        };
+        badgeRow.Children.Add(new FWInfoBadge());
+        badgeRow.Children.Add(new FWInfoBadge { Value = 7 });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 142, MaxValue = 99 });
+        badgeRow.Children.Add(new FWInfoBadge { IconGlyph = "\uE946", Severity = FWInfoBadgeSeverity.Informational });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 1, Severity = FWInfoBadgeSeverity.Success });
+        badgeRow.Children.Add(new FWInfoBadge { IconGlyph = "\uE7BA", Severity = FWInfoBadgeSeverity.Caution });
+        badgeRow.Children.Add(new FWInfoBadge { Value = 3, Severity = FWInfoBadgeSeverity.Critical });
+
+        panel.Children.Add(badgeRow);
+
+        var ratingRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 20
+        };
+        ratingRow.Children.Add(new FWRatingControl
+        {
+            Caption = "FWRatingControl",
+            Value = 3
+        });
+        ratingRow.Children.Add(new FWRatingControl
+        {
+            Caption = "Placeholder",
+            PlaceholderValue = 4
+        });
+        ratingRow.Children.Add(new FWRatingControl
+        {
+            Caption = "Read only",
+            Value = 4,
+            IsReadOnly = true
+        });
+        ratingRow.Children.Add(new FWRatingControl
+        {
+            Caption = "No clear",
+            Value = 1,
+            IsClearEnabled = false
+        });
+
+        panel.Children.Add(ratingRow);
+        return panel;
+    }
+
+    private UIElement CreateCommandSection()
+    {
+        var panel = CreateSection("Commands");
+        var menu = new FWMenuBar();
+        var fileMenu = new FWMenuBarItem { Title = "File" };
+        fileMenu.Items.Add(new FWMenuFlyoutItem { Text = "New" });
+        fileMenu.Items.Add(new FWMenuFlyoutItem { Text = "Open" });
+        fileMenu.Items.Add(new FWMenuFlyoutItem { Text = "Save" });
+        var editMenu = new FWMenuBarItem { Title = "Edit" };
+        editMenu.Items.Add(new FWMenuFlyoutItem { Text = "Undo", KeyboardAcceleratorTextOverride = "Ctrl+Z" });
+        editMenu.Items.Add(new FWMenuFlyoutItem { Text = "Redo", KeyboardAcceleratorTextOverride = "Ctrl+Y" });
+        menu.Items.Add(fileMenu);
+        menu.Items.Add(editMenu);
+
+        var commandBar = new FWCommandBar
+        {
+            Width = 420
+        };
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon("\uE74E") });
+        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon("\uE72D") });
+        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
+        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon("\uE718"), IsChecked = true });
+
+        panel.Children.Add(menu);
+        panel.Children.Add(commandBar);
+        return panel;
+    }
+
+    private UIElement CreateNavigationSection()
+    {
+        var panel = CreateSection("Navigation");
+        var navigationView = new FWNavigationView
+        {
+            Width = 620,
+            Height = 220,
+            PaneTitle = "FluentJalium",
+            Content = new Border
+            {
+                Background = ThemeBrush("SurfaceBackground"),
+                Padding = new Thickness(18),
+                Child = new TextBlock
+                {
+                    Text = "FWNavigationView content surface",
+                    Foreground = ThemeBrush("TextPrimary")
+                }
+            }
+        };
+
+        var home = new FWNavigationViewItem
+        {
+            Content = "Home",
+            IsSelected = true
+        };
+        var controls = new FWNavigationViewItem
+        {
+            Content = "Controls"
+        };
+        controls.MenuItems.Add(new FWNavigationViewItem { Content = "Inputs" });
+        controls.MenuItems.Add(new FWNavigationViewItem { Content = "Commands" });
+        navigationView.MenuItems.Add(home);
+        navigationView.MenuItems.Add(controls);
+        navigationView.FooterMenuItems.Add(new FWNavigationViewItem { Content = "Settings" });
+
+        panel.Children.Add(navigationView);
         return panel;
     }
 
@@ -173,224 +294,7 @@ public sealed class MainWindow : Window
         return panel;
     }
 
-    private UIElement CreateCollectionsSection()
-    {
-        var panel = CreateSection("Collections and Tables");
-        var sampleRows = CreateSampleRows();
-        var sampleTree = CreateSampleTree();
-
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
-        };
-
-        var listBox = new FWListBox
-        {
-            Width = 190,
-            Height = 152
-        };
-        listBox.Items.Add("Fluent tokens");
-        listBox.Items.Add("Control states");
-        listBox.Items.Add("Gallery coverage");
-        listBox.Items.Add("Disabled sample");
-        listBox.SelectedIndex = 1;
-        topRow.Children.Add(listBox);
-
-        var listView = new FWListView
-        {
-            Width = 340,
-            Height = 152,
-            ItemsSource = sampleRows,
-            View = CreateSampleGridView()
-        };
-        listView.SelectedIndex = 0;
-        topRow.Children.Add(listView);
-
-        var treeView = new FWTreeView
-        {
-            Width = 260,
-            Height = 152
-        };
-        treeView.Items.Add(new FWTreeViewItem
-        {
-            Header = "Workspace",
-            IsExpanded = true,
-            Items =
-            {
-                new FWTreeViewItem { Header = "Design" },
-                new FWTreeViewItem { Header = "Build" }
-            }
-        });
-        treeView.Items.Add(new FWTreeViewItem { Header = "Archive" });
-        topRow.Children.Add(treeView);
-
-        var dataGrid = new FWDataGrid
-        {
-            Width = 430,
-            Height = 180,
-            AutoGenerateColumns = false,
-            ItemsSource = sampleRows,
-            SelectedIndex = 1
-        };
-        dataGrid.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Binding("Name"), Width = 150 });
-        dataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 110 });
-        dataGrid.Columns.Add(new DataGridTextColumn { Header = "Count", Binding = new Binding("Count"), Width = 80 });
-
-        var treeDataGrid = new FWTreeDataGrid
-        {
-            Width = 430,
-            Height = 180,
-            ChildrenSelector = item => ((GalleryTreeRow)item).Children,
-            HasChildrenSelector = item => ((GalleryTreeRow)item).Children.Length > 0
-        };
-        treeDataGrid.ItemsSource = sampleTree;
-        treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "Area", Binding = new Binding("Name"), Width = 170 });
-        treeDataGrid.Columns.Add(new DataGridTextColumn { Header = "State", Binding = new Binding("State"), Width = 120 });
-        treeDataGrid.ExpandAll();
-
-        var gridRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
-        };
-        gridRow.Children.Add(dataGrid);
-        gridRow.Children.Add(treeDataGrid);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(gridRow);
-        return panel;
-    }
-
-    private UIElement CreateNavigationSection()
-    {
-        var panel = CreateSection("Navigation");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
-        };
-
-        var dashboardItem = new FWNavigationViewItem
-        {
-            Content = "Dashboard",
-            Icon = CreateIcon("\uE80F")
-        };
-        var controlsItem = new FWNavigationViewItem
-        {
-            Content = "Controls",
-            Icon = CreateIcon("\uECAA"),
-            IsExpanded = true
-        };
-        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Buttons", Icon = CreateIcon("\uE8FD") });
-        controlsItem.MenuItems.Add(new FWNavigationViewItem { Content = "Collections", Icon = CreateIcon("\uE8A9") });
-
-        var navigationView = new FWNavigationView
-        {
-            Width = 520,
-            Height = 230,
-            PaneTitle = "FluentJalium",
-            Header = "NavigationView",
-            SelectedItem = dashboardItem,
-            Content = CreateNavigationContent()
-        };
-        navigationView.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Workspace" });
-        navigationView.MenuItems.Add(dashboardItem);
-        navigationView.MenuItems.Add(controlsItem);
-        navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
-        navigationView.MenuItems.Add(new FWNavigationViewItem { Content = "Gallery", Icon = CreateIcon("\uE8B7") });
-        navigationView.FooterMenuItems.Add(new FWNavigationViewItem { Content = "Settings", Icon = CreateIcon("\uE713") });
-        navigationView.UpdateMenuItems();
-        row.Children.Add(navigationView);
-
-        var tabAndFrame = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 12
-        };
-
-        var tabControl = new FWTabControl
-        {
-            Width = 430,
-            Height = 116,
-            SelectedIndex = 0
-        };
-        tabControl.Items.Add(new FWTabItem
-        {
-            Header = "Overview",
-            Content = CreateTabContent("Navigation items share the Fluent selection pill and hover states.")
-        });
-        tabControl.Items.Add(new FWTabItem
-        {
-            Header = "Details",
-            Content = CreateTabContent("Tabs use the shared accent indicator and theme-aware strip colors.")
-        });
-        tabControl.Items.Add(new FWTabItem
-        {
-            Header = "Disabled",
-            Content = CreateTabContent("Disabled tab sample"),
-            IsEnabled = false
-        });
-
-        var frame = new FWFrame
-        {
-            Width = 430,
-            Height = 98,
-            Padding = new Thickness(14),
-            BorderThickness = new Thickness(1),
-            Content = new TextBlock
-            {
-                Text = "FWFrame content host",
-                Foreground = ThemeBrush("TextPrimary"),
-                VerticalAlignment = VerticalAlignment.Center
-            }
-        };
-
-        tabAndFrame.Children.Add(tabControl);
-        tabAndFrame.Children.Add(frame);
-        row.Children.Add(tabAndFrame);
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private static UIElement CreateNavigationContent()
-    {
-        var panel = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 8,
-            Margin = new Thickness(18)
-        };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text = "NavigationView content",
-            FontSize = 18,
-            Foreground = ThemeBrush("TextPrimary")
-        });
-        panel.Children.Add(new TextBlock
-        {
-            Text = "Selected, nested, footer, and separator states share FluentJalium tokens.",
-            Foreground = ThemeBrush("TextSecondary")
-        });
-
-        return panel;
-    }
-
-    private static UIElement CreateTabContent(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            Margin = new Thickness(12),
-            Foreground = ThemeBrush("TextPrimary"),
-            VerticalAlignment = VerticalAlignment.Center
-        };
-    }
-
-    private UIElement CreateButtonsSection()
+    private UIElement CreateBasicsSection()
     {
         var panel = CreateSection("Buttons");
         var row = new StackPanel
@@ -407,162 +311,42 @@ public sealed class MainWindow : Window
             Content = "FWDropDown",
             Flyout = CreateSampleFlyout()
         });
+        row.Children.Add(new FWToggleButton { Content = "FWToggle", IsChecked = true });
         row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
 
         panel.Children.Add(row);
         return panel;
     }
 
-    private UIElement CreateCommandButtonsSection()
+    private UIElement CreateTextSection()
     {
-        var panel = CreateSection("Command Buttons");
-
-        var splitRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-        splitRow.Children.Add(new FWSplitButton
-        {
-            Content = "FWSplitButton",
-            Width = 170,
-            Flyout = CreateSampleFlyout()
-        });
-        splitRow.Children.Add(new FWToggleSplitButton
-        {
-            Content = "FWToggleSplit",
-            Width = 180,
-            IsChecked = true,
-            Flyout = CreateSampleFlyout()
-        });
-
-        var commandBar = new CommandBar
-        {
-            Width = 420
-        };
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Save", Icon = CreateIcon("\uE74E") });
-        commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Share", Icon = CreateIcon("\uE72D") });
-        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
-        commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = CreateIcon("\uE718"), IsChecked = true });
-
-        panel.Children.Add(splitRow);
-        panel.Children.Add(commandBar);
-        return panel;
-    }
-
-    private UIElement CreateSwitchesSection()
-    {
-        var panel = CreateSection("Switches");
-
+        var panel = CreateSection("Text Input");
         var row = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 12
         };
 
-        row.Children.Add(new FWToggleButton { Content = "FWToggleButton" });
-        row.Children.Add(new FWToggleButton { Content = "Checked", IsChecked = true });
-        row.Children.Add(new FWToggleButton { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        row.Children.Add(new FWToggleButton { Content = "Disabled", IsChecked = true, IsEnabled = false });
-
-        var switchRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18
-        };
-
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "FWToggleSwitch",
-            OffContent = "Off",
-            OnContent = "On"
-        });
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "On",
-            IsOn = true,
-            OffContent = "Off",
-            OnContent = "On"
-        });
-        switchRow.Children.Add(new FWToggleSwitch
-        {
-            Header = "Disabled",
-            IsOn = true,
-            IsEnabled = false,
-            OffContent = "Off",
-            OnContent = "On"
-        });
-
-        panel.Children.Add(row);
-        panel.Children.Add(switchRow);
-        return panel;
-    }
-    private UIElement CreateTextSection()
-    {
-        var panel = CreateSection("Text Input");
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        topRow.Children.Add(new FWTextBox
+        row.Children.Add(new FWTextBox
         {
             Text = "FWTextBox",
             Width = 220,
             PlaceholderText = "Enter text"
         });
-        topRow.Children.Add(new FWPasswordBox
+        row.Children.Add(new FWPasswordBox
         {
             Password = "fluent",
             Width = 220,
             PlaceholderText = "Password"
         });
-        topRow.Children.Add(new FWNumberBox
-        {
-            Header = "FWNumberBox",
-            Width = 180,
-            Minimum = 0,
-            Maximum = 100,
-            Value = 42,
-            SmallChange = 2,
-            DecimalPlaces = 0
-        });
-        topRow.Children.Add(new FWTextBox
+        row.Children.Add(new FWTextBox
         {
             Text = "Disabled",
             Width = 220,
             IsEnabled = false
         });
 
-        var lowerRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-
-        var autoCompleteBox = new FWAutoCompleteBox
-        {
-            Width = 260,
-            ItemsSource = new[] { "Fluent tokens", "Fluent controls", "WinUI Gallery", "Community Toolkit" },
-            Text = "Fl",
-            PlaceholderText = "Search controls",
-            FilterMode = AutoCompleteFilterMode.Contains
-        };
-
-        var richTextBox = new FWRichTextBox
-        {
-            Width = 420,
-            Height = 96,
-            AcceptsTab = true
-        };
-        richTextBox.SetText("FWRichTextBox uses the same text input resource tokens.");
-
-        lowerRow.Children.Add(autoCompleteBox);
-        lowerRow.Children.Add(richTextBox);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(lowerRow);
+        panel.Children.Add(row);
         return panel;
     }
 
@@ -576,545 +360,21 @@ public sealed class MainWindow : Window
         };
 
         row.Children.Add(new FWCheckBox { Content = "FWCheckBox", IsChecked = true });
-        row.Children.Add(new FWCheckBox { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        row.Children.Add(new FWRadioButton { Content = "Option A", GroupName = "SelectionDemo", IsChecked = true });
-        row.Children.Add(new FWRadioButton { Content = "Option B", GroupName = "SelectionDemo" });
+        row.Children.Add(new FWRadioButton { Content = "FWRadioButton", IsChecked = true });
+        row.Children.Add(new FWToggleSwitch { Header = "FWToggleSwitch", IsOn = true });
 
         var comboBox = new FWComboBox
         {
             Width = 220,
-            PlaceholderText = "Choose an item"
+            PlaceholderText = "Choose an item",
+            SelectedIndex = 0
         };
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent tokens" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Control styles" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Gallery sample" });
-        comboBox.SelectedIndex = 1;
+        comboBox.Items.Add("Fluent tokens");
+        comboBox.Items.Add("Control styles");
+        comboBox.Items.Add("Gallery sample");
         row.Children.Add(comboBox);
 
         panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateVisualsSection()
-    {
-        var panel = CreateSection("Visuals and Icons");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var iconColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        iconColumn.Children.Add(new FWLabel { Content = "IconElement variants" });
-        iconColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18,
-            Children =
-            {
-                new FWSymbolIcon
-                {
-                    Symbol = Symbol.Save,
-                    Width = 24,
-                    Height = 24
-                },
-                new FWFontIcon
-                {
-                    Glyph = "\uE72D",
-                    FontFamily = "Segoe Fluent Icons",
-                    FontSize = 24
-                },
-                new FWPathIcon
-                {
-                    Data = Geometry.Parse("M 0,10 L 8,0 L 16,10 L 12,10 L 12,18 L 4,18 L 4,10 Z"),
-                    Width = 24,
-                    Height = 24
-                }
-            }
-        });
-        iconColumn.Children.Add(new FWSeparator());
-        iconColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new FWLabel { Content = "Target label", Width = 96 },
-                new FWTextBox { Text = "FWLabel", Width = 140 }
-            }
-        });
-        row.Children.Add(iconColumn);
-
-        var imageColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        imageColumn.Children.Add(new FWLabel { Content = "FWImage stretch" });
-        imageColumn.Children.Add(new FWImage
-        {
-            Width = 220,
-            Height = 120,
-            Source = CreateSampleBitmap(),
-            Stretch = Stretch.UniformToFill,
-            IsZoomEnabled = true
-        });
-        imageColumn.Children.Add(new TextBlock
-        {
-            Text = "UniformToFill with Fluent border and clipping.",
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        });
-        row.Children.Add(imageColumn);
-
-        var viewboxColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 260
-        };
-        viewboxColumn.Children.Add(new FWLabel { Content = "FWViewbox" });
-        viewboxColumn.Children.Add(new FWViewbox
-        {
-            Width = 220,
-            Height = 120,
-            Stretch = Stretch.Uniform,
-            Child = new Border
-            {
-                Width = 140,
-                Height = 70,
-                Background = ThemeBrush("SelectionBackgroundWeak"),
-                BorderBrush = ThemeBrush("AccentBrush"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(12),
-                Child = new TextBlock
-                {
-                    Text = "Scaled Fluent surface",
-                    Foreground = ThemeBrush("TextPrimary"),
-                    TextWrapping = TextWrapping.Wrap,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            }
-        });
-        viewboxColumn.Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                new TextBlock { Text = "Left", Foreground = ThemeBrush("TextSecondary") },
-                new FWSeparator { Orientation = Orientation.Vertical, Height = 18 },
-                new TextBlock { Text = "Right", Foreground = ThemeBrush("TextSecondary") }
-            }
-        });
-        row.Children.Add(viewboxColumn);
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateInteractionSection()
-    {
-        var panel = CreateSection("Interaction and Scrolling");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var scrollColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 300
-        };
-        scrollColumn.Children.Add(new FWLabel { Content = "FWScrollViewer" });
-        scrollColumn.Children.Add(new FWScrollViewer
-        {
-            Width = 280,
-            Height = 150,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            Background = ThemeBrush("SwipeControlBackground"),
-            BorderBrush = ThemeBrush("SwipeControlBorderBrush"),
-            BorderThickness = new Thickness(1),
-            Padding = new Thickness(12),
-            IsScrollBarAutoHideEnabled = false,
-            Content = CreateScrollableItems()
-        });
-        row.Children.Add(scrollColumn);
-
-        var swipeColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 330
-        };
-        swipeColumn.Children.Add(new FWLabel { Content = "FWSwipeControl" });
-        swipeColumn.Children.Add(new FWSwipeControl
-        {
-            Width = 310,
-            Height = 68,
-            LeftItems = CreateSwipeItems(SwipeMode.Reveal,
-                ("Archive", "\uE8C3", "SwipeItemBackgroundSecondary"),
-                ("Flag", "\uE7C1", "SwipeItemBackground")),
-            RightItems = CreateSwipeItems(SwipeMode.Execute,
-                ("Delete", "\uE74D", "SwipeItemBackgroundDestructive")),
-            Content = new Border
-            {
-                Background = ThemeBrush("SwipeControlBackground"),
-                Padding = new Thickness(14, 8, 14, 8),
-                Child = new StackPanel
-                {
-                    Orientation = Orientation.Vertical,
-                    Spacing = 2,
-                    Children =
-                    {
-                        new TextBlock
-                        {
-                            Text = "Swipe action row",
-                            Foreground = ThemeBrush("TextPrimary")
-                        },
-                        new TextBlock
-                        {
-                            Text = "Reveal from the left, execute from the right.",
-                            Foreground = ThemeBrush("TextSecondary"),
-                            FontSize = 12
-                        }
-                    }
-                }
-            }
-        });
-        row.Children.Add(swipeColumn);
-
-        var splitterColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 390
-        };
-        splitterColumn.Children.Add(new FWLabel { Content = "FWGridSplitter" });
-        splitterColumn.Children.Add(CreateSplitterPreview());
-        row.Children.Add(splitterColumn);
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateMenusSection()
-    {
-        var panel = CreateSection("Menus and Flyouts");
-        var menuBar = new FWMenuBar
-        {
-            Width = 520
-        };
-        menuBar.Items.Add(CreateMenuBarItem("File", ("New", "Ctrl+N"), ("Open", "Ctrl+O"), ("Save", "Ctrl+S")));
-        menuBar.Items.Add(CreateMenuBarItem("Edit", ("Undo", "Ctrl+Z"), ("Redo", "Ctrl+Y"), ("Preferences", string.Empty)));
-        menuBar.Items.Add(CreateMenuBarItem("View", ("Zoom in", "Ctrl++"), ("Zoom out", "Ctrl+-"), ("Actual size", "Ctrl+0")));
-
-        var menu = new FWMenu
-        {
-            Width = 520
-        };
-        var project = new FWMenuItem
-        {
-            Header = "Project"
-        };
-        project.Items.Add(new FWMenuItem { Header = "Build", InputGestureText = "Ctrl+B", Icon = "\uE768" });
-        project.Items.Add(new FWMenuItem { Header = "Run", InputGestureText = "F5", Icon = "\uE768" });
-        project.Items.Add(new FWMenuItem { Header = "Live preview", IsCheckable = true, IsChecked = true });
-        menu.Items.Add(project);
-        menu.Items.Add(new FWMenuItem { Header = "Tools" });
-        menu.Items.Add(new FWMenuItem { Header = "Disabled", IsEnabled = false });
-
-        var flyoutButton = new FWDropDownButton
-        {
-            Content = "MenuFlyout items",
-            Width = 180,
-            Flyout = CreateMenuControlsFlyout()
-        };
-
-        var contextMenu = new FWContextMenu
-        {
-            Placement = PlacementMode.Bottom,
-            StaysOpen = true
-        };
-        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh", InputGestureText = "F5", Icon = "\uE72C" });
-        contextMenu.Items.Add(new FWMenuItem { Header = "Rename", InputGestureText = "F2", Icon = "\uE70F" });
-        contextMenu.Items.Add(new FWMenuItem { Header = "Show details", IsCheckable = true, IsChecked = true });
-
-        var contextButton = new FWButton
-        {
-            Content = "Open context menu",
-            Width = 180,
-            ContextMenu = contextMenu
-        };
-        contextButton.Click += (_, _) => ContextMenuService.Open(contextButton, contextMenu);
-
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-        topRow.Children.Add(menuBar);
-        topRow.Children.Add(flyoutButton);
-        topRow.Children.Add(contextButton);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(menu);
-        return panel;
-    }
-
-    private UIElement CreateDisclosureDialogsSection()
-    {
-        var panel = CreateSection("Disclosure and Dialogs");
-
-        var row = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
-        };
-
-        var expanderColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 330
-        };
-        expanderColumn.Children.Add(new FWExpander
-        {
-            Header = "FWExpander",
-            IsExpanded = true,
-            Content = new TextBlock
-            {
-                Text = "Expanded content keeps a subtle Fluent surface and accent chevron state.",
-                TextWrapping = TextWrapping.Wrap,
-                Foreground = ThemeBrush("TextPrimary")
-            }
-        });
-        expanderColumn.Children.Add(new FWExpander
-        {
-            Header = "Disabled",
-            IsExpanded = false,
-            IsEnabled = false,
-            Content = new TextBlock
-            {
-                Text = "Disabled expander",
-                Foreground = ThemeBrush("TextSecondary")
-            }
-        });
-        row.Children.Add(expanderColumn);
-
-        var groupBox = new FWGroupBox
-        {
-            Header = "FWGroupBox",
-            Width = 300,
-            Content = new StackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 8,
-                Children =
-                {
-                    new FWCheckBox { Content = "Group option", IsChecked = true },
-                    new FWTextBox { Text = "Grouped text", Width = 240 },
-                    new FWButton { Content = "Apply" }
-                }
-            }
-        };
-        row.Children.Add(groupBox);
-
-        var actionColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 12,
-            Width = 270
-        };
-        var tipButton = new FWButton
-        {
-            Content = "Hover for FWToolTip",
-            Width = 190,
-            ToolTip = new FWToolTip
-            {
-                Content = new TextBlock
-                {
-                    Text = "FWToolTip follows Fluent popup resources.",
-                    Foreground = ThemeBrush("ToolTipForeground")
-                },
-                Placement = PlacementMode.Top,
-                InitialShowDelay = 200
-            }
-        };
-        var dialogResult = new TextBlock
-        {
-            Text = "Dialog result: not shown",
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        };
-        var dialogButton = new FWButton
-        {
-            Content = "Show FWContentDialog",
-            Width = 190
-        };
-        dialogButton.Click += async (_, _) => await ShowDisclosureDialogAsync(dialogResult);
-
-        actionColumn.Children.Add(tipButton);
-        actionColumn.Children.Add(dialogButton);
-        actionColumn.Children.Add(dialogResult);
-        row.Children.Add(actionColumn);
-
-        panel.Children.Add(row);
-        return panel;
-    }
-
-    private UIElement CreateDateTimeSection()
-    {
-        var panel = CreateSection("Date and Time");
-
-        var pickerRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 14
-        };
-
-        pickerRow.Children.Add(new FWDatePicker
-        {
-            Header = "Date",
-            Width = 220,
-            SelectedDate = DateTime.Today,
-            SelectedDateFormat = DatePickerFormat.Long
-        });
-        pickerRow.Children.Add(new FWDatePicker
-        {
-            Header = "Disabled date",
-            Width = 220,
-            PlaceholderText = "Select a date",
-            IsEnabled = false
-        });
-        pickerRow.Children.Add(new FWTimePicker
-        {
-            Header = "Time",
-            Width = 180,
-            SelectedTime = new TimeSpan(10, 30, 0),
-            MinuteIncrement = 15
-        });
-        pickerRow.Children.Add(new FWTimePicker
-        {
-            Header = "24 hour",
-            Width = 180,
-            ClockIdentifier = "24HourClock",
-            SelectedTime = new TimeSpan(18, 45, 0),
-            MinuteIncrement = 15
-        });
-
-        var calendar = new FWCalendar
-        {
-            DisplayDate = DateTime.Today,
-            DisplayDateStart = DateTime.Today.AddDays(-14),
-            DisplayDateEnd = DateTime.Today.AddDays(45),
-            FirstDayOfWeek = DayOfWeek.Monday,
-            IsTodayHighlighted = true,
-            SelectedDate = DateTime.Today.AddDays(1),
-            SelectionMode = CalendarSelectionMode.SingleDate
-        };
-        calendar.BlackoutDates.Add(DateTime.Today.AddDays(2).Date);
-
-        panel.Children.Add(pickerRow);
-        panel.Children.Add(calendar);
-        return panel;
-    }
-
-    private UIElement CreateStatusSection()
-    {
-        var panel = CreateSection("Notifications and Status");
-
-        var infoBarColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 8,
-            Width = 460
-        };
-        infoBarColumn.Children.Add(CreateInfoBar("Information", "A normal FluentJalium status message.", InfoBarSeverity.Informational));
-        infoBarColumn.Children.Add(CreateInfoBar("Success", "The selected operation completed.", InfoBarSeverity.Success));
-        infoBarColumn.Children.Add(CreateInfoBar("Warning", "Review settings before continuing.", InfoBarSeverity.Warning));
-        infoBarColumn.Children.Add(CreateInfoBar("Error", "A required resource could not be loaded.", InfoBarSeverity.Error));
-
-        var badgeColumn = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Width = 300
-        };
-        badgeColumn.Children.Add(new TextBlock
-        {
-            Text = "InfoBadge",
-            FontSize = 13,
-            Foreground = ThemeBrush("TextSecondary")
-        });
-
-        var badgeRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12
-        };
-        badgeRow.Children.Add(new FWInfoBadge { Severity = FWInfoBadgeSeverity.Attention });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 3, Severity = FWInfoBadgeSeverity.Informational });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 128, MaxValue = 99, Severity = FWInfoBadgeSeverity.Success });
-        badgeRow.Children.Add(new FWInfoBadge { IconGlyph = "\uE7BA", Severity = FWInfoBadgeSeverity.Caution });
-        badgeRow.Children.Add(new FWInfoBadge { Value = 1, Severity = FWInfoBadgeSeverity.Critical });
-        badgeColumn.Children.Add(badgeRow);
-
-        var statusBar = new FWStatusBar
-        {
-            Width = 300
-        };
-        statusBar.Items.Add(new FWStatusBarItem { Content = "Ready" });
-        statusBar.Items.Add(new FWStatusBarItem { Content = "Line 42" });
-        statusBar.Items.Add(new FWStatusBarItem { Content = "UTF-8" });
-        statusBar.Items.Add(new FWStatusBarItem { Content = "Disabled", IsEnabled = false });
-        badgeColumn.Children.Add(statusBar);
-
-        var toastHost = new FWToastNotificationHost
-        {
-            Width = 460,
-            Height = 156,
-            MaxVisibleToasts = 3,
-            Position = ToastPosition.TopLeft,
-            ToastWidth = 430
-        };
-        toastHost.ShowToast(new FWToastNotificationItem
-        {
-            Title = "Toast notification",
-            Message = "FWToastNotificationItem uses Fluent severity resources.",
-            Severity = ToastSeverity.Information,
-            IsAutoDismissEnabled = false
-        });
-        toastHost.ShowToast(new FWToastNotificationItem
-        {
-            Title = "Build complete",
-            Message = "Static sample toast remains visible in the gallery.",
-            Severity = ToastSeverity.Success,
-            IsAutoDismissEnabled = false
-        });
-
-        var topRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18
-        };
-        topRow.Children.Add(infoBarColumn);
-        topRow.Children.Add(badgeColumn);
-
-        panel.Children.Add(topRow);
-        panel.Children.Add(toastHost);
         return panel;
     }
 
@@ -1134,15 +394,6 @@ public sealed class MainWindow : Window
             Maximum = 100,
             Value = 64
         });
-        row.Children.Add(new FWRangeSlider
-        {
-            Width = 260,
-            Minimum = 0,
-            Maximum = 100,
-            RangeStart = 24,
-            RangeEnd = 76,
-            MinimumRange = 8
-        });
         row.Children.Add(new FWProgressBar
         {
             Width = 220,
@@ -1157,37 +408,21 @@ public sealed class MainWindow : Window
             Height = 8,
             IsIndeterminate = true
         });
-
-        var ringRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 18,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        ringRow.Children.Add(new FWProgressRing
+        row.Children.Add(new FWProgressRing
         {
             Width = 36,
             Height = 36,
             IsIndeterminate = true
         });
-        ringRow.Children.Add(new FWProgressRing
+        row.Children.Add(new FWProgressRing
         {
             Width = 36,
             Height = 36,
             IsIndeterminate = false,
             Value = 72
-        });
-        ringRow.Children.Add(new FWProgressRing
-        {
-            Width = 36,
-            Height = 36,
-            IsActive = false,
-            IsIndeterminate = false,
-            Value = 30
         });
 
         panel.Children.Add(row);
-        panel.Children.Add(ringRow);
         return panel;
     }
 
@@ -1202,7 +437,7 @@ public sealed class MainWindow : Window
             Margin = new Thickness(0, 0, 0, 4)
         };
         header.Children.Add(CreateCaption("Normal"));
-        header.Children.Add(CreateCaption("DropDown"));
+        header.Children.Add(CreateCaption("Pressed"));
         header.Children.Add(CreateCaption("Selected"));
         header.Children.Add(CreateCaption("Disabled"));
         panel.Children.Add(header);
@@ -1214,82 +449,24 @@ public sealed class MainWindow : Window
         };
 
         row.Children.Add(new FWButton { Content = "Normal" });
-        row.Children.Add(new FWDropDownButton { Content = "Open", Flyout = CreateSampleFlyout() });
-        row.Children.Add(new FWToggleSplitButton { Content = "Selected", IsChecked = true, Flyout = CreateSampleFlyout() });
+        row.Children.Add(new FWButton { Content = "Press me" });
+        row.Children.Add(new FWToggleButton { Content = "Selected", IsChecked = true });
         row.Children.Add(new FWButton { Content = "Disabled", IsEnabled = false });
         panel.Children.Add(row);
 
-        var switchRow = new StackPanel
+        var checkRow = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 12,
+            Spacing = 24,
             Margin = new Thickness(0, 10, 0, 0)
         };
-        switchRow.Children.Add(new FWToggleButton { Content = "Off" });
-        switchRow.Children.Add(new FWToggleButton { Content = "On", IsChecked = true });
-        switchRow.Children.Add(new FWToggleSwitch { Header = "On switch", IsOn = true });
-        switchRow.Children.Add(new FWToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
-        panel.Children.Add(switchRow);
-
-        var selectionRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        selectionRow.Children.Add(new FWCheckBox { Content = "Unchecked" });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Checked", IsChecked = true });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Indeterminate", IsThreeState = true, IsChecked = null });
-        selectionRow.Children.Add(new FWCheckBox { Content = "Disabled", IsChecked = true, IsEnabled = false });
-        panel.Children.Add(selectionRow);
-
-        var comboRow = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0)
-        };
-        comboRow.Children.Add(CreateSampleComboBox("Normal", 0, true));
-        comboRow.Children.Add(CreateSampleComboBox("Selected", 1, true));
-        comboRow.Children.Add(CreateSampleComboBox("Disabled", 2, false));
-        panel.Children.Add(comboRow);
+        checkRow.Children.Add(new FWCheckBox { Content = "Unchecked" });
+        checkRow.Children.Add(new FWCheckBox { Content = "Checked", IsChecked = true });
+        checkRow.Children.Add(new FWRadioButton { Content = "Selected", IsChecked = true });
+        checkRow.Children.Add(new FWToggleSwitch { Header = "Disabled", IsOn = true, IsEnabled = false });
+        panel.Children.Add(checkRow);
 
         return panel;
-    }
-
-    private static FWInfoBar CreateInfoBar(string title, string message, InfoBarSeverity severity)
-    {
-        return new FWInfoBar
-        {
-            Title = title,
-            Message = message,
-            Severity = severity,
-            IsOpen = true,
-            IsClosable = false,
-            Width = 460
-        };
-    }
-
-    private static async Task ShowDisclosureDialogAsync(TextBlock resultText)
-    {
-        var dialog = new FWContentDialog
-        {
-            Title = "Save gallery changes?",
-            PrimaryButtonText = "Save",
-            SecondaryButtonText = "Review",
-            CloseButtonText = "Cancel",
-            DefaultButton = ContentDialogButton.Primary,
-            Content = new TextBlock
-            {
-                Text = "FWContentDialog uses the Fluent dialog card, overlay, title, and command button resources.",
-                Foreground = ThemeBrush("TextPrimary"),
-                TextWrapping = TextWrapping.Wrap,
-                Width = 340
-            }
-        };
-
-        var result = await dialog.ShowAsync();
-        resultText.Text = $"Dialog result: {result}";
     }
 
     private StackPanel CreateSection(string title)
@@ -1321,129 +498,6 @@ public sealed class MainWindow : Window
         };
     }
 
-    private static StackPanel CreateScrollableItems()
-    {
-        var stack = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 6
-        };
-
-        for (var index = 1; index <= 9; index++)
-        {
-            stack.Children.Add(new Border
-            {
-                Height = 28,
-                Background = index % 2 == 0 ? ThemeBrush("ControlBackground") : ThemeBrush("SelectionBackgroundWeak"),
-                BorderBrush = ThemeBrush("ControlBorder"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(4),
-                Padding = new Thickness(8, 0, 8, 0),
-                Child = new TextBlock
-                {
-                    Text = $"Scrollable item {index}",
-                    Foreground = ThemeBrush("TextPrimary"),
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            });
-        }
-
-        return stack;
-    }
-
-    private static SwipeItems CreateSwipeItems(SwipeMode mode, params (string Text, string Icon, string BackgroundKey)[] items)
-    {
-        var swipeItems = new SwipeItems
-        {
-            Mode = mode
-        };
-
-        foreach (var item in items)
-        {
-            swipeItems.Add(new SwipeItem
-            {
-                Text = item.Text,
-                IconSource = item.Icon,
-                Background = ThemeBrush(item.BackgroundKey),
-                Foreground = ThemeBrush("SwipeItemForeground")
-            });
-        }
-
-        return swipeItems;
-    }
-
-    private static Grid CreateSplitterPreview()
-    {
-        var grid = new Grid
-        {
-            Width = 370,
-            Height = 150,
-            Background = ThemeBrush("SwipeControlBackground")
-        };
-        grid.ColumnDefinitions.Add(new ColumnDefinition
-        {
-            Width = new GridLength(150),
-            MinWidth = 96
-        });
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(6) });
-        grid.ColumnDefinitions.Add(new ColumnDefinition
-        {
-            Width = new GridLength(1, GridUnitType.Star),
-            MinWidth = 140
-        });
-
-        var left = CreateSplitterPane("Outline", "Theme tokens\nFW controls\nGallery states");
-        Grid.SetColumn(left, 0);
-        grid.Children.Add(left);
-
-        var splitter = new FWGridSplitter
-        {
-            Width = 6,
-            ResizeDirection = GridResizeDirection.Columns,
-            ResizeBehavior = GridResizeBehavior.PreviousAndNext,
-            KeyboardIncrement = 12,
-            DragIncrement = 1
-        };
-        Grid.SetColumn(splitter, 1);
-        grid.Children.Add(splitter);
-
-        var right = CreateSplitterPane("Preview", "Drag the splitter to resize this Fluent layout.");
-        Grid.SetColumn(right, 2);
-        grid.Children.Add(right);
-
-        return grid;
-    }
-
-    private static Border CreateSplitterPane(string title, string text)
-    {
-        var panel = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 8
-        };
-        panel.Children.Add(new TextBlock
-        {
-            Text = title,
-            Foreground = ThemeBrush("TextPrimary"),
-            FontSize = 14
-        });
-        panel.Children.Add(new TextBlock
-        {
-            Text = text,
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        });
-
-        return new Border
-        {
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            Padding = new Thickness(12),
-            Child = panel
-        };
-    }
-
     private Button CreateCommandButton(string text, Action action)
     {
         var button = new Button
@@ -1454,131 +508,13 @@ public sealed class MainWindow : Window
         return button;
     }
 
-    private static FWMenuBarItem CreateMenuBarItem(string title, params (string Text, string Shortcut)[] items)
-    {
-        var menuBarItem = new FWMenuBarItem
-        {
-            Title = title
-        };
-
-        for (var index = 0; index < items.Length; index++)
-        {
-            var (text, shortcut) = items[index];
-            menuBarItem.Items.Add(new FWMenuFlyoutItem
-            {
-                Text = text,
-                KeyboardAcceleratorTextOverride = shortcut,
-                Icon = index == 0 ? "\uE8A5" : null
-            });
-        }
-
-        if (items.Length > 1)
-        {
-            menuBarItem.Items.Insert(items.Length - 1, new FWMenuFlyoutSeparator());
-        }
-
-        return menuBarItem;
-    }
-
-    private static MenuFlyout CreateMenuControlsFlyout()
-    {
-        var flyout = new MenuFlyout();
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Pin", Icon = "\uE718", KeyboardAcceleratorTextOverride = "Ctrl+P" });
-        flyout.Items.Add(new FWToggleMenuFlyoutItem { Text = "Show badges", IsChecked = true });
-        flyout.Items.Add(new FWMenuFlyoutSeparator());
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Settings", Icon = "\uE713" });
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Disabled", IsEnabled = false });
-        return flyout;
-    }
-
     private static MenuFlyout CreateSampleFlyout()
     {
         var flyout = new MenuFlyout();
         flyout.Items.Add(new FWMenuFlyoutItem { Text = "Create" });
         flyout.Items.Add(new FWMenuFlyoutItem { Text = "Open" });
-        flyout.Items.Add(new FWMenuFlyoutSeparator());
         flyout.Items.Add(new FWMenuFlyoutItem { Text = "Export" });
         return flyout;
-    }
-
-    private static FWComboBox CreateSampleComboBox(string placeholder, int selectedIndex, bool isEnabled)
-    {
-        var comboBox = new FWComboBox
-        {
-            Width = 160,
-            PlaceholderText = placeholder,
-            IsEnabled = isEnabled
-        };
-
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "WinUI" });
-        comboBox.Items.Add(new FWComboBoxItem { Content = "Toolkit" });
-        comboBox.SelectedIndex = selectedIndex;
-        return comboBox;
-    }
-
-    private static GridView CreateSampleGridView()
-    {
-        var view = new GridView();
-        view.Columns.Add(new GridViewColumn
-        {
-            Header = "Name",
-            DisplayMemberBinding = new Binding("Name"),
-            Width = 150
-        });
-        view.Columns.Add(new GridViewColumn
-        {
-            Header = "State",
-            DisplayMemberBinding = new Binding("State"),
-            Width = 110
-        });
-        return view;
-    }
-
-    private static GalleryRow[] CreateSampleRows()
-    {
-        return
-        [
-            new GalleryRow("Buttons", "Complete", 9),
-            new GalleryRow("Selection", "Review", 4),
-            new GalleryRow("Collections", "Active", 8)
-        ];
-    }
-
-    private static GalleryTreeRow[] CreateSampleTree()
-    {
-        return
-        [
-            new GalleryTreeRow(
-                "FluentJalium",
-                "Active",
-                [
-                    new GalleryTreeRow("Theme resources", "Loaded", []),
-                    new GalleryTreeRow("FW controls", "Expanding", [])
-                ]),
-            new GalleryTreeRow("Gallery", "Visible", [])
-        ];
-    }
-
-    private static BitmapImage CreateSampleBitmap()
-    {
-        const int width = 96;
-        const int height = 64;
-        var pixels = new byte[width * height * 4];
-
-        for (var y = 0; y < height; y++)
-        {
-            for (var x = 0; x < width; x++)
-            {
-                var index = ((y * width) + x) * 4;
-                pixels[index] = (byte)(0x72 + (x * 0x30 / width));
-                pixels[index + 1] = (byte)(0x45 + (y * 0x70 / height));
-                pixels[index + 2] = (byte)(0xD4 - (x * 0x60 / width));
-                pixels[index + 3] = 0xFF;
-            }
-        }
-
-        return BitmapImage.FromPixels(pixels, width, height);
     }
 
     private void ApplyTheme(FluentThemeVariant theme)
@@ -1611,8 +547,4 @@ public sealed class MainWindow : Window
             Foreground = ThemeBrush("TextPrimary")
         };
     }
-
-    private sealed record GalleryRow(string Name, string State, int Count);
-
-    private sealed record GalleryTreeRow(string Name, string State, GalleryTreeRow[] Children);
 }

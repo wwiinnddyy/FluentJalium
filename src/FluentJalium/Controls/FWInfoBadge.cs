@@ -164,7 +164,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
         return new Size(width, height);
     }
 
-    private static Size CoerceToAvailable(Size desired, Size availableSize)
+    private Size CoerceToAvailable(Size desired, Size availableSize)
     {
         var width = desired.Width;
         var height = desired.Height;
@@ -177,7 +177,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
         return new Size(Math.Max(0, width), Math.Max(0, height));
     }
 
-    private static FormattedText CreateFormattedText(string text, Brush foreground, string fontFamily, double fontSize, FontWeight fontWeight)
+    private FormattedText CreateFormattedText(string text, Brush foreground, string fontFamily, double fontSize, FontWeight fontWeight)
     {
         var formatted = new FormattedText(text, fontFamily, fontSize)
         {
@@ -216,7 +216,9 @@ public class FWInfoBadge : Control, IFluentJaliumControl
 
     private double GetDisplayFontSize()
     {
-        return Math.Max(10.0, FontSize);
+        return DisplayKind == FWInfoBadgeDisplayKind.Icon
+            ? Math.Max(10.0, FontSize)
+            : Math.Max(10.0, FontSize);
     }
 
     private FontWeight GetDisplayFontWeight()
