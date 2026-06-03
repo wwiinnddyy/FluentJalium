@@ -1,3 +1,4 @@
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -32,14 +33,17 @@ internal sealed class GalleryMaterialsPage
         };
 
         examples.Children.Add(CreateMaterialsExampleCard(
+            FluentIconRegular.WindowBrush24,
             "Window SystemBackdrop",
             "Jalium windows expose WinUI-style Mica, Mica Alt, and Acrylic backdrops for app shell depth.",
             CreateWindowBackdropMaterialSample()));
         examples.Children.Add(CreateMaterialsExampleCard(
+            FluentIconRegular.TransparencySquare24,
             "Element BackdropEffect",
             "Controls can blur and tint content behind the element with Acrylic, Mica, frosted glass, and color adjustment effects.",
             CreateElementBackdropEffectsSample()));
         examples.Children.Add(CreateMaterialsExampleCard(
+            FluentIconRegular.LayerDiagonalSparkle24,
             "Layered control surfaces",
             "Controls should sit on layered materials that echo WinUI: backdrop, layer fill, subtle border, and soft elevation.",
             CreateLayeredMaterialControlsSample()));
@@ -50,7 +54,7 @@ internal sealed class GalleryMaterialsPage
 
     private UIElement CreateWindowBackdropMaterialSample()
     {
-        var status = CreateMaterialOutput($"Current window backdrop: {_window.SystemBackdrop}");
+        var status = CreateMaterialOutputText($"Current window backdrop: {_window.SystemBackdrop}");
 
         return new FWStackPanel
         {
@@ -60,11 +64,11 @@ internal sealed class GalleryMaterialsPage
             {
                 CreateBackdropPreview("System backdrop", "Mica / MicaAlt / Acrylic are window-level materials, not just panel colors.", ThemeBrush("LayerFillColorDefaultBrush")),
                 CreateMaterialButtonRow(
-                    CreateMaterialActionButton("None", () => ApplySystemBackdrop(WindowBackdropType.None, status)),
-                    CreateMaterialActionButton("Mica", () => ApplySystemBackdrop(WindowBackdropType.Mica, status)),
-                    CreateMaterialActionButton("Mica Alt", () => ApplySystemBackdrop(WindowBackdropType.MicaAlt, status)),
-                    CreateMaterialActionButton("Acrylic", () => ApplySystemBackdrop(WindowBackdropType.Acrylic, status))),
-                status
+                    CreateMaterialActionButton(FluentIconRegular.DismissCircle24, "None", () => ApplySystemBackdrop(WindowBackdropType.None, status)),
+                    CreateMaterialActionButton(FluentIconRegular.WindowBrush24, "Mica", () => ApplySystemBackdrop(WindowBackdropType.Mica, status)),
+                    CreateMaterialActionButton(FluentIconRegular.LayerDiagonal24, "Mica Alt", () => ApplySystemBackdrop(WindowBackdropType.MicaAlt, status)),
+                    CreateMaterialActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => ApplySystemBackdrop(WindowBackdropType.Acrylic, status))),
+                CreateMaterialStatus(status)
             }
         };
     }
@@ -77,12 +81,12 @@ internal sealed class GalleryMaterialsPage
             VerticalSpacing = 10,
             Children =
             {
-                CreateBackdropEffectTile("BlurEffect", "Backdrop blur", new Jalium.UI.Media.BlurEffect(18f)),
-                CreateBackdropEffectTile("AcrylicEffect", "Tint, blur, and noise", new AcrylicEffect(Color.FromArgb(180, 20, 84, 145), 0.55f, 28f)),
-                CreateBackdropEffectTile("MicaEffect", "Wallpaper-tinted material", new MicaEffect()),
-                CreateBackdropEffectTile("FrostedGlassEffect", "High diffusion glass", new FrostedGlassEffect(26f, 0.04f, Color.FromArgb(180, 245, 248, 255), 0.38f)),
-                CreateBackdropEffectTile("Grayscale", "Backdrop color adjustment", ColorAdjustmentEffect.CreateGrayscale(1.0f)),
-                CreateBackdropEffectTile("HueRotate", "Backdrop hue shift", ColorAdjustmentEffect.CreateHueRotate(72f))
+                CreateBackdropEffectTile(FluentIconRegular.CircleMultipleConcentric24, "BlurEffect", "Backdrop blur", new Jalium.UI.Media.BlurEffect(18f)),
+                CreateBackdropEffectTile(FluentIconRegular.Drop24, "AcrylicEffect", "Tint, blur, and noise", new AcrylicEffect(Color.FromArgb(180, 20, 84, 145), 0.55f, 28f)),
+                CreateBackdropEffectTile(FluentIconRegular.WindowBrush24, "MicaEffect", "Wallpaper-tinted material", new MicaEffect()),
+                CreateBackdropEffectTile(FluentIconRegular.WeatherSnowflake24, "FrostedGlassEffect", "High diffusion glass", new FrostedGlassEffect(26f, 0.04f, Color.FromArgb(180, 245, 248, 255), 0.38f)),
+                CreateBackdropEffectTile(FluentIconRegular.Color24, "Grayscale", "Backdrop color adjustment", ColorAdjustmentEffect.CreateGrayscale(1.0f)),
+                CreateBackdropEffectTile(FluentIconRegular.PaintBrushSparkle24, "HueRotate", "Backdrop hue shift", ColorAdjustmentEffect.CreateHueRotate(72f))
             }
         };
     }
@@ -90,6 +94,7 @@ internal sealed class GalleryMaterialsPage
     private static UIElement CreateLayeredMaterialControlsSample()
     {
         var elevated = CreateLayeredSurface(
+            FluentIconRegular.SquareShadow24,
             "Elevated command layer",
             "Soft shadow plus layer fill keeps commands readable on Mica.",
             ThemeBrush("LayerFillColorDefaultBrush"));
@@ -115,8 +120,8 @@ internal sealed class GalleryMaterialsPage
                     Spacing = 8,
                     Children =
                     {
-                        new FWButton { Content = "Primary action" },
-                        new FWButton { Content = "Secondary" },
+                        CreateMaterialCommandButton(FluentIconRegular.CheckmarkCircle24, "Primary action"),
+                        CreateMaterialCommandButton(FluentIconRegular.Layer24, "Secondary"),
                         new FWToggleSwitch { Header = "Backdrop-aware", IsOn = true }
                     }
                 }
@@ -130,14 +135,14 @@ internal sealed class GalleryMaterialsPage
         status.Text = $"Current window backdrop: {backdropType}";
     }
 
-    private static FWBorder CreateBackdropEffectTile(string title, string description, IBackdropEffect effect)
+    private static FWBorder CreateBackdropEffectTile(FluentIconRegular icon, string title, string description, IBackdropEffect effect)
     {
-        var preview = CreateLayeredSurface(title, description, new SolidColorBrush(Color.FromArgb(110, 255, 255, 255)));
+        var preview = CreateLayeredSurface(icon, title, description, new SolidColorBrush(Color.FromArgb(110, 255, 255, 255)));
         preview.BackdropEffect = effect;
         return preview;
     }
 
-    private static FWBorder CreateLayeredSurface(string title, string description, Brush background)
+    private static FWBorder CreateLayeredSurface(FluentIconRegular icon, string title, string description, Brush background)
     {
         return new FWBorder
         {
@@ -154,11 +159,21 @@ internal sealed class GalleryMaterialsPage
                 Spacing = 8,
                 Children =
                 {
-                    new FWTextBlock
+                    new FWStackPanel
                     {
-                        Text = title,
-                        FontSize = 15,
-                        Foreground = ThemeBrush("TextPrimary")
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Children =
+                        {
+                            CreateIcon(icon, 18, ThemeBrush("TextPrimary")),
+                            new FWTextBlock
+                            {
+                                Text = title,
+                                FontSize = 15,
+                                Foreground = ThemeBrush("TextPrimary"),
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
                     },
                     new FWTextBlock
                     {
@@ -193,13 +208,13 @@ internal sealed class GalleryMaterialsPage
                         CornerRadius = new CornerRadius(8),
                         Opacity = 0.24
                     },
-                    CreateLayeredSurface(title, description, layerBrush)
+                    CreateLayeredSurface(FluentIconRegular.WindowBrush24, title, description, layerBrush)
                 }
             }
         };
     }
 
-    private static FWBorder CreateMaterialsExampleCard(string title, string description, UIElement content)
+    private static FWBorder CreateMaterialsExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
         return new FWBorder
         {
@@ -215,11 +230,21 @@ internal sealed class GalleryMaterialsPage
                 Spacing = 10,
                 Children =
                 {
-                    new FWTextBlock
+                    new FWStackPanel
                     {
-                        Text = title,
-                        FontSize = 15,
-                        Foreground = ThemeBrush("TextPrimary")
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Children =
+                        {
+                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
+                            new FWTextBlock
+                            {
+                                Text = title,
+                                FontSize = 15,
+                                Foreground = ThemeBrush("TextPrimary"),
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
                     },
                     new FWTextBlock
                     {
@@ -250,17 +275,43 @@ internal sealed class GalleryMaterialsPage
         return row;
     }
 
-    private static FWButton CreateMaterialActionButton(string text, Action action)
+    private static FWButton CreateMaterialActionButton(FluentIconRegular icon, string text, Action action)
     {
         var button = new FWButton
         {
-            Content = text
+            Content = CreateMaterialButtonContent(icon, text)
         };
         button.Click += (_, _) => action();
         return button;
     }
 
-    private static TextBlock CreateMaterialOutput(string text)
+    private static FWButton CreateMaterialCommandButton(FluentIconRegular icon, string text)
+    {
+        return new FWButton
+        {
+            Content = CreateMaterialButtonContent(icon, text)
+        };
+    }
+
+    private static FWStackPanel CreateMaterialButtonContent(FluentIconRegular icon, string text)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            Children =
+            {
+                CreateIcon(icon, 16, ThemeBrush("TextPrimary")),
+                new FWTextBlock
+                {
+                    Text = text,
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
+        };
+    }
+
+    private static TextBlock CreateMaterialOutputText(string text)
     {
         return new TextBlock
         {
@@ -268,6 +319,28 @@ internal sealed class GalleryMaterialsPage
             FontSize = 12,
             Foreground = ThemeBrush("TextSecondary"),
             TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static FWBorder CreateMaterialStatus(TextBlock status)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(FluentIconRegular.InfoSparkle24, 18, ThemeBrush("TextSecondary")),
+                    status
+                }
+            }
         };
     }
 
@@ -279,14 +352,29 @@ internal sealed class GalleryMaterialsPage
             Spacing = 14,
             Children =
             {
-                new FWTextBlock
+                new FWStackPanel
                 {
-                    Text = title,
-                    FontSize = 22,
-                    Foreground = ThemeBrush("TextPrimary")
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 10,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.TransparencySquare24, 24, ThemeBrush("TextPrimary")),
+                        new FWTextBlock
+                        {
+                            Text = title,
+                            FontSize = 22,
+                            Foreground = ThemeBrush("TextPrimary"),
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    }
                 }
             }
         };
+    }
+
+    private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
+    {
+        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
 
     private static Brush ThemeBrush(string key)
