@@ -147,17 +147,12 @@ internal sealed class GalleryMaterialsPage
 
     private static FWFluentMaterialSurface CreateMaterialSurfaceTile(FluentIconRegular icon, string title, string description, FWFluentMaterialKind materialKind)
     {
+        var recipe = FWFluentMaterialRecipe.Create(materialKind);
         var isLiquidGlass = materialKind == FWFluentMaterialKind.LiquidGlass;
-        return new FWFluentMaterialSurface
+        var surface = new FWFluentMaterialSurface
         {
             Width = 236,
             Height = 130,
-            MaterialKind = materialKind,
-            TintColor = Color.FromArgb(180, 20, 84, 145),
-            TintOpacity = isLiquidGlass ? 0.22 : 0.46,
-            BlurRadius = isLiquidGlass ? 12 : 28,
-            RefractionAmount = 84,
-            ChromaticAberration = isLiquidGlass ? 0.55 : 0,
             Background = new SolidColorBrush(isLiquidGlass
                 ? Color.FromArgb(44, 0, 120, 212)
                 : Color.FromArgb(110, 255, 255, 255)),
@@ -169,6 +164,9 @@ internal sealed class GalleryMaterialsPage
             Padding = new Thickness(14),
             Child = CreateLayeredSurfaceContent(icon, title, description)
         };
+
+        surface.UseMaterialRecipe(recipe);
+        return surface;
     }
 
     private static FWBorder CreateLayeredSurface(FluentIconRegular icon, string title, string description, Brush background)

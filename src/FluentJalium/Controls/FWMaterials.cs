@@ -47,6 +47,102 @@ public enum FWFluentMaterialKind
 }
 
 /// <summary>
+/// Describes the effect recipe used by a FluentJalium material surface.
+/// </summary>
+public readonly record struct FWFluentMaterialRecipe(
+    FWFluentMaterialKind MaterialKind,
+    Color TintColor,
+    double TintOpacity,
+    double BlurRadius,
+    double NoiseIntensity,
+    double RefractionAmount,
+    double ChromaticAberration,
+    double FusionRadius,
+    bool IsInteractive)
+{
+    /// <summary>
+    /// Creates the default recipe for the requested material kind.
+    /// </summary>
+    public static FWFluentMaterialRecipe Create(FWFluentMaterialKind materialKind)
+    {
+        return materialKind switch
+        {
+            FWFluentMaterialKind.None => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(0, 0, 0, 0),
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.Layer => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(0, 0, 0, 0),
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.Mica => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(180, 20, 84, 145),
+                0.18,
+                18,
+                0,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.MicaAlt => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(190, 20, 84, 145),
+                0.26,
+                22,
+                0,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.Acrylic => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(180, 20, 84, 145),
+                0.46,
+                28,
+                0.035,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.FrostedGlass => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(160, 255, 255, 255),
+                0.32,
+                34,
+                0.045,
+                0,
+                0,
+                0,
+                false),
+            FWFluentMaterialKind.LiquidGlass => new FWFluentMaterialRecipe(
+                materialKind,
+                Color.FromArgb(180, 20, 84, 145),
+                0.22,
+                14,
+                0,
+                84,
+                0.55,
+                24,
+                true),
+            _ => throw new ArgumentOutOfRangeException(nameof(materialKind), materialKind, "Unknown Fluent material kind.")
+        };
+    }
+}
+
+/// <summary>
 /// A FluentJalium material surface that maps WinUI-style material names onto Jalium backdrop and liquid glass effects.
 /// </summary>
 public class FWFluentMaterialSurface : Border, IFluentJaliumControl
@@ -180,6 +276,30 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
     {
         get => (bool)GetValue(IsInteractiveProperty)!;
         set => SetValue(IsInteractiveProperty, value);
+    }
+
+    /// <summary>
+    /// Applies the default material recipe for the supplied kind.
+    /// </summary>
+    public void UseMaterialRecipe(FWFluentMaterialKind materialKind)
+    {
+        UseMaterialRecipe(FWFluentMaterialRecipe.Create(materialKind));
+    }
+
+    /// <summary>
+    /// Applies an explicit material recipe to this surface.
+    /// </summary>
+    public void UseMaterialRecipe(FWFluentMaterialRecipe recipe)
+    {
+        MaterialKind = recipe.MaterialKind;
+        TintColor = recipe.TintColor;
+        TintOpacity = recipe.TintOpacity;
+        BlurRadius = recipe.BlurRadius;
+        NoiseIntensity = recipe.NoiseIntensity;
+        RefractionAmount = recipe.RefractionAmount;
+        ChromaticAberration = recipe.ChromaticAberration;
+        FusionRadius = recipe.FusionRadius;
+        IsInteractive = recipe.IsInteractive;
     }
 
     private static void OnMaterialPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
