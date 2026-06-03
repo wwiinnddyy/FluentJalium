@@ -359,6 +359,86 @@ public sealed class FluentMenuControlsTests
     }
 
     [Fact]
+    public void FWMenuControls_ShouldComposeInsideLiquidGlassMenuWorkbench()
+    {
+        var menuBar = new FWMenuBar();
+        var file = new FWMenuBarItem { Title = "File" };
+        file.Items.Add(new FWMenuFlyoutItem { Text = "Open", KeyboardAcceleratorTextOverride = "Ctrl+O" });
+        file.Items.Add(new FWMenuFlyoutSeparator());
+        file.Items.Add(new FWMenuFlyoutItem { Text = "Save", Icon = "\uE74E" });
+        menuBar.Items.Add(file);
+
+        var flyout = new FWMenuFlyout();
+        var pin = new FWToggleMenuFlyoutItem
+        {
+            Text = "Pin",
+            IsChecked = true
+        };
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Copy" });
+        flyout.Items.Add(pin);
+        flyout.Items.Add(new FWMenuFlyoutSeparator());
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Disabled", IsEnabled = false });
+
+        var contextMenu = new FWContextMenu
+        {
+            Placement = PlacementMode.Bottom,
+            StaysOpen = true
+        };
+        contextMenu.Items.Add(new FWMenuItem { Header = "Refresh" });
+        contextMenu.Items.Add(new FWMenuItem { Header = "Metadata", IsCheckable = true, IsChecked = true });
+
+        var commandFlyout = new FWCommandBarFlyout
+        {
+            AlwaysExpanded = true
+        };
+        var copy = new FWAppBarButton { Label = "Copy" };
+        var share = new FWAppBarButton { Label = "Share" };
+        commandFlyout.PrimaryCommands.Add(copy);
+        commandFlyout.SecondaryCommands.Add(share);
+
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                menuBar,
+                new FWDropDownButton { Content = "Flyout", Flyout = flyout, ContextMenu = contextMenu }
+            }
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = panel
+        };
+
+        Assert.Single(menuBar.Items);
+        Assert.Equal(3, file.Items.Count);
+        Assert.Equal(4, flyout.Items.Count);
+        Assert.True(pin.IsChecked);
+        Assert.Equal(PlacementMode.Bottom, contextMenu.Placement);
+        Assert.True(contextMenu.StaysOpen);
+        Assert.True(commandFlyout.AlwaysExpanded);
+        Assert.Same(copy, Assert.Single(commandFlyout.PrimaryCommands));
+        Assert.Same(share, Assert.Single(commandFlyout.SecondaryCommands));
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(70, surface.RefractionAmount);
+        Assert.Equal(0.42, surface.ChromaticAberration);
+        Assert.Equal(24, surface.FusionRadius);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(4, surface.SuperEllipseN);
+        Assert.Same(panel, surface.Child);
+    }
+
+    [Fact]
     public void FWMenuFlyoutSubItem_ShouldExposeSubItemsAndUseSubmenuInvocation()
     {
         var subItem = new FWMenuFlyoutSubItem
