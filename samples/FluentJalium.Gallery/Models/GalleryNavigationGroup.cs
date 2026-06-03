@@ -9,6 +9,7 @@ internal static class GalleryNavigationGroup
     public const string Input = "Input";
     public const string LayoutAndMedia = "Layout and media";
     public const string CollectionsAndData = "Collections and data";
+    public const string MaterialsAndEffects = "Materials and effects";
     public const string AppStructure = "App structure";
     public const string Diagnostics = "Diagnostics";
 
@@ -18,6 +19,7 @@ internal static class GalleryNavigationGroup
         Input,
         LayoutAndMedia,
         CollectionsAndData,
+        MaterialsAndEffects,
         AppStructure
     ];
 
@@ -29,6 +31,7 @@ internal static class GalleryNavigationGroup
             Input => FluentIconRegular.Textbox24,
             LayoutAndMedia => FluentIconRegular.LayoutColumnTwo24,
             CollectionsAndData => FluentIconRegular.Table24,
+            MaterialsAndEffects => FluentIconRegular.TransparencySquare24,
             AppStructure => FluentIconRegular.Navigation24,
             Diagnostics => FluentIconRegular.DataUsage24,
             _ => FluentIconRegular.Home24
