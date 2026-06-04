@@ -18,6 +18,24 @@
     <system:Double x:Key="FluentMaterialLiquidGlassRefractionAmount">84</system:Double>
     <system:Double x:Key="FluentMaterialLiquidGlassChromaticAberration">0.55</system:Double>
     <system:Double x:Key="FluentMaterialLiquidGlassFusionRadius">24</system:Double>
+    <system:Double x:Key="FluentMaterialFocusGlassSuperEllipseN">4</system:Double>
+
+    <CornerRadius x:Key="FluentMaterialWindowSurfaceCornerRadius">0</CornerRadius>
+    <CornerRadius x:Key="FluentMaterialShellPaneCornerRadius">0</CornerRadius>
+    <CornerRadius x:Key="FluentMaterialContentLayerCornerRadius">0</CornerRadius>
+    <CornerRadius x:Key="FluentMaterialCardCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="FluentMaterialFlyoutCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="FluentMaterialFocusGlassCornerRadius">12</CornerRadius>
+    <Thickness x:Key="FluentMaterialWindowSurfacePadding">0</Thickness>
+    <Thickness x:Key="FluentMaterialShellPanePadding">0</Thickness>
+    <Thickness x:Key="FluentMaterialContentLayerPadding">0</Thickness>
+    <Thickness x:Key="FluentMaterialCardPadding">16</Thickness>
+    <Thickness x:Key="FluentMaterialFlyoutPadding">8</Thickness>
+    <Thickness x:Key="FluentMaterialFocusGlassPadding">12</Thickness>
+    <Thickness x:Key="FluentMaterialShellPaneBorderThickness">0,0,1,0</Thickness>
+    <Thickness x:Key="FluentMaterialCardBorderThickness">1</Thickness>
+    <Thickness x:Key="FluentMaterialFlyoutBorderThickness">1</Thickness>
+    <Thickness x:Key="FluentMaterialFocusGlassBorderThickness">1</Thickness>
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
@@ -29,6 +47,7 @@
             <SolidColorBrush x:Key="FluentMaterialWindowBackdropBrush" Color="#202020" />
             <SolidColorBrush x:Key="FluentMaterialShellPaneBrush" Color="#FF2C2C2C" />
             <SolidColorBrush x:Key="FluentMaterialContentLayerBrush" Color="#4C3A3A3A" />
+            <SolidColorBrush x:Key="FluentMaterialCardBrush" Color="#663A3A3A" />
             <SolidColorBrush x:Key="FluentMaterialTransientAcrylicBrush" Color="#B020548F" />
             <SolidColorBrush x:Key="FluentMaterialFocusedGlassBrush" Color="#2C0078D4" />
             <SolidColorBrush x:Key="FluentMaterialLayerBorderBrush" Color="#15FFFFFF" />
@@ -46,6 +65,7 @@
             <SolidColorBrush x:Key="FluentMaterialWindowBackdropBrush" Color="#FFF3F3F3" />
             <SolidColorBrush x:Key="FluentMaterialShellPaneBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FluentMaterialContentLayerBrush" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="FluentMaterialCardBrush" Color="#F3FFFFFF" />
             <SolidColorBrush x:Key="FluentMaterialTransientAcrylicBrush" Color="#CCFFFFFF" />
             <SolidColorBrush x:Key="FluentMaterialFocusedGlassBrush" Color="#260078D4" />
             <SolidColorBrush x:Key="FluentMaterialLayerBorderBrush" Color="#15000000" />
@@ -63,6 +83,7 @@
             <SolidColorBrush x:Key="FluentMaterialWindowBackdropBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialShellPaneBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialContentLayerBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="FluentMaterialCardBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialTransientAcrylicBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialFocusedGlassBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialLayerBorderBrush" Color="#FFFFFFFF" />

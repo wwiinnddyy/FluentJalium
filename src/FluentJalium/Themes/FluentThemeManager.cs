@@ -240,6 +240,7 @@ public static class FluentThemeManager
         AliasStyle<FWAccessText, AccessText>(dictionary);
         AliasStyle<FWBorder, Border>(dictionary);
         AliasStyle<FWFluentMaterialSurface, Border>(dictionary);
+        AliasStyle<FWFluentWindowSurface, Border>(dictionary);
         AliasStyle<FWContentControl, ContentControl>(dictionary);
         AliasStyle<FWTransitioningContentControl, TransitioningContentControl>(dictionary);
         AliasStyle<FWContentPresenter, ContentPresenter>(dictionary);

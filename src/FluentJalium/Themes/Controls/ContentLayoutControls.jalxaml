@@ -1,5 +1,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:fluent="https://jalium.dev/fluent"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="TextBlock">
@@ -23,6 +24,22 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style TargetType="fluent:FWFluentMaterialSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialContentLayerBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource FluentMaterialLayerBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialContentLayerCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialContentLayerPadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWFluentWindowSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="WindowBackdropKind" Value="Mica" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialWindowBackdropBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialWindowSurfaceCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialWindowSurfacePadding}" />
     </Style>
 
     <Style TargetType="ContentControl">

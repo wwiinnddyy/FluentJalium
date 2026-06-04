@@ -91,6 +91,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
+            AssertBasedOnStyle<FWFluentWindowSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
@@ -281,6 +282,7 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TextBlock>(dictionary);
         AssertContainsStyle<AccessText>(dictionary);
         AssertContainsStyle<Border>(dictionary);
+        AssertContainsStyle<FWFluentWindowSurface>(dictionary);
         AssertContainsStyle<ContentControl>(dictionary);
         AssertContainsStyle<TransitioningContentControl>(dictionary);
         AssertContainsStyle<ContentPresenter>(dictionary);
@@ -404,6 +406,7 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialWindowBackdropBrush"));
         Assert.True(dictionary.Contains("FluentMaterialShellPaneBrush"));
         Assert.True(dictionary.Contains("FluentMaterialContentLayerBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialCardBrush"));
         Assert.True(dictionary.Contains("FluentMaterialTransientAcrylicBrush"));
         Assert.True(dictionary.Contains("FluentMaterialFocusedGlassBrush"));
         Assert.True(dictionary.Contains("FluentMaterialLayerBorderBrush"));
@@ -430,6 +433,23 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialLiquidGlassRefractionAmount"));
         Assert.True(dictionary.Contains("FluentMaterialLiquidGlassChromaticAberration"));
         Assert.True(dictionary.Contains("FluentMaterialLiquidGlassFusionRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialFocusGlassSuperEllipseN"));
+        Assert.True(dictionary.Contains("FluentMaterialWindowSurfaceCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialShellPaneCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialContentLayerCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialCardCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialFlyoutCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialFocusGlassCornerRadius"));
+        Assert.True(dictionary.Contains("FluentMaterialWindowSurfacePadding"));
+        Assert.True(dictionary.Contains("FluentMaterialShellPanePadding"));
+        Assert.True(dictionary.Contains("FluentMaterialContentLayerPadding"));
+        Assert.True(dictionary.Contains("FluentMaterialCardPadding"));
+        Assert.True(dictionary.Contains("FluentMaterialFlyoutPadding"));
+        Assert.True(dictionary.Contains("FluentMaterialFocusGlassPadding"));
+        Assert.True(dictionary.Contains("FluentMaterialShellPaneBorderThickness"));
+        Assert.True(dictionary.Contains("FluentMaterialCardBorderThickness"));
+        Assert.True(dictionary.Contains("FluentMaterialFlyoutBorderThickness"));
+        Assert.True(dictionary.Contains("FluentMaterialFocusGlassBorderThickness"));
         Assert.True(dictionary.Contains("FluentControlCornerRadius"));
         Assert.True(dictionary.Contains("FluentOverlayCornerRadius"));
         Assert.True(dictionary.Contains("FluentCardCornerRadius"));
@@ -731,6 +751,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
+            AssertBasedOnStyle<FWFluentWindowSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
@@ -1000,6 +1021,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWAccessText, AccessText>();
         AssertFluentControl<FWBorder, Border>();
         AssertFluentControl<FWFluentMaterialSurface, Border>();
+        AssertFluentControl<FWFluentWindowSurface, Border>();
         AssertFluentControl<FWContentControl, ContentControl>();
         AssertFluentControl<FWTransitioningContentControl, TransitioningContentControl>();
         AssertFluentControl<FWContentPresenter, ContentPresenter>();
