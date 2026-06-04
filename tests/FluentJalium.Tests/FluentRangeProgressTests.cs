@@ -145,11 +145,19 @@ public sealed class FluentRangeProgressTests
         AssertSetter(sliderStyle, Slider.TrackBrushProperty);
         AssertSetter(sliderStyle, Slider.ThumbBrushProperty);
 
+        var fwSliderStyle = AssertStyle<FWSlider>(dictionary);
+        Assert.Same(sliderStyle, fwSliderStyle.BasedOn);
+        AssertSetter(fwSliderStyle, FWSlider.DensityProperty);
+
         var rangeSliderStyle = AssertStyle<RangeSlider>(dictionary);
         AssertSetter(rangeSliderStyle, Control.BackgroundProperty);
         AssertSetter(rangeSliderStyle, Control.ForegroundProperty);
         AssertSetter(rangeSliderStyle, RangeSlider.TrackBrushProperty);
         AssertSetter(rangeSliderStyle, RangeSlider.ThumbBrushProperty);
+
+        var fwRangeSliderStyle = AssertStyle<FWRangeSlider>(dictionary);
+        Assert.Same(rangeSliderStyle, fwRangeSliderStyle.BasedOn);
+        AssertSetter(fwRangeSliderStyle, FWRangeSlider.DensityProperty);
 
         var progressBarStyle = AssertStyle<ProgressBar>(dictionary);
         AssertSetter(progressBarStyle, Control.BackgroundProperty);
@@ -158,6 +166,7 @@ public sealed class FluentRangeProgressTests
 
         var fwProgressBarStyle = AssertStyle<FWProgressBar>(dictionary);
         Assert.Same(progressBarStyle, fwProgressBarStyle.BasedOn);
+        AssertSetter(fwProgressBarStyle, FWProgressBar.DensityProperty);
         AssertTriggerSetter(fwProgressBarStyle, FWProgressBar.ShowPausedProperty, true, ProgressBar.ProgressBrushProperty, "ProgressBarPausedForeground");
         AssertTriggerSetter(fwProgressBarStyle, FWProgressBar.ShowErrorProperty, true, ProgressBar.ProgressBrushProperty, "ProgressBarErrorForeground");
         AssertTriggerSetter(fwProgressBarStyle, Control.IsEnabledProperty, false, ProgressBar.ProgressBrushProperty, "ProgressBarDisabledForeground");
@@ -167,6 +176,7 @@ public sealed class FluentRangeProgressTests
         AssertSetter(ringStyle, Control.ForegroundProperty);
         AssertSetter(ringStyle, Control.BackgroundProperty);
         AssertSetter(ringStyle, FWProgressRing.ProgressBrushProperty);
+        AssertSetter(ringStyle, FWProgressRing.RingSizeProperty);
         AssertSetter(ringStyle, FWProgressRing.StrokeThicknessProperty);
         AssertBooleanSetter(ringStyle, FWProgressRing.IsActiveProperty, true);
         AssertBooleanSetter(ringStyle, FWProgressRing.IsIndeterminateProperty, true);
@@ -175,10 +185,82 @@ public sealed class FluentRangeProgressTests
     }
 
     [Fact]
+    public void FWRangeControls_ShouldApplyDensityAndSizePresets()
+    {
+        var slider = new FWSlider();
+
+        Assert.Equal(FWRangeDensity.Comfortable, slider.Density);
+        Assert.Equal(32, slider.MinHeight);
+        Assert.Equal(32, slider.Height);
+
+        slider.Density = FWRangeDensity.Compact;
+
+        Assert.Equal(28, slider.MinHeight);
+        Assert.Equal(28, slider.Height);
+
+        slider.Density = FWRangeDensity.Spacious;
+
+        Assert.Equal(40, slider.MinHeight);
+        Assert.Equal(40, slider.Height);
+
+        var rangeSlider = new FWRangeSlider
+        {
+            Density = FWRangeDensity.Spacious
+        };
+
+        Assert.Equal(40, rangeSlider.MinHeight);
+        Assert.Equal(40, rangeSlider.Height);
+
+        rangeSlider.Density = FWRangeDensity.Compact;
+
+        Assert.Equal(28, rangeSlider.MinHeight);
+        Assert.Equal(28, rangeSlider.Height);
+
+        var progressBar = new FWProgressBar();
+
+        Assert.Equal(FWRangeDensity.Comfortable, progressBar.Density);
+        Assert.Equal(6, progressBar.MinHeight);
+        Assert.Equal(6, progressBar.Height);
+        Assert.Equal(new CornerRadius(3), progressBar.CornerRadius);
+
+        progressBar.Density = FWRangeDensity.Compact;
+
+        Assert.Equal(4, progressBar.MinHeight);
+        Assert.Equal(4, progressBar.Height);
+        Assert.Equal(new CornerRadius(2), progressBar.CornerRadius);
+
+        progressBar.Density = FWRangeDensity.Spacious;
+
+        Assert.Equal(8, progressBar.MinHeight);
+        Assert.Equal(8, progressBar.Height);
+        Assert.Equal(new CornerRadius(4), progressBar.CornerRadius);
+
+        var ring = new FWProgressRing();
+
+        Assert.Equal(FWProgressRingSize.Medium, ring.RingSize);
+        Assert.Equal(32, ring.Width);
+        Assert.Equal(32, ring.Height);
+        Assert.Equal(4, ring.StrokeThickness);
+
+        ring.RingSize = FWProgressRingSize.Small;
+
+        Assert.Equal(24, ring.Width);
+        Assert.Equal(24, ring.Height);
+        Assert.Equal(3, ring.StrokeThickness);
+
+        ring.RingSize = FWProgressRingSize.Large;
+
+        Assert.Equal(48, ring.Width);
+        Assert.Equal(48, ring.Height);
+        Assert.Equal(5, ring.StrokeThickness);
+    }
+
+    [Fact]
     public void FWSlider_ShouldCoerceValueAndRaiseEventsForDirectValueChanges()
     {
         var slider = new FWSlider
         {
+            Density = FWRangeDensity.Compact,
             Minimum = 0,
             Maximum = 100,
             Value = 80
@@ -199,6 +281,7 @@ public sealed class FluentRangeProgressTests
 
         Assert.Equal(40, slider.Value);
         Assert.Equal(2, changed);
+        Assert.Equal(FWRangeDensity.Compact, slider.Density);
     }
 
     [Fact]
@@ -206,6 +289,7 @@ public sealed class FluentRangeProgressTests
     {
         var progressBar = new FWProgressBar
         {
+            Density = FWRangeDensity.Spacious,
             Minimum = 10,
             Maximum = 110,
             Value = 40,
@@ -217,6 +301,7 @@ public sealed class FluentRangeProgressTests
         progressBar.Value = -20;
 
         Assert.True(progressBar.IsIndeterminate);
+        Assert.Equal(FWRangeDensity.Spacious, progressBar.Density);
         Assert.Equal(10, progressBar.Value);
         Assert.Equal(0, progressBar.Percentage);
         Assert.Equal(1, changed);

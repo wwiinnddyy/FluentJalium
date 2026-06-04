@@ -7,10 +7,24 @@ using Jalium.UI.Media;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// FluentJalium progress ring size presets.
+/// </summary>
+public enum FWProgressRingSize
+{
+    Small,
+    Medium,
+    Large
+}
+
+/// <summary>
 /// FluentJalium ring progress control.
 /// </summary>
 public class FWProgressRing : RangeBase, IFluentJaliumControl
 {
+    public static readonly DependencyProperty RingSizeProperty =
+        DependencyProperty.Register(nameof(RingSize), typeof(FWProgressRingSize), typeof(FWProgressRing),
+            new PropertyMetadata(FWProgressRingSize.Medium, OnRingSizeChanged));
+
     public static readonly DependencyProperty IsActiveProperty =
         DependencyProperty.Register(nameof(IsActive), typeof(bool), typeof(FWProgressRing),
             new PropertyMetadata(true, OnAnimationPropertyChanged));
@@ -35,11 +49,17 @@ public class FWProgressRing : RangeBase, IFluentJaliumControl
 
     public FWProgressRing()
     {
-        Width = 32;
-        Height = 32;
+        ApplyRingSize(this, RingSize);
         Focusable = false;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWProgressRingSize RingSize
+    {
+        get => (FWProgressRingSize)GetValue(RingSizeProperty)!;
+        set => SetValue(RingSizeProperty, value);
     }
 
     public bool IsActive
@@ -151,6 +171,24 @@ public class FWProgressRing : RangeBase, IFluentJaliumControl
         return Background ?? TryFindResource("SliderTrack") as Brush;
     }
 
+    internal static (double Size, double StrokeThickness) GetRingSizeMetrics(FWProgressRingSize ringSize)
+    {
+        return ringSize switch
+        {
+            FWProgressRingSize.Small => (24.0, 3.0),
+            FWProgressRingSize.Large => (48.0, 5.0),
+            _ => (32.0, 4.0)
+        };
+    }
+
+    private static void ApplyRingSize(FWProgressRing ring, FWProgressRingSize ringSize)
+    {
+        var (size, strokeThickness) = GetRingSizeMetrics(ringSize);
+        ring.Width = size;
+        ring.Height = size;
+        ring.StrokeThickness = strokeThickness;
+    }
+
     private static void DrawArc(DrawingContext dc, Pen pen, Point center, double radius, double startAngle, double sweepAngle)
     {
         var steps = Math.Max(6, (int)Math.Ceiling(Math.Abs(sweepAngle) / 8.0));
@@ -232,6 +270,14 @@ public class FWProgressRing : RangeBase, IFluentJaliumControl
         if (d is FWProgressRing ring)
         {
             ring.UpdateAnimationSubscription();
+        }
+    }
+
+    private static void OnRingSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWProgressRing ring && e.NewValue is FWProgressRingSize ringSize)
+        {
+            ApplyRingSize(ring, ringSize);
         }
     }
 

@@ -4,8 +4,11 @@ using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
+using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWProgressRingSize = FluentJalium.Controls.FWProgressRingSize;
+using FWRangeDensity = FluentJalium.Controls.FWRangeDensity;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWProgressRing = FluentJalium.Controls.FWProgressRing;
 using FWRangeSlider = FluentJalium.Controls.FWRangeSlider;
@@ -63,6 +66,7 @@ internal sealed class GalleryRangePage
         var slider = new FWSlider
         {
             Width = 320,
+            Density = FWRangeDensity.Comfortable,
             Minimum = 0,
             Maximum = 100,
             Value = 64,
@@ -93,6 +97,12 @@ internal sealed class GalleryRangePage
             {
                 slider,
                 CreateRangeStatus(sliderValueOutput),
+                CreateRangeButtonRow(
+                    CreateRangeActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        slider.Density = NextDensity(slider.Density);
+                        sliderValueOutput.Text = $"{FormatRangeValue("Value", slider.Value)}. Density: {FormatDensity(slider.Density)}";
+                    })),
                 new FWWrapPanel
                 {
                     HorizontalSpacing = 18,
@@ -102,6 +112,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateColumn("Stepped", new FWSlider
                         {
                             Width = 220,
+                            Density = FWRangeDensity.Compact,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 40,
@@ -112,6 +123,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateColumn("Disabled", new FWSlider
                         {
                             Width = 220,
+                            Density = FWRangeDensity.Spacious,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 55,
@@ -129,6 +141,7 @@ internal sealed class GalleryRangePage
         var rangeSlider = new FWRangeSlider
         {
             Width = 320,
+            Density = FWRangeDensity.Comfortable,
             Minimum = 0,
             Maximum = 100,
             RangeStart = 24,
@@ -153,6 +166,12 @@ internal sealed class GalleryRangePage
             {
                 rangeSlider,
                 CreateRangeStatus(rangeOutput),
+                CreateRangeButtonRow(
+                    CreateRangeActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        rangeSlider.Density = NextDensity(rangeSlider.Density);
+                        rangeOutput.Text = $"Range: {rangeSlider.RangeStart:0} to {rangeSlider.RangeEnd:0}. Density: {FormatDensity(rangeSlider.Density)}";
+                    })),
                 new FWWrapPanel
                 {
                     HorizontalSpacing = 18,
@@ -162,6 +181,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateColumn("MinimumRange = 20", new FWRangeSlider
                         {
                             Width = 220,
+                            Density = FWRangeDensity.Compact,
                             Minimum = 0,
                             Maximum = 100,
                             RangeStart = 30,
@@ -175,6 +195,7 @@ internal sealed class GalleryRangePage
                             Orientation = Orientation.Vertical,
                             Width = 36,
                             Height = 120,
+                            Density = FWRangeDensity.Comfortable,
                             Minimum = 0,
                             Maximum = 100,
                             RangeStart = 20,
@@ -186,6 +207,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateColumn("Disabled", new FWRangeSlider
                         {
                             Width = 220,
+                            Density = FWRangeDensity.Spacious,
                             Minimum = 0,
                             Maximum = 100,
                             RangeStart = 18,
@@ -205,7 +227,7 @@ internal sealed class GalleryRangePage
         var progressBar = new FWProgressBar
         {
             Width = 320,
-            Height = 8,
+            Density = FWRangeDensity.Spacious,
             Minimum = 0,
             Maximum = 100,
             Value = 72
@@ -243,7 +265,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateRow("Determinate", new FWProgressBar
                         {
                             Width = 260,
-                            Height = 8,
+                            Density = FWRangeDensity.Compact,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 35
@@ -251,13 +273,13 @@ internal sealed class GalleryRangePage
                         CreateRangeStateRow("Indeterminate", new FWProgressBar
                         {
                             Width = 260,
-                            Height = 8,
+                            Density = FWRangeDensity.Comfortable,
                             IsIndeterminate = true
                         }),
                         CreateRangeStateRow("Paused", new FWProgressBar
                         {
                             Width = 260,
-                            Height = 8,
+                            Density = FWRangeDensity.Comfortable,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 42,
@@ -266,7 +288,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateRow("Error", new FWProgressBar
                         {
                             Width = 260,
-                            Height = 8,
+                            Density = FWRangeDensity.Spacious,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 86,
@@ -275,7 +297,7 @@ internal sealed class GalleryRangePage
                         CreateRangeStateRow("Disabled", new FWProgressBar
                         {
                             Width = 260,
-                            Height = 8,
+                            Density = FWRangeDensity.Comfortable,
                             Minimum = 0,
                             Maximum = 100,
                             Value = 55,
@@ -292,8 +314,7 @@ internal sealed class GalleryRangePage
         var ringOutput = CreateRangeOutput("Ring value: 72%");
         var determinateRing = new FWProgressRing
         {
-            Width = 48,
-            Height = 48,
+            RingSize = FWProgressRingSize.Large,
             Minimum = 0,
             Maximum = 100,
             Value = 72,
@@ -328,23 +349,20 @@ internal sealed class GalleryRangePage
                     {
                         CreateRangeRingState("Indeterminate", new FWProgressRing
                         {
-                            Width = 48,
-                            Height = 48,
+                            RingSize = FWProgressRingSize.Medium,
                             IsIndeterminate = true
                         }),
                         CreateRangeRingState("Determinate", determinateRing),
                         CreateRangeRingState("Inactive", new FWProgressRing
                         {
-                            Width = 48,
-                            Height = 48,
+                            RingSize = FWProgressRingSize.Small,
                             Value = 42,
                             IsActive = false,
                             IsIndeterminate = false
                         }),
                         CreateRangeRingState("Disabled", new FWProgressRing
                         {
-                            Width = 48,
-                            Height = 48,
+                            RingSize = FWProgressRingSize.Large,
                             Value = 64,
                             IsIndeterminate = false,
                             IsEnabled = false
@@ -352,6 +370,12 @@ internal sealed class GalleryRangePage
                     }
                 },
                 CreateRangeStatus(ringOutput),
+                CreateRangeButtonRow(
+                    CreateRangeActionButton(FluentIconRegular.ResizeLarge24, "Ring size", () =>
+                    {
+                        determinateRing.RingSize = NextRingSize(determinateRing.RingSize);
+                        ringOutput.Text = $"{FormatRangeValue("Ring value", determinateRing.Value)}%. Size: {FormatRingSize(determinateRing.RingSize)}";
+                    })),
                 ringSlider
             }
         };
@@ -362,15 +386,14 @@ internal sealed class GalleryRangePage
         var progressBar = new FWProgressBar
         {
             Width = 336,
-            Height = 8,
+            Density = FWRangeDensity.Spacious,
             Minimum = 0,
             Maximum = 100,
             Value = 68
         };
         var ring = new FWProgressRing
         {
-            Width = 42,
-            Height = 42,
+            RingSize = FWProgressRingSize.Large,
             Minimum = 0,
             Maximum = 100,
             Value = 68,
@@ -433,7 +456,7 @@ internal sealed class GalleryRangePage
                     CreateRangeStateRow("Status", new FWProgressBar
                     {
                         Width = 260,
-                        Height = 8,
+                        Density = FWRangeDensity.Comfortable,
                         Minimum = 0,
                         Maximum = 100,
                         Value = 38,
@@ -527,6 +550,45 @@ internal sealed class GalleryRangePage
         };
     }
 
+    private static FWWrapPanel CreateRangeButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateRangeActionButton(FluentIconRegular icon, string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(icon, 16, ThemeBrush("TextPrimary")),
+                    new FWTextBlock
+                    {
+                        Text = text,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
+        button.Click += (_, _) => action();
+        return button;
+    }
+
     private static FWStackPanel CreateRangeRingState(string label, UIElement ring)
     {
         return new FWStackPanel
@@ -612,6 +674,46 @@ internal sealed class GalleryRangePage
     private static string FormatRangeValue(string label, double value)
     {
         return $"{label}: {value:0}";
+    }
+
+    private static FWRangeDensity NextDensity(FWRangeDensity density)
+    {
+        return density switch
+        {
+            FWRangeDensity.Compact => FWRangeDensity.Comfortable,
+            FWRangeDensity.Comfortable => FWRangeDensity.Spacious,
+            _ => FWRangeDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWRangeDensity density)
+    {
+        return density switch
+        {
+            FWRangeDensity.Compact => "compact",
+            FWRangeDensity.Spacious => "spacious",
+            _ => "comfortable"
+        };
+    }
+
+    private static FWProgressRingSize NextRingSize(FWProgressRingSize ringSize)
+    {
+        return ringSize switch
+        {
+            FWProgressRingSize.Small => FWProgressRingSize.Medium,
+            FWProgressRingSize.Medium => FWProgressRingSize.Large,
+            _ => FWProgressRingSize.Small
+        };
+    }
+
+    private static string FormatRingSize(FWProgressRingSize ringSize)
+    {
+        return ringSize switch
+        {
+            FWProgressRingSize.Small => "small",
+            FWProgressRingSize.Large => "large",
+            _ => "medium"
+        };
     }
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
