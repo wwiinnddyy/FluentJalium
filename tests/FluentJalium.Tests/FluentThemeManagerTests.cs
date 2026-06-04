@@ -57,6 +57,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWProgressBar, ProgressBar>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
+            AssertOwnedStyle<FWRatingControl>(app.Resources);
             AssertBasedOnStyle<FWListBox, ListBox>(app.Resources);
             AssertBasedOnStyle<FWListBoxItem, ListBoxItem>(app.Resources);
             AssertBasedOnStyle<FWListView, ListView>(app.Resources);
@@ -199,6 +200,7 @@ public sealed class FluentThemeManagerTests
             Assert.Equal(accent, GetBrushColor(app.Resources["SliderThumbBackground"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ProgressBarForeground"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ProgressRingForeground"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["RatingControlSelectedForeground"]));
         }
         finally
         {
@@ -240,6 +242,7 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<ProgressBar>(dictionary);
         AssertContainsStyle<ComboBox>(dictionary);
         AssertContainsStyle<ComboBoxItem>(dictionary);
+        AssertContainsStyle<FWRatingControl>(dictionary);
         AssertContainsStyle<ListBox>(dictionary);
         AssertContainsStyle<ListBoxItem>(dictionary);
         AssertContainsStyle<ListView>(dictionary);
@@ -356,6 +359,7 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ProgressRingBackground"));
         Assert.True(dictionary.Contains("ProgressRingDisabledForeground"));
         Assert.True(dictionary.Contains("SelectionBackgroundWeak"));
+        Assert.True(dictionary.Contains("RatingControlCaptionForeground"));
         Assert.True(dictionary.Contains("MenuBarBackground"));
         Assert.True(dictionary.Contains("MenuBarItemBackgroundHover"));
         Assert.True(dictionary.Contains("MenuFlyoutPresenterBackground"));
@@ -939,6 +943,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWRadioButton, RadioButton>();
         AssertFluentControl<FWComboBox, ComboBox>();
         AssertFluentControl<FWComboBoxItem, ComboBoxItem>();
+        AssertFluentControl<FWRatingControl, Control>();
     }
 
     [Fact]

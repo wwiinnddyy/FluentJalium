@@ -62,7 +62,14 @@ public sealed class FluentSelectionControlsTests
         "ComboBoxItemForeground",
         "ComboBoxItemForegroundSelected",
         "ComboBoxItemForegroundDisabled",
-        "ComboBoxItemSelectedIndicator"
+        "ComboBoxItemSelectedIndicator",
+        "RatingControlSelectedForeground",
+        "RatingControlPointerOverSelectedForeground",
+        "RatingControlUnselectedForeground",
+        "RatingControlPointerOverUnselectedForeground",
+        "RatingControlPlaceholderForeground",
+        "RatingControlDisabledSelectedForeground",
+        "RatingControlCaptionForeground"
     ];
 
     [Theory]
@@ -109,6 +116,8 @@ public sealed class FluentSelectionControlsTests
             Assert.Equal(Color.FromArgb(0x33, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["SelectionBackgroundWeak"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ComboBoxBorderBrushFocused"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ComboBoxItemSelectedIndicator"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["RatingControlSelectedForeground"]));
+            Assert.IsType<SolidColorBrush>(app.Resources["RatingControlPointerOverSelectedForeground"]);
             Assert.Equal(Color.FromArgb(0x33, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["ComboBoxItemBackgroundSelected"]));
             Assert.Equal(Color.FromArgb(0x66, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["ComboBoxItemBackgroundSelectedPointerOver"]));
         }
@@ -134,6 +143,7 @@ public sealed class FluentSelectionControlsTests
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
+            AssertOwnedStyle<FWRatingControl>(app.Resources);
         }
         finally
         {
@@ -175,6 +185,14 @@ public sealed class FluentSelectionControlsTests
         AssertSetter(comboBoxItemStyle, Control.BackgroundProperty);
         AssertSetter(comboBoxItemStyle, Control.ForegroundProperty);
         AssertSetter(comboBoxItemStyle, Control.PaddingProperty);
+
+        var ratingStyle = AssertStyle<FWRatingControl>(dictionary);
+        AssertSetter(ratingStyle, Control.ForegroundProperty);
+        AssertSetter(ratingStyle, FWRatingControl.GlyphFontFamilyProperty);
+        AssertSetter(ratingStyle, FWRatingControl.GlyphProperty);
+        AssertSetter(ratingStyle, FWRatingControl.UnsetGlyphProperty);
+        AssertSetter(ratingStyle, FWRatingControl.RatingItemFontSizeProperty);
+        AssertSetter(ratingStyle, FWRatingControl.ItemSpacingProperty);
 
         ResetApplicationState();
     }
@@ -409,6 +427,78 @@ public sealed class FluentSelectionControlsTests
         Assert.IsType<FWComboBoxItem>(itemsHost.Children[1]);
     }
 
+    [Fact]
+    public void FWRatingControl_ShouldExposeWinUiStyleRatingStateAndEvents()
+    {
+        var rating = new FWRatingControl
+        {
+            Value = 3,
+            PlaceholderValue = 4,
+            Caption = "Quality",
+            MaxRating = 5,
+            IsClearEnabled = true
+        };
+        FWRatingControlValueChangedEventArgs? lastArgs = null;
+        var changed = 0;
+        rating.ValueChanged += (_, args) =>
+        {
+            changed++;
+            lastArgs = args;
+        };
+
+        rating.Value = 6;
+
+        Assert.Equal(5, rating.Value);
+        Assert.Equal(1, changed);
+        Assert.Equal(3, lastArgs!.OldValue);
+        Assert.Equal(5, lastArgs.NewValue);
+
+        rating.Clear();
+
+        Assert.Equal(FWRatingControl.UnsetValue, rating.Value);
+        Assert.Equal(2, changed);
+        Assert.Equal("Quality", rating.Caption);
+        Assert.Equal(4, rating.PlaceholderValue);
+
+        rating.Value = 2;
+        rating.IsReadOnly = true;
+        rating.Clear();
+
+        Assert.Equal(2, rating.Value);
+        Assert.Equal(3, changed);
+    }
+
+    [Fact]
+    public void FWRatingControl_ShouldExposeGalleryMaterialState()
+    {
+        var rating = new FWRatingControl
+        {
+            Value = 4,
+            Caption = "Fit",
+            RatingItemFontSize = 24,
+            ItemSpacing = 10,
+            GlyphFontFamily = "Segoe Fluent Icons"
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintOpacity = 0.2,
+            BlurRadius = 14,
+            RefractionAmount = 70,
+            ChromaticAberration = 0.42,
+            FusionRadius = 24,
+            Child = rating
+        };
+
+        Assert.Equal(4, rating.Value);
+        Assert.Equal("Fit", rating.Caption);
+        Assert.Equal(24, rating.RatingItemFontSize);
+        Assert.Equal(10, rating.ItemSpacing);
+        Assert.Equal("Segoe Fluent Icons", rating.GlyphFontFamily);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.Same(rating, surface.Child);
+    }
+
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
         var loaded = ResourceDictionary.SourceLoader?.Invoke(
@@ -435,6 +525,15 @@ public sealed class FluentSelectionControlsTests
 
         Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
         Assert.Same(baseStyle, fluentStyle.BasedOn);
+    }
+
+    private static void AssertOwnedStyle<TFluentControl>(ResourceDictionary dictionary)
+        where TFluentControl : FrameworkElement, IFluentJaliumControl
+    {
+        var fluentStyle = AssertStyle<TFluentControl>(dictionary);
+
+        Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
+        Assert.Null(fluentStyle.BasedOn);
     }
 
     private static void AssertSetter(Style style, DependencyProperty property)

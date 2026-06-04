@@ -1,5 +1,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:fluent="https://jalium.dev/fluent"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="ComboBox">
@@ -207,5 +208,17 @@
                 <Setter TargetName="PART_SelectedIndicator" Property="Background" Value="{ThemeResource ComboBoxItemForegroundDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWRatingControl">
+        <Setter Property="Foreground" Value="{ThemeResource RatingControlCaptionForeground}" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="GlyphFontFamily" Value="Segoe Fluent Icons" />
+        <Setter Property="Glyph" Value="&#xE735;" />
+        <Setter Property="UnsetGlyph" Value="&#xE734;" />
+        <Setter Property="RatingItemFontSize" Value="20" />
+        <Setter Property="ItemSpacing" Value="8" />
+        <Setter Property="MinHeight" Value="24" />
     </Style>
 </ResourceDictionary>

@@ -363,6 +363,8 @@ public static class FluentThemeManager
             ["ComboBoxItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
             ["ComboBoxItemBackgroundSelectedPointerOver"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
             ["ComboBoxItemSelectedIndicator"] = new SolidColorBrush(accent),
+            ["RatingControlSelectedForeground"] = new SolidColorBrush(accent),
+            ["RatingControlPointerOverSelectedForeground"] = new SolidColorBrush(hover),
             ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
             ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
             ["TabItemIndicator"] = new SolidColorBrush(accent),

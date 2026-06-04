@@ -9,6 +9,7 @@ using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
+using FWRatingControl = FluentJalium.Controls.FWRatingControl;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
@@ -46,6 +47,11 @@ internal sealed class GallerySelectionPage
             "FWComboBoxItem",
             "Selected, hover-ready, and disabled dropdown item states use Fluent resources.",
             CreateComboBoxItemStateSample()));
+        examples.Children.Add(CreateSelectionExampleCard(
+            FluentIconRegular.Star24,
+            "FWRatingControl",
+            "WinUI-style star selection with placeholder, caption, clear, read-only, and disabled states.",
+            CreateRatingSelectionSample()));
         examples.Children.Add(CreateSelectionExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
             "Material selection settings",
@@ -255,10 +261,53 @@ internal sealed class GallerySelectionPage
         };
     }
 
+    private static UIElement CreateRatingSelectionSample()
+    {
+        var output = CreateSelectionOutput("Rating: 3");
+        var rating = new FWRatingControl
+        {
+            Value = 3,
+            Caption = "Quality"
+        };
+        rating.ValueChanged += (_, args) => output.Text = args.NewValue < 0 ? "Rating: none" : $"Rating: {args.NewValue:0}";
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                rating,
+                CreateSelectionStatus(output),
+                CreateSelectionCaption("Placeholder"),
+                new FWRatingControl
+                {
+                    PlaceholderValue = 4,
+                    Caption = "Suggested"
+                },
+                CreateSelectionCaption("Read-only"),
+                new FWRatingControl
+                {
+                    Value = 4,
+                    IsReadOnly = true,
+                    Caption = "Current"
+                },
+                CreateSelectionCaption("Disabled"),
+                new FWRatingControl
+                {
+                    Value = 2,
+                    IsEnabled = false,
+                    Caption = "Unavailable"
+                }
+            }
+        };
+    }
+
     private static UIElement CreateMaterialSelectionSample()
     {
         var densityOutput = CreateSelectionOutput("Density: Comfortable");
         var colorOutput = CreateSelectionOutput("Accent set: Mica");
+        var scoreOutput = CreateSelectionOutput("Fit score: 4");
         var accentGroupName = $"MaterialSelection{Guid.NewGuid():N}";
 
         FWRadioButton CreateAccentOption(string text, bool isChecked = false)
@@ -282,6 +331,13 @@ internal sealed class GallerySelectionPage
         densityComboBox.Items.Add(new FWComboBoxItem { Content = "Comfortable" });
         densityComboBox.Items.Add(new FWComboBoxItem { Content = "Spacious" });
         densityComboBox.SelectionChanged += (_, _) => densityOutput.Text = $"Density: {densityComboBox.SelectionBoxItem}";
+
+        var scoreRating = new FWRatingControl
+        {
+            Value = 4,
+            Caption = "Fit"
+        };
+        scoreRating.ValueChanged += (_, args) => scoreOutput.Text = args.NewValue < 0 ? "Fit score: none" : $"Fit score: {args.NewValue:0}";
 
         return new FWFluentMaterialSurface
         {
@@ -311,6 +367,8 @@ internal sealed class GallerySelectionPage
                     CreateSelectionStatus(colorOutput),
                     CreateMaterialRow("Density", densityComboBox),
                     CreateSelectionStatus(densityOutput),
+                    CreateMaterialRow("Rating", scoreRating),
+                    CreateSelectionStatus(scoreOutput),
                     new FWCheckBox { Content = "Show selection indicators", IsChecked = true }
                 }
             }

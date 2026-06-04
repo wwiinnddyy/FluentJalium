@@ -166,6 +166,13 @@
             <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ComboBoxItemForegroundDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="ComboBoxItemSelectedIndicator" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#87FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#C5FFFFFF" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#5DFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackground" Color="#0FFFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundPointerOver" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundDisabled" Color="#0BFFFFFF" />
@@ -583,6 +590,13 @@
             <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#E4000000" />
             <SolidColorBrush x:Key="ComboBoxItemForegroundDisabled" Color="#5C000000" />
             <SolidColorBrush x:Key="ComboBoxItemSelectedIndicator" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#72000000" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#9E000000" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#5C000000" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#9E000000" />
             <SolidColorBrush x:Key="TreeSelectorBackground" Color="#B3FFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundPointerOver" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundDisabled" Color="#4DF9F9F9" />
@@ -980,6 +994,13 @@
             <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#FF000000" />
             <SolidColorBrush x:Key="ComboBoxItemForegroundDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="ComboBoxItemSelectedIndicator" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlSelectedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlPointerOverSelectedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlUnselectedForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlPointerOverUnselectedForeground" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="RatingControlPlaceholderForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="RatingControlDisabledSelectedForeground" Color="#FF7F7F7F" />
+            <SolidColorBrush x:Key="RatingControlCaptionForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="TreeSelectorBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundPointerOver" Color="#FF1A1A1A" />
             <SolidColorBrush x:Key="TreeSelectorBackgroundDisabled" Color="#FF000000" />
