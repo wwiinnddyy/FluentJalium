@@ -47,6 +47,82 @@ public enum FWFluentMaterialKind
 }
 
 /// <summary>
+/// FluentJalium window-level material roles that map onto Jalium's DWM system backdrops.
+/// </summary>
+public enum FWFluentWindowBackdropKind
+{
+    /// <summary>
+    /// Uses the normal window background brush without requesting a system backdrop.
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// WinUI-style Mica backdrop for the primary app shell.
+    /// </summary>
+    Mica,
+
+    /// <summary>
+    /// WinUI-style Mica Alt backdrop for tabbed or layered app shells.
+    /// </summary>
+    MicaAlt,
+
+    /// <summary>
+    /// WinUI-style acrylic backdrop for transient or high-depth windows.
+    /// </summary>
+    Acrylic
+}
+
+/// <summary>
+/// Describes how a FluentJalium window material role is applied to a Jalium window.
+/// </summary>
+public readonly record struct FWFluentWindowBackdropRecipe(
+    FWFluentWindowBackdropKind Kind,
+    WindowBackdropType SystemBackdrop,
+    string Role,
+    string Description)
+{
+    /// <summary>
+    /// Creates the default recipe for the requested Fluent window backdrop role.
+    /// </summary>
+    public static FWFluentWindowBackdropRecipe Create(FWFluentWindowBackdropKind kind)
+    {
+        return kind switch
+        {
+            FWFluentWindowBackdropKind.None => new FWFluentWindowBackdropRecipe(
+                kind,
+                WindowBackdropType.None,
+                "Solid shell",
+                "Use the FluentJalium window background brush without a DWM system backdrop."),
+            FWFluentWindowBackdropKind.Mica => new FWFluentWindowBackdropRecipe(
+                kind,
+                WindowBackdropType.Mica,
+                "Mica shell",
+                "Use the WinUI-style primary shell backdrop for long-lived app windows."),
+            FWFluentWindowBackdropKind.MicaAlt => new FWFluentWindowBackdropRecipe(
+                kind,
+                WindowBackdropType.MicaAlt,
+                "Mica Alt shell",
+                "Use the tabbed shell backdrop when navigation, tabs, or dense panes need more separation."),
+            FWFluentWindowBackdropKind.Acrylic => new FWFluentWindowBackdropRecipe(
+                kind,
+                WindowBackdropType.Acrylic,
+                "Acrylic shell",
+                "Use the transient DWM backdrop when a window needs stronger depth behind its content."),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown Fluent window backdrop kind.")
+        };
+    }
+
+    /// <summary>
+    /// Applies this recipe to the supplied Jalium window.
+    /// </summary>
+    public void ApplyTo(Window window)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+        window.SystemBackdrop = SystemBackdrop;
+    }
+}
+
+/// <summary>
 /// Describes the effect recipe used by a FluentJalium material surface.
 /// </summary>
 public readonly record struct FWFluentMaterialRecipe(

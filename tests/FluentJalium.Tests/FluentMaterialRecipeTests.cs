@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using Jalium.UI.Controls;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests;
@@ -6,6 +7,35 @@ namespace FluentJalium.Tests;
 [Collection("Application")]
 public sealed class FluentMaterialRecipeTests
 {
+    [Theory]
+    [InlineData(FWFluentWindowBackdropKind.None, WindowBackdropType.None, "Solid shell")]
+    [InlineData(FWFluentWindowBackdropKind.Mica, WindowBackdropType.Mica, "Mica shell")]
+    [InlineData(FWFluentWindowBackdropKind.MicaAlt, WindowBackdropType.MicaAlt, "Mica Alt shell")]
+    [InlineData(FWFluentWindowBackdropKind.Acrylic, WindowBackdropType.Acrylic, "Acrylic shell")]
+    public void WindowBackdropRecipe_ShouldMapFluentRolesToJaliumSystemBackdrops(
+        FWFluentWindowBackdropKind kind,
+        WindowBackdropType expectedBackdrop,
+        string expectedRole)
+    {
+        var recipe = FWFluentWindowBackdropRecipe.Create(kind);
+
+        Assert.Equal(kind, recipe.Kind);
+        Assert.Equal(expectedBackdrop, recipe.SystemBackdrop);
+        Assert.Equal(expectedRole, recipe.Role);
+        Assert.False(string.IsNullOrWhiteSpace(recipe.Description));
+    }
+
+    [Fact]
+    public void WindowBackdropRecipe_ShouldApplyToJaliumWindow()
+    {
+        var window = new Window();
+        var recipe = FWFluentWindowBackdropRecipe.Create(FWFluentWindowBackdropKind.MicaAlt);
+
+        recipe.ApplyTo(window);
+
+        Assert.Equal(WindowBackdropType.MicaAlt, window.SystemBackdrop);
+    }
+
     [Theory]
     [InlineData(FWFluentMaterialKind.None)]
     [InlineData(FWFluentMaterialKind.Layer)]

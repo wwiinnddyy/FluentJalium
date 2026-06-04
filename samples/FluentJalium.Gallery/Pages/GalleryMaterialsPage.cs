@@ -8,6 +8,8 @@ using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWFluentWindowBackdropKind = FluentJalium.Controls.FWFluentWindowBackdropKind;
+using FWFluentWindowBackdropRecipe = FluentJalium.Controls.FWFluentWindowBackdropRecipe;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
@@ -61,7 +63,7 @@ internal sealed class GalleryMaterialsPage
 
     private UIElement CreateWindowBackdropMaterialSample()
     {
-        var status = CreateMaterialOutputText($"Current window backdrop: {_window.SystemBackdrop}");
+        var status = CreateMaterialOutputText(CreateWindowBackdropStatusText(_window.SystemBackdrop));
 
         return new FWStackPanel
         {
@@ -71,10 +73,10 @@ internal sealed class GalleryMaterialsPage
             {
                 CreateBackdropPreview("System backdrop", "Mica / MicaAlt / Acrylic are window-level materials, not just panel colors.", ThemeBrush("LayerFillColorDefaultBrush")),
                 CreateMaterialButtonRow(
-                    CreateMaterialActionButton(FluentIconRegular.DismissCircle24, "None", () => ApplySystemBackdrop(WindowBackdropType.None, status)),
-                    CreateMaterialActionButton(FluentIconRegular.WindowBrush24, "Mica", () => ApplySystemBackdrop(WindowBackdropType.Mica, status)),
-                    CreateMaterialActionButton(FluentIconRegular.LayerDiagonal24, "Mica Alt", () => ApplySystemBackdrop(WindowBackdropType.MicaAlt, status)),
-                    CreateMaterialActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => ApplySystemBackdrop(WindowBackdropType.Acrylic, status))),
+                    CreateMaterialActionButton(FluentIconRegular.DismissCircle24, "None", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.None, status)),
+                    CreateMaterialActionButton(FluentIconRegular.WindowBrush24, "Mica", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Mica, status)),
+                    CreateMaterialActionButton(FluentIconRegular.LayerDiagonal24, "Mica Alt", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.MicaAlt, status)),
+                    CreateMaterialActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Acrylic, status))),
                 CreateMaterialStatus(status)
             }
         };
@@ -173,10 +175,24 @@ internal sealed class GalleryMaterialsPage
         };
     }
 
-    private void ApplySystemBackdrop(WindowBackdropType backdropType, TextBlock status)
+    private void ApplySystemBackdrop(FWFluentWindowBackdropKind backdropKind, TextBlock status)
     {
-        _window.SystemBackdrop = backdropType;
-        status.Text = $"Current window backdrop: {backdropType}";
+        var recipe = FWFluentWindowBackdropRecipe.Create(backdropKind);
+        recipe.ApplyTo(_window);
+        status.Text = $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
+    }
+
+    private static string CreateWindowBackdropStatusText(WindowBackdropType systemBackdrop)
+    {
+        var kind = systemBackdrop switch
+        {
+            WindowBackdropType.Mica => FWFluentWindowBackdropKind.Mica,
+            WindowBackdropType.MicaAlt => FWFluentWindowBackdropKind.MicaAlt,
+            WindowBackdropType.Acrylic => FWFluentWindowBackdropKind.Acrylic,
+            _ => FWFluentWindowBackdropKind.None
+        };
+        var recipe = FWFluentWindowBackdropRecipe.Create(kind);
+        return $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
     }
 
     private static FWBorder CreateBackdropEffectTile(FluentIconRegular icon, string title, string description, IBackdropEffect effect)
