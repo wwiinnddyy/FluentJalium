@@ -5,6 +5,8 @@ namespace FluentJalium.Gallery.Models;
 
 internal sealed record GalleryPageContentFactories(
     Func<UIElement> Overview,
+    Func<UIElement> Colors,
+    Func<UIElement> Typography,
     Func<UIElement> Geometry,
     Func<UIElement> Buttons,
     Func<UIElement> Switches,
@@ -35,6 +37,8 @@ internal static class GalleryCatalog
         return
         [
             new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, FluentIconRegular.Home24, content.Overview, "home design system theme typography accent light dark high contrast"),
+            new GalleryPage("Colors", "Accent, text, fill, and semantic color tokens for FluentJalium themes and FW controls.", GalleryNavigationGroup.Design, FluentIconRegular.Color24, content.Colors, "FluentColors AccentBrush AccentFillColor TextPrimary TextSecondary ControlFillColor LayerFillColor SelectionBackground HyperlinkForeground ProgressBarForeground semantic color token design"),
+            new GalleryPage("Typography", "Font families, type ramp, and control text roles used by FluentJalium themes.", GalleryNavigationGroup.Design, FluentIconRegular.TextFont24, content.Typography, "FluentTypography DisplayFontFamily BodyFontFamily MonoFontFamily FluentCaptionFontSize FluentBodyFontSize FluentSubtitleFontSize FluentTitleFontSize ControlContentThemeFontSize typography type ramp font design"),
             new GalleryPage("Geometry", "Corner radius, stroke, and elevation tokens for FluentJalium control surfaces.", GalleryNavigationGroup.Design, FluentIconRegular.Ruler24, content.Geometry, "ControlCornerRadius OverlayCornerRadius CardCornerRadius CompactCornerRadius FluentControlBorderThickness ControlElevationBorderBrush AccentControlElevationBorderBrush FluentGeometry radius corner stroke border elevation shadow WinUI geometry design token"),
             new GalleryPage("Buttons", "Button and command surfaces, including split, drop-down, app bar, toolbar, and material command decks.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ControlButton24, content.Buttons, "FWButton FWRepeatButton FWHyperlinkButton FWDropDownButton FWSplitButton FWToggleSplitButton FWAppBarButton FWAppBarToggleButton FWAppBarSeparator FWCommandBar FWToolBar FWToolBarTray command bar toolbar material liquid glass split drop down"),
             new GalleryPage("Switches", "ToggleButton and ToggleSwitch states, events, keyboard toggles, and material-aware setting rows.", GalleryNavigationGroup.ControlSurfaces, FluentIconRegular.ToggleMultiple24, content.Switches, "FWToggleButton FWToggleSwitch checked unchecked indeterminate disabled toggled keyboard drag material settings"),
