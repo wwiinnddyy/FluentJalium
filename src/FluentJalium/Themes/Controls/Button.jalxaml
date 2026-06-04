@@ -59,6 +59,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWButton" BasedOn="{StaticResource {x:Type Button}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style x:Key="AccentButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
         <Setter Property="Foreground" Value="{ThemeResource TextOnAccent}" />
@@ -155,6 +159,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWRepeatButton" BasedOn="{StaticResource {x:Type RepeatButton}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="HyperlinkButton">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource HyperlinkForeground}" />
@@ -192,6 +200,10 @@
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWHyperlinkButton" BasedOn="{StaticResource {x:Type HyperlinkButton}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="fluent:FWDropDownButton">

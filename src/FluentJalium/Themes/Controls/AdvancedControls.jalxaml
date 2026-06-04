@@ -169,6 +169,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWSplitButton" BasedOn="{StaticResource {x:Type SplitButton}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="fluent:FWToggleSplitButton">
         <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />

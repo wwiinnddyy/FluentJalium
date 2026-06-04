@@ -4,6 +4,7 @@ using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
@@ -66,6 +67,10 @@ public sealed class FluentCommandToolbarTests
         {
             FluentThemeManager.Apply(app);
 
+            AssertBasedOnStyle<FWButton, Button>(app.Resources);
+            AssertBasedOnStyle<FWRepeatButton, RepeatButton>(app.Resources);
+            AssertBasedOnStyle<FWHyperlinkButton, HyperlinkButton>(app.Resources);
+            AssertBasedOnStyle<FWSplitButton, SplitButton>(app.Resources);
             AssertBasedOnStyle<FWCommandBar, CommandBar>(app.Resources);
             AssertBasedOnStyle<FWAppBarButton, AppBarButton>(app.Resources);
             AssertBasedOnStyle<FWAppBarToggleButton, AppBarToggleButton>(app.Resources);
@@ -95,6 +100,40 @@ public sealed class FluentCommandToolbarTests
         AssertSetter(commandBarStyle, Control.ForegroundProperty);
         AssertSetter(commandBarStyle, FrameworkElement.MinHeightProperty);
 
+        var buttonStyle = AssertStyle<Button>(dictionary);
+        AssertSetter(buttonStyle, Control.BackgroundProperty);
+        AssertSetter(buttonStyle, Control.BorderBrushProperty);
+        AssertSetter(buttonStyle, Control.PaddingProperty);
+        AssertSetter(buttonStyle, FrameworkElement.MinWidthProperty);
+        AssertSetter(buttonStyle, FrameworkElement.MinHeightProperty);
+
+        var fluentButtonStyle = AssertStyle<FWButton>(dictionary);
+        Assert.Equal(typeof(Button), fluentButtonStyle.BasedOn?.TargetType);
+        AssertSetter(fluentButtonStyle, FWButton.DensityProperty);
+
+        var repeatButtonStyle = AssertStyle<RepeatButton>(dictionary);
+        AssertSetter(repeatButtonStyle, Control.BackgroundProperty);
+        AssertSetter(repeatButtonStyle, Control.BorderBrushProperty);
+        AssertSetter(repeatButtonStyle, Control.PaddingProperty);
+
+        var fluentRepeatButtonStyle = AssertStyle<FWRepeatButton>(dictionary);
+        Assert.Equal(typeof(RepeatButton), fluentRepeatButtonStyle.BasedOn?.TargetType);
+        AssertSetter(fluentRepeatButtonStyle, FWRepeatButton.DensityProperty);
+
+        var hyperlinkButtonStyle = AssertStyle<HyperlinkButton>(dictionary);
+        AssertSetter(hyperlinkButtonStyle, Control.ForegroundProperty);
+        AssertSetter(hyperlinkButtonStyle, Control.PaddingProperty);
+
+        var fluentHyperlinkButtonStyle = AssertStyle<FWHyperlinkButton>(dictionary);
+        Assert.Equal(typeof(HyperlinkButton), fluentHyperlinkButtonStyle.BasedOn?.TargetType);
+        AssertSetter(fluentHyperlinkButtonStyle, FWHyperlinkButton.DensityProperty);
+
+        var splitButtonStyle = AssertStyle<SplitButton>(dictionary);
+        var fluentSplitButtonStyle = AssertStyle<FWSplitButton>(dictionary);
+        Assert.Equal(typeof(SplitButton), fluentSplitButtonStyle.BasedOn?.TargetType);
+        AssertSetter(fluentSplitButtonStyle, FWSplitButton.DensityProperty);
+        Assert.NotNull(splitButtonStyle);
+
         var toolBarStyle = AssertStyle<Jalium.UI.Controls.ToolBar>(dictionary);
         AssertSetter(toolBarStyle, Control.BackgroundProperty);
         AssertSetter(toolBarStyle, Control.BorderBrushProperty);
@@ -107,6 +146,58 @@ public sealed class FluentCommandToolbarTests
         AssertSetter(toolBarTrayStyle, FrameworkElement.MinHeightProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWCoreButtonControls_ShouldApplyDensityPresets()
+    {
+        var button = new FWButton();
+
+        Assert.Equal(FWButtonDensity.Comfortable, button.Density);
+        Assert.Equal(32, button.MinHeight);
+        Assert.Equal(64, button.MinWidth);
+        Assert.Equal(new Thickness(12, 5, 12, 6), button.Padding);
+
+        button.Density = FWButtonDensity.Compact;
+
+        Assert.Equal(30, button.MinHeight);
+        Assert.Equal(56, button.MinWidth);
+        Assert.Equal(new Thickness(10, 4, 10, 5), button.Padding);
+
+        button.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(40, button.MinHeight);
+        Assert.Equal(72, button.MinWidth);
+        Assert.Equal(new Thickness(14, 8, 14, 8), button.Padding);
+
+        var repeatButton = new FWRepeatButton
+        {
+            Density = FWButtonDensity.Compact
+        };
+
+        Assert.Equal(30, repeatButton.MinHeight);
+        Assert.Equal(56, repeatButton.MinWidth);
+        Assert.Equal(new Thickness(10, 4, 10, 5), repeatButton.Padding);
+
+        var hyperlinkButton = new FWHyperlinkButton();
+
+        Assert.Equal(FWButtonDensity.Comfortable, hyperlinkButton.Density);
+        Assert.Equal(24, hyperlinkButton.MinHeight);
+        Assert.Equal(new Thickness(0, 1, 0, 2), hyperlinkButton.Padding);
+
+        hyperlinkButton.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(28, hyperlinkButton.MinHeight);
+        Assert.Equal(new Thickness(0, 3, 0, 3), hyperlinkButton.Padding);
+
+        var splitButton = new FWSplitButton
+        {
+            Density = FWButtonDensity.Spacious
+        };
+
+        Assert.Equal(40, splitButton.MinHeight);
+        Assert.Equal(72, splitButton.MinWidth);
+        Assert.Equal(new Thickness(14, 8, 14, 8), splitButton.Padding);
     }
 
     [Fact]
