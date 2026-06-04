@@ -294,6 +294,12 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal(48, appBarButton.MinWidth);
         Assert.Equal(new Thickness(6, 6, 6, 6), appBarButton.Padding);
 
+        appBarButton.IsCompact = true;
+
+        Assert.Equal(48, appBarButton.MinHeight);
+        Assert.Equal(48, appBarButton.MinWidth);
+        Assert.Equal(new Thickness(6, 4, 6, 4), appBarButton.Padding);
+
         var appBarToggleButton = new FWAppBarToggleButton
         {
             Density = FWButtonDensity.Spacious
@@ -302,6 +308,12 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal(56, appBarToggleButton.MinHeight);
         Assert.Equal(48, appBarToggleButton.MinWidth);
         Assert.Equal(new Thickness(6, 6, 6, 6), appBarToggleButton.Padding);
+
+        appBarToggleButton.IsCompact = true;
+
+        Assert.Equal(48, appBarToggleButton.MinHeight);
+        Assert.Equal(48, appBarToggleButton.MinWidth);
+        Assert.Equal(new Thickness(6, 4, 6, 4), appBarToggleButton.Padding);
 
         var separator = new FWAppBarSeparator();
 

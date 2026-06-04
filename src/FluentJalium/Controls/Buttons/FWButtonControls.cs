@@ -233,10 +233,36 @@ public class FWAppBarButton : AppBarButton, IFluentJaliumControl
 
     private static void ApplyDensity(FWAppBarButton button, FWButtonDensity density)
     {
-        var (minHeight, minWidth, padding) = GetAppBarDensityMetrics(density);
+        var (minHeight, minWidth, padding) = GetAppBarDensityMetrics(density, button.IsCompact);
         button.MinHeight = minHeight;
         button.MinWidth = minWidth;
         button.Padding = padding;
+    }
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.Property == AppBarButton.IsCompactProperty)
+        {
+            ApplyDensity(this, Density);
+        }
+    }
+
+    private static (double MinHeight, double MinWidth, Thickness Padding) GetAppBarDensityMetrics(
+        FWButtonDensity density,
+        bool isCompact)
+    {
+        if (isCompact)
+        {
+            return density switch
+            {
+                FWButtonDensity.Spacious => (48.0, 48.0, new Thickness(6, 4, 6, 4)),
+                _ => (40.0, 40.0, new Thickness(4, 2, 4, 2))
+            };
+        }
+
+        return GetAppBarDensityMetrics(density);
     }
 }
 
@@ -271,10 +297,36 @@ public class FWAppBarToggleButton : AppBarToggleButton, IFluentJaliumControl
 
     private static void ApplyDensity(FWAppBarToggleButton button, FWButtonDensity density)
     {
-        var (minHeight, minWidth, padding) = FWAppBarButton.GetAppBarDensityMetrics(density);
+        var (minHeight, minWidth, padding) = GetAppBarDensityMetrics(density, button.IsCompact);
         button.MinHeight = minHeight;
         button.MinWidth = minWidth;
         button.Padding = padding;
+    }
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.Property == AppBarToggleButton.IsCompactProperty)
+        {
+            ApplyDensity(this, Density);
+        }
+    }
+
+    private static (double MinHeight, double MinWidth, Thickness Padding) GetAppBarDensityMetrics(
+        FWButtonDensity density,
+        bool isCompact)
+    {
+        if (isCompact)
+        {
+            return density switch
+            {
+                FWButtonDensity.Spacious => (48.0, 48.0, new Thickness(6, 4, 6, 4)),
+                _ => (40.0, 40.0, new Thickness(4, 2, 4, 2))
+            };
+        }
+
+        return FWAppBarButton.GetAppBarDensityMetrics(density);
     }
 }
 
@@ -302,6 +354,16 @@ public class FWAppBarSeparator : AppBarSeparator, IFluentJaliumControl
     protected override Size MeasureOverride(Size availableSize)
     {
         return new Size(1, GetSeparatorHeight(Density, IsCompact));
+    }
+
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.Property == AppBarSeparator.IsCompactProperty)
+        {
+            InvalidateMeasure();
+        }
     }
 
     private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
