@@ -8,6 +8,7 @@ using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
+using FWDataGridDensity = FluentJalium.Controls.FWDataGridDensity;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWListBox = FluentJalium.Controls.FWListBox;
@@ -371,8 +372,7 @@ internal sealed class GalleryCollectionsPage
         var rows = GallerySampleData.CreateRows();
         var output = CreateCollectionOutput("Surface: LiquidGlass. Rows: 3. Density: comfortable");
         var dataGrid = CreateSampleDataGrid(rows, width: 420, height: 154);
-        dataGrid.RowHeight = 30;
-        dataGrid.ColumnHeaderHeight = 34;
+        dataGrid.Density = FWDataGridDensity.Comfortable;
         dataGrid.AlternatingRowBackground = ThemeBrush("LayerFillColorDefaultBrush");
         dataGrid.SelectedIndex = 2;
 
@@ -404,15 +404,18 @@ internal sealed class GalleryCollectionsPage
                     CreateCollectionButtonRow(
                         CreateCollectionActionButton("Compact", () =>
                         {
-                            dataGrid.RowHeight = 26;
-                            dataGrid.ColumnHeaderHeight = 30;
+                            dataGrid.Density = FWDataGridDensity.Compact;
                             output.Text = "Surface: LiquidGlass. Rows: 3. Density: compact";
                         }),
                         CreateCollectionActionButton("Comfortable", () =>
                         {
-                            dataGrid.RowHeight = 30;
-                            dataGrid.ColumnHeaderHeight = 34;
+                            dataGrid.Density = FWDataGridDensity.Comfortable;
                             output.Text = "Surface: LiquidGlass. Rows: 3. Density: comfortable";
+                        }),
+                        CreateCollectionActionButton("Spacious", () =>
+                        {
+                            dataGrid.Density = FWDataGridDensity.Spacious;
+                            output.Text = "Surface: LiquidGlass. Rows: 3. Density: spacious";
                         }),
                         CreateCollectionActionButton("Toggle lines", () =>
                         {

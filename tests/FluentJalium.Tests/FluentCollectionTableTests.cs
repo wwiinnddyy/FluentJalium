@@ -100,7 +100,9 @@ public sealed class FluentCollectionTableTests
         AssertContainsStyle<DataGridRow>(dictionary);
         AssertContainsStyle<DataGridCell>(dictionary);
         AssertContainsStyle<DataGridColumnHeader>(dictionary);
+        AssertContainsStyle<FWDataGrid>(dictionary);
         AssertContainsStyle<TreeDataGrid>(dictionary);
+        AssertContainsStyle<FWTreeDataGrid>(dictionary);
         AssertContainsStyle<TreeDataGridRow>(dictionary);
 
         var dataGridStyle = AssertStyle<DataGrid>(dictionary);
@@ -111,6 +113,10 @@ public sealed class FluentCollectionTableTests
         AssertSetter(dataGridStyle, DataGrid.HorizontalGridLinesBrushProperty);
         AssertSetter(dataGridStyle, DataGrid.VerticalGridLinesBrushProperty);
 
+        var fwDataGridStyle = AssertStyle<FWDataGrid>(dictionary);
+        Assert.Same(dataGridStyle, fwDataGridStyle.BasedOn);
+        AssertSetter(fwDataGridStyle, FWDataGrid.DensityProperty);
+
         var treeDataGridStyle = AssertStyle<TreeDataGrid>(dictionary);
         AssertSetter(treeDataGridStyle, Control.BackgroundProperty);
         AssertSetter(treeDataGridStyle, Control.BorderBrushProperty);
@@ -118,6 +124,10 @@ public sealed class FluentCollectionTableTests
         AssertSetter(treeDataGridStyle, TreeDataGrid.ColumnHeaderHeightProperty);
         AssertSetter(treeDataGridStyle, TreeDataGrid.HorizontalGridLinesBrushProperty);
         AssertSetter(treeDataGridStyle, TreeDataGrid.VerticalGridLinesBrushProperty);
+
+        var fwTreeDataGridStyle = AssertStyle<FWTreeDataGrid>(dictionary);
+        Assert.Same(treeDataGridStyle, fwTreeDataGridStyle.BasedOn);
+        AssertSetter(fwTreeDataGridStyle, FWTreeDataGrid.DensityProperty);
 
         ResetApplicationState();
     }
@@ -231,6 +241,39 @@ public sealed class FluentCollectionTableTests
     }
 
     [Fact]
+    public void FWDataGrids_ShouldApplyDensityPresets()
+    {
+        var dataGrid = new FWDataGrid();
+
+        Assert.Equal(FWDataGridDensity.Comfortable, dataGrid.Density);
+        Assert.Equal(32, dataGrid.RowHeight);
+        Assert.Equal(36, dataGrid.ColumnHeaderHeight);
+
+        dataGrid.Density = FWDataGridDensity.Compact;
+
+        Assert.Equal(26, dataGrid.RowHeight);
+        Assert.Equal(30, dataGrid.ColumnHeaderHeight);
+
+        dataGrid.Density = FWDataGridDensity.Spacious;
+
+        Assert.Equal(40, dataGrid.RowHeight);
+        Assert.Equal(44, dataGrid.ColumnHeaderHeight);
+
+        var treeDataGrid = new FWTreeDataGrid
+        {
+            Density = FWDataGridDensity.Spacious
+        };
+
+        Assert.Equal(40, treeDataGrid.RowHeight);
+        Assert.Equal(44, treeDataGrid.ColumnHeaderHeight);
+
+        treeDataGrid.Density = FWDataGridDensity.Comfortable;
+
+        Assert.Equal(32, treeDataGrid.RowHeight);
+        Assert.Equal(36, treeDataGrid.ColumnHeaderHeight);
+    }
+
+    [Fact]
     public void FWDataGrid_ShouldExposeMaterialSurfaceDensityAndLayeringProperties()
     {
         var rows = new[]
@@ -244,8 +287,7 @@ public sealed class FluentCollectionTableTests
         {
             AutoGenerateColumns = false,
             ItemsSource = rows,
-            RowHeight = 30,
-            ColumnHeaderHeight = 34,
+            Density = FWDataGridDensity.Comfortable,
             AlternatingRowBackground = alternatingBrush,
             GridLinesVisibility = DataGridGridLinesVisibility.All,
             HeadersVisibility = DataGridHeadersVisibility.All
@@ -267,8 +309,8 @@ public sealed class FluentCollectionTableTests
             Child = dataGrid
         };
 
-        Assert.Equal(30, dataGrid.RowHeight);
-        Assert.Equal(34, dataGrid.ColumnHeaderHeight);
+        Assert.Equal(32, dataGrid.RowHeight);
+        Assert.Equal(36, dataGrid.ColumnHeaderHeight);
         Assert.Same(alternatingBrush, dataGrid.AlternatingRowBackground);
         Assert.Equal(rows[2], dataGrid.SelectedItem);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
