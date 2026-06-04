@@ -1,5 +1,6 @@
 using System.Globalization;
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -343,46 +344,16 @@ internal sealed class GalleryMotionPage
 
     private static FWBorder CreateMotionExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title), width: 520);
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 520,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "Connected animation" => "var service = new FWConnectedAnimationService();\nservice.PrepareToAnimate(\"card\", source, FWConnectedAnimationOptions.CreateDefault());\nservice.TryStart(\"card\", destination);",
+            "Content transitions" => "<FWTransitioningContentControl TransitionMode=\"Crossfade\" />\n<FWTransitioningContentControl TransitionMode=\"LiquidMorph\" />",
+            _ => "<FWTransitioningContentControl TransitionMode=\"Crossfade\" />"
         };
     }
 
