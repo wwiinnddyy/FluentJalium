@@ -1,0 +1,186 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <CornerRadius x:Key="FluentControlCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="FluentOverlayCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="FluentCardCornerRadius">6</CornerRadius>
+    <CornerRadius x:Key="FluentCompactCornerRadius">2</CornerRadius>
+    <CornerRadius x:Key="FluentPillCornerRadius">999</CornerRadius>
+    <Thickness x:Key="FluentControlBorderThickness">1</Thickness>
+    <Thickness x:Key="FluentOverlayBorderThickness">1</Thickness>
+    <x:String x:Key="FluentElevationShadowDepthLow">2</x:String>
+    <x:String x:Key="FluentElevationShadowDepthMedium">4</x:String>
+    <x:String x:Key="FluentElevationShadowDepthHigh">8</x:String>
+    <x:String x:Key="FluentElevationShadowBlurLow">10</x:String>
+    <x:String x:Key="FluentElevationShadowBlurMedium">18</x:String>
+    <x:String x:Key="FluentElevationShadowBlurHigh">28</x:String>
+
+    <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+    <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">6</CornerRadius>
+    <CornerRadius x:Key="CompactCornerRadius">2</CornerRadius>
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <LinearGradientBrush x:Key="FluentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#18FFFFFF" />
+                    <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentAccentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#23000000" />
+                    <GradientStop Offset="1.0" Color="#14FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentTextControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,2">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#18FFFFFF" />
+                    <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentCircleElevationBorderBrush"
+                                 MappingMode="RelativeToBoundingBox"
+                                 StartPoint="0,0"
+                                 EndPoint="1,0">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.70" Color="#18FFFFFF" />
+                    <GradientStop Offset="0.50" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="ControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#18FFFFFF" />
+                    <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="AccentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#23000000" />
+                    <GradientStop Offset="1.0" Color="#14FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="TextControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,2">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#18FFFFFF" />
+                    <GradientStop Offset="1.0" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="CircleElevationBorderBrush"
+                                 MappingMode="RelativeToBoundingBox"
+                                 StartPoint="0,0"
+                                 EndPoint="1,0">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.70" Color="#18FFFFFF" />
+                    <GradientStop Offset="0.50" Color="#12FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <LinearGradientBrush x:Key="FluentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#29000000" />
+                    <GradientStop Offset="1.0" Color="#0F000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentAccentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#66000000" />
+                    <GradientStop Offset="1.0" Color="#14FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentTextControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,2">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#29000000" />
+                    <GradientStop Offset="1.0" Color="#0F000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="FluentCircleElevationBorderBrush"
+                                 MappingMode="RelativeToBoundingBox"
+                                 StartPoint="0,0"
+                                 EndPoint="1,0">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.50" Color="#0F000000" />
+                    <GradientStop Offset="0.70" Color="#29000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="ControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#29000000" />
+                    <GradientStop Offset="1.0" Color="#0F000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="AccentControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,3">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#66000000" />
+                    <GradientStop Offset="1.0" Color="#14FFFFFF" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="TextControlElevationBorderBrush"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="0,2">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.33" Color="#29000000" />
+                    <GradientStop Offset="1.0" Color="#0F000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="CircleElevationBorderBrush"
+                                 MappingMode="RelativeToBoundingBox"
+                                 StartPoint="0,0"
+                                 EndPoint="1,0">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.50" Color="#0F000000" />
+                    <GradientStop Offset="0.70" Color="#29000000" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="HighContrast">
+            <SolidColorBrush x:Key="FluentControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="FluentAccentControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="FluentTextControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="FluentCircleElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlElevationBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CircleElevationBorderBrush" Color="#FFFFFFFF" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

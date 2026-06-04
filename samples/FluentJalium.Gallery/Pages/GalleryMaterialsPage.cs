@@ -36,6 +36,7 @@ internal sealed class GalleryMaterialsPage
             VerticalSpacing = 16
         };
 
+        panel.Children.Add(CreateGeometryTokenStrip());
         examples.Children.Add(CreateMaterialsExampleCard(
             FluentIconRegular.WindowBrush24,
             "Window SystemBackdrop",
@@ -171,6 +172,67 @@ internal sealed class GalleryMaterialsPage
                     "LiquidGlass",
                     "Jalium HLSL surfaces are reserved for expressive controls that need refraction and highlight.",
                     ThemeBrush("FluentMaterialFocusedGlassBrush"))
+            }
+        };
+    }
+
+    private static FWBorder CreateGeometryTokenStrip()
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Child = new FWWrapPanel
+            {
+                HorizontalSpacing = 8,
+                VerticalSpacing = 8,
+                Children =
+                {
+                    CreateGeometryTokenPill(FluentIconRegular.Ruler24, "Control radius", FormatResourceValue("ControlCornerRadius")),
+                    CreateGeometryTokenPill(FluentIconRegular.BorderOutside24, "Overlay radius", FormatResourceValue("OverlayCornerRadius")),
+                    CreateGeometryTokenPill(FluentIconRegular.AppGeneric24, "Card radius", FormatResourceValue("CardCornerRadius")),
+                    CreateGeometryTokenPill(FluentIconRegular.BorderAll24, "Control stroke", FormatResourceValue("FluentControlBorderThickness")),
+                    CreateGeometryTokenPill(FluentIconRegular.SquareShadow24, "Shadow depth", $"{FormatResourceValue("FluentElevationShadowDepthMedium")} px"),
+                    CreateGeometryTokenPill(FluentIconRegular.LayerDiagonal24, "Shadow blur", $"{FormatResourceValue("FluentElevationShadowBlurMedium")} px")
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateGeometryTokenPill(FluentIconRegular icon, string title, string value)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 6, 10, 6),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(icon, 16, ThemeBrush("TextSecondary")),
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    new FWTextBlock
+                    {
+                        Text = value,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
             }
         };
     }
@@ -545,6 +607,46 @@ internal sealed class GalleryMaterialsPage
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+    }
+
+    private static string FormatResourceValue(string key)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) != true)
+        {
+            return "-";
+        }
+
+        return value switch
+        {
+            CornerRadius radius => FormatCornerRadius(radius),
+            Thickness thickness => FormatThickness(thickness),
+            string text => text,
+            _ => value.ToString() ?? "-"
+        };
+    }
+
+    private static string FormatCornerRadius(CornerRadius radius)
+    {
+        if (radius.TopLeft == radius.TopRight &&
+            radius.TopLeft == radius.BottomRight &&
+            radius.TopLeft == radius.BottomLeft)
+        {
+            return $"{radius.TopLeft:0.##} px";
+        }
+
+        return $"{radius.TopLeft:0.##}, {radius.TopRight:0.##}, {radius.BottomRight:0.##}, {radius.BottomLeft:0.##}";
+    }
+
+    private static string FormatThickness(Thickness thickness)
+    {
+        if (thickness.Left == thickness.Top &&
+            thickness.Left == thickness.Right &&
+            thickness.Left == thickness.Bottom)
+        {
+            return $"{thickness.Left:0.##} px";
+        }
+
+        return $"{thickness.Left:0.##}, {thickness.Top:0.##}, {thickness.Right:0.##}, {thickness.Bottom:0.##}";
     }
 
     private static Brush ThemeBrush(string key)

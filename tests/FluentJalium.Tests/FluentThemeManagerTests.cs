@@ -405,6 +405,17 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialRoleBadgeBrush"));
         Assert.True(dictionary.Contains("FluentMaterialRoleIconBackgroundBrush"));
         Assert.True(dictionary.Contains("FluentMaterialElevationShadowBrush"));
+        Assert.True(dictionary.Contains("FluentControlCornerRadius"));
+        Assert.True(dictionary.Contains("FluentOverlayCornerRadius"));
+        Assert.True(dictionary.Contains("FluentCardCornerRadius"));
+        Assert.True(dictionary.Contains("FluentCompactCornerRadius"));
+        Assert.True(dictionary.Contains("FluentControlBorderThickness"));
+        Assert.True(dictionary.Contains("FluentControlElevationBorderBrush"));
+        Assert.True(dictionary.Contains("FluentAccentControlElevationBorderBrush"));
+        Assert.True(dictionary.Contains("ControlCornerRadius"));
+        Assert.True(dictionary.Contains("OverlayCornerRadius"));
+        Assert.True(dictionary.Contains("ControlElevationBorderBrush"));
+        Assert.True(dictionary.Contains("AccentControlElevationBorderBrush"));
         Assert.True(dictionary.Contains("FluentMotionDurationFast"));
         Assert.True(dictionary.Contains("FluentMotionDurationNormal"));
         Assert.True(dictionary.Contains("FluentMotionDurationEmphasized"));
@@ -438,6 +449,10 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("StatusBarBackground"));
         Assert.True(dictionary.Contains("StatusBarSeparatorForeground"));
         Assert.True(dictionary.Contains("ControlContentThemeFontSize"));
+
+        var buttonStyle = Assert.IsType<Style>(dictionary[typeof(Button)]);
+        AssertStyleSetterValue(buttonStyle, Control.BorderBrushProperty, "ControlElevationBorderBrush");
+        AssertStyleSetterValue(buttonStyle, Control.CornerRadiusProperty, dictionary["ControlCornerRadius"]);
     }
 
     [Fact]
@@ -2859,6 +2874,21 @@ public sealed class FluentThemeManagerTests
 
         Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
         Assert.Null(fluentStyle.BasedOn);
+    }
+
+    private static void AssertStyleSetterValue(Style style, DependencyProperty property, object? expectedValue)
+    {
+        var setter = style.Setters.OfType<Setter>().FirstOrDefault(candidate => candidate.Property == property);
+
+        Assert.NotNull(setter);
+
+        if (setter!.Value is IDynamicResourceReference dynamicReference)
+        {
+            Assert.Equal(expectedValue, dynamicReference.ResourceKey);
+            return;
+        }
+
+        Assert.Equal(expectedValue, setter.Value);
     }
 
     private static void AssertFluentControl<TFluentControl, TJaliumControl>()
