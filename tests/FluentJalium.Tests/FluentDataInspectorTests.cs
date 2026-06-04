@@ -104,12 +104,20 @@ public sealed class FluentDataInspectorTests
         AssertSetter(diffStyle, DiffViewer.RemovedLineBrushProperty);
         AssertSetter(diffStyle, Control.TemplateProperty);
 
+        var fwDiffStyle = AssertStyle<FWDiffViewer>(dictionary);
+        Assert.Same(diffStyle, fwDiffStyle.BasedOn);
+        AssertSetter(fwDiffStyle, FWDiffViewer.DensityProperty);
+
         var hexStyle = AssertStyle<HexEditor>(dictionary);
         AssertSetter(hexStyle, Control.BackgroundProperty);
         AssertSetter(hexStyle, Control.BorderBrushProperty);
         AssertSetter(hexStyle, HexEditor.OffsetForegroundProperty);
         AssertSetter(hexStyle, HexEditor.SelectionBrushProperty);
         AssertSetter(hexStyle, Control.TemplateProperty);
+
+        var fwHexStyle = AssertStyle<FWHexEditor>(dictionary);
+        Assert.Same(hexStyle, fwHexStyle.BasedOn);
+        AssertSetter(fwHexStyle, FWHexEditor.DensityProperty);
 
         var jsonStyle = AssertStyle<JsonTreeViewer>(dictionary);
         AssertSetter(jsonStyle, Control.BackgroundProperty);
@@ -118,7 +126,90 @@ public sealed class FluentDataInspectorTests
         AssertSetter(jsonStyle, JsonTreeViewer.KeyBrushProperty);
         AssertSetter(jsonStyle, Control.TemplateProperty);
 
+        var fwJsonStyle = AssertStyle<FWJsonTreeViewer>(dictionary);
+        Assert.Same(jsonStyle, fwJsonStyle.BasedOn);
+        AssertSetter(fwJsonStyle, FWJsonTreeViewer.DensityProperty);
+
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWDataInspectors_ShouldApplyDensityPresets()
+    {
+        var diffViewer = new FWDiffViewer();
+
+        Assert.Equal(FWDataInspectorDensity.Comfortable, diffViewer.Density);
+        Assert.Equal(13, diffViewer.FontSize);
+        Assert.Equal(60, diffViewer.GutterWidth);
+        Assert.Equal(240, diffViewer.MinWidth);
+        Assert.Equal(140, diffViewer.MinHeight);
+        Assert.Equal(new CornerRadius(6), diffViewer.CornerRadius);
+
+        diffViewer.Density = FWDataInspectorDensity.Compact;
+
+        Assert.Equal(12, diffViewer.FontSize);
+        Assert.Equal(48, diffViewer.GutterWidth);
+        Assert.Equal(220, diffViewer.MinWidth);
+        Assert.Equal(120, diffViewer.MinHeight);
+        Assert.Equal(new CornerRadius(4), diffViewer.CornerRadius);
+
+        diffViewer.Density = FWDataInspectorDensity.Spacious;
+
+        Assert.Equal(14, diffViewer.FontSize);
+        Assert.Equal(72, diffViewer.GutterWidth);
+        Assert.Equal(280, diffViewer.MinWidth);
+        Assert.Equal(180, diffViewer.MinHeight);
+        Assert.Equal(new CornerRadius(8), diffViewer.CornerRadius);
+
+        var hexEditor = new FWHexEditor();
+
+        Assert.Equal(FWDataInspectorDensity.Comfortable, hexEditor.Density);
+        Assert.Equal(13, hexEditor.FontSize);
+        Assert.Equal(new Thickness(6), hexEditor.Padding);
+        Assert.Equal(240, hexEditor.MinWidth);
+        Assert.Equal(140, hexEditor.MinHeight);
+        Assert.Equal(new CornerRadius(6), hexEditor.CornerRadius);
+
+        hexEditor.Density = FWDataInspectorDensity.Compact;
+
+        Assert.Equal(12, hexEditor.FontSize);
+        Assert.Equal(new Thickness(4), hexEditor.Padding);
+        Assert.Equal(220, hexEditor.MinWidth);
+        Assert.Equal(120, hexEditor.MinHeight);
+        Assert.Equal(new CornerRadius(4), hexEditor.CornerRadius);
+
+        hexEditor.Density = FWDataInspectorDensity.Spacious;
+
+        Assert.Equal(14, hexEditor.FontSize);
+        Assert.Equal(new Thickness(8), hexEditor.Padding);
+        Assert.Equal(280, hexEditor.MinWidth);
+        Assert.Equal(180, hexEditor.MinHeight);
+        Assert.Equal(new CornerRadius(8), hexEditor.CornerRadius);
+
+        var jsonViewer = new FWJsonTreeViewer();
+
+        Assert.Equal(FWDataInspectorDensity.Comfortable, jsonViewer.Density);
+        Assert.Equal(13, jsonViewer.FontSize);
+        Assert.Equal(20, jsonViewer.IndentSize);
+        Assert.Equal(240, jsonViewer.MinWidth);
+        Assert.Equal(180, jsonViewer.MinHeight);
+        Assert.Equal(new CornerRadius(6), jsonViewer.CornerRadius);
+
+        jsonViewer.Density = FWDataInspectorDensity.Compact;
+
+        Assert.Equal(12, jsonViewer.FontSize);
+        Assert.Equal(16, jsonViewer.IndentSize);
+        Assert.Equal(220, jsonViewer.MinWidth);
+        Assert.Equal(160, jsonViewer.MinHeight);
+        Assert.Equal(new CornerRadius(4), jsonViewer.CornerRadius);
+
+        jsonViewer.Density = FWDataInspectorDensity.Spacious;
+
+        Assert.Equal(14, jsonViewer.FontSize);
+        Assert.Equal(24, jsonViewer.IndentSize);
+        Assert.Equal(300, jsonViewer.MinWidth);
+        Assert.Equal(220, jsonViewer.MinHeight);
+        Assert.Equal(new CornerRadius(8), jsonViewer.CornerRadius);
     }
 
     [Fact]
@@ -126,6 +217,7 @@ public sealed class FluentDataInspectorTests
     {
         var viewer = new FWDiffViewer
         {
+            Density = FWDataInspectorDensity.Spacious,
             OriginalText = "alpha\nbeta\ngamma",
             ModifiedText = "alpha\nbeta updated\ngamma\ndelta",
             ViewMode = DiffViewMode.Unified,
@@ -146,6 +238,8 @@ public sealed class FluentDataInspectorTests
         Assert.Equal(2, viewer.ContextLines);
         Assert.True(viewer.EnableInlineEdit);
         Assert.False(viewer.IsReadOnly);
+        Assert.Equal(FWDataInspectorDensity.Spacious, viewer.Density);
+        Assert.Equal(14, viewer.FontSize);
         Assert.True(viewer.GetChangeCount() > 0);
     }
 
@@ -154,6 +248,7 @@ public sealed class FluentDataInspectorTests
     {
         var editor = new FWHexEditor
         {
+            Density = FWDataInspectorDensity.Compact,
             Data = [0x48, 0x65, 0x6C, 0x6C, 0x6F],
             BytesPerRow = 8,
             ColumnGroupSize = 4,
@@ -182,6 +277,8 @@ public sealed class FluentDataInspectorTests
         Assert.Equal(1, editor.SelectionStart);
         Assert.Equal(2, editor.SelectionLength);
         Assert.Equal(3, editor.CaretOffset);
+        Assert.Equal(FWDataInspectorDensity.Compact, editor.Density);
+        Assert.Equal(12, editor.FontSize);
         Assert.Equal([0x48, 0x45, 0x4C, 0x6C, 0x6F], editor.Data);
     }
 
@@ -190,6 +287,7 @@ public sealed class FluentDataInspectorTests
     {
         var viewer = new FWJsonTreeViewer
         {
+            Density = FWDataInspectorDensity.Spacious,
             JsonText = """
                 {
                   "theme": "Fluent",
@@ -199,7 +297,6 @@ public sealed class FluentDataInspectorTests
                 """,
             SearchText = "theme",
             IsEditable = true,
-            IndentSize = 18,
             ExpandDepth = 2,
             MaxRenderDepth = 8,
             ShowTypeIndicators = true,
@@ -212,11 +309,12 @@ public sealed class FluentDataInspectorTests
         Assert.NotNull(viewer.RootNode);
         Assert.Equal("theme", viewer.SearchText);
         Assert.True(viewer.IsEditable);
-        Assert.Equal(18, viewer.IndentSize);
         Assert.Equal(2, viewer.ExpandDepth);
         Assert.Equal(8, viewer.MaxRenderDepth);
         Assert.True(viewer.ShowTypeIndicators);
         Assert.True(viewer.ShowItemCount);
+        Assert.Equal(FWDataInspectorDensity.Spacious, viewer.Density);
+        Assert.Equal(24, viewer.IndentSize);
     }
 
     [Fact]

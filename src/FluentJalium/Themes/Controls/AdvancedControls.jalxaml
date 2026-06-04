@@ -480,6 +480,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWDiffViewer" BasedOn="{StaticResource {x:Type DiffViewer}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="HexEditor">
         <Setter Property="Background" Value="{ThemeResource DataInspectorBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource DataInspectorForeground}" />
@@ -521,6 +525,10 @@
                 <Setter Property="Opacity" Value="0.65" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWHexEditor" BasedOn="{StaticResource {x:Type HexEditor}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="JsonTreeViewer">
@@ -616,6 +624,10 @@
                 <Setter Property="Opacity" Value="0.65" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWJsonTreeViewer" BasedOn="{StaticResource {x:Type JsonTreeViewer}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="Expander">
