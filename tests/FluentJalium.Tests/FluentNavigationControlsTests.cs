@@ -100,11 +100,19 @@ public sealed class FluentNavigationControlsTests
         AssertSetter(navigationViewStyle, NavigationView.PaneBackgroundProperty);
         AssertSetter(navigationViewStyle, NavigationView.ContentBackgroundProperty);
 
+        var fwNavigationViewStyle = AssertStyle<FWNavigationView>(dictionary);
+        Assert.Equal(typeof(NavigationView), fwNavigationViewStyle.BasedOn?.TargetType);
+        AssertSetter(fwNavigationViewStyle, FWNavigationView.DensityProperty);
+
         var navigationItemStyle = AssertStyle<NavigationViewItem>(dictionary);
         AssertSetter(navigationItemStyle, Control.BackgroundProperty);
         AssertSetter(navigationItemStyle, TextElement.ForegroundProperty);
         AssertSetter(navigationItemStyle, Control.CornerRadiusProperty);
         AssertSetter(navigationItemStyle, FrameworkElement.MarginProperty);
+
+        var fwNavigationItemStyle = AssertStyle<FWNavigationViewItem>(dictionary);
+        Assert.Equal(typeof(NavigationViewItem), fwNavigationItemStyle.BasedOn?.TargetType);
+        AssertSetter(fwNavigationItemStyle, FWNavigationViewItem.DensityProperty);
 
         var tabControlStyle = AssertStyle<TabControl>(dictionary);
         AssertSetter(tabControlStyle, Control.BackgroundProperty);
@@ -112,11 +120,81 @@ public sealed class FluentNavigationControlsTests
         AssertSetter(tabControlStyle, TabControl.TabStripBorderBrushProperty);
         AssertSetter(tabControlStyle, TabControl.TabStripHeightProperty);
 
+        var fwTabControlStyle = AssertStyle<FWTabControl>(dictionary);
+        Assert.Equal(typeof(TabControl), fwTabControlStyle.BasedOn?.TargetType);
+        AssertSetter(fwTabControlStyle, FWTabControl.DensityProperty);
+
+        var tabItemStyle = AssertStyle<TabItem>(dictionary);
+        var fwTabItemStyle = AssertStyle<FWTabItem>(dictionary);
+        Assert.Equal(typeof(TabItem), fwTabItemStyle.BasedOn?.TargetType);
+        AssertSetter(fwTabItemStyle, FWTabItem.DensityProperty);
+
         var frameStyle = AssertStyle<Frame>(dictionary);
         AssertSetter(frameStyle, Control.BackgroundProperty);
         AssertSetter(frameStyle, Control.BorderBrushProperty);
 
+        var fwFrameStyle = AssertStyle<FWFrame>(dictionary);
+        Assert.Equal(typeof(Frame), fwFrameStyle.BasedOn?.TargetType);
+
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWNavigationControls_ShouldApplyDensityPresets()
+    {
+        var navigationView = new FWNavigationView();
+
+        Assert.Equal(FWNavigationDensity.Comfortable, navigationView.Density);
+        Assert.Equal(280, navigationView.OpenPaneLength);
+        Assert.Equal(48, navigationView.CompactPaneLength);
+
+        navigationView.Density = FWNavigationDensity.Compact;
+
+        Assert.Equal(240, navigationView.OpenPaneLength);
+        Assert.Equal(40, navigationView.CompactPaneLength);
+
+        navigationView.Density = FWNavigationDensity.Spacious;
+
+        Assert.Equal(320, navigationView.OpenPaneLength);
+        Assert.Equal(56, navigationView.CompactPaneLength);
+
+        var item = new FWNavigationViewItem();
+
+        Assert.Equal(FWNavigationDensity.Comfortable, item.Density);
+        Assert.Equal(36, item.MinHeight);
+        Assert.Equal(new Thickness(6, 2, 6, 2), item.Margin);
+
+        item.Density = FWNavigationDensity.Compact;
+
+        Assert.Equal(32, item.MinHeight);
+        Assert.Equal(new Thickness(4, 1, 4, 1), item.Margin);
+
+        item.Density = FWNavigationDensity.Spacious;
+
+        Assert.Equal(44, item.MinHeight);
+        Assert.Equal(new Thickness(8, 2, 8, 2), item.Margin);
+
+        var tabControl = new FWTabControl();
+
+        Assert.Equal(FWNavigationDensity.Comfortable, tabControl.Density);
+        Assert.Equal(40, tabControl.TabStripHeight);
+
+        tabControl.Density = FWNavigationDensity.Compact;
+
+        Assert.Equal(36, tabControl.TabStripHeight);
+
+        var tabItem = new FWTabItem
+        {
+            Density = FWNavigationDensity.Spacious
+        };
+
+        Assert.Equal(44, tabItem.MinHeight);
+        Assert.Equal(new Thickness(18, 12, 18, 12), tabItem.Padding);
+
+        tabItem.Density = FWNavigationDensity.Compact;
+
+        Assert.Equal(32, tabItem.MinHeight);
+        Assert.Equal(new Thickness(12, 7, 12, 7), tabItem.Padding);
     }
 
     [Fact]
