@@ -7,9 +7,8 @@ using Jalium.UI.Media.Effects;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
+using FWFluentMaterialRecipe = FluentJalium.Controls.FWFluentMaterialRecipe;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
-using FWFluentWindowBackdropKind = FluentJalium.Controls.FWFluentWindowBackdropKind;
-using FWFluentWindowBackdropRecipe = FluentJalium.Controls.FWFluentWindowBackdropRecipe;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
@@ -20,27 +19,15 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryMaterialsPage
 {
-    private readonly Window _window;
-
-    public GalleryMaterialsPage(Window window)
-    {
-        _window = window;
-    }
-
     public UIElement CreateContent()
     {
-        var panel = CreateSection("Materials and Effects");
+        var panel = CreateSection("Element Materials and Effects");
         var examples = new FWWrapPanel
         {
             HorizontalSpacing = 16,
             VerticalSpacing = 16
         };
 
-        examples.Children.Add(CreateMaterialsExampleCard(
-            FluentIconRegular.WindowBrush24,
-            "Window SystemBackdrop",
-            "Jalium windows expose WinUI-style Mica, Mica Alt, and Acrylic backdrops for app shell depth.",
-            CreateWindowBackdropMaterialSample()));
         examples.Children.Add(CreateMaterialsExampleCard(
             FluentIconRegular.TransparencySquare24,
             "Element BackdropEffect",
@@ -59,27 +46,6 @@ internal sealed class GalleryMaterialsPage
 
         panel.Children.Add(examples);
         return panel;
-    }
-
-    private UIElement CreateWindowBackdropMaterialSample()
-    {
-        var status = CreateMaterialOutputText(CreateWindowBackdropStatusText(_window.SystemBackdrop));
-
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                CreateBackdropPreview("System backdrop", "Mica / MicaAlt / Acrylic are window-level materials, not just panel colors.", ThemeBrush("LayerFillColorDefaultBrush")),
-                CreateMaterialButtonRow(
-                    CreateMaterialActionButton(FluentIconRegular.DismissCircle24, "None", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.None, status)),
-                    CreateMaterialActionButton(FluentIconRegular.WindowBrush24, "Mica", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Mica, status)),
-                    CreateMaterialActionButton(FluentIconRegular.LayerDiagonal24, "Mica Alt", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.MicaAlt, status)),
-                    CreateMaterialActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Acrylic, status))),
-                CreateMaterialStatus(status)
-            }
-        };
     }
 
     private static UIElement CreateElementBackdropEffectsSample()
@@ -151,7 +117,7 @@ internal sealed class GalleryMaterialsPage
                     FluentIconRegular.WindowBrush24,
                     "Window shell",
                     "SystemBackdrop",
-                    "Mica, Mica Alt, and Acrylic belong on the Window so the app frame carries depth.",
+                    "Mica, Mica Alt, and Acrylic are shown on the Window Backdrops page so shell materials stay separate.",
                     ThemeBrush("FluentMaterialWindowBackdropBrush")),
                 CreateMaterialRoleTile(
                     FluentIconRegular.LayerDiagonal24,
@@ -173,26 +139,6 @@ internal sealed class GalleryMaterialsPage
                     ThemeBrush("FluentMaterialFocusedGlassBrush"))
             }
         };
-    }
-
-    private void ApplySystemBackdrop(FWFluentWindowBackdropKind backdropKind, TextBlock status)
-    {
-        var recipe = FWFluentWindowBackdropRecipe.Create(backdropKind);
-        recipe.ApplyTo(_window);
-        status.Text = $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
-    }
-
-    private static string CreateWindowBackdropStatusText(WindowBackdropType systemBackdrop)
-    {
-        var kind = systemBackdrop switch
-        {
-            WindowBackdropType.Mica => FWFluentWindowBackdropKind.Mica,
-            WindowBackdropType.MicaAlt => FWFluentWindowBackdropKind.MicaAlt,
-            WindowBackdropType.Acrylic => FWFluentWindowBackdropKind.Acrylic,
-            _ => FWFluentWindowBackdropKind.None
-        };
-        var recipe = FWFluentWindowBackdropRecipe.Create(kind);
-        return $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
     }
 
     private static FWBorder CreateBackdropEffectTile(FluentIconRegular icon, string title, string description, IBackdropEffect effect)
@@ -357,33 +303,6 @@ internal sealed class GalleryMaterialsPage
         };
     }
 
-    private static FWBorder CreateBackdropPreview(string title, string description, Brush layerBrush)
-    {
-        return new FWBorder
-        {
-            Width = 490,
-            Height = 150,
-            Background = ThemeBrush("SurfaceBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(14),
-            Child = new FWGrid
-            {
-                Children =
-                {
-                    new FWBorder
-                    {
-                        Background = ThemeBrush("AccentBrush"),
-                        CornerRadius = new CornerRadius(8),
-                        Opacity = 0.24
-                    },
-                    CreateLayeredSurface(FluentIconRegular.WindowBrush24, title, description, layerBrush)
-                }
-            }
-        };
-    }
-
     private static FWBorder CreateMaterialsExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
         return new FWBorder
@@ -429,32 +348,6 @@ internal sealed class GalleryMaterialsPage
         };
     }
 
-    private static FWStackPanel CreateMaterialButtonRow(params FWButton[] buttons)
-    {
-        var row = new FWStackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8
-        };
-
-        foreach (var button in buttons)
-        {
-            row.Children.Add(button);
-        }
-
-        return row;
-    }
-
-    private static FWButton CreateMaterialActionButton(FluentIconRegular icon, string text, Action action)
-    {
-        var button = new FWButton
-        {
-            Content = CreateMaterialButtonContent(icon, text)
-        };
-        button.Click += (_, _) => action();
-        return button;
-    }
-
     private static FWButton CreateMaterialCommandButton(FluentIconRegular icon, string text)
     {
         return new FWButton
@@ -476,39 +369,6 @@ internal sealed class GalleryMaterialsPage
                 {
                     Text = text,
                     VerticalAlignment = VerticalAlignment.Center
-                }
-            }
-        };
-    }
-
-    private static TextBlock CreateMaterialOutputText(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            FontSize = 12,
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        };
-    }
-
-    private static FWBorder CreateMaterialStatus(TextBlock status)
-    {
-        return new FWBorder
-        {
-            Background = ThemeBrush("LayerFillColorDefaultBrush"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 8,
-                Children =
-                {
-                    CreateIcon(FluentIconRegular.InfoSparkle24, 18, ThemeBrush("TextSecondary")),
-                    status
                 }
             }
         };
