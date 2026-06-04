@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -495,46 +496,19 @@ internal sealed class GalleryNavigationPage
 
     private static FWBorder CreateNavigationExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWNavigationView" => "<FWNavigationView PaneTitle=\"FluentJalium\" Header=\"NavigationView\">\n    <FWNavigationViewItem Content=\"Dashboard\" />\n    <FWNavigationViewItem Content=\"Controls\" />\n</FWNavigationView>",
+            "Pane modes and hierarchy" => "<FWNavigationView PaneDisplayMode=\"LeftCompact\" IsPaneOpen=\"False\">\n    <FWNavigationViewItem Content=\"Document options\" IsExpanded=\"True\" SelectsOnInvoked=\"False\" />\n</FWNavigationView>",
+            "FWTabControl" => "<FWTabControl TabStripPlacement=\"Top\" IsSwipeEnabled=\"True\">\n    <FWTabItem Header=\"Overview\" />\n    <FWTabItem Header=\"Details\" />\n</FWTabControl>",
+            "FWFrame" => "var frame = new FWFrame();\nframe.Navigate(typeof(GalleryNavigationOverviewPage), \"Overview\");\nframe.GoBack();",
+            "Material navigation shell" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWNavigationView PaneDisplayMode=\"LeftCompact\" />\n    <FWTabControl />\n</FWFluentMaterialSurface>",
+            _ => "<FWNavigationView />"
         };
     }
 
