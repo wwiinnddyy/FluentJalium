@@ -3,6 +3,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
+using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
@@ -10,6 +11,8 @@ using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
 using FWRatingControl = FluentJalium.Controls.FWRatingControl;
+using FWRatingControlSize = FluentJalium.Controls.FWRatingControlSize;
+using FWSelectionDensity = FluentJalium.Controls.FWSelectionDensity;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
@@ -188,22 +191,24 @@ internal sealed class GallerySelectionPage
 
     private static UIElement CreateComboBoxSelectionSample()
     {
-        var output = CreateSelectionOutput("Selected: Control styles");
+        var output = CreateSelectionOutput("Selected: Control styles. Density: comfortable");
         var comboBox = new FWComboBox
         {
             Width = 260,
+            Density = FWSelectionDensity.Comfortable,
             PlaceholderText = "Choose an item"
         };
         comboBox.Items.Add(new FWComboBoxItem { Content = "Fluent tokens" });
         comboBox.Items.Add(new FWComboBoxItem { Content = "Control styles" });
         comboBox.Items.Add(new FWComboBoxItem { Content = "Gallery sample" });
         comboBox.SelectedIndex = 1;
-        comboBox.SelectionChanged += (_, _) => output.Text = $"Selected: {comboBox.SelectionBoxItem}";
+        comboBox.SelectionChanged += (_, _) => output.Text = $"Selected: {comboBox.SelectionBoxItem}. Density: {FormatDensity(comboBox.Density)}";
 
-        var editableOutput = CreateSelectionOutput("Editable text: Custom value");
+        var editableOutput = CreateSelectionOutput("Editable text: Custom value. Density: comfortable");
         var editableComboBox = new FWComboBox
         {
             Width = 260,
+            Density = FWSelectionDensity.Comfortable,
             PlaceholderText = "Type or select",
             IsEditable = true,
             Text = "Custom value",
@@ -212,7 +217,7 @@ internal sealed class GallerySelectionPage
         editableComboBox.Items.Add("Custom value");
         editableComboBox.Items.Add("Preset A");
         editableComboBox.Items.Add("Preset B");
-        editableComboBox.SelectionChanged += (_, _) => editableOutput.Text = $"Editable text: {editableComboBox.SelectionBoxItem}";
+        editableComboBox.SelectionChanged += (_, _) => editableOutput.Text = $"Editable text: {editableComboBox.SelectionBoxItem}. Density: {FormatDensity(editableComboBox.Density)}";
 
         return new FWStackPanel
         {
@@ -223,6 +228,15 @@ internal sealed class GallerySelectionPage
                 CreateSelectionCaption("Inline items"),
                 comboBox,
                 CreateSelectionStatus(output),
+                CreateSelectionButtonRow(
+                    CreateSelectionActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        var density = NextDensity(comboBox.Density);
+                        comboBox.Density = density;
+                        editableComboBox.Density = density;
+                        output.Text = $"Selected: {comboBox.SelectionBoxItem}. Density: {FormatDensity(comboBox.Density)}";
+                        editableOutput.Text = $"Editable text: {editableComboBox.SelectionBoxItem}. Density: {FormatDensity(editableComboBox.Density)}";
+                    })),
                 CreateSelectionCaption("Editable"),
                 editableComboBox,
                 CreateSelectionStatus(editableOutput),
@@ -237,6 +251,7 @@ internal sealed class GallerySelectionPage
         var comboBox = new FWComboBox
         {
             Width = 260,
+            Density = FWSelectionDensity.Comfortable,
             PlaceholderText = "Disabled",
             IsEnabled = false
         };
@@ -253,9 +268,9 @@ internal sealed class GallerySelectionPage
             Spacing = 8,
             Children =
             {
-                new FWComboBoxItem { Content = "Normal item", Width = 260 },
-                new FWComboBoxItem { Content = "Selected item", Width = 260, IsSelected = true },
-                new FWComboBoxItem { Content = "Disabled item", Width = 260, IsEnabled = false },
+                new FWComboBoxItem { Content = "Compact item", Width = 260, Density = FWSelectionDensity.Compact },
+                new FWComboBoxItem { Content = "Selected item", Width = 260, Density = FWSelectionDensity.Comfortable, IsSelected = true },
+                new FWComboBoxItem { Content = "Spacious disabled item", Width = 260, Density = FWSelectionDensity.Spacious, IsEnabled = false },
                 CreateSelectionStatus(CreateSelectionOutput("Open a ComboBox above to validate live dropdown behavior."))
             }
         };
@@ -267,9 +282,12 @@ internal sealed class GallerySelectionPage
         var rating = new FWRatingControl
         {
             Value = 3,
+            RatingSize = FWRatingControlSize.Medium,
             Caption = "Quality"
         };
-        rating.ValueChanged += (_, args) => output.Text = args.NewValue < 0 ? "Rating: none" : $"Rating: {args.NewValue:0}";
+        rating.ValueChanged += (_, args) => output.Text = args.NewValue < 0
+            ? $"Rating: none. Size: {FormatRatingSize(rating.RatingSize)}"
+            : $"Rating: {args.NewValue:0}. Size: {FormatRatingSize(rating.RatingSize)}";
 
         return new FWStackPanel
         {
@@ -279,16 +297,26 @@ internal sealed class GallerySelectionPage
             {
                 rating,
                 CreateSelectionStatus(output),
+                CreateSelectionButtonRow(
+                    CreateSelectionActionButton(FluentIconRegular.ResizeLarge24, "Size", () =>
+                    {
+                        rating.RatingSize = NextRatingSize(rating.RatingSize);
+                        output.Text = rating.Value < 0
+                            ? $"Rating: none. Size: {FormatRatingSize(rating.RatingSize)}"
+                            : $"Rating: {rating.Value:0}. Size: {FormatRatingSize(rating.RatingSize)}";
+                    })),
                 CreateSelectionCaption("Placeholder"),
                 new FWRatingControl
                 {
                     PlaceholderValue = 4,
+                    RatingSize = FWRatingControlSize.Small,
                     Caption = "Suggested"
                 },
                 CreateSelectionCaption("Read-only"),
                 new FWRatingControl
                 {
                     Value = 4,
+                    RatingSize = FWRatingControlSize.Medium,
                     IsReadOnly = true,
                     Caption = "Current"
                 },
@@ -297,6 +325,7 @@ internal sealed class GallerySelectionPage
                 {
                     Value = 2,
                     IsEnabled = false,
+                    RatingSize = FWRatingControlSize.Large,
                     Caption = "Unavailable"
                 }
             }
@@ -325,16 +354,28 @@ internal sealed class GallerySelectionPage
         var densityComboBox = new FWComboBox
         {
             Width = 200,
+            Density = FWSelectionDensity.Comfortable,
             SelectedIndex = 1
         };
         densityComboBox.Items.Add(new FWComboBoxItem { Content = "Compact" });
         densityComboBox.Items.Add(new FWComboBoxItem { Content = "Comfortable" });
         densityComboBox.Items.Add(new FWComboBoxItem { Content = "Spacious" });
-        densityComboBox.SelectionChanged += (_, _) => densityOutput.Text = $"Density: {densityComboBox.SelectionBoxItem}";
+        densityComboBox.SelectionChanged += (_, _) =>
+        {
+            var density = densityComboBox.SelectedIndex switch
+            {
+                0 => FWSelectionDensity.Compact,
+                2 => FWSelectionDensity.Spacious,
+                _ => FWSelectionDensity.Comfortable
+            };
+            densityComboBox.Density = density;
+            densityOutput.Text = $"Density: {densityComboBox.SelectionBoxItem}";
+        };
 
         var scoreRating = new FWRatingControl
         {
             Value = 4,
+            RatingSize = FWRatingControlSize.Medium,
             Caption = "Fit"
         };
         scoreRating.ValueChanged += (_, args) => scoreOutput.Text = args.NewValue < 0 ? "Fit score: none" : $"Fit score: {args.NewValue:0}";
@@ -429,6 +470,45 @@ internal sealed class GallerySelectionPage
             Padding = new Thickness(10),
             Child = row
         };
+    }
+
+    private static FWWrapPanel CreateSelectionButtonRow(params FWButton[] buttons)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            row.Children.Add(button);
+        }
+
+        return row;
+    }
+
+    private static FWButton CreateSelectionActionButton(FluentIconRegular icon, string text, Action action)
+    {
+        var button = new FWButton
+        {
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(icon, 16, ThemeBrush("TextPrimary")),
+                    new FWTextBlock
+                    {
+                        Text = text,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
+        button.Click += (_, _) => action();
+        return button;
     }
 
     private static FWBorder CreateSelectionExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
@@ -544,6 +624,46 @@ internal sealed class GallerySelectionPage
                     }
                 }
             }
+        };
+    }
+
+    private static FWSelectionDensity NextDensity(FWSelectionDensity density)
+    {
+        return density switch
+        {
+            FWSelectionDensity.Compact => FWSelectionDensity.Comfortable,
+            FWSelectionDensity.Comfortable => FWSelectionDensity.Spacious,
+            _ => FWSelectionDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWSelectionDensity density)
+    {
+        return density switch
+        {
+            FWSelectionDensity.Compact => "compact",
+            FWSelectionDensity.Spacious => "spacious",
+            _ => "comfortable"
+        };
+    }
+
+    private static FWRatingControlSize NextRatingSize(FWRatingControlSize size)
+    {
+        return size switch
+        {
+            FWRatingControlSize.Small => FWRatingControlSize.Medium,
+            FWRatingControlSize.Medium => FWRatingControlSize.Large,
+            _ => FWRatingControlSize.Small
+        };
+    }
+
+    private static string FormatRatingSize(FWRatingControlSize size)
+    {
+        return size switch
+        {
+            FWRatingControlSize.Small => "small",
+            FWRatingControlSize.Large => "large",
+            _ => "medium"
         };
     }
 

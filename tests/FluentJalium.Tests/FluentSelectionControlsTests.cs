@@ -181,20 +181,87 @@ public sealed class FluentSelectionControlsTests
         AssertSetter(comboBoxStyle, Control.BorderThicknessProperty);
         AssertSetter(comboBoxStyle, Control.CornerRadiusProperty);
 
+        var fluentComboBoxStyle = AssertStyle<FWComboBox>(dictionary);
+        Assert.Same(comboBoxStyle, fluentComboBoxStyle.BasedOn);
+        AssertSetter(fluentComboBoxStyle, FWComboBox.DensityProperty);
+
         var comboBoxItemStyle = AssertStyle<ComboBoxItem>(dictionary);
         AssertSetter(comboBoxItemStyle, Control.BackgroundProperty);
         AssertSetter(comboBoxItemStyle, Control.ForegroundProperty);
         AssertSetter(comboBoxItemStyle, Control.PaddingProperty);
+
+        var fluentComboBoxItemStyle = AssertStyle<FWComboBoxItem>(dictionary);
+        Assert.Same(comboBoxItemStyle, fluentComboBoxItemStyle.BasedOn);
+        AssertSetter(fluentComboBoxItemStyle, FWComboBoxItem.DensityProperty);
 
         var ratingStyle = AssertStyle<FWRatingControl>(dictionary);
         AssertSetter(ratingStyle, Control.ForegroundProperty);
         AssertSetter(ratingStyle, FWRatingControl.GlyphFontFamilyProperty);
         AssertSetter(ratingStyle, FWRatingControl.GlyphProperty);
         AssertSetter(ratingStyle, FWRatingControl.UnsetGlyphProperty);
+        AssertSetter(ratingStyle, FWRatingControl.RatingSizeProperty);
         AssertSetter(ratingStyle, FWRatingControl.RatingItemFontSizeProperty);
         AssertSetter(ratingStyle, FWRatingControl.ItemSpacingProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWSelectionControls_ShouldApplyDensityAndRatingSizePresets()
+    {
+        var comboBox = new FWComboBox();
+
+        Assert.Equal(FWSelectionDensity.Comfortable, comboBox.Density);
+        Assert.Equal(34, comboBox.MinHeight);
+        Assert.Equal(120, comboBox.MinWidth);
+        Assert.Equal(new Thickness(10, 5, 8, 6), comboBox.Padding);
+
+        comboBox.Density = FWSelectionDensity.Compact;
+
+        Assert.Equal(30, comboBox.MinHeight);
+        Assert.Equal(120, comboBox.MinWidth);
+        Assert.Equal(new Thickness(8, 4, 8, 5), comboBox.Padding);
+
+        comboBox.Density = FWSelectionDensity.Spacious;
+
+        Assert.Equal(40, comboBox.MinHeight);
+        Assert.Equal(144, comboBox.MinWidth);
+        Assert.Equal(new Thickness(12, 8, 10, 8), comboBox.Padding);
+
+        var comboBoxItem = new FWComboBoxItem();
+
+        Assert.Equal(FWSelectionDensity.Comfortable, comboBoxItem.Density);
+        Assert.Equal(32, comboBoxItem.MinHeight);
+        Assert.Equal(new Thickness(9, 6, 10, 6), comboBoxItem.Padding);
+
+        comboBoxItem.Density = FWSelectionDensity.Compact;
+
+        Assert.Equal(28, comboBoxItem.MinHeight);
+        Assert.Equal(new Thickness(8, 4, 8, 4), comboBoxItem.Padding);
+
+        comboBoxItem.Density = FWSelectionDensity.Spacious;
+
+        Assert.Equal(38, comboBoxItem.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), comboBoxItem.Padding);
+
+        var rating = new FWRatingControl();
+
+        Assert.Equal(FWRatingControlSize.Medium, rating.RatingSize);
+        Assert.Equal(20, rating.RatingItemFontSize);
+        Assert.Equal(8, rating.ItemSpacing);
+        Assert.Equal(24, rating.MinHeight);
+
+        rating.RatingSize = FWRatingControlSize.Small;
+
+        Assert.Equal(16, rating.RatingItemFontSize);
+        Assert.Equal(6, rating.ItemSpacing);
+        Assert.Equal(20, rating.MinHeight);
+
+        rating.RatingSize = FWRatingControlSize.Large;
+
+        Assert.Equal(24, rating.RatingItemFontSize);
+        Assert.Equal(10, rating.ItemSpacing);
+        Assert.Equal(30, rating.MinHeight);
     }
 
     [Fact]
@@ -414,7 +481,10 @@ public sealed class FluentSelectionControlsTests
     [Fact]
     public void FWComboBox_ShouldGenerateFwComboBoxItemContainersForPlainItems()
     {
-        var comboBox = new FWComboBox();
+        var comboBox = new FWComboBox
+        {
+            Density = FWSelectionDensity.Spacious
+        };
         comboBox.Items.Add("Fluent");
         comboBox.Items.Add(new FWComboBoxItem { Content = "Existing" });
 
@@ -424,6 +494,7 @@ public sealed class FluentSelectionControlsTests
 
         var generated = Assert.IsType<FWComboBoxItem>(itemsHost.Children[0]);
         Assert.Equal("Fluent", generated.Content);
+        Assert.Equal(FWSelectionDensity.Spacious, generated.Density);
         Assert.IsType<FWComboBoxItem>(itemsHost.Children[1]);
     }
 
@@ -475,8 +546,7 @@ public sealed class FluentSelectionControlsTests
         {
             Value = 4,
             Caption = "Fit",
-            RatingItemFontSize = 24,
-            ItemSpacing = 10,
+            RatingSize = FWRatingControlSize.Large,
             GlyphFontFamily = "Segoe Fluent Icons"
         };
         var surface = new FWFluentMaterialSurface
@@ -492,6 +562,7 @@ public sealed class FluentSelectionControlsTests
 
         Assert.Equal(4, rating.Value);
         Assert.Equal("Fit", rating.Caption);
+        Assert.Equal(FWRatingControlSize.Large, rating.RatingSize);
         Assert.Equal(24, rating.RatingItemFontSize);
         Assert.Equal(10, rating.ItemSpacing);
         Assert.Equal("Segoe Fluent Icons", rating.GlyphFontFamily);

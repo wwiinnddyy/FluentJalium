@@ -142,6 +142,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ComboBoxItem">
         <Setter Property="Background" Value="{ThemeResource ComboBoxItemBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ComboBoxItemForeground}" />
@@ -210,6 +214,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="fluent:FWRatingControl">
         <Setter Property="Foreground" Value="{ThemeResource RatingControlCaptionForeground}" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
@@ -217,6 +225,7 @@
         <Setter Property="GlyphFontFamily" Value="Segoe Fluent Icons" />
         <Setter Property="Glyph" Value="&#xE735;" />
         <Setter Property="UnsetGlyph" Value="&#xE734;" />
+        <Setter Property="RatingSize" Value="Medium" />
         <Setter Property="RatingItemFontSize" Value="20" />
         <Setter Property="ItemSpacing" Value="8" />
         <Setter Property="MinHeight" Value="24" />

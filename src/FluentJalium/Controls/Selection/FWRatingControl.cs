@@ -7,6 +7,16 @@ using Jalium.UI.Media;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// FluentJalium rating control size presets.
+/// </summary>
+public enum FWRatingControlSize
+{
+    Small,
+    Medium,
+    Large
+}
+
+/// <summary>
 /// FluentJalium rating control inspired by WinUI RatingControl.
 /// </summary>
 public class FWRatingControl : Control, IFluentJaliumControl
@@ -45,6 +55,10 @@ public class FWRatingControl : Control, IFluentJaliumControl
         DependencyProperty.Register(nameof(RatingItemFontSize), typeof(double), typeof(FWRatingControl),
             new PropertyMetadata(20.0, OnLayoutPropertyChanged), IsValidPositiveDouble);
 
+    public static readonly DependencyProperty RatingSizeProperty =
+        DependencyProperty.Register(nameof(RatingSize), typeof(FWRatingControlSize), typeof(FWRatingControl),
+            new PropertyMetadata(FWRatingControlSize.Medium, OnRatingSizePropertyChanged));
+
     public static readonly DependencyProperty GlyphProperty =
         DependencyProperty.Register(nameof(Glyph), typeof(string), typeof(FWRatingControl),
             new PropertyMetadata("\uE735", OnLayoutPropertyChanged));
@@ -64,6 +78,7 @@ public class FWRatingControl : Control, IFluentJaliumControl
     public FWRatingControl()
     {
         Focusable = true;
+        ApplyRatingSize(this, RatingSize);
         AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDownHandler));
         AddHandler(MouseMoveEvent, new MouseEventHandler(OnMouseMoveHandler));
         AddHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveHandler));
@@ -124,6 +139,13 @@ public class FWRatingControl : Control, IFluentJaliumControl
     {
         get => (double)GetValue(RatingItemFontSizeProperty)!;
         set => SetValue(RatingItemFontSizeProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWRatingControlSize RatingSize
+    {
+        get => (FWRatingControlSize)GetValue(RatingSizeProperty)!;
+        set => SetValue(RatingSizeProperty, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
@@ -443,6 +465,24 @@ public class FWRatingControl : Control, IFluentJaliumControl
         return value is double number && number > 0 && !double.IsInfinity(number) && !double.IsNaN(number);
     }
 
+    internal static (double RatingItemFontSize, double ItemSpacing, double MinHeight) GetSizeMetrics(FWRatingControlSize size)
+    {
+        return size switch
+        {
+            FWRatingControlSize.Small => (16.0, 6.0, 20.0),
+            FWRatingControlSize.Large => (24.0, 10.0, 30.0),
+            _ => (20.0, 8.0, 24.0)
+        };
+    }
+
+    private static void ApplyRatingSize(FWRatingControl rating, FWRatingControlSize size)
+    {
+        var (ratingItemFontSize, itemSpacing, minHeight) = GetSizeMetrics(size);
+        rating.RatingItemFontSize = ratingItemFontSize;
+        rating.ItemSpacing = itemSpacing;
+        rating.MinHeight = minHeight;
+    }
+
     private static void OnValuePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWRatingControl rating)
@@ -467,6 +507,14 @@ public class FWRatingControl : Control, IFluentJaliumControl
             rating.EnsureCoercedValues();
             rating.InvalidateMeasure();
             rating.InvalidateVisual();
+        }
+    }
+
+    private static void OnRatingSizePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWRatingControl rating && e.NewValue is FWRatingControlSize size)
+        {
+            ApplyRatingSize(rating, size);
         }
     }
 
