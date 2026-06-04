@@ -6,6 +6,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWFrame = FluentJalium.Controls.FWFrame;
+using FWGrid = FluentJalium.Controls.FWGrid;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
@@ -101,16 +102,23 @@ internal sealed class GalleryShell : UserControl
 
     private UIElement CreateContentHost()
     {
-        return new StackPanel
+        var searchHeader = CreateSearchHeader();
+        var frame = _frame!;
+        var host = new FWGrid
         {
-            Orientation = Orientation.Vertical,
             Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
-            Children =
+            RowDefinitions =
             {
-                CreateSearchHeader(),
-                _frame!
+                new RowDefinition { Height = GridLength.Auto },
+                new RowDefinition { Height = GridLength.Star }
             }
         };
+
+        Grid.SetRow(searchHeader, 0);
+        Grid.SetRow(frame, 1);
+        host.Children.Add(searchHeader);
+        host.Children.Add(frame);
+        return host;
     }
 
     private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
