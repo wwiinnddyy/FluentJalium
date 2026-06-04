@@ -49,6 +49,11 @@ internal sealed class GalleryMaterialsPage
             "Layered control surfaces",
             "Controls should sit on layered materials that echo WinUI: backdrop, layer fill, subtle border, and soft elevation.",
             CreateLayeredMaterialControlsSample()));
+        examples.Children.Add(CreateMaterialsExampleCard(
+            FluentIconRegular.AppGeneric24,
+            "Fluent material roles",
+            "Use window backdrops for the shell, layer fills for content, acrylic for transient UI, and LiquidGlass for focused Jalium element effects.",
+            CreateMaterialRoleMapSample()));
 
         panel.Children.Add(examples);
         return panel;
@@ -132,6 +137,38 @@ internal sealed class GalleryMaterialsPage
         };
     }
 
+    private static UIElement CreateMaterialRoleMapSample()
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                CreateMaterialRoleTile(
+                    FluentIconRegular.WindowBrush24,
+                    "Window shell",
+                    "SystemBackdrop",
+                    "Mica, Mica Alt, and Acrylic belong on the Window so the app frame carries depth."),
+                CreateMaterialRoleTile(
+                    FluentIconRegular.LayerDiagonal24,
+                    "Content layer",
+                    "Layer fill",
+                    "Default pages and cards use opaque layer brushes, borders, and compact elevation."),
+                CreateMaterialRoleTile(
+                    FluentIconRegular.Drop24,
+                    "Transient surface",
+                    "Acrylic",
+                    "Flyouts, menus, and teaching UI can use acrylic blur when content behind remains readable."),
+                CreateMaterialRoleTile(
+                    FluentIconRegular.Glasses24,
+                    "Focused element",
+                    "LiquidGlass",
+                    "Jalium HLSL surfaces are reserved for expressive controls that need refraction and highlight.")
+            }
+        };
+    }
+
     private void ApplySystemBackdrop(WindowBackdropType backdropType, TextBlock status)
     {
         _window.SystemBackdrop = backdropType;
@@ -143,6 +180,87 @@ internal sealed class GalleryMaterialsPage
         var preview = CreateLayeredSurface(icon, title, description, new SolidColorBrush(Color.FromArgb(110, 255, 255, 255)));
         preview.BackdropEffect = effect;
         return preview;
+    }
+
+    private static FWBorder CreateMaterialRoleTile(FluentIconRegular icon, string title, string role, string description)
+    {
+        var iconFrame = new FWBorder
+        {
+            Width = 30,
+            Height = 30,
+            Background = ThemeBrush("SubtleFillColorSecondaryBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Child = CreateIcon(icon, 18, ThemeBrush("TextPrimary"))
+        };
+
+        var content = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 3,
+            Children =
+            {
+                new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new FWTextBlock
+                        {
+                            Text = title,
+                            FontSize = 13,
+                            Foreground = ThemeBrush("TextPrimary"),
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new FWBorder
+                        {
+                            Background = ThemeBrush("SelectionBackgroundWeak"),
+                            CornerRadius = new CornerRadius(4),
+                            Padding = new Thickness(6, 2, 6, 2),
+                            Child = new FWTextBlock
+                            {
+                                Text = role,
+                                FontSize = 11,
+                                Foreground = ThemeBrush("TextPrimary")
+                            }
+                        }
+                    }
+                },
+                new FWTextBlock
+                {
+                    Text = description,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ThemeBrush("TextSecondary")
+                }
+            }
+        };
+
+        Grid.SetColumn(content, 1);
+
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(12),
+            Child = new FWGrid
+            {
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition { Width = new GridLength(36) },
+                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+                },
+                Children =
+                {
+                    iconFrame,
+                    content
+                }
+            }
+        };
     }
 
     private static FWFluentMaterialSurface CreateMaterialSurfaceTile(FluentIconRegular icon, string title, string description, FWFluentMaterialKind materialKind)
