@@ -16,6 +16,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWMenuBar" BasedOn="{StaticResource {x:Type MenuBar}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="Menu">
         <Setter Property="Background" Value="{ThemeResource MenuBarBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -31,6 +35,10 @@
                 <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWMenu" BasedOn="{StaticResource {x:Type Menu}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="MenuBarItem">
@@ -51,6 +59,10 @@
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWMenuBarItem" BasedOn="{StaticResource {x:Type MenuBarItem}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="MenuItem">
@@ -98,6 +110,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWMenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ContextMenu">
         <Setter Property="Background" Value="{ThemeResource MenuFlyoutPresenterBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -113,6 +129,10 @@
                 <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="MenuFlyoutItem">
@@ -134,17 +154,23 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWMenuFlyoutItem" BasedOn="{StaticResource {x:Type MenuFlyoutItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style x:Key="FWMenuFlyoutPresenterStyle" TargetType="fluent:FWMenuFlyoutPresenter">
         <Setter Property="Background" Value="{ThemeResource MenuFlyoutPresenterBackground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutPresenterBorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4" />
         <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Density" Value="Comfortable" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
     </Style>
 
     <Style TargetType="fluent:FWMenuFlyoutSubItem" BasedOn="{StaticResource {x:Type MenuFlyoutItem}}">
+        <Setter Property="Density" Value="Comfortable" />
         <Setter Property="MinWidth" Value="160" />
     </Style>
 
@@ -170,8 +196,16 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWToggleMenuFlyoutItem" BasedOn="{StaticResource {x:Type ToggleMenuFlyoutItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="MenuFlyoutSeparator">
         <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutSeparatorForeground}" />
         <Setter Property="Margin" Value="0,4,0,4" />
+    </Style>
+
+    <Style TargetType="fluent:FWMenuFlyoutSeparator" BasedOn="{StaticResource {x:Type MenuFlyoutSeparator}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 </ResourceDictionary>

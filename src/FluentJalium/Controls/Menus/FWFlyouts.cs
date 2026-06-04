@@ -14,6 +14,16 @@ namespace FluentJalium.Controls;
 public class FWMenuFlyout : FlyoutBase, IFluentJaliumControl
 {
     private readonly ObservableCollection<Control> _items = new();
+    private FWMenuFlyoutPresenter? _presenter;
+
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuFlyout),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenuFlyout()
+    {
+        _items.CollectionChanged += OnItemsChanged;
+    }
 
     /// <summary>
     /// Gets the menu controls shown by the flyout.
@@ -27,13 +37,26 @@ public class FWMenuFlyout : FlyoutBase, IFluentJaliumControl
     /// </summary>
     public Style? MenuFlyoutPresenterStyle { get; set; }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
     protected override Control CreatePresenter()
     {
         var presenter = new FWMenuFlyoutPresenter(this);
+        _presenter = presenter;
         var presenterStyle = MenuFlyoutPresenterStyle ?? ResolvePresenterStyle();
         if (presenterStyle != null)
         {
             presenter.Style = presenterStyle;
+        }
+
+        if (!presenter.HasLocalValue(FWMenuFlyoutPresenter.DensityProperty))
+        {
+            presenter.SetCurrentValue(FWMenuFlyoutPresenter.DensityProperty, Density);
         }
 
         return presenter;
@@ -50,6 +73,57 @@ public class FWMenuFlyout : FlyoutBase, IFluentJaliumControl
         }
 
         return null;
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuFlyout flyout && e.NewValue is FWMenuDensity density)
+        {
+            flyout.ApplyDensityToItems(density);
+            if (flyout._presenter != null &&
+                !flyout._presenter.HasLocalValue(FWMenuFlyoutPresenter.DensityProperty))
+            {
+                flyout._presenter.SetCurrentValue(FWMenuFlyoutPresenter.DensityProperty, density);
+            }
+        }
+    }
+
+    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (var item in e.NewItems.OfType<Control>())
+            {
+                ApplyDensityToItem(item, Density);
+            }
+        }
+    }
+
+    private void ApplyDensityToItems(FWMenuDensity density)
+    {
+        foreach (var item in _items)
+        {
+            ApplyDensityToItem(item, density);
+        }
+    }
+
+    private static void ApplyDensityToItem(Control item, FWMenuDensity density)
+    {
+        switch (item)
+        {
+            case FluentMenuFlyoutItemBase flyoutItem
+                when !flyoutItem.HasLocalValue(FluentMenuFlyoutItemBase.DensityProperty):
+                flyoutItem.SetCurrentValue(FluentMenuFlyoutItemBase.DensityProperty, density);
+                break;
+            case FluentToggleMenuFlyoutItemBase toggleItem
+                when !toggleItem.HasLocalValue(FluentToggleMenuFlyoutItemBase.DensityProperty):
+                toggleItem.SetCurrentValue(FluentToggleMenuFlyoutItemBase.DensityProperty, density);
+                break;
+            case FWMenuFlyoutSeparator separator
+                when !separator.HasLocalValue(FWMenuFlyoutSeparator.DensityProperty):
+                separator.SetCurrentValue(FWMenuFlyoutSeparator.DensityProperty, density);
+                break;
+        }
     }
 }
 
@@ -296,7 +370,23 @@ public class FWMenuFlyoutSubItem : FluentMenuFlyoutItemBase, IFluentJaliumContro
         panel.Children.Clear();
         foreach (var item in _items)
         {
+            ApplyDensityToSubItem(item);
             FWMenuFlyoutItemHost.AttachItemToPanel(panel, item);
+        }
+    }
+
+    private void ApplyDensityToSubItem(MenuFlyoutItem item)
+    {
+        switch (item)
+        {
+            case FluentMenuFlyoutItemBase flyoutItem
+                when !flyoutItem.HasLocalValue(FluentMenuFlyoutItemBase.DensityProperty):
+                flyoutItem.SetCurrentValue(FluentMenuFlyoutItemBase.DensityProperty, Density);
+                break;
+            case FluentToggleMenuFlyoutItemBase toggleItem
+                when !toggleItem.HasLocalValue(FluentToggleMenuFlyoutItemBase.DensityProperty):
+                toggleItem.SetCurrentValue(FluentToggleMenuFlyoutItemBase.DensityProperty, Density);
+                break;
         }
     }
 
@@ -370,15 +460,28 @@ public sealed class FWMenuFlyoutPresenter : Control
     private readonly FWMenuFlyout _flyout;
     private readonly FWSimpleMenuPopupScrollHost _scrollHost;
 
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuFlyoutPresenter),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
     public FWMenuFlyoutPresenter(FWMenuFlyout flyout)
     {
         _flyout = flyout;
         _scrollHost = new FWSimpleMenuPopupScrollHost();
+        SetCurrentValue(DensityProperty, flyout.Density);
+        ApplyDensity(this, Density);
 
         _flyout.ItemCollection.CollectionChanged += OnFlyoutItemsChanged;
         RefreshItems();
 
         AddVisualChild(_scrollHost);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
     }
 
     public override int VisualChildrenCount => 1;
@@ -419,6 +522,21 @@ public sealed class FWMenuFlyoutPresenter : Control
         {
             FWMenuFlyoutItemHost.AttachItemToPanel(_scrollHost.ItemsPanel, item);
         }
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuFlyoutPresenter presenter && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(presenter, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenuFlyoutPresenter presenter, FWMenuDensity density)
+    {
+        var (padding, cornerRadius) = FWMenuDensityMetrics.GetMenuFlyoutSurfaceMetrics(density);
+        presenter.Padding = padding;
+        presenter.CornerRadius = cornerRadius;
     }
 }
 

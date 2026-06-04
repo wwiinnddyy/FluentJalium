@@ -98,11 +98,17 @@ public sealed class FluentMenuControlsTests
         AssertSetter(menuBarStyle, Control.ForegroundProperty);
         AssertSetter(menuBarStyle, Control.MinHeightProperty);
 
+        var fwMenuBarStyle = AssertStyle<FWMenuBar>(dictionary);
+        AssertSetter(fwMenuBarStyle, FWMenuBar.DensityProperty);
+
         var menuStyle = AssertStyle<Menu>(dictionary);
         AssertSetter(menuStyle, Control.BackgroundProperty);
         AssertSetter(menuStyle, Control.ForegroundProperty);
         AssertSetter(menuStyle, Control.BorderBrushProperty);
         AssertSetter(menuStyle, Control.PaddingProperty);
+
+        var fwMenuStyle = AssertStyle<FWMenu>(dictionary);
+        AssertSetter(fwMenuStyle, FWMenu.DensityProperty);
 
         var menuBarItemStyle = AssertStyle<MenuBarItem>(dictionary);
         AssertForegroundSetter(menuBarItemStyle);
@@ -110,10 +116,16 @@ public sealed class FluentMenuControlsTests
         AssertSetter(menuBarItemStyle, Control.PaddingProperty);
         AssertSetter(menuBarItemStyle, Control.CornerRadiusProperty);
 
+        var fwMenuBarItemStyle = AssertStyle<FWMenuBarItem>(dictionary);
+        AssertSetter(fwMenuBarItemStyle, FWMenuBarItem.DensityProperty);
+
         var menuItemStyle = AssertStyle<MenuItem>(dictionary);
         AssertForegroundSetter(menuItemStyle);
         AssertSetter(menuItemStyle, Control.BackgroundProperty);
         AssertSetter(menuItemStyle, Control.PaddingProperty);
+
+        var fwMenuItemStyle = AssertStyle<FWMenuItem>(dictionary);
+        AssertSetter(fwMenuItemStyle, FWMenuItem.DensityProperty);
 
         var contextMenuStyle = AssertStyle<ContextMenu>(dictionary);
         AssertSetter(contextMenuStyle, Control.BackgroundProperty);
@@ -121,23 +133,36 @@ public sealed class FluentMenuControlsTests
         AssertSetter(contextMenuStyle, Control.PaddingProperty);
         AssertSetter(contextMenuStyle, Control.CornerRadiusProperty);
 
+        var fwContextMenuStyle = AssertStyle<FWContextMenu>(dictionary);
+        AssertSetter(fwContextMenuStyle, FWContextMenu.DensityProperty);
+
         var menuFlyoutItemStyle = AssertStyle<MenuFlyoutItem>(dictionary);
         AssertForegroundSetter(menuFlyoutItemStyle);
         AssertSetter(menuFlyoutItemStyle, Control.BackgroundProperty);
         AssertSetter(menuFlyoutItemStyle, Control.MinHeightProperty);
+
+        var fwMenuFlyoutItemStyle = AssertStyle<FWMenuFlyoutItem>(dictionary);
+        AssertSetter(fwMenuFlyoutItemStyle, FluentMenuFlyoutItemBase.DensityProperty);
 
         var toggleMenuFlyoutItemStyle = AssertStyle<ToggleMenuFlyoutItem>(dictionary);
         AssertForegroundSetter(toggleMenuFlyoutItemStyle);
         AssertSetter(toggleMenuFlyoutItemStyle, Control.BackgroundProperty);
         AssertSetter(toggleMenuFlyoutItemStyle, Control.MinHeightProperty);
 
+        var fwToggleMenuFlyoutItemStyle = AssertStyle<FWToggleMenuFlyoutItem>(dictionary);
+        AssertSetter(fwToggleMenuFlyoutItemStyle, FluentToggleMenuFlyoutItemBase.DensityProperty);
+
         var separatorStyle = AssertStyle<MenuFlyoutSeparator>(dictionary);
         AssertSetter(separatorStyle, Control.ForegroundProperty);
         AssertSetter(separatorStyle, FrameworkElement.MarginProperty);
 
+        var fwSeparatorStyle = AssertStyle<FWMenuFlyoutSeparator>(dictionary);
+        AssertSetter(fwSeparatorStyle, FWMenuFlyoutSeparator.DensityProperty);
+
         var subItemStyle = AssertStyle<FWMenuFlyoutSubItem>(dictionary);
         Assert.Equal(typeof(FWMenuFlyoutSubItem), subItemStyle.TargetType);
         Assert.NotNull(subItemStyle.BasedOn);
+        AssertSetter(subItemStyle, FluentMenuFlyoutItemBase.DensityProperty);
 
         Assert.True(dictionary.TryGetValue("FWMenuFlyoutPresenterStyle", out var presenterStyle));
         var style = Assert.IsType<Style>(presenterStyle);
@@ -145,8 +170,136 @@ public sealed class FluentMenuControlsTests
         AssertSetter(style, Control.BackgroundProperty);
         AssertSetter(style, Control.BorderBrushProperty);
         AssertSetter(style, Control.PaddingProperty);
+        AssertSetter(style, FWMenuFlyoutPresenter.DensityProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWMenuControls_ShouldApplyDensityPresets()
+    {
+        var menu = new TestMenu();
+
+        Assert.Equal(FWMenuDensity.Comfortable, menu.Density);
+        Assert.Equal(32, menu.Height);
+        Assert.Equal(new Thickness(4, 0, 4, 0), menu.Padding);
+
+        menu.Density = FWMenuDensity.Compact;
+
+        Assert.Equal(28, menu.Height);
+        Assert.Equal(new Thickness(2, 0, 2, 0), menu.Padding);
+
+        var generated = Assert.IsType<FWMenuItem>(menu.CreateContainer("Open"));
+        menu.Prepare(generated, "Open");
+
+        Assert.Equal(FWMenuDensity.Compact, generated.Density);
+        Assert.Equal(28, generated.Height);
+        Assert.Equal(new Thickness(10, 0, 10, 0), generated.Padding);
+
+        generated.Density = FWMenuDensity.Spacious;
+
+        Assert.Equal(40, generated.Height);
+        Assert.Equal(new Thickness(14, 4, 14, 4), generated.Padding);
+
+        var contextMenu = new TestContextMenu
+        {
+            Density = FWMenuDensity.Spacious
+        };
+        var contextItem = Assert.IsType<FWMenuItem>(contextMenu.CreateContainer("Refresh"));
+        contextMenu.Prepare(contextItem, "Refresh");
+
+        Assert.Equal(new Thickness(6), contextMenu.Padding);
+        Assert.Equal(new CornerRadius(10), contextMenu.CornerRadius);
+        Assert.Equal(FWMenuDensity.Spacious, contextItem.Density);
+        Assert.Equal(40, contextItem.Height);
+
+        contextMenu.Density = FWMenuDensity.Compact;
+
+        Assert.Equal(new Thickness(3), contextMenu.Padding);
+        Assert.Equal(new CornerRadius(6), contextMenu.CornerRadius);
+    }
+
+    [Fact]
+    public void FWMenuFlyout_ShouldApplyDensityToItemsAndPresenter()
+    {
+        var target = new FWButton { Content = "Open menu" };
+        var flyout = new FWMenuFlyout
+        {
+            Density = FWMenuDensity.Compact
+        };
+        var item = new FWMenuFlyoutItem { Text = "Copy" };
+        var toggle = new FWToggleMenuFlyoutItem { Text = "Pin" };
+        var separator = new FWMenuFlyoutSeparator();
+        var fixedItem = new FWMenuFlyoutItem
+        {
+            Density = FWMenuDensity.Spacious,
+            Text = "Fixed"
+        };
+
+        flyout.Items.Add(item);
+        flyout.Items.Add(toggle);
+        flyout.Items.Add(separator);
+        flyout.Items.Add(fixedItem);
+
+        Assert.Equal(FWMenuDensity.Compact, item.Density);
+        Assert.Equal(28, item.Height);
+        Assert.Equal(FWMenuDensity.Compact, toggle.Density);
+        Assert.Equal(28, toggle.Height);
+        Assert.Equal(FWMenuDensity.Compact, separator.Density);
+        Assert.Equal(new Thickness(0, 3, 0, 3), separator.Margin);
+        Assert.Equal(FWMenuDensity.Spacious, fixedItem.Density);
+        Assert.Equal(40, fixedItem.Height);
+
+        flyout.ShowAt(target);
+
+        var presenter = GetFlyoutPresenter<FWMenuFlyoutPresenter>(flyout);
+
+        Assert.Equal(FWMenuDensity.Compact, presenter.Density);
+        Assert.Equal(new Thickness(3), presenter.Padding);
+        Assert.Equal(new CornerRadius(6), presenter.CornerRadius);
+
+        flyout.Density = FWMenuDensity.Spacious;
+
+        Assert.Equal(FWMenuDensity.Spacious, item.Density);
+        Assert.Equal(40, item.Height);
+        Assert.Equal(FWMenuDensity.Spacious, toggle.Density);
+        Assert.Equal(40, toggle.Height);
+        Assert.Equal(FWMenuDensity.Spacious, separator.Density);
+        Assert.Equal(new Thickness(0, 6, 0, 6), separator.Margin);
+        Assert.Equal(FWMenuDensity.Spacious, fixedItem.Density);
+        Assert.Equal(FWMenuDensity.Spacious, presenter.Density);
+        Assert.Equal(new Thickness(6), presenter.Padding);
+        Assert.Equal(new CornerRadius(10), presenter.CornerRadius);
+
+        flyout.Hide();
+    }
+
+    [Fact]
+    public void FWMenuFlyoutSubItem_ShouldPropagateDensityToSubItems()
+    {
+        var subItem = new FWMenuFlyoutSubItem
+        {
+            Density = FWMenuDensity.Spacious,
+            Text = "Share"
+        };
+        var child = new FWMenuFlyoutItem { Text = "Copy link" };
+        var fixedChild = new FWMenuFlyoutItem
+        {
+            Density = FWMenuDensity.Compact,
+            Text = "Mail"
+        };
+
+        subItem.Items.Add(child);
+        subItem.Items.Add(fixedChild);
+
+        InvokeMenuFlyoutItem(subItem);
+
+        Assert.Equal(FWMenuDensity.Spacious, child.Density);
+        Assert.Equal(40, child.Height);
+        Assert.Equal(FWMenuDensity.Compact, fixedChild.Density);
+        Assert.Equal(28, fixedChild.Height);
+
+        subItem.HideSubMenu();
     }
 
     [Fact]

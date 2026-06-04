@@ -7,10 +7,50 @@ using FluentJalium.Icon;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// FluentJalium density presets for menu bars, menu items, and flyout surfaces.
+/// </summary>
+public enum FWMenuDensity
+{
+    Compact,
+    Comfortable,
+    Spacious
+}
+
+/// <summary>
 /// FluentJalium MenuBar control.
 /// </summary>
 public class FWMenuBar : MenuBar, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuBar),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenuBar()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuBar menuBar && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(menuBar, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenuBar menuBar, FWMenuDensity density)
+    {
+        var (minHeight, padding) = FWMenuDensityMetrics.GetMenuBarMetrics(density);
+        menuBar.MinHeight = minHeight;
+        menuBar.Padding = padding;
+    }
 }
 
 /// <summary>
@@ -18,6 +58,37 @@ public class FWMenuBar : MenuBar, IFluentJaliumControl
 /// </summary>
 public class FWMenuBarItem : MenuBarItem, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuBarItem),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenuBarItem()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuBarItem item && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(item, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenuBarItem item, FWMenuDensity density)
+    {
+        var (height, padding) = FWMenuDensityMetrics.GetMenuBarItemMetrics(density);
+        item.Height = height;
+        item.MinHeight = height;
+        item.Padding = padding;
+    }
 }
 
 /// <summary>
@@ -25,7 +96,23 @@ public class FWMenuBarItem : MenuBarItem, IFluentJaliumControl
 /// </summary>
 public class FWMenu : Menu, IFluentJaliumControl
 {
-    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenu),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenu()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
     protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
 
@@ -33,10 +120,27 @@ public class FWMenu : Menu, IFluentJaliumControl
     {
         base.PrepareContainerForItem(element, item);
 
-        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem)
         {
-            menuItem.Header = item;
+            menuItem.Density = Density;
+            menuItem.Header ??= item;
         }
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenu menu && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(menu, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenu menu, FWMenuDensity density)
+    {
+        var (height, padding) = FWMenuDensityMetrics.GetMenuMetrics(density);
+        menu.Height = height;
+        menu.MinHeight = height;
+        menu.Padding = padding;
     }
 }
 
@@ -45,7 +149,23 @@ public class FWMenu : Menu, IFluentJaliumControl
 /// </summary>
 public class FWMenuItem : MenuItem, IFluentJaliumControl
 {
-    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuItem),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenuItem()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
     protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
 
@@ -53,10 +173,24 @@ public class FWMenuItem : MenuItem, IFluentJaliumControl
     {
         base.PrepareContainerForItem(element, item);
 
-        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem)
         {
-            menuItem.Header = item;
+            menuItem.Density = Density;
+            menuItem.Header ??= item;
         }
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuItem item && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(item, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenuItem item, FWMenuDensity density)
+    {
+        FWMenuDensityMetrics.ApplyMenuItemMetrics(item, density);
     }
 }
 
@@ -65,7 +199,23 @@ public class FWMenuItem : MenuItem, IFluentJaliumControl
 /// </summary>
 public class FWContextMenu : ContextMenu, IFluentJaliumControl
 {
-    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem();
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWContextMenu),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWContextMenu()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
     protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
 
@@ -73,10 +223,26 @@ public class FWContextMenu : ContextMenu, IFluentJaliumControl
     {
         base.PrepareContainerForItem(element, item);
 
-        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem && menuItem.Header == null)
+        if (!ReferenceEquals(element, item) && element is FWMenuItem menuItem)
         {
-            menuItem.Header = item;
+            menuItem.Density = Density;
+            menuItem.Header ??= item;
         }
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWContextMenu contextMenu && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(contextMenu, density);
+        }
+    }
+
+    private static void ApplyDensity(FWContextMenu contextMenu, FWMenuDensity density)
+    {
+        var (padding, cornerRadius) = FWMenuDensityMetrics.GetMenuFlyoutSurfaceMetrics(density);
+        contextMenu.Padding = padding;
+        contextMenu.CornerRadius = cornerRadius;
     }
 }
 
@@ -99,23 +265,192 @@ public class FWToggleMenuFlyoutItem : FluentToggleMenuFlyoutItemBase, IFluentJal
 /// </summary>
 public class FWMenuFlyoutSeparator : MenuFlyoutSeparator, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWMenuFlyoutSeparator),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWMenuFlyoutSeparator()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWMenuFlyoutSeparator separator && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(separator, density);
+        }
+    }
+
+    private static void ApplyDensity(FWMenuFlyoutSeparator separator, FWMenuDensity density)
+    {
+        FWMenuDensityMetrics.ApplyMenuFlyoutSeparatorMetrics(separator, density);
+    }
 }
 
 public abstract class FluentMenuFlyoutItemBase : MenuFlyoutItem
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FluentMenuFlyoutItemBase),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    protected FluentMenuFlyoutItemBase()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
         FWMenuFlyoutIconRenderer.DrawFluentIcon(this, drawingContext, Icon);
     }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FluentMenuFlyoutItemBase item && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(item, density);
+        }
+    }
+
+    private static void ApplyDensity(FluentMenuFlyoutItemBase item, FWMenuDensity density)
+    {
+        FWMenuDensityMetrics.ApplyMenuFlyoutItemMetrics(item, density);
+    }
 }
 
 public abstract class FluentToggleMenuFlyoutItemBase : ToggleMenuFlyoutItem
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FluentToggleMenuFlyoutItemBase),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    protected FluentToggleMenuFlyoutItemBase()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
         FWMenuFlyoutIconRenderer.DrawFluentIcon(this, drawingContext, Icon);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FluentToggleMenuFlyoutItemBase item && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(item, density);
+        }
+    }
+
+    private static void ApplyDensity(FluentToggleMenuFlyoutItemBase item, FWMenuDensity density)
+    {
+        FWMenuDensityMetrics.ApplyMenuFlyoutItemMetrics(item, density);
+    }
+}
+
+internal static class FWMenuDensityMetrics
+{
+    public static (double MinHeight, Thickness Padding) GetMenuBarMetrics(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => (28.0, new Thickness(2, 0, 2, 0)),
+            FWMenuDensity.Spacious => (40.0, new Thickness(6, 0, 6, 0)),
+            _ => (32.0, new Thickness(4, 0, 4, 0))
+        };
+    }
+
+    public static (double Height, Thickness Padding) GetMenuMetrics(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => (28.0, new Thickness(2, 0, 2, 0)),
+            FWMenuDensity.Spacious => (40.0, new Thickness(6, 0, 6, 0)),
+            _ => (32.0, new Thickness(4, 0, 4, 0))
+        };
+    }
+
+    public static (double Height, Thickness Padding) GetMenuBarItemMetrics(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => (28.0, new Thickness(10, 2, 10, 2)),
+            FWMenuDensity.Spacious => (40.0, new Thickness(16, 8, 16, 8)),
+            _ => (32.0, new Thickness(12, 4, 12, 4))
+        };
+    }
+
+    public static (double Height, Thickness Padding) GetMenuItemMetrics(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => (28.0, new Thickness(10, 0, 10, 0)),
+            FWMenuDensity.Spacious => (40.0, new Thickness(14, 4, 14, 4)),
+            _ => (32.0, new Thickness(12, 0, 12, 0))
+        };
+    }
+
+    public static (Thickness Padding, CornerRadius CornerRadius) GetMenuFlyoutSurfaceMetrics(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => (new Thickness(3), new CornerRadius(6)),
+            FWMenuDensity.Spacious => (new Thickness(6), new CornerRadius(10)),
+            _ => (new Thickness(4), new CornerRadius(8))
+        };
+    }
+
+    public static Thickness GetMenuFlyoutSeparatorMargin(FWMenuDensity density)
+    {
+        return density switch
+        {
+            FWMenuDensity.Compact => new Thickness(0, 3, 0, 3),
+            FWMenuDensity.Spacious => new Thickness(0, 6, 0, 6),
+            _ => new Thickness(0, 4, 0, 4)
+        };
+    }
+
+    public static void ApplyMenuItemMetrics(Control item, FWMenuDensity density)
+    {
+        var (height, padding) = GetMenuItemMetrics(density);
+        item.Height = height;
+        item.MinHeight = height;
+        item.Padding = padding;
+    }
+
+    public static void ApplyMenuFlyoutItemMetrics(Control item, FWMenuDensity density)
+    {
+        var (height, _) = GetMenuItemMetrics(density);
+        item.Height = height;
+        item.MinHeight = height;
+    }
+
+    public static void ApplyMenuFlyoutSeparatorMetrics(Control separator, FWMenuDensity density)
+    {
+        separator.Margin = GetMenuFlyoutSeparatorMargin(density);
     }
 }
 
