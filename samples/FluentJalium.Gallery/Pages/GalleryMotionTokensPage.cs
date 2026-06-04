@@ -9,6 +9,7 @@ using FWBorder = FluentJalium.Controls.FWBorder;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+using AnimationDuration = Jalium.UI.Media.Animation.Duration;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -424,7 +425,7 @@ internal sealed class GalleryMotionTokensPage
 
         return value switch
         {
-            Duration duration when duration.HasTimeSpan => duration.TimeSpan.TotalMilliseconds,
+            AnimationDuration duration when duration.HasTimeSpan => duration.TimeSpan.TotalMilliseconds,
             TimeSpan timeSpan => timeSpan.TotalMilliseconds,
             string text when TimeSpan.TryParse(text, CultureInfo.InvariantCulture, out var timeSpan) => timeSpan.TotalMilliseconds,
             _ => 0
@@ -451,7 +452,7 @@ internal sealed class GalleryMotionTokensPage
 
         return value switch
         {
-            Duration duration => FormatDuration(duration),
+            AnimationDuration duration => FormatDuration(duration),
             TimeSpan timeSpan => FormatTimeSpan(timeSpan),
             string text => text,
             double number => number.ToString("0.##", CultureInfo.InvariantCulture),
@@ -460,7 +461,7 @@ internal sealed class GalleryMotionTokensPage
         };
     }
 
-    private static string FormatDuration(Duration duration)
+    private static string FormatDuration(AnimationDuration duration)
     {
         return duration.HasTimeSpan ? FormatTimeSpan(duration.TimeSpan) : duration.ToString();
     }

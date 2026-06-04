@@ -20,6 +20,7 @@ using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
 using FWTreeView = FluentJalium.Controls.FWTreeView;
 using FWTreeViewItem = FluentJalium.Controls.FWTreeViewItem;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+using GridViewColumn = Jalium.UI.Controls.GridViewColumn;
 
 namespace FluentJalium.Gallery.Pages;
 

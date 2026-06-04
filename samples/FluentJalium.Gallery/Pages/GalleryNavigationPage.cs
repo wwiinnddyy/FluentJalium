@@ -638,7 +638,7 @@ internal sealed class GalleryNavigationPage
         };
     }
 
-    private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
+    private static FluentIcon CreateIcon(FluentIconRegular icon, double size = 20, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
