@@ -216,7 +216,7 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Null(transitionHost.TransitionMode);
         Assert.Equal(new AnimationDuration(TimeSpan.Zero), transitionHost.TransitionDuration);
         Assert.Equal(TransitionTimingFunction.Linear, transitionHost.TransitionTimingFunction);
-        Assert.Throws<ArgumentOutOfRangeException>(() => transitionHost.TransitionProfile = (FWContentTransitionProfile)42);
+        Assert.ThrowsAny<ArgumentException>(() => transitionHost.TransitionProfile = (FWContentTransitionProfile)42);
     }
 
     [Fact]
