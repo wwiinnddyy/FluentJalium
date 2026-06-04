@@ -34,6 +34,37 @@ public enum FWConnectedAnimationConfiguration
 }
 
 /// <summary>
+/// Describes FluentJalium connected animation timing profiles.
+/// </summary>
+public enum FWConnectedAnimationProfile
+{
+    /// <summary>
+    /// Uses the default Fluent shared element timing.
+    /// </summary>
+    Default,
+
+    /// <summary>
+    /// Uses shared element timing for page-to-page navigation continuity.
+    /// </summary>
+    Navigation,
+
+    /// <summary>
+    /// Uses a shorter entrance-oriented profile for bringing a prepared element into view.
+    /// </summary>
+    Entrance,
+
+    /// <summary>
+    /// Uses direct WinUI-style shared element timing and configuration.
+    /// </summary>
+    Direct,
+
+    /// <summary>
+    /// Uses center-aligned WinUI-style gravity timing and configuration.
+    /// </summary>
+    Gravity
+}
+
+/// <summary>
 /// Options for <see cref="FWConnectedAnimationService"/>.
 /// </summary>
 public sealed class FWConnectedAnimationOptions
@@ -64,6 +95,54 @@ public sealed class FWConnectedAnimationOptions
             Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationDuration", s_defaultDuration),
             InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationInitialOpacity", DefaultInitialOpacity)
         };
+    }
+
+    /// <summary>
+    /// Creates FluentJalium connected animation defaults for a named motion profile.
+    /// </summary>
+    public static FWConnectedAnimationOptions CreateProfile(FWConnectedAnimationProfile profile)
+    {
+        return CreateProfile(profile, Application.Current?.Resources);
+    }
+
+    /// <summary>
+    /// Creates FluentJalium connected animation defaults for a named motion profile from the supplied resource scope.
+    /// </summary>
+    public static FWConnectedAnimationOptions CreateProfile(FWConnectedAnimationProfile profile, ResourceDictionary? resources)
+    {
+        if (!Enum.IsDefined(profile))
+        {
+            throw new ArgumentOutOfRangeException(nameof(profile), "Unknown connected animation profile.");
+        }
+
+        var options = CreateDefault(resources);
+
+        switch (profile)
+        {
+            case FWConnectedAnimationProfile.Default:
+                break;
+            case FWConnectedAnimationProfile.Navigation:
+                options.Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationNavigationDuration", options.Duration);
+                options.InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationNavigationInitialOpacity", options.InitialOpacity);
+                break;
+            case FWConnectedAnimationProfile.Entrance:
+                options.Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationEntranceDuration", options.Duration);
+                options.InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationEntranceInitialOpacity", options.InitialOpacity);
+                break;
+            case FWConnectedAnimationProfile.Direct:
+                options.Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationDirectDuration", options.Duration);
+                options.InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationDirectInitialOpacity", options.InitialOpacity);
+                options.Configuration = FWConnectedAnimationConfiguration.Direct;
+                break;
+            case FWConnectedAnimationProfile.Gravity:
+                options.Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationGravityDuration", options.Duration);
+                options.InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationGravityInitialOpacity", options.InitialOpacity);
+                options.Configuration = FWConnectedAnimationConfiguration.Gravity;
+                options.AnimateScale = false;
+                break;
+        }
+
+        return options;
     }
 
     /// <summary>
@@ -160,6 +239,237 @@ public sealed class FWConnectedAnimationOptions
             string text when double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && double.IsFinite(number) => number,
             _ => fallback
         };
+    }
+}
+
+/// <summary>
+/// Attached property helpers for declarative FluentJalium connected animations.
+/// </summary>
+public static class FWConnectedAnimation
+{
+    /// <summary>
+    /// Identifies the Key attached property.
+    /// </summary>
+    public static readonly DependencyProperty KeyProperty =
+        DependencyProperty.RegisterAttached(
+            "Key",
+            typeof(string),
+            typeof(FWConnectedAnimation),
+            new PropertyMetadata(null));
+
+    /// <summary>
+    /// Identifies the Profile attached property.
+    /// </summary>
+    public static readonly DependencyProperty ProfileProperty =
+        DependencyProperty.RegisterAttached(
+            "Profile",
+            typeof(FWConnectedAnimationProfile),
+            typeof(FWConnectedAnimation),
+            new PropertyMetadata(FWConnectedAnimationProfile.Default));
+
+    /// <summary>
+    /// Identifies the Configuration attached property.
+    /// </summary>
+    public static readonly DependencyProperty ConfigurationProperty =
+        DependencyProperty.RegisterAttached(
+            "Configuration",
+            typeof(FWConnectedAnimationConfiguration),
+            typeof(FWConnectedAnimation),
+            new PropertyMetadata(FWConnectedAnimationConfiguration.Direct));
+
+    /// <summary>
+    /// Identifies the IsEnabled attached property.
+    /// </summary>
+    public static readonly DependencyProperty IsEnabledProperty =
+        DependencyProperty.RegisterAttached(
+            "IsEnabled",
+            typeof(bool),
+            typeof(FWConnectedAnimation),
+            new PropertyMetadata(true));
+
+    /// <summary>
+    /// Gets the shared default connected animation service.
+    /// </summary>
+    public static FWConnectedAnimationService DefaultService { get; } = new();
+
+    /// <summary>
+    /// Sets the key that links a source and destination element.
+    /// </summary>
+    public static void SetKey(DependencyObject element, string? value)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        element.SetValue(KeyProperty, value);
+    }
+
+    /// <summary>
+    /// Gets the key that links a source and destination element.
+    /// </summary>
+    public static string? GetKey(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        return (string?)element.GetValue(KeyProperty);
+    }
+
+    /// <summary>
+    /// Sets the motion profile used when creating options from attached properties.
+    /// </summary>
+    public static void SetProfile(DependencyObject element, FWConnectedAnimationProfile value)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        ValidateProfile(value);
+        element.SetValue(ProfileProperty, value);
+    }
+
+    /// <summary>
+    /// Gets the motion profile used when creating options from attached properties.
+    /// </summary>
+    public static FWConnectedAnimationProfile GetProfile(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        var value = (FWConnectedAnimationProfile)element.GetValue(ProfileProperty)!;
+        return Enum.IsDefined(value) ? value : FWConnectedAnimationProfile.Default;
+    }
+
+    /// <summary>
+    /// Sets the connected animation configuration used by attached-property helpers.
+    /// </summary>
+    public static void SetConfiguration(DependencyObject element, FWConnectedAnimationConfiguration value)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        ValidateConfiguration(value);
+        element.SetValue(ConfigurationProperty, value);
+    }
+
+    /// <summary>
+    /// Gets the connected animation configuration used by attached-property helpers.
+    /// </summary>
+    public static FWConnectedAnimationConfiguration GetConfiguration(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        var value = (FWConnectedAnimationConfiguration)element.GetValue(ConfigurationProperty)!;
+        return Enum.IsDefined(value) ? value : FWConnectedAnimationConfiguration.Direct;
+    }
+
+    /// <summary>
+    /// Sets whether attached-property helpers should prepare or start this element.
+    /// </summary>
+    public static void SetIsEnabled(DependencyObject element, bool value)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        element.SetValue(IsEnabledProperty, value);
+    }
+
+    /// <summary>
+    /// Gets whether attached-property helpers should prepare or start this element.
+    /// </summary>
+    public static bool GetIsEnabled(DependencyObject element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        return (bool)element.GetValue(IsEnabledProperty)!;
+    }
+
+    /// <summary>
+    /// Creates connected animation options from the attached properties on an element.
+    /// </summary>
+    public static FWConnectedAnimationOptions CreateOptions(DependencyObject element, ResourceDictionary? resources = null)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+
+        var options = FWConnectedAnimationOptions.CreateProfile(GetProfile(element), resources ?? Application.Current?.Resources);
+        var hasExplicitConfiguration = !ReferenceEquals(element.ReadLocalValue(ConfigurationProperty), DependencyProperty.UnsetValue);
+        if (hasExplicitConfiguration)
+        {
+            options.Configuration = GetConfiguration(element);
+        }
+
+        if (options.Configuration == FWConnectedAnimationConfiguration.Gravity)
+        {
+            options.AnimateScale = false;
+        }
+        else if (hasExplicitConfiguration)
+        {
+            options.AnimateScale = true;
+        }
+
+        return options;
+    }
+
+    /// <summary>
+    /// Prepares an element using its attached key and profile on the default service.
+    /// </summary>
+    public static bool PrepareToAnimate(UIElement source)
+    {
+        return PrepareToAnimate(source, DefaultService);
+    }
+
+    /// <summary>
+    /// Prepares an element using its attached key and profile on the supplied service.
+    /// </summary>
+    public static bool PrepareToAnimate(UIElement source, FWConnectedAnimationService service)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(service);
+
+        var key = GetKey(source);
+        return GetIsEnabled(source) &&
+            !string.IsNullOrWhiteSpace(key) &&
+            service.PrepareToAnimate(key, source, CreateOptions(source));
+    }
+
+    /// <summary>
+    /// Starts a prepared animation using the destination element attached key on the default service.
+    /// </summary>
+    public static bool TryStart(UIElement destination)
+    {
+        return TryStart(destination, DefaultService);
+    }
+
+    /// <summary>
+    /// Starts a prepared animation using the destination element attached key on the supplied service.
+    /// </summary>
+    public static bool TryStart(UIElement destination, FWConnectedAnimationService service)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        ArgumentNullException.ThrowIfNull(service);
+
+        var key = GetKey(destination);
+        return GetIsEnabled(destination) &&
+            !string.IsNullOrWhiteSpace(key) &&
+            service.TryStart(key, destination);
+    }
+
+    /// <summary>
+    /// Creates a non-destructive plan from an attached destination key without consuming the prepared animation.
+    /// </summary>
+    public static bool TryCreatePreparedPlan(UIElement destination, FWConnectedAnimationService service, out FWConnectedAnimationPlan plan)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        ArgumentNullException.ThrowIfNull(service);
+
+        var key = GetKey(destination);
+        if (!GetIsEnabled(destination) || string.IsNullOrWhiteSpace(key))
+        {
+            plan = default;
+            return false;
+        }
+
+        return service.TryCreatePreparedPlan(key, destination, out plan);
+    }
+
+    private static void ValidateProfile(FWConnectedAnimationProfile value)
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), "Unknown connected animation profile.");
+        }
+    }
+
+    private static void ValidateConfiguration(FWConnectedAnimationConfiguration value)
+    {
+        if (!Enum.IsDefined(value))
+        {
+            throw new ArgumentOutOfRangeException(nameof(value), "Unknown connected animation configuration.");
+        }
     }
 }
 

@@ -8,4 +8,12 @@
     <animation:Duration x:Key="FluentMotionDurationEmphasized">0:0:0.32</animation:Duration>
     <animation:Duration x:Key="FluentMotionConnectedAnimationDuration">0:0:0.32</animation:Duration>
     <x:String x:Key="FluentMotionConnectedAnimationInitialOpacity">0.72</x:String>
+    <animation:Duration x:Key="FluentMotionConnectedAnimationNavigationDuration">0:0:0.32</animation:Duration>
+    <x:String x:Key="FluentMotionConnectedAnimationNavigationInitialOpacity">0.72</x:String>
+    <animation:Duration x:Key="FluentMotionConnectedAnimationEntranceDuration">0:0:0.24</animation:Duration>
+    <x:String x:Key="FluentMotionConnectedAnimationEntranceInitialOpacity">0.0</x:String>
+    <animation:Duration x:Key="FluentMotionConnectedAnimationDirectDuration">0:0:0.32</animation:Duration>
+    <x:String x:Key="FluentMotionConnectedAnimationDirectInitialOpacity">0.72</x:String>
+    <animation:Duration x:Key="FluentMotionConnectedAnimationGravityDuration">0:0:0.36</animation:Duration>
+    <x:String x:Key="FluentMotionConnectedAnimationGravityInitialOpacity">0.64</x:String>
 </ResourceDictionary>

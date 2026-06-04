@@ -466,6 +466,14 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMotionDurationEmphasized"));
         Assert.True(dictionary.Contains("FluentMotionConnectedAnimationDuration"));
         Assert.True(dictionary.Contains("FluentMotionConnectedAnimationInitialOpacity"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationNavigationDuration"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationNavigationInitialOpacity"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationEntranceDuration"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationEntranceInitialOpacity"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationDirectDuration"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationDirectInitialOpacity"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationGravityDuration"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationGravityInitialOpacity"));
         Assert.True(dictionary.Contains("ColorPickerBackground"));
         Assert.True(dictionary.Contains("ColorPickerBorderBrush"));
         Assert.True(dictionary.Contains("ColorPickerForeground"));
