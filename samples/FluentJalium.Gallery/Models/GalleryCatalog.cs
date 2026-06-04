@@ -5,6 +5,7 @@ namespace FluentJalium.Gallery.Models;
 
 internal sealed record GalleryPageContentFactories(
     Func<UIElement> Overview,
+    Func<UIElement> ThemeArchitecture,
     Func<UIElement> Colors,
     Func<UIElement> Typography,
     Func<UIElement> Geometry,
@@ -38,6 +39,7 @@ internal static class GalleryCatalog
         return
         [
             new GalleryPage("Overview", "Theme, typography, and accent controls for validating FluentJalium across variants.", GalleryNavigationGroup.Home, FluentIconRegular.Home24, content.Overview, "home design system theme typography accent light dark high contrast"),
+            new GalleryPage("Theme Architecture", "How FluentJalium splits stable theme entry points, design resources, control dictionaries, and FW control surfaces.", GalleryNavigationGroup.Design, FluentIconRegular.Diagram24, content.ThemeArchitecture, "Generic.jalxaml FluentResources.jalxaml FluentControls.jalxaml FluentThemeManager theme resources controls dictionary FW control architecture FluentAvalonia WinUI WPFUI gallery design"),
             new GalleryPage("Colors", "Accent, text, fill, and semantic color tokens for FluentJalium themes and FW controls.", GalleryNavigationGroup.Design, FluentIconRegular.Color24, content.Colors, "FluentColors AccentBrush AccentFillColor TextPrimary TextSecondary ControlFillColor LayerFillColor SelectionBackground HyperlinkForeground ProgressBarForeground semantic color token design"),
             new GalleryPage("Typography", "Font families, type ramp, and control text roles used by FluentJalium themes.", GalleryNavigationGroup.Design, FluentIconRegular.TextFont24, content.Typography, "FluentTypography DisplayFontFamily BodyFontFamily MonoFontFamily FluentCaptionFontSize FluentBodyFontSize FluentSubtitleFontSize FluentTitleFontSize ControlContentThemeFontSize typography type ramp font design"),
             new GalleryPage("Geometry", "Corner radius, stroke, and elevation tokens for FluentJalium control surfaces.", GalleryNavigationGroup.Design, FluentIconRegular.Ruler24, content.Geometry, "ControlCornerRadius OverlayCornerRadius CardCornerRadius CompactCornerRadius FluentControlBorderThickness ControlElevationBorderBrush AccentControlElevationBorderBrush FluentGeometry radius corner stroke border elevation shadow WinUI geometry design token"),

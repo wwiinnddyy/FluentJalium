@@ -71,6 +71,7 @@ public sealed class MainWindow : Window
     {
         return new GalleryPageContentFactories(
             Overview: () => CreatePageStack(new GalleryOverviewPage(ApplyTheme, ApplyAccent).CreateContent()),
+            ThemeArchitecture: () => CreatePageStack(new GalleryThemeArchitecturePage().CreateContent()),
             Colors: () => CreatePageStack(new GalleryColorsPage().CreateContent()),
             Typography: () => CreatePageStack(new GalleryTypographyPage().CreateContent()),
             Geometry: () => CreatePageStack(new GalleryGeometryPage().CreateContent()),
