@@ -2,12 +2,18 @@ using FluentJalium.Icon;
 
 namespace FluentJalium.Gallery.Models;
 
+internal sealed record GalleryDocumentationLink(string Title, string Uri);
+
 internal sealed record GalleryPageInfo(
+    string UniqueId,
     string Title,
+    string Subtitle,
     string Description,
     string Group,
     FluentIconRegular Icon,
-    string[] Keywords,
+    string[] Tags,
+    string[] RelatedControls,
+    GalleryDocumentationLink[] DocumentationLinks,
     GalleryPageStatus Status = GalleryPageStatus.Stable,
     bool IsFooter = false)
 {
@@ -21,10 +27,15 @@ internal sealed record GalleryPageInfo(
 
         foreach (var token in query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            if (!ContainsIgnoreCase(Title, token)
+            if (!ContainsIgnoreCase(UniqueId, token)
+                && !ContainsIgnoreCase(Title, token)
+                && !ContainsIgnoreCase(Subtitle, token)
                 && !ContainsIgnoreCase(Description, token)
                 && !ContainsIgnoreCase(Group, token)
-                && !Keywords.Any(keyword => ContainsIgnoreCase(keyword, token)))
+                && !Tags.Any(tag => ContainsIgnoreCase(tag, token))
+                && !RelatedControls.Any(control => ContainsIgnoreCase(control, token))
+                && !DocumentationLinks.Any(link =>
+                    ContainsIgnoreCase(link.Title, token) || ContainsIgnoreCase(link.Uri, token)))
             {
                 return false;
             }

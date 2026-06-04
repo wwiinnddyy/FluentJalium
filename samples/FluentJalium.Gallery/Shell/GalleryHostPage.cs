@@ -4,6 +4,7 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 
@@ -55,6 +56,7 @@ internal sealed class GalleryHostPage : Page
                 Children =
                 {
                     CreatePageHeader(page),
+                    CreateMetadataRow(page),
                     new FWTextBlock
                     {
                         Text = page.Description,
@@ -96,7 +98,36 @@ internal sealed class GalleryHostPage : Page
         return header;
     }
 
+    private static UIElement CreateMetadataRow(GalleryPage page)
+    {
+        var row = new FWWrapPanel
+        {
+            HorizontalSpacing = 6,
+            VerticalSpacing = 6
+        };
+
+        row.Children.Add(CreateMetadataPill(page.Subtitle));
+        row.Children.Add(CreateMetadataPill(page.UniqueId));
+
+        foreach (var relatedControl in page.RelatedControls.Take(6))
+        {
+            row.Children.Add(CreateMetadataPill(relatedControl));
+        }
+
+        foreach (var documentationLink in page.DocumentationLinks.Take(2))
+        {
+            row.Children.Add(CreateMetadataPill(documentationLink.Title));
+        }
+
+        return row;
+    }
+
     private static UIElement CreateStatusPill(GalleryPageStatus status)
+    {
+        return CreateMetadataPill(status.ToString());
+    }
+
+    private static UIElement CreateMetadataPill(string text)
     {
         return new Border
         {
@@ -108,7 +139,7 @@ internal sealed class GalleryHostPage : Page
             VerticalAlignment = VerticalAlignment.Center,
             Child = new FWTextBlock
             {
-                Text = status.ToString(),
+                Text = text,
                 FontSize = 12,
                 Foreground = GalleryThemeResources.Brush("TextSecondary")
             }

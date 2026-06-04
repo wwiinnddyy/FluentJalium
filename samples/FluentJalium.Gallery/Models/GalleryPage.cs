@@ -8,7 +8,11 @@ internal sealed record GalleryPage(
     Func<UIElement> CreateContent,
     Func<UIElement>? CreateSampleMetadata = null)
 {
+    public string UniqueId => Info.UniqueId;
+
     public string Title => Info.Title;
+
+    public string Subtitle => Info.Subtitle;
 
     public string Description => Info.Description;
 
@@ -19,6 +23,12 @@ internal sealed record GalleryPage(
     public GalleryPageStatus Status => Info.Status;
 
     public bool IsFooter => Info.IsFooter;
+
+    public IReadOnlyList<string> Tags => Info.Tags;
+
+    public IReadOnlyList<string> RelatedControls => Info.RelatedControls;
+
+    public IReadOnlyList<GalleryDocumentationLink> DocumentationLinks => Info.DocumentationLinks;
 
     public bool MatchesSearch(string searchText) => Info.MatchesSearch(searchText);
 }

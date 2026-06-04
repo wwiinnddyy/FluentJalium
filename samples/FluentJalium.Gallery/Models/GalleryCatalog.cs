@@ -78,15 +78,60 @@ internal static class GalleryCatalog
         GalleryPageStatus status = GalleryPageStatus.Stable,
         bool IsFooter = false)
     {
+        var tags = keywords.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         var info = new GalleryPageInfo(
+            CreateUniqueId(title),
             title,
+            CreateSubtitle(group, status),
             description,
             group,
             icon,
-            keywords.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            tags,
+            CreateRelatedControls(tags),
+            CreateDocumentationLinks(title, tags),
             status,
             IsFooter);
 
         return new GalleryPage(info, createContent);
+    }
+
+    private static string CreateUniqueId(string title)
+    {
+        return string.Concat(title
+            .Where(character => char.IsLetterOrDigit(character))
+            .Select(char.ToLowerInvariant));
+    }
+
+    private static string CreateSubtitle(string group, GalleryPageStatus status)
+    {
+        return status == GalleryPageStatus.Stable
+            ? group
+            : $"{group} · {status}";
+    }
+
+    private static string[] CreateRelatedControls(IEnumerable<string> tags)
+    {
+        return tags
+            .Where(tag => tag.StartsWith("FW", StringComparison.Ordinal))
+            .Distinct(StringComparer.Ordinal)
+            .Take(8)
+            .ToArray();
+    }
+
+    private static GalleryDocumentationLink[] CreateDocumentationLinks(string title, IEnumerable<string> tags)
+    {
+        var links = new List<GalleryDocumentationLink>
+        {
+            new("WinUI Gallery", $"https://github.com/microsoft/WinUI-Gallery/search?q={Uri.EscapeDataString(title)}"),
+            new("FluentJalium source", $"https://github.com/search?q={Uri.EscapeDataString("FluentJalium " + title)}")
+        };
+
+        var firstControl = tags.FirstOrDefault(tag => tag.StartsWith("FW", StringComparison.Ordinal));
+        if (!string.IsNullOrWhiteSpace(firstControl))
+        {
+            links.Add(new("Related FW control", $"https://github.com/search?q={Uri.EscapeDataString("FluentJalium " + firstControl)}"));
+        }
+
+        return links.ToArray();
     }
 }
