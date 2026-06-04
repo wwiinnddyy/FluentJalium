@@ -16,4 +16,23 @@
     <x:String x:Key="FluentMotionConnectedAnimationDirectInitialOpacity">0.72</x:String>
     <animation:Duration x:Key="FluentMotionConnectedAnimationGravityDuration">0:0:0.36</animation:Duration>
     <x:String x:Key="FluentMotionConnectedAnimationGravityInitialOpacity">0.64</x:String>
+
+    <x:String x:Key="FluentMotionContentTransitionDefaultMode">Crossfade</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionDefaultDuration">0:0:0.28</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionDefaultTimingFunction">Recommended</x:String>
+    <x:String x:Key="FluentMotionContentTransitionEntranceMode">SlideLeft</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionEntranceDuration">0:0:0.32</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionEntranceTimingFunction">EaseOut</x:String>
+    <x:String x:Key="FluentMotionContentTransitionDrillInMode">ZoomIn</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionDrillInDuration">0:0:0.36</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionDrillInTimingFunction">EaseInOut</x:String>
+    <x:String x:Key="FluentMotionContentTransitionBackNavigationMode">SlideRight</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionBackNavigationDuration">0:0:0.28</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionBackNavigationTimingFunction">EaseOut</x:String>
+    <x:String x:Key="FluentMotionContentTransitionLiquidMorphMode">LiquidMorph</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionLiquidMorphDuration">0:0:0.42</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionLiquidMorphTimingFunction">EaseInOut</x:String>
+    <x:String x:Key="FluentMotionContentTransitionSuppressMode">None</x:String>
+    <animation:Duration x:Key="FluentMotionContentTransitionSuppressDuration">0:0:0</animation:Duration>
+    <x:String x:Key="FluentMotionContentTransitionSuppressTimingFunction">Linear</x:String>
 </ResourceDictionary>

@@ -56,9 +56,9 @@
     </Style>
 
     <Style TargetType="TransitioningContentControl" BasedOn="{StaticResource {x:Type ContentControl}}">
-        <Setter Property="TransitionMode" Value="Crossfade" />
-        <Setter Property="TransitionDuration" Value="{ThemeResource FluentMotionDurationNormal}" />
-        <Setter Property="TransitionTimingFunction" Value="Recommended" />
+        <Setter Property="TransitionMode" Value="{ThemeResource FluentMotionContentTransitionDefaultMode}" />
+        <Setter Property="TransitionDuration" Value="{ThemeResource FluentMotionContentTransitionDefaultDuration}" />
+        <Setter Property="TransitionTimingFunction" Value="{ThemeResource FluentMotionContentTransitionDefaultTimingFunction}" />
     </Style>
 
     <Style TargetType="ContentPresenter">

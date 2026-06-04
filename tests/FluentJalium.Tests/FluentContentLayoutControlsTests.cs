@@ -3,6 +3,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
+using AnimationDuration = Jalium.UI.Media.Animation.Duration;
 
 namespace FluentJalium.Tests;
 
@@ -133,5 +134,106 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(stack, surface.Child);
+    }
+
+    [Fact]
+    public void ContentTransitionRecipe_ShouldExposeFluentMotionProfiles()
+    {
+        var defaultRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Default);
+        var entranceRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Entrance);
+        var drillInRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.DrillIn);
+        var backRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.BackNavigation);
+        var liquidRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.LiquidMorph);
+        var suppressRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Suppress);
+
+        Assert.Equal(TransitionMode.Crossfade, defaultRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(280)), defaultRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.Recommended, defaultRecipe.TimingFunction);
+        Assert.Equal(TransitionMode.SlideLeft, entranceRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(320)), entranceRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.EaseOut, entranceRecipe.TimingFunction);
+        Assert.Equal(TransitionMode.ZoomIn, drillInRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(360)), drillInRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.EaseInOut, drillInRecipe.TimingFunction);
+        Assert.Equal(TransitionMode.SlideRight, backRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(280)), backRecipe.Duration);
+        Assert.Equal(TransitionMode.LiquidMorph, liquidRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(420)), liquidRecipe.Duration);
+        Assert.Null(suppressRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.Zero), suppressRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.Linear, suppressRecipe.TimingFunction);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FWContentTransitionRecipe.Create((FWContentTransitionProfile)42));
+    }
+
+    [Fact]
+    public void ContentTransitionRecipe_ShouldCreateProfilesFromMotionResources()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMotionContentTransitionEntranceMode"] = "SlideUp",
+            ["FluentMotionContentTransitionEntranceDuration"] = new AnimationDuration(TimeSpan.FromMilliseconds(500)),
+            ["FluentMotionContentTransitionEntranceTimingFunction"] = "EaseInOut",
+            ["FluentMotionContentTransitionSuppressMode"] = "Suppress",
+            ["FluentMotionContentTransitionSuppressDuration"] = 0,
+            ["FluentMotionContentTransitionSuppressTimingFunction"] = TransitionTimingFunction.Linear
+        };
+
+        var entranceRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Entrance, resources);
+        var suppressRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Suppress, resources);
+
+        Assert.Equal(TransitionMode.SlideUp, entranceRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(500)), entranceRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.EaseInOut, entranceRecipe.TimingFunction);
+        Assert.Null(suppressRecipe.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.Zero), suppressRecipe.Duration);
+        Assert.Equal(TransitionTimingFunction.Linear, suppressRecipe.TimingFunction);
+    }
+
+    [Fact]
+    public void FWTransitioningContentControl_ShouldApplyFluentTransitionProfiles()
+    {
+        var transitionHost = new FWTransitioningContentControl();
+
+        Assert.Equal(FWContentTransitionProfile.Default, transitionHost.TransitionProfile);
+        Assert.Equal(TransitionMode.Crossfade, transitionHost.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(280)), transitionHost.TransitionDuration);
+        Assert.Equal(TransitionTimingFunction.Recommended, transitionHost.TransitionTimingFunction);
+
+        transitionHost.TransitionProfile = FWContentTransitionProfile.Entrance;
+
+        Assert.Equal(TransitionMode.SlideLeft, transitionHost.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(320)), transitionHost.TransitionDuration);
+        Assert.Equal(TransitionTimingFunction.EaseOut, transitionHost.TransitionTimingFunction);
+
+        transitionHost.TransitionProfile = FWContentTransitionProfile.LiquidMorph;
+
+        Assert.Equal(TransitionMode.LiquidMorph, transitionHost.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(420)), transitionHost.TransitionDuration);
+        Assert.Equal(TransitionTimingFunction.EaseInOut, transitionHost.TransitionTimingFunction);
+
+        transitionHost.TransitionProfile = FWContentTransitionProfile.Suppress;
+
+        Assert.Null(transitionHost.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.Zero), transitionHost.TransitionDuration);
+        Assert.Equal(TransitionTimingFunction.Linear, transitionHost.TransitionTimingFunction);
+        Assert.Throws<ArgumentOutOfRangeException>(() => transitionHost.TransitionProfile = (FWContentTransitionProfile)42);
+    }
+
+    [Fact]
+    public void FWTransitioningContentControl_ShouldApplyExplicitTransitionRecipe()
+    {
+        var transitionHost = new FWTransitioningContentControl();
+        var recipe = new FWContentTransitionRecipe(
+            FWContentTransitionProfile.DrillIn,
+            TransitionMode.WaveDistortion,
+            new AnimationDuration(TimeSpan.FromMilliseconds(640)),
+            TransitionTimingFunction.EaseInOut);
+
+        transitionHost.ApplyTransitionRecipe(recipe);
+
+        Assert.Equal(FWContentTransitionProfile.DrillIn, transitionHost.TransitionProfile);
+        Assert.Equal(TransitionMode.WaveDistortion, transitionHost.TransitionMode);
+        Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(640)), transitionHost.TransitionDuration);
+        Assert.Equal(TransitionTimingFunction.EaseInOut, transitionHost.TransitionTimingFunction);
     }
 }

@@ -474,6 +474,24 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMotionConnectedAnimationDirectInitialOpacity"));
         Assert.True(dictionary.Contains("FluentMotionConnectedAnimationGravityDuration"));
         Assert.True(dictionary.Contains("FluentMotionConnectedAnimationGravityInitialOpacity"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDefaultMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDefaultDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDefaultTimingFunction"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionEntranceMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionEntranceDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionEntranceTimingFunction"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDrillInMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDrillInDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionDrillInTimingFunction"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionBackNavigationMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionBackNavigationDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionBackNavigationTimingFunction"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionLiquidMorphMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionLiquidMorphDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionLiquidMorphTimingFunction"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionSuppressMode"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionSuppressDuration"));
+        Assert.True(dictionary.Contains("FluentMotionContentTransitionSuppressTimingFunction"));
         Assert.True(dictionary.Contains("ColorPickerBackground"));
         Assert.True(dictionary.Contains("ColorPickerBorderBrush"));
         Assert.True(dictionary.Contains("ColorPickerForeground"));
@@ -506,6 +524,10 @@ public sealed class FluentThemeManagerTests
         var buttonStyle = Assert.IsType<Style>(dictionary[typeof(Button)]);
         AssertStyleSetterValue(buttonStyle, Control.BorderBrushProperty, "ControlElevationBorderBrush");
         AssertStyleSetterValue(buttonStyle, Control.CornerRadiusProperty, dictionary["ControlCornerRadius"]);
+        var transitioningStyle = Assert.IsType<Style>(dictionary[typeof(TransitioningContentControl)]);
+        AssertStyleSetterValue(transitioningStyle, TransitioningContentControl.TransitionModeProperty, "FluentMotionContentTransitionDefaultMode");
+        AssertStyleSetterValue(transitioningStyle, UIElement.TransitionDurationProperty, "FluentMotionContentTransitionDefaultDuration");
+        AssertStyleSetterValue(transitioningStyle, UIElement.TransitionTimingFunctionProperty, "FluentMotionContentTransitionDefaultTimingFunction");
     }
 
     [Fact]
