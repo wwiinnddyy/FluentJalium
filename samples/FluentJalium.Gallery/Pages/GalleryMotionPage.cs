@@ -50,7 +50,7 @@ internal sealed class GalleryMotionPage
     {
         const string animationKey = "motion.connected-card";
 
-        var options = new FWConnectedAnimationOptions();
+        var options = FWConnectedAnimationOptions.CreateDefault();
         var source = CreateMotionSurface(
             FluentIconRegular.Connected24,
             "Source",

@@ -39,6 +39,40 @@ public sealed class FluentConnectedAnimationTests
     }
 
     [Fact]
+    public void Options_ShouldCreateDefaultsFromMotionResources()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMotionConnectedAnimationDuration"] = new Duration(TimeSpan.FromMilliseconds(460)),
+            ["FluentMotionConnectedAnimationInitialOpacity"] = "0.58"
+        };
+
+        var options = FWConnectedAnimationOptions.CreateDefault(resources);
+
+        Assert.Equal(TimeSpan.FromMilliseconds(460), options.Duration);
+        Assert.Equal(0.58, options.InitialOpacity);
+        Assert.IsType<CubicEase>(options.EasingFunction);
+        Assert.True(options.AnimateScale);
+        Assert.True(options.AnimateOpacity);
+        Assert.Equal(FWConnectedAnimationConfiguration.Direct, options.Configuration);
+    }
+
+    [Fact]
+    public void Options_ShouldFallbackWhenMotionResourcesAreInvalid()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMotionConnectedAnimationDuration"] = Duration.Automatic,
+            ["FluentMotionConnectedAnimationInitialOpacity"] = "not-a-number"
+        };
+
+        var options = FWConnectedAnimationOptions.CreateDefault(resources);
+
+        Assert.Equal(TimeSpan.FromMilliseconds(320), options.Duration);
+        Assert.Equal(0.72, options.InitialOpacity);
+    }
+
+    [Fact]
     public void TryCreatePlan_ShouldMapSourceBoundsToDestinationStartTransform()
     {
         var options = new FWConnectedAnimationOptions { InitialOpacity = 0.5 };

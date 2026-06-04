@@ -2,6 +2,7 @@ using Jalium.UI;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using Jalium.UI.Threading;
+using System.Globalization;
 
 namespace FluentJalium.Controls;
 
@@ -37,10 +38,33 @@ public enum FWConnectedAnimationConfiguration
 /// </summary>
 public sealed class FWConnectedAnimationOptions
 {
-    private TimeSpan _duration = TimeSpan.FromMilliseconds(320);
+    private static readonly TimeSpan s_defaultDuration = TimeSpan.FromMilliseconds(320);
+    private const double DefaultInitialOpacity = 0.72;
+
+    private TimeSpan _duration = s_defaultDuration;
     private IEasingFunction _easingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
-    private double _initialOpacity = 0.72;
+    private double _initialOpacity = DefaultInitialOpacity;
     private FWConnectedAnimationConfiguration _configuration;
+
+    /// <summary>
+    /// Creates FluentJalium connected animation defaults from the current application resource scope.
+    /// </summary>
+    public static FWConnectedAnimationOptions CreateDefault()
+    {
+        return CreateDefault(Application.Current?.Resources);
+    }
+
+    /// <summary>
+    /// Creates FluentJalium connected animation defaults from the supplied motion token resource scope.
+    /// </summary>
+    public static FWConnectedAnimationOptions CreateDefault(ResourceDictionary? resources)
+    {
+        return new FWConnectedAnimationOptions
+        {
+            Duration = ResourceTimeSpan(resources, "FluentMotionConnectedAnimationDuration", s_defaultDuration),
+            InitialOpacity = ResourceDouble(resources, "FluentMotionConnectedAnimationInitialOpacity", DefaultInitialOpacity)
+        };
+    }
 
     /// <summary>
     /// Gets or sets the transition duration. Defaults to 320ms, matching the snappy WinUI motion family.
@@ -102,6 +126,40 @@ public sealed class FWConnectedAnimationOptions
 
             _configuration = value;
         }
+    }
+
+    private static TimeSpan ResourceTimeSpan(ResourceDictionary? resources, string key, TimeSpan fallback)
+    {
+        if (resources?.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            Duration duration when duration.HasTimeSpan && duration.TimeSpan >= TimeSpan.Zero => duration.TimeSpan,
+            TimeSpan timeSpan when timeSpan >= TimeSpan.Zero => timeSpan,
+            double milliseconds when double.IsFinite(milliseconds) && milliseconds >= 0 => TimeSpan.FromMilliseconds(milliseconds),
+            int milliseconds when milliseconds >= 0 => TimeSpan.FromMilliseconds(milliseconds),
+            string text when TimeSpan.TryParse(text, CultureInfo.InvariantCulture, out var timeSpan) && timeSpan >= TimeSpan.Zero => timeSpan,
+            _ => fallback
+        };
+    }
+
+    private static double ResourceDouble(ResourceDictionary? resources, string key, double fallback)
+    {
+        if (resources?.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            double number when double.IsFinite(number) => number,
+            int number => number,
+            string text when double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && double.IsFinite(number) => number,
+            _ => fallback
+        };
     }
 }
 
@@ -201,7 +259,7 @@ public sealed class FWConnectedAnimationService
         FWConnectedAnimationOptions? options,
         out FWConnectedAnimationPlan plan)
     {
-        var resolvedOptions = options ?? new FWConnectedAnimationOptions();
+        var resolvedOptions = options ?? FWConnectedAnimationOptions.CreateDefault();
         plan = default;
 
         if (!IsUsableBounds(sourceBounds) || !IsUsableBounds(destinationBounds))
@@ -330,7 +388,7 @@ public sealed class FWConnectedAnimationService
     {
         if (options == null)
         {
-            return new FWConnectedAnimationOptions();
+            return FWConnectedAnimationOptions.CreateDefault();
         }
 
         return new FWConnectedAnimationOptions
