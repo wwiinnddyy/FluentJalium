@@ -34,6 +34,65 @@
         <Setter Property="Padding" Value="{ThemeResource FluentMaterialContentLayerPadding}" />
     </Style>
 
+    <Style TargetType="fluent:FWLayerSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialKind" Value="Layer" />
+    </Style>
+
+    <Style TargetType="fluent:FWMicaSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialKind" Value="Mica" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialShellPaneBrush}" />
+    </Style>
+
+    <Style TargetType="fluent:FWMicaAltSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialKind" Value="MicaAlt" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialShellPaneBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialShellPaneBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialShellPaneCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialShellPanePadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWAcrylicSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialKind" Value="Acrylic" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialTransientAcrylicBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFlyoutBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFlyoutCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialFlyoutPadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWFrostedGlassSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialKind" Value="FrostedGlass" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialFocusedGlassBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFocusGlassBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFocusGlassCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialFocusGlassPadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWCardSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialRole" Value="Card" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialCardBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialCardBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialCardCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialCardPadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWFlyoutSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialRole" Value="Flyout" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialTransientAcrylicBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFlyoutBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFlyoutCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialFlyoutPadding}" />
+    </Style>
+
+    <Style TargetType="fluent:FWFocusGlassSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="MaterialRole" Value="FocusGlass" />
+        <Setter Property="Background" Value="{ThemeResource FluentMaterialFocusedGlassBrush}" />
+        <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFocusGlassBorderThickness}" />
+        <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFocusGlassCornerRadius}" />
+        <Setter Property="Padding" Value="{ThemeResource FluentMaterialFocusGlassPadding}" />
+        <Setter Property="Shape" Value="SuperEllipse" />
+        <Setter Property="SuperEllipseN" Value="{ThemeResource FluentMaterialFocusGlassSuperEllipseN}" />
+    </Style>
+
     <Style TargetType="fluent:FWFluentWindowSurface" BasedOn="{StaticResource {x:Type Border}}">
         <Setter Property="WindowMaterialProfile" Value="MicaShell" />
         <Setter Property="WindowBackdropKind" Value="Mica" />

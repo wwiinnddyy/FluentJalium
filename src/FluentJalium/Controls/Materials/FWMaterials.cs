@@ -992,6 +992,94 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium layer surface for content regions that do not need a generated backdrop effect.
+/// </summary>
+public class FWLayerSurface : FWFluentMaterialSurface
+{
+    public FWLayerSurface()
+    {
+        UseMaterialRecipe(FWFluentMaterialKind.Layer);
+    }
+}
+
+/// <summary>
+/// FluentJalium Mica element surface for long-lived shell regions.
+/// </summary>
+public class FWMicaSurface : FWFluentMaterialSurface
+{
+    public FWMicaSurface()
+    {
+        UseMaterialRecipe(FWFluentMaterialKind.Mica);
+    }
+}
+
+/// <summary>
+/// FluentJalium Mica Alt element surface for tabbed and pane-heavy regions.
+/// </summary>
+public class FWMicaAltSurface : FWFluentMaterialSurface
+{
+    public FWMicaAltSurface()
+    {
+        UseMaterialRecipe(FWFluentMaterialKind.MicaAlt);
+    }
+}
+
+/// <summary>
+/// FluentJalium acrylic element surface for transient and elevated regions.
+/// </summary>
+public class FWAcrylicSurface : FWFluentMaterialSurface
+{
+    public FWAcrylicSurface()
+    {
+        UseMaterialRecipe(FWFluentMaterialKind.Acrylic);
+    }
+}
+
+/// <summary>
+/// FluentJalium frosted glass element surface for soft media and preview regions.
+/// </summary>
+public class FWFrostedGlassSurface : FWFluentMaterialSurface
+{
+    public FWFrostedGlassSurface()
+    {
+        UseMaterialRecipe(FWFluentMaterialKind.FrostedGlass);
+    }
+}
+
+/// <summary>
+/// FluentJalium card surface for repeated grouped content.
+/// </summary>
+public class FWCardSurface : FWFluentMaterialSurface
+{
+    public FWCardSurface()
+    {
+        UseMaterialRole(FWFluentMaterialRole.Card);
+    }
+}
+
+/// <summary>
+/// FluentJalium flyout surface for menus, popups, and transient command surfaces.
+/// </summary>
+public class FWFlyoutSurface : FWFluentMaterialSurface
+{
+    public FWFlyoutSurface()
+    {
+        UseMaterialRole(FWFluentMaterialRole.Flyout);
+    }
+}
+
+/// <summary>
+/// FluentJalium liquid glass focus surface for high-emphasis preview and creative regions.
+/// </summary>
+public class FWFocusGlassSurface : FWFluentMaterialSurface
+{
+    public FWFocusGlassSurface()
+    {
+        UseMaterialRole(FWFluentMaterialRole.FocusGlass);
+    }
+}
+
+/// <summary>
 /// A FluentJalium root surface that couples a WinUI-style window backdrop role with in-window material tokens.
 /// </summary>
 public class FWFluentWindowSurface : FWFluentMaterialSurface

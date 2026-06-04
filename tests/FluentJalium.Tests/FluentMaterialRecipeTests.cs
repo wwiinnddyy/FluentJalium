@@ -279,6 +279,36 @@ public sealed class FluentMaterialRecipeTests
         Assert.IsType<AcrylicEffect>(surface.BackdropEffect);
     }
 
+    [Theory]
+    [MemberData(nameof(MaterialSurfaceControls))]
+    public void SurfaceControls_ShouldExposeFluentMaterialDefaults(
+        FWFluentMaterialSurface surface,
+        FWFluentMaterialRole expectedRole,
+        FWFluentMaterialKind expectedMaterialKind,
+        Type? expectedEffectType)
+    {
+        Assert.Equal(expectedRole, surface.MaterialRole);
+        Assert.Equal(expectedMaterialKind, surface.MaterialKind);
+
+        if (expectedMaterialKind == FWFluentMaterialKind.LiquidGlass)
+        {
+            Assert.True(surface.LiquidGlass);
+            Assert.Null(surface.BackdropEffect);
+        }
+        else
+        {
+            Assert.False(surface.LiquidGlass);
+            if (expectedEffectType == null)
+            {
+                Assert.Null(surface.BackdropEffect);
+            }
+            else
+            {
+                Assert.IsType(expectedEffectType, surface.BackdropEffect);
+            }
+        }
+    }
+
     [Fact]
     public void WindowSurface_ShouldApplySelectedBackdropToJaliumWindow()
     {
@@ -329,5 +359,20 @@ public sealed class FluentMaterialRecipeTests
         Assert.Equal(FWFluentMaterialRole.Flyout, surface.MaterialRole);
         Assert.Equal(FWFluentMaterialKind.Acrylic, surface.MaterialKind);
         Assert.IsType<AcrylicEffect>(surface.BackdropEffect);
+    }
+
+    public static TheoryData<FWFluentMaterialSurface, FWFluentMaterialRole, FWFluentMaterialKind, Type?> MaterialSurfaceControls()
+    {
+        return new TheoryData<FWFluentMaterialSurface, FWFluentMaterialRole, FWFluentMaterialKind, Type?>
+        {
+            { new FWLayerSurface(), FWFluentMaterialRole.None, FWFluentMaterialKind.Layer, null },
+            { new FWMicaSurface(), FWFluentMaterialRole.None, FWFluentMaterialKind.Mica, typeof(MicaEffect) },
+            { new FWMicaAltSurface(), FWFluentMaterialRole.None, FWFluentMaterialKind.MicaAlt, typeof(MicaEffect) },
+            { new FWAcrylicSurface(), FWFluentMaterialRole.None, FWFluentMaterialKind.Acrylic, typeof(AcrylicEffect) },
+            { new FWFrostedGlassSurface(), FWFluentMaterialRole.None, FWFluentMaterialKind.FrostedGlass, typeof(FrostedGlassEffect) },
+            { new FWCardSurface(), FWFluentMaterialRole.Card, FWFluentMaterialKind.Layer, null },
+            { new FWFlyoutSurface(), FWFluentMaterialRole.Flyout, FWFluentMaterialKind.Acrylic, typeof(AcrylicEffect) },
+            { new FWFocusGlassSurface(), FWFluentMaterialRole.FocusGlass, FWFluentMaterialKind.LiquidGlass, null }
+        };
     }
 }
