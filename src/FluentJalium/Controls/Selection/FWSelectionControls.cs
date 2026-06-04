@@ -18,6 +18,46 @@ public enum FWSelectionDensity
 /// </summary>
 public class FWCheckBox : CheckBox, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWSelectionDensity), typeof(FWCheckBox),
+            new PropertyMetadata(FWSelectionDensity.Comfortable, OnDensityChanged));
+
+    public FWCheckBox()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWSelectionDensity Density
+    {
+        get => (FWSelectionDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    internal static (double MinHeight, Thickness Padding) GetDensityMetrics(FWSelectionDensity density)
+    {
+        return density switch
+        {
+            FWSelectionDensity.Compact => (22.0, new Thickness(6, 0, 0, 0)),
+            FWSelectionDensity.Spacious => (32.0, new Thickness(10, 0, 0, 0)),
+            _ => (24.0, new Thickness(8, 0, 0, 0))
+        };
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWCheckBox checkBox && e.NewValue is FWSelectionDensity density)
+        {
+            ApplyDensity(checkBox, density);
+        }
+    }
+
+    private static void ApplyDensity(FWCheckBox checkBox, FWSelectionDensity density)
+    {
+        var (minHeight, padding) = GetDensityMetrics(density);
+        checkBox.MinHeight = minHeight;
+        checkBox.Padding = padding;
+    }
 }
 
 /// <summary>
@@ -25,6 +65,36 @@ public class FWCheckBox : CheckBox, IFluentJaliumControl
 /// </summary>
 public class FWRadioButton : RadioButton, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWSelectionDensity), typeof(FWRadioButton),
+            new PropertyMetadata(FWSelectionDensity.Comfortable, OnDensityChanged));
+
+    public FWRadioButton()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWSelectionDensity Density
+    {
+        get => (FWSelectionDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWRadioButton radioButton && e.NewValue is FWSelectionDensity density)
+        {
+            ApplyDensity(radioButton, density);
+        }
+    }
+
+    private static void ApplyDensity(FWRadioButton radioButton, FWSelectionDensity density)
+    {
+        var (minHeight, padding) = FWCheckBox.GetDensityMetrics(density);
+        radioButton.MinHeight = minHeight;
+        radioButton.Padding = padding;
+    }
 }
 
 /// <summary>

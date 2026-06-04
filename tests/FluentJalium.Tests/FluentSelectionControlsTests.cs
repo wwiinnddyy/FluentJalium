@@ -167,12 +167,24 @@ public sealed class FluentSelectionControlsTests
         AssertSetter(checkBoxStyle, Control.BorderBrushProperty);
         AssertSetter(checkBoxStyle, Control.BorderThicknessProperty);
         AssertSetter(checkBoxStyle, Control.CornerRadiusProperty);
+        AssertSetter(checkBoxStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(checkBoxStyle, Control.PaddingProperty);
+
+        var fluentCheckBoxStyle = AssertStyle<FWCheckBox>(dictionary);
+        Assert.Equal(typeof(CheckBox), fluentCheckBoxStyle.BasedOn?.TargetType);
+        AssertSetter(fluentCheckBoxStyle, FWCheckBox.DensityProperty);
 
         var radioButtonStyle = AssertStyle<RadioButton>(dictionary);
         AssertSetter(radioButtonStyle, Control.BackgroundProperty);
         AssertSetter(radioButtonStyle, Control.ForegroundProperty);
         AssertSetter(radioButtonStyle, Control.BorderBrushProperty);
         AssertSetter(radioButtonStyle, Control.BorderThicknessProperty);
+        AssertSetter(radioButtonStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(radioButtonStyle, Control.PaddingProperty);
+
+        var fluentRadioButtonStyle = AssertStyle<FWRadioButton>(dictionary);
+        Assert.Equal(typeof(RadioButton), fluentRadioButtonStyle.BasedOn?.TargetType);
+        AssertSetter(fluentRadioButtonStyle, FWRadioButton.DensityProperty);
 
         var comboBoxStyle = AssertStyle<ComboBox>(dictionary);
         AssertSetter(comboBoxStyle, Control.BackgroundProperty);
@@ -209,6 +221,35 @@ public sealed class FluentSelectionControlsTests
     [Fact]
     public void FWSelectionControls_ShouldApplyDensityAndRatingSizePresets()
     {
+        var checkBox = new FWCheckBox();
+
+        Assert.Equal(FWSelectionDensity.Comfortable, checkBox.Density);
+        Assert.Equal(24, checkBox.MinHeight);
+        Assert.Equal(new Thickness(8, 0, 0, 0), checkBox.Padding);
+
+        checkBox.Density = FWSelectionDensity.Compact;
+
+        Assert.Equal(22, checkBox.MinHeight);
+        Assert.Equal(new Thickness(6, 0, 0, 0), checkBox.Padding);
+
+        checkBox.Density = FWSelectionDensity.Spacious;
+
+        Assert.Equal(32, checkBox.MinHeight);
+        Assert.Equal(new Thickness(10, 0, 0, 0), checkBox.Padding);
+
+        var radioButton = new FWRadioButton
+        {
+            Density = FWSelectionDensity.Compact
+        };
+
+        Assert.Equal(22, radioButton.MinHeight);
+        Assert.Equal(new Thickness(6, 0, 0, 0), radioButton.Padding);
+
+        radioButton.Density = FWSelectionDensity.Spacious;
+
+        Assert.Equal(32, radioButton.MinHeight);
+        Assert.Equal(new Thickness(10, 0, 0, 0), radioButton.Padding);
+
         var comboBox = new FWComboBox();
 
         Assert.Equal(FWSelectionDensity.Comfortable, comboBox.Density);
