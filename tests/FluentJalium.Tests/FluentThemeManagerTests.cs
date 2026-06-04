@@ -565,6 +565,30 @@ public sealed class FluentThemeManagerTests
 
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void TextInputBatch_ShouldDefineFwNumberBoxDensityDefaults()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            var numberBoxStyle = Assert.IsType<Style>(app.Resources[typeof(NumberBox)]);
+            var fwNumberBoxStyle = Assert.IsType<Style>(app.Resources[typeof(FWNumberBox)]);
+
+            Assert.Same(numberBoxStyle, fwNumberBoxStyle.BasedOn);
+            AssertStyleSetterValue(fwNumberBoxStyle, FWNumberBox.DensityProperty, "Comfortable");
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void SwitchBatch_ShouldExposeFwStylesForSwitchControls()
     {
         ResetApplicationState();
@@ -1119,6 +1143,7 @@ public sealed class FluentThemeManagerTests
     {
         var numberBox = new FWNumberBox
         {
+            Density = FWNumberBoxDensity.Compact,
             Minimum = 0,
             Maximum = 10,
             SmallChange = 2,
@@ -1140,12 +1165,20 @@ public sealed class FluentThemeManagerTests
 
         Assert.Equal(10, numberBox.Value);
         Assert.Equal("10", numberBox.Text);
+        Assert.Equal(FWNumberBoxDensity.Compact, numberBox.Density);
+        Assert.Equal(30, numberBox.MinHeight);
+        Assert.Equal(new Thickness(8, 4, 8, 5), numberBox.Padding);
         Assert.Equal(2, numberBox.SmallChange);
         Assert.Equal(5, numberBox.LargeChange);
         Assert.Equal(3, changed);
         Assert.NotNull(lastArgs);
         Assert.Equal(0, lastArgs!.OldValue);
         Assert.Equal(10, lastArgs.NewValue);
+
+        numberBox.Density = FWNumberBoxDensity.Spacious;
+
+        Assert.Equal(40, numberBox.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), numberBox.Padding);
     }
 
     [Fact]

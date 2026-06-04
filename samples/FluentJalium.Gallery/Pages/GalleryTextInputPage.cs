@@ -1,3 +1,4 @@
+using System.Globalization;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -8,6 +9,7 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWNumberBox = FluentJalium.Controls.FWNumberBox;
+using FWNumberBoxDensity = FluentJalium.Controls.FWNumberBoxDensity;
 using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
@@ -117,7 +119,7 @@ internal sealed class GalleryTextInputPage
 
     private static UIElement CreatePasswordNumberInputSample()
     {
-        var output = CreateTextInputOutput("Password and NumberBox: ready");
+        var output = CreateTextInputOutput("NumberBox value: 42. Density: comfortable. Spin: inline");
         var passwordBox = new FWPasswordBox
         {
             Password = "fluent",
@@ -129,15 +131,18 @@ internal sealed class GalleryTextInputPage
         {
             Header = "FWNumberBox",
             Width = 200,
+            Density = FWNumberBoxDensity.Comfortable,
             Minimum = 0,
             Maximum = 100,
             Value = 42,
             SmallChange = 2,
             LargeChange = 10,
-            DecimalPlaces = 0
+            DecimalPlaces = 0,
+            PlaceholderText = "0-100"
         };
         passwordBox.PasswordChanged += (_, _) => output.Text = $"Password length: {passwordBox.Password.Length}";
-        numberBox.ValueChanged += (_, e) => output.Text = $"NumberBox value: {e.NewValue}";
+        numberBox.ValueChanged += (_, e) =>
+            output.Text = $"NumberBox value: {FormatNumberBoxValue(e.NewValue, numberBox.DecimalPlaces)}. Density: {FormatDensity(numberBox.Density)}. Spin: {FormatSpinPlacement(numberBox.SpinButtonPlacementMode)}";
 
         return new FWStackPanel
         {
@@ -155,9 +160,18 @@ internal sealed class GalleryTextInputPage
                         numberBox,
                         new FWNumberBox
                         {
+                            Header = "Hidden spin",
+                            Width = 180,
+                            Density = FWNumberBoxDensity.Compact,
+                            Value = 12,
+                            SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Hidden
+                        },
+                        new FWNumberBox
+                        {
                             Header = "Disabled",
                             Width = 180,
-                            Value = 12,
+                            Density = FWNumberBoxDensity.Spacious,
+                            Value = 24,
                             IsEnabled = false
                         }
                     }
@@ -170,10 +184,25 @@ internal sealed class GalleryTextInputPage
                     }),
                     CreateTextInputActionButton(FluentIconRegular.NumberSymbol24, "Step up", () => numberBox.StepUp()),
                     CreateTextInputActionButton(FluentIconRegular.NumberSymbol24, "Step down", () => numberBox.StepDown()),
+                    CreateTextInputActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        numberBox.Density = NextDensity(numberBox.Density);
+                        output.Text = $"NumberBox value: {FormatNumberBoxValue(numberBox.Value, numberBox.DecimalPlaces)}. Density: {FormatDensity(numberBox.Density)}. Spin: {FormatSpinPlacement(numberBox.SpinButtonPlacementMode)}";
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.TextBoxSettings24, "Spin", () =>
+                    {
+                        numberBox.SpinButtonPlacementMode = NextSpinPlacement(numberBox.SpinButtonPlacementMode);
+                        output.Text = $"NumberBox value: {FormatNumberBoxValue(numberBox.Value, numberBox.DecimalPlaces)}. Density: {FormatDensity(numberBox.Density)}. Spin: {FormatSpinPlacement(numberBox.SpinButtonPlacementMode)}";
+                    }),
                     CreateTextInputActionButton(FluentIconRegular.TextBoxSettings24, "Wrap", () =>
                     {
                         numberBox.IsWrapEnabled = !numberBox.IsWrapEnabled;
                         output.Text = $"NumberBox wrap: {FormatOnOff(numberBox.IsWrapEnabled)}";
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.DecimalArrowLeft24, "Decimals", () =>
+                    {
+                        numberBox.DecimalPlaces = numberBox.DecimalPlaces == 0 ? 2 : 0;
+                        output.Text = $"NumberBox value: {FormatNumberBoxValue(numberBox.Value, numberBox.DecimalPlaces)}. Decimals: {numberBox.DecimalPlaces}";
                     })),
                 CreateTextInputStatus(output)
             }
@@ -494,6 +523,53 @@ internal sealed class GalleryTextInputPage
     private static string FormatOnOff(bool value)
     {
         return value ? "on" : "off";
+    }
+
+    private static FWNumberBoxDensity NextDensity(FWNumberBoxDensity density)
+    {
+        return density switch
+        {
+            FWNumberBoxDensity.Compact => FWNumberBoxDensity.Comfortable,
+            FWNumberBoxDensity.Comfortable => FWNumberBoxDensity.Spacious,
+            _ => FWNumberBoxDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWNumberBoxDensity density)
+    {
+        return density switch
+        {
+            FWNumberBoxDensity.Compact => "compact",
+            FWNumberBoxDensity.Spacious => "spacious",
+            _ => "comfortable"
+        };
+    }
+
+    private static NumberBoxSpinButtonPlacementMode NextSpinPlacement(NumberBoxSpinButtonPlacementMode mode)
+    {
+        return mode switch
+        {
+            NumberBoxSpinButtonPlacementMode.Inline => NumberBoxSpinButtonPlacementMode.Hidden,
+            NumberBoxSpinButtonPlacementMode.Hidden => NumberBoxSpinButtonPlacementMode.Compact,
+            _ => NumberBoxSpinButtonPlacementMode.Inline
+        };
+    }
+
+    private static string FormatSpinPlacement(NumberBoxSpinButtonPlacementMode mode)
+    {
+        return mode switch
+        {
+            NumberBoxSpinButtonPlacementMode.Hidden => "hidden",
+            NumberBoxSpinButtonPlacementMode.Compact => "compact",
+            _ => "inline"
+        };
+    }
+
+    private static string FormatNumberBoxValue(double value, int decimalPlaces)
+    {
+        return decimalPlaces >= 0
+            ? value.ToString($"F{decimalPlaces}", CultureInfo.CurrentCulture)
+            : value.ToString("G", CultureInfo.CurrentCulture);
     }
 
     private static FWStackPanel CreateSection(string title)

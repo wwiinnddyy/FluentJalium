@@ -27,12 +27,15 @@ public sealed class FluentTextInputControlsTests
         };
         var numberBox = new FWNumberBox
         {
+            Density = FWNumberBoxDensity.Spacious,
             Minimum = 0,
             Maximum = 100,
             Value = 24,
             SmallChange = 4,
             LargeChange = 12,
-            DecimalPlaces = 0
+            DecimalPlaces = 0,
+            AcceptsExpression = true,
+            SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Hidden
         };
         var autoCompleteBox = new FWAutoCompleteBox
         {
@@ -83,9 +86,14 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(PasswordRevealMode.Peek, passwordBox.RevealMode);
         Assert.True(passwordBox.IsPasswordRevealed);
         Assert.Equal(24, numberBox.Value);
+        Assert.Equal(FWNumberBoxDensity.Spacious, numberBox.Density);
+        Assert.Equal(40, numberBox.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), numberBox.Padding);
         Assert.Equal(4, numberBox.SmallChange);
         Assert.Equal(12, numberBox.LargeChange);
         Assert.Equal(0, numberBox.DecimalPlaces);
+        Assert.True(numberBox.AcceptsExpression);
+        Assert.Equal(NumberBoxSpinButtonPlacementMode.Hidden, numberBox.SpinButtonPlacementMode);
         Assert.Equal("Fluent", autoCompleteBox.Text);
         Assert.Equal(AutoCompleteFilterMode.Contains, autoCompleteBox.FilterMode);
         Assert.Equal(2, autoCompleteBox.FilteredItems.Count);

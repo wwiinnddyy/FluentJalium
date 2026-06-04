@@ -284,13 +284,18 @@ public static class FluentThemeManager
         where TFluentControl : FrameworkElement, IFluentJaliumControl
         where TJaliumControl : FrameworkElement
     {
-        if (dictionary.Contains(typeof(TFluentControl)))
-        {
-            return;
-        }
-
         if (dictionary.TryGetValue(typeof(TJaliumControl), out var baseStyle) && baseStyle is Style style)
         {
+            if (dictionary.TryGetValue(typeof(TFluentControl), out var fluentStyleValue) && fluentStyleValue is Style fluentStyle)
+            {
+                if (fluentStyle.BasedOn?.TargetType == typeof(TJaliumControl))
+                {
+                    fluentStyle.BasedOn = style;
+                }
+
+                return;
+            }
+
             dictionary[typeof(TFluentControl)] = new Style(typeof(TFluentControl), style);
         }
     }
