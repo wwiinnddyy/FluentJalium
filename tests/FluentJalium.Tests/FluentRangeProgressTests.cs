@@ -5,6 +5,7 @@ using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Data;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
@@ -136,6 +137,7 @@ public sealed class FluentRangeProgressTests
         AssertContainsStyle<Slider>(dictionary);
         AssertContainsStyle<RangeSlider>(dictionary);
         AssertContainsStyle<ProgressBar>(dictionary);
+        AssertContainsStyle<FWProgressBar>(dictionary);
 
         var sliderStyle = AssertStyle<Slider>(dictionary);
         AssertSetter(sliderStyle, Control.BackgroundProperty);
@@ -153,6 +155,12 @@ public sealed class FluentRangeProgressTests
         AssertSetter(progressBarStyle, Control.BackgroundProperty);
         AssertSetter(progressBarStyle, Control.ForegroundProperty);
         AssertSetter(progressBarStyle, ProgressBar.ProgressBrushProperty);
+
+        var fwProgressBarStyle = AssertStyle<FWProgressBar>(dictionary);
+        Assert.Same(progressBarStyle, fwProgressBarStyle.BasedOn);
+        AssertTriggerSetter(fwProgressBarStyle, FWProgressBar.ShowPausedProperty, true, ProgressBar.ProgressBrushProperty, "ProgressBarPausedForeground");
+        AssertTriggerSetter(fwProgressBarStyle, FWProgressBar.ShowErrorProperty, true, ProgressBar.ProgressBrushProperty, "ProgressBarErrorForeground");
+        AssertTriggerSetter(fwProgressBarStyle, Control.IsEnabledProperty, false, ProgressBar.ProgressBrushProperty, "ProgressBarDisabledForeground");
 
         var ringStyle = AssertStyle<FWProgressRing>(dictionary);
         Assert.Null(ringStyle.BasedOn);
@@ -219,6 +227,26 @@ public sealed class FluentRangeProgressTests
         Assert.False(progressBar.IsIndeterminate);
         Assert.Equal(0.5, progressBar.Percentage);
         Assert.Equal(2, changed);
+    }
+
+    [Fact]
+    public void FWProgressBar_ShouldExposePausedAndErrorStatusStates()
+    {
+        var progressBar = new FWProgressBar
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Value = 48,
+            ShowPaused = true
+        };
+
+        Assert.True(progressBar.ShowPaused);
+        Assert.False(progressBar.ShowError);
+
+        progressBar.ShowError = true;
+
+        Assert.True(progressBar.ShowPaused);
+        Assert.True(progressBar.ShowError);
     }
 
     [Fact]
@@ -317,6 +345,8 @@ public sealed class FluentRangeProgressTests
         Assert.Equal(10, rangeSlider.MinimumRange);
 
         Assert.False(progressBar.IsIndeterminate);
+        Assert.False(progressBar.ShowPaused);
+        Assert.False(progressBar.ShowError);
         Assert.InRange(progressBar.Percentage, 0.6799, 0.6801);
 
         Assert.True(progressRing.IsActive);
@@ -439,6 +469,37 @@ public sealed class FluentRangeProgressTests
     {
         var setter = Assert.Single(style.Setters, s => s.Property == property);
         Assert.Equal(expectedValue, Convert.ToBoolean(setter.Value));
+    }
+
+    private static void AssertTriggerSetter(
+        Style style,
+        DependencyProperty triggerProperty,
+        object triggerValue,
+        DependencyProperty setterProperty,
+        object expectedSetterValue)
+    {
+        var trigger = Assert.Single(
+            style.Triggers.OfType<Trigger>(),
+            candidate => candidate.Property == triggerProperty && TriggerValueEquals(candidate.Value, triggerValue));
+        var setter = Assert.Single(trigger.Setters, candidate => candidate.Property == setterProperty);
+
+        if (setter.Value is IDynamicResourceReference dynamicReference)
+        {
+            Assert.Equal(expectedSetterValue, dynamicReference.ResourceKey);
+            return;
+        }
+
+        Assert.Equal(expectedSetterValue, setter.Value);
+    }
+
+    private static bool TriggerValueEquals(object? actual, object expected)
+    {
+        if (Equals(actual, expected))
+        {
+            return true;
+        }
+
+        return actual is string text && string.Equals(text, Convert.ToString(expected), StringComparison.OrdinalIgnoreCase);
     }
 
     private static Color GetBrushColor(object? value)

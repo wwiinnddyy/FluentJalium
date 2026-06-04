@@ -40,7 +40,7 @@ internal sealed class GalleryRangePage
         examples.Children.Add(CreateRangeExampleCard(
             FluentIconRegular.DataUsage24,
             "FWProgressBar",
-            "Determinate progress driven by a slider plus indeterminate and disabled states.",
+            "Determinate progress driven by a slider plus indeterminate, paused, error, and disabled states.",
             CreateProgressBarSample()));
         examples.Children.Add(CreateRangeExampleCard(
             FluentIconRegular.CircleMultipleConcentric24,
@@ -254,6 +254,24 @@ internal sealed class GalleryRangePage
                             Height = 8,
                             IsIndeterminate = true
                         }),
+                        CreateRangeStateRow("Paused", new FWProgressBar
+                        {
+                            Width = 260,
+                            Height = 8,
+                            Minimum = 0,
+                            Maximum = 100,
+                            Value = 42,
+                            ShowPaused = true
+                        }),
+                        CreateRangeStateRow("Error", new FWProgressBar
+                        {
+                            Width = 260,
+                            Height = 8,
+                            Minimum = 0,
+                            Maximum = 100,
+                            Value = 86,
+                            ShowError = true
+                        }),
                         CreateRangeStateRow("Disabled", new FWProgressBar
                         {
                             Width = 260,
@@ -416,7 +434,10 @@ internal sealed class GalleryRangePage
                     {
                         Width = 260,
                         Height = 8,
-                        IsIndeterminate = true
+                        Minimum = 0,
+                        Maximum = 100,
+                        Value = 38,
+                        ShowPaused = true
                     })
                 }
             }
