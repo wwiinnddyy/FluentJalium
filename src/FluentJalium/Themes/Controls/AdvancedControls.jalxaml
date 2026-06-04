@@ -178,6 +178,7 @@
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Density" Value="Comfortable" />
         <Setter Property="Padding" Value="12,5,12,6" />
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />

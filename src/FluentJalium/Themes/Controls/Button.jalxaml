@@ -211,6 +211,7 @@
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource FluentControlBorderThickness}" />
+        <Setter Property="Density" Value="Comfortable" />
         <Setter Property="Padding" Value="12,5,10,6" />
         <Setter Property="CornerRadius">
             <Setter.Value>

@@ -9,6 +9,10 @@ namespace FluentJalium.Controls;
 /// </summary>
 public class FWDropDownButton : Button, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWButtonDensity), typeof(FWDropDownButton),
+            new PropertyMetadata(FWButtonDensity.Comfortable, OnDensityChanged));
+
     public static readonly DependencyProperty FlyoutProperty =
         DependencyProperty.Register(nameof(Flyout), typeof(FlyoutBase), typeof(FWDropDownButton),
             new PropertyMetadata(null, OnFlyoutChanged));
@@ -22,6 +26,14 @@ public class FWDropDownButton : Button, IFluentJaliumControl
     public FWDropDownButton()
     {
         UseTemplateContentManagement();
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWButtonDensity Density
+    {
+        get => (FWButtonDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
     }
 
     /// <summary>
@@ -108,6 +120,28 @@ public class FWDropDownButton : Button, IFluentJaliumControl
     {
         _isFlyoutOpen = false;
         FlyoutClosed?.Invoke(this, EventArgs.Empty);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWDropDownButton button && e.NewValue is FWButtonDensity density)
+        {
+            ApplyDensity(button, density);
+        }
+    }
+
+    private static void ApplyDensity(FWDropDownButton button, FWButtonDensity density)
+    {
+        var (minHeight, minWidth, padding) = density switch
+        {
+            FWButtonDensity.Compact => (30.0, 64.0, new Thickness(10, 4, 8, 5)),
+            FWButtonDensity.Spacious => (40.0, 80.0, new Thickness(14, 8, 12, 8)),
+            _ => (32.0, 72.0, new Thickness(12, 5, 10, 6))
+        };
+
+        button.MinHeight = minHeight;
+        button.MinWidth = minWidth;
+        button.Padding = padding;
     }
 
     private static void OnFlyoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

@@ -128,11 +128,21 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal(typeof(HyperlinkButton), fluentHyperlinkButtonStyle.BasedOn?.TargetType);
         AssertSetter(fluentHyperlinkButtonStyle, FWHyperlinkButton.DensityProperty);
 
+        var dropDownButtonStyle = AssertStyle<FWDropDownButton>(dictionary);
+        Assert.Equal(typeof(FWDropDownButton), dropDownButtonStyle.TargetType);
+        Assert.Null(dropDownButtonStyle.BasedOn);
+        AssertSetter(dropDownButtonStyle, nameof(FWDropDownButton.Density), "Comfortable");
+
         var splitButtonStyle = AssertStyle<SplitButton>(dictionary);
         var fluentSplitButtonStyle = AssertStyle<FWSplitButton>(dictionary);
         Assert.Equal(typeof(SplitButton), fluentSplitButtonStyle.BasedOn?.TargetType);
         AssertSetter(fluentSplitButtonStyle, FWSplitButton.DensityProperty);
         Assert.NotNull(splitButtonStyle);
+
+        var toggleSplitButtonStyle = AssertStyle<FWToggleSplitButton>(dictionary);
+        Assert.Equal(typeof(FWToggleSplitButton), toggleSplitButtonStyle.TargetType);
+        Assert.Null(toggleSplitButtonStyle.BasedOn);
+        AssertSetter(toggleSplitButtonStyle, nameof(FWToggleSplitButton.Density), "Comfortable");
 
         var toolBarStyle = AssertStyle<Jalium.UI.Controls.ToolBar>(dictionary);
         AssertSetter(toolBarStyle, Control.BackgroundProperty);
@@ -198,6 +208,48 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal(40, splitButton.MinHeight);
         Assert.Equal(72, splitButton.MinWidth);
         Assert.Equal(new Thickness(14, 8, 14, 8), splitButton.Padding);
+    }
+
+    [Fact]
+    public void FWDropDownAndToggleSplitButtons_ShouldApplyDensityPresets()
+    {
+        var dropDownButton = new FWDropDownButton();
+
+        Assert.Equal(FWButtonDensity.Comfortable, dropDownButton.Density);
+        Assert.Equal(32, dropDownButton.MinHeight);
+        Assert.Equal(72, dropDownButton.MinWidth);
+        Assert.Equal(new Thickness(12, 5, 10, 6), dropDownButton.Padding);
+
+        dropDownButton.Density = FWButtonDensity.Compact;
+
+        Assert.Equal(30, dropDownButton.MinHeight);
+        Assert.Equal(64, dropDownButton.MinWidth);
+        Assert.Equal(new Thickness(10, 4, 8, 5), dropDownButton.Padding);
+
+        dropDownButton.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(40, dropDownButton.MinHeight);
+        Assert.Equal(80, dropDownButton.MinWidth);
+        Assert.Equal(new Thickness(14, 8, 12, 8), dropDownButton.Padding);
+
+        var toggleSplitButton = new FWToggleSplitButton();
+
+        Assert.Equal(FWButtonDensity.Comfortable, toggleSplitButton.Density);
+        Assert.Equal(32, toggleSplitButton.MinHeight);
+        Assert.Equal(120, toggleSplitButton.MinWidth);
+        Assert.Equal(new Thickness(12, 5, 12, 6), toggleSplitButton.Padding);
+
+        toggleSplitButton.Density = FWButtonDensity.Compact;
+
+        Assert.Equal(30, toggleSplitButton.MinHeight);
+        Assert.Equal(104, toggleSplitButton.MinWidth);
+        Assert.Equal(new Thickness(10, 4, 10, 5), toggleSplitButton.Padding);
+
+        toggleSplitButton.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(40, toggleSplitButton.MinHeight);
+        Assert.Equal(136, toggleSplitButton.MinWidth);
+        Assert.Equal(new Thickness(14, 8, 14, 8), toggleSplitButton.Padding);
     }
 
     [Fact]
@@ -446,9 +498,15 @@ public sealed class FluentCommandToolbarTests
         Assert.Same(baseStyle, fluentStyle.BasedOn);
     }
 
-    private static void AssertSetter(Style style, DependencyProperty property)
+    private static void AssertSetter(Style style, DependencyProperty property, string? propertyName = null)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters, setter => setter.Property == property || setter.PropertyName == propertyName);
+    }
+
+    private static void AssertSetter(Style style, string propertyName, object? value)
+    {
+        Assert.Contains(style.Setters, setter =>
+            setter.PropertyName == propertyName && Equals(setter.Value, value));
     }
 
     private static void ResetApplicationState()
