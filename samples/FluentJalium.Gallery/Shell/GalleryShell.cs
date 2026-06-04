@@ -50,6 +50,7 @@ internal sealed class GalleryShell : UserControl
             _navigationView.PaneBackground = GalleryThemeResources.Brush("NavigationViewPaneBackground");
             _navigationView.ContentBackground = GalleryThemeResources.Brush("NavigationViewContentBackground");
             _navigationView.PaneHeader = CreatePaneHeader();
+            _navigationView.Content = CreateContentHost();
             PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
         }
 
@@ -84,7 +85,7 @@ internal sealed class GalleryShell : UserControl
             OpenPaneLength = 320,
             CompactPaneLength = 48,
             PaneHeader = CreatePaneHeader(),
-            Content = _frame
+            Content = CreateContentHost()
         };
         _navigationView.SelectionChanged += OnNavigationSelectionChanged;
 
@@ -96,6 +97,20 @@ internal sealed class GalleryShell : UserControl
         }
 
         return _navigationView;
+    }
+
+    private UIElement CreateContentHost()
+    {
+        return new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
+            Children =
+            {
+                CreateSearchHeader(),
+                _frame!
+            }
+        };
     }
 
     private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
@@ -206,12 +221,26 @@ internal sealed class GalleryShell : UserControl
             Foreground = GalleryThemeResources.Brush("TextSecondary")
         });
 
+        return panel;
+    }
+
+    private UIElement CreateSearchHeader()
+    {
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            Margin = new Thickness(40, 24, 40, 0)
+        };
+
+        panel.Children.Add(CreateIcon(FluentIconRegular.Search24, 20, GalleryThemeResources.Brush("TextSecondary")));
         _searchBox = new FWTextBox
         {
             Text = _navigationSearchText,
-            PlaceholderText = "Search controls and samples",
-            MinHeight = 32,
-            Margin = new Thickness(0, 2, 0, 0)
+            PlaceholderText = "Search controls, materials, and samples",
+            MinHeight = 34,
+            Width = 420,
+            VerticalAlignment = VerticalAlignment.Center
         };
         _searchBox.TextChanged += OnNavigationSearchTextChanged;
         panel.Children.Add(_searchBox);
