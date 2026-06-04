@@ -41,7 +41,7 @@
 
     <Style TargetType="controls:TransitioningContentControl" BasedOn="{StaticResource {x:Type ContentControl}}">
         <Setter Property="TransitionMode" Value="Crossfade" />
-        <Setter Property="TransitionDuration" Value="0:0:0.28" />
+        <Setter Property="TransitionDuration" Value="{ThemeResource FluentMotionDurationNormal}" />
         <Setter Property="TransitionTimingFunction" Value="Recommended" />
     </Style>
 

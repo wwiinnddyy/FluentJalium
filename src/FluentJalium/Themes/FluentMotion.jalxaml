@@ -1,0 +1,11 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:animation="clr-namespace:Jalium.UI.Media.Animation;assembly=Jalium.UI.Core"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <animation:Duration x:Key="FluentMotionDurationFast">0:0:0.12</animation:Duration>
+    <animation:Duration x:Key="FluentMotionDurationNormal">0:0:0.28</animation:Duration>
+    <animation:Duration x:Key="FluentMotionDurationEmphasized">0:0:0.32</animation:Duration>
+    <animation:Duration x:Key="FluentMotionConnectedAnimationDuration">0:0:0.32</animation:Duration>
+    <x:String x:Key="FluentMotionConnectedAnimationInitialOpacity">0.72</x:String>
+</ResourceDictionary>

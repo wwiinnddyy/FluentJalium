@@ -405,6 +405,11 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialRoleBadgeBrush"));
         Assert.True(dictionary.Contains("FluentMaterialRoleIconBackgroundBrush"));
         Assert.True(dictionary.Contains("FluentMaterialElevationShadowBrush"));
+        Assert.True(dictionary.Contains("FluentMotionDurationFast"));
+        Assert.True(dictionary.Contains("FluentMotionDurationNormal"));
+        Assert.True(dictionary.Contains("FluentMotionDurationEmphasized"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationDuration"));
+        Assert.True(dictionary.Contains("FluentMotionConnectedAnimationInitialOpacity"));
         Assert.True(dictionary.Contains("ColorPickerBackground"));
         Assert.True(dictionary.Contains("ColorPickerBorderBrush"));
         Assert.True(dictionary.Contains("ColorPickerForeground"));

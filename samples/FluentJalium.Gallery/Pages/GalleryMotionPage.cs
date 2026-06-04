@@ -40,6 +40,7 @@ internal sealed class GalleryMotionPage
             "FWTransitioningContentControl wraps Jalium content transitions with Fluent motion defaults.",
             CreateContentTransitionSample()));
 
+        panel.Children.Add(CreateMotionTokenStrip());
         panel.Children.Add(examples);
         return panel;
     }
@@ -277,6 +278,65 @@ internal sealed class GalleryMotionPage
                 transitionMode == TransitionMode.LiquidMorph ? FWFluentMaterialKind.LiquidGlass : FWFluentMaterialKind.Acrylic);
             status.Text = $"Current transition: {transitionMode}";
         });
+    }
+
+    private static FWBorder CreateMotionTokenStrip()
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Child = new FWWrapPanel
+            {
+                HorizontalSpacing = 8,
+                VerticalSpacing = 8,
+                Children =
+                {
+                    CreateMotionTokenPill(FluentIconRegular.Timer24, "Fast", "120 ms"),
+                    CreateMotionTokenPill(FluentIconRegular.SlideTransition24, "Normal", "280 ms"),
+                    CreateMotionTokenPill(FluentIconRegular.Connected24, "Connected", "320 ms"),
+                    CreateMotionTokenPill(FluentIconRegular.Gauge24, "Initial opacity", "72%")
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateMotionTokenPill(FluentIconRegular icon, string title, string value)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 6, 10, 6),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(icon, 16, ThemeBrush("TextSecondary")),
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    new FWTextBlock
+                    {
+                        Text = value,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
     }
 
     private static FWBorder CreateMotionExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
