@@ -430,6 +430,13 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialRoleBadgeBrush"));
         Assert.True(dictionary.Contains("FluentMaterialRoleIconBackgroundBrush"));
         Assert.True(dictionary.Contains("FluentMaterialElevationShadowBrush"));
+        Assert.True(dictionary.Contains("MicaBackgroundFillColorBaseBrush"));
+        Assert.True(dictionary.Contains("MicaBackgroundFillColorBaseAltBrush"));
+        Assert.True(dictionary.Contains("LayerOnMicaBaseAltFillColorDefaultBrush"));
+        Assert.True(dictionary.Contains("AcrylicBackgroundFillColorDefaultBrush"));
+        Assert.True(dictionary.Contains("AcrylicInAppFillColorDefaultBrush"));
+        Assert.True(dictionary.Contains("AccentAcrylicBackgroundFillColorDefaultBrush"));
+        Assert.True(dictionary.Contains("AccentAcrylicInAppFillColorDefaultBrush"));
         Assert.True(dictionary.Contains("FluentMaterialMicaTintBrush"));
         Assert.True(dictionary.Contains("FluentMaterialMicaTintOpacity"));
         Assert.True(dictionary.Contains("FluentMaterialMicaBlurRadius"));

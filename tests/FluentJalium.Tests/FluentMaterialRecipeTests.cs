@@ -221,6 +221,36 @@ public sealed class FluentMaterialRecipeTests
     }
 
     [Fact]
+    public void Recipe_ShouldPreferWinUiMaterialAliasTokens()
+    {
+        var micaAlias = new SolidColorBrush(Color.FromArgb(211, 10, 20, 30));
+        var micaAltAlias = new SolidColorBrush(Color.FromArgb(212, 40, 50, 60));
+        var acrylicAlias = new SolidColorBrush(Color.FromArgb(213, 70, 80, 90));
+        var shellPaneAlias = new SolidColorBrush(Color.FromArgb(214, 100, 110, 120));
+        var resources = new ResourceDictionary
+        {
+            ["MicaBackgroundFillColorBaseBrush"] = micaAlias,
+            ["MicaBackgroundFillColorBaseAltBrush"] = micaAltAlias,
+            ["AcrylicBackgroundFillColorDefaultBrush"] = acrylicAlias,
+            ["LayerOnMicaBaseAltFillColorDefaultBrush"] = shellPaneAlias,
+            ["FluentMaterialMicaTintBrush"] = new SolidColorBrush(Color.FromRgb(1, 2, 3)),
+            ["FluentMaterialMicaAltTintBrush"] = new SolidColorBrush(Color.FromRgb(4, 5, 6)),
+            ["FluentMaterialAcrylicTintBrush"] = new SolidColorBrush(Color.FromRgb(7, 8, 9)),
+            ["FluentMaterialShellPaneBrush"] = new SolidColorBrush(Color.FromRgb(10, 11, 12))
+        };
+
+        var mica = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.Mica, resources);
+        var micaAlt = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.MicaAlt, resources);
+        var acrylic = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.Acrylic, resources);
+        var shellPane = FWFluentMaterialSurfaceRecipe.Create(FWFluentMaterialRole.ShellPane, resources);
+
+        Assert.Equal(micaAlias.Color, mica.TintColor);
+        Assert.Equal(micaAltAlias.Color, micaAlt.TintColor);
+        Assert.Equal(acrylicAlias.Color, acrylic.TintColor);
+        Assert.Same(shellPaneAlias, shellPane.Background);
+    }
+
+    [Fact]
     public void Surface_ShouldApplyAcrylicRecipeToBackdropEffect()
     {
         var surface = new FWFluentMaterialSurface();

@@ -379,7 +379,7 @@ public readonly record struct FWFluentMaterialSurfaceRecipe(
             FWFluentMaterialRole.ShellPane => new FWFluentMaterialSurfaceRecipe(
                 role,
                 FWFluentMaterialKind.MicaAlt,
-                ResourceBrush(resources, "FluentMaterialShellPaneBrush", Color.FromRgb(0x2C, 0x2C, 0x2C)),
+                ResourceBrush(resources, ["LayerOnMicaBaseAltFillColorDefaultBrush", "FluentMaterialShellPaneBrush"], Color.FromRgb(0x2C, 0x2C, 0x2C)),
                 ResourceBrush(resources, "FluentMaterialLayerBorderBrush", Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF)),
                 ResourceThickness(resources, "FluentMaterialShellPaneBorderThickness", new Thickness(0, 0, 1, 0)),
                 ResourceCornerRadius(resources, "FluentMaterialShellPaneCornerRadius", new CornerRadius(0)),
@@ -412,7 +412,7 @@ public readonly record struct FWFluentMaterialSurfaceRecipe(
             FWFluentMaterialRole.Flyout => new FWFluentMaterialSurfaceRecipe(
                 role,
                 FWFluentMaterialKind.Acrylic,
-                ResourceBrush(resources, "FluentMaterialTransientAcrylicBrush", Color.FromArgb(0xB0, 0x20, 0x54, 0x8F)),
+                ResourceBrush(resources, ["AcrylicInAppFillColorDefaultBrush", "AcrylicBackgroundFillColorDefaultBrush", "FluentMaterialTransientAcrylicBrush"], Color.FromArgb(0xB0, 0x20, 0x54, 0x8F)),
                 ResourceBrush(resources, "FluentMaterialLayerBorderBrush", Color.FromArgb(0x15, 0xFF, 0xFF, 0xFF)),
                 ResourceThickness(resources, "FluentMaterialFlyoutBorderThickness", new Thickness(1)),
                 ResourceCornerRadius(resources, "FluentMaterialFlyoutCornerRadius", new CornerRadius(8)),
@@ -437,9 +437,22 @@ public readonly record struct FWFluentMaterialSurfaceRecipe(
 
     private static Brush ResourceBrush(ResourceDictionary? resources, string key, Color fallback)
     {
-        if (resources?.TryGetValue(key, out var value) == true && value is Brush brush)
+        return ResourceBrush(resources, [key], fallback);
+    }
+
+    private static Brush ResourceBrush(ResourceDictionary? resources, ReadOnlySpan<string> keys, Color fallback)
+    {
+        if (resources == null)
         {
-            return brush;
+            return new SolidColorBrush(fallback);
+        }
+
+        foreach (var key in keys)
+        {
+            if (resources.TryGetValue(key, out var value) && value is Brush brush)
+            {
+                return brush;
+            }
         }
 
         return new SolidColorBrush(fallback);
@@ -547,7 +560,7 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.Mica => new FWFluentMaterialRecipe(
                 materialKind,
-                ResourceColor(resources, "FluentMaterialMicaTintBrush", Color.FromArgb(180, 20, 84, 145)),
+                ResourceColor(resources, ["MicaBackgroundFillColorBaseBrush", "FluentMaterialMicaTintBrush"], Color.FromArgb(180, 20, 84, 145)),
                 ResourceDouble(resources, "FluentMaterialMicaTintOpacity", 0.18),
                 ResourceDouble(resources, "FluentMaterialMicaBlurRadius", 18),
                 0,
@@ -557,7 +570,7 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.MicaAlt => new FWFluentMaterialRecipe(
                 materialKind,
-                ResourceColor(resources, "FluentMaterialMicaAltTintBrush", Color.FromArgb(190, 20, 84, 145)),
+                ResourceColor(resources, ["MicaBackgroundFillColorBaseAltBrush", "FluentMaterialMicaAltTintBrush"], Color.FromArgb(190, 20, 84, 145)),
                 ResourceDouble(resources, "FluentMaterialMicaAltTintOpacity", 0.26),
                 ResourceDouble(resources, "FluentMaterialMicaAltBlurRadius", 22),
                 0,
@@ -567,7 +580,7 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.Acrylic => new FWFluentMaterialRecipe(
                 materialKind,
-                ResourceColor(resources, "FluentMaterialAcrylicTintBrush", Color.FromArgb(180, 20, 84, 145)),
+                ResourceColor(resources, ["AcrylicBackgroundFillColorDefaultBrush", "AcrylicInAppFillColorDefaultBrush", "FluentMaterialAcrylicTintBrush"], Color.FromArgb(180, 20, 84, 145)),
                 ResourceDouble(resources, "FluentMaterialAcrylicTintOpacity", 0.46),
                 ResourceDouble(resources, "FluentMaterialAcrylicBlurRadius", 28),
                 ResourceDouble(resources, "FluentMaterialAcrylicNoiseIntensity", 0.035),
@@ -601,17 +614,35 @@ public readonly record struct FWFluentMaterialRecipe(
 
     private static Color ResourceColor(ResourceDictionary? resources, string key, Color fallback)
     {
-        if (resources?.TryGetValue(key, out var value) != true)
+        return ResourceColor(resources, [key], fallback);
+    }
+
+    private static Color ResourceColor(ResourceDictionary? resources, ReadOnlySpan<string> keys, Color fallback)
+    {
+        if (resources == null)
         {
             return fallback;
         }
 
-        return value switch
+        foreach (var key in keys)
         {
-            SolidColorBrush brush => brush.Color,
-            Color color => color,
-            _ => fallback
-        };
+            if (resources.TryGetValue(key, out var value))
+            {
+                var resolved = value switch
+                {
+                    SolidColorBrush brush => (Color?)brush.Color,
+                    Color color => color,
+                    _ => null
+                };
+
+                if (resolved.HasValue)
+                {
+                    return resolved.Value;
+                }
+            }
+        }
+
+        return fallback;
     }
 
     private static double ResourceDouble(ResourceDictionary? resources, string key, double fallback)

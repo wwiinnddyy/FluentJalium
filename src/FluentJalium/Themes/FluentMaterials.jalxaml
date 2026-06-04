@@ -55,6 +55,13 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#330078D4" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#66000000" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#B4145491" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#BE145491" />
+            <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FF2C2C2C" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#B020548F" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#B020548F" />
+            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="#B4145491" />
+            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="#B4145491" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -73,6 +80,13 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#220078D4" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#0A000000" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#B4145491" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#BE145491" />
+            <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#CCFFFFFF" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#CCFFFFFF" />
+            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="#B4145491" />
+            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="#B4145491" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -91,6 +105,13 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="#FFFFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

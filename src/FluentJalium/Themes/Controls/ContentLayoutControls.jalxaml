@@ -40,12 +40,12 @@
 
     <Style TargetType="fluent:FWMicaSurface" BasedOn="{StaticResource {x:Type Border}}">
         <Setter Property="MaterialKind" Value="Mica" />
-        <Setter Property="Background" Value="{ThemeResource FluentMaterialShellPaneBrush}" />
+        <Setter Property="Background" Value="{ThemeResource MicaBackgroundFillColorBaseBrush}" />
     </Style>
 
     <Style TargetType="fluent:FWMicaAltSurface" BasedOn="{StaticResource {x:Type Border}}">
         <Setter Property="MaterialKind" Value="MicaAlt" />
-        <Setter Property="Background" Value="{ThemeResource FluentMaterialShellPaneBrush}" />
+        <Setter Property="Background" Value="{ThemeResource LayerOnMicaBaseAltFillColorDefaultBrush}" />
         <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialShellPaneBorderThickness}" />
         <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialShellPaneCornerRadius}" />
         <Setter Property="Padding" Value="{ThemeResource FluentMaterialShellPanePadding}" />
@@ -53,7 +53,7 @@
 
     <Style TargetType="fluent:FWAcrylicSurface" BasedOn="{StaticResource {x:Type Border}}">
         <Setter Property="MaterialKind" Value="Acrylic" />
-        <Setter Property="Background" Value="{ThemeResource FluentMaterialTransientAcrylicBrush}" />
+        <Setter Property="Background" Value="{ThemeResource AcrylicInAppFillColorDefaultBrush}" />
         <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFlyoutBorderThickness}" />
         <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFlyoutCornerRadius}" />
         <Setter Property="Padding" Value="{ThemeResource FluentMaterialFlyoutPadding}" />
@@ -77,7 +77,7 @@
 
     <Style TargetType="fluent:FWFlyoutSurface" BasedOn="{StaticResource {x:Type Border}}">
         <Setter Property="MaterialRole" Value="Flyout" />
-        <Setter Property="Background" Value="{ThemeResource FluentMaterialTransientAcrylicBrush}" />
+        <Setter Property="Background" Value="{ThemeResource AcrylicInAppFillColorDefaultBrush}" />
         <Setter Property="BorderThickness" Value="{ThemeResource FluentMaterialFlyoutBorderThickness}" />
         <Setter Property="CornerRadius" Value="{ThemeResource FluentMaterialFlyoutCornerRadius}" />
         <Setter Property="Padding" Value="{ThemeResource FluentMaterialFlyoutPadding}" />
