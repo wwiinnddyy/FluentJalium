@@ -83,6 +83,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
+            AssertBasedOnStyle<FWScrollBar, ScrollBar>(app.Resources);
             AssertBasedOnStyle<FWScrollViewer, ScrollViewer>(app.Resources);
             AssertBasedOnStyle<FWSwipeControl, SwipeControl>(app.Resources);
             AssertBasedOnStyle<FWGridSplitter, GridSplitter>(app.Resources);
@@ -699,6 +700,7 @@ public sealed class FluentThemeManagerTests
         {
             FluentThemeManager.Apply(app);
 
+            AssertBasedOnStyle<FWScrollBar, ScrollBar>(app.Resources);
             AssertBasedOnStyle<FWScrollViewer, ScrollViewer>(app.Resources);
             AssertBasedOnStyle<FWSwipeControl, SwipeControl>(app.Resources);
             AssertBasedOnStyle<FWGridSplitter, GridSplitter>(app.Resources);
@@ -985,6 +987,7 @@ public sealed class FluentThemeManagerTests
     [Fact]
     public void FluentInteractionControls_ShouldExposeFwPrefixedSurface()
     {
+        AssertFluentControl<FWScrollBar, ScrollBar>();
         AssertFluentControl<FWScrollViewer, ScrollViewer>();
         AssertFluentControl<FWSwipeControl, SwipeControl>();
         AssertFluentControl<FWGridSplitter, GridSplitter>();

@@ -10,6 +10,93 @@ namespace FluentJalium.Tests;
 public sealed class FluentInteractionControlsTests
 {
     [Fact]
+    public void FWInteractionControls_ShouldApplyDensityPresets()
+    {
+        var scrollBar = new FWScrollBar();
+
+        Assert.Equal(FWInteractionDensity.Comfortable, scrollBar.Density);
+        Assert.Equal(12, scrollBar.MinWidth);
+        Assert.Equal(12, scrollBar.MinHeight);
+        Assert.Equal(new Thickness(2), scrollBar.Padding);
+        Assert.Equal(new CornerRadius(6), scrollBar.CornerRadius);
+
+        scrollBar.Density = FWInteractionDensity.Compact;
+
+        Assert.Equal(8, scrollBar.MinWidth);
+        Assert.Equal(8, scrollBar.MinHeight);
+        Assert.Equal(new Thickness(1), scrollBar.Padding);
+        Assert.Equal(new CornerRadius(4), scrollBar.CornerRadius);
+
+        scrollBar.Density = FWInteractionDensity.Spacious;
+
+        Assert.Equal(16, scrollBar.MinWidth);
+        Assert.Equal(16, scrollBar.MinHeight);
+        Assert.Equal(new Thickness(3), scrollBar.Padding);
+        Assert.Equal(new CornerRadius(8), scrollBar.CornerRadius);
+
+        var swipeControl = new FWSwipeControl();
+
+        Assert.Equal(FWInteractionDensity.Comfortable, swipeControl.Density);
+        Assert.Equal(48, swipeControl.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), swipeControl.Padding);
+        Assert.Equal(new CornerRadius(6), swipeControl.CornerRadius);
+
+        swipeControl.Density = FWInteractionDensity.Compact;
+
+        Assert.Equal(40, swipeControl.MinHeight);
+        Assert.Equal(new Thickness(10, 6, 10, 6), swipeControl.Padding);
+        Assert.Equal(new CornerRadius(4), swipeControl.CornerRadius);
+
+        swipeControl.Density = FWInteractionDensity.Spacious;
+
+        Assert.Equal(56, swipeControl.MinHeight);
+        Assert.Equal(new Thickness(16, 12, 16, 12), swipeControl.Padding);
+        Assert.Equal(new CornerRadius(8), swipeControl.CornerRadius);
+
+        var splitter = new FWGridSplitter();
+
+        Assert.Equal(FWInteractionDensity.Comfortable, splitter.Density);
+        Assert.Equal(6, splitter.MinWidth);
+        Assert.Equal(6, splitter.MinHeight);
+
+        splitter.Density = FWInteractionDensity.Compact;
+
+        Assert.Equal(4, splitter.MinWidth);
+        Assert.Equal(4, splitter.MinHeight);
+
+        splitter.Density = FWInteractionDensity.Spacious;
+
+        Assert.Equal(8, splitter.MinWidth);
+        Assert.Equal(8, splitter.MinHeight);
+    }
+
+    [Fact]
+    public void FWScrollBar_ShouldExposeFluentScrollSurfaceState()
+    {
+        var scrollBar = new FWScrollBar
+        {
+            Density = FWInteractionDensity.Compact,
+            Orientation = Orientation.Vertical,
+            Minimum = 0,
+            Maximum = 100,
+            ViewportSize = 20,
+            SmallChange = 4,
+            LargeChange = 16,
+            Value = 40,
+            IsThumbSlim = true
+        };
+
+        Assert.Equal(Orientation.Vertical, scrollBar.Orientation);
+        Assert.Equal(20, scrollBar.ViewportSize);
+        Assert.Equal(4, scrollBar.SmallChange);
+        Assert.Equal(16, scrollBar.LargeChange);
+        Assert.Equal(40, scrollBar.Value);
+        Assert.True(scrollBar.IsThumbSlim);
+        Assert.Equal(FWInteractionDensity.Compact, scrollBar.Density);
+        Assert.Equal(8, scrollBar.MinWidth);
+    }
+
+    [Fact]
     public void FWInteractionControls_ShouldComposeInsideLiquidGlassSurface()
     {
         var scrollContent = new FWStackPanel
@@ -70,6 +157,7 @@ public sealed class FluentInteractionControlsTests
         };
         var splitter = new FWGridSplitter
         {
+            Density = FWInteractionDensity.Comfortable,
             ResizeDirection = GridResizeDirection.Columns,
             ResizeBehavior = GridResizeBehavior.PreviousAndNext,
             ShowsPreview = true,
@@ -130,6 +218,7 @@ public sealed class FluentInteractionControlsTests
         Assert.True(splitter.ShowsPreview);
         Assert.Equal(2, splitter.DragIncrement);
         Assert.Equal(16, splitter.KeyboardIncrement);
+        Assert.Equal(FWInteractionDensity.Comfortable, splitter.Density);
         Assert.Equal(6, splitter.Width);
         Assert.Equal(3, grid.ColumnDefinitions.Count);
         Assert.Equal(2, grid.Children.Count);
