@@ -1,5 +1,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:fluent="https://jalium.dev/fluent"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style TargetType="ToggleButton">
@@ -273,6 +274,74 @@
                 <Setter Property="OffBackground" Value="{ThemeResource ToggleDisabledBackground}" />
                 <Setter TargetName="PART_SwitchThumb" Property="Background" Value="{ThemeResource ToggleSwitchThumbDisabled}" />
             </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWToggleSwitch" BasedOn="{StaticResource {x:Type ToggleSwitch}}">
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWToggleSwitch">
+                <Grid Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Name="PART_TextPanel"
+                                Grid.Column="0"
+                                Orientation="Vertical"
+                                VerticalAlignment="Center"
+                                Margin="0,0,16,0">
+                        <ContentPresenter Name="PART_Header"
+                                          Content="{TemplateBinding Header}"
+                                          Visibility="Collapsed"
+                                          Foreground="{TemplateBinding Foreground}" />
+                        <ContentPresenter Name="PART_Description"
+                                          Content="{TemplateBinding Description}"
+                                          Margin="0,2,0,0"
+                                          Foreground="{ThemeResource TextSecondary}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <Grid Width="44" Height="20">
+                            <Border Name="PART_SwitchTrack"
+                                    Width="44"
+                                    Height="20"
+                                    CornerRadius="10"
+                                    Background="{TemplateBinding OffBackground}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1">
+                                <Border Name="PART_SwitchThumb"
+                                        Width="14"
+                                        Height="14"
+                                        CornerRadius="7"
+                                        Background="{ThemeResource ToggleSwitchThumb}"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Top"
+                                        Margin="3,2,0,0" />
+                            </Border>
+                        </Grid>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Margin="8,0,0,0"
+                                          VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}" />
+                    </StackPanel>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Description" Value="{x:Null}">
+                <Setter TargetName="PART_Description" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="Header" Value="{x:Null}" />
+                    <Condition Property="Description" Value="{x:Null}" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="PART_TextPanel" Property="Visibility" Value="Collapsed" />
+            </MultiTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

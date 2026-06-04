@@ -284,6 +284,11 @@ public static class FluentThemeManager
         where TFluentControl : FrameworkElement, IFluentJaliumControl
         where TJaliumControl : FrameworkElement
     {
+        if (dictionary.Contains(typeof(TFluentControl)))
+        {
+            return;
+        }
+
         if (dictionary.TryGetValue(typeof(TJaliumControl), out var baseStyle) && baseStyle is Style style)
         {
             dictionary[typeof(TFluentControl)] = new Style(typeof(TFluentControl), style);

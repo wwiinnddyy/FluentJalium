@@ -113,6 +113,11 @@ public sealed class FluentSwitchControlsTests
         AssertSetter(toggleSwitchStyle, ToggleSwitch.OffBackgroundProperty);
         AssertSetter(toggleSwitchStyle, FrameworkElement.MinHeightProperty);
 
+        var fluentToggleSwitchStyle = AssertStyle<FWToggleSwitch>(dictionary);
+        Assert.Same(toggleSwitchStyle, fluentToggleSwitchStyle.BasedOn);
+        AssertSetter(fluentToggleSwitchStyle, Control.TemplateProperty);
+        AssertSetter(fluentToggleSwitchStyle, FrameworkElement.MinHeightProperty);
+
         ResetApplicationState();
     }
 
@@ -154,6 +159,7 @@ public sealed class FluentSwitchControlsTests
         var toggleSwitch = new FWToggleSwitch
         {
             Header = "Notifications",
+            Description = "Use the app setting row pattern.",
             OffContent = "Notifications off",
             OnContent = "Notifications on"
         };
@@ -163,6 +169,7 @@ public sealed class FluentSwitchControlsTests
 
         Assert.False(toggleSwitch.IsOn);
         Assert.Equal("Notifications", toggleSwitch.Header);
+        Assert.Equal("Use the app setting row pattern.", toggleSwitch.Description);
         Assert.Equal("Notifications off", toggleSwitch.OffContent);
 
         toggleSwitch.IsOn = true;

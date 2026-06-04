@@ -214,42 +214,14 @@ internal sealed class GallerySwitchesPage
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
             Padding = new Thickness(10),
-            Child = new FWStackPanel
+            Child = new FWToggleSwitch
             {
-                Orientation = Orientation.Horizontal,
-                Spacing = 12,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Width = 280,
-                        Orientation = Orientation.Vertical,
-                        Spacing = 2,
-                        Children =
-                        {
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 13,
-                                Foreground = ThemeBrush("TextPrimary")
-                            },
-                            new FWTextBlock
-                            {
-                                Text = detail,
-                                FontSize = 12,
-                                Foreground = ThemeBrush("TextSecondary"),
-                                TextWrapping = TextWrapping.Wrap
-                            }
-                        }
-                    },
-                    new FWToggleSwitch
-                    {
-                        IsOn = isOn,
-                        OffContent = "Off",
-                        OnContent = "On",
-                        VerticalAlignment = VerticalAlignment.Center
-                    }
-                }
+                Header = title,
+                Description = detail,
+                IsOn = isOn,
+                OffContent = "Off",
+                OnContent = "On",
+                VerticalAlignment = VerticalAlignment.Center
             }
         };
     }
