@@ -1,4 +1,5 @@
 using FluentJalium.Icon;
+using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -458,46 +459,18 @@ internal sealed class GalleryButtonsPage
 
     private static FWBorder CreateButtonExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "Button surfaces" => "<FWButton Content=\"Button\" />\n<FWRepeatButton Content=\"Repeat\" />\n<FWHyperlinkButton Content=\"Hyperlink\" />",
+            "Split command buttons" => "<FWSplitButton Content=\"Split\" />\n<FWToggleSplitButton Content=\"Toggle split\" />\n<FWDropDownButton Content=\"Drop down\" />",
+            "FWCommandBar" => "<FWCommandBar DefaultLabelPosition=\"Bottom\">\n  <FWAppBarButton Label=\"Add\" />\n  <FWAppBarToggleButton Label=\"Pin\" />\n</FWCommandBar>",
+            "FWToolBar and FWToolBarTray" => "<FWToolBarTray>\n  <FWToolBar>\n    <FWButton Content=\"Bold\" />\n  </FWToolBar>\n</FWToolBarTray>",
+            _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWButton Content=\"Command\" />\n</FWFluentMaterialSurface>"
         };
     }
 

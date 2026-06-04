@@ -4,38 +4,21 @@ using Jalium.UI;
 namespace FluentJalium.Gallery.Models;
 
 internal sealed record GalleryPage(
-    string Title,
-    string Description,
-    string Group,
-    FluentIconRegular Icon,
+    GalleryPageInfo Info,
     Func<UIElement> CreateContent,
-    string SearchText,
-    bool IsFooter = false)
+    Func<UIElement>? CreateSampleMetadata = null)
 {
-    public bool MatchesSearch(string searchText)
-    {
-        var query = searchText.Trim();
-        if (query.Length == 0)
-        {
-            return true;
-        }
+    public string Title => Info.Title;
 
-        foreach (var token in query.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-        {
-            if (!ContainsIgnoreCase(Title, token)
-                && !ContainsIgnoreCase(Description, token)
-                && !ContainsIgnoreCase(Group, token)
-                && !ContainsIgnoreCase(SearchText, token))
-            {
-                return false;
-            }
-        }
+    public string Description => Info.Description;
 
-        return true;
-    }
+    public string Group => Info.Group;
 
-    private static bool ContainsIgnoreCase(string value, string query)
-    {
-        return value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
-    }
+    public FluentIconRegular Icon => Info.Icon;
+
+    public GalleryPageStatus Status => Info.Status;
+
+    public bool IsFooter => Info.IsFooter;
+
+    public bool MatchesSearch(string searchText) => Info.MatchesSearch(searchText);
 }
