@@ -58,6 +58,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWTextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="PasswordBox">
         <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -88,6 +92,10 @@
                 <Setter Property="CaretBrush" Value="{ThemeResource TextDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWPasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="NumberBox">
@@ -280,6 +288,10 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWAutoCompleteBox" BasedOn="{StaticResource {x:Type AutoCompleteBox}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="RichTextBox">
         <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -308,5 +320,9 @@
                 <Setter Property="CaretBrush" Value="{ThemeResource TextDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWRichTextBox" BasedOn="{StaticResource {x:Type RichTextBox}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 </ResourceDictionary>
