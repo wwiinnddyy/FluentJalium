@@ -105,6 +105,10 @@ public sealed class FluentSwitchControlsTests
         AssertSetter(toggleButtonStyle, Control.CornerRadiusProperty);
         AssertSetter(toggleButtonStyle, FrameworkElement.MinHeightProperty);
 
+        var fluentToggleButtonStyle = AssertStyle<FWToggleButton>(dictionary);
+        Assert.Same(toggleButtonStyle, fluentToggleButtonStyle.BasedOn);
+        AssertSetter(fluentToggleButtonStyle, FWToggleButton.DensityProperty);
+
         var toggleSwitchStyle = AssertStyle<ToggleSwitch>(dictionary);
         AssertSetter(toggleSwitchStyle, Control.ForegroundProperty);
         AssertSetter(toggleSwitchStyle, Control.BackgroundProperty);
@@ -117,8 +121,46 @@ public sealed class FluentSwitchControlsTests
         Assert.Same(toggleSwitchStyle, fluentToggleSwitchStyle.BasedOn);
         AssertSetter(fluentToggleSwitchStyle, Control.TemplateProperty);
         AssertSetter(fluentToggleSwitchStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(fluentToggleSwitchStyle, Control.PaddingProperty);
+        AssertSetter(fluentToggleSwitchStyle, FWToggleSwitch.DensityProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWSwitchControls_ShouldApplyDensityPresets()
+    {
+        var toggleButton = new FWToggleButton();
+
+        Assert.Equal(FWSwitchDensity.Comfortable, toggleButton.Density);
+        Assert.Equal(32, toggleButton.MinHeight);
+        Assert.Equal(new Thickness(12, 5, 12, 6), toggleButton.Padding);
+
+        toggleButton.Density = FWSwitchDensity.Compact;
+
+        Assert.Equal(30, toggleButton.MinHeight);
+        Assert.Equal(new Thickness(10, 4, 10, 5), toggleButton.Padding);
+
+        toggleButton.Density = FWSwitchDensity.Spacious;
+
+        Assert.Equal(36, toggleButton.MinHeight);
+        Assert.Equal(new Thickness(14, 7, 14, 8), toggleButton.Padding);
+
+        var toggleSwitch = new FWToggleSwitch();
+
+        Assert.Equal(FWSwitchDensity.Comfortable, toggleSwitch.Density);
+        Assert.Equal(44, toggleSwitch.MinHeight);
+        Assert.Equal(new Thickness(10, 8, 10, 8), toggleSwitch.Padding);
+
+        toggleSwitch.Density = FWSwitchDensity.Compact;
+
+        Assert.Equal(40, toggleSwitch.MinHeight);
+        Assert.Equal(new Thickness(8, 6, 8, 6), toggleSwitch.Padding);
+
+        toggleSwitch.Density = FWSwitchDensity.Spacious;
+
+        Assert.Equal(52, toggleSwitch.MinHeight);
+        Assert.Equal(new Thickness(12, 10, 12, 10), toggleSwitch.Padding);
     }
 
     [Fact]
@@ -127,6 +169,7 @@ public sealed class FluentSwitchControlsTests
         var button = new FWToggleButton
         {
             Content = "Switch mode",
+            Density = FWSwitchDensity.Compact,
             IsThreeState = true
         };
         var checkedCount = 0;
@@ -151,6 +194,7 @@ public sealed class FluentSwitchControlsTests
         Assert.False(button.IsChecked);
         Assert.Equal(1, uncheckedCount);
         Assert.Equal("Switch mode", button.Content);
+        Assert.Equal(FWSwitchDensity.Compact, button.Density);
     }
 
     [Fact]
@@ -160,6 +204,7 @@ public sealed class FluentSwitchControlsTests
         {
             Header = "Notifications",
             Description = "Use the app setting row pattern.",
+            Density = FWSwitchDensity.Spacious,
             OffContent = "Notifications off",
             OnContent = "Notifications on"
         };
@@ -170,6 +215,7 @@ public sealed class FluentSwitchControlsTests
         Assert.False(toggleSwitch.IsOn);
         Assert.Equal("Notifications", toggleSwitch.Header);
         Assert.Equal("Use the app setting row pattern.", toggleSwitch.Description);
+        Assert.Equal(FWSwitchDensity.Spacious, toggleSwitch.Density);
         Assert.Equal("Notifications off", toggleSwitch.OffContent);
 
         toggleSwitch.IsOn = true;

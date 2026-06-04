@@ -9,6 +9,7 @@ using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWSwitchDensity = FluentJalium.Controls.FWSwitchDensity;
 using FWToggleButton = FluentJalium.Controls.FWToggleButton;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
@@ -57,6 +58,7 @@ internal sealed class GallerySwitchesPage
         var indeterminate = new FWToggleButton
         {
             Content = CreateButtonContent(FluentIconRegular.Flash24, "Mixed"),
+            Density = FWSwitchDensity.Comfortable,
             IsThreeState = true,
             IsChecked = null
         };
@@ -71,10 +73,10 @@ internal sealed class GallerySwitchesPage
             Children =
             {
                 CreateSwitchButtonRow(
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.DismissCircle24, "Off") },
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.CheckmarkCircle24, "On"), IsChecked = true },
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.DismissCircle24, "Off"), Density = FWSwitchDensity.Compact },
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.CheckmarkCircle24, "On"), Density = FWSwitchDensity.Comfortable, IsChecked = true },
                     indeterminate,
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.Pause24, "Disabled"), IsChecked = true, IsEnabled = false }),
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.Pause24, "Disabled"), Density = FWSwitchDensity.Spacious, IsChecked = true, IsEnabled = false }),
                 CreateSwitchStatus(output)
             }
         };
@@ -91,12 +93,14 @@ internal sealed class GallerySwitchesPage
                 new FWToggleSwitch
                 {
                     Header = "Default",
+                    Density = FWSwitchDensity.Compact,
                     OffContent = "Off",
                     OnContent = "On"
                 },
                 new FWToggleSwitch
                 {
                     Header = "On",
+                    Density = FWSwitchDensity.Comfortable,
                     IsOn = true,
                     OffContent = "Off",
                     OnContent = "On"
@@ -104,6 +108,8 @@ internal sealed class GallerySwitchesPage
                 new FWToggleSwitch
                 {
                     Header = "Status",
+                    Description = "Comfortable settings row",
+                    Density = FWSwitchDensity.Comfortable,
                     IsOn = true,
                     OffContent = "Paused",
                     OnContent = "Running"
@@ -111,6 +117,8 @@ internal sealed class GallerySwitchesPage
                 new FWToggleSwitch
                 {
                     Header = "Disabled",
+                    Description = "Spacious disabled row",
+                    Density = FWSwitchDensity.Spacious,
                     IsOn = true,
                     IsEnabled = false,
                     OffContent = "Off",
@@ -125,14 +133,16 @@ internal sealed class GallerySwitchesPage
         var toggleSwitch = new FWToggleSwitch
         {
             Header = "Live setting",
+            Description = "Cycle density or flip the state.",
+            Density = FWSwitchDensity.Comfortable,
             OffContent = "Notifications off",
             OnContent = "Notifications on"
         };
-        var output = CreateSwitchOutputText("Live setting: off");
+        var output = CreateSwitchOutputText("Live setting: off. Density: comfortable");
 
         toggleSwitch.Toggled += (_, _) =>
         {
-            output.Text = toggleSwitch.IsOn ? "Live setting: on" : "Live setting: off";
+            output.Text = $"Live setting: {(toggleSwitch.IsOn ? "on" : "off")}. Density: {FormatDensity(toggleSwitch.Density)}";
         };
 
         return new FWStackPanel
@@ -145,7 +155,12 @@ internal sealed class GallerySwitchesPage
                 CreateSwitchButtonRow(
                     CreateSwitchActionButton(FluentIconRegular.Play24, "Turn on", () => toggleSwitch.IsOn = true),
                     CreateSwitchActionButton(FluentIconRegular.DismissCircle24, "Turn off", () => toggleSwitch.IsOn = false),
-                    CreateSwitchActionButton(FluentIconRegular.Keyboard24, "Flip", () => toggleSwitch.IsOn = !toggleSwitch.IsOn)),
+                    CreateSwitchActionButton(FluentIconRegular.Keyboard24, "Flip", () => toggleSwitch.IsOn = !toggleSwitch.IsOn),
+                    CreateSwitchActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        toggleSwitch.Density = NextDensity(toggleSwitch.Density);
+                        output.Text = $"Live setting: {(toggleSwitch.IsOn ? "on" : "off")}. Density: {FormatDensity(toggleSwitch.Density)}";
+                    })),
                 CreateSwitchStatus(output)
             }
         };
@@ -177,9 +192,9 @@ internal sealed class GallerySwitchesPage
                 Children =
                 {
                     CreateMaterialHeader(),
-                    CreateMaterialSwitchRow("Mica layer", "Use backdrop-aware surfaces", isOn: true),
-                    CreateMaterialSwitchRow("Acrylic pass", "Show translucent panels", isOn: true),
-                    CreateMaterialSwitchRow("Reduced motion", "Keep state changes calm", isOn: false)
+                    CreateMaterialSwitchRow("Mica layer", "Use backdrop-aware surfaces", FWSwitchDensity.Compact, isOn: true),
+                    CreateMaterialSwitchRow("Acrylic pass", "Show translucent panels", FWSwitchDensity.Comfortable, isOn: true),
+                    CreateMaterialSwitchRow("Reduced motion", "Keep state changes calm", FWSwitchDensity.Spacious, isOn: false)
                 }
             }
         };
@@ -205,7 +220,7 @@ internal sealed class GallerySwitchesPage
         };
     }
 
-    private static FWBorder CreateMaterialSwitchRow(string title, string detail, bool isOn)
+    private static FWBorder CreateMaterialSwitchRow(string title, string detail, FWSwitchDensity density, bool isOn)
     {
         return new FWBorder
         {
@@ -218,6 +233,7 @@ internal sealed class GallerySwitchesPage
             {
                 Header = title,
                 Description = detail,
+                Density = density,
                 IsOn = isOn,
                 OffContent = "Off",
                 OnContent = "On",
@@ -339,6 +355,26 @@ internal sealed class GallerySwitchesPage
             FontSize = 12,
             Foreground = ThemeBrush("TextSecondary"),
             TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static FWSwitchDensity NextDensity(FWSwitchDensity density)
+    {
+        return density switch
+        {
+            FWSwitchDensity.Compact => FWSwitchDensity.Comfortable,
+            FWSwitchDensity.Comfortable => FWSwitchDensity.Spacious,
+            _ => FWSwitchDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWSwitchDensity density)
+    {
+        return density switch
+        {
+            FWSwitchDensity.Compact => "compact",
+            FWSwitchDensity.Spacious => "spacious",
+            _ => "comfortable"
         };
     }
 
