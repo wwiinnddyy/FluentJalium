@@ -74,6 +74,7 @@ public sealed class MainWindow : Window
             Colors: () => CreatePageStack(new GalleryColorsPage().CreateContent()),
             Typography: () => CreatePageStack(new GalleryTypographyPage().CreateContent()),
             Geometry: () => CreatePageStack(new GalleryGeometryPage().CreateContent()),
+            MotionTokens: () => CreatePageStack(new GalleryMotionTokensPage().CreateContent()),
             Buttons: () => CreatePageStack(new GalleryButtonsPage().CreateContent()),
             Switches: () => CreatePageStack(new GallerySwitchesPage().CreateContent()),
             TextInput: () => CreatePageStack(new GalleryTextInputPage().CreateContent()),

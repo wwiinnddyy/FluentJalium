@@ -1,3 +1,4 @@
+using System.Globalization;
 using FluentJalium.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
@@ -295,10 +296,10 @@ internal sealed class GalleryMotionPage
                 VerticalSpacing = 8,
                 Children =
                 {
-                    CreateMotionTokenPill(FluentIconRegular.Timer24, "Fast", "120 ms"),
-                    CreateMotionTokenPill(FluentIconRegular.SlideTransition24, "Normal", "280 ms"),
-                    CreateMotionTokenPill(FluentIconRegular.Connected24, "Connected", "320 ms"),
-                    CreateMotionTokenPill(FluentIconRegular.Gauge24, "Initial opacity", "72%")
+                    CreateMotionTokenPill(FluentIconRegular.Timer24, "Fast", FormatResourceValue("FluentMotionDurationFast")),
+                    CreateMotionTokenPill(FluentIconRegular.SlideTransition24, "Normal", FormatResourceValue("FluentMotionDurationNormal")),
+                    CreateMotionTokenPill(FluentIconRegular.Connected24, "Connected", FormatResourceValue("FluentMotionConnectedAnimationDuration")),
+                    CreateMotionTokenPill(FluentIconRegular.Gauge24, "Initial opacity", FormatPercentResourceValue("FluentMotionConnectedAnimationInitialOpacity"))
                 }
             }
         };
@@ -487,6 +488,47 @@ internal sealed class GalleryMotionPage
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+    }
+
+    private static string FormatPercentResourceValue(string key)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) == true &&
+            double.TryParse(value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var number))
+        {
+            return number.ToString("P0", CultureInfo.InvariantCulture);
+        }
+
+        return FormatResourceValue(key);
+    }
+
+    private static string FormatResourceValue(string key)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) != true)
+        {
+            return "-";
+        }
+
+        return value switch
+        {
+            Duration duration => FormatDuration(duration),
+            TimeSpan timeSpan => FormatTimeSpan(timeSpan),
+            string text => text,
+            double number => number.ToString("0.##", CultureInfo.InvariantCulture),
+            int number => number.ToString(CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? "-"
+        };
+    }
+
+    private static string FormatDuration(Duration duration)
+    {
+        return duration.HasTimeSpan ? FormatTimeSpan(duration.TimeSpan) : duration.ToString();
+    }
+
+    private static string FormatTimeSpan(TimeSpan timeSpan)
+    {
+        return timeSpan.TotalMilliseconds >= 1
+            ? $"{timeSpan.TotalMilliseconds:0} ms"
+            : timeSpan.ToString();
     }
 
     private static Brush ThemeBrush(string key)
