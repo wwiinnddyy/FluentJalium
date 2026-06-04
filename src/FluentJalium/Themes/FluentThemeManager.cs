@@ -40,6 +40,8 @@ public sealed class FluentThemeOptions
 public static class FluentThemeManager
 {
     public const string GenericThemeResourceName = "FluentJalium.Themes.Generic.jalxaml";
+    public const string FluentResourcesResourceName = "FluentJalium.Themes.FluentResources.jalxaml";
+    public const string FluentControlsResourceName = "FluentJalium.Themes.Controls.FluentControls.jalxaml";
 
     private const string ThemeRefreshVersionKey = "__FluentJalium.ThemeVersion";
     private static ResourceDictionary? s_themeDictionary;

@@ -5,51 +5,23 @@
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentResources.jalxaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentResources.jalxaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
-                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentResources.jalxaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentTypography.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ContentLayoutControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/Button.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/TextControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ToggleControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/RangeControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/SelectionControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/VisualControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InteractionControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InputMediaControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/CollectionControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/NavigationControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DisclosureControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/MenuControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DateTimeControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/StatusControls.jalxaml" />
-        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/AdvancedControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentResources.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/FluentControls.jalxaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

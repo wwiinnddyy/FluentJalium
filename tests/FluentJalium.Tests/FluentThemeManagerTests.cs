@@ -477,6 +477,35 @@ public sealed class FluentThemeManagerTests
 
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void AggregatedThemeDictionaries_ShouldLoadResourcesAndControlsIndependently()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        ResourceDictionary.CurrentThemeKey = FluentThemeVariant.Dark.ToString();
+
+        var resources = ResourceDictionary.SourceLoader?.Invoke(
+            new ResourceDictionary(),
+            new Uri("/FluentJalium;component/Themes/FluentResources.jalxaml", UriKind.Relative),
+            FluentThemeManager.ThemeAssembly);
+        var controls = ResourceDictionary.SourceLoader?.Invoke(
+            new ResourceDictionary(),
+            new Uri("/FluentJalium;component/Themes/Controls/FluentControls.jalxaml", UriKind.Relative),
+            FluentThemeManager.ThemeAssembly);
+
+        Assert.NotNull(resources);
+        Assert.NotNull(controls);
+        Assert.Equal("FluentJalium.Themes.FluentResources.jalxaml", FluentThemeManager.FluentResourcesResourceName);
+        Assert.Equal("FluentJalium.Themes.Controls.FluentControls.jalxaml", FluentThemeManager.FluentControlsResourceName);
+        Assert.True(resources!.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(resources.Contains("FluentMotionDurationNormal"));
+        Assert.True(resources.Contains("FluentTitleFontSize"));
+        AssertContainsStyle<Button>(controls!);
+        AssertContainsStyle<NavigationView>(controls);
+        AssertContainsStyle<ContentDialog>(controls);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void ButtonBatch_ShouldExposeFwStylesForButtonAndCommandControls()
     {
         ResetApplicationState();

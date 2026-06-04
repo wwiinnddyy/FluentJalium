@@ -1,0 +1,23 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ContentLayoutControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/Button.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/TextControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ToggleControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/RangeControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/SelectionControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/VisualControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InteractionControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InputMediaControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/CollectionControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/NavigationControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DisclosureControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/MenuControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DateTimeControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/StatusControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/AdvancedControls.jalxaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

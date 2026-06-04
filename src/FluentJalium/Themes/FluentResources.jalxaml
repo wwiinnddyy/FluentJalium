@@ -1,0 +1,39 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast">
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
+                <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentColors.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMaterials.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentGeometry.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentMotion.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentTypography.jalxaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>
