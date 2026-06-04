@@ -690,6 +690,10 @@
         <Setter Property="MinHeight" Value="48" />
     </Style>
 
+    <Style TargetType="fluent:FWCommandBar" BasedOn="{StaticResource {x:Type CommandBar}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ToolBar">
         <Setter Property="Background" Value="{ThemeResource ToolBarBackground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ToolBarBorderBrush}" />
@@ -723,9 +727,17 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWToolBar" BasedOn="{StaticResource {x:Type ToolBar}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ToolBarTray">
         <Setter Property="Background" Value="{ThemeResource ToolBarTrayBackground}" />
         <Setter Property="MinHeight" Value="48" />
+    </Style>
+
+    <Style TargetType="fluent:FWToolBarTray" BasedOn="{StaticResource {x:Type ToolBarTray}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="AppBarButton">

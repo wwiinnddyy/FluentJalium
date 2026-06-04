@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -454,46 +455,19 @@ internal sealed class GalleryDisclosurePage
 
     private static FWBorder CreateDisclosureExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWExpander" => "<FWExpander Header=\"Advanced options\" IsExpanded=\"True\">\n    <FWTextBlock Text=\"Expanded content\" />\n</FWExpander>",
+            "FWGroupBox" => "<FWGroupBox Header=\"Settings\">\n    <FWCheckBox Content=\"Sync group option\" />\n</FWGroupBox>",
+            "FWToolTip" => "<FWButton Content=\"Hover for FWToolTip\">\n    <FWButton.ToolTip>\n        <FWToolTip Placement=\"Top\" />\n    </FWButton.ToolTip>\n</FWButton>",
+            "FWContentDialog" => "<FWContentDialog Title=\"Save gallery changes?\" PrimaryButtonText=\"Save\" SecondaryButtonText=\"Review\" CloseButtonText=\"Cancel\" />",
+            "Material disclosure panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWExpander Header=\"Surface options\" />\n    <FWGroupBox Header=\"Material settings\" />\n</FWFluentMaterialSurface>",
+            _ => "<FWExpander />"
         };
     }
 

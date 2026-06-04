@@ -100,6 +100,10 @@ public sealed class FluentCommandToolbarTests
         AssertSetter(commandBarStyle, Control.ForegroundProperty);
         AssertSetter(commandBarStyle, FrameworkElement.MinHeightProperty);
 
+        var fluentCommandBarStyle = AssertStyle<FWCommandBar>(dictionary);
+        Assert.Equal(typeof(CommandBar), fluentCommandBarStyle.BasedOn?.TargetType);
+        AssertSetter(fluentCommandBarStyle, nameof(FWCommandBar.Density), "Comfortable");
+
         var buttonStyle = AssertStyle<Button>(dictionary);
         AssertSetter(buttonStyle, Control.BackgroundProperty);
         AssertSetter(buttonStyle, Control.BorderBrushProperty);
@@ -151,9 +155,17 @@ public sealed class FluentCommandToolbarTests
         AssertSetter(toolBarStyle, Control.PaddingProperty);
         AssertSetter(toolBarStyle, Control.TemplateProperty);
 
+        var fluentToolBarStyle = AssertStyle<FWToolBar>(dictionary);
+        Assert.Equal(typeof(Jalium.UI.Controls.ToolBar), fluentToolBarStyle.BasedOn?.TargetType);
+        AssertSetter(fluentToolBarStyle, nameof(FWToolBar.Density), "Comfortable");
+
         var toolBarTrayStyle = AssertStyle<ToolBarTray>(dictionary);
         AssertSetter(toolBarTrayStyle, ToolBarTray.BackgroundProperty);
         AssertSetter(toolBarTrayStyle, FrameworkElement.MinHeightProperty);
+
+        var fluentToolBarTrayStyle = AssertStyle<FWToolBarTray>(dictionary);
+        Assert.Equal(typeof(ToolBarTray), fluentToolBarTrayStyle.BasedOn?.TargetType);
+        AssertSetter(fluentToolBarTrayStyle, nameof(FWToolBarTray.Density), "Comfortable");
 
         var appBarButtonStyle = AssertStyle<AppBarButton>(dictionary);
         var fluentAppBarButtonStyle = AssertStyle<FWAppBarButton>(dictionary);
@@ -330,6 +342,44 @@ public sealed class FluentCommandToolbarTests
 
         Assert.Equal(1, separator.Width);
         Assert.Equal(new Thickness(8, 10, 8, 10), separator.Margin);
+    }
+
+    [Fact]
+    public void FWCommandContainers_ShouldApplyDensityPresets()
+    {
+        var commandBar = new FWCommandBar();
+
+        Assert.Equal(FWCommandSurfaceDensity.Comfortable, commandBar.Density);
+        Assert.Equal(48, commandBar.MinHeight);
+        Assert.Equal(new Thickness(6, 4, 6, 4), commandBar.Padding);
+
+        commandBar.Density = FWCommandSurfaceDensity.Compact;
+
+        Assert.Equal(40, commandBar.MinHeight);
+        Assert.Equal(new Thickness(4, 2, 4, 2), commandBar.Padding);
+
+        commandBar.Density = FWCommandSurfaceDensity.Spacious;
+
+        Assert.Equal(56, commandBar.MinHeight);
+        Assert.Equal(new Thickness(8, 6, 8, 6), commandBar.Padding);
+
+        var toolBar = new FWToolBar
+        {
+            Density = FWCommandSurfaceDensity.Spacious
+        };
+
+        Assert.Equal(56, toolBar.MinHeight);
+        Assert.Equal(new Thickness(8, 6, 8, 6), toolBar.Padding);
+        Assert.NotNull(toolBar.ItemsPanel);
+
+        var tray = new FWToolBarTray();
+
+        Assert.Equal(FWCommandSurfaceDensity.Comfortable, tray.Density);
+        Assert.Equal(48, tray.MinHeight);
+
+        tray.Density = FWCommandSurfaceDensity.Compact;
+
+        Assert.Equal(40, tray.MinHeight);
     }
 
     [Fact]

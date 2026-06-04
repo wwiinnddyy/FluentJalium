@@ -15,6 +15,16 @@ public enum FWButtonDensity
 }
 
 /// <summary>
+/// FluentJalium density presets for command containers.
+/// </summary>
+public enum FWCommandSurfaceDensity
+{
+    Compact,
+    Comfortable,
+    Spacious
+}
+
+/// <summary>
 /// FluentJalium Button control.
 /// </summary>
 public class FWButton : Button, IFluentJaliumControl
@@ -190,6 +200,46 @@ public class FWSplitButton : SplitButton, IFluentJaliumControl
 /// </summary>
 public class FWCommandBar : CommandBar, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWCommandSurfaceDensity), typeof(FWCommandBar),
+            new PropertyMetadata(FWCommandSurfaceDensity.Comfortable, OnDensityChanged));
+
+    public FWCommandBar()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWCommandSurfaceDensity Density
+    {
+        get => (FWCommandSurfaceDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    internal static (double MinHeight, Thickness Padding) GetDensityMetrics(FWCommandSurfaceDensity density)
+    {
+        return density switch
+        {
+            FWCommandSurfaceDensity.Compact => (40.0, new Thickness(4, 2, 4, 2)),
+            FWCommandSurfaceDensity.Spacious => (56.0, new Thickness(8, 6, 8, 6)),
+            _ => (48.0, new Thickness(6, 4, 6, 4))
+        };
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWCommandBar commandBar && e.NewValue is FWCommandSurfaceDensity density)
+        {
+            ApplyDensity(commandBar, density);
+        }
+    }
+
+    private static void ApplyDensity(FWCommandBar commandBar, FWCommandSurfaceDensity density)
+    {
+        var (minHeight, padding) = GetDensityMetrics(density);
+        commandBar.MinHeight = minHeight;
+        commandBar.Padding = padding;
+    }
 }
 
 /// <summary>
@@ -403,6 +453,10 @@ public class FWAppBarSeparator : AppBarSeparator, IFluentJaliumControl
 /// </summary>
 public class FWToolBar : Jalium.UI.Controls.ToolBar, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWCommandSurfaceDensity), typeof(FWToolBar),
+            new PropertyMetadata(FWCommandSurfaceDensity.Comfortable, OnDensityChanged));
+
     /// <summary>
     /// Initializes a new instance of the <see cref="FWToolBar"/> class.
     /// </summary>
@@ -412,6 +466,29 @@ public class FWToolBar : Jalium.UI.Controls.ToolBar, IFluentJaliumControl
         template.SetVisualTree(() => new StackPanel { Orientation = Orientation.Horizontal });
         template.Seal();
         ItemsPanel = template;
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWCommandSurfaceDensity Density
+    {
+        get => (FWCommandSurfaceDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWToolBar toolBar && e.NewValue is FWCommandSurfaceDensity density)
+        {
+            ApplyDensity(toolBar, density);
+        }
+    }
+
+    private static void ApplyDensity(FWToolBar toolBar, FWCommandSurfaceDensity density)
+    {
+        var (minHeight, padding) = FWCommandBar.GetDensityMetrics(density);
+        toolBar.MinHeight = minHeight;
+        toolBar.Padding = padding;
     }
 }
 
@@ -420,4 +497,37 @@ public class FWToolBar : Jalium.UI.Controls.ToolBar, IFluentJaliumControl
 /// </summary>
 public class FWToolBarTray : Jalium.UI.Controls.ToolBarTray, IFluentJaliumControl
 {
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWCommandSurfaceDensity), typeof(FWToolBarTray),
+            new PropertyMetadata(FWCommandSurfaceDensity.Comfortable, OnDensityChanged));
+
+    public FWToolBarTray()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWCommandSurfaceDensity Density
+    {
+        get => (FWCommandSurfaceDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWToolBarTray tray && e.NewValue is FWCommandSurfaceDensity density)
+        {
+            ApplyDensity(tray, density);
+        }
+    }
+
+    private static void ApplyDensity(FWToolBarTray tray, FWCommandSurfaceDensity density)
+    {
+        tray.MinHeight = density switch
+        {
+            FWCommandSurfaceDensity.Compact => 40.0,
+            FWCommandSurfaceDensity.Spacious => 56.0,
+            _ => 48.0
+        };
+    }
 }
