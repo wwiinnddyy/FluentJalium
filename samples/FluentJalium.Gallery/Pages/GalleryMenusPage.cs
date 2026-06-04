@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -678,46 +679,21 @@ internal sealed class GalleryMenusPage
 
     private static FWBorder CreateMenuExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWMenuBar" => "<FWMenuBar>\n    <FWMenuBarItem Title=\"File\" />\n    <FWMenuBarItem Title=\"Edit\" />\n</FWMenuBar>",
+            "FWMenu and FWMenuItem" => "<FWMenu>\n    <FWMenuItem Header=\"Project\">\n        <FWMenuItem Header=\"Build\" InputGestureText=\"Ctrl+B\" />\n    </FWMenuItem>\n</FWMenu>",
+            "FWContextMenu" => "<FWBorder>\n    <FWBorder.ContextMenu>\n        <FWContextMenu Placement=\"Bottom\" />\n    </FWBorder.ContextMenu>\n</FWBorder>",
+            "FWMenuFlyout" => "<FWDropDownButton Content=\"Actions\">\n    <FWDropDownButton.Flyout>\n        <FWMenuFlyout />\n    </FWDropDownButton.Flyout>\n</FWDropDownButton>",
+            "FWMenuFlyoutSubItem" => "<FWMenuFlyoutSubItem Text=\"Export\">\n    <FWMenuFlyoutItem Text=\"PDF document\" />\n</FWMenuFlyoutSubItem>",
+            "FWCommandBarFlyout" => "<FWCommandBarFlyout AlwaysExpanded=\"True\">\n    <FWAppBarButton Label=\"Copy\" />\n</FWCommandBarFlyout>",
+            "Material menu workbench" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWMenuBar />\n    <FWCommandBarFlyout />\n</FWFluentMaterialSurface>",
+            _ => "<FWMenuFlyout />"
         };
     }
 
