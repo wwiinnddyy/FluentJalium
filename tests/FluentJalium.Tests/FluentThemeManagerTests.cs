@@ -396,6 +396,15 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("ContentSurfaceBackground"));
         Assert.True(dictionary.Contains("ContentSurfaceBorderBrush"));
         Assert.True(dictionary.Contains("ContentPanelBackground"));
+        Assert.True(dictionary.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialShellPaneBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialContentLayerBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialTransientAcrylicBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialFocusedGlassBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialLayerBorderBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialRoleBadgeBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialRoleIconBackgroundBrush"));
+        Assert.True(dictionary.Contains("FluentMaterialElevationShadowBrush"));
         Assert.True(dictionary.Contains("ColorPickerBackground"));
         Assert.True(dictionary.Contains("ColorPickerBorderBrush"));
         Assert.True(dictionary.Contains("ColorPickerForeground"));

@@ -149,22 +149,26 @@ internal sealed class GalleryMaterialsPage
                     FluentIconRegular.WindowBrush24,
                     "Window shell",
                     "SystemBackdrop",
-                    "Mica, Mica Alt, and Acrylic belong on the Window so the app frame carries depth."),
+                    "Mica, Mica Alt, and Acrylic belong on the Window so the app frame carries depth.",
+                    ThemeBrush("FluentMaterialWindowBackdropBrush")),
                 CreateMaterialRoleTile(
                     FluentIconRegular.LayerDiagonal24,
                     "Content layer",
                     "Layer fill",
-                    "Default pages and cards use opaque layer brushes, borders, and compact elevation."),
+                    "Default pages and cards use opaque layer brushes, borders, and compact elevation.",
+                    ThemeBrush("FluentMaterialContentLayerBrush")),
                 CreateMaterialRoleTile(
                     FluentIconRegular.Drop24,
                     "Transient surface",
                     "Acrylic",
-                    "Flyouts, menus, and teaching UI can use acrylic blur when content behind remains readable."),
+                    "Flyouts, menus, and teaching UI can use acrylic blur when content behind remains readable.",
+                    ThemeBrush("FluentMaterialTransientAcrylicBrush")),
                 CreateMaterialRoleTile(
                     FluentIconRegular.Glasses24,
                     "Focused element",
                     "LiquidGlass",
-                    "Jalium HLSL surfaces are reserved for expressive controls that need refraction and highlight.")
+                    "Jalium HLSL surfaces are reserved for expressive controls that need refraction and highlight.",
+                    ThemeBrush("FluentMaterialFocusedGlassBrush"))
             }
         };
     }
@@ -182,14 +186,14 @@ internal sealed class GalleryMaterialsPage
         return preview;
     }
 
-    private static FWBorder CreateMaterialRoleTile(FluentIconRegular icon, string title, string role, string description)
+    private static FWBorder CreateMaterialRoleTile(FluentIconRegular icon, string title, string role, string description, Brush background)
     {
         var iconFrame = new FWBorder
         {
             Width = 30,
             Height = 30,
-            Background = ThemeBrush("SubtleFillColorSecondaryBrush"),
-            BorderBrush = ThemeBrush("ControlBorder"),
+            Background = ThemeBrush("FluentMaterialRoleIconBackgroundBrush"),
+            BorderBrush = ThemeBrush("FluentMaterialLayerBorderBrush"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
             Child = CreateIcon(icon, 18, ThemeBrush("TextPrimary"))
@@ -216,7 +220,7 @@ internal sealed class GalleryMaterialsPage
                         },
                         new FWBorder
                         {
-                            Background = ThemeBrush("SelectionBackgroundWeak"),
+                            Background = ThemeBrush("FluentMaterialRoleBadgeBrush"),
                             CornerRadius = new CornerRadius(4),
                             Padding = new Thickness(6, 2, 6, 2),
                             Child = new FWTextBlock
@@ -242,8 +246,8 @@ internal sealed class GalleryMaterialsPage
 
         return new FWBorder
         {
-            Background = ThemeBrush("LayerFillColorDefaultBrush"),
-            BorderBrush = ThemeBrush("ControlBorder"),
+            Background = background,
+            BorderBrush = ThemeBrush("FluentMaterialLayerBorderBrush"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(12),
