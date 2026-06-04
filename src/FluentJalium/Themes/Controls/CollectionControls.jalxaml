@@ -1142,4 +1142,8 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <Style TargetType="fluent:FWPropertyGrid" BasedOn="{StaticResource {x:Type PropertyGrid}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
 </ResourceDictionary>

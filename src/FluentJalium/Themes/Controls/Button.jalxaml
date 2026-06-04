@@ -9,7 +9,11 @@
         <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource FluentControlBorderThickness}" />
         <Setter Property="Padding" Value="12,5,12,6" />
-        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="CornerRadius">
+            <Setter.Value>
+                <CornerRadius>4</CornerRadius>
+            </Setter.Value>
+        </Setter>
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Setter Property="MinWidth" Value="64" />
@@ -61,7 +65,11 @@
         <Setter Property="BorderBrush" Value="{ThemeResource AccentControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource FluentControlBorderThickness}" />
         <Setter Property="Padding" Value="12,5,12,6" />
-        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="CornerRadius">
+            <Setter.Value>
+                <CornerRadius>4</CornerRadius>
+            </Setter.Value>
+        </Setter>
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Setter Property="MinWidth" Value="64" />
@@ -112,7 +120,11 @@
         <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource FluentControlBorderThickness}" />
         <Setter Property="Padding" Value="8,4,8,4" />
-        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="CornerRadius">
+            <Setter.Value>
+                <CornerRadius>4</CornerRadius>
+            </Setter.Value>
+        </Setter>
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="Template">
             <ControlTemplate TargetType="RepeatButton">
@@ -188,7 +200,11 @@
         <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}" />
         <Setter Property="BorderThickness" Value="{StaticResource FluentControlBorderThickness}" />
         <Setter Property="Padding" Value="12,5,10,6" />
-        <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+        <Setter Property="CornerRadius">
+            <Setter.Value>
+                <CornerRadius>4</CornerRadius>
+            </Setter.Value>
+        </Setter>
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Setter Property="MinWidth" Value="72" />

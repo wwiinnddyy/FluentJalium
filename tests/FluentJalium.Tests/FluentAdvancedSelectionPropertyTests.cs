@@ -106,6 +106,10 @@ public sealed class FluentAdvancedSelectionPropertyTests
         AssertSetter(propertyGridStyle, PropertyGrid.PropertyNameForegroundProperty);
         AssertSetter(propertyGridStyle, Control.TemplateProperty);
 
+        var fwPropertyGridStyle = AssertStyle<FWPropertyGrid>(dictionary);
+        Assert.Same(propertyGridStyle, fwPropertyGridStyle.BasedOn);
+        AssertSetter(fwPropertyGridStyle, FWPropertyGrid.DensityProperty);
+
         Assert.True(dictionary.TryGetValue("PropertyGridToolbarButtonStyle", out var toolbarButtonStyle));
         Assert.IsType<Style>(toolbarButtonStyle);
         Assert.True(dictionary.TryGetValue("PropertyGridCategoryExpanderStyle", out var categoryStyle));
@@ -205,6 +209,23 @@ public sealed class FluentAdvancedSelectionPropertyTests
     }
 
     [Fact]
+    public void FWPropertyGrid_ShouldApplyDensityPresets()
+    {
+        var grid = new FWPropertyGrid();
+
+        Assert.Equal(FWPropertyGridDensity.Comfortable, grid.Density);
+        Assert.Equal(150, grid.NameColumnWidth);
+
+        grid.Density = FWPropertyGridDensity.Compact;
+
+        Assert.Equal(128, grid.NameColumnWidth);
+
+        grid.Density = FWPropertyGridDensity.Spacious;
+
+        Assert.Equal(176, grid.NameColumnWidth);
+    }
+
+    [Fact]
     [RequiresUnreferencedCode("Discovers sample properties through PropertyGrid reflection.")]
     public void FWPropertyGrid_ShouldExposeObjectEditingModesAndEvents()
     {
@@ -218,7 +239,7 @@ public sealed class FluentAdvancedSelectionPropertyTests
             ShowToolBar = true,
             SearchText = "layout",
             IsReadOnly = true,
-            NameColumnWidth = 160
+            Density = FWPropertyGridDensity.Spacious
         };
         grid.RegisterCustomEditor(typeof(string), (_, _) => new FWTextBox());
 
@@ -243,7 +264,7 @@ public sealed class FluentAdvancedSelectionPropertyTests
         Assert.False(grid.ShowToolBar);
         Assert.Equal("layout", grid.SearchText);
         Assert.False(grid.IsReadOnly);
-        Assert.Equal(160.0, grid.NameColumnWidth);
+        Assert.Equal(176.0, grid.NameColumnWidth);
         Assert.Same(selectedProperty, grid.SelectedProperty);
         Assert.Equal(1, selectedEvents);
     }
@@ -273,7 +294,7 @@ public sealed class FluentAdvancedSelectionPropertyTests
             ShowSearchBox = true,
             ShowDescription = true,
             ShowToolBar = false,
-            NameColumnWidth = 144,
+            Density = FWPropertyGridDensity.Compact,
             IsReadOnly = true
         };
 
@@ -301,7 +322,7 @@ public sealed class FluentAdvancedSelectionPropertyTests
         Assert.True(grid.ShowDescription);
         Assert.False(grid.ShowToolBar);
         Assert.True(grid.IsReadOnly);
-        Assert.Equal(144, grid.NameColumnWidth);
+        Assert.Equal(128, grid.NameColumnWidth);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.Equal(70, surface.RefractionAmount);
         Assert.Equal(0.42, surface.ChromaticAberration);

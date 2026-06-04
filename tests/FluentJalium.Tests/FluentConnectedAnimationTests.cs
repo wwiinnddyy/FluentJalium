@@ -2,6 +2,7 @@ using FluentJalium.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media.Animation;
+using AnimationDuration = Jalium.UI.Media.Animation.Duration;
 
 namespace FluentJalium.Tests;
 
@@ -43,7 +44,7 @@ public sealed class FluentConnectedAnimationTests
     {
         var resources = new ResourceDictionary
         {
-            ["FluentMotionConnectedAnimationDuration"] = new Duration(TimeSpan.FromMilliseconds(460)),
+            ["FluentMotionConnectedAnimationDuration"] = new AnimationDuration(TimeSpan.FromMilliseconds(460)),
             ["FluentMotionConnectedAnimationInitialOpacity"] = "0.58"
         };
 
@@ -62,7 +63,7 @@ public sealed class FluentConnectedAnimationTests
     {
         var resources = new ResourceDictionary
         {
-            ["FluentMotionConnectedAnimationDuration"] = Duration.Automatic,
+            ["FluentMotionConnectedAnimationDuration"] = AnimationDuration.Automatic,
             ["FluentMotionConnectedAnimationInitialOpacity"] = "not-a-number"
         };
 
