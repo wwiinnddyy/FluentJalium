@@ -1,4 +1,5 @@
 using System.Globalization;
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -405,46 +406,19 @@ internal sealed class GalleryTextInputPage
 
     private static FWBorder CreateTextInputExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWTextBox" => "<FWTextBox PlaceholderText=\"Enter text\" />\n<FWTextBox AcceptsReturn=\"True\" TextWrapping=\"Wrap\" />",
+            "FWPasswordBox and FWNumberBox" => "<FWPasswordBox RevealMode=\"Visible\" PlaceholderText=\"Password\" />\n<FWNumberBox Minimum=\"0\" Maximum=\"100\" Value=\"42\" SpinButtonPlacementMode=\"Inline\" />",
+            "FWAutoCompleteBox" => "<FWAutoCompleteBox ItemsSource=\"{Binding SearchItems}\" FilterMode=\"Contains\" MinimumPrefixLength=\"1\" />",
+            "FWRichTextBox" => "<FWRichTextBox AcceptsTab=\"True\" IsSpellCheckEnabled=\"True\" />",
+            "Material input panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWTextBox PlaceholderText=\"Search FluentJalium\" />\n</FWFluentMaterialSurface>",
+            _ => "<FWTextBox />"
         };
     }
 

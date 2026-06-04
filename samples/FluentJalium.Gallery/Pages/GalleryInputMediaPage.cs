@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -488,46 +489,19 @@ internal sealed class GalleryInputMediaPage
 
     private static FWBorder CreateInputMediaExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWColorPicker" => "<FWColorPicker Color=\"#0078D4\" IsAlphaEnabled=\"True\" IsHexInputVisible=\"True\" />",
+            "FWInkCanvas" => "<FWInkCanvas EditingMode=\"Ink\" DefaultStrokeTaperMode=\"TaperedEnd\" />",
+            "FWInkPresenter" => "<FWInkPresenter Strokes=\"{Binding Strokes}\" />",
+            "FWMediaElement" => "<FWMediaElement LoadedBehavior=\"Manual\" Stretch=\"Uniform\" ScrubbingEnabled=\"True\" />",
+            "Material input and media workbench" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWColorPicker IsCompact=\"True\" />\n    <FWInkCanvas />\n</FWFluentMaterialSurface>",
+            _ => "<FWColorPicker />"
         };
     }
 
