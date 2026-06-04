@@ -39,11 +39,15 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ListBoxItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Padding" Value="8,6,8,6" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="14,6,12,6" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
@@ -103,12 +107,17 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ListView">
         <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="3" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
         <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
         <Setter Property="Template">
@@ -133,7 +142,7 @@
                                         Orientation="Horizontal" />
                         </Border>
                         <ScrollViewer Grid.Row="1"
-                                      Margin="3"
+                                      Margin="{TemplateBinding Padding}"
                                       VerticalScrollBarVisibility="Auto"
                                       HorizontalScrollBarVisibility="Auto">
                             <ItemsPresenter />
@@ -154,11 +163,15 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWListView" BasedOn="{StaticResource {x:Type ListView}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="ListViewItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Padding" Value="8,5,8,5" />
-        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Padding" Value="14,6,12,6" />
+        <Setter Property="MinHeight" Value="40" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
@@ -197,6 +210,10 @@
                 <Setter Property="Background" Value="Transparent" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="GridViewColumnHeader">
@@ -276,7 +293,8 @@
     <Style TargetType="TreeViewItem">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-        <Setter Property="Padding" Value="8,5,8,5" />
+        <Setter Property="Padding" Value="10,5,10,5" />
+        <Setter Property="MinHeight" Value="28" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate TargetType="TreeViewItem">
@@ -284,7 +302,7 @@
                     <Border Name="PART_HeaderBorder"
                             Background="{TemplateBinding Background}"
                             CornerRadius="4"
-                            MinHeight="32">
+                            MinHeight="{TemplateBinding MinHeight}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -345,6 +363,14 @@
                 <Setter TargetName="PART_ExpanderArrow" Property="Fill" Value="{ThemeResource TextDisabled}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWTreeView" BasedOn="{StaticResource {x:Type TreeView}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
+    <Style TargetType="fluent:FWTreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+        <Setter Property="Density" Value="Comfortable" />
     </Style>
 
     <Style TargetType="DataGrid">

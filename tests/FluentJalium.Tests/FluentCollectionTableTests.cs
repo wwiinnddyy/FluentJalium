@@ -91,11 +91,17 @@ public sealed class FluentCollectionTableTests
 
         AssertContainsStyle<ListBox>(dictionary);
         AssertContainsStyle<ListBoxItem>(dictionary);
+        AssertContainsStyle<FWListBox>(dictionary);
+        AssertContainsStyle<FWListBoxItem>(dictionary);
         AssertContainsStyle<ListView>(dictionary);
         AssertContainsStyle<ListViewItem>(dictionary);
+        AssertContainsStyle<FWListView>(dictionary);
+        AssertContainsStyle<FWListViewItem>(dictionary);
         AssertContainsStyle<GridViewColumnHeader>(dictionary);
         AssertContainsStyle<TreeView>(dictionary);
         AssertContainsStyle<TreeViewItem>(dictionary);
+        AssertContainsStyle<FWTreeView>(dictionary);
+        AssertContainsStyle<FWTreeViewItem>(dictionary);
         AssertContainsStyle<DataGrid>(dictionary);
         AssertContainsStyle<DataGridRow>(dictionary);
         AssertContainsStyle<DataGridCell>(dictionary);
@@ -116,6 +122,36 @@ public sealed class FluentCollectionTableTests
         var fwDataGridStyle = AssertStyle<FWDataGrid>(dictionary);
         Assert.Same(dataGridStyle, fwDataGridStyle.BasedOn);
         AssertSetter(fwDataGridStyle, FWDataGrid.DensityProperty);
+
+        var listBoxStyle = AssertStyle<ListBox>(dictionary);
+        var fwListBoxStyle = AssertStyle<FWListBox>(dictionary);
+        Assert.Same(listBoxStyle, fwListBoxStyle.BasedOn);
+        AssertSetter(fwListBoxStyle, FWListBox.DensityProperty);
+
+        var listBoxItemStyle = AssertStyle<ListBoxItem>(dictionary);
+        var fwListBoxItemStyle = AssertStyle<FWListBoxItem>(dictionary);
+        Assert.Same(listBoxItemStyle, fwListBoxItemStyle.BasedOn);
+        AssertSetter(fwListBoxItemStyle, FWListBoxItem.DensityProperty);
+
+        var listViewStyle = AssertStyle<ListView>(dictionary);
+        var fwListViewStyle = AssertStyle<FWListView>(dictionary);
+        Assert.Same(listViewStyle, fwListViewStyle.BasedOn);
+        AssertSetter(fwListViewStyle, FWListView.DensityProperty);
+
+        var listViewItemStyle = AssertStyle<ListViewItem>(dictionary);
+        var fwListViewItemStyle = AssertStyle<FWListViewItem>(dictionary);
+        Assert.Same(listViewItemStyle, fwListViewItemStyle.BasedOn);
+        AssertSetter(fwListViewItemStyle, FWListViewItem.DensityProperty);
+
+        var treeViewStyle = AssertStyle<TreeView>(dictionary);
+        var fwTreeViewStyle = AssertStyle<FWTreeView>(dictionary);
+        Assert.Same(treeViewStyle, fwTreeViewStyle.BasedOn);
+        AssertSetter(fwTreeViewStyle, FWTreeView.DensityProperty);
+
+        var treeViewItemStyle = AssertStyle<TreeViewItem>(dictionary);
+        var fwTreeViewItemStyle = AssertStyle<FWTreeViewItem>(dictionary);
+        Assert.Same(treeViewItemStyle, fwTreeViewItemStyle.BasedOn);
+        AssertSetter(fwTreeViewItemStyle, FWTreeViewItem.DensityProperty);
 
         var treeDataGridStyle = AssertStyle<TreeDataGrid>(dictionary);
         AssertSetter(treeDataGridStyle, Control.BackgroundProperty);
@@ -144,6 +180,58 @@ public sealed class FluentCollectionTableTests
         Assert.IsType<FWListViewItem>(listView.CreateContainer("ListView item"));
         Assert.IsType<FWTreeViewItem>(treeView.CreateContainer("Tree root"));
         Assert.IsType<FWTreeViewItem>(treeItem.CreateContainer("Tree child"));
+    }
+
+    [Fact]
+    public void FWCollections_ShouldApplyDensityPresetsAndCreateMatchingContainers()
+    {
+        var listBox = new TestListBox();
+
+        Assert.Equal(FWCollectionDensity.Comfortable, listBox.Density);
+        Assert.Equal(new Thickness(3), listBox.Padding);
+
+        var comfortableListBoxItem = Assert.IsType<FWListBoxItem>(listBox.CreateContainer("Comfortable item"));
+        Assert.Equal(FWCollectionDensity.Comfortable, comfortableListBoxItem.Density);
+        Assert.Equal(40, comfortableListBoxItem.MinHeight);
+        Assert.Equal(new Thickness(14, 6, 12, 6), comfortableListBoxItem.Padding);
+
+        listBox.Density = FWCollectionDensity.Compact;
+
+        Assert.Equal(new Thickness(2), listBox.Padding);
+
+        var compactListBoxItem = Assert.IsType<FWListBoxItem>(listBox.CreateContainer("Compact item"));
+        Assert.Equal(FWCollectionDensity.Compact, compactListBoxItem.Density);
+        Assert.Equal(32, compactListBoxItem.MinHeight);
+        Assert.Equal(new Thickness(10, 4, 10, 4), compactListBoxItem.Padding);
+
+        var listView = new TestListView
+        {
+            Density = FWCollectionDensity.Spacious
+        };
+
+        Assert.Equal(new Thickness(4), listView.Padding);
+
+        var spaciousListViewItem = Assert.IsType<FWListViewItem>(listView.CreateContainer("Spacious item"));
+        Assert.Equal(FWCollectionDensity.Spacious, spaciousListViewItem.Density);
+        Assert.Equal(48, spaciousListViewItem.MinHeight);
+        Assert.Equal(new Thickness(16, 8, 16, 8), spaciousListViewItem.Padding);
+
+        var treeView = new TestTreeView
+        {
+            Density = FWCollectionDensity.Spacious
+        };
+
+        Assert.Equal(new Thickness(4), treeView.Padding);
+
+        var spaciousTreeItem = Assert.IsType<FWTreeViewItem>(treeView.CreateContainer("Tree item"));
+        Assert.Equal(FWCollectionDensity.Spacious, spaciousTreeItem.Density);
+        Assert.Equal(36, spaciousTreeItem.MinHeight);
+        Assert.Equal(new Thickness(12, 7, 12, 7), spaciousTreeItem.Padding);
+
+        spaciousTreeItem.Density = FWCollectionDensity.Compact;
+
+        Assert.Equal(24, spaciousTreeItem.MinHeight);
+        Assert.Equal(new Thickness(8, 3, 8, 3), spaciousTreeItem.Padding);
     }
 
     [Fact]
