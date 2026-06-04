@@ -5,6 +5,7 @@ using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCalendar = FluentJalium.Controls.FWCalendar;
+using FWDateTimePickerDensity = FluentJalium.Controls.FWDateTimePickerDensity;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
@@ -63,7 +64,7 @@ internal sealed class GalleryDateTimePage
         var datePicker = new FWDatePicker
         {
             Header = "Appointment date",
-            Width = 260,
+            Density = FWDateTimePickerDensity.Comfortable,
             PlaceholderText = "Pick a date",
             DisplayDateStart = today.AddDays(-14),
             DisplayDateEnd = today.AddDays(45),
@@ -97,6 +98,11 @@ internal sealed class GalleryDateTimePage
                         datePicker.SelectedDateFormat = DatePickerFormat.Long;
                         output.Text = "SelectedDateFormat: Long";
                     }),
+                    CreateDateTimeActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        datePicker.Density = NextDensity(datePicker.Density);
+                        output.Text = $"DatePicker density: {FormatDensity(datePicker.Density)}";
+                    }),
                     CreateDateTimeActionButton(FluentIconRegular.ChevronDown24, "Flyout", () => datePicker.IsDropDownOpen = !datePicker.IsDropDownOpen)),
                 CreateDateTimeStatus(output)
             }
@@ -109,7 +115,7 @@ internal sealed class GalleryDateTimePage
         var timePicker = new FWTimePicker
         {
             Header = "Arrival time",
-            Width = 220,
+            Density = FWDateTimePickerDensity.Comfortable,
             PlaceholderText = "Pick a time",
             SelectedTime = new TimeSpan(10, 30, 0),
             MinuteIncrement = 15
@@ -143,6 +149,11 @@ internal sealed class GalleryDateTimePage
                     {
                         timePicker.MinuteIncrement = 15;
                         output.Text = "MinuteIncrement: 15";
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        timePicker.Density = NextDensity(timePicker.Density);
+                        output.Text = $"TimePicker density: {FormatDensity(timePicker.Density)}";
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.ChevronDown24, "Flyout", () => timePicker.IsDropDownOpen = !timePicker.IsDropDownOpen)),
                 CreateDateTimeStatus(output)
@@ -254,11 +265,11 @@ internal sealed class GalleryDateTimePage
     private static UIElement CreateMaterialSchedulePanelSample()
     {
         var today = DateTime.Today;
-        var output = CreateDateTimeOutput($"Plan: {FormatDateTimeDate(today.AddDays(3))} at 14:15");
+        var output = CreateDateTimeOutput($"Plan: {FormatDateTimeDate(today.AddDays(3))} at 14:15. Density: comfortable");
         var datePicker = new FWDatePicker
         {
             Header = "Planning date",
-            Width = 220,
+            Density = FWDateTimePickerDensity.Comfortable,
             PlaceholderText = "Select",
             DisplayDateStart = today,
             DisplayDateEnd = today.AddDays(60),
@@ -268,7 +279,7 @@ internal sealed class GalleryDateTimePage
         var timePicker = new FWTimePicker
         {
             Header = "Focus block",
-            Width = 190,
+            Density = FWDateTimePickerDensity.Comfortable,
             SelectedTime = new TimeSpan(14, 15, 0),
             MinuteIncrement = 15,
             ClockIdentifier = "24HourClock"
@@ -287,7 +298,7 @@ internal sealed class GalleryDateTimePage
 
         void UpdateOutput()
         {
-            output.Text = $"Plan: {FormatDateTimeDate(datePicker.SelectedDate)} at {FormatDateTimeTime(timePicker.SelectedTime, timePicker.ClockIdentifier)}";
+            output.Text = $"Plan: {FormatDateTimeDate(datePicker.SelectedDate)} at {FormatDateTimeTime(timePicker.SelectedTime, timePicker.ClockIdentifier)}. Density: {FormatDensity(datePicker.Density)}";
         }
 
         datePicker.SelectedDateChanged += (_, _) =>
@@ -353,6 +364,13 @@ internal sealed class GalleryDateTimePage
                         CreateDateTimeActionButton(FluentIconRegular.Clock24, "Evening", () =>
                         {
                             timePicker.SelectedTime = new TimeSpan(18, 45, 0);
+                            UpdateOutput();
+                        }),
+                        CreateDateTimeActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                        {
+                            var density = NextDensity(datePicker.Density);
+                            datePicker.Density = density;
+                            timePicker.Density = density;
                             UpdateOutput();
                         })),
                     CreateDateTimeStatus(output)
@@ -522,6 +540,26 @@ internal sealed class GalleryDateTimePage
         }
 
         return $"{hour}:{time.Value.Minutes:D2} {(time.Value.Hours >= 12 ? "PM" : "AM")}";
+    }
+
+    private static FWDateTimePickerDensity NextDensity(FWDateTimePickerDensity density)
+    {
+        return density switch
+        {
+            FWDateTimePickerDensity.Compact => FWDateTimePickerDensity.Comfortable,
+            FWDateTimePickerDensity.Comfortable => FWDateTimePickerDensity.Spacious,
+            _ => FWDateTimePickerDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWDateTimePickerDensity density)
+    {
+        return density switch
+        {
+            FWDateTimePickerDensity.Compact => "compact",
+            FWDateTimePickerDensity.Spacious => "spacious",
+            _ => "comfortable"
+        };
     }
 
     private static FWStackPanel CreateSection(string title)

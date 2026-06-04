@@ -158,6 +158,10 @@ public sealed class FluentDateTimeControlsTests
         AssertSetter(datePickerStyle, Control.CornerRadiusProperty);
         AssertSetter(datePickerStyle, Control.MinHeightProperty);
 
+        var fwDatePickerStyle = AssertStyle<FWDatePicker>(dictionary);
+        Assert.Same(datePickerStyle, fwDatePickerStyle.BasedOn);
+        AssertSetter(fwDatePickerStyle, FWDatePicker.DensityProperty);
+
         var timePickerStyle = AssertStyle<TimePicker>(dictionary);
         AssertSetter(timePickerStyle, Control.BackgroundProperty);
         AssertSetter(timePickerStyle, Control.ForegroundProperty);
@@ -165,12 +169,19 @@ public sealed class FluentDateTimeControlsTests
         AssertSetter(timePickerStyle, Control.CornerRadiusProperty);
         AssertSetter(timePickerStyle, Control.MinWidthProperty);
 
+        var fwTimePickerStyle = AssertStyle<FWTimePicker>(dictionary);
+        Assert.Same(timePickerStyle, fwTimePickerStyle.BasedOn);
+        AssertSetter(fwTimePickerStyle, FWTimePicker.DensityProperty);
+
         var calendarStyle = AssertStyle<Calendar>(dictionary);
         AssertSetter(calendarStyle, Control.BackgroundProperty);
         AssertSetter(calendarStyle, Control.ForegroundProperty);
         AssertSetter(calendarStyle, Control.BorderBrushProperty);
         AssertSetter(calendarStyle, Control.PaddingProperty);
         AssertSetter(calendarStyle, Control.CornerRadiusProperty);
+
+        var fwCalendarStyle = AssertStyle<FWCalendar>(dictionary);
+        Assert.Same(calendarStyle, fwCalendarStyle.BasedOn);
 
         var calendarDayButtonStyle = AssertStyle<CalendarDayButton>(dictionary);
         AssertSetter(calendarDayButtonStyle, Control.BackgroundProperty);
@@ -184,6 +195,48 @@ public sealed class FluentDateTimeControlsTests
         AssertSetter(datePickerTextBoxStyle, TextBox.TextWrappingProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void FWDateTimePickers_ShouldApplyDensityPresets()
+    {
+        var datePicker = new FWDatePicker();
+
+        Assert.Equal(FWDateTimePickerDensity.Comfortable, datePicker.Density);
+        Assert.Equal(32, datePicker.MinHeight);
+        Assert.Equal(200, datePicker.MinWidth);
+        Assert.Equal(new Thickness(10, 5, 34, 6), datePicker.Padding);
+
+        datePicker.Density = FWDateTimePickerDensity.Compact;
+
+        Assert.Equal(30, datePicker.MinHeight);
+        Assert.Equal(180, datePicker.MinWidth);
+        Assert.Equal(new Thickness(8, 4, 30, 5), datePicker.Padding);
+
+        datePicker.Density = FWDateTimePickerDensity.Spacious;
+
+        Assert.Equal(36, datePicker.MinHeight);
+        Assert.Equal(240, datePicker.MinWidth);
+        Assert.Equal(new Thickness(12, 7, 38, 8), datePicker.Padding);
+
+        var timePicker = new FWTimePicker();
+
+        Assert.Equal(FWDateTimePickerDensity.Comfortable, timePicker.Density);
+        Assert.Equal(32, timePicker.MinHeight);
+        Assert.Equal(160, timePicker.MinWidth);
+        Assert.Equal(new Thickness(10, 5, 34, 6), timePicker.Padding);
+
+        timePicker.Density = FWDateTimePickerDensity.Compact;
+
+        Assert.Equal(30, timePicker.MinHeight);
+        Assert.Equal(140, timePicker.MinWidth);
+        Assert.Equal(new Thickness(8, 4, 30, 5), timePicker.Padding);
+
+        timePicker.Density = FWDateTimePickerDensity.Spacious;
+
+        Assert.Equal(36, timePicker.MinHeight);
+        Assert.Equal(200, timePicker.MinWidth);
+        Assert.Equal(new Thickness(12, 7, 38, 8), timePicker.Padding);
     }
 
     [Fact]
