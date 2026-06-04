@@ -155,6 +155,26 @@ public sealed class FluentCommandToolbarTests
         AssertSetter(toolBarTrayStyle, ToolBarTray.BackgroundProperty);
         AssertSetter(toolBarTrayStyle, FrameworkElement.MinHeightProperty);
 
+        var appBarButtonStyle = AssertStyle<AppBarButton>(dictionary);
+        var fluentAppBarButtonStyle = AssertStyle<FWAppBarButton>(dictionary);
+        Assert.Equal(typeof(AppBarButton), fluentAppBarButtonStyle.BasedOn?.TargetType);
+        AssertSetter(appBarButtonStyle, Control.BackgroundProperty);
+        AssertSetter(appBarButtonStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(fluentAppBarButtonStyle, nameof(FWAppBarButton.Density), "Comfortable");
+
+        var appBarToggleButtonStyle = AssertStyle<AppBarToggleButton>(dictionary);
+        var fluentAppBarToggleButtonStyle = AssertStyle<FWAppBarToggleButton>(dictionary);
+        Assert.Equal(typeof(AppBarToggleButton), fluentAppBarToggleButtonStyle.BasedOn?.TargetType);
+        AssertSetter(appBarToggleButtonStyle, Control.BackgroundProperty);
+        AssertSetter(appBarToggleButtonStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(fluentAppBarToggleButtonStyle, nameof(FWAppBarToggleButton.Density), "Comfortable");
+
+        var appBarSeparatorStyle = AssertStyle<AppBarSeparator>(dictionary);
+        var fluentAppBarSeparatorStyle = AssertStyle<FWAppBarSeparator>(dictionary);
+        Assert.Equal(typeof(AppBarSeparator), fluentAppBarSeparatorStyle.BasedOn?.TargetType);
+        AssertSetter(appBarSeparatorStyle, Control.ForegroundProperty);
+        AssertSetter(fluentAppBarSeparatorStyle, nameof(FWAppBarSeparator.Density), "Comfortable");
+
         ResetApplicationState();
     }
 
@@ -250,6 +270,54 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal(40, toggleSplitButton.MinHeight);
         Assert.Equal(136, toggleSplitButton.MinWidth);
         Assert.Equal(new Thickness(14, 8, 14, 8), toggleSplitButton.Padding);
+    }
+
+    [Fact]
+    public void FWAppBarCommandControls_ShouldApplyDensityPresets()
+    {
+        var appBarButton = new FWAppBarButton();
+
+        Assert.Equal(FWButtonDensity.Comfortable, appBarButton.Density);
+        Assert.Equal(48, appBarButton.MinHeight);
+        Assert.Equal(40, appBarButton.MinWidth);
+        Assert.Equal(new Thickness(4, 4, 4, 4), appBarButton.Padding);
+
+        appBarButton.Density = FWButtonDensity.Compact;
+
+        Assert.Equal(40, appBarButton.MinHeight);
+        Assert.Equal(40, appBarButton.MinWidth);
+        Assert.Equal(new Thickness(4, 2, 4, 2), appBarButton.Padding);
+
+        appBarButton.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(56, appBarButton.MinHeight);
+        Assert.Equal(48, appBarButton.MinWidth);
+        Assert.Equal(new Thickness(6, 6, 6, 6), appBarButton.Padding);
+
+        var appBarToggleButton = new FWAppBarToggleButton
+        {
+            Density = FWButtonDensity.Spacious
+        };
+
+        Assert.Equal(56, appBarToggleButton.MinHeight);
+        Assert.Equal(48, appBarToggleButton.MinWidth);
+        Assert.Equal(new Thickness(6, 6, 6, 6), appBarToggleButton.Padding);
+
+        var separator = new FWAppBarSeparator();
+
+        Assert.Equal(FWButtonDensity.Comfortable, separator.Density);
+        Assert.Equal(1, separator.Width);
+        Assert.Equal(new Thickness(6, 8, 6, 8), separator.Margin);
+
+        separator.Density = FWButtonDensity.Compact;
+
+        Assert.Equal(1, separator.Width);
+        Assert.Equal(new Thickness(4, 6, 4, 6), separator.Margin);
+
+        separator.Density = FWButtonDensity.Spacious;
+
+        Assert.Equal(1, separator.Width);
+        Assert.Equal(new Thickness(8, 10, 8, 10), separator.Margin);
     }
 
     [Fact]
@@ -506,7 +574,14 @@ public sealed class FluentCommandToolbarTests
     private static void AssertSetter(Style style, string propertyName, object? value)
     {
         Assert.Contains(style.Setters, setter =>
-            setter.PropertyName == propertyName && Equals(setter.Value, value));
+            (setter.PropertyName == propertyName || setter.Property?.Name == propertyName)
+            && SetterValueEquals(setter.Value, value));
+    }
+
+    private static bool SetterValueEquals(object? actual, object? expected)
+    {
+        return Equals(actual, expected)
+            || string.Equals(actual?.ToString(), expected?.ToString(), StringComparison.Ordinal);
     }
 
     private static void ResetApplicationState()
