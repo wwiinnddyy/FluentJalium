@@ -35,6 +35,7 @@
     </Style>
 
     <Style TargetType="fluent:FWFluentWindowSurface" BasedOn="{StaticResource {x:Type Border}}">
+        <Setter Property="WindowMaterialProfile" Value="MicaShell" />
         <Setter Property="WindowBackdropKind" Value="Mica" />
         <Setter Property="Background" Value="{ThemeResource FluentMaterialWindowBackdropBrush}" />
         <Setter Property="BorderThickness" Value="0" />

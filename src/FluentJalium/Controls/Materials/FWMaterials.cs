@@ -73,6 +73,37 @@ public enum FWFluentWindowBackdropKind
 }
 
 /// <summary>
+/// FluentJalium window material profiles that combine a DWM backdrop with an in-window material surface role.
+/// </summary>
+public enum FWFluentWindowMaterialProfile
+{
+    /// <summary>
+    /// Uses an opaque Fluent window surface without a DWM system backdrop.
+    /// </summary>
+    Solid,
+
+    /// <summary>
+    /// Uses the WinUI-style Mica shell for long-lived application windows.
+    /// </summary>
+    MicaShell,
+
+    /// <summary>
+    /// Uses Mica Alt for tabbed or pane-heavy application shells.
+    /// </summary>
+    TabbedMicaAlt,
+
+    /// <summary>
+    /// Uses acrylic for transient windows, dialogs, and high-depth overlay shells.
+    /// </summary>
+    TransientAcrylic,
+
+    /// <summary>
+    /// Uses a Mica Alt shell with Jalium liquid glass focus material inside the window.
+    /// </summary>
+    FocusGlassShell
+}
+
+/// <summary>
 /// FluentJalium surface roles used to layer content over window and element materials.
 /// </summary>
 public enum FWFluentMaterialRole
@@ -160,6 +191,136 @@ public readonly record struct FWFluentWindowBackdropRecipe(
     {
         ArgumentNullException.ThrowIfNull(window);
         window.SystemBackdrop = SystemBackdrop;
+    }
+}
+
+/// <summary>
+/// Describes a complete FluentJalium window material profile.
+/// </summary>
+public readonly record struct FWFluentWindowMaterialProfileRecipe(
+    FWFluentWindowMaterialProfile Profile,
+    FWFluentWindowBackdropKind WindowBackdropKind,
+    FWFluentMaterialSurfaceRecipe Surface,
+    string Role,
+    string Description)
+{
+    /// <summary>
+    /// Gets the Jalium DWM system backdrop selected by this profile.
+    /// </summary>
+    public WindowBackdropType SystemBackdrop => FWFluentWindowBackdropRecipe.Create(WindowBackdropKind).SystemBackdrop;
+
+    /// <summary>
+    /// Gets the surface role selected by this profile.
+    /// </summary>
+    public FWFluentMaterialRole SurfaceRole => Surface.Role;
+
+    /// <summary>
+    /// Gets the element-level material selected by this profile.
+    /// </summary>
+    public FWFluentMaterialKind MaterialKind => Surface.MaterialKind;
+
+    /// <summary>
+    /// Creates the default profile recipe from the current application resource scope.
+    /// </summary>
+    public static FWFluentWindowMaterialProfileRecipe CreateDefault()
+    {
+        return CreateDefault(Application.Current?.Resources);
+    }
+
+    /// <summary>
+    /// Creates the default profile recipe from the supplied resource scope.
+    /// </summary>
+    public static FWFluentWindowMaterialProfileRecipe CreateDefault(ResourceDictionary? resources)
+    {
+        return Create(ResourceWindowMaterialProfile(resources, "FluentMaterialWindowDefaultProfile", FWFluentWindowMaterialProfile.MicaShell), resources);
+    }
+
+    /// <summary>
+    /// Creates a window material profile recipe for the supplied profile.
+    /// </summary>
+    public static FWFluentWindowMaterialProfileRecipe Create(FWFluentWindowMaterialProfile profile)
+    {
+        return Create(profile, Application.Current?.Resources);
+    }
+
+    /// <summary>
+    /// Creates a window material profile recipe for the supplied profile using a resource scope.
+    /// </summary>
+    public static FWFluentWindowMaterialProfileRecipe Create(FWFluentWindowMaterialProfile profile, ResourceDictionary? resources)
+    {
+        if (!Enum.IsDefined(profile))
+        {
+            throw new ArgumentOutOfRangeException(nameof(profile), "Unknown Fluent window material profile.");
+        }
+
+        var (backdropKind, surfaceRole, materialKind, role, description) = profile switch
+        {
+            FWFluentWindowMaterialProfile.Solid => (
+                FWFluentWindowBackdropKind.None,
+                FWFluentMaterialRole.Window,
+                FWFluentMaterialKind.Layer,
+                "Solid shell",
+                "Use an opaque Fluent window surface when system backdrops are unavailable or high contrast is active."),
+            FWFluentWindowMaterialProfile.MicaShell => (
+                FWFluentWindowBackdropKind.Mica,
+                FWFluentMaterialRole.Window,
+                FWFluentMaterialKind.Layer,
+                "Mica shell",
+                "Use the WinUI-style Mica shell for long-lived application windows."),
+            FWFluentWindowMaterialProfile.TabbedMicaAlt => (
+                FWFluentWindowBackdropKind.MicaAlt,
+                FWFluentMaterialRole.ShellPane,
+                FWFluentMaterialKind.MicaAlt,
+                "Tabbed Mica Alt shell",
+                "Use Mica Alt with stronger shell-pane separation for tabs, navigation, and dense command regions."),
+            FWFluentWindowMaterialProfile.TransientAcrylic => (
+                FWFluentWindowBackdropKind.Acrylic,
+                FWFluentMaterialRole.Flyout,
+                FWFluentMaterialKind.Acrylic,
+                "Transient acrylic shell",
+                "Use acrylic depth for transient windows, dialogs, flyouts, and elevated overlay shells."),
+            FWFluentWindowMaterialProfile.FocusGlassShell => (
+                FWFluentWindowBackdropKind.MicaAlt,
+                FWFluentMaterialRole.FocusGlass,
+                FWFluentMaterialKind.LiquidGlass,
+                "Focus glass shell",
+                "Use Jalium liquid glass over a Mica Alt window shell for high-emphasis preview and creative surfaces."),
+            _ => throw new ArgumentOutOfRangeException(nameof(profile), "Unknown Fluent window material profile.")
+        };
+
+        var surface = FWFluentMaterialSurfaceRecipe.Create(surfaceRole, resources) with
+        {
+            MaterialKind = materialKind,
+            Description = description
+        };
+
+        return new FWFluentWindowMaterialProfileRecipe(profile, backdropKind, surface, role, description);
+    }
+
+    /// <summary>
+    /// Applies the window backdrop selected by this profile to the supplied Jalium window.
+    /// </summary>
+    public void ApplyTo(Window window)
+    {
+        FWFluentWindowBackdropRecipe.Create(WindowBackdropKind).ApplyTo(window);
+    }
+
+    private static FWFluentWindowMaterialProfile ResourceWindowMaterialProfile(
+        ResourceDictionary? resources,
+        string key,
+        FWFluentWindowMaterialProfile fallback)
+    {
+        if (resources?.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            FWFluentWindowMaterialProfile profile when Enum.IsDefined(profile) => profile,
+            string text when Enum.TryParse<FWFluentWindowMaterialProfile>(text, ignoreCase: true, out var profile) && Enum.IsDefined(profile) => profile,
+            _ => fallback
+        };
     }
 }
 
@@ -643,18 +804,43 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
     /// </summary>
     public void UseMaterialSurfaceRecipe(FWFluentMaterialSurfaceRecipe recipe)
     {
+        ApplyMaterialSurfaceRecipeCore(recipe, useCurrentValue: false);
+    }
+
+    protected void SetCurrentMaterialSurfaceRecipe(FWFluentMaterialSurfaceRecipe recipe)
+    {
+        ApplyMaterialSurfaceRecipeCore(recipe, useCurrentValue: true);
+    }
+
+    private void ApplyMaterialSurfaceRecipeCore(FWFluentMaterialSurfaceRecipe recipe, bool useCurrentValue)
+    {
         _suppressMaterialRoleRecipe = true;
         try
         {
-            MaterialRole = recipe.Role;
-            UseMaterialRecipe(recipe.MaterialKind);
-            Background = recipe.Background;
-            BorderBrush = recipe.BorderBrush;
-            BorderThickness = recipe.BorderThickness;
-            CornerRadius = recipe.CornerRadius;
-            Padding = recipe.Padding;
-            Shape = recipe.Shape;
-            SuperEllipseN = recipe.SuperEllipseN;
+            if (useCurrentValue)
+            {
+                SetCurrentValue(MaterialRoleProperty, recipe.Role);
+                SetCurrentMaterialRecipe(FWFluentMaterialRecipe.Create(recipe.MaterialKind));
+                SetCurrentValue(BackgroundProperty, recipe.Background);
+                SetCurrentValue(BorderBrushProperty, recipe.BorderBrush);
+                SetCurrentValue(BorderThicknessProperty, recipe.BorderThickness);
+                SetCurrentValue(CornerRadiusProperty, recipe.CornerRadius);
+                SetCurrentValue(PaddingProperty, recipe.Padding);
+                SetCurrentValue(ShapeProperty, recipe.Shape);
+                SetCurrentValue(SuperEllipseNProperty, recipe.SuperEllipseN);
+            }
+            else
+            {
+                MaterialRole = recipe.Role;
+                UseMaterialRecipe(recipe.MaterialKind);
+                Background = recipe.Background;
+                BorderBrush = recipe.BorderBrush;
+                BorderThickness = recipe.BorderThickness;
+                CornerRadius = recipe.CornerRadius;
+                Padding = recipe.Padding;
+                Shape = recipe.Shape;
+                SuperEllipseN = recipe.SuperEllipseN;
+            }
         }
         finally
         {
@@ -667,6 +853,30 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
     /// </summary>
     public void UseMaterialRecipe(FWFluentMaterialRecipe recipe)
     {
+        ApplyMaterialRecipeCore(recipe, useCurrentValue: false);
+    }
+
+    protected void SetCurrentMaterialRecipe(FWFluentMaterialRecipe recipe)
+    {
+        ApplyMaterialRecipeCore(recipe, useCurrentValue: true);
+    }
+
+    private void ApplyMaterialRecipeCore(FWFluentMaterialRecipe recipe, bool useCurrentValue)
+    {
+        if (useCurrentValue)
+        {
+            SetCurrentValue(MaterialKindProperty, recipe.MaterialKind);
+            SetCurrentValue(TintColorProperty, recipe.TintColor);
+            SetCurrentValue(TintOpacityProperty, recipe.TintOpacity);
+            SetCurrentValue(BlurRadiusProperty, recipe.BlurRadius);
+            SetCurrentValue(NoiseIntensityProperty, recipe.NoiseIntensity);
+            SetCurrentValue(RefractionAmountProperty, recipe.RefractionAmount);
+            SetCurrentValue(ChromaticAberrationProperty, recipe.ChromaticAberration);
+            SetCurrentValue(FusionRadiusProperty, recipe.FusionRadius);
+            SetCurrentValue(IsInteractiveProperty, recipe.IsInteractive);
+            return;
+        }
+
         MaterialKind = recipe.MaterialKind;
         TintColor = recipe.TintColor;
         TintOpacity = recipe.TintOpacity;
@@ -760,9 +970,15 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
         return new FrostedGlassEffect((float)BlurRadius, (float)NoiseIntensity, TintColor, (float)TintOpacity);
     }
 
-    private static bool IsValidMaterialRole(object? value) => value is FWFluentMaterialRole;
+    private static bool IsValidMaterialRole(object? value)
+    {
+        return value is FWFluentMaterialRole role && Enum.IsDefined(role);
+    }
 
-    private static bool IsValidMaterialKind(object? value) => value is FWFluentMaterialKind;
+    private static bool IsValidMaterialKind(object? value)
+    {
+        return value is FWFluentMaterialKind kind && Enum.IsDefined(kind);
+    }
 
     private static bool IsValidOpacity(object? value)
     {
@@ -780,6 +996,12 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
 /// </summary>
 public class FWFluentWindowSurface : FWFluentMaterialSurface
 {
+    private bool _applyingWindowMaterialProfile;
+
+    public static readonly DependencyProperty WindowMaterialProfileProperty =
+        DependencyProperty.Register(nameof(WindowMaterialProfile), typeof(FWFluentWindowMaterialProfile), typeof(FWFluentWindowSurface),
+            new PropertyMetadata(FWFluentWindowMaterialProfile.MicaShell, OnWindowMaterialProfileChanged), IsValidWindowMaterialProfile);
+
     public static readonly DependencyProperty WindowBackdropKindProperty =
         DependencyProperty.Register(nameof(WindowBackdropKind), typeof(FWFluentWindowBackdropKind), typeof(FWFluentWindowSurface),
             new PropertyMetadata(FWFluentWindowBackdropKind.Mica, OnWindowBackdropPropertyChanged), IsValidWindowBackdropKind);
@@ -792,6 +1014,16 @@ public class FWFluentWindowSurface : FWFluentMaterialSurface
     {
         SetMaterialRoleSilently(FWFluentMaterialRole.Window);
         Loaded += OnLoaded;
+    }
+
+    /// <summary>
+    /// Gets or sets the Fluent window material profile that configures the DWM backdrop and root material surface.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
+    public FWFluentWindowMaterialProfile WindowMaterialProfile
+    {
+        get => (FWFluentWindowMaterialProfile)GetValue(WindowMaterialProfileProperty)!;
+        set => SetValue(WindowMaterialProfileProperty, value);
     }
 
     /// <summary>
@@ -812,6 +1044,46 @@ public class FWFluentWindowSurface : FWFluentMaterialSurface
     {
         get => (bool)GetValue(AutoApplyWindowBackdropProperty)!;
         set => SetValue(AutoApplyWindowBackdropProperty, value);
+    }
+
+    /// <summary>
+    /// Applies the selected Fluent window material profile to this surface.
+    /// </summary>
+    public void ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile profile)
+    {
+        ApplyWindowMaterialProfile(FWFluentWindowMaterialProfileRecipe.Create(profile));
+    }
+
+    /// <summary>
+    /// Applies the selected Fluent window material profile using the supplied resource scope.
+    /// </summary>
+    public void ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile profile, ResourceDictionary? resources)
+    {
+        ApplyWindowMaterialProfile(FWFluentWindowMaterialProfileRecipe.Create(profile, resources));
+    }
+
+    /// <summary>
+    /// Applies the default Fluent window material profile from the current application resource scope.
+    /// </summary>
+    public void ApplyDefaultWindowMaterialProfile()
+    {
+        ApplyWindowMaterialProfile(FWFluentWindowMaterialProfileRecipe.CreateDefault());
+    }
+
+    /// <summary>
+    /// Applies the default Fluent window material profile from the supplied resource scope.
+    /// </summary>
+    public void ApplyDefaultWindowMaterialProfile(ResourceDictionary? resources)
+    {
+        ApplyWindowMaterialProfile(FWFluentWindowMaterialProfileRecipe.CreateDefault(resources));
+    }
+
+    /// <summary>
+    /// Applies an explicit Fluent window material profile recipe to this surface.
+    /// </summary>
+    public void ApplyWindowMaterialProfile(FWFluentWindowMaterialProfileRecipe recipe)
+    {
+        ApplyWindowMaterialProfileCore(recipe, updateProfile: true, useCurrentValue: false);
     }
 
     /// <summary>
@@ -845,6 +1117,53 @@ public class FWFluentWindowSurface : FWFluentMaterialSurface
         }
     }
 
+    private static void OnWindowMaterialProfileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWFluentWindowSurface surface &&
+            !surface._applyingWindowMaterialProfile &&
+            e.NewValue is FWFluentWindowMaterialProfile profile)
+        {
+            surface.ApplyWindowMaterialProfileCore(FWFluentWindowMaterialProfileRecipe.Create(profile), updateProfile: false, useCurrentValue: true);
+        }
+    }
+
+    private void ApplyWindowMaterialProfileCore(FWFluentWindowMaterialProfileRecipe recipe, bool updateProfile, bool useCurrentValue)
+    {
+        _applyingWindowMaterialProfile = true;
+        try
+        {
+            if (useCurrentValue)
+            {
+                SetCurrentValue(WindowBackdropKindProperty, recipe.WindowBackdropKind);
+                if (updateProfile)
+                {
+                    SetCurrentValue(WindowMaterialProfileProperty, recipe.Profile);
+                }
+            }
+            else
+            {
+                WindowBackdropKind = recipe.WindowBackdropKind;
+                if (updateProfile)
+                {
+                    WindowMaterialProfile = recipe.Profile;
+                }
+            }
+
+            if (useCurrentValue)
+            {
+                SetCurrentMaterialSurfaceRecipe(recipe.Surface);
+            }
+            else
+            {
+                UseMaterialSurfaceRecipe(recipe.Surface);
+            }
+        }
+        finally
+        {
+            _applyingWindowMaterialProfile = false;
+        }
+    }
+
     private static void OnWindowBackdropPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWFluentWindowSurface { AutoApplyWindowBackdrop: true } surface)
@@ -853,5 +1172,13 @@ public class FWFluentWindowSurface : FWFluentMaterialSurface
         }
     }
 
-    private static bool IsValidWindowBackdropKind(object? value) => value is FWFluentWindowBackdropKind;
+    private static bool IsValidWindowMaterialProfile(object? value)
+    {
+        return value is FWFluentWindowMaterialProfile profile && Enum.IsDefined(profile);
+    }
+
+    private static bool IsValidWindowBackdropKind(object? value)
+    {
+        return value is FWFluentWindowBackdropKind kind && Enum.IsDefined(kind);
+    }
 }

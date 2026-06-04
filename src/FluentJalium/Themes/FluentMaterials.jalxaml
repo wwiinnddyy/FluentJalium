@@ -19,6 +19,7 @@
     <system:Double x:Key="FluentMaterialLiquidGlassChromaticAberration">0.55</system:Double>
     <system:Double x:Key="FluentMaterialLiquidGlassFusionRadius">24</system:Double>
     <system:Double x:Key="FluentMaterialFocusGlassSuperEllipseN">4</system:Double>
+    <x:String x:Key="FluentMaterialWindowDefaultProfile">MicaShell</x:String>
 
     <CornerRadius x:Key="FluentMaterialWindowSurfaceCornerRadius">0</CornerRadius>
     <CornerRadius x:Key="FluentMaterialShellPaneCornerRadius">0</CornerRadius>

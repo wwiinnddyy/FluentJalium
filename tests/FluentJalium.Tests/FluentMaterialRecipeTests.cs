@@ -38,6 +38,63 @@ public sealed class FluentMaterialRecipeTests
     }
 
     [Theory]
+    [InlineData(FWFluentWindowMaterialProfile.Solid, FWFluentWindowBackdropKind.None, WindowBackdropType.None, FWFluentMaterialRole.Window, FWFluentMaterialKind.Layer, "Solid shell")]
+    [InlineData(FWFluentWindowMaterialProfile.MicaShell, FWFluentWindowBackdropKind.Mica, WindowBackdropType.Mica, FWFluentMaterialRole.Window, FWFluentMaterialKind.Layer, "Mica shell")]
+    [InlineData(FWFluentWindowMaterialProfile.TabbedMicaAlt, FWFluentWindowBackdropKind.MicaAlt, WindowBackdropType.MicaAlt, FWFluentMaterialRole.ShellPane, FWFluentMaterialKind.MicaAlt, "Tabbed Mica Alt shell")]
+    [InlineData(FWFluentWindowMaterialProfile.TransientAcrylic, FWFluentWindowBackdropKind.Acrylic, WindowBackdropType.Acrylic, FWFluentMaterialRole.Flyout, FWFluentMaterialKind.Acrylic, "Transient acrylic shell")]
+    [InlineData(FWFluentWindowMaterialProfile.FocusGlassShell, FWFluentWindowBackdropKind.MicaAlt, WindowBackdropType.MicaAlt, FWFluentMaterialRole.FocusGlass, FWFluentMaterialKind.LiquidGlass, "Focus glass shell")]
+    public void WindowMaterialProfileRecipe_ShouldComposeBackdropAndSurfaceRoles(
+        FWFluentWindowMaterialProfile profile,
+        FWFluentWindowBackdropKind expectedBackdropKind,
+        WindowBackdropType expectedBackdrop,
+        FWFluentMaterialRole expectedSurfaceRole,
+        FWFluentMaterialKind expectedMaterialKind,
+        string expectedRole)
+    {
+        var recipe = FWFluentWindowMaterialProfileRecipe.Create(profile);
+
+        Assert.Equal(profile, recipe.Profile);
+        Assert.Equal(expectedBackdropKind, recipe.WindowBackdropKind);
+        Assert.Equal(expectedBackdrop, recipe.SystemBackdrop);
+        Assert.Equal(expectedSurfaceRole, recipe.SurfaceRole);
+        Assert.Equal(expectedMaterialKind, recipe.MaterialKind);
+        Assert.Equal(expectedSurfaceRole, recipe.Surface.Role);
+        Assert.Equal(expectedMaterialKind, recipe.Surface.MaterialKind);
+        Assert.Equal(expectedRole, recipe.Role);
+        Assert.False(string.IsNullOrWhiteSpace(recipe.Description));
+    }
+
+    [Fact]
+    public void WindowMaterialProfileRecipe_ShouldReadDefaultProfileFromResourceDictionary()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMaterialWindowDefaultProfile"] = "FocusGlassShell"
+        };
+
+        var recipe = FWFluentWindowMaterialProfileRecipe.CreateDefault(resources);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.FocusGlassShell, recipe.Profile);
+        Assert.Equal(FWFluentWindowBackdropKind.MicaAlt, recipe.WindowBackdropKind);
+        Assert.Equal(FWFluentMaterialRole.FocusGlass, recipe.SurfaceRole);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, recipe.MaterialKind);
+    }
+
+    [Fact]
+    public void WindowMaterialProfileRecipe_ShouldFallBackWhenDefaultProfileResourceIsInvalid()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMaterialWindowDefaultProfile"] = "UnknownProfile"
+        };
+
+        var recipe = FWFluentWindowMaterialProfileRecipe.CreateDefault(resources);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.MicaShell, recipe.Profile);
+        Assert.Equal(FWFluentWindowBackdropKind.Mica, recipe.WindowBackdropKind);
+    }
+
+    [Theory]
     [InlineData(FWFluentMaterialRole.None, FWFluentMaterialKind.None, 0)]
     [InlineData(FWFluentMaterialRole.Window, FWFluentMaterialKind.Layer, 0)]
     [InlineData(FWFluentMaterialRole.ShellPane, FWFluentMaterialKind.MicaAlt, 0)]
@@ -236,5 +293,41 @@ public sealed class FluentMaterialRecipeTests
         Assert.Equal(FWFluentMaterialRole.Window, surface.MaterialRole);
         Assert.Equal(FWFluentWindowBackdropKind.Acrylic, surface.WindowBackdropKind);
         Assert.Equal(WindowBackdropType.Acrylic, window.SystemBackdrop);
+    }
+
+    [Fact]
+    public void WindowSurface_ShouldApplyProfileRecipeToBackdropAndMaterialSurface()
+    {
+        var window = new Window();
+        var surface = new FWFluentWindowSurface();
+
+        surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.FocusGlassShell);
+        surface.ApplyWindowBackdrop(window);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.FocusGlassShell, surface.WindowMaterialProfile);
+        Assert.Equal(FWFluentWindowBackdropKind.MicaAlt, surface.WindowBackdropKind);
+        Assert.Equal(FWFluentMaterialRole.FocusGlass, surface.MaterialRole);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
+        Assert.True(surface.LiquidGlass);
+        Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
+        Assert.Equal(WindowBackdropType.MicaAlt, window.SystemBackdrop);
+    }
+
+    [Fact]
+    public void WindowSurface_ShouldApplyDefaultProfileFromResourceDictionary()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMaterialWindowDefaultProfile"] = FWFluentWindowMaterialProfile.TransientAcrylic
+        };
+        var surface = new FWFluentWindowSurface();
+
+        surface.ApplyDefaultWindowMaterialProfile(resources);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.TransientAcrylic, surface.WindowMaterialProfile);
+        Assert.Equal(FWFluentWindowBackdropKind.Acrylic, surface.WindowBackdropKind);
+        Assert.Equal(FWFluentMaterialRole.Flyout, surface.MaterialRole);
+        Assert.Equal(FWFluentMaterialKind.Acrylic, surface.MaterialKind);
+        Assert.IsType<AcrylicEffect>(surface.BackdropEffect);
     }
 }

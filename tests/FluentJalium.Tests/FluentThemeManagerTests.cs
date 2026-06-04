@@ -434,6 +434,7 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentMaterialLiquidGlassChromaticAberration"));
         Assert.True(dictionary.Contains("FluentMaterialLiquidGlassFusionRadius"));
         Assert.True(dictionary.Contains("FluentMaterialFocusGlassSuperEllipseN"));
+        Assert.True(dictionary.Contains("FluentMaterialWindowDefaultProfile"));
         Assert.True(dictionary.Contains("FluentMaterialWindowSurfaceCornerRadius"));
         Assert.True(dictionary.Contains("FluentMaterialShellPaneCornerRadius"));
         Assert.True(dictionary.Contains("FluentMaterialContentLayerCornerRadius"));
@@ -528,6 +529,8 @@ public sealed class FluentThemeManagerTests
         AssertStyleSetterValue(transitioningStyle, TransitioningContentControl.TransitionModeProperty, "FluentMotionContentTransitionDefaultMode");
         AssertStyleSetterValue(transitioningStyle, UIElement.TransitionDurationProperty, "FluentMotionContentTransitionDefaultDuration");
         AssertStyleSetterValue(transitioningStyle, UIElement.TransitionTimingFunctionProperty, "FluentMotionContentTransitionDefaultTimingFunction");
+        var windowSurfaceStyle = Assert.IsType<Style>(dictionary[typeof(FWFluentWindowSurface)]);
+        AssertStyleSetterValue(windowSurfaceStyle, FWFluentWindowSurface.WindowMaterialProfileProperty, "MicaShell");
     }
 
     [Fact]
@@ -552,6 +555,7 @@ public sealed class FluentThemeManagerTests
         Assert.Equal("FluentJalium.Themes.FluentResources.jalxaml", FluentThemeManager.FluentResourcesResourceName);
         Assert.Equal("FluentJalium.Themes.Controls.FluentControls.jalxaml", FluentThemeManager.FluentControlsResourceName);
         Assert.True(resources!.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(resources.Contains("FluentMaterialWindowDefaultProfile"));
         Assert.True(resources.Contains("FluentMotionDurationNormal"));
         Assert.True(resources.Contains("FluentTitleFontSize"));
         AssertContainsStyle<Button>(controls!);
@@ -584,9 +588,11 @@ public sealed class FluentThemeManagerTests
         var controls = LoadEntryDictionary(controlsEntry);
 
         Assert.True(complete.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(complete.Contains("FluentMaterialWindowDefaultProfile"));
         Assert.True(complete.Contains("FluentMotionContentTransitionDefaultDuration"));
         AssertContainsStyle<Button>(complete);
         Assert.True(resources.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(resources.Contains("FluentMaterialWindowDefaultProfile"));
         Assert.True(resources.Contains("FluentMotionContentTransitionDefaultDuration"));
         Assert.False(resources.Contains(typeof(Button)));
         AssertContainsStyle<Button>(controls);
