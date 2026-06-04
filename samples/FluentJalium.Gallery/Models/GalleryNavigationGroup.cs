@@ -5,6 +5,7 @@ namespace FluentJalium.Gallery.Models;
 internal static class GalleryNavigationGroup
 {
     public const string Home = "Home";
+    public const string Design = "Design";
     public const string ControlSurfaces = "Control surfaces";
     public const string Input = "Input";
     public const string LayoutAndMedia = "Layout and media";
@@ -15,6 +16,7 @@ internal static class GalleryNavigationGroup
 
     public static readonly string[] Order =
     [
+        Design,
         ControlSurfaces,
         Input,
         LayoutAndMedia,
@@ -27,6 +29,7 @@ internal static class GalleryNavigationGroup
     {
         return groupName switch
         {
+            Design => FluentIconRegular.DesignIdeas24,
             ControlSurfaces => FluentIconRegular.ControlButton24,
             Input => FluentIconRegular.Textbox24,
             LayoutAndMedia => FluentIconRegular.LayoutColumnTwo24,
