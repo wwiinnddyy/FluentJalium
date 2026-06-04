@@ -47,6 +47,7 @@ internal sealed class GalleryCatalogService
             [PageId("Menus")] = () => CreatePageStack(new GalleryMenusPage().CreateContent()),
             [PageId("Disclosure")] = () => CreatePageStack(new GalleryDisclosurePage().CreateContent()),
             [PageId("Status")] = () => CreatePageStack(new GalleryStatusPage().CreateContent()),
+            [PageId("Design")] = () => CreatePageStack(new GalleryDesignPage().CreateContent()),
             [PageId("Settings")] = () => CreatePageStack(new GallerySettingsPage(applyTheme, applyAccent).CreateContent()),
             [PageId("State Matrix")] = () => CreatePageStack(new GalleryStateMatrixPage().CreateContent())
         };
