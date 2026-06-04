@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 
@@ -84,6 +85,38 @@ public sealed class FluentMaterialRecipeTests
         Assert.Equal(84, recipe.RefractionAmount);
         Assert.Equal(0.55, recipe.ChromaticAberration);
         Assert.Equal(24, recipe.FusionRadius);
+    }
+
+    [Fact]
+    public void Recipe_ShouldReadFluentMaterialTokensFromResourceDictionary()
+    {
+        var resources = new ResourceDictionary
+        {
+            ["FluentMaterialAcrylicTintBrush"] = new SolidColorBrush(Color.FromArgb(222, 12, 34, 56)),
+            ["FluentMaterialAcrylicTintOpacity"] = 0.61,
+            ["FluentMaterialAcrylicBlurRadius"] = 31.0,
+            ["FluentMaterialAcrylicNoiseIntensity"] = 0.052,
+            ["FluentMaterialLiquidGlassTintBrush"] = new SolidColorBrush(Color.FromArgb(180, 70, 80, 90)),
+            ["FluentMaterialLiquidGlassTintOpacity"] = 0.27,
+            ["FluentMaterialLiquidGlassBlurRadius"] = 18.0,
+            ["FluentMaterialLiquidGlassRefractionAmount"] = 96.0,
+            ["FluentMaterialLiquidGlassChromaticAberration"] = 0.68,
+            ["FluentMaterialLiquidGlassFusionRadius"] = 30.0
+        };
+
+        var acrylic = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.Acrylic, resources);
+        var liquidGlass = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.LiquidGlass, resources);
+
+        Assert.Equal(Color.FromArgb(222, 12, 34, 56), acrylic.TintColor);
+        Assert.Equal(0.61, acrylic.TintOpacity);
+        Assert.Equal(31.0, acrylic.BlurRadius);
+        Assert.Equal(0.052, acrylic.NoiseIntensity);
+        Assert.Equal(Color.FromArgb(180, 70, 80, 90), liquidGlass.TintColor);
+        Assert.Equal(0.27, liquidGlass.TintOpacity);
+        Assert.Equal(18.0, liquidGlass.BlurRadius);
+        Assert.Equal(96.0, liquidGlass.RefractionAmount);
+        Assert.Equal(0.68, liquidGlass.ChromaticAberration);
+        Assert.Equal(30.0, liquidGlass.FusionRadius);
     }
 
     [Fact]

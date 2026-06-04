@@ -141,6 +141,14 @@ public readonly record struct FWFluentMaterialRecipe(
     /// </summary>
     public static FWFluentMaterialRecipe Create(FWFluentMaterialKind materialKind)
     {
+        return Create(materialKind, Application.Current?.Resources);
+    }
+
+    /// <summary>
+    /// Creates the default recipe for the requested material kind using the supplied FluentJalium resource scope.
+    /// </summary>
+    public static FWFluentMaterialRecipe Create(FWFluentMaterialKind materialKind, ResourceDictionary? resources)
+    {
         return materialKind switch
         {
             FWFluentMaterialKind.None => new FWFluentMaterialRecipe(
@@ -165,9 +173,9 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.Mica => new FWFluentMaterialRecipe(
                 materialKind,
-                Color.FromArgb(180, 20, 84, 145),
-                0.18,
-                18,
+                ResourceColor(resources, "FluentMaterialMicaTintBrush", Color.FromArgb(180, 20, 84, 145)),
+                ResourceDouble(resources, "FluentMaterialMicaTintOpacity", 0.18),
+                ResourceDouble(resources, "FluentMaterialMicaBlurRadius", 18),
                 0,
                 0,
                 0,
@@ -175,9 +183,9 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.MicaAlt => new FWFluentMaterialRecipe(
                 materialKind,
-                Color.FromArgb(190, 20, 84, 145),
-                0.26,
-                22,
+                ResourceColor(resources, "FluentMaterialMicaAltTintBrush", Color.FromArgb(190, 20, 84, 145)),
+                ResourceDouble(resources, "FluentMaterialMicaAltTintOpacity", 0.26),
+                ResourceDouble(resources, "FluentMaterialMicaAltBlurRadius", 22),
                 0,
                 0,
                 0,
@@ -185,35 +193,66 @@ public readonly record struct FWFluentMaterialRecipe(
                 false),
             FWFluentMaterialKind.Acrylic => new FWFluentMaterialRecipe(
                 materialKind,
-                Color.FromArgb(180, 20, 84, 145),
-                0.46,
-                28,
-                0.035,
+                ResourceColor(resources, "FluentMaterialAcrylicTintBrush", Color.FromArgb(180, 20, 84, 145)),
+                ResourceDouble(resources, "FluentMaterialAcrylicTintOpacity", 0.46),
+                ResourceDouble(resources, "FluentMaterialAcrylicBlurRadius", 28),
+                ResourceDouble(resources, "FluentMaterialAcrylicNoiseIntensity", 0.035),
                 0,
                 0,
                 0,
                 false),
             FWFluentMaterialKind.FrostedGlass => new FWFluentMaterialRecipe(
                 materialKind,
-                Color.FromArgb(160, 255, 255, 255),
-                0.32,
-                34,
-                0.045,
+                ResourceColor(resources, "FluentMaterialFrostedGlassTintBrush", Color.FromArgb(160, 255, 255, 255)),
+                ResourceDouble(resources, "FluentMaterialFrostedGlassTintOpacity", 0.32),
+                ResourceDouble(resources, "FluentMaterialFrostedGlassBlurRadius", 34),
+                ResourceDouble(resources, "FluentMaterialFrostedGlassNoiseIntensity", 0.045),
                 0,
                 0,
                 0,
                 false),
             FWFluentMaterialKind.LiquidGlass => new FWFluentMaterialRecipe(
                 materialKind,
-                Color.FromArgb(180, 20, 84, 145),
-                0.22,
-                14,
+                ResourceColor(resources, "FluentMaterialLiquidGlassTintBrush", Color.FromArgb(180, 20, 84, 145)),
+                ResourceDouble(resources, "FluentMaterialLiquidGlassTintOpacity", 0.22),
+                ResourceDouble(resources, "FluentMaterialLiquidGlassBlurRadius", 14),
                 0,
-                84,
-                0.55,
-                24,
+                ResourceDouble(resources, "FluentMaterialLiquidGlassRefractionAmount", 84),
+                ResourceDouble(resources, "FluentMaterialLiquidGlassChromaticAberration", 0.55),
+                ResourceDouble(resources, "FluentMaterialLiquidGlassFusionRadius", 24),
                 true),
             _ => throw new ArgumentOutOfRangeException(nameof(materialKind), materialKind, "Unknown Fluent material kind.")
+        };
+    }
+
+    private static Color ResourceColor(ResourceDictionary? resources, string key, Color fallback)
+    {
+        if (resources?.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            SolidColorBrush brush => brush.Color,
+            Color color => color,
+            _ => fallback
+        };
+    }
+
+    private static double ResourceDouble(ResourceDictionary? resources, string key, double fallback)
+    {
+        if (resources?.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            double number when double.IsFinite(number) => number,
+            int number => number,
+            string text when double.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var number) => number,
+            _ => fallback
         };
     }
 }

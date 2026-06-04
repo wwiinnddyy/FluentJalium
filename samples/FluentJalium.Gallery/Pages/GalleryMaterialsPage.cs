@@ -1,3 +1,4 @@
+using System.Globalization;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -44,8 +45,34 @@ internal sealed class GalleryMaterialsPage
             "Use window backdrops for the shell, layer fills for content, acrylic for transient UI, and LiquidGlass for focused Jalium element effects.",
             CreateMaterialRoleMapSample()));
 
+        panel.Children.Add(CreateMaterialTokenStrip());
         panel.Children.Add(examples);
         return panel;
+    }
+
+    private static FWBorder CreateMaterialTokenStrip()
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Child = new FWWrapPanel
+            {
+                HorizontalSpacing = 8,
+                VerticalSpacing = 8,
+                Children =
+                {
+                    CreateMaterialTokenPill(FluentIconRegular.WindowBrush24, "Mica", "FluentMaterialMicaTintOpacity", FormatPercentResourceValue("FluentMaterialMicaTintOpacity")),
+                    CreateMaterialTokenPill(FluentIconRegular.LayerDiagonal24, "Mica Alt", "FluentMaterialMicaAltBlurRadius", FormatPixelResourceValue("FluentMaterialMicaAltBlurRadius")),
+                    CreateMaterialTokenPill(FluentIconRegular.Drop24, "Acrylic", "FluentMaterialAcrylicNoiseIntensity", FormatDecimalResourceValue("FluentMaterialAcrylicNoiseIntensity")),
+                    CreateMaterialTokenPill(FluentIconRegular.WeatherSnowflake24, "Frosted", "FluentMaterialFrostedGlassBlurRadius", FormatPixelResourceValue("FluentMaterialFrostedGlassBlurRadius")),
+                    CreateMaterialTokenPill(FluentIconRegular.Glasses24, "LiquidGlass", "FluentMaterialLiquidGlassRefractionAmount", FormatPixelResourceValue("FluentMaterialLiquidGlassRefractionAmount"))
+                }
+            }
+        };
     }
 
     private static UIElement CreateElementBackdropEffectsSample()
@@ -238,8 +265,8 @@ internal sealed class GalleryMaterialsPage
             Width = 236,
             Height = 130,
             Background = new SolidColorBrush(isLiquidGlass
-                ? Color.FromArgb(44, 0, 120, 212)
-                : Color.FromArgb(110, 255, 255, 255)),
+                ? WithAlpha(recipe.TintColor, 44)
+                : WithAlpha(recipe.TintColor, 110)),
             BorderBrush = ThemeBrush("ControlBorder"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
@@ -251,6 +278,48 @@ internal sealed class GalleryMaterialsPage
 
         surface.UseMaterialRecipe(recipe);
         return surface;
+    }
+
+    private static FWBorder CreateMaterialTokenPill(FluentIconRegular icon, string title, string tokenKey, string value)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 6, 10, 6),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(icon, 16, ThemeBrush("TextSecondary")),
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    new FWTextBlock
+                    {
+                        Text = value,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    new FWTextBlock
+                    {
+                        Text = tokenKey,
+                        FontSize = 11,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
     }
 
     private static FWBorder CreateLayeredSurface(FluentIconRegular icon, string title, string description, Brush background)
@@ -405,6 +474,45 @@ internal sealed class GalleryMaterialsPage
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+    }
+
+    private static string FormatPercentResourceValue(string key)
+    {
+        var value = ResourceDouble(key, double.NaN);
+        return double.IsNaN(value) ? "-" : value.ToString("P0", CultureInfo.InvariantCulture);
+    }
+
+    private static string FormatPixelResourceValue(string key)
+    {
+        var value = ResourceDouble(key, double.NaN);
+        return double.IsNaN(value) ? "-" : $"{value:0.##} px";
+    }
+
+    private static string FormatDecimalResourceValue(string key)
+    {
+        var value = ResourceDouble(key, double.NaN);
+        return double.IsNaN(value) ? "-" : value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    private static double ResourceDouble(string key, double fallback)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) != true)
+        {
+            return fallback;
+        }
+
+        return value switch
+        {
+            double number => number,
+            int number => number,
+            string text when double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) => number,
+            _ => fallback
+        };
+    }
+
+    private static Color WithAlpha(Color color, byte alpha)
+    {
+        return Color.FromArgb(alpha, color.R, color.G, color.B);
     }
 
     private static Brush ThemeBrush(string key)
