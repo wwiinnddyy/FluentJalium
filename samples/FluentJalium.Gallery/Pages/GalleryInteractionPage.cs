@@ -1,4 +1,5 @@
 using FluentJalium.Icon;
+using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -484,46 +485,17 @@ internal sealed class GalleryInteractionPage
 
     private static FWBorder CreateInteractionExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "FWScrollViewer" => "<FWScrollViewer VerticalScrollBarVisibility=\"Visible\" IsScrollBarAutoHideEnabled=\"False\" />",
+            "FWSwipeControl" => "<FWSwipeControl>\n  <FWSwipeControl.LeftItems>\n    <SwipeItems Mode=\"Reveal\" />\n  </FWSwipeControl.LeftItems>\n</FWSwipeControl>",
+            "FWGridSplitter" => "<FWGridSplitter ResizeDirection=\"Columns\" ResizeBehavior=\"PreviousAndNext\" KeyboardIncrement=\"12\" />",
+            _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWScrollViewer />\n  <FWSwipeControl />\n  <FWGridSplitter />\n</FWFluentMaterialSurface>"
         };
     }
 

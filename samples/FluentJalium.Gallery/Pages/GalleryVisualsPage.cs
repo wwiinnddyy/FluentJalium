@@ -1,4 +1,5 @@
 using FluentJalium.Icon;
+using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -575,46 +576,18 @@ internal sealed class GalleryVisualsPage
 
     private static FWBorder CreateVisualExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "Fluent icon library" => "<FluentIcon Icon=\"Save24\" />\n<FWFontIcon Glyph=\"&#xE72D;\" />\n<FWSymbolIcon Symbol=\"Save\" />",
+            "FWImage" => "<FWImage Stretch=\"UniformToFill\" IsZoomEnabled=\"True\" MinZoom=\"0.75\" MaxZoom=\"4\" />",
+            "FWLabel and FWSeparator" => "<FWLabel Content=\"Name\" Target=\"{Binding ElementName=NameBox}\" AccessKey=\"N\" />\n<FWSeparator />",
+            "FWViewbox" => "<FWViewbox Stretch=\"Uniform\" StretchDirection=\"Both\" />",
+            _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWImage Stretch=\"UniformToFill\" />\n  <FWViewbox Stretch=\"Uniform\" />\n</FWFluentMaterialSurface>"
         };
     }
 

@@ -1,4 +1,5 @@
 using FluentJalium.Icon;
+using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -413,46 +414,18 @@ internal sealed class GalleryContentLayoutPage
 
     private static FWBorder CreateLayoutExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWBorder
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+    }
+
+    private static string CreateSampleCode(string title)
+    {
+        return title switch
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
+            "Text and access text" => "<FWTextBlock Text=\"Selectable body copy\" IsTextSelectionEnabled=\"True\" />\n<FWAccessText Text=\"_Open command\" />",
+            "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
+            "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
+            "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
+            _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
         };
     }
 
