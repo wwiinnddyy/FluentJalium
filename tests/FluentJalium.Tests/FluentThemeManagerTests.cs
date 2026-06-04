@@ -560,6 +560,40 @@ public sealed class FluentThemeManagerTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading through public dictionary entry points.")]
+    public void FluentDictionaries_ShouldExposeStableApplicationResourceEntryPoints()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        ResourceDictionary.CurrentThemeKey = FluentThemeVariant.Dark.ToString();
+
+        var completeEntry = new FluentJaliumThemeDictionary();
+        var resourcesEntry = new FluentJaliumResourcesDictionary();
+        var controlsEntry = new FluentJaliumControlsDictionary();
+
+        Assert.Equal(FluentJaliumDictionaryKind.Complete, completeEntry.Kind);
+        Assert.Equal(FluentJaliumDictionary.GetSource(FluentJaliumDictionaryKind.Complete), completeEntry.Source);
+        Assert.Equal(FluentJaliumDictionaryKind.Resources, resourcesEntry.Kind);
+        Assert.Equal(FluentJaliumDictionary.GetSource(FluentJaliumDictionaryKind.Resources), resourcesEntry.Source);
+        Assert.Equal(FluentJaliumDictionaryKind.Controls, controlsEntry.Kind);
+        Assert.Equal(FluentJaliumDictionary.GetSource(FluentJaliumDictionaryKind.Controls), controlsEntry.Source);
+        Assert.Throws<ArgumentOutOfRangeException>(() => FluentJaliumDictionary.GetSource((FluentJaliumDictionaryKind)42));
+
+        var complete = LoadEntryDictionary(completeEntry);
+        var resources = LoadEntryDictionary(resourcesEntry);
+        var controls = LoadEntryDictionary(controlsEntry);
+
+        Assert.True(complete.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(complete.Contains("FluentMotionContentTransitionDefaultDuration"));
+        AssertContainsStyle<Button>(complete);
+        Assert.True(resources.Contains("FluentMaterialWindowBackdropBrush"));
+        Assert.True(resources.Contains("FluentMotionContentTransitionDefaultDuration"));
+        Assert.False(resources.Contains(typeof(Button)));
+        AssertContainsStyle<Button>(controls);
+        AssertContainsStyle<TransitioningContentControl>(controls);
+    }
+
+    [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void ButtonBatch_ShouldExposeFwStylesForButtonAndCommandControls()
     {
@@ -2992,6 +3026,17 @@ public sealed class FluentThemeManagerTests
     {
         Assert.True(dictionary.TryGetValue(typeof(TControl), out var value), $"{typeof(TControl).Name} style was not found.");
         Assert.IsType<Style>(value);
+    }
+
+    private static ResourceDictionary LoadEntryDictionary(FluentJaliumDictionary dictionary)
+    {
+        Assert.NotNull(dictionary.Source);
+        var loaded = ResourceDictionary.SourceLoader?.Invoke(
+            new ResourceDictionary(),
+            dictionary.Source!,
+            FluentThemeManager.ThemeAssembly);
+
+        return Assert.IsType<ResourceDictionary>(loaded);
     }
 
     private static void AssertBasedOnStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
