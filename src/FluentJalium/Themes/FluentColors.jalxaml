@@ -60,6 +60,18 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#87FFFFFF" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#202020" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarText" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarGlyph" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonHover" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonPressed" Color="#08FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonHover" Color="#FFE81123" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonPressed" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphPressed" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="SurfaceBackground" Color="#2C2C2C" />
             <SolidColorBrush x:Key="ContentSurfaceBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="ContentSurfaceBorderBrush" Color="#15FFFFFF" />
@@ -496,6 +508,18 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#72000000" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarText" Color="#E4000000" />
+            <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="TitleBarGlyph" Color="#E4000000" />
+            <SolidColorBrush x:Key="TitleBarButtonBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonHover" Color="#09000000" />
+            <SolidColorBrush x:Key="TitleBarButtonPressed" Color="#06000000" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonHover" Color="#FFC42B1C" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonPressed" Color="#FFFDE7E9" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphHover" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphPressed" Color="#E4000000" />
             <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ContentSurfaceBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="ContentSurfaceBorderBrush" Color="#15000000" />
@@ -912,6 +936,18 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FF000000" />
             <SolidColorBrush x:Key="WindowBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TitleBarText" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarGlyph" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarButtonBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="TitleBarButtonBorderBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TitleBarButtonHover" Color="#FF1A1A1A" />
+            <SolidColorBrush x:Key="TitleBarButtonPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphHover" Color="#FF000000" />
+            <SolidColorBrush x:Key="TitleBarCloseButtonGlyphPressed" Color="#FF000000" />
             <SolidColorBrush x:Key="SurfaceBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ContentSurfaceBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ContentSurfaceBorderBrush" Color="#FFFFFFFF" />

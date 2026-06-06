@@ -4,6 +4,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ContentLayoutControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ShellControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/Button.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/TextControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ToggleControls.jalxaml" />

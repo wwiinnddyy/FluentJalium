@@ -97,6 +97,8 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTextBlock, TextBlock>(app.Resources);
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
+            AssertBasedOnStyle<FWTitleBar, TitleBar>(app.Resources);
+            AssertBasedOnStyle<FWTitleBarButton, TitleBarButton>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWLayerSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWMicaSurface, Border>(app.Resources);
@@ -307,6 +309,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<TextBlock>(dictionary);
         AssertContainsStyle<AccessText>(dictionary);
         AssertContainsStyle<Border>(dictionary);
+        AssertContainsStyle<TitleBar>(dictionary);
+        AssertContainsStyle<TitleBarButton>(dictionary);
         AssertContainsStyle<FWFluentMaterialSurface>(dictionary);
         AssertContainsStyle<FWLayerSurface>(dictionary);
         AssertContainsStyle<FWMicaSurface>(dictionary);
@@ -371,6 +375,16 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<AppBarSeparator>(dictionary);
         Assert.True(dictionary.Contains("TextPrimary"));
         Assert.True(dictionary.Contains("AccentBrush"));
+        Assert.True(dictionary.Contains("TitleBarBackground"));
+        Assert.True(dictionary.Contains("TitleBarText"));
+        Assert.True(dictionary.Contains("TitleBarBorderBrush"));
+        Assert.True(dictionary.Contains("TitleBarGlyph"));
+        Assert.True(dictionary.Contains("TitleBarButtonBackground"));
+        Assert.True(dictionary.Contains("TitleBarButtonHover"));
+        Assert.True(dictionary.Contains("TitleBarButtonPressed"));
+        Assert.True(dictionary.Contains("TitleBarCloseButtonHover"));
+        Assert.True(dictionary.Contains("TitleBarCloseButtonPressed"));
+        Assert.True(dictionary.Contains("TitleBarCloseButtonGlyphHover"));
         Assert.True(dictionary.Contains("TextControlBackground"));
         Assert.True(dictionary.Contains("TextControlBorderFocused"));
         Assert.True(dictionary.Contains("TextControlFlyoutBackground"));
@@ -894,6 +908,30 @@ public sealed class FluentThemeManagerTests
 
     [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void ShellBatch_ShouldExposeFwStylesForWindowChromeControls()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+
+            AssertBasedOnStyle<FWTitleBar, TitleBar>(app.Resources);
+            AssertBasedOnStyle<FWTitleBarButton, TitleBarButton>(app.Resources);
+            Assert.IsType<SolidColorBrush>(app.Resources["TitleBarBackground"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["TitleBarButtonHover"]);
+            Assert.IsType<SolidColorBrush>(app.Resources["TitleBarCloseButtonHover"]);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void InputMediaBatch_ShouldExposeFwStylesForAdvancedInputAndMediaControls()
     {
         ResetApplicationState();
@@ -1161,6 +1199,13 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWStackPanel, StackPanel>();
         AssertFluentControl<FWWrapPanel, WrapPanel>();
         AssertFluentControl<FWGrid, Grid>();
+    }
+
+    [Fact]
+    public void FluentShellControls_ShouldExposeFwPrefixedSurface()
+    {
+        AssertFluentControl<FWTitleBar, TitleBar>();
+        AssertFluentControl<FWTitleBarButton, TitleBarButton>();
     }
 
     [Fact]

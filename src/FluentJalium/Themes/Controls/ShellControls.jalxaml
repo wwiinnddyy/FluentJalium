@@ -1,0 +1,199 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:fluent="https://jalium.dev/fluent"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="TitleBar">
+        <Setter Property="Background" Value="{ThemeResource TitleBarBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TitleBarText}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TitleBarBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Setter Property="Padding" Value="10,0,0,0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TitleBar">
+                <Border Name="PART_RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BackdropEffect="{TemplateBinding BackdropEffect}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <DockPanel LastChildFill="True">
+                        <TitleBarButton Name="PART_CloseButton"
+                                        Kind="Close"
+                                        DockPanel.Dock="Right" />
+                        <TitleBarButton Name="PART_MaximizeButton"
+                                        Kind="Maximize"
+                                        DockPanel.Dock="Right" />
+                        <TitleBarButton Name="PART_MinimizeButton"
+                                        Kind="Minimize"
+                                        DockPanel.Dock="Right" />
+                        <ContentPresenter Name="PART_RightWindowCommandsHost"
+                                          DockPanel.Dock="Right"
+                                          Content="{TemplateBinding RightWindowCommands}"
+                                          Margin="0,0,8,0"
+                                          VerticalAlignment="Center"
+                                          Visibility="Collapsed" />
+                        <DockPanel LastChildFill="False">
+                            <Border Name="PART_WindowIconHost"
+                                    DockPanel.Dock="Left"
+                                    Width="16"
+                                    Height="16"
+                                    Margin="0,0,8,0"
+                                    VerticalAlignment="Center"
+                                    Visibility="Collapsed">
+                                <Image Source="{TemplateBinding WindowIcon}"
+                                       Stretch="Uniform" />
+                            </Border>
+                            <TextBlock Name="PART_TitleText"
+                                       DockPanel.Dock="Left"
+                                       Margin="0,0,12,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       FontFamily="{TemplateBinding FontFamily}"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Text="{TemplateBinding Title}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <ContentPresenter Name="PART_LeftWindowCommandsHost"
+                                              DockPanel.Dock="Left"
+                                              Content="{TemplateBinding LeftWindowCommands}"
+                                              Margin="8,0,0,0"
+                                              VerticalAlignment="Center"
+                                              Visibility="Collapsed" />
+                        </DockPanel>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWTitleBar" BasedOn="{StaticResource {x:Type TitleBar}}" />
+
+    <Style TargetType="TitleBarButton">
+        <Setter Property="Background" Value="{ThemeResource TitleBarButtonBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TitleBarGlyph}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TitleBarButtonBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Width" Value="46" />
+        <Setter Property="MinWidth" Value="46" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="GlyphSize" Value="10" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TitleBarButton">
+                <Border Name="PART_RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid Width="16"
+                          Height="16"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center">
+                        <Path Name="GlyphPath"
+                              Width="16"
+                              Height="16"
+                              Fill="{TemplateBinding Foreground}"
+                              Stretch="None" />
+                    </Grid>
+                </Border>
+
+                <ControlTemplate.Triggers>
+                    <Trigger Property="Kind" Value="Minimize">
+                        <Setter TargetName="GlyphPath" Property="Data" Value="M14 8v1H3V8h11z" />
+                    </Trigger>
+                    <Trigger Property="Kind" Value="Maximize">
+                        <Setter TargetName="GlyphPath" Property="Data" Value="M3 3v10h10V3H3zm9 9H4V4h8v8z" />
+                    </Trigger>
+                    <Trigger Property="Kind" Value="Restore">
+                        <Setter TargetName="GlyphPath" Property="Data" Value="M3 5v9h9V5H3zm8 8H4V6h7v7z M5 5h1V4h7v7h-1v1h2V3H5v2z" />
+                    </Trigger>
+                    <Trigger Property="Kind" Value="Close">
+                        <Setter TargetName="GlyphPath" Property="Data" Value="M7.116 8l-4.558 4.558.884.884L8 8.884l4.558 4.558.884-.884L8.884 8l4.558-4.558-.884-.884L8 7.116 3.442 2.558l-.884.884L7.116 8z" />
+                    </Trigger>
+
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="Kind" Value="Minimize" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonHover}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="Kind" Value="Maximize" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonHover}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="Kind" Value="Restore" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonHover}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="Kind" Value="Close" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarCloseButtonHover}" />
+                        <Setter Property="Foreground" Value="{ThemeResource TitleBarCloseButtonGlyphHover}" />
+                    </MultiTrigger>
+
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="IsPressed" Value="True" />
+                            <Condition Property="Kind" Value="Minimize" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonPressed}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="IsPressed" Value="True" />
+                            <Condition Property="Kind" Value="Maximize" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonPressed}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="IsPressed" Value="True" />
+                            <Condition Property="Kind" Value="Restore" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonPressed}" />
+                    </MultiTrigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsMouseOver" Value="True" />
+                            <Condition Property="IsPressed" Value="True" />
+                            <Condition Property="Kind" Value="Close" />
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarCloseButtonPressed}" />
+                        <Setter Property="Foreground" Value="{ThemeResource TitleBarCloseButtonGlyphPressed}" />
+                    </MultiTrigger>
+
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                        <Setter TargetName="PART_RootBorder" Property="Background" Value="{ThemeResource TitleBarButtonBackground}" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style TargetType="fluent:FWTitleBarButton" BasedOn="{StaticResource {x:Type TitleBarButton}}" />
+</ResourceDictionary>
