@@ -12,6 +12,20 @@ public class FWImage : Image, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium Markdown control.
+/// </summary>
+public class FWMarkdown : Markdown, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium QRCode control.
+/// </summary>
+public class FWQRCode : QRCode, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium FontIcon control.
 /// </summary>
 public class FWFontIcon : FontIcon, IFluentJaliumControl

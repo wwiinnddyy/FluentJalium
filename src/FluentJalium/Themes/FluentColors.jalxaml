@@ -238,6 +238,10 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFC5C5C5" />
             <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="QRCodeForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="QRCodeBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="QRCodeLogoBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ShapeFill" Color="#330078D4" />
             <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#4D1683D8" />
             <SolidColorBrush x:Key="ShapeFillPressed" Color="#400067B6" />
@@ -670,6 +674,10 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#9E000000" />
             <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="QRCodeForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="QRCodeBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="QRCodeLogoBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ShapeFill" Color="#260078D4" />
             <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#330078D4" />
             <SolidColorBrush x:Key="ShapeFillPressed" Color="#2E005A9E" />
@@ -1082,6 +1090,10 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="QRCodeForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="QRCodeBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="QRCodeLogoBackground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ShapeFill" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="ShapeFillPressed" Color="#FFFFFFFF" />

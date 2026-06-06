@@ -251,6 +251,8 @@ public static class FluentThemeManager
         AliasStyle<FWColorPicker, ColorPicker>(dictionary);
         AliasStyle<FWInkPresenter, InkPresenter>(dictionary);
         AliasStyle<FWImage, Image>(dictionary);
+        AliasStyle<FWMarkdown, Markdown>(dictionary);
+        AliasStyle<FWQRCode, QRCode>(dictionary);
         AliasStyle<FWFontIcon, FontIcon>(dictionary);
         AliasStyle<FWSymbolIcon, SymbolIcon>(dictionary);
         AliasStyle<FWPathIcon, PathIcon>(dictionary);

@@ -26,6 +26,26 @@ public sealed class FluentVisualControlsTests
         };
         var fluentIcon = FluentIconFactory.Regular(FluentIconRegular.Image24, 24);
         var filledIcon = FluentIconFactory.Filled(FluentIconRegular.Share24, 24);
+        var markdownBaseUri = new Uri("https://jalium.dev/");
+        var markdown = new FWMarkdown
+        {
+            Text = "# FluentJalium\n\n[Gallery](/gallery)",
+            BaseUri = markdownBaseUri,
+            OpenLinksExternally = false
+        };
+        var qrCode = new FWQRCode
+        {
+            Text = "https://jalium.dev/fluent",
+            QuietZoneModules = 3,
+            ErrorCorrectionLevel = QRCodeErrorCorrectionLevel.H,
+            Version = 2,
+            Mask = 3,
+            Encoding = QRCodeEncoding.Utf8,
+            ModuleShape = QRModuleShape.RoundedSquare,
+            EyeShape = QREyeShape.Rounded,
+            LogoSizeRatio = 0.2,
+            IsForegroundGradient = false
+        };
         var fontIcon = new FWFontIcon
         {
             Glyph = FluentIconRegular.Share24.GetString(),
@@ -140,6 +160,8 @@ public sealed class FluentVisualControlsTests
                 image,
                 fluentIcon,
                 filledIcon,
+                markdown,
+                qrCode,
                 fontIcon,
                 symbolIcon,
                 pathIcon,
@@ -178,6 +200,19 @@ public sealed class FluentVisualControlsTests
         Assert.False(fluentIcon.Filled);
         Assert.Equal(FluentIconRegular.Share24, filledIcon.Icon);
         Assert.True(filledIcon.Filled);
+        Assert.Equal("# FluentJalium\n\n[Gallery](/gallery)", markdown.Text);
+        Assert.Same(markdownBaseUri, markdown.BaseUri);
+        Assert.False(markdown.OpenLinksExternally);
+        Assert.Equal("https://jalium.dev/fluent", qrCode.Text);
+        Assert.Equal(3, qrCode.QuietZoneModules);
+        Assert.Equal(QRCodeErrorCorrectionLevel.H, qrCode.ErrorCorrectionLevel);
+        Assert.Equal(2, qrCode.Version);
+        Assert.Equal(3, qrCode.Mask);
+        Assert.Equal(QRCodeEncoding.Utf8, qrCode.Encoding);
+        Assert.Equal(QRModuleShape.RoundedSquare, qrCode.ModuleShape);
+        Assert.Equal(QREyeShape.Rounded, qrCode.EyeShape);
+        Assert.Equal(0.2, qrCode.LogoSizeRatio);
+        Assert.False(qrCode.IsForegroundGradient);
         Assert.Equal(FluentIconRegular.Share24.GetString(), fontIcon.Glyph);
         Assert.Equal(FluentIcon.RegularFontFamily, fontIcon.FontFamily?.ToString());
         Assert.Equal(24, fontIcon.FontSize);
@@ -209,7 +244,7 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(Stretch.Uniform, viewbox.Stretch);
         Assert.Equal(StretchDirection.DownOnly, viewbox.StretchDirection);
         Assert.Equal(10, stack.Spacing);
-        Assert.Equal(15, stack.Children.Count);
+        Assert.Equal(17, stack.Children.Count);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);

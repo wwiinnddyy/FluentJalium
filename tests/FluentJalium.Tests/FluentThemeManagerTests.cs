@@ -118,6 +118,8 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWInkPresenter, InkPresenter>(app.Resources);
             AssertOwnedStyle<FWMediaElement>(app.Resources);
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
+            AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
             AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
             AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
             AssertBasedOnStyle<FWPathIcon, PathIcon>(app.Resources);
@@ -328,6 +330,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<MediaElement>(dictionary);
         AssertContainsStyle<FWMediaElement>(dictionary);
         AssertContainsStyle<Image>(dictionary);
+        AssertContainsStyle<Markdown>(dictionary);
+        AssertContainsStyle<QRCode>(dictionary);
         AssertContainsStyle<FontIcon>(dictionary);
         AssertContainsStyle<SymbolIcon>(dictionary);
         AssertContainsStyle<PathIcon>(dictionary);
@@ -547,6 +551,10 @@ public sealed class FluentThemeManagerTests
         Assert.True(dictionary.Contains("FluentInkCanvasDrawingAttributes"));
         Assert.True(dictionary.Contains("ImageBackground"));
         Assert.True(dictionary.Contains("ImageBorderBrush"));
+        Assert.True(dictionary.Contains("QRCodeBackground"));
+        Assert.True(dictionary.Contains("QRCodeForeground"));
+        Assert.True(dictionary.Contains("QRCodeBorderBrush"));
+        Assert.True(dictionary.Contains("QRCodeLogoBackground"));
         Assert.True(dictionary.Contains("IconForeground"));
         Assert.True(dictionary.Contains("IconForegroundDisabled"));
         Assert.True(dictionary.Contains("LabelForeground"));
@@ -804,6 +812,8 @@ public sealed class FluentThemeManagerTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
+            AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
             AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
             AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
             AssertBasedOnStyle<FWPathIcon, PathIcon>(app.Resources);
@@ -1112,6 +1122,8 @@ public sealed class FluentThemeManagerTests
     public void FluentVisualControls_ShouldExposeFwPrefixedSurface()
     {
         AssertFluentControl<FWImage, Image>();
+        AssertFluentControl<FWMarkdown, Markdown>();
+        AssertFluentControl<FWQRCode, QRCode>();
         AssertFluentControl<FWFontIcon, FontIcon>();
         AssertFluentControl<FWSymbolIcon, SymbolIcon>();
         AssertFluentControl<FWPathIcon, PathIcon>();
