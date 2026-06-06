@@ -3,6 +3,7 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using ShapePointCollection = Jalium.UI.Controls.Shapes.PointCollection;
 
 namespace FluentJalium.Tests;
 
@@ -41,6 +42,62 @@ public sealed class FluentVisualControlsTests
             Data = geometry,
             Width = 24,
             Height = 24
+        };
+        var shapeStroke = new SolidColorBrush(Colors.DeepSkyBlue);
+        var shapeFill = new SolidColorBrush(Color.FromArgb(0x33, 0x00, 0x78, 0xD4));
+        var rectangle = new FWRectangle
+        {
+            Width = 64,
+            Height = 32,
+            RadiusX = 6,
+            RadiusY = 6,
+            Fill = shapeFill,
+            Stroke = shapeStroke,
+            StrokeThickness = 1
+        };
+        var ellipse = new FWEllipse
+        {
+            Width = 32,
+            Height = 32,
+            Fill = shapeFill,
+            Stroke = shapeStroke,
+            StrokeThickness = 1
+        };
+        var line = new FWLine
+        {
+            X1 = 0,
+            Y1 = 0,
+            X2 = 48,
+            Y2 = 18,
+            Stroke = shapeStroke,
+            StrokeThickness = 2,
+            StrokeStartLineCap = PenLineCap.Round,
+            StrokeEndLineCap = PenLineCap.Round
+        };
+        var polylinePoints = ShapePointCollection.Parse("0,24 16,4 32,24 48,8");
+        var polyline = new FWPolyline
+        {
+            Points = polylinePoints,
+            Stroke = shapeStroke,
+            StrokeThickness = 2,
+            StrokeLineJoin = PenLineJoin.Round
+        };
+        var polygonPoints = ShapePointCollection.Parse("0,24 16,0 32,24");
+        var polygon = new FWPolygon
+        {
+            Points = polygonPoints,
+            Fill = shapeFill,
+            Stroke = shapeStroke,
+            StrokeThickness = 1,
+            FillRule = FillRule.Nonzero
+        };
+        var path = new FWPath
+        {
+            Data = "M 0,16 C 8,0 24,0 32,16 S 56,32 64,16",
+            Fill = shapeFill,
+            Stroke = shapeStroke,
+            StrokeThickness = 1.5,
+            Stretch = Stretch.Uniform
         };
         var target = new FWTextBox
         {
@@ -86,6 +143,12 @@ public sealed class FluentVisualControlsTests
                 fontIcon,
                 symbolIcon,
                 pathIcon,
+                rectangle,
+                ellipse,
+                line,
+                polyline,
+                polygon,
+                path,
                 label,
                 separator,
                 viewbox
@@ -122,6 +185,21 @@ public sealed class FluentVisualControlsTests
         Assert.Same(geometry, pathIcon.Data);
         Assert.Equal(24, pathIcon.Width);
         Assert.Equal(24, pathIcon.Height);
+        Assert.Equal(6, rectangle.RadiusX);
+        Assert.Equal(6, rectangle.RadiusY);
+        Assert.Same(shapeFill, rectangle.Fill);
+        Assert.Same(shapeStroke, rectangle.Stroke);
+        Assert.Same(shapeFill, ellipse.Fill);
+        Assert.Equal(48, line.X2);
+        Assert.Equal(18, line.Y2);
+        Assert.Equal(PenLineCap.Round, line.StrokeStartLineCap);
+        Assert.Same(polylinePoints, polyline.Points);
+        Assert.Equal(4, polyline.Points?.Count);
+        Assert.Equal(PenLineJoin.Round, polyline.StrokeLineJoin);
+        Assert.Same(polygonPoints, polygon.Points);
+        Assert.Equal(FillRule.Nonzero, polygon.FillRule);
+        Assert.Equal("M 0,16 C 8,0 24,0 32,16 S 56,32 64,16", path.Data);
+        Assert.Equal(Stretch.Uniform, path.Stretch);
         Assert.Equal("Name", label.Content);
         Assert.Same(target, label.Target);
         Assert.Equal('N', label.AccessKey);
@@ -131,7 +209,7 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(Stretch.Uniform, viewbox.Stretch);
         Assert.Equal(StretchDirection.DownOnly, viewbox.StretchDirection);
         Assert.Equal(10, stack.Spacing);
-        Assert.Equal(9, stack.Children.Count);
+        Assert.Equal(15, stack.Children.Count);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);

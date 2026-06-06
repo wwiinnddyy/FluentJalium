@@ -12,6 +12,12 @@ using Jalium.UI.Data;
 using Jalium.UI.Input;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using ShapeEllipse = Jalium.UI.Controls.Shapes.Ellipse;
+using ShapeLine = Jalium.UI.Controls.Shapes.Line;
+using ShapePath = Jalium.UI.Controls.Shapes.Path;
+using ShapePolygon = Jalium.UI.Controls.Shapes.Polygon;
+using ShapePolyline = Jalium.UI.Controls.Shapes.Polyline;
+using ShapeRectangle = Jalium.UI.Controls.Shapes.Rectangle;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 
 namespace FluentJalium.Tests;
@@ -118,6 +124,12 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWViewbox, Viewbox>(app.Resources);
             AssertBasedOnStyle<FWLabel, Label>(app.Resources);
             AssertBasedOnStyle<FWSeparator, Separator>(app.Resources);
+            AssertOwnedStyle<FWRectangle>(app.Resources);
+            AssertOwnedStyle<FWEllipse>(app.Resources);
+            AssertOwnedStyle<FWLine>(app.Resources);
+            AssertOwnedStyle<FWPolyline>(app.Resources);
+            AssertOwnedStyle<FWPolygon>(app.Resources);
+            AssertOwnedStyle<FWPath>(app.Resources);
             AssertBasedOnStyle<FWMenuBar, MenuBar>(app.Resources);
             AssertBasedOnStyle<FWMenuBarItem, MenuBarItem>(app.Resources);
             AssertBasedOnStyle<FWMenu, Menu>(app.Resources);
@@ -211,6 +223,8 @@ public sealed class FluentThemeManagerTests
             Assert.Equal(accent, GetBrushColor(app.Resources["SliderThumbBackground"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ProgressBarForeground"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["ProgressRingForeground"]));
+            Assert.Equal(Color.FromArgb(0x33, accent.R, accent.G, accent.B), GetBrushColor(app.Resources["ShapeFill"]));
+            Assert.Equal(accent, GetBrushColor(app.Resources["ShapeStroke"]));
             Assert.Equal(accent, GetBrushColor(app.Resources["RatingControlSelectedForeground"]));
         }
         finally
@@ -796,6 +810,12 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWViewbox, Viewbox>(app.Resources);
             AssertBasedOnStyle<FWLabel, Label>(app.Resources);
             AssertBasedOnStyle<FWSeparator, Separator>(app.Resources);
+            AssertOwnedStyle<FWRectangle>(app.Resources);
+            AssertOwnedStyle<FWEllipse>(app.Resources);
+            AssertOwnedStyle<FWLine>(app.Resources);
+            AssertOwnedStyle<FWPolyline>(app.Resources);
+            AssertOwnedStyle<FWPolygon>(app.Resources);
+            AssertOwnedStyle<FWPath>(app.Resources);
         }
         finally
         {
@@ -1098,6 +1118,12 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWViewbox, Viewbox>();
         AssertFluentControl<FWLabel, Label>();
         AssertFluentControl<FWSeparator, Separator>();
+        AssertFluentControl<FWRectangle, ShapeRectangle>();
+        AssertFluentControl<FWEllipse, ShapeEllipse>();
+        AssertFluentControl<FWLine, ShapeLine>();
+        AssertFluentControl<FWPolyline, ShapePolyline>();
+        AssertFluentControl<FWPolygon, ShapePolygon>();
+        AssertFluentControl<FWPath, ShapePath>();
     }
 
     [Fact]

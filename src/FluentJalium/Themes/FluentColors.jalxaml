@@ -238,6 +238,14 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFC5C5C5" />
             <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
+            <SolidColorBrush x:Key="ShapeFill" Color="#330078D4" />
+            <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#4D1683D8" />
+            <SolidColorBrush x:Key="ShapeFillPressed" Color="#400067B6" />
+            <SolidColorBrush x:Key="ShapeFillDisabled" Color="#0BFFFFFF" />
+            <SolidColorBrush x:Key="ShapeStroke" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ShapeStrokePointerOver" Color="#FF1683D8" />
+            <SolidColorBrush x:Key="ShapeStrokePressed" Color="#FF0067B6" />
+            <SolidColorBrush x:Key="ShapeStrokeDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="IconForegroundSecondary" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5DFFFFFF" />
@@ -662,6 +670,14 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#9E000000" />
             <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ShapeFill" Color="#260078D4" />
+            <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#330078D4" />
+            <SolidColorBrush x:Key="ShapeFillPressed" Color="#2E005A9E" />
+            <SolidColorBrush x:Key="ShapeFillDisabled" Color="#0F000000" />
+            <SolidColorBrush x:Key="ShapeStroke" Color="#FF0078D4" />
+            <SolidColorBrush x:Key="ShapeStrokePointerOver" Color="#FF106EBE" />
+            <SolidColorBrush x:Key="ShapeStrokePressed" Color="#FF005A9E" />
+            <SolidColorBrush x:Key="ShapeStrokeDisabled" Color="#37000000" />
             <SolidColorBrush x:Key="IconForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="IconForegroundSecondary" Color="#9E000000" />
             <SolidColorBrush x:Key="IconForegroundDisabled" Color="#5C000000" />
@@ -1066,6 +1082,14 @@
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ShapeFill" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ShapeFillPointerOver" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ShapeFillPressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ShapeFillDisabled" Color="#FF000000" />
+            <SolidColorBrush x:Key="ShapeStroke" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ShapeStrokePointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ShapeStrokePressed" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ShapeStrokeDisabled" Color="#FF7F7F7F" />
             <SolidColorBrush x:Key="IconForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="IconForegroundSecondary" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="IconForegroundDisabled" Color="#FF7F7F7F" />
