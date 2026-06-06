@@ -18,11 +18,9 @@
 
   <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
     <ProjectReference Include="$(JaliumSourceRoot)src\packaging\Jalium.UI.Desktop\Jalium.UI.Desktop.csproj" />
-    <PackageReference Include="Jalium.UI.Interop"
-                      Version="$(JaliumPackageVersion)"
-                      GeneratePathProperty="true"
-                      PrivateAssets="all"
-                      ExcludeAssets="compile;runtime;native;contentFiles;analyzers;build;buildTransitive" />
+    <PackageReference Include="Jalium.UI.Interop" Version="26.10.5" GeneratePathProperty="true" PrivateAssets="all" ExcludeAssets="compile;runtime;native;contentFiles;analyzers;build;buildTransitive">
+      <IncludeAssets>none</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseJaliumSourceReferences)' != 'true'">
