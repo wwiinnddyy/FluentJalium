@@ -27,8 +27,8 @@ public sealed class FluentVisualControlsTests
         var filledIcon = FluentIconFactory.Filled(FluentIconRegular.Share24, 24);
         var fontIcon = new FWFontIcon
         {
-            Glyph = "\uE72D",
-            FontFamily = FluentIcon.SegoeFontFamily,
+            Glyph = FluentIconRegular.Share24.GetString(),
+            FontFamily = FluentIcon.RegularFontFamily,
             FontSize = 24
         };
         var symbolIcon = new FWSymbolIcon
@@ -115,8 +115,8 @@ public sealed class FluentVisualControlsTests
         Assert.False(fluentIcon.Filled);
         Assert.Equal(FluentIconRegular.Share24, filledIcon.Icon);
         Assert.True(filledIcon.Filled);
-        Assert.Equal("\uE72D", fontIcon.Glyph);
-        Assert.Equal(FluentIcon.SegoeFontFamily, fontIcon.FontFamily?.ToString());
+        Assert.Equal(FluentIconRegular.Share24.GetString(), fontIcon.Glyph);
+        Assert.Equal(FluentIcon.RegularFontFamily, fontIcon.FontFamily?.ToString());
         Assert.Equal(24, fontIcon.FontSize);
         Assert.Equal(Symbol.Save, symbolIcon.Symbol);
         Assert.Same(geometry, pathIcon.Data);

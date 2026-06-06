@@ -9,14 +9,14 @@ namespace FluentJalium.Icon;
 public static class FluentIconExtensions
 {
     /// <summary>
-    /// Gets the regular Fluent UI System Icons glyph for an enum value.
+    /// Gets the Jalium symbol glyph that best matches a regular Fluent icon enum value.
     /// </summary>
-    public static string GetGlyph(this FluentIconRegular icon) => ConvertCodePoint((int)icon);
+    public static string GetGlyph(this FluentIconRegular icon) => FluentIconSymbolMapper.GetGlyph(icon);
 
     /// <summary>
-    /// Gets the filled Fluent UI System Icons glyph for an enum value.
+    /// Gets the Jalium symbol glyph that best matches a filled Fluent icon enum value.
     /// </summary>
-    public static string GetGlyph(this FluentIconFilled icon) => ConvertCodePoint((int)icon);
+    public static string GetGlyph(this FluentIconFilled icon) => FluentIconSymbolMapper.GetGlyph(icon);
 
     /// <summary>
     /// Gets the Segoe Fluent Icons glyph for an enum value.

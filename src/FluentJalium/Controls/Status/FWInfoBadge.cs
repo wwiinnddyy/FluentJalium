@@ -1,3 +1,4 @@
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Interop;
@@ -24,7 +25,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
 
     public static readonly DependencyProperty IconFontFamilyProperty =
         DependencyProperty.Register(nameof(IconFontFamily), typeof(string), typeof(FWInfoBadge),
-            new PropertyMetadata("Segoe Fluent Icons", OnContentPropertyChanged));
+            new PropertyMetadata(FluentIconFonts.Regular, OnContentPropertyChanged));
 
     public static readonly DependencyProperty SeverityProperty =
         DependencyProperty.Register(nameof(Severity), typeof(FWInfoBadgeSeverity), typeof(FWInfoBadge),
@@ -79,7 +80,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public string IconFontFamily
     {
-        get => (string)(GetValue(IconFontFamilyProperty) ?? "Segoe Fluent Icons");
+        get => (string)(GetValue(IconFontFamilyProperty) ?? FluentIconFonts.Regular);
         set => SetValue(IconFontFamilyProperty, value);
     }
 
@@ -210,7 +211,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
     private string GetDisplayFontFamily()
     {
         return DisplayKind == FWInfoBadgeDisplayKind.Icon
-            ? (string.IsNullOrWhiteSpace(IconFontFamily) ? "Segoe Fluent Icons" : IconFontFamily)
+            ? (string.IsNullOrWhiteSpace(IconFontFamily) ? FluentIconFonts.Regular : IconFontFamily)
             : FontFamily;
     }
 

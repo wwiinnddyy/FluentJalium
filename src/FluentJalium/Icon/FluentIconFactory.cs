@@ -8,13 +8,13 @@ namespace FluentJalium.Icon;
 public static class FluentIconFactory
 {
     /// <summary>
-    /// Creates a regular Fluent UI System Icon element.
+    /// Creates a regular Fluent-named icon element backed by Jalium's symbol font.
     /// </summary>
     public static FluentIcon Create(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
         => Regular(icon, size, foreground);
 
     /// <summary>
-    /// Creates a filled Fluent UI System Icon element.
+    /// Creates a filled Fluent-named icon element backed by Jalium's symbol font.
     /// </summary>
     public static FluentIcon Create(FluentIconFilled icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
         => Filled(icon, size, foreground);
@@ -26,19 +26,19 @@ public static class FluentIconFactory
         => Segoe(icon, size, foreground);
 
     /// <summary>
-    /// Creates a regular Fluent UI System Icon element.
+    /// Creates a regular Fluent-named icon element backed by Jalium's symbol font.
     /// </summary>
     public static FluentIcon Regular(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
         => CreateIcon(icon, FluentIconSet.Regular, false, size, foreground);
 
     /// <summary>
-    /// Creates a filled Fluent UI System Icon element.
+    /// Creates a filled Fluent-named icon element backed by Jalium's symbol font.
     /// </summary>
     public static FluentIcon Filled(FluentIconFilled icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
         => CreateIcon(icon, FluentIconSet.Filled, true, size, foreground);
 
     /// <summary>
-    /// Creates a filled Fluent UI System Icon element from a regular icon name.
+    /// Creates a filled Fluent-named icon element from a regular icon name.
     /// </summary>
     public static FluentIcon Filled(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
         => CreateIcon(icon, FluentIconSet.Filled, true, size, foreground);

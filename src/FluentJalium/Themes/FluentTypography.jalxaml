@@ -5,7 +5,7 @@
     <x:String x:Key="FluentDisplayFontFamily">Segoe UI Variable Display</x:String>
     <x:String x:Key="FluentBodyFontFamily">Segoe UI Variable Text</x:String>
     <x:String x:Key="FluentMonoFontFamily">Cascadia Code</x:String>
-    <x:String x:Key="FluentIconFontFamily">Segoe Fluent Icons</x:String>
+    <x:String x:Key="FluentIconFontFamily">Segoe MDL2 Assets</x:String>
 
     <x:String x:Key="DisplayFontFamily">Segoe UI Variable Display</x:String>
     <x:String x:Key="BodyFontFamily">Segoe UI Variable Text</x:String>

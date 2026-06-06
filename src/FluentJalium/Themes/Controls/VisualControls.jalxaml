@@ -32,7 +32,7 @@
 
     <Style TargetType="FontIcon">
         <Setter Property="Foreground" Value="{ThemeResource IconForeground}" />
-        <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
         <Setter Property="FontSize" Value="20" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">

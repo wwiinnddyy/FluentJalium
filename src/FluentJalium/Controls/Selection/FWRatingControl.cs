@@ -1,3 +1,4 @@
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
@@ -61,15 +62,15 @@ public class FWRatingControl : Control, IFluentJaliumControl
 
     public static readonly DependencyProperty GlyphProperty =
         DependencyProperty.Register(nameof(Glyph), typeof(string), typeof(FWRatingControl),
-            new PropertyMetadata("\uE735", OnLayoutPropertyChanged));
+            new PropertyMetadata(FluentIconRegular.Star48.GetString(), OnLayoutPropertyChanged));
 
     public static readonly DependencyProperty UnsetGlyphProperty =
         DependencyProperty.Register(nameof(UnsetGlyph), typeof(string), typeof(FWRatingControl),
-            new PropertyMetadata("\uE734", OnLayoutPropertyChanged));
+            new PropertyMetadata(FluentIconRegular.Star48.GetString(), OnLayoutPropertyChanged));
 
     public static readonly DependencyProperty GlyphFontFamilyProperty =
         DependencyProperty.Register(nameof(GlyphFontFamily), typeof(string), typeof(FWRatingControl),
-            new PropertyMetadata("Segoe Fluent Icons", OnLayoutPropertyChanged));
+            new PropertyMetadata(FluentIconFonts.Regular, OnLayoutPropertyChanged));
 
     private bool _isPointerOver;
     private double _pointerPreviewValue = UnsetValue;
@@ -151,21 +152,21 @@ public class FWRatingControl : Control, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public string Glyph
     {
-        get => (string)(GetValue(GlyphProperty) ?? "\uE735");
+        get => (string)(GetValue(GlyphProperty) ?? FluentIconRegular.Star48.GetString());
         set => SetValue(GlyphProperty, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public string UnsetGlyph
     {
-        get => (string)(GetValue(UnsetGlyphProperty) ?? "\uE734");
+        get => (string)(GetValue(UnsetGlyphProperty) ?? FluentIconRegular.Star48.GetString());
         set => SetValue(UnsetGlyphProperty, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public string GlyphFontFamily
     {
-        get => (string)(GetValue(GlyphFontFamilyProperty) ?? "Segoe Fluent Icons");
+        get => (string)(GetValue(GlyphFontFamilyProperty) ?? FluentIconFonts.Regular);
         set => SetValue(GlyphFontFamilyProperty, value);
     }
 
@@ -203,7 +204,7 @@ public class FWRatingControl : Control, IFluentJaliumControl
         var activeValue = GetActiveDisplayValue();
         var activeBrush = ResolveActiveBrush();
         var unsetBrush = ResolveUnsetBrush();
-        var itemFontFamily = string.IsNullOrWhiteSpace(GlyphFontFamily) ? "Segoe Fluent Icons" : GlyphFontFamily;
+        var itemFontFamily = string.IsNullOrWhiteSpace(GlyphFontFamily) ? FluentIconFonts.Regular : GlyphFontFamily;
 
         for (var index = 0; index < MaxRating; index++)
         {
@@ -227,7 +228,7 @@ public class FWRatingControl : Control, IFluentJaliumControl
 
     private RatingMetrics MeasureGlyphs()
     {
-        var itemFontFamily = string.IsNullOrWhiteSpace(GlyphFontFamily) ? "Segoe Fluent Icons" : GlyphFontFamily;
+        var itemFontFamily = string.IsNullOrWhiteSpace(GlyphFontFamily) ? FluentIconFonts.Regular : GlyphFontFamily;
         var set = CreateText(Glyph, itemFontFamily, RatingItemFontSize, ResolveActiveBrush(), FontWeights.Normal);
         var unset = CreateText(UnsetGlyph, itemFontFamily, RatingItemFontSize, ResolveUnsetBrush(), FontWeights.Normal);
         var itemWidth = Math.Max(RatingItemFontSize, Math.Max(set.Width, unset.Width));

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Ink;
@@ -1561,8 +1562,8 @@ public sealed class FluentThemeManagerTests
     {
         var fontIcon = new FWFontIcon
         {
-            Glyph = "\uE72D",
-            FontFamily = "Segoe Fluent Icons",
+            Glyph = FluentIconRegular.Share24.GetString(),
+            FontFamily = FluentIcon.RegularFontFamily,
             FontSize = 24
         };
         var symbolIcon = new FWSymbolIcon
@@ -1577,8 +1578,8 @@ public sealed class FluentThemeManagerTests
             Height = 24
         };
 
-        Assert.Equal("\uE72D", fontIcon.Glyph);
-        Assert.Equal("Segoe Fluent Icons", fontIcon.FontFamily?.ToString());
+        Assert.Equal(FluentIconRegular.Share24.GetString(), fontIcon.Glyph);
+        Assert.Equal(FluentIcon.RegularFontFamily, fontIcon.FontFamily?.ToString());
         Assert.Equal(24, fontIcon.FontSize);
         Assert.Equal(Symbol.Save, symbolIcon.Symbol);
         Assert.Same(geometry, pathIcon.Data);

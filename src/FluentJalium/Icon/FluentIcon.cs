@@ -6,7 +6,7 @@ using Jalium.UI.Media;
 namespace FluentJalium.Icon;
 
 /// <summary>
-/// Displays a Fluent UI System Icons or Segoe Fluent Icons glyph.
+/// Displays a FluentJalium icon by mapping Fluent UI icon names onto Jalium's built-in symbol font.
 /// </summary>
 public class FluentIcon : FontIcon
 {
@@ -16,19 +16,19 @@ public class FluentIcon : FontIcon
     public const double DefaultSize = 20.0;
 
     /// <summary>
-    /// Font family used for regular Fluent UI System Icons.
+    /// Font family used for regular Fluent icon fallback glyphs.
     /// </summary>
-    public const string RegularFontFamily = "FluentSystemIcons-Regular";
+    public const string RegularFontFamily = FluentIconFonts.Regular;
 
     /// <summary>
-    /// Font family used for filled Fluent UI System Icons.
+    /// Font family used for filled Fluent icon fallback glyphs.
     /// </summary>
-    public const string FilledFontFamily = "FluentSystemIcons-Filled";
+    public const string FilledFontFamily = FluentIconFonts.Filled;
 
     /// <summary>
     /// Font family used for Windows Segoe Fluent Icons compatibility glyphs.
     /// </summary>
-    public const string SegoeFontFamily = "Segoe Fluent Icons";
+    public const string SegoeFontFamily = FluentIconFonts.Segoe;
 
     private bool _isUpdating;
 
@@ -76,7 +76,7 @@ public class FluentIcon : FontIcon
     }
 
     /// <summary>
-    /// Gets or sets whether a regular system icon should use the filled glyph set.
+    /// Gets or sets whether a regular icon name should use the filled fallback set.
     /// </summary>
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Other)]
     public bool Filled

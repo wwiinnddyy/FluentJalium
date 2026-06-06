@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -588,7 +589,7 @@ public sealed class FluentSelectionControlsTests
             Value = 4,
             Caption = "Fit",
             RatingSize = FWRatingControlSize.Large,
-            GlyphFontFamily = "Segoe Fluent Icons"
+            GlyphFontFamily = FluentIconFonts.Regular
         };
         var surface = new FWFluentMaterialSurface
         {
@@ -606,7 +607,7 @@ public sealed class FluentSelectionControlsTests
         Assert.Equal(FWRatingControlSize.Large, rating.RatingSize);
         Assert.Equal(24, rating.RatingItemFontSize);
         Assert.Equal(10, rating.ItemSpacing);
-        Assert.Equal("Segoe Fluent Icons", rating.GlyphFontFamily);
+        Assert.Equal(FluentIconFonts.Regular, rating.GlyphFontFamily);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.Same(rating, surface.Child);
     }

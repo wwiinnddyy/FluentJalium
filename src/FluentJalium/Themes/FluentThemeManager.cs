@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -393,6 +394,7 @@ public static class FluentThemeManager
             ["FluentDisplayFontFamily"] = CurrentDisplayFontFamily,
             ["FluentBodyFontFamily"] = CurrentBodyFontFamily,
             ["FluentMonoFontFamily"] = CurrentMonoFontFamily,
+            ["FluentIconFontFamily"] = FluentIconFonts.Regular,
             ["DisplayFontFamily"] = CurrentDisplayFontFamily,
             ["BodyFontFamily"] = CurrentBodyFontFamily,
             ["MonoFontFamily"] = CurrentMonoFontFamily,

@@ -10,12 +10,12 @@ namespace FluentJalium.Tests;
 public sealed class FluentIconTests
 {
     [Fact]
-    public void FluentSystemIcons_ShouldConvertRegularAndFilledGlyphs()
+    public void FluentIcons_ShouldMapToJaliumSymbolGlyphs()
     {
-        Assert.Equal(char.ConvertFromUtf32((int)FluentIconRegular.Home24), FluentIconRegular.Home24.GetGlyph());
-        Assert.Equal(char.ConvertFromUtf32((int)FluentIconFilled.Home24), FluentIconFilled.Home24.GetString());
+        Assert.Equal(char.ConvertFromUtf32((int)Symbol.Home), FluentIconRegular.Home24.GetGlyph());
+        Assert.Equal(char.ConvertFromUtf32((int)Symbol.Home), FluentIconFilled.Home24.GetString());
         Assert.Equal(string.Empty, FluentIconRegular.Empty.GetString());
-        Assert.NotEqual(FluentIconRegular.Home24.GetString(), FluentIconFilled.Home24.GetString());
+        Assert.Equal(char.ConvertFromUtf32((int)Symbol.Save), FluentIconRegular.Save24.GetString());
     }
 
     [Fact]
