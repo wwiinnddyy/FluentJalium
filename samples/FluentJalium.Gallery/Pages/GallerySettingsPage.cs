@@ -1,11 +1,14 @@
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Controls;
+using FluentJalium.Gallery.Resources;
+using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWComboBox = FluentJalium.Controls.FWComboBox;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
@@ -17,38 +20,59 @@ internal sealed class GallerySettingsPage
 {
     private readonly Action<FluentThemeVariant> _applyTheme;
     private readonly Action<Color> _applyAccent;
+    private readonly LocalizationService _localization;
+    private TextBlock? _themeOutput;
+    private TextBlock? _accentOutput;
+    private TextBlock? _languageOutput;
 
     public GallerySettingsPage(Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
     {
         _applyTheme = applyTheme;
         _applyAccent = applyAccent;
+        _localization = LocalizationService.Instance;
+
+        // Subscribe to localization changes to refresh UI
+        _localization.PropertyChanged += (_, _) => RefreshLocalizedContent();
     }
 
     public UIElement CreateContent()
     {
-        var panel = CreateSection("Gallery Settings");
+        var panel = CreateSection(Strings.Settings_Title);
         var examples = new FWWrapPanel
         {
             HorizontalSpacing = 16,
             VerticalSpacing = 16
         };
 
+        // Theme mode card
         examples.Children.Add(CreateSettingsCard(
             FluentIconRegular.DarkTheme24,
-            "Theme mode",
-            "Apply the active FluentJalium theme dictionary from a footer settings surface.",
+            Strings.Settings_Theme,
+            Strings.Settings_ThemeDescription,
             CreateThemeModeSample(),
             "<FWNavigationView.FooterMenuItems>\n    <FWNavigationViewItem Content=\"Settings\" Icon=\"Settings\" />\n</FWNavigationView.FooterMenuItems>"));
+
+        // Accent color card
         examples.Children.Add(CreateSettingsCard(
             FluentIconRegular.Color24,
-            "Accent color",
-            "Validate accent-dependent brushes without leaving the current Gallery shell.",
+            Strings.Settings_Accent,
+            Strings.Settings_AccentDescription,
             CreateAccentSample(),
             "FluentThemeManager.ApplyAccent(application, Color.FromRgb(0x00, 0x78, 0xD4));"));
+
+        // Language selection card
+        examples.Children.Add(CreateSettingsCard(
+            FluentIconRegular.LocalLanguage24,
+            Strings.Settings_Language,
+            Strings.Settings_LanguageDescription,
+            CreateLanguageSample(),
+            "LocalizationService.Instance.ChangeLanguage(\"zh-CN\");"));
+
+        // Gallery diagnostics card
         examples.Children.Add(CreateSettingsCard(
             FluentIconRegular.DataUsage24,
-            "Gallery diagnostics",
-            "Keep design, metadata, and state checks discoverable from footer navigation.",
+            Strings.Settings_Diagnostics,
+            Strings.Settings_DiagnosticsDescription,
             CreateDiagnosticsSample(),
             "GalleryCatalog.CreatePageInfos()\n    .Where(page => page.IsFooter || page.Status != GalleryPageStatus.Stable);"));
 
@@ -56,9 +80,29 @@ internal sealed class GallerySettingsPage
         return panel;
     }
 
+    private void RefreshLocalizedContent()
+    {
+        // Update status outputs with new language
+        if (_themeOutput != null)
+        {
+            _themeOutput.Text = string.Format(Strings.Status_Theme, FluentThemeManager.CurrentTheme);
+        }
+
+        if (_accentOutput != null)
+        {
+            var color = FluentThemeManager.CurrentAccentColor;
+            _accentOutput.Text = string.Format(Strings.Status_Accent, $"{color.R:X2}{color.G:X2}{color.B:X2}");
+        }
+
+        if (_languageOutput != null)
+        {
+            _languageOutput.Text = string.Format(Strings.Status_Language, _localization.CurrentCulture.DisplayName);
+        }
+    }
+
     private UIElement CreateThemeModeSample()
     {
-        var output = CreateOutput($"Theme: {FluentThemeManager.CurrentTheme}.");
+        _themeOutput = CreateOutput(string.Format(Strings.Status_Theme, FluentThemeManager.CurrentTheme));
 
         return new FWStackPanel
         {
@@ -67,29 +111,30 @@ internal sealed class GallerySettingsPage
             Children =
             {
                 CreateButtonRow(
-                    CreateActionButton(FluentIconRegular.WeatherSunny24, "Light", () =>
+                    CreateActionButton(FluentIconRegular.WeatherSunny24, Strings.Settings_ThemeLight, () =>
                     {
                         _applyTheme(FluentThemeVariant.Light);
-                        output.Text = "Theme: Light.";
+                        _themeOutput.Text = string.Format(Strings.Status_Theme, "Light");
                     }),
-                    CreateActionButton(FluentIconRegular.DarkTheme24, "Dark", () =>
+                    CreateActionButton(FluentIconRegular.DarkTheme24, Strings.Settings_ThemeDark, () =>
                     {
                         _applyTheme(FluentThemeVariant.Dark);
-                        output.Text = "Theme: Dark.";
+                        _themeOutput.Text = string.Format(Strings.Status_Theme, "Dark");
                     }),
-                    CreateActionButton(FluentIconRegular.Accessibility24, "High Contrast", () =>
+                    CreateActionButton(FluentIconRegular.Accessibility24, Strings.Settings_ThemeHighContrast, () =>
                     {
                         _applyTheme(FluentThemeVariant.HighContrast);
-                        output.Text = "Theme: HighContrast.";
+                        _themeOutput.Text = string.Format(Strings.Status_Theme, "HighContrast");
                     })),
-                CreateStatus(output)
+                CreateStatus(_themeOutput)
             }
         };
     }
 
     private UIElement CreateAccentSample()
     {
-        var output = CreateOutput($"Accent: #{FluentThemeManager.CurrentAccentColor.R:X2}{FluentThemeManager.CurrentAccentColor.G:X2}{FluentThemeManager.CurrentAccentColor.B:X2}.");
+        var currentColor = FluentThemeManager.CurrentAccentColor;
+        _accentOutput = CreateOutput(string.Format(Strings.Status_Accent, $"{currentColor.R:X2}{currentColor.G:X2}{currentColor.B:X2}"));
 
         return new FWStackPanel
         {
@@ -103,13 +148,88 @@ internal sealed class GallerySettingsPage
                     VerticalSpacing = 10,
                     Children =
                     {
-                        CreateAccentButton("Blue", Color.FromRgb(0x00, 0x78, 0xD4), output),
-                        CreateAccentButton("Rose", Color.FromRgb(0xC2, 0x39, 0xB3), output),
-                        CreateAccentButton("Orange", Color.FromRgb(0xD8, 0x3B, 0x01), output),
-                        CreateAccentButton("Green", Color.FromRgb(0x10, 0x7C, 0x10), output)
+                        CreateAccentButton(Strings.Color_Blue, Color.FromRgb(0x00, 0x78, 0xD4), _accentOutput),
+                        CreateAccentButton(Strings.Color_Rose, Color.FromRgb(0xC2, 0x39, 0xB3), _accentOutput),
+                        CreateAccentButton(Strings.Color_Orange, Color.FromRgb(0xD8, 0x3B, 0x01), _accentOutput),
+                        CreateAccentButton(Strings.Color_Green, Color.FromRgb(0x10, 0x7C, 0x10), _accentOutput)
                     }
                 },
-                CreateStatus(output)
+                CreateStatus(_accentOutput)
+            }
+        };
+    }
+
+    private UIElement CreateLanguageSample()
+    {
+        _languageOutput = CreateOutput(string.Format(Strings.Status_Language, _localization.CurrentCulture.DisplayName));
+
+        var comboBox = new FWComboBox
+        {
+            MinWidth = 280,
+            SelectedIndex = 0
+        };
+
+        // Add language items
+        var currentCultureName = _localization.CurrentCulture.Name;
+        var selectedIndex = 0;
+
+        for (var i = 0; i < _localization.SupportedLanguages.Count; i++)
+        {
+            var lang = _localization.SupportedLanguages[i];
+            var item = new ComboBoxItem
+            {
+                Content = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        new FWTextBlock
+                        {
+                            Text = lang.Flag,
+                            FontSize = 16,
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new FWTextBlock
+                        {
+                            Text = lang.DisplayName,
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    }
+                },
+                Tag = lang.CultureName
+            };
+
+            if (lang.CultureName == currentCultureName)
+            {
+                selectedIndex = i;
+            }
+
+            comboBox.Items.Add(item);
+        }
+
+        comboBox.SelectedIndex = selectedIndex;
+        comboBox.SelectionChanged += (_, _) =>
+        {
+            if (comboBox.SelectedItem is ComboBoxItem item && item.Tag is string cultureName)
+            {
+                _localization.ChangeLanguage(cultureName);
+                var selectedLang = _localization.SupportedLanguages.FirstOrDefault(l => l.CultureName == cultureName);
+                if (selectedLang != null && _languageOutput != null)
+                {
+                    _languageOutput.Text = string.Format(Strings.Status_Language, selectedLang.DisplayName);
+                }
+            }
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                comboBox,
+                CreateStatus(_languageOutput)
             }
         };
     }
@@ -122,12 +242,12 @@ internal sealed class GallerySettingsPage
             Spacing = 10,
             Children =
             {
-                CreateDiagnosticRow(FluentIconRegular.Navigation24, "Shell", "NavigationView + Frame routes through GalleryHostPage."),
-                CreateDiagnosticRow(FluentIconRegular.DatabaseSearch24, "Catalog", "Metadata entries resolve through UniqueId page factories."),
-                CreateDiagnosticRow(FluentIconRegular.DataUsage24, "State Matrix", "Footer diagnostics stay available beside Settings."),
+                CreateDiagnosticRow(FluentIconRegular.Navigation24, Strings.Diag_Shell, Strings.Diag_ShellDesc),
+                CreateDiagnosticRow(FluentIconRegular.DatabaseSearch24, Strings.Diag_Catalog, Strings.Diag_CatalogDesc),
+                CreateDiagnosticRow(FluentIconRegular.DataUsage24, Strings.Diag_StateMatrix, Strings.Diag_StateMatrixDesc),
                 new FWToggleSwitch
                 {
-                    Header = "Show metadata chips",
+                    Header = Strings.Diag_ShowMetadata,
                     IsOn = true
                 }
             }
@@ -164,7 +284,7 @@ internal sealed class GallerySettingsPage
         button.Click += (_, _) =>
         {
             _applyAccent(color);
-            output.Text = $"Accent: #{color.R:X2}{color.G:X2}{color.B:X2}.";
+            output.Text = string.Format(Strings.Status_Accent, $"{color.R:X2}{color.G:X2}{color.B:X2}");
         };
         return button;
     }

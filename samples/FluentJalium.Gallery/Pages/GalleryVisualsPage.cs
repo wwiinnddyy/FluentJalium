@@ -80,8 +80,8 @@ internal sealed class GalleryVisualsPage
             "Font",
             new FWFontIcon
             {
-                Glyph = "\uE72D",
-                FontFamily = FluentIcon.SegoeFontFamily,
+                Glyph = FluentIconRegular.Share24.GetString(),
+                FontFamily = FluentIcon.RegularFontFamily,
                 FontSize = 24,
                 Foreground = ThemeBrush("TextPrimary")
             });

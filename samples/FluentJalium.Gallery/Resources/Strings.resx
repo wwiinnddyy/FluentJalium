@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Settings Page -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Gallery Settings</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>Theme mode</value>
+  </data>
+  <data name="Settings_ThemeDescription" xml:space="preserve">
+    <value>Apply the active FluentJalium theme dictionary from a footer settings surface.</value>
+  </data>
+  <data name="Settings_ThemeLight" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_ThemeHighContrast" xml:space="preserve">
+    <value>High Contrast</value>
+  </data>
+  <data name="Settings_Accent" xml:space="preserve">
+    <value>Accent color</value>
+  </data>
+  <data name="Settings_AccentDescription" xml:space="preserve">
+    <value>Validate accent-dependent brushes without leaving the current Gallery shell.</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_LanguageDescription" xml:space="preserve">
+    <value>Select the app display language (requires restart)</value>
+  </data>
+  <data name="Settings_Diagnostics" xml:space="preserve">
+    <value>Gallery diagnostics</value>
+  </data>
+  <data name="Settings_DiagnosticsDescription" xml:space="preserve">
+    <value>Keep design, metadata, and state checks discoverable from footer navigation.</value>
+  </data>
+
+  <!-- Theme Status -->
+  <data name="Status_Theme" xml:space="preserve">
+    <value>Theme: {0}.</value>
+  </data>
+  <data name="Status_Accent" xml:space="preserve">
+    <value>Accent: #{0}.</value>
+  </data>
+  <data name="Status_Language" xml:space="preserve">
+    <value>Language: {0}.</value>
+  </data>
+
+  <!-- Diagnostics -->
+  <data name="Diag_Shell" xml:space="preserve">
+    <value>Shell</value>
+  </data>
+  <data name="Diag_ShellDesc" xml:space="preserve">
+    <value>NavigationView + Frame routes through GalleryHostPage.</value>
+  </data>
+  <data name="Diag_Catalog" xml:space="preserve">
+    <value>Catalog</value>
+  </data>
+  <data name="Diag_CatalogDesc" xml:space="preserve">
+    <value>Metadata entries resolve through UniqueId page factories.</value>
+  </data>
+  <data name="Diag_StateMatrix" xml:space="preserve">
+    <value>State Matrix</value>
+  </data>
+  <data name="Diag_StateMatrixDesc" xml:space="preserve">
+    <value>Footer diagnostics stay available beside Settings.</value>
+  </data>
+  <data name="Diag_ShowMetadata" xml:space="preserve">
+    <value>Show metadata chips</value>
+  </data>
+
+  <!-- Color Names -->
+  <data name="Color_Blue" xml:space="preserve">
+    <value>Blue</value>
+  </data>
+  <data name="Color_Rose" xml:space="preserve">
+    <value>Rose</value>
+  </data>
+  <data name="Color_Orange" xml:space="preserve">
+    <value>Orange</value>
+  </data>
+  <data name="Color_Green" xml:space="preserve">
+    <value>Green</value>
+  </data>
+</root>

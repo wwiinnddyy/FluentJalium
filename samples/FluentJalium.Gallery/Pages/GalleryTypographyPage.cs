@@ -55,7 +55,7 @@ internal sealed class GalleryTypographyPage
                 CreateFamilyPreview("Display", "DisplayFontFamily", FluentThemeManager.CurrentDisplayFontFamily, 22, "FluentJalium Gallery"),
                 CreateFamilyPreview("Body", "BodyFontFamily", FluentThemeManager.CurrentBodyFontFamily, 14, "Readable controls, descriptions, and state labels."),
                 CreateFamilyPreview("Mono", "MonoFontFamily", FluentThemeManager.CurrentMonoFontFamily, 13, "FWButton | FWTextBox | FWNavigationView"),
-                CreateFamilyPreview("Icon", "FluentIconFontFamily", FormatResourceValue("FluentIconFontFamily"), 18, "Segoe Fluent Icons")
+                CreateFamilyPreview("Icon", "FluentIconFontFamily", FormatResourceValue("FluentIconFontFamily"), 18, FluentIconFonts.Regular)
             }
         };
     }

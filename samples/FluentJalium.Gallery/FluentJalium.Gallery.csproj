@@ -27,6 +27,25 @@
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Localization resources -->
+    <EmbeddedResource Update="Resources\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.zh-CN.resx">
+      <DependentUpon>Strings.resx</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Strings.zh-TW.resx">
+      <DependentUpon>Strings.resx</DependentUpon>
+    </EmbeddedResource>
+    <Compile Update="Resources\Strings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
   <Target Name="CopyPackageJaliumNativeRuntimeForSourceReferences"
           AfterTargets="CopyFilesToOutputDirectory"
           Condition="'$(UseJaliumPackageNativeRuntime)' == 'true' and '$(UseJaliumSourceReferences)' == 'true'">

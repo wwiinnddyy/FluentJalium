@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Settings Page -->
+  <data name="Settings_Title" xml:space="preserve">
+    <value>展示庫設定</value>
+  </data>
+  <data name="Settings_Theme" xml:space="preserve">
+    <value>主題模式</value>
+  </data>
+  <data name="Settings_ThemeDescription" xml:space="preserve">
+    <value>從底部設定介面套用活動的FluentJalium主題字典。</value>
+  </data>
+  <data name="Settings_ThemeLight" xml:space="preserve">
+    <value>淺色</value>
+  </data>
+  <data name="Settings_ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="Settings_ThemeHighContrast" xml:space="preserve">
+    <value>高對比</value>
+  </data>
+  <data name="Settings_Accent" xml:space="preserve">
+    <value>主題色</value>
+  </data>
+  <data name="Settings_AccentDescription" xml:space="preserve">
+    <value>在不離開當前展示庫介面的情況下驗證依賴主題色的筆刷。</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="Settings_LanguageDescription" xml:space="preserve">
+    <value>選擇應用程式顯示語言（需要重新啟動）</value>
+  </data>
+  <data name="Settings_Diagnostics" xml:space="preserve">
+    <value>展示庫診斷</value>
+  </data>
+  <data name="Settings_DiagnosticsDescription" xml:space="preserve">
+    <value>保持設計、中繼資料和狀態檢查從底部導覽可發現。</value>
+  </data>
+
+  <!-- Theme Status -->
+  <data name="Status_Theme" xml:space="preserve">
+    <value>主題：{0}。</value>
+  </data>
+  <data name="Status_Accent" xml:space="preserve">
+    <value>主題色：#{0}。</value>
+  </data>
+  <data name="Status_Language" xml:space="preserve">
+    <value>語言：{0}。</value>
+  </data>
+
+  <!-- Diagnostics -->
+  <data name="Diag_Shell" xml:space="preserve">
+    <value>外殼</value>
+  </data>
+  <data name="Diag_ShellDesc" xml:space="preserve">
+    <value>NavigationView + Frame 透過GalleryHostPage路由。</value>
+  </data>
+  <data name="Diag_Catalog" xml:space="preserve">
+    <value>目錄</value>
+  </data>
+  <data name="Diag_CatalogDesc" xml:space="preserve">
+    <value>中繼資料項目透過UniqueId頁面工廠解析。</value>
+  </data>
+  <data name="Diag_StateMatrix" xml:space="preserve">
+    <value>狀態矩陣</value>
+  </data>
+  <data name="Diag_StateMatrixDesc" xml:space="preserve">
+    <value>底部診斷與設定並排保持可用。</value>
+  </data>
+  <data name="Diag_ShowMetadata" xml:space="preserve">
+    <value>顯示中繼資料標籤</value>
+  </data>
+
+  <!-- Color Names -->
+  <data name="Color_Blue" xml:space="preserve">
+    <value>藍色</value>
+  </data>
+  <data name="Color_Rose" xml:space="preserve">
+    <value>玫瑰色</value>
+  </data>
+  <data name="Color_Orange" xml:space="preserve">
+    <value>橙色</value>
+  </data>
+  <data name="Color_Green" xml:space="preserve">
+    <value>綠色</value>
+  </data>
+</root>

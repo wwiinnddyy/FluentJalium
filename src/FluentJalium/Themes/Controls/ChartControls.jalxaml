@@ -1,0 +1,419 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:fluent="https://jalium.dev/fluent"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="LineChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="160" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="LineChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWLineChart" BasedOn="{StaticResource {x:Type LineChart}}" />
+
+    <Style TargetType="BarChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="160" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="BarCornerRadius" Value="3,3,0,0" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="BarChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWBarChart" BasedOn="{StaticResource {x:Type BarChart}}" />
+
+    <Style TargetType="PieChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="180" />
+        <Setter Property="MinHeight" Value="180" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="PieChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWPieChart" BasedOn="{StaticResource {x:Type PieChart}}" />
+
+    <Style TargetType="ScatterPlot">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="160" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ScatterPlot">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWScatterPlot" BasedOn="{StaticResource {x:Type ScatterPlot}}" />
+
+    <Style TargetType="Heatmap">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="160" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="CellBorderBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Heatmap">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWHeatmap" BasedOn="{StaticResource {x:Type Heatmap}}" />
+
+    <Style TargetType="Sparkline">
+        <Setter Property="Background" Value="{ThemeResource ChartInlineBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartInlineBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="MinWidth" Value="64" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="LineBrush" Value="{ThemeResource ChartPalette1}" />
+        <Setter Property="FillBrush" Value="{ThemeResource ChartAreaFillBrush}" />
+        <Setter Property="HighPointBrush" Value="{ThemeResource ChartPositiveBrush}" />
+        <Setter Property="LowPointBrush" Value="{ThemeResource ChartNegativeBrush}" />
+        <Setter Property="NegativeBarBrush" Value="{ThemeResource ChartNegativeBrush}" />
+        <Setter Property="WinColor" Value="{ThemeResource ChartPositiveBrush}" />
+        <Setter Property="LossColor" Value="{ThemeResource ChartNegativeBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Sparkline">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWSparkline" BasedOn="{StaticResource {x:Type Sparkline}}" />
+
+    <Style TargetType="GaugeChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="180" />
+        <Setter Property="MinHeight" Value="140" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="TrackBrush" Value="{ThemeResource ChartTrackBrush}" />
+        <Setter Property="NeedleBrush" Value="{ThemeResource ChartNeedleBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="GaugeChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWGaugeChart" BasedOn="{StaticResource {x:Type GaugeChart}}" />
+
+    <Style TargetType="TreeMap">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="160" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="CellBorderBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="TreeMap">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWTreeMap" BasedOn="{StaticResource {x:Type TreeMap}}" />
+
+    <Style TargetType="CandlestickChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="240" />
+        <Setter Property="MinHeight" Value="180" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="CandlestickChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWCandlestickChart" BasedOn="{StaticResource {x:Type CandlestickChart}}" />
+
+    <Style TargetType="NetworkGraph">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="220" />
+        <Setter Property="MinHeight" Value="220" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="NetworkGraph">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWNetworkGraph" BasedOn="{StaticResource {x:Type NetworkGraph}}" />
+
+    <Style TargetType="GanttChart">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="320" />
+        <Setter Property="MinHeight" Value="220" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="AxisBrush" Value="{ThemeResource ChartAxisBrush}" />
+        <Setter Property="GridLineBrush" Value="{ThemeResource ChartGridLineBrush}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="GanttChart">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWGanttChart" BasedOn="{StaticResource {x:Type GanttChart}}" />
+
+    <Style TargetType="SankeyDiagram">
+        <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="MinWidth" Value="320" />
+        <Setter Property="MinHeight" Value="220" />
+        <Setter Property="TitleForeground" Value="{ThemeResource ChartTitleForeground}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="SankeyDiagram">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.56" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWSankeyDiagram" BasedOn="{StaticResource {x:Type SankeyDiagram}}" />
+
+    <Style TargetType="ChartLegend">
+        <Setter Property="Background" Value="{ThemeResource ChartLegendBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartLegendBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ChartLegend">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Padding="{TemplateBinding Padding}"
+                        ClipToBounds="True" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style TargetType="fluent:FWChartLegend" BasedOn="{StaticResource {x:Type ChartLegend}}" />
+
+    <Style TargetType="ChartTooltip">
+        <Setter Property="Background" Value="{ThemeResource ChartTooltipBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ChartTooltipForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ChartTooltipBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="8,4,8,4" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ChartTooltip">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ContentPresenter />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style TargetType="fluent:FWChartTooltip" BasedOn="{StaticResource {x:Type ChartTooltip}}" />
+</ResourceDictionary>
