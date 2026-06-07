@@ -206,6 +206,44 @@ public class FWAutoCompleteBox : AutoCompleteBox, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium AutoSuggestBox control.
+/// </summary>
+public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWTextInputDensity), typeof(FWAutoSuggestBox),
+            new PropertyMetadata(FWTextInputDensity.Comfortable, OnDensityChanged));
+
+    public FWAutoSuggestBox()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWTextInputDensity Density
+    {
+        get => (FWTextInputDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWAutoSuggestBox autoSuggestBox && e.NewValue is FWTextInputDensity density)
+        {
+            ApplyDensity(autoSuggestBox, density);
+        }
+    }
+
+    private static void ApplyDensity(FWAutoSuggestBox autoSuggestBox, FWTextInputDensity density)
+    {
+        var (minHeight, padding, maxDropDownHeight) = FWAutoCompleteBox.GetDensityMetrics(density);
+        autoSuggestBox.MinHeight = minHeight;
+        autoSuggestBox.Padding = padding;
+        autoSuggestBox.MaxDropDownHeight = maxDropDownHeight;
+    }
+}
+
+/// <summary>
 /// FluentJalium RichTextBox control.
 /// </summary>
 public class FWRichTextBox : RichTextBox, IFluentJaliumControl

@@ -62,6 +62,44 @@ public class FWDatePicker : DatePicker, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium CalendarDatePicker control.
+/// </summary>
+public class FWCalendarDatePicker : DatePicker, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWDateTimePickerDensity), typeof(FWCalendarDatePicker),
+            new PropertyMetadata(FWDateTimePickerDensity.Comfortable, OnDensityChanged));
+
+    public FWCalendarDatePicker()
+    {
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWDateTimePickerDensity Density
+    {
+        get => (FWDateTimePickerDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWCalendarDatePicker picker && e.NewValue is FWDateTimePickerDensity density)
+        {
+            ApplyDensity(picker, density);
+        }
+    }
+
+    private static void ApplyDensity(FWCalendarDatePicker picker, FWDateTimePickerDensity density)
+    {
+        var (minHeight, minWidth, padding) = FWDatePicker.GetDensityMetrics(density);
+        picker.MinHeight = minHeight;
+        picker.MinWidth = minWidth;
+        picker.Padding = padding;
+    }
+}
+
+/// <summary>
 /// FluentJalium TimePicker control.
 /// </summary>
 public class FWTimePicker : TimePicker, IFluentJaliumControl
@@ -113,5 +151,12 @@ public class FWTimePicker : TimePicker, IFluentJaliumControl
 /// FluentJalium Calendar control.
 /// </summary>
 public class FWCalendar : Calendar, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium CalendarView control.
+/// </summary>
+public class FWCalendarView : Calendar, IFluentJaliumControl
 {
 }

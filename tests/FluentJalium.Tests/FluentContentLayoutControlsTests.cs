@@ -1,9 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using FluentJalium.Controls;
+using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Themes;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 
 namespace FluentJalium.Tests;
 
@@ -85,6 +91,17 @@ public sealed class FluentContentLayoutControlsTests
             TransitionMode = TransitionMode.LiquidMorph,
             Content = grid
         };
+        var splitView = new FWSplitView
+        {
+            Pane = stack,
+            Content = transitionHost,
+            DisplayMode = FWSplitViewDisplayMode.CompactInline,
+            PanePlacement = FWSplitViewPanePlacement.Right,
+            OpenPaneLength = 300,
+            CompactPaneLength = 56,
+            IsPaneOpen = false,
+            IsLightDismissEnabled = false
+        };
         var surface = new FWFluentMaterialSurface
         {
             MaterialKind = FWFluentMaterialKind.LiquidGlass,
@@ -95,7 +112,7 @@ public sealed class FluentContentLayoutControlsTests
             FusionRadius = 24,
             Shape = BorderShape.SuperEllipse,
             SuperEllipseN = 4,
-            Child = stack
+            Child = splitView
         };
 
         Assert.Equal("Selectable Fluent text", textBlock.Text);
@@ -126,6 +143,37 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Same(wrap, grid.Children[0]);
         Assert.Equal(TransitionMode.LiquidMorph, transitionHost.TransitionMode);
         Assert.Same(grid, transitionHost.Content);
+        Assert.Same(stack, splitView.Pane);
+        Assert.Same(transitionHost, splitView.Content);
+        Assert.Equal(FWSplitViewDisplayMode.CompactInline, splitView.DisplayMode);
+        Assert.Equal(FWSplitViewPanePlacement.Right, splitView.PanePlacement);
+        Assert.Equal(56, splitView.ActualPaneLength);
+        Assert.False(splitView.IsOverlayMode);
+        Assert.False(splitView.IsLightDismissEnabled);
+        splitView.OpenPane();
+        Assert.True(splitView.IsPaneOpen);
+        Assert.Equal(300, splitView.ActualPaneLength);
+        splitView.TogglePane();
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(56, splitView.ActualPaneLength);
+
+        var inlineSplitView = new FWSplitView
+        {
+            DisplayMode = FWSplitViewDisplayMode.Inline,
+            OpenPaneLength = 240,
+            CompactPaneLength = 52
+        };
+        Assert.Equal(240, inlineSplitView.ActualPaneLength);
+        inlineSplitView.ClosePane();
+        Assert.Equal(0, inlineSplitView.ActualPaneLength);
+        inlineSplitView.DisplayMode = FWSplitViewDisplayMode.CompactOverlay;
+        Assert.Equal(52, inlineSplitView.ActualPaneLength);
+        inlineSplitView.OpenPane();
+        Assert.Equal(240, inlineSplitView.ActualPaneLength);
+        inlineSplitView.DisplayMode = FWSplitViewDisplayMode.Overlay;
+        inlineSplitView.ClosePane();
+        Assert.Equal(0, inlineSplitView.ActualPaneLength);
+
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);
@@ -133,7 +181,7 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(24, surface.FusionRadius);
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
-        Assert.Same(stack, surface.Child);
+        Assert.Same(splitView, surface.Child);
     }
 
     [Fact]
@@ -220,6 +268,28 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void GenericTheme_ShouldDefineSplitViewStyle()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        ResourceDictionary.CurrentThemeKey = FluentThemeVariant.Dark.ToString();
+
+        var dictionary = LoadGenericThemeDictionary();
+
+        var splitViewStyle = AssertStyle<FWSplitView>(dictionary);
+        Assert.Equal(typeof(ContentControl), splitViewStyle.BasedOn?.TargetType);
+        AssertSetter(splitViewStyle, FWSplitView.DisplayModeProperty);
+        AssertSetter(splitViewStyle, FWSplitView.PanePlacementProperty);
+        AssertSetter(splitViewStyle, FWSplitView.OpenPaneLengthProperty);
+        AssertSetter(splitViewStyle, FWSplitView.CompactPaneLengthProperty);
+        AssertSetter(splitViewStyle, FWSplitView.PaneBackgroundProperty);
+        AssertSetter(splitViewStyle, FWSplitView.ContentBackgroundProperty);
+
+        ResetApplicationState();
+    }
+
+    [Fact]
     public void FWTransitioningContentControl_ShouldApplyExplicitTransitionRecipe()
     {
         var transitionHost = new FWTransitioningContentControl();
@@ -235,5 +305,39 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(TransitionMode.WaveDistortion, transitionHost.TransitionMode);
         Assert.Equal(new AnimationDuration(TimeSpan.FromMilliseconds(640)), transitionHost.TransitionDuration);
         Assert.Equal(TransitionTimingFunction.EaseInOut, transitionHost.TransitionTimingFunction);
+    }
+
+    private static ResourceDictionary LoadGenericThemeDictionary()
+    {
+        var loaded = ResourceDictionary.SourceLoader?.Invoke(
+            new ResourceDictionary(),
+            new Uri("/FluentJalium;component/Themes/Generic.jalxaml", UriKind.Relative),
+            FluentThemeManager.ThemeAssembly);
+
+        return Assert.IsType<ResourceDictionary>(loaded);
+    }
+
+    private static Style AssertStyle<TControl>(ResourceDictionary dictionary)
+        where TControl : FrameworkElement
+    {
+        Assert.True(dictionary.TryGetValue(typeof(TControl), out var value), $"{typeof(TControl).Name} style was not found.");
+        return Assert.IsType<Style>(value);
+    }
+
+    private static void AssertSetter(Style style, DependencyProperty property)
+    {
+        Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private static void ResetApplicationState()
+    {
+        var currentField = typeof(Application).GetField("_current", BindingFlags.NonPublic | BindingFlags.Static);
+        currentField?.SetValue(null, null);
+
+        var jaliumReset = typeof(JaliumThemeManager).GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Static);
+        jaliumReset?.Invoke(null, null);
+
+        var fluentReset = typeof(FluentThemeManager).GetMethod("Reset", BindingFlags.NonPublic | BindingFlags.Static);
+        fluentReset?.Invoke(null, null);
     }
 }

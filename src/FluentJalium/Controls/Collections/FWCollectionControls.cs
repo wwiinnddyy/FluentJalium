@@ -190,6 +190,78 @@ public class FWListViewItem : ListViewItem, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium GridView control.
+/// </summary>
+public class FWGridView : ListView, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWCollectionDensity), typeof(FWGridView),
+            new PropertyMetadata(FWCollectionDensity.Comfortable, OnDensityChanged));
+
+    public FWGridView()
+    {
+        View = new Jalium.UI.Controls.GridView();
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWCollectionDensity Density
+    {
+        get => (FWCollectionDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWGridView gridView && e.NewValue is FWCollectionDensity density)
+        {
+            ApplyDensity(gridView, density);
+        }
+    }
+
+    private static void ApplyDensity(FWGridView gridView, FWCollectionDensity density)
+    {
+        var (padding, _, _) = FWListBox.GetListDensityMetrics(density);
+        gridView.Padding = padding;
+    }
+
+    protected override FrameworkElement GetContainerForItem(object item)
+    {
+        return new FWGridViewItem { Density = Density };
+    }
+}
+
+/// <summary>
+/// FluentJalium GridViewItem control.
+/// </summary>
+public class FWGridViewItem : ListViewItem, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWCollectionDensity), typeof(FWGridViewItem),
+            new PropertyMetadata(FWCollectionDensity.Comfortable, OnDensityChanged));
+
+    public FWGridViewItem()
+    {
+        FWListBox.ApplyListItemDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWCollectionDensity Density
+    {
+        get => (FWCollectionDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWGridViewItem item && e.NewValue is FWCollectionDensity density)
+        {
+            FWListBox.ApplyListItemDensity(item, density);
+        }
+    }
+}
+
+/// <summary>
 /// FluentJalium TreeView control.
 /// </summary>
 public class FWTreeView : TreeView, IFluentJaliumControl

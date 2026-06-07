@@ -32,9 +32,9 @@ internal sealed class GalleryDesignPage
         examples.Children.Add(GallerySampleCard.Create(
             FluentIconRegular.DatabaseSearch24,
             "Catalog metadata",
-            "Catalog entries follow WinUI ControlInfoData shape: stable ids, groups, icons, tags, related controls, status, and documentation links.",
+            "Catalog entries follow WinUI ControlInfoData shape: stable ids, groups, icons, source paths, API namespaces, base classes, related controls, status, and sample keys.",
             CreateCatalogSample(),
-            code: "GalleryCatalogEntry(\n    Title,\n    Description,\n    Group,\n    Icon,\n    Keywords,\n    Status,\n    IsFooter)"));
+            code: "GalleryCatalogEntry(\n    UniqueId,\n    GroupId,\n    Icon,\n    Keywords,\n    Status,\n    IsNew,\n    IsUpdated,\n    SourcePath,\n    BaseClasses,\n    ApiNamespace,\n    RelatedControls,\n    SampleCodeKey)"));
         examples.Children.Add(GallerySampleCard.Create(
             FluentIconRegular.AppFolder24,
             "Sample card anatomy",
@@ -189,6 +189,9 @@ internal sealed class GalleryDesignPage
                 CreateCatalogRow("UniqueId", "Stable search/navigation key"),
                 CreateCatalogRow("Group", "Navigation category and sort order"),
                 CreateCatalogRow("Keywords", "Search tags and related FW controls"),
+                CreateCatalogRow("SourcePath", "WinUI-style source or sample route"),
+                CreateCatalogRow("ApiNamespace", "Primary API surface namespace"),
+                CreateCatalogRow("BaseClasses", "Control lineage and parity hints"),
                 CreateCatalogRow("Status", "Stable, preview, or diagnostic"),
                 CreateCatalogRow("Factory", "Resolved separately by GalleryCatalogService")
             }

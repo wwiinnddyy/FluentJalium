@@ -77,6 +77,10 @@ public sealed class FluentNavigationControlsTests
             AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
+            AssertStyle<FWTabView>(app.Resources);
+            AssertBasedOnStyle<FWTabViewItem, TabItem>(app.Resources);
+            AssertStyle<FWSelectorBar>(app.Resources);
+            AssertStyle<FWSelectorBarItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
         }
         finally
@@ -128,6 +132,25 @@ public sealed class FluentNavigationControlsTests
         var fwTabItemStyle = AssertStyle<FWTabItem>(dictionary);
         Assert.Equal(typeof(TabItem), fwTabItemStyle.BasedOn?.TargetType);
         AssertSetter(fwTabItemStyle, FWTabItem.DensityProperty);
+
+        var tabViewStyle = AssertStyle<FWTabView>(dictionary);
+        AssertSetter(tabViewStyle, FWTabView.DensityProperty);
+        AssertSetter(tabViewStyle, FWTabView.TabWidthModeProperty);
+        AssertSetter(tabViewStyle, FWTabView.CloseButtonOverlayModeProperty);
+
+        var fwTabViewItemStyle = AssertStyle<FWTabViewItem>(dictionary);
+        Assert.Equal(typeof(TabItem), fwTabViewItemStyle.BasedOn?.TargetType);
+        AssertSetter(fwTabViewItemStyle, FWTabViewItem.IsClosableProperty);
+
+        var selectorBarStyle = AssertStyle<FWSelectorBar>(dictionary);
+        AssertSetter(selectorBarStyle, FWSelectorBar.DensityProperty);
+        AssertSetter(selectorBarStyle, FWSelectorBar.OrientationProperty);
+        AssertSetter(selectorBarStyle, FWSelectorBar.SelectionIndicatorPlacementProperty);
+
+        var selectorBarItemStyle = AssertStyle<FWSelectorBarItem>(dictionary);
+        AssertSetter(selectorBarItemStyle, Control.PaddingProperty);
+        AssertSetter(selectorBarItemStyle, Control.BackgroundProperty);
+        AssertSetter(selectorBarItemStyle, Control.BorderBrushProperty);
 
         var frameStyle = AssertStyle<Frame>(dictionary);
         AssertSetter(frameStyle, Control.BackgroundProperty);
@@ -195,6 +218,125 @@ public sealed class FluentNavigationControlsTests
 
         Assert.Equal(32, tabItem.MinHeight);
         Assert.Equal(new Thickness(12, 7, 12, 7), tabItem.Padding);
+    }
+
+    [Fact]
+    public void FWTabView_ShouldExposeSelectionAddCloseAndDensityState()
+    {
+        var overview = new FWTabViewItem
+        {
+            Header = "Overview",
+            Content = "Overview content",
+            Icon = "Home"
+        };
+        var details = new FWTabViewItem
+        {
+            Header = "Details",
+            Content = "Details content"
+        };
+        var tabView = new FWTabView
+        {
+            Header = "Workspaces",
+            Footer = "Actions",
+            Density = FWNavigationDensity.Spacious,
+            TabStripPlacement = Jalium.UI.Controls.Dock.Bottom,
+            TabWidthMode = FWTabViewWidthMode.SizeToContent,
+            CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always,
+            CanReorderTabs = true
+        };
+        var selectionChanged = 0;
+        var addRequested = 0;
+        var closeRequested = 0;
+        tabView.SelectionChanged += (_, _) => selectionChanged++;
+        tabView.AddTabButtonClick += (_, args) =>
+        {
+            addRequested++;
+            args.NewItem = new FWTabViewItem
+            {
+                Header = "New",
+                Content = "New content",
+                IsClosable = false
+            };
+        };
+        tabView.TabCloseRequested += (_, args) =>
+        {
+            closeRequested++;
+            Assert.Same(details, args.Tab);
+            Assert.Equal(1, args.Index);
+        };
+
+        tabView.Items.Add(overview);
+        tabView.Items.Add(details);
+        tabView.SelectedIndex = 0;
+        tabView.SelectTab(details);
+
+        Assert.Equal("Workspaces", tabView.Header);
+        Assert.Equal("Actions", tabView.Footer);
+        Assert.Equal(FWNavigationDensity.Spacious, tabView.Density);
+        Assert.Equal(52, tabView.MinHeight);
+        Assert.Equal(new Thickness(16, 10, 16, 10), tabView.Padding);
+        Assert.Equal(Jalium.UI.Controls.Dock.Bottom, tabView.TabStripPlacement);
+        Assert.Equal(FWTabViewWidthMode.SizeToContent, tabView.TabWidthMode);
+        Assert.Equal(FWTabViewCloseButtonOverlayMode.Always, tabView.CloseButtonOverlayMode);
+        Assert.True(tabView.CanReorderTabs);
+        Assert.True(details.IsSelected);
+        Assert.False(overview.IsSelected);
+        Assert.Equal("Details content", tabView.SelectedContent);
+
+        Assert.True(tabView.RequestCloseTab(details));
+
+        Assert.Single(tabView.Items);
+        Assert.Equal(overview, tabView.SelectedItem);
+        Assert.True(overview.IsSelected);
+        Assert.Equal(1, closeRequested);
+
+        Assert.True(tabView.RequestAddTab());
+
+        Assert.Equal(2, tabView.Items.Count);
+        Assert.Equal("New content", tabView.SelectedContent);
+        Assert.IsType<FWTabViewItem>(tabView.SelectedItem);
+        Assert.False(((FWTabViewItem)tabView.SelectedItem!).IsClosable);
+        Assert.Equal(1, addRequested);
+        Assert.True(selectionChanged >= 3);
+    }
+
+    [Fact]
+    public void FWSelectorBar_ShouldExposeSelectionAndDensityState()
+    {
+        var overview = new FWSelectorBarItem
+        {
+            Text = "Overview",
+            Icon = "Home"
+        };
+        var activity = new FWSelectorBarItem
+        {
+            Text = "Activity"
+        };
+        var selectorBar = new FWSelectorBar
+        {
+            Orientation = Orientation.Vertical,
+            Density = FWNavigationDensity.Compact,
+            SelectionIndicatorPlacement = FWSelectorBarSelectionIndicatorPlacement.Left
+        };
+        var selectionChanged = 0;
+        selectorBar.SelectionChanged += (_, _) => selectionChanged++;
+        selectorBar.Items.Add(overview);
+        selectorBar.Items.Add(activity);
+
+        selectorBar.SelectedIndex = 0;
+        selectorBar.SelectItem(activity);
+
+        Assert.Equal(Orientation.Vertical, selectorBar.Orientation);
+        Assert.Equal(FWNavigationDensity.Compact, selectorBar.Density);
+        Assert.Equal(32, selectorBar.MinHeight);
+        Assert.Equal(new Thickness(4), selectorBar.Padding);
+        Assert.Equal(FWSelectorBarSelectionIndicatorPlacement.Left, selectorBar.SelectionIndicatorPlacement);
+        Assert.Equal("Overview", overview.Text);
+        Assert.Equal("Home", overview.Icon);
+        Assert.Same(activity, selectorBar.SelectedItem);
+        Assert.False(overview.IsSelected);
+        Assert.True(activity.IsSelected);
+        Assert.Equal(2, selectionChanged);
     }
 
     [Fact]

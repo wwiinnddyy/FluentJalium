@@ -24,6 +24,18 @@ internal sealed record GalleryPage(
 
     public bool IsFooter => Info.IsFooter;
 
+    public bool IsNew => Info.IsNew;
+
+    public bool IsUpdated => Info.IsUpdated;
+
+    public string? SourcePath => Info.SourcePath;
+
+    public IReadOnlyList<string> BaseClasses => Info.BaseClasses ?? [];
+
+    public string? ApiNamespace => Info.ApiNamespace;
+
+    public string? SampleCodeKey => Info.SampleCodeKey;
+
     public IReadOnlyList<string> Tags => Info.Tags;
 
     public IReadOnlyList<string> RelatedControls => Info.RelatedControls;

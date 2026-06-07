@@ -141,4 +141,62 @@
         <Setter Property="RowSpacing" Value="0" />
         <Setter Property="ColumnSpacing" Value="0" />
     </Style>
+
+    <Style TargetType="fluent:FWSplitView" BasedOn="{StaticResource {x:Type ContentControl}}">
+        <Setter Property="Background" Value="{ThemeResource ContentSurfaceBackground}" />
+        <Setter Property="PaneBackground" Value="{ThemeResource FluentMaterialShellPaneBrush}" />
+        <Setter Property="ContentBackground" Value="{ThemeResource ContentSurfaceBackground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource FluentMaterialLayerBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="DisplayMode" Value="Inline" />
+        <Setter Property="PanePlacement" Value="Left" />
+        <Setter Property="IsPaneOpen" Value="True" />
+        <Setter Property="OpenPaneLength" Value="320" />
+        <Setter Property="CompactPaneLength" Value="48" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSplitView">
+                <Grid Background="{TemplateBinding Background}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Name="PART_PanePresenter"
+                            Grid.Column="0"
+                            Width="{TemplateBinding ActualPaneLength}"
+                            Background="{TemplateBinding PaneBackground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="0,0,1,0">
+                        <ContentPresenter Content="{TemplateBinding Pane}"
+                                          ContentTemplate="{TemplateBinding PaneTemplate}" />
+                    </Border>
+
+                    <Border Name="PART_ContentPresenterHost"
+                            Grid.Column="1"
+                            Background="{TemplateBinding ContentBackground}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="PanePlacement" Value="Right">
+                <Setter TargetName="PART_PanePresenter" Property="Grid.Column" Value="1" />
+                <Setter TargetName="PART_ContentPresenterHost" Property="Grid.Column" Value="0" />
+                <Setter TargetName="PART_PanePresenter" Property="BorderThickness" Value="1,0,0,0" />
+            </Trigger>
+            <Trigger Property="DisplayMode" Value="Overlay">
+                <Setter TargetName="PART_ContentPresenterHost" Property="Grid.Column" Value="0" />
+                <Setter TargetName="PART_ContentPresenterHost" Property="Grid.ColumnSpan" Value="2" />
+            </Trigger>
+            <Trigger Property="DisplayMode" Value="CompactOverlay">
+                <Setter TargetName="PART_ContentPresenterHost" Property="Grid.Column" Value="0" />
+                <Setter TargetName="PART_ContentPresenterHost" Property="Grid.ColumnSpan" Value="2" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

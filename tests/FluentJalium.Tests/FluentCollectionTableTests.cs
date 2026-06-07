@@ -68,6 +68,8 @@ public sealed class FluentCollectionTableTests
             AssertBasedOnStyle<FWListBoxItem, ListBoxItem>(app.Resources);
             AssertBasedOnStyle<FWListView, ListView>(app.Resources);
             AssertBasedOnStyle<FWListViewItem, ListViewItem>(app.Resources);
+            AssertBasedOnStyle<FWGridView, ListView>(app.Resources);
+            AssertBasedOnStyle<FWGridViewItem, ListViewItem>(app.Resources);
             AssertBasedOnStyle<FWTreeView, TreeView>(app.Resources);
             AssertBasedOnStyle<FWTreeViewItem, TreeViewItem>(app.Resources);
             AssertBasedOnStyle<FWDataGrid, DataGrid>(app.Resources);
@@ -97,6 +99,8 @@ public sealed class FluentCollectionTableTests
         AssertContainsStyle<ListViewItem>(dictionary);
         AssertContainsStyle<FWListView>(dictionary);
         AssertContainsStyle<FWListViewItem>(dictionary);
+        AssertContainsStyle<FWGridView>(dictionary);
+        AssertContainsStyle<FWGridViewItem>(dictionary);
         AssertContainsStyle<GridViewColumnHeader>(dictionary);
         AssertContainsStyle<TreeView>(dictionary);
         AssertContainsStyle<TreeViewItem>(dictionary);
@@ -143,6 +147,14 @@ public sealed class FluentCollectionTableTests
         Assert.Same(listViewItemStyle, fwListViewItemStyle.BasedOn);
         AssertSetter(fwListViewItemStyle, FWListViewItem.DensityProperty);
 
+        var fwGridViewStyle = AssertStyle<FWGridView>(dictionary);
+        Assert.Same(listViewStyle, fwGridViewStyle.BasedOn);
+        AssertSetter(fwGridViewStyle, FWGridView.DensityProperty);
+
+        var fwGridViewItemStyle = AssertStyle<FWGridViewItem>(dictionary);
+        Assert.Same(listViewItemStyle, fwGridViewItemStyle.BasedOn);
+        AssertSetter(fwGridViewItemStyle, FWGridViewItem.DensityProperty);
+
         var treeViewStyle = AssertStyle<TreeView>(dictionary);
         var fwTreeViewStyle = AssertStyle<FWTreeView>(dictionary);
         Assert.Same(treeViewStyle, fwTreeViewStyle.BasedOn);
@@ -173,11 +185,13 @@ public sealed class FluentCollectionTableTests
     {
         var listBox = new TestListBox();
         var listView = new TestListView();
+        var gridView = new TestGridView();
         var treeView = new TestTreeView();
         var treeItem = new TestTreeViewItem();
 
         Assert.IsType<FWListBoxItem>(listBox.CreateContainer("ListBox item"));
         Assert.IsType<FWListViewItem>(listView.CreateContainer("ListView item"));
+        Assert.IsType<FWGridViewItem>(gridView.CreateContainer("GridView item"));
         Assert.IsType<FWTreeViewItem>(treeView.CreateContainer("Tree root"));
         Assert.IsType<FWTreeViewItem>(treeItem.CreateContainer("Tree child"));
     }
@@ -215,6 +229,23 @@ public sealed class FluentCollectionTableTests
         Assert.Equal(FWCollectionDensity.Spacious, spaciousListViewItem.Density);
         Assert.Equal(48, spaciousListViewItem.MinHeight);
         Assert.Equal(new Thickness(16, 8, 16, 8), spaciousListViewItem.Padding);
+
+        var gridView = new TestGridView
+        {
+            Density = FWCollectionDensity.Compact
+        };
+
+        Assert.Equal(new Thickness(2), gridView.Padding);
+
+        var compactGridViewItem = Assert.IsType<FWGridViewItem>(gridView.CreateContainer("Compact grid item"));
+        Assert.Equal(FWCollectionDensity.Compact, compactGridViewItem.Density);
+        Assert.Equal(32, compactGridViewItem.MinHeight);
+        Assert.Equal(new Thickness(10, 4, 10, 4), compactGridViewItem.Padding);
+
+        compactGridViewItem.Density = FWCollectionDensity.Spacious;
+
+        Assert.Equal(48, compactGridViewItem.MinHeight);
+        Assert.Equal(new Thickness(16, 8, 16, 8), compactGridViewItem.Padding);
 
         var treeView = new TestTreeView
         {
@@ -289,6 +320,14 @@ public sealed class FluentCollectionTableTests
         Assert.Equal(3, view.Columns.Count);
         Assert.Equal("Count", view.Columns[2].Header);
         Assert.Equal(rows[2], listView.SelectedItem);
+
+        var gridView = new FWGridView
+        {
+            ItemsSource = rows,
+            SelectedIndex = 1
+        };
+
+        Assert.Equal(rows[1], gridView.SelectedItem);
     }
 
     [Fact]
@@ -457,6 +496,11 @@ public sealed class FluentCollectionTableTests
     }
 
     private sealed class TestListView : FWListView
+    {
+        public FrameworkElement CreateContainer(object item) => GetContainerForItem(item);
+    }
+
+    private sealed class TestGridView : FWGridView
     {
         public FrameworkElement CreateContainer(object item) => GetContainerForItem(item);
     }

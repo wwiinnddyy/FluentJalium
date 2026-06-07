@@ -69,6 +69,7 @@ public sealed class FluentTextInputControlsTests
             AssertBasedOnStyle<FWPasswordBox, PasswordBox>(app.Resources);
             AssertBasedOnStyle<FWNumberBox, NumberBox>(app.Resources);
             AssertBasedOnStyle<FWAutoCompleteBox, AutoCompleteBox>(app.Resources);
+            AssertBasedOnStyle<FWAutoSuggestBox, AutoCompleteBox>(app.Resources);
             AssertBasedOnStyle<FWRichTextBox, RichTextBox>(app.Resources);
         }
         finally
@@ -132,6 +133,10 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(typeof(AutoCompleteBox), fwAutoCompleteBoxStyle.BasedOn?.TargetType);
         AssertSetter(fwAutoCompleteBoxStyle, FWAutoCompleteBox.DensityProperty);
 
+        var fwAutoSuggestBoxStyle = AssertStyle<FWAutoSuggestBox>(dictionary);
+        Assert.Equal(typeof(AutoCompleteBox), fwAutoSuggestBoxStyle.BasedOn?.TargetType);
+        AssertSetter(fwAutoSuggestBoxStyle, FWAutoSuggestBox.DensityProperty);
+
         var richTextBoxStyle = AssertStyle<RichTextBox>(dictionary);
         AssertSetter(richTextBoxStyle, Control.BackgroundProperty);
         AssertSetter(richTextBoxStyle, Control.ForegroundProperty);
@@ -188,6 +193,21 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(new Thickness(8, 4, 8, 5), autoCompleteBox.Padding);
         Assert.Equal(192, autoCompleteBox.MaxDropDownHeight);
 
+        var autoSuggestBox = new FWAutoSuggestBox
+        {
+            Density = FWTextInputDensity.Compact
+        };
+
+        Assert.Equal(30, autoSuggestBox.MinHeight);
+        Assert.Equal(new Thickness(8, 4, 8, 5), autoSuggestBox.Padding);
+        Assert.Equal(192, autoSuggestBox.MaxDropDownHeight);
+
+        autoSuggestBox.Density = FWTextInputDensity.Spacious;
+
+        Assert.Equal(40, autoSuggestBox.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), autoSuggestBox.Padding);
+        Assert.Equal(288, autoSuggestBox.MaxDropDownHeight);
+
         var richTextBox = new FWRichTextBox();
 
         Assert.Equal(FWTextInputDensity.Comfortable, richTextBox.Density);
@@ -242,6 +262,15 @@ public sealed class FluentTextInputControlsTests
             MinimumPrefixLength = 1,
             PlaceholderText = "Search"
         };
+        var autoSuggestBox = new FWAutoSuggestBox
+        {
+            ItemsSource = new[] { "CalendarView", "CalendarDatePicker", "GridView", "AutoSuggestBox" },
+            Text = "Calendar",
+            FilterMode = AutoCompleteFilterMode.StartsWith,
+            MinimumPrefixLength = 1,
+            IsTextCompletionEnabled = true,
+            PlaceholderText = "Suggest controls"
+        };
         var richTextBox = new FWRichTextBox
         {
             AcceptsTab = true,
@@ -259,6 +288,7 @@ public sealed class FluentTextInputControlsTests
                 passwordBox,
                 numberBox,
                 autoCompleteBox,
+                autoSuggestBox,
                 richTextBox
             }
         };
@@ -296,6 +326,12 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(2, autoCompleteBox.FilteredItems.Count);
         Assert.Contains("Fluent tokens", autoCompleteBox.FilteredItems);
         Assert.Contains("Fluent controls", autoCompleteBox.FilteredItems);
+        Assert.Equal("Calendar", autoSuggestBox.Text);
+        Assert.Equal(AutoCompleteFilterMode.StartsWith, autoSuggestBox.FilterMode);
+        Assert.True(autoSuggestBox.IsTextCompletionEnabled);
+        Assert.Equal(2, autoSuggestBox.FilteredItems.Count);
+        Assert.Contains("CalendarView", autoSuggestBox.FilteredItems);
+        Assert.Contains("CalendarDatePicker", autoSuggestBox.FilteredItems);
         Assert.True(richTextBox.AcceptsTab);
         Assert.True(richTextBox.IsSpellCheckEnabled);
         Assert.Contains("Layered input surfaces", richTextBox.GetText());

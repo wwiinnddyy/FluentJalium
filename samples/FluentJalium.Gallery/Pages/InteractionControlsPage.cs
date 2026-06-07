@@ -23,6 +23,13 @@ public class InteractionControlsPage : Page
         InitializeComponent();
     }
 
+    public UIElement CreateContent()
+    {
+        return Content is UIElement element
+            ? element
+            : new StackPanel();
+    }
+
     private void InitializeComponent()
     {
         var scrollViewer = new ScrollViewer
@@ -134,7 +141,7 @@ public class InteractionControlsPage : Page
         return border;
     }
 
-    private void OnRefreshRequested(object sender, RefreshRequestedEventArgs e)
+    private void OnRefreshRequested(object? sender, RefreshRequestedEventArgs e)
     {
         var deferral = e.GetDeferral();
 

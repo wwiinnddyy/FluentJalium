@@ -25,6 +25,13 @@ public class AdvancedCollectionsPage : Page
         InitializeComponent();
     }
 
+    public UIElement CreateContent()
+    {
+        return Content is UIElement element
+            ? element
+            : new StackPanel();
+    }
+
     private void InitializeComponent()
     {
         var scrollViewer = new ScrollViewer

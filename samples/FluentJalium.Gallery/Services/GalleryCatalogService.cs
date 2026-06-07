@@ -12,17 +12,24 @@ internal sealed class GalleryCatalogService
     public GalleryPage[] CreatePages(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
     {
         var localization = new GalleryLocalizationService();
-        return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent));
+        var pageInfos = GalleryCatalog.CreatePageInfos(localization);
+        return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent, pageInfos));
     }
 
     private static IReadOnlyDictionary<string, Func<UIElement>> CreateContentFactories(
         Window owner,
         Action<FluentThemeVariant> applyTheme,
-        Action<Color> applyAccent)
+        Action<Color> applyAccent,
+        GalleryPageInfo[] pageInfos)
     {
         var factories = new Dictionary<string, Func<UIElement>>(StringComparer.Ordinal)
         {
             [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent).CreateContent()),
+            [PageId("All Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.AllControls, pageInfos).CreateContent()),
+            [PageId("New Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.New, pageInfos).CreateContent()),
+            [PageId("Updated Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Updated, pageInfos).CreateContent()),
+            [PageId("Preview Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Preview, pageInfos).CreateContent()),
+            [PageId("Diagnostic Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Diagnostic, pageInfos).CreateContent()),
             [PageId("Theme Architecture")] = () => CreatePageStack(new GalleryThemeArchitecturePage().CreateContent()),
             [PageId("Colors")] = () => CreatePageStack(new GalleryColorsPage().CreateContent()),
             [PageId("Typography")] = () => CreatePageStack(new GalleryTypographyPage().CreateContent()),
@@ -39,14 +46,18 @@ internal sealed class GalleryCatalogService
             [PageId("Interaction")] = () => CreatePageStack(new GalleryInteractionPage().CreateContent()),
             [PageId("Input and Media")] = () => CreatePageStack(new GalleryInputMediaPage().CreateContent()),
             [PageId("Collections")] = () => CreatePageStack(new GalleryCollectionsPage().CreateContent()),
+            [PageId("Advanced Collections")] = () => CreatePageStack(new AdvancedCollectionsPage().CreateContent()),
             [PageId("Selectors and Properties")] = () => CreatePageStack(new GallerySelectorsPropertiesPage().CreateContent()),
             [PageId("Data Inspectors")] = () => CreatePageStack(new GalleryDataInspectorsPage().CreateContent()),
             [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent()),
             [PageId("Window Backdrops")] = () => CreatePageStack(new GalleryWindowBackdropsPage(owner).CreateContent()),
             [PageId("Materials and Effects")] = () => CreatePageStack(new GalleryMaterialsPage().CreateContent()),
+            [PageId("Material Primitives")] = () => CreatePageStack(new MaterialsPage().CreateContent()),
             [PageId("Motion and Transitions")] = () => CreatePageStack(new GalleryMotionPage().CreateContent()),
+            [PageId("Animated Controls")] = () => CreatePageStack(new MotionControlsPage().CreateContent()),
             [PageId("Menus")] = () => CreatePageStack(new GalleryMenusPage().CreateContent()),
             [PageId("Disclosure")] = () => CreatePageStack(new GalleryDisclosurePage().CreateContent()),
+            [PageId("Advanced Interaction")] = () => CreatePageStack(new InteractionControlsPage().CreateContent()),
             [PageId("Status")] = () => CreatePageStack(new GalleryStatusPage().CreateContent()),
             [PageId("Design")] = () => CreatePageStack(new GalleryDesignPage().CreateContent()),
             [PageId("Settings")] = () => CreatePageStack(new GallerySettingsPage(applyTheme, applyAccent).CreateContent()),

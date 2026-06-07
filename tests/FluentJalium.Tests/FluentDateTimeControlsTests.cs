@@ -132,8 +132,10 @@ public sealed class FluentDateTimeControlsTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWDatePicker, DatePicker>(app.Resources);
+            AssertBasedOnStyle<FWCalendarDatePicker, DatePicker>(app.Resources);
             AssertBasedOnStyle<FWTimePicker, TimePicker>(app.Resources);
             AssertBasedOnStyle<FWCalendar, Calendar>(app.Resources);
+            AssertBasedOnStyle<FWCalendarView, Calendar>(app.Resources);
         }
         finally
         {
@@ -162,6 +164,10 @@ public sealed class FluentDateTimeControlsTests
         Assert.Same(datePickerStyle, fwDatePickerStyle.BasedOn);
         AssertSetter(fwDatePickerStyle, FWDatePicker.DensityProperty);
 
+        var fwCalendarDatePickerStyle = AssertStyle<FWCalendarDatePicker>(dictionary);
+        Assert.Same(datePickerStyle, fwCalendarDatePickerStyle.BasedOn);
+        AssertSetter(fwCalendarDatePickerStyle, FWCalendarDatePicker.DensityProperty);
+
         var timePickerStyle = AssertStyle<TimePicker>(dictionary);
         AssertSetter(timePickerStyle, Control.BackgroundProperty);
         AssertSetter(timePickerStyle, Control.ForegroundProperty);
@@ -182,6 +188,9 @@ public sealed class FluentDateTimeControlsTests
 
         var fwCalendarStyle = AssertStyle<FWCalendar>(dictionary);
         Assert.Same(calendarStyle, fwCalendarStyle.BasedOn);
+
+        var fwCalendarViewStyle = AssertStyle<FWCalendarView>(dictionary);
+        Assert.Same(calendarStyle, fwCalendarViewStyle.BasedOn);
 
         var calendarDayButtonStyle = AssertStyle<CalendarDayButton>(dictionary);
         AssertSetter(calendarDayButtonStyle, Control.BackgroundProperty);
@@ -218,6 +227,21 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(36, datePicker.MinHeight);
         Assert.Equal(240, datePicker.MinWidth);
         Assert.Equal(new Thickness(12, 7, 38, 8), datePicker.Padding);
+
+        var calendarDatePicker = new FWCalendarDatePicker
+        {
+            Density = FWDateTimePickerDensity.Compact
+        };
+
+        Assert.Equal(30, calendarDatePicker.MinHeight);
+        Assert.Equal(180, calendarDatePicker.MinWidth);
+        Assert.Equal(new Thickness(8, 4, 30, 5), calendarDatePicker.Padding);
+
+        calendarDatePicker.Density = FWDateTimePickerDensity.Spacious;
+
+        Assert.Equal(36, calendarDatePicker.MinHeight);
+        Assert.Equal(240, calendarDatePicker.MinWidth);
+        Assert.Equal(new Thickness(12, 7, 38, 8), calendarDatePicker.Padding);
 
         var timePicker = new FWTimePicker();
 
@@ -350,6 +374,22 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(CalendarSelectionMode.SingleDate, calendar.SelectionMode);
         Assert.Equal(1, selectedChanged);
         Assert.Equal(2, displayChanged);
+
+        var calendarView = new FWCalendarView
+        {
+            DisplayDate = today,
+            SelectedDate = today.AddDays(3),
+            DisplayDateStart = today.AddDays(-10),
+            DisplayDateEnd = today.AddDays(40),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true
+        };
+
+        Assert.Equal(today.AddDays(3), calendarView.SelectedDate);
+        Assert.Equal(today.AddDays(-10), calendarView.DisplayDateStart);
+        Assert.Equal(today.AddDays(40), calendarView.DisplayDateEnd);
+        Assert.Equal(DayOfWeek.Monday, calendarView.FirstDayOfWeek);
+        Assert.True(calendarView.IsTodayHighlighted);
     }
 
     [Fact]
@@ -364,6 +404,15 @@ public sealed class FluentDateTimeControlsTests
             DisplayDateEnd = today.AddDays(60),
             SelectedDate = today.AddDays(3),
             SelectedDateFormat = DatePickerFormat.Short
+        };
+        var calendarDatePicker = new FWCalendarDatePicker
+        {
+            Header = "Review date",
+            PlaceholderText = "Select",
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(90),
+            SelectedDate = today.AddDays(7),
+            SelectedDateFormat = DatePickerFormat.Long
         };
         var timePicker = new FWTimePicker
         {
@@ -382,6 +431,16 @@ public sealed class FluentDateTimeControlsTests
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
+        var calendarView = new FWCalendarView
+        {
+            DisplayDate = today,
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(120),
+            SelectedDate = calendarDatePicker.SelectedDate,
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
         calendar.BlackoutDates.Add(today.AddDays(1));
 
         var panel = new FWStackPanel
@@ -391,8 +450,10 @@ public sealed class FluentDateTimeControlsTests
             Children =
             {
                 datePicker,
+                calendarDatePicker,
                 timePicker,
-                calendar
+                calendar,
+                calendarView
             }
         };
         var surface = new FWFluentMaterialSurface
@@ -412,6 +473,9 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(DatePickerFormat.Short, datePicker.SelectedDateFormat);
         Assert.Equal(today, datePicker.DisplayDateStart);
         Assert.Equal(today.AddDays(60), datePicker.DisplayDateEnd);
+        Assert.Equal(today.AddDays(7), calendarDatePicker.SelectedDate);
+        Assert.Equal(DatePickerFormat.Long, calendarDatePicker.SelectedDateFormat);
+        Assert.Equal(today.AddDays(90), calendarDatePicker.DisplayDateEnd);
         Assert.Equal(new TimeSpan(14, 15, 0), timePicker.SelectedTime);
         Assert.Equal(15, timePicker.MinuteIncrement);
         Assert.Equal("24HourClock", timePicker.ClockIdentifier);
@@ -419,6 +483,8 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(DayOfWeek.Monday, calendar.FirstDayOfWeek);
         Assert.True(calendar.IsTodayHighlighted);
         Assert.Contains(today.AddDays(1), calendar.BlackoutDates);
+        Assert.Equal(calendarDatePicker.SelectedDate, calendarView.SelectedDate);
+        Assert.Equal(today.AddDays(120), calendarView.DisplayDateEnd);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);

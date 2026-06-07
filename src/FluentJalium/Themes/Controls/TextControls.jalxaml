@@ -292,6 +292,10 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWAutoSuggestBox" BasedOn="{StaticResource {x:Type AutoCompleteBox}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="RichTextBox">
         <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />

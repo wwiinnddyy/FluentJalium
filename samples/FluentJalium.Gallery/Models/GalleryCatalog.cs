@@ -10,13 +10,25 @@ internal sealed record GalleryCatalogEntry(
     FluentIconRegular Icon,
     string Keywords,
     GalleryPageStatus Status = GalleryPageStatus.Stable,
-    bool IsFooter = false);
+    bool IsFooter = false,
+    bool IsNew = false,
+    bool IsUpdated = false,
+    string? SourcePath = null,
+    string[]? BaseClasses = null,
+    string? ApiNamespace = null,
+    string[]? RelatedControls = null,
+    string? SampleCodeKey = null);
 
 internal static class GalleryCatalog
 {
     private static readonly GalleryCatalogEntry[] Entries =
     [
         Entry("overview", GalleryNavigationGroup.Home, FluentIconRegular.Home24, "home design system theme typography accent light dark high contrast"),
+        Entry("allcontrols", GalleryNavigationGroup.Catalog, FluentIconRegular.DocumentBulletList24, "all controls catalog metadata filter FW control index", SourcePath: "/GalleryCatalog/AllControls", BaseClasses: ["GalleryPageInfo"], ApiNamespace: "FluentJalium.Gallery.Models", RelatedControls: ["FWNavigationView", "FWFrame"], SampleCodeKey: "catalog.filter.all"),
+        Entry("newcontrols", GalleryNavigationGroup.Catalog, FluentIconRegular.New24, "new controls catalog metadata filter first wave FW control index", SourcePath: "/GalleryCatalog/NewControls", BaseClasses: ["GalleryPageInfo"], ApiNamespace: "FluentJalium.Gallery.Models", RelatedControls: ["FWNavigationView", "FWFrame"], SampleCodeKey: "catalog.filter.new"),
+        Entry("updatedcontrols", GalleryNavigationGroup.Catalog, FluentIconRegular.ArrowClockwise24, "updated controls catalog metadata filter improved FW control index", SourcePath: "/GalleryCatalog/UpdatedControls", BaseClasses: ["GalleryPageInfo"], ApiNamespace: "FluentJalium.Gallery.Models", RelatedControls: ["FWNavigationView", "FWFrame"], SampleCodeKey: "catalog.filter.updated"),
+        Entry("previewcontrols", GalleryNavigationGroup.Catalog, FluentIconRegular.Sparkle24, "preview controls catalog metadata filter experimental FW control index", SourcePath: "/GalleryCatalog/PreviewControls", BaseClasses: ["GalleryPageInfo"], ApiNamespace: "FluentJalium.Gallery.Models", RelatedControls: ["FWNavigationView", "FWFrame"], SampleCodeKey: "catalog.filter.preview"),
+        Entry("diagnosticcontrols", GalleryNavigationGroup.Catalog, FluentIconRegular.DataUsage24, "diagnostic controls catalog metadata filter state matrix diagnostics FW control index", SourcePath: "/GalleryCatalog/DiagnosticControls", BaseClasses: ["GalleryPageInfo"], ApiNamespace: "FluentJalium.Gallery.Models", RelatedControls: ["FWNavigationView", "FWFrame"], SampleCodeKey: "catalog.filter.diagnostic"),
         Entry("themearchitecture", GalleryNavigationGroup.Design, FluentIconRegular.Diagram24, "Generic.jalxaml FluentResources.jalxaml FluentControls.jalxaml FluentThemeManager theme resources controls dictionary FW control architecture FluentAvalonia WinUI WPFUI gallery design"),
         Entry("colors", GalleryNavigationGroup.Design, FluentIconRegular.Color24, "FluentColors AccentBrush AccentFillColor TextPrimary TextSecondary ControlFillColor LayerFillColor SelectionBackground HyperlinkForeground ProgressBarForeground semantic color token design"),
         Entry("typography", GalleryNavigationGroup.Design, FluentIconRegular.TextFont24, "FluentTypography DisplayFontFamily BodyFontFamily MonoFontFamily FluentCaptionFontSize FluentBodyFontSize FluentSubtitleFontSize FluentTitleFontSize ControlContentThemeFontSize typography type ramp font design"),
@@ -33,14 +45,18 @@ internal static class GalleryCatalog
         Entry("interaction", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.CursorClick24, "FWScrollViewer FWSwipeControl FWGridSplitter scrolling scroll viewer auto hide offset swipe reveal execute archive delete grid splitter resize keyboard drag increment material liquid glass interaction"),
         Entry("inputandmedia", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Color24, "FWColorPicker FWInkCanvas FWInkPresenter FWMediaElement color picker alpha hex compact spectrum ink canvas draw erase taper stroke presenter media element play pause stop mute stretch playback material liquid glass"),
         Entry("collections", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Table24, "FWListBox FWListView FWTreeView FWDataGrid FWTreeDataGrid table list data grid hierarchy selection material liquid glass row height headers"),
+        Entry("advancedcollections", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.AppFolder24, "FWItemsRepeater items repeater virtualized layout stack grid cache advanced collections first wave", GalleryPageStatus.Preview, IsNew: true, SourcePath: "/Collections/FWItemsRepeater", BaseClasses: ["Panel", "FrameworkElement"], ApiNamespace: "FluentJalium.Controls", RelatedControls: ["FWItemsRepeater", "FWListView", "FWTreeView", "FWDataGrid"], SampleCodeKey: "advancedcollections.itemsrepeater"),
         Entry("selectorsandproperties", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.DatabaseSearch24, "FWTreeSelector FWTreeSelectorItem FWPropertyGrid tree selector property grid search categorized alphabetical cascade checkbox material liquid glass editor"),
         Entry("datainspectors", GalleryNavigationGroup.CollectionsAndData, FluentIconRegular.Code24, "FWDiffViewer FWHexEditor FWJsonTreeViewer diff hex json code data inspector binary material liquid glass minimap ascii"),
         Entry("navigation", GalleryNavigationGroup.AppStructure, FluentIconRegular.Navigation24, "FWNavigationView FWNavigationViewItem FWNavigationViewItemHeader FWNavigationViewItemSeparator pane display mode LeftCompact LeftMinimal Top hierarchy FWTabControl FWTabItem FWFrame page shell back forward material liquid glass app shell"),
         Entry("windowbackdrops", GalleryNavigationGroup.Materials, FluentIconRegular.WindowBrush24, "FWFluentWindowBackdropKind FWFluentWindowBackdropRecipe WindowBackdropType SystemBackdrop DWM Mica MicaAlt Acrylic solid shell window backdrop material"),
         Entry("materialsand effects".Replace(" ", string.Empty), GalleryNavigationGroup.Materials, FluentIconRegular.TransparencySquare24, "FWFluentMaterialSurface FWFluentMaterialKind FWFluentMaterialRecipe BackdropEffect BlurEffect AcrylicEffect MicaEffect FrostedGlassEffect DropShadowEffect material role layer transient focused reveal HLSL shader liquid glass recipe preset"),
+        Entry("materialprimitives", GalleryNavigationGroup.Materials, FluentIconRegular.WindowBrush24, "FWBackdrop FWAcrylicBrush acrylic mica micaalt tabbed material primitives backdrop brush", GalleryPageStatus.Preview, IsUpdated: true, SourcePath: "/Materials/FWBackdrop", BaseClasses: ["Control", "Object"], ApiNamespace: "FluentJalium.Controls", RelatedControls: ["FWBackdrop", "FWAcrylicBrush", "FWFluentMaterialSurface"], SampleCodeKey: "materialprimitives.backdrop"),
         Entry("motionandtransitions", GalleryNavigationGroup.Motion, FluentIconRegular.SlideTransition24, "FWConnectedAnimationService FWTransitioningContentControl connected animation shared element motion content transition continuity navigation suppress entrance drill in slide crossfade liquid morph"),
+        Entry("animatedcontrols", GalleryNavigationGroup.Motion, FluentIconRegular.Sparkle24, "FWAnimatedIcon FWAnimatedVisualPlayer animated icon visual player lottie playback motion controls first wave", GalleryPageStatus.Preview, IsUpdated: true, SourcePath: "/Motion/FWAnimatedIcon", BaseClasses: ["Control", "FrameworkElement"], ApiNamespace: "FluentJalium.Controls", RelatedControls: ["FWAnimatedIcon", "FWAnimatedVisualPlayer", "FWConnectedAnimationService"], SampleCodeKey: "animatedcontrols.motion"),
         Entry("menus", GalleryNavigationGroup.AppStructure, FluentIconRegular.List24, "FWMenuBar FWMenu FWContextMenu FWMenuFlyout FWMenuFlyoutItem FWToggleMenuFlyoutItem FWMenuFlyoutSubItem FWMenuFlyoutSeparator FWCommandBarFlyout command menu flyout submenu shortcut material liquid glass workbench"),
         Entry("disclosure", GalleryNavigationGroup.AppStructure, FluentIconRegular.PanelLeft24, "FWExpander FWToolTip FWContentDialog FWGroupBox dialog tooltip expander group box disclosure material liquid glass panel"),
+        Entry("advancedinteraction", GalleryNavigationGroup.LayoutAndMedia, FluentIconRegular.Filter24, "FWRefreshContainer FWScroller FWAnnotatedScrollBar pull refresh scroller snap annotated scrollbar advanced interaction", GalleryPageStatus.Preview, IsUpdated: true, SourcePath: "/Interaction/FWScroller", BaseClasses: ["ContentControl", "ScrollBar"], ApiNamespace: "FluentJalium.Controls", RelatedControls: ["FWRefreshContainer", "FWScroller", "FWAnnotatedScrollBar", "FWScrollViewer"], SampleCodeKey: "advancedinteraction.scroller"),
         Entry("status", GalleryNavigationGroup.AppStructure, FluentIconRegular.AlertBadge24, "FWInfoBar FWInfoBadge FWToastNotificationHost FWToastNotificationItem FWStatusBar FWStatusBarItem notification message severity toast queue max visible status bar item material liquid glass operations"),
         Entry("design", GalleryNavigationGroup.Diagnostics, FluentIconRegular.DesignIdeas24, "design footer gallery shell NavigationView Frame Page ControlInfoData catalog metadata sample card ControlExample materials backdrops FluentAvalonia WinUI WPFUI UI.WPF.Modern Jalium.UI", IsFooter: true),
         Entry("settings", GalleryNavigationGroup.Diagnostics, FluentIconRegular.Settings24, "settings footer theme accent language diagnostics NavigationView FooterMenuItems FluentThemeManager", IsFooter: true),
@@ -65,9 +81,29 @@ internal static class GalleryCatalog
         FluentIconRegular icon,
         string keywords,
         GalleryPageStatus status = GalleryPageStatus.Stable,
-        bool IsFooter = false)
+        bool IsFooter = false,
+        bool IsNew = false,
+        bool IsUpdated = false,
+        string? SourcePath = null,
+        string[]? BaseClasses = null,
+        string? ApiNamespace = null,
+        string[]? RelatedControls = null,
+        string? SampleCodeKey = null)
     {
-        return new GalleryCatalogEntry(uniqueId, groupId, icon, keywords, status, IsFooter);
+        return new GalleryCatalogEntry(
+            uniqueId,
+            groupId,
+            icon,
+            keywords,
+            status,
+            IsFooter,
+            IsNew,
+            IsUpdated,
+            SourcePath,
+            BaseClasses,
+            ApiNamespace,
+            RelatedControls,
+            SampleCodeKey);
     }
 
     private static GalleryPageInfo CreatePageInfo(GalleryCatalogEntry entry, GalleryLocalizationService localization)
@@ -84,10 +120,16 @@ internal static class GalleryCatalog
             group,
             entry.Icon,
             tags,
-            CreateRelatedControls(tags),
+            entry.RelatedControls ?? CreateRelatedControls(tags),
             CreateDocumentationLinks(entry.UniqueId, title, tags, localization),
             entry.Status,
-            entry.IsFooter);
+            entry.IsFooter,
+            entry.IsNew,
+            entry.IsUpdated,
+            entry.SourcePath,
+            entry.BaseClasses,
+            entry.ApiNamespace,
+            entry.SampleCodeKey);
 
         return info;
     }

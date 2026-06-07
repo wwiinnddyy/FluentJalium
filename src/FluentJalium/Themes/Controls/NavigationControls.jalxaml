@@ -269,6 +269,161 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWTabView">
+        <Setter Property="Background" Value="{ThemeResource TabContentBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TabStripBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12,6,12,6" />
+        <Setter Property="Density" Value="Comfortable" />
+        <Setter Property="TabStripPlacement" Value="Top" />
+        <Setter Property="TabWidthMode" Value="Equal" />
+        <Setter Property="CloseButtonOverlayMode" Value="Auto" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="4" />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWTabView">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Name="PART_TabStrip"
+                              Grid.Row="0"
+                              Background="{ThemeResource TabStripBackground}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter Grid.Column="0"
+                                              Content="{TemplateBinding Header}"
+                                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                              Margin="0,0,8,0" />
+
+                            <ItemsPresenter Grid.Column="1" />
+
+                            <Button Name="PART_AddTabButton"
+                                    Grid.Column="2"
+                                    Content="+"
+                                    Width="32"
+                                    Height="32"
+                                    Margin="8,0,0,0" />
+
+                            <ContentPresenter Grid.Column="3"
+                                              Content="{TemplateBinding Footer}"
+                                              ContentTemplate="{TemplateBinding FooterTemplate}"
+                                              Margin="8,0,0,0" />
+                        </Grid>
+
+                        <ContentPresenter Name="PART_SelectedContentPresenter"
+                                          Grid.Row="1"
+                                          Content="{TemplateBinding SelectedContent}"
+                                          Margin="0,8,0,0" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsAddTabButtonVisible" Value="False">
+                <Setter TargetName="PART_AddTabButton" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWTabViewItem" BasedOn="{StaticResource {x:Type TabItem}}">
+        <Setter Property="IsClosable" Value="True" />
+    </Style>
+
+    <Style TargetType="fluent:FWSelectorBar">
+        <Setter Property="Background" Value="{ThemeResource TabStripBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource TabStripBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Density" Value="Comfortable" />
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="SelectionIndicatorPlacement" Value="Auto" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" Spacing="4" />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSelectorBar">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ItemsPresenter />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style x:Key="FWSelectorBarItemContentControlBaseStyle" TargetType="ContentControl">
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style TargetType="fluent:FWSelectorBarItem" BasedOn="{StaticResource FWSelectorBarItemContentControlBaseStyle}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="12,7,12,7" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSelectorBarItem">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ContentPresenter Content="{TemplateBinding Icon}"
+                                          VerticalAlignment="Center" />
+                        <ContentPresenter Content="{TemplateBinding Text}"
+                                          VerticalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource TabItemHoverBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{ThemeResource TabItemSelectedBackground}" />
+                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource TabItemIndicator}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="TabPanel">
         <Setter Property="Background" Value="{ThemeResource TabStripBackground}" />
     </Style>

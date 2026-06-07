@@ -37,6 +37,10 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWCalendarDatePicker" BasedOn="{StaticResource {x:Type DatePicker}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="TimePicker">
         <Setter Property="Background" Value="{ThemeResource TimePickerBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TimePickerForeground}" />
@@ -96,6 +100,8 @@
     </Style>
 
     <Style TargetType="fluent:FWCalendar" BasedOn="{StaticResource {x:Type Calendar}}" />
+
+    <Style TargetType="fluent:FWCalendarView" BasedOn="{StaticResource {x:Type Calendar}}" />
 
     <Style TargetType="CalendarButton">
         <Setter Property="Background" Value="Transparent" />

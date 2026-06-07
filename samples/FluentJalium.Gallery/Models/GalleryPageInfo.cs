@@ -15,7 +15,13 @@ internal sealed record GalleryPageInfo(
     string[] RelatedControls,
     GalleryDocumentationLink[] DocumentationLinks,
     GalleryPageStatus Status = GalleryPageStatus.Stable,
-    bool IsFooter = false)
+    bool IsFooter = false,
+    bool IsNew = false,
+    bool IsUpdated = false,
+    string? SourcePath = null,
+    string[]? BaseClasses = null,
+    string? ApiNamespace = null,
+    string? SampleCodeKey = null)
 {
     public bool MatchesSearch(string searchText)
     {
@@ -34,6 +40,13 @@ internal sealed record GalleryPageInfo(
                 && !ContainsIgnoreCase(Group, token)
                 && !Tags.Any(tag => ContainsIgnoreCase(tag, token))
                 && !RelatedControls.Any(control => ContainsIgnoreCase(control, token))
+                && !(BaseClasses?.Any(baseClass => ContainsIgnoreCase(baseClass, token)) == true)
+                && !ContainsOptional(SourcePath, token)
+                && !ContainsOptional(ApiNamespace, token)
+                && !ContainsOptional(SampleCodeKey, token)
+                && !ContainsIgnoreCase(Status.ToString(), token)
+                && !(IsNew && ContainsIgnoreCase("new", token))
+                && !(IsUpdated && ContainsIgnoreCase("updated", token))
                 && !DocumentationLinks.Any(link =>
                     ContainsIgnoreCase(link.Title, token) || ContainsIgnoreCase(link.Uri, token)))
             {
@@ -47,5 +60,10 @@ internal sealed record GalleryPageInfo(
     private static bool ContainsIgnoreCase(string value, string query)
     {
         return value.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private static bool ContainsOptional(string? value, string query)
+    {
+        return !string.IsNullOrWhiteSpace(value) && ContainsIgnoreCase(value, query);
     }
 }

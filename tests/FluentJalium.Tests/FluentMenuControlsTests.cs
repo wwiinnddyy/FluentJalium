@@ -136,6 +136,14 @@ public sealed class FluentMenuControlsTests
         var fwContextMenuStyle = AssertStyle<FWContextMenu>(dictionary);
         AssertSetter(fwContextMenuStyle, FWContextMenu.DensityProperty);
 
+        Assert.True(dictionary.TryGetValue("FWFlyoutPresenterStyle", out var flyoutPresenterStyle));
+        var flyoutStyle = Assert.IsType<Style>(flyoutPresenterStyle);
+        Assert.Equal(typeof(FWFlyoutPresenter), flyoutStyle.TargetType);
+        AssertSetter(flyoutStyle, Control.BackgroundProperty);
+        AssertSetter(flyoutStyle, Control.BorderBrushProperty);
+        AssertSetter(flyoutStyle, Control.PaddingProperty);
+        AssertSetter(flyoutStyle, FWFlyoutPresenter.DensityProperty);
+
         var menuFlyoutItemStyle = AssertStyle<MenuFlyoutItem>(dictionary);
         AssertForegroundSetter(menuFlyoutItemStyle);
         AssertSetter(menuFlyoutItemStyle, Control.BackgroundProperty);
@@ -217,6 +225,70 @@ public sealed class FluentMenuControlsTests
 
         Assert.Equal(new Thickness(3), contextMenu.Padding);
         Assert.Equal(new CornerRadius(6), contextMenu.CornerRadius);
+    }
+
+    [Fact]
+    public void FWFlyout_ShouldExposeContentPlacementAndPresenterState()
+    {
+        var target = new FWButton { Content = "Open flyout" };
+        var content = new FWTextBlock { Text = "Details" };
+        var flyout = new FWFlyout
+        {
+            Content = content,
+            Placement = FlyoutPlacementMode.Right,
+            Density = FWMenuDensity.Compact
+        };
+        var opened = 0;
+        var closed = 0;
+        flyout.Opened += (_, _) => opened++;
+        flyout.Closed += (_, _) => closed++;
+
+        flyout.ShowAt(target);
+
+        var presenter = GetFlyoutPresenter<FWFlyoutPresenter>(flyout);
+        Assert.True(flyout.IsOpen);
+        Assert.IsAssignableFrom<IFluentJaliumControl>(flyout);
+        Assert.IsAssignableFrom<IFluentJaliumControl>(presenter);
+        Assert.Same(content, presenter.Content);
+        Assert.Equal(FlyoutPlacementMode.Right, flyout.Placement);
+        Assert.Equal(FWMenuDensity.Compact, presenter.Density);
+        Assert.Equal(new Thickness(3), presenter.Padding);
+        Assert.Equal(new CornerRadius(6), presenter.CornerRadius);
+        Assert.Equal(1, opened);
+
+        flyout.Content = "Updated";
+        flyout.Density = FWMenuDensity.Spacious;
+
+        Assert.Equal("Updated", presenter.Content);
+        Assert.Equal(FWMenuDensity.Spacious, presenter.Density);
+        Assert.Equal(new Thickness(6), presenter.Padding);
+        Assert.Equal(new CornerRadius(10), presenter.CornerRadius);
+
+        flyout.Hide();
+
+        Assert.False(flyout.IsOpen);
+        Assert.True(closed >= 1);
+    }
+
+    [Fact]
+    public void FWFlyout_ShouldUseExplicitPresenterStyle()
+    {
+        var target = new FWButton { Content = "Open flyout" };
+        var style = new Style(typeof(FWFlyoutPresenter));
+        style.Setters.Add(new Setter(Control.MinWidthProperty, 240.0));
+        var flyout = new FWFlyout
+        {
+            Content = "Settings",
+            FlyoutPresenterStyle = style
+        };
+
+        flyout.ShowAt(target);
+
+        var presenter = GetFlyoutPresenter<FWFlyoutPresenter>(flyout);
+        Assert.Same(style, presenter.Style);
+        Assert.Equal("Settings", presenter.Content);
+
+        flyout.Hide();
     }
 
     [Fact]

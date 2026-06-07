@@ -216,6 +216,14 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWGridView" BasedOn="{StaticResource {x:Type ListView}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
+    <Style TargetType="fluent:FWGridViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+        <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
     <Style TargetType="GridViewColumnHeader">
         <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />

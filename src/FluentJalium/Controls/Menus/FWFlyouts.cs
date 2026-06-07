@@ -8,6 +8,125 @@ using Jalium.UI.Media;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// FluentJalium flyout surface for arbitrary content.
+/// </summary>
+[ContentProperty("Content")]
+public class FWFlyout : FlyoutBase, IFluentJaliumControl
+{
+    private FWFlyoutPresenter? _presenter;
+
+    public static readonly DependencyProperty ContentProperty =
+        DependencyProperty.Register(nameof(Content), typeof(object), typeof(FWFlyout),
+            new PropertyMetadata(null, OnContentChanged));
+
+    public static readonly DependencyProperty ContentTemplateProperty =
+        DependencyProperty.Register(nameof(ContentTemplate), typeof(DataTemplate), typeof(FWFlyout),
+            new PropertyMetadata(null, OnContentChanged));
+
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWFlyout),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    /// <summary>
+    /// Gets or sets the content shown by the flyout.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Content
+    {
+        get => GetValue(ContentProperty);
+        set => SetValue(ContentProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the template used to display the flyout content.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? ContentTemplate
+    {
+        get => (DataTemplate?)GetValue(ContentTemplateProperty);
+        set => SetValue(ContentTemplateProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the density preset for the flyout surface.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets an optional presenter style for the flyout chrome.
+    /// </summary>
+    public Style? FlyoutPresenterStyle { get; set; }
+
+    protected override Control CreatePresenter()
+    {
+        var presenter = new FWFlyoutPresenter(this);
+        _presenter = presenter;
+        var presenterStyle = FlyoutPresenterStyle ?? ResolvePresenterStyle();
+        if (presenterStyle != null)
+        {
+            presenter.Style = presenterStyle;
+        }
+
+        SyncPresenter();
+
+        if (!presenter.HasLocalValue(FWFlyoutPresenter.DensityProperty))
+        {
+            presenter.SetCurrentValue(FWFlyoutPresenter.DensityProperty, Density);
+        }
+
+        return presenter;
+    }
+
+    private static Style? ResolvePresenterStyle()
+    {
+        var app = Application.Current;
+        if (app?.Resources != null &&
+            app.Resources.TryGetValue("FWFlyoutPresenterStyle", out var resource) &&
+            resource is Style style)
+        {
+            return style;
+        }
+
+        return null;
+    }
+
+    private static void OnContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWFlyout flyout)
+        {
+            flyout.SyncPresenter();
+        }
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWFlyout flyout &&
+            e.NewValue is FWMenuDensity density &&
+            flyout._presenter != null &&
+            !flyout._presenter.HasLocalValue(FWFlyoutPresenter.DensityProperty))
+        {
+            flyout._presenter.SetCurrentValue(FWFlyoutPresenter.DensityProperty, density);
+        }
+    }
+
+    private void SyncPresenter()
+    {
+        if (_presenter == null)
+        {
+            return;
+        }
+
+        _presenter.Content = Content;
+        _presenter.ContentTemplate = ContentTemplate;
+    }
+}
+
+/// <summary>
 /// FluentJalium menu flyout surface.
 /// </summary>
 [ContentProperty("Items")]
@@ -452,6 +571,46 @@ public class FWMenuFlyoutSubItem : FluentMenuFlyoutItemBase, IFluentJaliumContro
                 childSubItem._subPopup.IsOpen = false;
             }
         }
+    }
+}
+
+/// <summary>
+/// Presents the content of a <see cref="FWFlyout"/>.
+/// </summary>
+public class FWFlyoutPresenter : ContentControl, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DensityProperty =
+        DependencyProperty.Register(nameof(Density), typeof(FWMenuDensity), typeof(FWFlyoutPresenter),
+            new PropertyMetadata(FWMenuDensity.Comfortable, OnDensityChanged));
+
+    public FWFlyoutPresenter(FWFlyout flyout)
+    {
+        Content = flyout.Content;
+        ContentTemplate = flyout.ContentTemplate;
+        SetCurrentValue(DensityProperty, flyout.Density);
+        ApplyDensity(this, Density);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWMenuDensity Density
+    {
+        get => (FWMenuDensity)GetValue(DensityProperty)!;
+        set => SetValue(DensityProperty, value);
+    }
+
+    private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWFlyoutPresenter presenter && e.NewValue is FWMenuDensity density)
+        {
+            ApplyDensity(presenter, density);
+        }
+    }
+
+    private static void ApplyDensity(FWFlyoutPresenter presenter, FWMenuDensity density)
+    {
+        var (padding, cornerRadius) = FWMenuDensityMetrics.GetMenuFlyoutSurfaceMetrics(density);
+        presenter.Padding = padding;
+        presenter.CornerRadius = cornerRadius;
     }
 }
 

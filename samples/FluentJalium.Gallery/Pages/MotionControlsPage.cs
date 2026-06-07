@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -18,6 +18,13 @@ public class MotionControlsPage : Page
     {
         Title = "Motion & Animation";
         InitializeComponent();
+    }
+
+    public UIElement CreateContent()
+    {
+        return Content is UIElement element
+            ? element
+            : new StackPanel();
     }
 
     private void InitializeComponent()
@@ -128,7 +135,7 @@ public class MotionControlsPage : Page
             MirroredWhenRightToLeft = mirrored,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            FallbackIconSource = "▶" // Play icon fallback
+            FallbackIconSource = "Play"
         };
 
         return icon;
