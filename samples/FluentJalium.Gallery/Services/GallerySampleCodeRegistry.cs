@@ -187,6 +187,44 @@ var pager = new FWPipsPager
     SelectedPageIndex = 0
 };
 """,
+        ["materials.windowbackdrop"] = """
+var windowSurface = new FWFluentWindowSurface
+{
+    WindowMaterialProfile = FWFluentWindowMaterialProfile.MicaShell,
+    WindowBackdropKind = FWFluentWindowBackdropKind.Mica,
+    AutoApplyWindowBackdrop = true,
+    Child = new FWNavigationView
+    {
+        PaneTitle = "Fluent shell"
+    }
+};
+
+// For an explicit host window:
+windowSurface.ApplyWindowBackdrop(window);
+""",
+        ["materials.derivedsurfaces"] = """
+var card = new FWCardSurface
+{
+    Child = new FWTextBlock { Text = "Stable card content" }
+};
+
+var flyout = new FWFlyoutSurface
+{
+    Child = new FWButton { Content = "Command" }
+};
+
+var focusGlass = new FWFocusGlassSurface
+{
+    Child = new FWTextBlock { Text = "Focused preview" }
+};
+
+var windowSurface = new FWFluentWindowSurface
+{
+    AutoApplyWindowBackdrop = false,
+    WindowMaterialProfile = FWFluentWindowMaterialProfile.MicaShell,
+    WindowBackdropKind = FWFluentWindowBackdropKind.Mica
+};
+""",
         ["materialprimitives.backdrop"] = """
 var surface = new FWBorder
 {

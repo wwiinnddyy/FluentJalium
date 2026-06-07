@@ -6,12 +6,24 @@ using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Effects;
+using FWAcrylicSurface = FluentJalium.Controls.FWAcrylicSurface;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWCardSurface = FluentJalium.Controls.FWCardSurface;
+using FWFlyoutSurface = FluentJalium.Controls.FWFlyoutSurface;
+using FWFluentWindowBackdropKind = FluentJalium.Controls.FWFluentWindowBackdropKind;
+using FWFluentWindowMaterialProfile = FluentJalium.Controls.FWFluentWindowMaterialProfile;
+using FWFluentWindowSurface = FluentJalium.Controls.FWFluentWindowSurface;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialRecipe = FluentJalium.Controls.FWFluentMaterialRecipe;
+using FWFluentMaterialRole = FluentJalium.Controls.FWFluentMaterialRole;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWFocusGlassSurface = FluentJalium.Controls.FWFocusGlassSurface;
+using FWFrostedGlassSurface = FluentJalium.Controls.FWFrostedGlassSurface;
 using FWGrid = FluentJalium.Controls.FWGrid;
+using FWLayerSurface = FluentJalium.Controls.FWLayerSurface;
+using FWMicaAltSurface = FluentJalium.Controls.FWMicaAltSurface;
+using FWMicaSurface = FluentJalium.Controls.FWMicaSurface;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
@@ -40,6 +52,11 @@ internal sealed class GalleryMaterialsPage
             "Layered control surfaces",
             "Controls should sit on layered materials that echo WinUI: backdrop, layer fill, subtle border, and soft elevation.",
             CreateLayeredMaterialControlsSample()));
+        examples.Children.Add(CreateMaterialsExampleCard(
+            FluentIconRegular.AppGeneric24,
+            "Derived FW surfaces",
+            "FWLayerSurface, Mica, Acrylic, card, flyout, focus glass, and window surfaces expose ready-to-use Fluent material roles.",
+            CreateDerivedSurfaceControlsSample()));
         examples.Children.Add(CreateMaterialsExampleCard(
             FluentIconRegular.AppGeneric24,
             "Fluent material roles",
@@ -129,6 +146,35 @@ internal sealed class GalleryMaterialsPage
                         new FWToggleSwitch { Header = "Backdrop-aware", IsOn = true }
                     }
                 }
+            }
+        };
+    }
+
+    private static UIElement CreateDerivedSurfaceControlsSample()
+    {
+        var windowSurface = new FWFluentWindowSurface
+        {
+            AutoApplyWindowBackdrop = false,
+            WindowMaterialProfile = FWFluentWindowMaterialProfile.MicaShell,
+            WindowBackdropKind = FWFluentWindowBackdropKind.Mica
+        };
+        windowSurface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.MicaShell);
+
+        return new FWWrapPanel
+        {
+            HorizontalSpacing = 10,
+            VerticalSpacing = 10,
+            Children =
+            {
+                CreateDerivedSurfaceTile(new FWLayerSurface(), FluentIconRegular.Layer24, "FWLayerSurface", "Content layer for stable page regions."),
+                CreateDerivedSurfaceTile(new FWMicaSurface(), FluentIconRegular.WindowBrush24, "FWMicaSurface", "Long-lived shell and background regions."),
+                CreateDerivedSurfaceTile(new FWMicaAltSurface(), FluentIconRegular.LayerDiagonal24, "FWMicaAltSurface", "Tabbed or pane-heavy app chrome."),
+                CreateDerivedSurfaceTile(new FWAcrylicSurface(), FluentIconRegular.Drop24, "FWAcrylicSurface", "Transient elevated surfaces and overlays."),
+                CreateDerivedSurfaceTile(new FWFrostedGlassSurface(), FluentIconRegular.WeatherSnowflake24, "FWFrostedGlassSurface", "Soft media and preview glass."),
+                CreateDerivedSurfaceTile(new FWCardSurface(), FluentIconRegular.CardUi24, "FWCardSurface", "Repeated settings and content groups."),
+                CreateDerivedSurfaceTile(new FWFlyoutSurface(), FluentIconRegular.AppFolder24, "FWFlyoutSurface", "Menus, popups, and command overflow."),
+                CreateDerivedSurfaceTile(new FWFocusGlassSurface(), FluentIconRegular.Glasses24, "FWFocusGlassSurface", "High-emphasis LiquidGlass previews."),
+                CreateDerivedSurfaceTile(windowSurface, FluentIconRegular.AppGeneric24, "FWFluentWindowSurface", "Root surface paired with a window backdrop.")
             }
         };
     }
@@ -281,6 +327,96 @@ internal sealed class GalleryMaterialsPage
         return surface;
     }
 
+    private static FWFluentMaterialSurface CreateDerivedSurfaceTile(
+        FWFluentMaterialSurface surface,
+        FluentIconRegular icon,
+        string title,
+        string description)
+    {
+        surface.Width = 236;
+        surface.Height = 136;
+        surface.Background = CreateDerivedSurfaceBrush(surface);
+        surface.BorderBrush = ThemeBrush("ControlBorder");
+        surface.BorderThickness = new Thickness(1);
+        surface.CornerRadius = new CornerRadius(8);
+        surface.Padding = new Thickness(12);
+        surface.Child = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        CreateIcon(icon, 18, ThemeBrush("TextPrimary")),
+                        new FWTextBlock
+                        {
+                            Text = title,
+                            FontSize = 13,
+                            Foreground = ThemeBrush("TextPrimary"),
+                            VerticalAlignment = VerticalAlignment.Center
+                        }
+                    }
+                },
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 6,
+                    VerticalSpacing = 6,
+                    Children =
+                    {
+                        CreateSurfaceBadge(surface.MaterialRole == FWFluentMaterialRole.None ? "Recipe" : surface.MaterialRole.ToString()),
+                        CreateSurfaceBadge(surface.MaterialKind.ToString())
+                    }
+                },
+                new FWTextBlock
+                {
+                    Text = description,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = ThemeBrush("TextSecondary")
+                }
+            }
+        };
+
+        return surface;
+    }
+
+    private static FWBorder CreateSurfaceBadge(string text)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("FluentMaterialRoleBadgeBrush"),
+            CornerRadius = new CornerRadius(4),
+            Padding = new Thickness(6, 2, 6, 2),
+            Child = new FWTextBlock
+            {
+                Text = text,
+                FontSize = 11,
+                Foreground = ThemeBrush("TextPrimary")
+            }
+        };
+    }
+
+    private static Brush CreateDerivedSurfaceBrush(FWFluentMaterialSurface surface)
+    {
+        return surface switch
+        {
+            FWFluentWindowSurface => ThemeBrush("FluentMaterialWindowBackdropBrush"),
+            FWCardSurface => ThemeBrush("FluentMaterialCardBrush"),
+            FWFlyoutSurface => ThemeBrush("AcrylicInAppFillColorDefaultBrush"),
+            FWFocusGlassSurface => ThemeBrush("FluentMaterialFocusedGlassBrush"),
+            FWAcrylicSurface => ThemeBrush("AcrylicInAppFillColorDefaultBrush"),
+            FWFrostedGlassSurface => ThemeBrush("FluentMaterialFocusedGlassBrush"),
+            FWMicaAltSurface => ThemeBrush("LayerOnMicaBaseAltFillColorDefaultBrush"),
+            FWMicaSurface => ThemeBrush("MicaBackgroundFillColorBaseBrush"),
+            _ => ThemeBrush("LayerFillColorDefaultBrush")
+        };
+    }
+
     private static FWBorder CreateMaterialTokenPill(FluentIconRegular icon, string title, string tokenKey, string value)
     {
         return new FWBorder
@@ -384,6 +520,7 @@ internal sealed class GalleryMaterialsPage
         {
             "Element BackdropEffect" => "<FWBorder BackdropEffect=\"{BlurEffect Radius=18}\" />\n<FWFluentMaterialSurface MaterialKind=\"Acrylic\" />",
             "Layered control surfaces" => "<FWBorder Background=\"{ThemeResource LayerFillColorDefaultBrush}\">\n    <FWButton Content=\"Primary action\" />\n</FWBorder>",
+            "Derived FW surfaces" => "new FWCardSurface { Child = new FWTextBlock { Text = \"Card content\" } };\nnew FWFlyoutSurface { Child = new FWButton { Content = \"Action\" } };\nnew FWFluentWindowSurface { AutoApplyWindowBackdrop = false, WindowMaterialProfile = FWFluentWindowMaterialProfile.MicaShell };",
             "Fluent material roles" => "<Window SystemBackdrop=\"Mica\">\n    <FWNavigationView />\n    <FWFluentMaterialSurface MaterialKind=\"LiquidGlass\" />\n</Window>",
             _ => "<FWFluentMaterialSurface MaterialKind=\"Mica\" />"
         };
