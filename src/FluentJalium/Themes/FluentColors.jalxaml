@@ -248,6 +248,30 @@
             <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#FF8A8A8A" />
             <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FF9CDCFE" />
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFC5C5C5" />
+            <SolidColorBrush x:Key="ChartBackground" Color="#FF1E1E1E" />
+            <SolidColorBrush x:Key="ChartForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartBorderBrush" Color="#18FFFFFF" />
+            <SolidColorBrush x:Key="ChartTitleForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartAxisBrush" Color="#8BFFFFFF" />
+            <SolidColorBrush x:Key="ChartGridLineBrush" Color="#18FFFFFF" />
+            <SolidColorBrush x:Key="ChartPalette1" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="ChartPalette2" Color="#FF60CDFF" />
+            <SolidColorBrush x:Key="ChartPalette3" Color="#FF25B55B" />
+            <SolidColorBrush x:Key="ChartPalette4" Color="#FFFFC27A" />
+            <SolidColorBrush x:Key="ChartPalette5" Color="#FFE74856" />
+            <SolidColorBrush x:Key="ChartPalette6" Color="#FFC239B3" />
+            <SolidColorBrush x:Key="ChartAreaFillBrush" Color="#334CC2FF" />
+            <SolidColorBrush x:Key="ChartPositiveBrush" Color="#FF25B55B" />
+            <SolidColorBrush x:Key="ChartNegativeBrush" Color="#FFFF6B6B" />
+            <SolidColorBrush x:Key="ChartTrackBrush" Color="#2AFFFFFF" />
+            <SolidColorBrush x:Key="ChartNeedleBrush" Color="#FF60CDFF" />
+            <SolidColorBrush x:Key="ChartInlineBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartInlineBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartLegendBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartLegendBorderBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartTooltipBackground" Color="#F02C2C2C" />
+            <SolidColorBrush x:Key="ChartTooltipForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartTooltipBorderBrush" Color="#33FFFFFF" />
             <SolidColorBrush x:Key="ImageBackground" Color="#08FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />
@@ -696,6 +720,30 @@
             <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#72000000" />
             <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FF005FB8" />
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#9E000000" />
+            <SolidColorBrush x:Key="ChartBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ChartBorderBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ChartTitleForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ChartAxisBrush" Color="#72000000" />
+            <SolidColorBrush x:Key="ChartGridLineBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="ChartPalette1" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="ChartPalette2" Color="#FF0099BC" />
+            <SolidColorBrush x:Key="ChartPalette3" Color="#FF107C10" />
+            <SolidColorBrush x:Key="ChartPalette4" Color="#FFD83B01" />
+            <SolidColorBrush x:Key="ChartPalette5" Color="#FFC50F1F" />
+            <SolidColorBrush x:Key="ChartPalette6" Color="#FF881798" />
+            <SolidColorBrush x:Key="ChartAreaFillBrush" Color="#22005FB8" />
+            <SolidColorBrush x:Key="ChartPositiveBrush" Color="#FF107C10" />
+            <SolidColorBrush x:Key="ChartNegativeBrush" Color="#FFB3261E" />
+            <SolidColorBrush x:Key="ChartTrackBrush" Color="#1F000000" />
+            <SolidColorBrush x:Key="ChartNeedleBrush" Color="#FF005FB8" />
+            <SolidColorBrush x:Key="ChartInlineBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartInlineBorderBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="ChartLegendBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="ChartLegendBorderBrush" Color="#00000000" />
+            <SolidColorBrush x:Key="ChartTooltipBackground" Color="#F0FFFFFF" />
+            <SolidColorBrush x:Key="ChartTooltipForeground" Color="#E4000000" />
+            <SolidColorBrush x:Key="ChartTooltipBorderBrush" Color="#29000000" />
             <SolidColorBrush x:Key="ImageBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />
@@ -1124,6 +1172,30 @@
             <SolidColorBrush x:Key="DataInspectorJsonNullBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="DataInspectorJsonKeyBrush" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="DataInspectorJsonBracketBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ChartForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartTitleForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartAxisBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartGridLineBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartPalette1" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ChartPalette2" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartPalette3" Color="#FF00FFFF" />
+            <SolidColorBrush x:Key="ChartPalette4" Color="#FFFF00FF" />
+            <SolidColorBrush x:Key="ChartPalette5" Color="#FFFF8000" />
+            <SolidColorBrush x:Key="ChartPalette6" Color="#FF00FF00" />
+            <SolidColorBrush x:Key="ChartAreaFillBrush" Color="#66FFFF00" />
+            <SolidColorBrush x:Key="ChartPositiveBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartNegativeBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ChartTrackBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartNeedleBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="ChartInlineBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ChartInlineBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartLegendBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ChartLegendBorderBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartTooltipBackground" Color="#FF000000" />
+            <SolidColorBrush x:Key="ChartTooltipForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ChartTooltipBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="ImageBackground" Color="#FF000000" />
             <SolidColorBrush x:Key="ImageBorderBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="QRCodeBackground" Color="#FFFFFFFF" />

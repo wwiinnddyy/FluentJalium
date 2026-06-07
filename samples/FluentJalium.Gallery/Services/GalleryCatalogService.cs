@@ -49,6 +49,7 @@ internal sealed class GalleryCatalogService
             [PageId("Advanced Collections")] = () => CreatePageStack(new AdvancedCollectionsPage().CreateContent()),
             [PageId("Selectors and Properties")] = () => CreatePageStack(new GallerySelectorsPropertiesPage().CreateContent()),
             [PageId("Data Inspectors")] = () => CreatePageStack(new GalleryDataInspectorsPage().CreateContent()),
+            [PageId("Charts")] = () => CreatePageStack(new GalleryChartsPage().CreateContent()),
             [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent()),
             [PageId("Window Backdrops")] = () => CreatePageStack(new GalleryWindowBackdropsPage(owner).CreateContent()),
             [PageId("Materials and Effects")] = () => CreatePageStack(new GalleryMaterialsPage().CreateContent()),

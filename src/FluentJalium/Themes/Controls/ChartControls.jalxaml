@@ -1,9 +1,10 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:charts="clr-namespace:Jalium.UI.Controls.Charts;assembly=Jalium.UI.Controls"
     xmlns:fluent="https://jalium.dev/fluent"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Style TargetType="LineChart">
+    <Style x:Key="FluentLineChartStyle" TargetType="LineChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -32,9 +33,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWLineChart" BasedOn="{StaticResource {x:Type LineChart}}" />
+    <Style TargetType="LineChart" BasedOn="{StaticResource FluentLineChartStyle}" />
+    <Style TargetType="fluent:FWLineChart" BasedOn="{StaticResource FluentLineChartStyle}" />
 
-    <Style TargetType="BarChart">
+    <Style x:Key="FluentBarChartStyle" TargetType="BarChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -64,9 +66,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWBarChart" BasedOn="{StaticResource {x:Type BarChart}}" />
+    <Style TargetType="BarChart" BasedOn="{StaticResource FluentBarChartStyle}" />
+    <Style TargetType="fluent:FWBarChart" BasedOn="{StaticResource FluentBarChartStyle}" />
 
-    <Style TargetType="PieChart">
+    <Style x:Key="FluentPieChartStyle" TargetType="PieChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -93,9 +96,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWPieChart" BasedOn="{StaticResource {x:Type PieChart}}" />
+    <Style TargetType="PieChart" BasedOn="{StaticResource FluentPieChartStyle}" />
+    <Style TargetType="fluent:FWPieChart" BasedOn="{StaticResource FluentPieChartStyle}" />
 
-    <Style TargetType="ScatterPlot">
+    <Style x:Key="FluentScatterPlotStyle" TargetType="ScatterPlot">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -124,9 +128,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWScatterPlot" BasedOn="{StaticResource {x:Type ScatterPlot}}" />
+    <Style TargetType="ScatterPlot" BasedOn="{StaticResource FluentScatterPlotStyle}" />
+    <Style TargetType="fluent:FWScatterPlot" BasedOn="{StaticResource FluentScatterPlotStyle}" />
 
-    <Style TargetType="Heatmap">
+    <Style x:Key="FluentHeatmapStyle" TargetType="Heatmap">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -156,9 +161,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWHeatmap" BasedOn="{StaticResource {x:Type Heatmap}}" />
+    <Style TargetType="Heatmap" BasedOn="{StaticResource FluentHeatmapStyle}" />
+    <Style TargetType="fluent:FWHeatmap" BasedOn="{StaticResource FluentHeatmapStyle}" />
 
-    <Style TargetType="Sparkline">
+    <Style x:Key="FluentSparklineStyle" TargetType="Sparkline">
         <Setter Property="Background" Value="{ThemeResource ChartInlineBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartInlineBorderBrush}" />
@@ -189,9 +195,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWSparkline" BasedOn="{StaticResource {x:Type Sparkline}}" />
+    <Style TargetType="Sparkline" BasedOn="{StaticResource FluentSparklineStyle}" />
+    <Style TargetType="fluent:FWSparkline" BasedOn="{StaticResource FluentSparklineStyle}" />
 
-    <Style TargetType="GaugeChart">
+    <Style x:Key="FluentGaugeChartStyle" TargetType="GaugeChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -220,9 +227,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWGaugeChart" BasedOn="{StaticResource {x:Type GaugeChart}}" />
+    <Style TargetType="GaugeChart" BasedOn="{StaticResource FluentGaugeChartStyle}" />
+    <Style TargetType="fluent:FWGaugeChart" BasedOn="{StaticResource FluentGaugeChartStyle}" />
 
-    <Style TargetType="TreeMap">
+    <Style x:Key="FluentTreeMapStyle" TargetType="TreeMap">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -250,9 +258,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWTreeMap" BasedOn="{StaticResource {x:Type TreeMap}}" />
+    <Style TargetType="TreeMap" BasedOn="{StaticResource FluentTreeMapStyle}" />
+    <Style TargetType="fluent:FWTreeMap" BasedOn="{StaticResource FluentTreeMapStyle}" />
 
-    <Style TargetType="CandlestickChart">
+    <Style x:Key="FluentCandlestickChartStyle" TargetType="CandlestickChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -281,9 +290,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWCandlestickChart" BasedOn="{StaticResource {x:Type CandlestickChart}}" />
+    <Style TargetType="CandlestickChart" BasedOn="{StaticResource FluentCandlestickChartStyle}" />
+    <Style TargetType="fluent:FWCandlestickChart" BasedOn="{StaticResource FluentCandlestickChartStyle}" />
 
-    <Style TargetType="NetworkGraph">
+    <Style x:Key="FluentNetworkGraphStyle" TargetType="NetworkGraph">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -310,9 +320,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWNetworkGraph" BasedOn="{StaticResource {x:Type NetworkGraph}}" />
+    <Style TargetType="NetworkGraph" BasedOn="{StaticResource FluentNetworkGraphStyle}" />
+    <Style TargetType="fluent:FWNetworkGraph" BasedOn="{StaticResource FluentNetworkGraphStyle}" />
 
-    <Style TargetType="GanttChart">
+    <Style x:Key="FluentGanttChartStyle" TargetType="GanttChart">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -341,9 +352,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWGanttChart" BasedOn="{StaticResource {x:Type GanttChart}}" />
+    <Style TargetType="GanttChart" BasedOn="{StaticResource FluentGanttChartStyle}" />
+    <Style TargetType="fluent:FWGanttChart" BasedOn="{StaticResource FluentGanttChartStyle}" />
 
-    <Style TargetType="SankeyDiagram">
+    <Style x:Key="FluentSankeyDiagramStyle" TargetType="SankeyDiagram">
         <Setter Property="Background" Value="{ThemeResource ChartBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartBorderBrush}" />
@@ -370,9 +382,10 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWSankeyDiagram" BasedOn="{StaticResource {x:Type SankeyDiagram}}" />
+    <Style TargetType="SankeyDiagram" BasedOn="{StaticResource FluentSankeyDiagramStyle}" />
+    <Style TargetType="fluent:FWSankeyDiagram" BasedOn="{StaticResource FluentSankeyDiagramStyle}" />
 
-    <Style TargetType="ChartLegend">
+    <Style x:Key="FluentChartLegendStyle" TargetType="ChartLegend">
         <Setter Property="Background" Value="{ThemeResource ChartLegendBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartLegendBorderBrush}" />
@@ -391,9 +404,10 @@
         </Setter>
     </Style>
 
-    <Style TargetType="fluent:FWChartLegend" BasedOn="{StaticResource {x:Type ChartLegend}}" />
+    <Style TargetType="ChartLegend" BasedOn="{StaticResource FluentChartLegendStyle}" />
+    <Style TargetType="fluent:FWChartLegend" BasedOn="{StaticResource FluentChartLegendStyle}" />
 
-    <Style TargetType="ChartTooltip">
+    <Style x:Key="FluentChartTooltipStyle" TargetType="ChartTooltip">
         <Setter Property="Background" Value="{ThemeResource ChartTooltipBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource ChartTooltipForeground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ChartTooltipBorderBrush}" />
@@ -415,5 +429,6 @@
         </Setter>
     </Style>
 
-    <Style TargetType="fluent:FWChartTooltip" BasedOn="{StaticResource {x:Type ChartTooltip}}" />
+    <Style TargetType="ChartTooltip" BasedOn="{StaticResource FluentChartTooltipStyle}" />
+    <Style TargetType="fluent:FWChartTooltip" BasedOn="{StaticResource FluentChartTooltipStyle}" />
 </ResourceDictionary>

@@ -6,6 +6,7 @@ using FluentJalium.Controls.Themes;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Charts;
 using Jalium.UI.Controls.Ink;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Data;
@@ -80,6 +81,20 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWDiffViewer, DiffViewer>(app.Resources);
             AssertBasedOnStyle<FWHexEditor, HexEditor>(app.Resources);
             AssertBasedOnStyle<FWJsonTreeViewer, JsonTreeViewer>(app.Resources);
+            AssertSharesBasedOnStyle<FWLineChart, LineChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWBarChart, BarChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWPieChart, PieChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWScatterPlot, ScatterPlot>(app.Resources);
+            AssertSharesBasedOnStyle<FWHeatmap, Heatmap>(app.Resources);
+            AssertSharesBasedOnStyle<FWSparkline, Sparkline>(app.Resources);
+            AssertSharesBasedOnStyle<FWGaugeChart, GaugeChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWTreeMap, TreeMap>(app.Resources);
+            AssertSharesBasedOnStyle<FWCandlestickChart, CandlestickChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWNetworkGraph, NetworkGraph>(app.Resources);
+            AssertSharesBasedOnStyle<FWGanttChart, GanttChart>(app.Resources);
+            AssertSharesBasedOnStyle<FWSankeyDiagram, SankeyDiagram>(app.Resources);
+            AssertSharesBasedOnStyle<FWChartLegend, ChartLegend>(app.Resources);
+            AssertSharesBasedOnStyle<FWChartTooltip, ChartTooltip>(app.Resources);
             AssertBasedOnStyle<FWNavigationView, NavigationView>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
@@ -310,6 +325,34 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<DiffViewer>(dictionary);
         AssertContainsStyle<HexEditor>(dictionary);
         AssertContainsStyle<JsonTreeViewer>(dictionary);
+        AssertContainsStyle<LineChart>(dictionary);
+        AssertContainsStyle<FWLineChart>(dictionary);
+        AssertContainsStyle<BarChart>(dictionary);
+        AssertContainsStyle<FWBarChart>(dictionary);
+        AssertContainsStyle<PieChart>(dictionary);
+        AssertContainsStyle<FWPieChart>(dictionary);
+        AssertContainsStyle<ScatterPlot>(dictionary);
+        AssertContainsStyle<FWScatterPlot>(dictionary);
+        AssertContainsStyle<Heatmap>(dictionary);
+        AssertContainsStyle<FWHeatmap>(dictionary);
+        AssertContainsStyle<Sparkline>(dictionary);
+        AssertContainsStyle<FWSparkline>(dictionary);
+        AssertContainsStyle<GaugeChart>(dictionary);
+        AssertContainsStyle<FWGaugeChart>(dictionary);
+        AssertContainsStyle<TreeMap>(dictionary);
+        AssertContainsStyle<FWTreeMap>(dictionary);
+        AssertContainsStyle<CandlestickChart>(dictionary);
+        AssertContainsStyle<FWCandlestickChart>(dictionary);
+        AssertContainsStyle<NetworkGraph>(dictionary);
+        AssertContainsStyle<FWNetworkGraph>(dictionary);
+        AssertContainsStyle<GanttChart>(dictionary);
+        AssertContainsStyle<FWGanttChart>(dictionary);
+        AssertContainsStyle<SankeyDiagram>(dictionary);
+        AssertContainsStyle<FWSankeyDiagram>(dictionary);
+        AssertContainsStyle<ChartLegend>(dictionary);
+        AssertContainsStyle<FWChartLegend>(dictionary);
+        AssertContainsStyle<ChartTooltip>(dictionary);
+        AssertContainsStyle<FWChartTooltip>(dictionary);
         AssertContainsStyle<NavigationView>(dictionary);
         AssertContainsStyle<NavigationViewItem>(dictionary);
         AssertContainsStyle<NavigationViewItemHeader>(dictionary);
@@ -608,8 +651,8 @@ public sealed class FluentThemeManagerTests
         var buttonStyle = Assert.IsType<Style>(dictionary[typeof(Button)]);
         AssertStyleSetterValue(buttonStyle, Control.BorderBrushProperty, "ControlElevationBorderBrush");
         AssertStyleSetterValue(buttonStyle, Control.CornerRadiusProperty, dictionary["ControlCornerRadius"]);
-        var transitioningStyle = Assert.IsType<Style>(dictionary[typeof(TransitioningContentControl)]);
-        AssertStyleSetterValue(transitioningStyle, TransitioningContentControl.TransitionModeProperty, "FluentMotionContentTransitionDefaultMode");
+        var transitioningStyle = ResolveStyleDefinition(Assert.IsType<Style>(dictionary[typeof(TransitioningContentControl)]));
+        AssertStyleSetterValue(transitioningStyle, "TransitionMode", "FluentMotionContentTransitionDefaultMode");
         AssertStyleSetterValue(transitioningStyle, UIElement.TransitionDurationProperty, "FluentMotionContentTransitionDefaultDuration");
         AssertStyleSetterValue(transitioningStyle, UIElement.TransitionTimingFunctionProperty, "FluentMotionContentTransitionDefaultTimingFunction");
         var windowSurfaceStyle = Assert.IsType<Style>(dictionary[typeof(FWFluentWindowSurface)]);
@@ -3225,6 +3268,23 @@ public sealed class FluentThemeManagerTests
         Assert.Same(baseStyle, fluentStyle.BasedOn);
     }
 
+    private static void AssertSharesBasedOnStyle<TFluentControl, TJaliumControl>(ResourceDictionary dictionary)
+        where TFluentControl : TJaliumControl, IFluentJaliumControl
+        where TJaliumControl : FrameworkElement
+    {
+        Assert.True(dictionary.TryGetValue(typeof(TJaliumControl), out var baseValue), $"{typeof(TJaliumControl).Name} base style was not found.");
+        var baseStyle = Assert.IsType<Style>(baseValue);
+
+        Assert.True(dictionary.TryGetValue(typeof(TFluentControl), out var fluentValue), $"{typeof(TFluentControl).Name} FW style was not found.");
+        var fluentStyle = Assert.IsType<Style>(fluentValue);
+
+        Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
+        Assert.True(
+            ReferenceEquals(baseStyle, fluentStyle.BasedOn)
+            || (baseStyle.BasedOn != null && ReferenceEquals(baseStyle.BasedOn, fluentStyle.BasedOn)),
+            $"{typeof(TFluentControl).Name} FW style should be based on {typeof(TJaliumControl).Name} or share its keyed base style.");
+    }
+
     private static void AssertOwnedStyle<TFluentControl>(ResourceDictionary dictionary)
         where TFluentControl : FrameworkElement, IFluentJaliumControl
     {
@@ -3248,6 +3308,30 @@ public sealed class FluentThemeManagerTests
         }
 
         Assert.Equal(expectedValue, setter.Value);
+    }
+
+    private static void AssertStyleSetterValue(Style style, string propertyName, object? expectedValue)
+    {
+        var setter = style.Setters
+            .OfType<Setter>()
+            .FirstOrDefault(candidate =>
+                string.Equals(candidate.PropertyName, propertyName, StringComparison.Ordinal)
+                || string.Equals(candidate.Property?.Name, propertyName, StringComparison.Ordinal));
+
+        Assert.NotNull(setter);
+
+        if (setter!.Value is IDynamicResourceReference dynamicReference)
+        {
+            Assert.Equal(expectedValue, dynamicReference.ResourceKey);
+            return;
+        }
+
+        Assert.Equal(expectedValue, setter.Value);
+    }
+
+    private static Style ResolveStyleDefinition(Style style)
+    {
+        return style.Setters.Count > 0 ? style : style.BasedOn ?? style;
     }
 
     private static void AssertFluentControl<TFluentControl, TJaliumControl>()

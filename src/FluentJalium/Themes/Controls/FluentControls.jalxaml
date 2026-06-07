@@ -14,6 +14,7 @@
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InteractionControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/InputMediaControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/CollectionControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/ChartControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/NavigationControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DisclosureControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/MenuControls.jalxaml" />
