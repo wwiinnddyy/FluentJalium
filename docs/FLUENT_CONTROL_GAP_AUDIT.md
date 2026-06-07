@@ -15,22 +15,18 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 ## Current strengths
 
 - Buttons, selection, status, layout basics, materials, shell, range/progress, text input, charts, and visual primitives all have `FW*` public surfaces.
-- Gallery has a central catalog, grouped NavigationView shell, All/New/Updated/Preview/Diagnostic filters, and real sample pages for many control groups.
+- Gallery has a central catalog, grouped NavigationView shell, All/New/Updated/Preview/Diagnostic filters, visible source/sample metadata, and real sample pages for many control groups.
 - Material work is a FluentJalium strength: DWM/window-material profiles, surface presets, Mica/Acrylic/LiquidGlass recipes, and WinUI-compatible aliases are already deeper than a flat token skin.
-- Recent work added first-wave WinUI semantic gaps, second-wave ecosystem controls, visible Gallery samples, and promoted `FWRelativePanel` from a Grid wrapper to a real relative layout panel.
+- Recent work added first-wave WinUI semantic gaps, second-wave ecosystem controls, visible Gallery samples, chart coverage, Navigation shell coverage, Date/Time and GridView coverage, and promoted `FWRelativePanel` from a Grid wrapper to a real relative layout panel.
 
 ## High-value gaps
 
 ### Gallery visibility gaps
 
-- Navigation/Shell: `FWBreadcrumbBar`, `FWPipsPager`, `FWSelectorBar`, `FWTabView`, `FWTitleBar`.
-- Date/Time: `FWCalendarDatePicker`, `FWCalendarView`.
-- Collections: `FWGridView` and richer DataGrid/List/Grid states.
-- Text: `FWAutoSuggestBox`.
-- Disclosure: `FWTeachingTip`.
-- Visuals: `FWPersonPicture`, `FWMarkdown`, `FWQRCode`, shape controls.
-- Charts: the full `FW*Chart` family needs a dedicated Gallery entry/page.
-- Materials: convenience surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, `FWFocusGlassSurface`, and `FWFluentWindowSurface` need catalog and visible examples.
+- Text: `FWAutoSuggestBox` should be visible by WinUI name, not only through `FWAutoCompleteBox`.
+- Disclosure: `FWTeachingTip` still needs a dedicated Gallery sample and catalog metadata.
+- Materials: convenience surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, `FWFocusGlassSurface`, and `FWFluentWindowSurface` need a consolidated catalog route and visible examples.
+- Data depth: DataGrid/List/GridView now have direct Gallery coverage, but richer loading, empty, grouped, and high-density comparison states would make the collection story stronger.
 
 ### Semantic-depth gaps
 
@@ -44,10 +40,17 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ## Next implementation batches
 
-1. Visuals coverage package: `FWPersonPicture` style/tests/Gallery, plus `FWMarkdown`, `FWQRCode`, and shape samples.
-2. Navigation Gallery package: `FWBreadcrumbBar`, `FWPipsPager`, `FWSelectorBar`, `FWTabView`, `FWTitleBar` samples and catalog metadata.
-3. Settings semantics package: `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics.
-4. Snackbar/TaskDialog semantics package: `FWSnackbarHost` or service and `FWTaskDialog.ShowAsync` style result flow.
-5. Charts Gallery package: one dedicated Charts catalog entry with the existing chart family shown as scan-friendly samples.
-6. Catalog metadata activation: make `SourcePath`, `SampleCodeKey`, and `RelatedControls` visible, navigable, and useful in `GalleryHostPage` or a shared sample-code registry.
+1. AutoSuggestBox visibility package: add `FWAutoSuggestBox` to Text Input Gallery, catalog metadata, and sample-code registry while keeping `FWAutoCompleteBox` as the Jalium base.
+2. TeachingTip Gallery package: add `FWTeachingTip` samples for target placement, action, close, and icon/content states.
+3. Materials Gallery package: consolidate `FWFluentWindowSurface` and derived material surfaces into a visible route with copyable recipes.
+4. Settings semantics package: continue deepening `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics where the current API is still thin.
+5. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
+6. Collection state package: extend FWListView/FWGridView/FWDataGrid samples with empty/loading/grouped/high-density states once the current direct `FWGridView` coverage is verified.
 
+## Recently completed batches
+
+- Visuals coverage: `FWPersonPicture`, `FWMarkdown`, `FWQRCode`, and shape controls are visible in Gallery.
+- Navigation Gallery coverage: `FWBreadcrumbBar`, `FWPipsPager`, `FWSelectorBar`, `FWTabView`, and `FWTitleBar` now have direct examples.
+- Charts Gallery coverage: the `FW*Chart` family has a dedicated Gallery entry/page.
+- Catalog metadata activation: `SourcePath`, `SampleCodeKey`, API/base/related controls, docs, and registry-backed sample code are visible in `GalleryHostPage`.
+- Date/Time and Collections coverage: `FWCalendarDatePicker`, `FWCalendarView`, `FWGridView`, and `FWGridViewItem` have direct Gallery samples and catalog metadata.

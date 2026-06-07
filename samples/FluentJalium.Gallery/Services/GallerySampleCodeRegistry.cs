@@ -24,6 +24,27 @@ radioButtons.Items.Add("Gallery shell");
 radioButtons.Items.Add("Control playground");
 radioButtons.SelectedIndex = 1;
 """,
+        ["datetime.calendarpicker.calendarview"] = """
+var reviewDate = new FWCalendarDatePicker
+{
+    Header = "Review date",
+    PlaceholderText = "Choose a date",
+    DisplayDateStart = DateTime.Today,
+    DisplayDateEnd = DateTime.Today.AddDays(90),
+    SelectedDate = DateTime.Today.AddDays(7),
+    SelectedDateFormat = DatePickerFormat.Long
+};
+
+var calendarView = new FWCalendarView
+{
+    DisplayDate = DateTime.Today,
+    DisplayDateStart = DateTime.Today,
+    DisplayDateEnd = DateTime.Today.AddDays(90),
+    SelectedDate = reviewDate.SelectedDate,
+    FirstDayOfWeek = DayOfWeek.Monday,
+    IsTodayHighlighted = true
+};
+""",
         ["layout.settingscard"] = """
 var card = new FWSettingsCard
 {
@@ -77,6 +98,28 @@ var repeater = new FWItemsRepeater
     HorizontalCacheLength = 200,
     VerticalCacheLength = 200
 };
+""",
+        ["collections.gridview"] = """
+var gridView = new FWGridView
+{
+    Width = 460,
+    Height = 190,
+    SelectionMode = SelectionMode.Single,
+    Density = FWCollectionDensity.Comfortable,
+    ItemsSource = rows
+};
+
+if (gridView.View is GridView view)
+{
+    view.Columns.Add(new GridViewColumn { Header = "Control", DisplayMemberBinding = new Binding("Name") });
+    view.Columns.Add(new GridViewColumn { Header = "State", DisplayMemberBinding = new Binding("State") });
+}
+
+gridView.Items.Add(new FWGridViewItem
+{
+    Content = "Disabled container state",
+    IsEnabled = false
+});
 """,
         ["charts.family"] = """
 var chart = new FWLineChart

@@ -8,10 +8,13 @@ using Jalium.UI.Data;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWCollectionDensity = FluentJalium.Controls.FWCollectionDensity;
 using FWDataGrid = FluentJalium.Controls.FWDataGrid;
 using FWDataGridDensity = FluentJalium.Controls.FWDataGridDensity;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWGridView = FluentJalium.Controls.FWGridView;
+using FWGridViewItem = FluentJalium.Controls.FWGridViewItem;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListBoxItem = FluentJalium.Controls.FWListBoxItem;
 using FWListView = FluentJalium.Controls.FWListView;
@@ -46,6 +49,11 @@ internal sealed class GalleryCollectionsPage
             "FWListView",
             "GridView columns with row selection and column-reorder option.",
             CreateListViewCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            FluentIconRegular.TableSimple24,
+            "FWGridView / FWGridViewItem",
+            "Dedicated grid rows with columns, selection, density, and item container states.",
+            CreateGridViewCollectionSample()));
         examples.Children.Add(CreateCollectionExampleCard(
             FluentIconRegular.BranchFork24,
             "FWTreeView",
@@ -183,6 +191,126 @@ internal sealed class GalleryCollectionsPage
                     {
                         listView.IsEnabled = !listView.IsEnabled;
                         output.Text = $"ListView enabled: {listView.IsEnabled}";
+                    })),
+                CreateCollectionStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateGridViewCollectionSample()
+    {
+        var rows = GallerySampleData.CreateRows();
+        var output = CreateCollectionOutput("Selected: Selection / Review / 4. Density: comfortable");
+        var firstItem = new FWGridViewItem { Content = rows[0] };
+        var selectedItem = new FWGridViewItem { Content = rows[1], IsSelected = true };
+        var disabledItem = new FWGridViewItem { Content = rows[2], IsEnabled = false };
+        var gridView = new FWGridView
+        {
+            Width = 470,
+            Height = 170,
+            SelectionMode = SelectionMode.Single,
+            Density = FWCollectionDensity.Comfortable
+        };
+
+        if (gridView.View is GridView view)
+        {
+            view.AllowsColumnReorder = true;
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "Name",
+                DisplayMemberBinding = new Binding("Content.Name"),
+                Width = 150
+            });
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "State",
+                DisplayMemberBinding = new Binding("Content.State"),
+                Width = 110
+            });
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "Count",
+                DisplayMemberBinding = new Binding("Content.Count"),
+                Width = 80
+            });
+        }
+
+        gridView.Items.Add(firstItem);
+        gridView.Items.Add(selectedItem);
+        gridView.Items.Add(disabledItem);
+        gridView.SelectedIndex = 1;
+
+        void SetDensity(FWCollectionDensity density)
+        {
+            gridView.Density = density;
+            firstItem.Density = density;
+            selectedItem.Density = density;
+            disabledItem.Density = density;
+        }
+
+        string FormatDensity()
+        {
+            return gridView.Density.ToString().ToLowerInvariant();
+        }
+
+        void UpdateOutput()
+        {
+            output.Text = gridView.SelectionMode == SelectionMode.Multiple && gridView.SelectedItems.Count > 0
+                ? $"Selected ({gridView.SelectedItems.Count}): {FormatCollectionItems(gridView.SelectedItems)}. Density: {FormatDensity()}"
+                : gridView.SelectedItem is FWGridViewItem item && item.Content is GalleryRow row
+                    ? $"Selected: {row.Name} / {row.State} / {row.Count}. Density: {FormatDensity()}"
+                    : $"Selected: none. Density: {FormatDensity()}";
+        }
+
+        gridView.SelectionChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                gridView,
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Next", () =>
+                    {
+                        gridView.SelectionMode = SelectionMode.Single;
+                        gridView.SelectedIndex = gridView.SelectedIndex == 0 ? 1 : 0;
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Multi", () =>
+                    {
+                        gridView.SelectionMode = gridView.SelectionMode == SelectionMode.Multiple
+                            ? SelectionMode.Single
+                            : SelectionMode.Multiple;
+                        if (gridView.SelectionMode == SelectionMode.Multiple)
+                        {
+                            firstItem.IsSelected = true;
+                            selectedItem.IsSelected = true;
+                        }
+                        else
+                        {
+                            gridView.SelectedIndex = 1;
+                        }
+
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Density", () =>
+                    {
+                        var density = gridView.Density switch
+                        {
+                            FWCollectionDensity.Comfortable => FWCollectionDensity.Compact,
+                            FWCollectionDensity.Compact => FWCollectionDensity.Spacious,
+                            _ => FWCollectionDensity.Comfortable
+                        };
+                        SetDensity(density);
+                        UpdateOutput();
+                    }),
+                    CreateCollectionActionButton("Disabled row", () =>
+                    {
+                        disabledItem.IsEnabled = !disabledItem.IsEnabled;
+                        output.Text = $"Disabled row enabled: {disabledItem.IsEnabled}. Density: {FormatDensity()}";
                     })),
                 CreateCollectionStatus(output)
             }
@@ -515,6 +643,7 @@ internal sealed class GalleryCollectionsPage
         {
             "FWListBox" => "<FWListBox SelectionMode=\"Multiple\">\n    <FWListBoxItem Content=\"Fluent tokens\" />\n</FWListBox>",
             "FWListView" => "<FWListView ItemsSource=\"{Binding Rows}\">\n    <FWListView.View>\n        <GridView />\n    </FWListView.View>\n</FWListView>",
+            "FWGridView / FWGridViewItem" => "<FWGridView SelectionMode=\"Single\" SelectedIndex=\"1\" Density=\"Comfortable\">\n    <FWGridView.View>\n        <GridView>\n            <GridViewColumn Header=\"Name\" DisplayMemberBinding=\"{Binding Content.Name}\" />\n        </GridView>\n    </FWGridView.View>\n    <FWGridViewItem Content=\"{Binding ActiveRow}\" IsSelected=\"True\" />\n    <FWGridViewItem Content=\"{Binding DisabledRow}\" IsEnabled=\"False\" />\n</FWGridView>",
             "FWTreeView" => "<FWTreeView>\n    <FWTreeViewItem Header=\"Workspace\" IsExpanded=\"True\" />\n</FWTreeView>",
             "FWDataGrid" => "<FWDataGrid AutoGenerateColumns=\"False\" GridLinesVisibility=\"All\" HeadersVisibility=\"All\" />",
             "FWTreeDataGrid" => "<FWTreeDataGrid ChildrenSelector=\"{Binding Children}\" GridLinesVisibility=\"Horizontal\" />",
@@ -591,6 +720,9 @@ internal sealed class GalleryCollectionsPage
             names.Add(item switch
             {
                 FWListBoxItem listBoxItem => listBoxItem.Content?.ToString() ?? string.Empty,
+                FWGridViewItem gridViewItem => gridViewItem.Content is GalleryRow gridRow
+                    ? gridRow.Name
+                    : gridViewItem.Content?.ToString() ?? string.Empty,
                 GalleryRow row => row.Name,
                 GalleryTreeRow row => row.Name,
                 _ => item?.ToString() ?? string.Empty

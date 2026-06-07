@@ -6,6 +6,8 @@ using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWCalendar = FluentJalium.Controls.FWCalendar;
+using FWCalendarDatePicker = FluentJalium.Controls.FWCalendarDatePicker;
+using FWCalendarView = FluentJalium.Controls.FWCalendarView;
 using FWDateTimePickerDensity = FluentJalium.Controls.FWDateTimePickerDensity;
 using FWDatePicker = FluentJalium.Controls.FWDatePicker;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
@@ -34,6 +36,11 @@ internal sealed class GalleryDateTimePage
             "Header, placeholder, long and short formats, bounded dates, dropdown events, and live selected-date output.",
             CreateDatePickerDateTimeSample()));
         examples.Children.Add(CreateDateTimeExampleCard(
+            FluentIconRegular.CalendarLtr24,
+            "FWCalendarDatePicker",
+            "SelectedDate, bounded display range, format switching, and flyout open/close state.",
+            CreateCalendarDatePickerDateTimeSample()));
+        examples.Children.Add(CreateDateTimeExampleCard(
             FluentIconRegular.TimePicker24,
             "FWTimePicker",
             "Minute increments, 12-hour and 24-hour clocks, dropdown state, keyboard-ready selection, and output.",
@@ -43,6 +50,11 @@ internal sealed class GalleryDateTimePage
             "FWCalendar",
             "CalendarView-style single-date selection with first-day-of-week, today highlight, blackout, and range bounds.",
             CreateCalendarDateTimeSample()));
+        examples.Children.Add(CreateDateTimeExampleCard(
+            FluentIconRegular.CalendarMonth24,
+            "FWCalendarView",
+            "FirstDayOfWeek, today highlight, display month, selected date, bounds, and blackout state.",
+            CreateCalendarViewDateTimeSample()));
         examples.Children.Add(CreateDateTimeExampleCard(
             FluentIconRegular.CalendarSettings24,
             "States and bounds",
@@ -105,6 +117,78 @@ internal sealed class GalleryDateTimePage
                         output.Text = $"DatePicker density: {FormatDensity(datePicker.Density)}";
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.ChevronDown24, "Flyout", () => datePicker.IsDropDownOpen = !datePicker.IsDropDownOpen)),
+                CreateDateTimeStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateCalendarDatePickerDateTimeSample()
+    {
+        var today = DateTime.Today;
+        var output = CreateDateTimeOutput(string.Empty);
+        var datePicker = new FWCalendarDatePicker
+        {
+            Header = "Review date",
+            Density = FWDateTimePickerDensity.Comfortable,
+            PlaceholderText = "Pick a date",
+            DisplayDateStart = today.AddDays(-7),
+            DisplayDateEnd = today.AddDays(30),
+            SelectedDate = today.AddDays(2),
+            SelectedDateFormat = DatePickerFormat.Long
+        };
+
+        void UpdateOutput(string? prefix = null)
+        {
+            var state = $"Selected: {FormatDateTimeDate(datePicker.SelectedDate)}. " +
+                $"Range: {FormatDateTimeDate(datePicker.DisplayDateStart)} to {FormatDateTimeDate(datePicker.DisplayDateEnd)}. " +
+                $"Format: {datePicker.SelectedDateFormat}. Drop-down: {(datePicker.IsDropDownOpen ? "open" : "closed")}";
+            output.Text = prefix is null ? state : $"{prefix}. {state}";
+        }
+
+        datePicker.SelectedDateChanged += (_, _) => UpdateOutput();
+        datePicker.CalendarOpened += (_, _) => UpdateOutput("Calendar opened");
+        datePicker.CalendarClosed += (_, _) => UpdateOutput("Calendar closed");
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                datePicker,
+                CreateDateTimeButtonRow(
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarToday24, "Today", () =>
+                    {
+                        datePicker.SelectedDate = today;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarArrowRight24, "+2 weeks", () =>
+                    {
+                        datePicker.SelectedDate = today.AddDays(14);
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarDate24, "Short", () =>
+                    {
+                        datePicker.SelectedDateFormat = DatePickerFormat.Short;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarMonth24, "Long", () =>
+                    {
+                        datePicker.SelectedDateFormat = DatePickerFormat.Long;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarSettings24, "Bounds", () =>
+                    {
+                        datePicker.DisplayDateStart = today;
+                        datePicker.DisplayDateEnd = today.AddDays(45);
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.ChevronDown24, "Flyout", () =>
+                    {
+                        datePicker.IsDropDownOpen = !datePicker.IsDropDownOpen;
+                        UpdateOutput();
+                    })),
                 CreateDateTimeStatus(output)
             }
         };
@@ -210,6 +294,77 @@ internal sealed class GalleryDateTimePage
                     {
                         calendar.IsTodayHighlighted = !calendar.IsTodayHighlighted;
                         output.Text = $"IsTodayHighlighted: {calendar.IsTodayHighlighted}";
+                    })),
+                CreateDateTimeStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateCalendarViewDateTimeSample()
+    {
+        var today = DateTime.Today;
+        var output = CreateDateTimeOutput(string.Empty);
+        var calendarView = new FWCalendarView
+        {
+            DisplayDate = today,
+            DisplayDateStart = today.AddDays(-21),
+            DisplayDateEnd = today.AddDays(75),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectedDate = today.AddDays(4),
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        calendarView.BlackoutDates.Add(today.AddDays(2).Date);
+
+        void UpdateOutput()
+        {
+            output.Text = $"DisplayDate: {calendarView.DisplayDate:MMMM yyyy}. " +
+                $"SelectedDate: {FormatDateTimeDate(calendarView.SelectedDate)}. " +
+                $"FirstDayOfWeek: {calendarView.FirstDayOfWeek}. IsTodayHighlighted: {calendarView.IsTodayHighlighted}";
+        }
+
+        calendarView.SelectedDateChanged += (_, _) => UpdateOutput();
+        calendarView.DisplayDateChanged += (_, _) => UpdateOutput();
+        UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                calendarView,
+                CreateDateTimeButtonRow(
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarToday24, "Today", () =>
+                    {
+                        calendarView.DisplayDate = today;
+                        calendarView.SelectedDate = today;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarArrowRight24, "Next month", () =>
+                    {
+                        calendarView.DisplayDate = calendarView.DisplayDate.AddMonths(1);
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarArrowRight24, "+10 days", () =>
+                    {
+                        calendarView.SelectedDate = today.AddDays(10);
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarWeekStart24, "Monday", () =>
+                    {
+                        calendarView.FirstDayOfWeek = DayOfWeek.Monday;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarWeekStart24, "Sunday", () =>
+                    {
+                        calendarView.FirstDayOfWeek = DayOfWeek.Sunday;
+                        UpdateOutput();
+                    }),
+                    CreateDateTimeActionButton(FluentIconRegular.CalendarCheckmark24, "Today ring", () =>
+                    {
+                        calendarView.IsTodayHighlighted = !calendarView.IsTodayHighlighted;
+                        UpdateOutput();
                     })),
                 CreateDateTimeStatus(output)
             }
@@ -410,8 +565,10 @@ internal sealed class GalleryDateTimePage
         return title switch
         {
             "FWDatePicker" => "<FWDatePicker Header=\"Appointment date\" SelectedDateFormat=\"Long\" PlaceholderText=\"Pick a date\" />",
+            "FWCalendarDatePicker" => "<FWCalendarDatePicker Header=\"Review date\"\n                      DisplayDateStart=\"{Binding StartDate}\"\n                      DisplayDateEnd=\"{Binding EndDate}\"\n                      SelectedDate=\"{Binding ReviewDate}\"\n                      SelectedDateFormat=\"Long\" />",
             "FWTimePicker" => "<FWTimePicker Header=\"Arrival time\" MinuteIncrement=\"15\" ClockIdentifier=\"12HourClock\" />",
             "FWCalendar" => "<FWCalendar SelectionMode=\"SingleDate\" FirstDayOfWeek=\"Monday\" IsTodayHighlighted=\"True\" />",
+            "FWCalendarView" => "<FWCalendarView SelectionMode=\"SingleDate\"\n                DisplayDate=\"{Binding DisplayDate}\"\n                DisplayDateStart=\"{Binding StartDate}\"\n                DisplayDateEnd=\"{Binding EndDate}\"\n                SelectedDate=\"{Binding SelectedDate}\"\n                FirstDayOfWeek=\"Monday\"\n                IsTodayHighlighted=\"True\" />",
             "States and bounds" => "<FWDatePicker DisplayDateStart=\"{Binding StartDate}\" DisplayDateEnd=\"{Binding EndDate}\" />\n<FWTimePicker IsEnabled=\"False\" />",
             "Material schedule panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWDatePicker Header=\"Planning date\" />\n    <FWTimePicker Header=\"Focus block\" />\n</FWFluentMaterialSurface>",
             _ => "<FWDatePicker />"
