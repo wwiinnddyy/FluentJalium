@@ -393,6 +393,7 @@
         <Setter Property="MaxWidth" Value="548" />
         <Setter Property="Density" Value="Comfortable" />
         <Setter Property="DefaultButton" Value="Primary" />
+        <Setter Property="CancelButton" Value="Close" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWTaskDialog">
                 <Border Name="PART_DialogCard"

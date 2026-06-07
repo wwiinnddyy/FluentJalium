@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
@@ -90,6 +91,7 @@ public sealed class FluentNotificationStatusTests
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
             AssertOwnedStyle<FWSnackbar>(app.Resources);
+            AssertOwnedStyle<FWSnackbarHost>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, StatusBarItem>(app.Resources);
         }
@@ -117,6 +119,10 @@ public sealed class FluentNotificationStatusTests
         AssertSetter(snackbarStyle, FWSnackbar.SeverityProperty);
         AssertSetter(snackbarStyle, FWSnackbar.IsClosableProperty);
         AssertSetter(snackbarStyle, FWSnackbar.IsAutoDismissEnabledProperty);
+        var snackbarHostStyle = AssertStyle<FWSnackbarHost>(dictionary);
+        Assert.Null(snackbarHostStyle.BasedOn);
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.MaxVisibleSnackbarsProperty, 1);
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.PlacementProperty, "Bottom");
         AssertContainsStyle<StatusBar>(dictionary);
         AssertContainsStyle<StatusBarItem>(dictionary);
 
@@ -218,7 +224,9 @@ public sealed class FluentNotificationStatusTests
             Content = new FWInfoBadge { Severity = FWInfoBadgeSeverity.Attention },
             Severity = ToastSeverity.Warning,
             Duration = TimeSpan.FromSeconds(8),
-            IsAutoDismissEnabled = false
+            IsAutoDismissEnabled = false,
+            ActionCommand = new RecordingCommand(),
+            ActionCommandParameter = "archive"
         };
         var actionCount = 0;
         var closedCount = 0;
@@ -241,11 +249,80 @@ public sealed class FluentNotificationStatusTests
         Assert.True(handled);
         Assert.True(snackbar.IsOpen);
         Assert.Equal(1, actionCount);
+        var command = Assert.IsType<RecordingCommand>(snackbar.ActionCommand);
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("archive", command.LastParameter);
 
         snackbar.Close();
 
         Assert.False(snackbar.IsOpen);
         Assert.Equal(1, closedCount);
+    }
+
+    [Fact]
+    public async Task FWSnackbar_ShouldAutoDismissAndCompleteShowAsync()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Saved",
+            Message = "The queued snackbar closes itself.",
+            Duration = TimeSpan.FromMilliseconds(20),
+            IsAutoDismissEnabled = true
+        };
+        var openedCount = 0;
+        var closedCount = 0;
+        snackbar.Opened += (_, _) => openedCount++;
+        snackbar.Closed += (_, _) => closedCount++;
+
+        var showTask = snackbar.ShowAsync();
+        var completed = await Task.WhenAny(showTask, Task.Delay(TimeSpan.FromSeconds(2)));
+
+        Assert.Same(showTask, completed);
+        Assert.False(snackbar.IsOpen);
+        Assert.Equal(1, openedCount);
+        Assert.Equal(1, closedCount);
+    }
+
+    [Fact]
+    public void FWSnackbarHost_ShouldQueueAndPromoteSnackbarItems()
+    {
+        var host = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 2,
+            Placement = FWSnackbarPlacement.Top
+        };
+        var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
+        var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
+        var third = new FWSnackbar { Title = "Third", IsAutoDismissEnabled = false };
+
+        host.Enqueue(first);
+        host.Enqueue(second);
+        host.Enqueue(third);
+
+        Assert.Equal(FWSnackbarPlacement.Top, host.Placement);
+        Assert.Equal(2, host.Snackbars.Count);
+        Assert.Equal(1, host.PendingCount);
+        Assert.Same(first, host.CurrentSnackbar);
+        Assert.True(first.IsOpen);
+        Assert.True(second.IsOpen);
+        Assert.False(third.IsOpen);
+
+        first.Close();
+
+        Assert.Equal(2, host.Snackbars.Count);
+        Assert.Equal(0, host.PendingCount);
+        Assert.DoesNotContain(first, host.Snackbars);
+        Assert.Contains(second, host.Snackbars);
+        Assert.Contains(third, host.Snackbars);
+        Assert.True(third.IsOpen);
+
+        Assert.True(host.CloseCurrent());
+        Assert.Single(host.Snackbars);
+
+        host.Clear();
+
+        Assert.Empty(host.Snackbars);
+        Assert.Equal(0, host.PendingCount);
     }
 
     [Fact]
@@ -395,6 +472,24 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(panel, surface.Child);
+    }
+
+    private sealed class RecordingCommand : ICommand
+    {
+        public event EventHandler? CanExecuteChanged;
+
+        public int ExecuteCount { get; private set; }
+
+        public object? LastParameter { get; private set; }
+
+        public bool CanExecute(object? parameter) => true;
+
+        public void Execute(object? parameter)
+        {
+            ExecuteCount++;
+            LastParameter = parameter;
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static ResourceDictionary LoadGenericThemeDictionary()

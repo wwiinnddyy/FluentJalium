@@ -1,5 +1,7 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FluentJalium.Controls;
 
@@ -193,6 +195,34 @@ public sealed class FWTaskDialogButtonClickEventArgs : EventArgs
 }
 
 /// <summary>
+/// Event data raised before an <see cref="FWTaskDialog"/> closes.
+/// </summary>
+public sealed class FWTaskDialogClosingEventArgs : EventArgs
+{
+    public FWTaskDialogClosingEventArgs(FWTaskDialogResult result)
+    {
+        Result = result;
+    }
+
+    public FWTaskDialogResult Result { get; }
+
+    public bool Cancel { get; set; }
+}
+
+/// <summary>
+/// Event data raised after an <see cref="FWTaskDialog"/> closes.
+/// </summary>
+public sealed class FWTaskDialogClosedEventArgs : EventArgs
+{
+    public FWTaskDialogClosedEventArgs(FWTaskDialogResult result)
+    {
+        Result = result;
+    }
+
+    public FWTaskDialogResult Result { get; }
+}
+
+/// <summary>
 /// FluentJalium TaskDialog control for command confirmation and rich status prompts.
 /// </summary>
 public class FWTaskDialog : ContentControl, IFluentJaliumControl
@@ -200,6 +230,8 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
     private Button? _primaryButton;
     private Button? _secondaryButton;
     private Button? _closeButton;
+    private TaskCompletionSource<FWTaskDialogResult>? _showTask;
+    private CancellationTokenRegistration _showCancellationRegistration;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWTaskDialog),
@@ -229,13 +261,17 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         DependencyProperty.Register(nameof(DefaultButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
             new PropertyMetadata(FWTaskDialogButton.Primary), IsValidButton);
 
+    public static readonly DependencyProperty CancelButtonProperty =
+        DependencyProperty.Register(nameof(CancelButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
+            new PropertyMetadata(FWTaskDialogButton.Close), IsValidButton);
+
     public static readonly DependencyProperty ResultProperty =
         DependencyProperty.Register(nameof(Result), typeof(FWTaskDialogResult), typeof(FWTaskDialog),
             new PropertyMetadata(FWTaskDialogResult.None), IsValidResult);
 
     public static readonly DependencyProperty IsOpenProperty =
         DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(FWTaskDialog),
-            new PropertyMetadata(false, OnDialogPropertyChanged));
+            new PropertyMetadata(false, OnIsOpenChanged));
 
     public static readonly DependencyProperty DensityProperty =
         DependencyProperty.Register(nameof(Density), typeof(FWDisclosureDensity), typeof(FWTaskDialog),
@@ -296,6 +332,13 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         set => SetValue(DefaultButtonProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public FWTaskDialogButton CancelButton
+    {
+        get => (FWTaskDialogButton)GetValue(CancelButtonProperty)!;
+        set => SetValue(CancelButtonProperty, value);
+    }
+
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public FWTaskDialogResult Result
     {
@@ -323,16 +366,60 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
     public event EventHandler<FWTaskDialogButtonClickEventArgs>? CloseButtonClick;
 
+    public event EventHandler? Opening;
+
+    public event EventHandler? Opened;
+
+    public event EventHandler<FWTaskDialogClosingEventArgs>? Closing;
+
+    public event EventHandler<FWTaskDialogClosedEventArgs>? Closed;
+
     public void Open()
     {
         Result = FWTaskDialogResult.None;
         IsOpen = true;
     }
 
-    public void Close(FWTaskDialogResult result = FWTaskDialogResult.Close)
+    public bool Close(FWTaskDialogResult result = FWTaskDialogResult.Close)
     {
+        if (!IsOpen)
+        {
+            Result = result;
+            CompleteShowTask(result);
+            return true;
+        }
+
+        var args = new FWTaskDialogClosingEventArgs(result);
+        Closing?.Invoke(this, args);
+        if (args.Cancel)
+        {
+            return false;
+        }
+
         Result = result;
         IsOpen = false;
+        return true;
+    }
+
+    public Task<FWTaskDialogResult> ShowAsync(CancellationToken cancellationToken = default)
+    {
+        if (IsOpen && _showTask != null)
+        {
+            return _showTask.Task;
+        }
+
+        _showTask = new TaskCompletionSource<FWTaskDialogResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _showCancellationRegistration.Dispose();
+        if (cancellationToken.CanBeCanceled)
+        {
+            _showCancellationRegistration = cancellationToken.Register(static state =>
+            {
+                ((FWTaskDialog)state!).Close(FWTaskDialogResult.Close);
+            }, this);
+        }
+
+        Open();
+        return _showTask.Task;
     }
 
     public bool RequestPrimaryButtonClick()
@@ -348,6 +435,16 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
     public bool RequestCloseButtonClick()
     {
         return RequestButton(FWTaskDialogResult.Close, CloseButtonClick);
+    }
+
+    public bool RequestDefaultButtonClick()
+    {
+        return RequestButton(ToResult(DefaultButton), HandlerFor(DefaultButton));
+    }
+
+    public bool RequestCancelButtonClick()
+    {
+        return RequestButton(ToResult(CancelButton), HandlerFor(CancelButton));
     }
 
     public override void OnApplyTemplate()
@@ -398,8 +495,7 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
             return false;
         }
 
-        Close(result);
-        return true;
+        return Close(result);
     }
 
     private void OnPrimaryButtonClick(object sender, RoutedEventArgs e)
@@ -423,6 +519,27 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         {
             dialog.InvalidateMeasure();
             dialog.InvalidateVisual();
+        }
+    }
+
+    private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not FWTaskDialog dialog)
+        {
+            return;
+        }
+
+        OnDialogPropertyChanged(d, e);
+
+        if (e.NewValue is true)
+        {
+            dialog.Opening?.Invoke(dialog, EventArgs.Empty);
+            dialog.Opened?.Invoke(dialog, EventArgs.Empty);
+        }
+        else if (e.OldValue is true)
+        {
+            dialog.Closed?.Invoke(dialog, new FWTaskDialogClosedEventArgs(dialog.Result));
+            dialog.CompleteShowTask(dialog.Result);
         }
     }
 
@@ -450,6 +567,35 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
     private static bool IsValidResult(object? value)
     {
         return value is FWTaskDialogResult result && Enum.IsDefined(result);
+    }
+
+    private EventHandler<FWTaskDialogButtonClickEventArgs>? HandlerFor(FWTaskDialogButton button)
+    {
+        return button switch
+        {
+            FWTaskDialogButton.Primary => PrimaryButtonClick,
+            FWTaskDialogButton.Secondary => SecondaryButtonClick,
+            FWTaskDialogButton.Close => CloseButtonClick,
+            _ => null
+        };
+    }
+
+    private static FWTaskDialogResult ToResult(FWTaskDialogButton button)
+    {
+        return button switch
+        {
+            FWTaskDialogButton.Primary => FWTaskDialogResult.Primary,
+            FWTaskDialogButton.Secondary => FWTaskDialogResult.Secondary,
+            FWTaskDialogButton.Close => FWTaskDialogResult.Close,
+            _ => FWTaskDialogResult.None
+        };
+    }
+
+    private void CompleteShowTask(FWTaskDialogResult result)
+    {
+        _showCancellationRegistration.Dispose();
+        _showTask?.TrySetResult(result);
+        _showTask = null;
     }
 }
 

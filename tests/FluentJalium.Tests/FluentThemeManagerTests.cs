@@ -166,6 +166,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
             AssertOwnedStyle<FWSnackbar>(app.Resources);
+            AssertOwnedStyle<FWSnackbarHost>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
             AssertOwnedStyle<FWInfoBadge>(app.Resources);
@@ -1139,6 +1140,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
             AssertOwnedStyle<FWSnackbar>(app.Resources);
+            AssertOwnedStyle<FWSnackbarHost>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
         }
@@ -1340,6 +1342,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWToastNotificationItem, ToastNotificationItem>();
         AssertFluentControl<FWToastNotificationHost, ToastNotificationHost>();
         AssertFluentControl<FWSnackbar, ContentControl>();
+        AssertFluentControl<FWSnackbarHost, Control>();
         AssertFluentControl<FWStatusBar, StatusBar>();
         AssertFluentControl<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>();
     }

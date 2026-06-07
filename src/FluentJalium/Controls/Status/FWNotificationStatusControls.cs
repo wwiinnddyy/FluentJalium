@@ -1,5 +1,10 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace FluentJalium.Controls;
 
@@ -58,7 +63,23 @@ public class FWToastNotificationHost : ToastNotificationHost, IFluentJaliumContr
 /// </summary>
 public sealed class FWSnackbarActionEventArgs : EventArgs
 {
+    public FWSnackbarActionEventArgs(bool commandExecuted)
+    {
+        CommandExecuted = commandExecuted;
+    }
+
+    public bool CommandExecuted { get; }
+
     public bool Handled { get; set; }
+}
+
+/// <summary>
+/// Describes where an <see cref="FWSnackbarHost"/> prefers to place transient notifications.
+/// </summary>
+public enum FWSnackbarPlacement
+{
+    Top,
+    Bottom
 }
 
 /// <summary>
@@ -68,6 +89,8 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 {
     private Button? _actionButton;
     private Button? _closeButton;
+    private CancellationTokenSource? _autoDismissCancellation;
+    private TaskCompletionSource<object?>? _closedTask;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWSnackbar),
@@ -81,13 +104,21 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         DependencyProperty.Register(nameof(ActionContent), typeof(object), typeof(FWSnackbar),
             new PropertyMetadata(null, OnSnackbarPropertyChanged));
 
+    public static readonly DependencyProperty ActionCommandProperty =
+        DependencyProperty.Register(nameof(ActionCommand), typeof(ICommand), typeof(FWSnackbar),
+            new PropertyMetadata(null, OnActionCommandChanged));
+
+    public static readonly DependencyProperty ActionCommandParameterProperty =
+        DependencyProperty.Register(nameof(ActionCommandParameter), typeof(object), typeof(FWSnackbar),
+            new PropertyMetadata(null, OnSnackbarPropertyChanged));
+
     public static readonly DependencyProperty SeverityProperty =
         DependencyProperty.Register(nameof(Severity), typeof(ToastSeverity), typeof(FWSnackbar),
             new PropertyMetadata(ToastSeverity.Information, OnSnackbarPropertyChanged), IsValidSeverity);
 
     public static readonly DependencyProperty IsOpenProperty =
         DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(FWSnackbar),
-            new PropertyMetadata(false, OnSnackbarPropertyChanged));
+            new PropertyMetadata(false, OnIsOpenChanged));
 
     public static readonly DependencyProperty IsClosableProperty =
         DependencyProperty.Register(nameof(IsClosable), typeof(bool), typeof(FWSnackbar),
@@ -95,11 +126,11 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty IsAutoDismissEnabledProperty =
         DependencyProperty.Register(nameof(IsAutoDismissEnabled), typeof(bool), typeof(FWSnackbar),
-            new PropertyMetadata(true));
+            new PropertyMetadata(true, OnSnackbarPropertyChanged));
 
     public static readonly DependencyProperty DurationProperty =
         DependencyProperty.Register(nameof(Duration), typeof(TimeSpan), typeof(FWSnackbar),
-            new PropertyMetadata(TimeSpan.FromSeconds(4)), IsValidDuration);
+            new PropertyMetadata(TimeSpan.FromSeconds(4), OnSnackbarPropertyChanged), IsValidDuration);
 
     public FWSnackbar()
     {
@@ -125,6 +156,20 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     {
         get => GetValue(ActionContentProperty);
         set => SetValue(ActionContentProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public ICommand? ActionCommand
+    {
+        get => (ICommand?)GetValue(ActionCommandProperty);
+        set => SetValue(ActionCommandProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public object? ActionCommandParameter
+    {
+        get => GetValue(ActionCommandParameterProperty);
+        set => SetValue(ActionCommandParameterProperty, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
@@ -164,11 +209,20 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     public event EventHandler<FWSnackbarActionEventArgs>? ActionClick;
 
+    public event EventHandler? Opened;
+
     public event EventHandler? Closed;
 
     public void Show()
     {
+        _closedTask = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
         IsOpen = true;
+    }
+
+    public Task ShowAsync()
+    {
+        Show();
+        return _closedTask?.Task ?? Task.CompletedTask;
     }
 
     public void Close()
@@ -179,12 +233,12 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
 
         IsOpen = false;
-        Closed?.Invoke(this, EventArgs.Empty);
     }
 
     public bool RequestAction()
     {
-        var args = new FWSnackbarActionEventArgs();
+        var commandExecuted = ExecuteActionCommand();
+        var args = new FWSnackbarActionEventArgs(commandExecuted);
         ActionClick?.Invoke(this, args);
         if (!args.Handled)
         {
@@ -220,6 +274,8 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         {
             _closeButton.Click += OnCloseButtonClick;
         }
+
+        UpdateTemplateState();
     }
 
     private void OnActionButtonClick(object sender, RoutedEventArgs e)
@@ -232,10 +288,124 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         Close();
     }
 
+    private bool ExecuteActionCommand()
+    {
+        var command = ActionCommand;
+        var parameter = ActionCommandParameter;
+        if (command == null || !command.CanExecute(parameter))
+        {
+            return false;
+        }
+
+        command.Execute(parameter);
+        return true;
+    }
+
+    private void OnActionCanExecuteChanged(object? sender, EventArgs e)
+    {
+        UpdateTemplateState();
+    }
+
+    private void UpdateTemplateState()
+    {
+        if (_actionButton != null)
+        {
+            _actionButton.Visibility = ActionContent == null && ActionCommand == null ? Visibility.Collapsed : Visibility.Visible;
+            _actionButton.IsEnabled = ActionCommand?.CanExecute(ActionCommandParameter) ?? true;
+        }
+
+        if (_closeButton != null)
+        {
+            _closeButton.Visibility = IsClosable ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    private void ScheduleAutoDismiss()
+    {
+        _autoDismissCancellation?.Cancel();
+        _autoDismissCancellation?.Dispose();
+        _autoDismissCancellation = null;
+
+        if (!IsOpen || !IsAutoDismissEnabled || Duration <= TimeSpan.Zero)
+        {
+            return;
+        }
+
+        var cancellation = new CancellationTokenSource();
+        _autoDismissCancellation = cancellation;
+        _ = DismissAfterDelayAsync(cancellation.Token);
+    }
+
+    private async Task DismissAfterDelayAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(Duration, cancellationToken).ConfigureAwait(false);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                Close();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+    }
+
+    private void CompleteClose()
+    {
+        _autoDismissCancellation?.Cancel();
+        _autoDismissCancellation?.Dispose();
+        _autoDismissCancellation = null;
+        Closed?.Invoke(this, EventArgs.Empty);
+        _closedTask?.TrySetResult(null);
+        _closedTask = null;
+    }
+
+    private static void OnActionCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not FWSnackbar snackbar)
+        {
+            return;
+        }
+
+        if (e.OldValue is ICommand oldCommand)
+        {
+            oldCommand.CanExecuteChanged -= snackbar.OnActionCanExecuteChanged;
+        }
+
+        if (e.NewValue is ICommand newCommand)
+        {
+            newCommand.CanExecuteChanged += snackbar.OnActionCanExecuteChanged;
+        }
+
+        snackbar.UpdateTemplateState();
+        OnSnackbarPropertyChanged(d, e);
+    }
+
+    private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbar snackbar)
+        {
+            OnSnackbarPropertyChanged(d, e);
+
+            if (e.NewValue is true)
+            {
+                snackbar.Opened?.Invoke(snackbar, EventArgs.Empty);
+                snackbar.ScheduleAutoDismiss();
+            }
+            else if (e.OldValue is true)
+            {
+                snackbar.CompleteClose();
+            }
+        }
+    }
+
     private static void OnSnackbarPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSnackbar snackbar)
         {
+            snackbar.UpdateTemplateState();
+            snackbar.ScheduleAutoDismiss();
             snackbar.InvalidateMeasure();
             snackbar.InvalidateVisual();
         }
@@ -249,6 +419,166 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     private static bool IsValidDuration(object? value)
     {
         return value is TimeSpan duration && duration >= TimeSpan.Zero;
+    }
+}
+
+/// <summary>
+/// Hosts queued <see cref="FWSnackbar"/> instances and promotes pending messages as visible items close.
+/// </summary>
+public class FWSnackbarHost : Control, IFluentJaliumControl
+{
+    private readonly Queue<FWSnackbar> _queue = new();
+    private readonly ObservableCollection<FWSnackbar> _snackbars = new();
+    private ItemsControl? _itemsControl;
+
+    public static readonly DependencyProperty MaxVisibleSnackbarsProperty =
+        DependencyProperty.Register(nameof(MaxVisibleSnackbars), typeof(int), typeof(FWSnackbarHost),
+            new PropertyMetadata(1, OnHostLayoutChanged), IsValidMaxVisibleSnackbars);
+
+    public static readonly DependencyProperty PlacementProperty =
+        DependencyProperty.Register(nameof(Placement), typeof(FWSnackbarPlacement), typeof(FWSnackbarHost),
+            new PropertyMetadata(FWSnackbarPlacement.Bottom, OnHostLayoutChanged), IsValidPlacement);
+
+    public FWSnackbarHost()
+    {
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public ObservableCollection<FWSnackbar> Snackbars => _snackbars;
+
+    public int PendingCount => _queue.Count;
+
+    public FWSnackbar? CurrentSnackbar => _snackbars.Count > 0 ? _snackbars[0] : null;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public int MaxVisibleSnackbars
+    {
+        get => (int)GetValue(MaxVisibleSnackbarsProperty)!;
+        set => SetValue(MaxVisibleSnackbarsProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWSnackbarPlacement Placement
+    {
+        get => (FWSnackbarPlacement)GetValue(PlacementProperty)!;
+        set => SetValue(PlacementProperty, value);
+    }
+
+    public FWSnackbar Show(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
+    {
+        var snackbar = new FWSnackbar
+        {
+            Severity = severity,
+            Title = title,
+            Message = message,
+            ActionContent = actionContent,
+            Duration = duration ?? TimeSpan.FromSeconds(4)
+        };
+
+        Enqueue(snackbar);
+        return snackbar;
+    }
+
+    public FWSnackbar Enqueue(FWSnackbar snackbar)
+    {
+        ArgumentNullException.ThrowIfNull(snackbar);
+
+        if (_snackbars.Contains(snackbar) || _queue.Contains(snackbar))
+        {
+            return snackbar;
+        }
+
+        snackbar.Closed += OnSnackbarClosed;
+        if (_snackbars.Count < MaxVisibleSnackbars)
+        {
+            OpenSnackbar(snackbar);
+        }
+        else
+        {
+            _queue.Enqueue(snackbar);
+        }
+
+        return snackbar;
+    }
+
+    public bool CloseCurrent()
+    {
+        var snackbar = CurrentSnackbar;
+        if (snackbar == null)
+        {
+            return false;
+        }
+
+        snackbar.Close();
+        return true;
+    }
+
+    public void Clear()
+    {
+        _queue.Clear();
+        foreach (var snackbar in new List<FWSnackbar>(_snackbars))
+        {
+            snackbar.Close();
+        }
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        _itemsControl = GetTemplateChild("PART_ItemsControl") as ItemsControl;
+        if (_itemsControl != null)
+        {
+            _itemsControl.ItemsSource = _snackbars;
+        }
+    }
+
+    private void OnSnackbarClosed(object? sender, EventArgs e)
+    {
+        if (sender is not FWSnackbar snackbar)
+        {
+            return;
+        }
+
+        snackbar.Closed -= OnSnackbarClosed;
+        _snackbars.Remove(snackbar);
+        PromotePendingSnackbars();
+    }
+
+    private void OpenSnackbar(FWSnackbar snackbar)
+    {
+        _snackbars.Add(snackbar);
+        snackbar.Show();
+        InvalidateMeasure();
+        InvalidateVisual();
+    }
+
+    private void PromotePendingSnackbars()
+    {
+        while (_snackbars.Count < MaxVisibleSnackbars && _queue.Count > 0)
+        {
+            OpenSnackbar(_queue.Dequeue());
+        }
+    }
+
+    private static void OnHostLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbarHost host)
+        {
+            host.PromotePendingSnackbars();
+            host.InvalidateMeasure();
+            host.InvalidateVisual();
+        }
+    }
+
+    private static bool IsValidMaxVisibleSnackbars(object? value)
+    {
+        return value is int count && count > 0;
+    }
+
+    private static bool IsValidPlacement(object? value)
+    {
+        return value is FWSnackbarPlacement placement && Enum.IsDefined(placement);
     }
 }
 

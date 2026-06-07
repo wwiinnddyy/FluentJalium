@@ -148,6 +148,7 @@ public sealed class FluentDisclosureControlsTests
         Assert.Null(taskDialogStyle.BasedOn);
         AssertSetter(taskDialogStyle, FWTaskDialog.DensityProperty);
         AssertSetter(taskDialogStyle, FWTaskDialog.DefaultButtonProperty);
+        AssertSetter(taskDialogStyle, FWTaskDialog.CancelButtonProperty);
         AssertSetter(taskDialogStyle, Control.PaddingProperty);
 
         ResetApplicationState();
@@ -229,6 +230,65 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.Equal(new Thickness(10, 12, 10, 10), groupBox.Padding);
         Assert.Equal(48, groupBox.MinHeight);
+    }
+
+    [Fact]
+    public async Task FWTaskDialog_ShouldExposeAwaitableResultAndDefaultCancelRequests()
+    {
+        var dialog = new FWTaskDialog
+        {
+            Title = "Reset defaults?",
+            PrimaryButtonText = "Reset",
+            SecondaryButtonText = "Review",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Secondary,
+            CancelButton = FWTaskDialogButton.Close
+        };
+        var openingCount = 0;
+        var openedCount = 0;
+        var closingCount = 0;
+        var closedCount = 0;
+        var cancelClose = true;
+        FWTaskDialogResult? closedResult = null;
+        dialog.Opening += (_, _) => openingCount++;
+        dialog.Opened += (_, _) => openedCount++;
+        dialog.Closing += (_, args) =>
+        {
+            closingCount++;
+            if (cancelClose && args.Result == FWTaskDialogResult.Close)
+            {
+                args.Cancel = true;
+            }
+        };
+        dialog.Closed += (_, args) =>
+        {
+            closedCount++;
+            closedResult = args.Result;
+        };
+
+        var showTask = dialog.ShowAsync();
+
+        Assert.True(dialog.IsOpen);
+        Assert.Equal(FWTaskDialogResult.None, dialog.Result);
+        Assert.Equal(1, openingCount);
+        Assert.Equal(1, openedCount);
+
+        Assert.False(dialog.RequestCancelButtonClick());
+        Assert.True(dialog.IsOpen);
+        Assert.False(showTask.IsCompleted);
+
+        cancelClose = false;
+
+        Assert.True(dialog.RequestDefaultButtonClick());
+
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Secondary, result);
+        Assert.Equal(FWTaskDialogResult.Secondary, dialog.Result);
+        Assert.False(dialog.IsOpen);
+        Assert.Equal(2, closingCount);
+        Assert.Equal(1, closedCount);
+        Assert.Equal(FWTaskDialogResult.Secondary, closedResult);
     }
 
     [Fact]
