@@ -125,6 +125,9 @@ public sealed class FluentNotificationStatusTests
         Assert.Null(snackbarHostStyle.BasedOn);
         AssertSetter(snackbarHostStyle, FWSnackbarHost.MaxVisibleSnackbarsProperty, 1);
         AssertSetter(snackbarHostStyle, FWSnackbarHost.PlacementProperty, "Bottom");
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.SpacingProperty, 8.0);
+        AssertSetter(snackbarHostStyle, Control.HorizontalContentAlignmentProperty, "Stretch");
+        AssertSetter(snackbarHostStyle, Control.VerticalContentAlignmentProperty, "Bottom");
         AssertContainsStyle<StatusBar>(dictionary);
         AssertContainsStyle<StatusBarItem>(dictionary);
 
@@ -391,7 +394,8 @@ public sealed class FluentNotificationStatusTests
         var host = new FWSnackbarHost
         {
             MaxVisibleSnackbars = 2,
-            Placement = FWSnackbarPlacement.Top
+            Placement = FWSnackbarPlacement.Top,
+            Spacing = 12
         };
         var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
         var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
@@ -402,6 +406,9 @@ public sealed class FluentNotificationStatusTests
         host.Enqueue(third);
 
         Assert.Equal(FWSnackbarPlacement.Top, host.Placement);
+        Assert.Equal(VerticalAlignment.Top, host.VerticalContentAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, host.HorizontalContentAlignment);
+        Assert.Equal(12, host.Spacing);
         Assert.Equal(2, host.Snackbars.Count);
         Assert.Equal(1, host.PendingCount);
         Assert.Same(first, host.CurrentSnackbar);
@@ -427,6 +434,78 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal(0, host.PendingCount);
         Assert.Equal(FWSnackbarCloseReason.Programmatic, second.LastCloseReason);
         Assert.Equal(FWSnackbarCloseReason.HostCleared, third.LastCloseReason);
+    }
+
+    [Fact]
+    public void FWSnackbarHost_ShouldResolvePlacementAlignmentAndValidateSpacing()
+    {
+        var host = new FWSnackbarHost();
+
+        Assert.Equal(FWSnackbarPlacement.Bottom, host.Placement);
+        Assert.Equal(VerticalAlignment.Bottom, host.VerticalContentAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, host.HorizontalContentAlignment);
+        Assert.Equal(8, host.Spacing);
+
+        host.Placement = FWSnackbarPlacement.Top;
+
+        Assert.Equal(VerticalAlignment.Top, host.VerticalContentAlignment);
+
+        host.Placement = FWSnackbarPlacement.Bottom;
+        host.Spacing = 16;
+
+        Assert.Equal(VerticalAlignment.Bottom, host.VerticalContentAlignment);
+        Assert.Equal(16, host.Spacing);
+        Assert.Throws<ArgumentException>(() => host.Spacing = -1);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void FWSnackbarHost_TemplateShouldApplyPlacementAlignmentToItemsControl()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var host = new FWSnackbarHost
+            {
+                Width = 420,
+                Height = 180,
+                MaxVisibleSnackbars = 1,
+                Placement = FWSnackbarPlacement.Top,
+                Spacing = 14
+            };
+            host.Style = AssertStyle<FWSnackbarHost>(app.Resources);
+            host.Enqueue(new FWSnackbar
+            {
+                Title = "Aligned",
+                IsAutoDismissEnabled = false,
+                Width = 360
+            });
+
+            host.ApplyTemplate();
+            host.Measure(new Size(420, 180));
+            host.Arrange(new Rect(0, 0, 420, 180));
+
+            var itemsControl = FindVisualDescendant<ItemsControl>(host);
+            Assert.NotNull(itemsControl);
+            Assert.Equal(VerticalAlignment.Top, itemsControl!.VerticalAlignment);
+            Assert.Equal(HorizontalAlignment.Stretch, itemsControl.HorizontalAlignment);
+
+            host.Placement = FWSnackbarPlacement.Bottom;
+            host.Measure(new Size(420, 180));
+            host.Arrange(new Rect(0, 0, 420, 180));
+
+            itemsControl = FindVisualDescendant<ItemsControl>(host);
+            Assert.NotNull(itemsControl);
+            Assert.Equal(VerticalAlignment.Bottom, itemsControl!.VerticalAlignment);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
     }
 
     [Fact]
@@ -772,6 +851,26 @@ public sealed class FluentNotificationStatusTests
                 Assert.Equal(expectedValue, setter.Value);
             }
         }
+    }
+
+    private static T? FindVisualDescendant<T>(Visual visual)
+        where T : Visual
+    {
+        if (visual is T candidate)
+        {
+            return candidate;
+        }
+
+        for (var index = 0; index < visual.VisualChildrenCount; index++)
+        {
+            var child = visual.GetVisualChild(index);
+            if (child != null && FindVisualDescendant<T>(child) is { } match)
+            {
+                return match;
+            }
+        }
+
+        return null;
     }
 
     private static void ResetApplicationState()

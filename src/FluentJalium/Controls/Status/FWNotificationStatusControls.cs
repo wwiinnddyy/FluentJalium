@@ -654,6 +654,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 /// </summary>
 public class FWSnackbarHost : Control, IFluentJaliumControl
 {
+    private const double DefaultSpacing = 8.0;
     private readonly Queue<FWSnackbar> _queue = new();
     private readonly ObservableCollection<FWSnackbar> _snackbars = new();
     private ItemsControl? _itemsControl;
@@ -666,8 +667,13 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         DependencyProperty.Register(nameof(Placement), typeof(FWSnackbarPlacement), typeof(FWSnackbarHost),
             new PropertyMetadata(FWSnackbarPlacement.Bottom, OnHostLayoutChanged), IsValidPlacement);
 
+    public static readonly DependencyProperty SpacingProperty =
+        DependencyProperty.Register(nameof(Spacing), typeof(double), typeof(FWSnackbarHost),
+            new PropertyMetadata(DefaultSpacing, OnHostLayoutChanged), IsValidSpacing);
+
     public FWSnackbarHost()
     {
+        ApplyPlacementState();
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
@@ -689,6 +695,13 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     {
         get => (FWSnackbarPlacement)GetValue(PlacementProperty)!;
         set => SetValue(PlacementProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double Spacing
+    {
+        get => (double)GetValue(SpacingProperty)!;
+        set => SetValue(SpacingProperty, value);
     }
 
     public FWSnackbar Show(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
@@ -773,6 +786,7 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         if (_itemsControl != null)
         {
             _itemsControl.ItemsSource = _snackbars;
+            ApplyPlacementState();
         }
     }
 
@@ -804,10 +818,44 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         }
     }
 
+    private void ApplyPlacementState()
+    {
+        var verticalAlignment = Placement == FWSnackbarPlacement.Bottom
+            ? VerticalAlignment.Bottom
+            : VerticalAlignment.Top;
+
+        VerticalContentAlignment = verticalAlignment;
+        HorizontalContentAlignment = HorizontalAlignment.Stretch;
+
+        if (_itemsControl == null)
+        {
+            return;
+        }
+
+        _itemsControl.VerticalAlignment = verticalAlignment;
+        _itemsControl.HorizontalAlignment = HorizontalContentAlignment;
+        _itemsControl.ItemsPanel = CreateItemsPanelTemplate(Spacing);
+        _itemsControl.InvalidateMeasure();
+        _itemsControl.InvalidateVisual();
+    }
+
+    private static ItemsPanelTemplate CreateItemsPanelTemplate(double spacing)
+    {
+        var template = new ItemsPanelTemplate();
+        template.SetVisualTree(() => new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = spacing
+        });
+        template.Seal();
+        return template;
+    }
+
     private static void OnHostLayoutChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSnackbarHost host)
         {
+            host.ApplyPlacementState();
             host.PromotePendingSnackbars();
             host.InvalidateMeasure();
             host.InvalidateVisual();
@@ -822,6 +870,11 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     private static bool IsValidPlacement(object? value)
     {
         return value is FWSnackbarPlacement placement && Enum.IsDefined(placement);
+    }
+
+    private static bool IsValidSpacing(object? value)
+    {
+        return value is double spacing && spacing >= 0 && !double.IsNaN(spacing) && !double.IsInfinity(spacing);
     }
 }
 

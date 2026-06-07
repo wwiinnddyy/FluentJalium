@@ -29,7 +29,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 - `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, and command-state restoration now exist; remaining work is mostly focus/pressed visuals, automation patterns, and action alignment polish.
 - `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, and add/remove/clear helpers; remaining work is richer item container styling and default data-row templates.
-- `FWSnackbar`: host queueing, auto-dismiss, action command support, close reasons, result-style async flow, pause-on-hover/focus lifetime, closing cancellation, and host/service async result APIs now exist; remaining work is placement realization and richer host layout/transition behavior.
+- `FWSnackbar`: host queueing, auto-dismiss, action command support, close reasons, result-style async flow, pause-on-hover/focus lifetime, closing cancellation, host/service async result APIs, and top/bottom host placement with spacing now exist; remaining work is richer transition behavior and deeper overlay integration.
 - `FWTaskDialog`: awaitable result flow, button command DPs, `CommandExecuted` request metadata, default/cancel requests, Escape-to-cancel, default focus, and empty/disabled button states now exist; remaining work is modal host/overlay behavior plus focus restore/trap.
 - `FWItemsRepeater`: the API exists, but virtualization/recycling behavior remains the larger WinUI-style gap.
 - NavigationView shell: consider WPF UI style navigation service/page service/history patterns for app-shell ergonomics.
@@ -37,7 +37,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 ## Next implementation batches
 
 1. TaskDialog modal-host package: add host/overlay behavior, focus restore/trap, and deeper automation coverage on top of the command/default/cancel base.
-2. Snackbar placement/transition package: realize top/bottom placement in the host template, add transition timing, and broaden queue layout diagnostics.
+2. Snackbar transition package: add transition timing/animation hooks, broaden queue layout diagnostics, and explore overlay-host integration.
 3. Settings visual/automation polish: add focus/pressed states, action alignment refinements, and automation/invoke patterns after the command and item-host semantics stabilize.
 
 ## Recently completed batches
@@ -55,3 +55,4 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Snackbar result/service coverage: `FWSnackbar` now exposes `FWSnackbarCloseReason`, `LastCloseReason`, and `ShowForResultAsync`; `FWSnackbarHost.Clear` marks visible and pending items as host-cleared; `FWSnackbarService` routes service-style show/enqueue/close/clear calls into a configured host with Gallery, registry, and tests updated.
 - TaskDialog command/focus coverage: `FWTaskDialog` now exposes button command DPs and command parameters, records `CommandExecuted` on button request events, respects command `CanExecute`, routes Escape through the configured cancel button, focuses the default template button when opened, and hides/disables empty or unavailable buttons.
 - Snackbar lifetime coverage: `FWSnackbar` now exposes cancelable `Closing`, `RequestClose`, pointer/focus/manual auto-dismiss pause state, `WaitForCloseAsync`, and host/service `ShowForResultAsync` / `EnqueueForResultAsync` APIs; Gallery shows pause/resume, close cancellation, service queues, and result-task completion.
+- Snackbar host placement coverage: `FWSnackbarHost.Placement` now drives top/bottom content alignment, `Spacing` controls the generated snackbar stack panel, and Gallery exposes placement/alignment/spacing diagnostics with registry and catalog metadata updated.

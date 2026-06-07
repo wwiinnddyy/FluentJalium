@@ -403,7 +403,8 @@ var host = new FWSnackbarHost
 {
     Width = 470,
     MaxVisibleSnackbars = 2,
-    Placement = FWSnackbarPlacement.Bottom
+    Placement = FWSnackbarPlacement.Bottom,
+    Spacing = 8
 };
 var service = new FWSnackbarService();
 service.SetHost(host);

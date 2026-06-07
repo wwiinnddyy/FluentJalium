@@ -132,11 +132,16 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="MaxVisibleSnackbars" Value="1" />
         <Setter Property="Placement" Value="Bottom" />
+        <Setter Property="Spacing" Value="8" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSnackbarHost">
                 <Border Background="{TemplateBinding Background}"
                         Padding="{TemplateBinding Padding}">
-                    <ItemsControl Name="PART_ItemsControl">
+                    <ItemsControl Name="PART_ItemsControl"
+                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical" Spacing="8" />
