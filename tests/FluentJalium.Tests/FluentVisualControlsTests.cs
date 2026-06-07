@@ -11,6 +11,58 @@ namespace FluentJalium.Tests;
 public sealed class FluentVisualControlsTests
 {
     [Fact]
+    public void FWPersonPicture_ShouldResolveDisplayAndBadgeState()
+    {
+        var pixels = CreateSamplePixels(4, 4);
+        var source = BitmapImage.FromPixels(pixels, 4, 4);
+        var avatar = new FWPersonPicture
+        {
+            DisplayName = "Ada Lovelace",
+            BadgeNumber = 128
+        };
+
+        Assert.IsAssignableFrom<IFluentJaliumControl>(avatar);
+        Assert.Equal(48, avatar.Width);
+        Assert.Equal(48, avatar.Height);
+        Assert.False(avatar.Focusable);
+        Assert.Equal(string.Empty, avatar.Initials);
+        Assert.Equal("AL", avatar.DisplayInitials);
+        Assert.Equal(FWPersonPictureDisplayKind.Initials, avatar.DisplayKind);
+        Assert.False(avatar.HasProfilePicture);
+        Assert.True(avatar.HasBadge);
+        Assert.Equal(FWPersonPictureBadgeKind.Number, avatar.BadgeKind);
+        Assert.Equal("99+", avatar.BadgeDisplayText);
+
+        avatar.Initials = "gh";
+        avatar.DisplayName = "Grace Hopper";
+
+        Assert.Equal("GH", avatar.DisplayInitials);
+        Assert.Equal("gh", avatar.Initials);
+
+        avatar.IsGroup = true;
+
+        Assert.Equal(FWPersonPictureDisplayKind.Group, avatar.DisplayKind);
+        Assert.Equal("GH", avatar.DisplayInitials);
+
+        avatar.ProfilePicture = source;
+
+        Assert.True(avatar.HasProfilePicture);
+        Assert.Equal(FWPersonPictureDisplayKind.Image, avatar.DisplayKind);
+
+        avatar.BadgeNumber = 0;
+        avatar.BadgeGlyph = "!";
+
+        Assert.True(avatar.HasBadge);
+        Assert.Equal(FWPersonPictureBadgeKind.Glyph, avatar.BadgeKind);
+        Assert.Equal("!", avatar.BadgeDisplayText);
+
+        avatar.BadgeImageSource = source;
+
+        Assert.Equal(FWPersonPictureBadgeKind.Image, avatar.BadgeKind);
+        Assert.Equal(string.Empty, avatar.BadgeDisplayText);
+    }
+
+    [Fact]
     public void FWVisualControls_ShouldComposeInsideLiquidGlassSurface()
     {
         var pixels = CreateSamplePixels(12, 8);
@@ -35,6 +87,13 @@ public sealed class FluentVisualControlsTests
         {
             Source = source,
             Stretch = Stretch.Uniform
+        };
+        var personPicture = new FWPersonPicture
+        {
+            DisplayName = "Grace Hopper",
+            BadgeNumber = 7,
+            Width = 56,
+            Height = 56
         };
         var fluentIcon = FluentIconFactory.Regular(FluentIconRegular.Image24, 24);
         var filledIcon = FluentIconFactory.Filled(FluentIconRegular.Share24, 24);
@@ -178,6 +237,7 @@ public sealed class FluentVisualControlsTests
                 image,
                 bitmapIcon,
                 imageIcon,
+                personPicture,
                 fluentIcon,
                 filledIcon,
                 markdown,
@@ -221,6 +281,10 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(20, bitmapIcon.Width);
         Assert.Same(source, imageIcon.Source);
         Assert.Equal(Stretch.Uniform, imageIcon.Stretch);
+        Assert.Equal("GH", personPicture.DisplayInitials);
+        Assert.Equal(FWPersonPictureDisplayKind.Initials, personPicture.DisplayKind);
+        Assert.Equal(FWPersonPictureBadgeKind.Number, personPicture.BadgeKind);
+        Assert.Equal("7", personPicture.BadgeDisplayText);
         Assert.Equal(FluentIconRegular.Image24, fluentIcon.Icon);
         Assert.Equal(24, fluentIcon.Size);
         Assert.False(fluentIcon.Filled);
@@ -273,7 +337,7 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(Stretch.Uniform, viewbox.Stretch);
         Assert.Equal(StretchDirection.DownOnly, viewbox.StretchDirection);
         Assert.Equal(10, stack.Spacing);
-        Assert.Equal(20, stack.Children.Count);
+        Assert.Equal(21, stack.Children.Count);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);

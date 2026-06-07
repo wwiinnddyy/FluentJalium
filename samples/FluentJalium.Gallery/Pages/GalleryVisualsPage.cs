@@ -6,13 +6,22 @@ using Jalium.UI.Media;
 using FWBitmapIcon = FluentJalium.Controls.FWBitmapIcon;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWEllipse = FluentJalium.Controls.FWEllipse;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWFontIcon = FluentJalium.Controls.FWFontIcon;
 using FWImage = FluentJalium.Controls.FWImage;
 using FWImageIcon = FluentJalium.Controls.FWImageIcon;
 using FWLabel = FluentJalium.Controls.FWLabel;
+using FWLine = FluentJalium.Controls.FWLine;
+using FWMarkdown = FluentJalium.Controls.FWMarkdown;
+using FWPath = FluentJalium.Controls.FWPath;
 using FWPathIcon = FluentJalium.Controls.FWPathIcon;
+using FWPersonPicture = FluentJalium.Controls.FWPersonPicture;
+using FWPolygon = FluentJalium.Controls.FWPolygon;
+using FWPolyline = FluentJalium.Controls.FWPolyline;
+using FWQRCode = FluentJalium.Controls.FWQRCode;
+using FWRectangle = FluentJalium.Controls.FWRectangle;
 using FWRichTextBlock = FluentJalium.Controls.FWRichTextBlock;
 using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
@@ -21,6 +30,7 @@ using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWViewbox = FluentJalium.Controls.FWViewbox;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+using ShapePointCollection = Jalium.UI.Controls.Shapes.PointCollection;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -45,6 +55,26 @@ internal sealed class GalleryVisualsPage
             "FWBitmapIcon, FWImageIcon, and FWRichTextBlock",
             "Bitmap and image icon sizing plus selectable, wrapping rich text for WinUI-style visual compatibility.",
             CreateCompatibilityVisualsSample()));
+        examples.Children.Add(CreateVisualExampleCard(
+            FluentIconRegular.Person32,
+            "FWPersonPicture",
+            "Person, group, badge, profile image, initials, and small-image preference states for avatar surfaces.",
+            CreatePersonPictureSample()));
+        examples.Children.Add(CreateVisualExampleCard(
+            FluentIconRegular.Markdown20,
+            "FWMarkdown",
+            "Markdown blocks, tables, links, quotes, and code styling pick up Fluent text and accent resources.",
+            CreateMarkdownSample()));
+        examples.Children.Add(CreateVisualExampleCard(
+            FluentIconRegular.QrCode20,
+            "FWQRCode",
+            "QR payloads, error correction, quiet zone, logo, module shape, and eye shape stay theme-aware.",
+            CreateQRCodeSample()));
+        examples.Children.Add(CreateVisualExampleCard(
+            FluentIconRegular.Shapes28,
+            "Fluent shape controls",
+            "FWRectangle, FWEllipse, FWLine, FWPolyline, FWPolygon, and FWPath show themed fill, stroke, and disabled states.",
+            CreateShapeControlsSample()));
         examples.Children.Add(CreateVisualExampleCard(
             FluentIconRegular.Image24,
             "FWImage",
@@ -226,6 +256,443 @@ internal sealed class GalleryVisualsPage
                     {
                         richTextBlock.IsTextSelectionEnabled = !richTextBlock.IsTextSelectionEnabled;
                         output.Text = $"RichTextBlock selection: {FormatOnOff(richTextBlock.IsTextSelectionEnabled)}.";
+                    })),
+                CreateVisualStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreatePersonPictureSample()
+    {
+        var output = CreateVisualOutput("PersonPicture: initials RH, badge 2, individual mode.");
+        var personPicture = new FWPersonPicture
+        {
+            Width = 72,
+            Height = 72,
+            DisplayName = "Rhea Holloway",
+            Initials = "RH",
+            BadgeNumber = 2,
+            BadgeGlyph = "2"
+        };
+        var nameText = new FWTextBlock
+        {
+            Foreground = ThemeBrush("TextPrimary"),
+            FontSize = 14
+        };
+        var detailText = new FWTextBlock
+        {
+            Foreground = ThemeBrush("TextSecondary"),
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            Width = 195
+        };
+
+        void UpdateReadout()
+        {
+            nameText.Text = personPicture.DisplayName;
+            detailText.Text = personPicture.ProfilePicture != null
+                ? $"Profile image, badge {personPicture.BadgeNumber}, small image {FormatOnOff(personPicture.PreferSmallImage)}."
+                : personPicture.IsGroup
+                ? $"Group avatar, badge {personPicture.BadgeNumber}, small image {FormatOnOff(personPicture.PreferSmallImage)}."
+                : $"Initials {personPicture.Initials}, badge {personPicture.BadgeNumber}, small image {FormatOnOff(personPicture.PreferSmallImage)}.";
+        }
+
+        UpdateReadout();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "FWPersonPicture states" },
+                new FWBorder
+                {
+                    Width = 320,
+                    Background = ThemeBrush("LayerFillColorDefaultBrush"),
+                    BorderBrush = ThemeBrush("ControlBorder"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(12),
+                    Child = new FWStackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 14,
+                        Children =
+                        {
+                            personPicture,
+                            new FWStackPanel
+                            {
+                                Orientation = Orientation.Vertical,
+                                Spacing = 4,
+                                VerticalAlignment = VerticalAlignment.Center,
+                                Children =
+                                {
+                                    nameText,
+                                    detailText
+                                }
+                            }
+                        }
+                    }
+                },
+                CreateVisualButtonRow(
+                    CreateVisualActionButton(FluentIconRegular.Person32, "Person", () =>
+                    {
+                        personPicture.ProfilePicture = null;
+                        personPicture.DisplayName = "Rhea Holloway";
+                        personPicture.Initials = "RH";
+                        personPicture.IsGroup = false;
+                        personPicture.BadgeNumber = 2;
+                        personPicture.BadgeGlyph = "2";
+                        output.Text = "PersonPicture: initials fallback with numeric badge.";
+                        UpdateReadout();
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.Image24, "Image", () =>
+                    {
+                        personPicture.ProfilePicture = CreateSampleBitmap();
+                        personPicture.DisplayName = "Rhea Holloway";
+                        personPicture.Initials = string.Empty;
+                        personPicture.IsGroup = false;
+                        personPicture.BadgeNumber = 1;
+                        personPicture.BadgeGlyph = "1";
+                        output.Text = "PersonPicture: profile image source applied.";
+                        UpdateReadout();
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.People32, "Group", () =>
+                    {
+                        personPicture.ProfilePicture = null;
+                        personPicture.DisplayName = "Design Review";
+                        personPicture.Initials = "UX";
+                        personPicture.IsGroup = true;
+                        personPicture.BadgeNumber = 8;
+                        personPicture.BadgeGlyph = "8";
+                        output.Text = "PersonPicture: group mode with generated team initials.";
+                        UpdateReadout();
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.ResizeImage20, "Small", () =>
+                    {
+                        personPicture.PreferSmallImage = !personPicture.PreferSmallImage;
+                        var size = personPicture.PreferSmallImage ? 56 : 72;
+                        personPicture.Width = size;
+                        personPicture.Height = size;
+                        output.Text = $"PersonPicture PreferSmallImage: {FormatOnOff(personPicture.PreferSmallImage)}.";
+                        UpdateReadout();
+                    })),
+                CreateVisualStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateMarkdownSample()
+    {
+        var output = CreateVisualOutput("Markdown: overview content, relative links handled in-gallery.");
+        var markdown = new FWMarkdown
+        {
+            Width = 320,
+            Height = 190,
+            Text = MarkdownOverviewText,
+            BaseUri = new Uri("https://jalium.dev/fluent/"),
+            OpenLinksExternally = false
+        };
+        markdown.LinkClicked += (_, args) =>
+        {
+            args.Handled = true;
+            output.Text = $"Markdown link resolved: {args.Uri}.";
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "FWMarkdown content" },
+                new FWBorder
+                {
+                    Width = 342,
+                    Background = ThemeBrush("LayerFillColorDefaultBrush"),
+                    BorderBrush = ThemeBrush("ControlBorder"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10),
+                    Child = markdown
+                },
+                CreateVisualButtonRow(
+                    CreateVisualActionButton(FluentIconRegular.Markdown20, "Notes", () =>
+                    {
+                        markdown.Text = MarkdownOverviewText;
+                        output.Text = "Markdown: overview source restored.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.TableSparkle20, "Table", () =>
+                    {
+                        markdown.Text = MarkdownTableText;
+                        output.Text = "Markdown: table and inline code rendered.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.Link32, "Links", () =>
+                    {
+                        markdown.OpenLinksExternally = !markdown.OpenLinksExternally;
+                        output.Text = $"Markdown external links: {FormatOnOff(markdown.OpenLinksExternally)}.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.Color24, "Tone", () =>
+                    {
+                        if (markdown.CodeBackground == null)
+                        {
+                            markdown.LinkForeground = ThemeBrush("AccentBrush");
+                            markdown.CodeBackground = ThemeBrush("SelectionBackgroundWeak");
+                            markdown.QuoteBackground = ThemeBrush("LayerFillColorDefaultBrush");
+                            output.Text = "Markdown: accent link, code, and quote brushes.";
+                        }
+                        else
+                        {
+                            markdown.LinkForeground = null;
+                            markdown.CodeBackground = null;
+                            markdown.QuoteBackground = null;
+                            output.Text = "Markdown: default code and quote brushes.";
+                        }
+                    })),
+                CreateVisualStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateQRCodeSample()
+    {
+        var output = CreateVisualOutput("QRCode: https payload, ECC Q, rounded modules.");
+        var payloadBox = new FWTextBox
+        {
+            Text = "https://jalium.dev/fluent",
+            Width = 150
+        };
+        var qrCode = new FWQRCode
+        {
+            Text = payloadBox.Text,
+            Width = 155,
+            Height = 155,
+            QuietZoneModules = 3,
+            ErrorCorrectionLevel = QRCodeErrorCorrectionLevel.Q,
+            Encoding = QRCodeEncoding.Utf8,
+            ModuleShape = QRModuleShape.RoundedSquare,
+            EyeShape = QREyeShape.Rounded,
+            IsForegroundGradient = false
+        };
+        payloadBox.TextChanged += (_, _) => output.Text = $"QRCode payload draft: {payloadBox.Text.Length} chars.";
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "FWQRCode generator" },
+                new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 14,
+                    Children =
+                    {
+                        qrCode,
+                        new FWStackPanel
+                        {
+                            Orientation = Orientation.Vertical,
+                            Spacing = 8,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            Children =
+                            {
+                                new FWTextBlock
+                                {
+                                    Text = "Payload",
+                                    Foreground = ThemeBrush("TextSecondary"),
+                                    FontSize = 12
+                                },
+                                payloadBox
+                            }
+                        }
+                    }
+                },
+                CreateVisualButtonRow(
+                    CreateVisualActionButton(FluentIconRegular.QrCode20, "Apply", () =>
+                    {
+                        qrCode.Text = string.IsNullOrWhiteSpace(payloadBox.Text)
+                            ? "https://jalium.dev/fluent"
+                            : payloadBox.Text.Trim();
+                        output.Text = $"QRCode payload applied: {qrCode.Text.Length} chars.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.TextBulletListSquare20, "Payload", () =>
+                    {
+                        payloadBox.Text = payloadBox.Text.StartsWith("WIFI:", StringComparison.Ordinal)
+                            ? "https://jalium.dev/fluent"
+                            : "WIFI:T:WPA;S:FluentJalium;P:samplepass;;";
+                        qrCode.Text = payloadBox.Text;
+                        output.Text = payloadBox.Text.StartsWith("WIFI:", StringComparison.Ordinal)
+                            ? "QRCode payload: Wi-Fi credentials."
+                            : "QRCode payload: gallery URL.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.ShieldBadge24, "ECC", () =>
+                    {
+                        qrCode.ErrorCorrectionLevel = qrCode.ErrorCorrectionLevel == QRCodeErrorCorrectionLevel.H
+                            ? QRCodeErrorCorrectionLevel.Q
+                            : QRCodeErrorCorrectionLevel.H;
+                        output.Text = $"QRCode ECC: {qrCode.ErrorCorrectionLevel}.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.DrawShape24, "Shape", () =>
+                    {
+                        if (qrCode.ModuleShape == QRModuleShape.RoundedSquare)
+                        {
+                            qrCode.ModuleShape = QRModuleShape.Circle;
+                            qrCode.EyeShape = QREyeShape.Leaf;
+                        }
+                        else
+                        {
+                            qrCode.ModuleShape = QRModuleShape.RoundedSquare;
+                            qrCode.EyeShape = QREyeShape.Rounded;
+                        }
+
+                        output.Text = $"QRCode shape: {qrCode.ModuleShape}, eyes {qrCode.EyeShape}.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.Image24, "Logo", () =>
+                    {
+                        qrCode.LogoImage = qrCode.LogoImage == null ? CreateSampleBitmap() : null;
+                        if (qrCode.LogoImage != null)
+                        {
+                            qrCode.ErrorCorrectionLevel = QRCodeErrorCorrectionLevel.H;
+                            qrCode.LogoSizeRatio = 0.2;
+                        }
+
+                        output.Text = qrCode.LogoImage == null
+                            ? "QRCode logo removed."
+                            : "QRCode logo image added with ECC H.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.ArrowAutofitHeight24, "Quiet", () =>
+                    {
+                        qrCode.QuietZoneModules = qrCode.QuietZoneModules == 3 ? 1 : 3;
+                        output.Text = $"QRCode quiet zone: {qrCode.QuietZoneModules} modules.";
+                    })),
+                CreateVisualStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateShapeControlsSample()
+    {
+        var output = CreateVisualOutput("Shapes: themed fill and stroke with rounded line joins.");
+        var rectangle = new FWRectangle
+        {
+            Width = 86,
+            Height = 48,
+            RadiusX = 8,
+            RadiusY = 8,
+            Fill = ThemeBrush("SelectionBackgroundWeak"),
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 1.5
+        };
+        var ellipse = new FWEllipse
+        {
+            Width = 56,
+            Height = 56,
+            Fill = ThemeBrush("SelectionBackgroundWeak"),
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 1.5
+        };
+        var line = new FWLine
+        {
+            Width = 88,
+            Height = 58,
+            X1 = 4,
+            Y1 = 42,
+            X2 = 84,
+            Y2 = 10,
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 3,
+            StrokeStartLineCap = PenLineCap.Round,
+            StrokeEndLineCap = PenLineCap.Round
+        };
+        var polyline = new FWPolyline
+        {
+            Width = 88,
+            Height = 58,
+            Points = ShapePointCollection.Parse("0,40 18,14 38,34 58,8 82,28"),
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 3,
+            StrokeLineJoin = PenLineJoin.Round
+        };
+        var polygon = new FWPolygon
+        {
+            Width = 88,
+            Height = 58,
+            Points = ShapePointCollection.Parse("8,44 28,8 52,22 74,44"),
+            Fill = ThemeBrush("SelectionBackgroundWeak"),
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 1.5,
+            StrokeLineJoin = PenLineJoin.Round,
+            FillRule = FillRule.Nonzero
+        };
+        var path = new FWPath
+        {
+            Width = 88,
+            Height = 56,
+            Data = "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20",
+            Fill = ThemeBrush("SelectionBackgroundWeak"),
+            Stroke = ThemeBrush("AccentBrush"),
+            StrokeThickness = 1.5,
+            StrokeLineJoin = PenLineJoin.Round,
+            Stretch = Stretch.Uniform
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "Fluent shape controls" },
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 8,
+                    VerticalSpacing = 8,
+                    Children =
+                    {
+                        CreateShapePreviewTile("FWRectangle", rectangle),
+                        CreateShapePreviewTile("FWEllipse", ellipse),
+                        CreateShapePreviewTile("FWLine", line),
+                        CreateShapePreviewTile("FWPolyline", polyline),
+                        CreateShapePreviewTile("FWPolygon", polygon),
+                        CreateShapePreviewTile("FWPath", path)
+                    }
+                },
+                CreateVisualButtonRow(
+                    CreateVisualActionButton(FluentIconRegular.Color24, "Accent", () =>
+                    {
+                        ApplyShapeBrushes(rectangle, ellipse, polygon, path, ThemeBrush("SelectionBackgroundWeak"), ThemeBrush("AccentBrush"));
+                        line.Stroke = ThemeBrush("AccentBrush");
+                        polyline.Stroke = ThemeBrush("AccentBrush");
+                        output.Text = "Shapes: accent fill and stroke restored.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.DrawShape24, "Morph", () =>
+                    {
+                        rectangle.RadiusX = rectangle.RadiusX == 8 ? 22 : 8;
+                        rectangle.RadiusY = rectangle.RadiusY == 8 ? 22 : 8;
+                        line.X2 = line.X2 == 84 ? 54 : 84;
+                        line.Y2 = line.Y2 == 10 ? 42 : 10;
+                        polyline.Points = polyline.Points?.Count == 5
+                            ? ShapePointCollection.Parse("4,20 22,38 42,12 62,38 84,18 84,42")
+                            : ShapePointCollection.Parse("0,40 18,14 38,34 58,8 82,28");
+                        polygon.Points = polygon.Points?.Count == 4
+                            ? ShapePointCollection.Parse("8,44 28,8 52,22 74,44")
+                            : ShapePointCollection.Parse("8,28 28,8 52,8 74,28 60,48 22,48");
+                        path.Data = path.Data.StartsWith("M 4,36", StringComparison.Ordinal)
+                            ? "M 6,44 L 22,10 L 42,38 L 62,10 L 82,44 Z"
+                            : "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20";
+                        output.Text = "Shapes: geometry, radius, and path data morphed.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.Prohibited24, "Disable", () =>
+                    {
+                        var isEnabled = !rectangle.IsEnabled;
+                        SetShapeEnabled(isEnabled, rectangle, ellipse, line, polyline, polygon, path);
+                        output.Text = $"Shapes enabled: {FormatOnOff(isEnabled)}.";
                     })),
                 CreateVisualStatus(output)
             }
@@ -600,6 +1067,71 @@ internal sealed class GalleryVisualsPage
         };
     }
 
+    private static FWBorder CreateShapePreviewTile(string label, FrameworkElement shape)
+    {
+        shape.HorizontalAlignment = HorizontalAlignment.Center;
+        shape.VerticalAlignment = VerticalAlignment.Center;
+
+        return new FWBorder
+        {
+            Width = 104,
+            Height = 96,
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(8),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Children =
+                {
+                    new FWBorder
+                    {
+                        Width = 88,
+                        Height = 58,
+                        Child = shape
+                    },
+                    new FWTextBlock
+                    {
+                        Text = label,
+                        FontSize = 11,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    }
+                }
+            }
+        };
+    }
+
+    private static void ApplyShapeBrushes(
+        FWRectangle rectangle,
+        FWEllipse ellipse,
+        FWPolygon polygon,
+        FWPath path,
+        Brush fill,
+        Brush stroke)
+    {
+        rectangle.Fill = fill;
+        rectangle.Stroke = stroke;
+        ellipse.Fill = fill;
+        ellipse.Stroke = stroke;
+        polygon.Fill = fill;
+        polygon.Stroke = stroke;
+        path.Fill = fill;
+        path.Stroke = stroke;
+    }
+
+    private static void SetShapeEnabled(bool isEnabled, params FrameworkElement[] shapes)
+    {
+        foreach (var shape in shapes)
+        {
+            shape.IsEnabled = isEnabled;
+        }
+    }
+
     private static FWBorder CreateSeparatorMetric(string title, string detail)
     {
         return new FWBorder
@@ -726,6 +1258,10 @@ internal sealed class GalleryVisualsPage
         {
             "Fluent icon library" => "<FluentIcon Icon=\"Save24\" />\n<FWFontIcon Glyph=\"&#xE72D;\" />\n<FWSymbolIcon Symbol=\"Save\" />",
             "FWBitmapIcon, FWImageIcon, and FWRichTextBlock" => "<FWBitmapIcon Source=\"...\" ShowAsMonochrome=\"True\" Width=\"24\" Height=\"24\" />\n<FWImageIcon Source=\"...\" Width=\"32\" Height=\"32\" />\n<FWRichTextBlock TextWrapping=\"Wrap\" IsTextSelectionEnabled=\"True\" />",
+            "FWPersonPicture" => "<FWPersonPicture DisplayName=\"Rhea Holloway\" Initials=\"RH\" BadgeNumber=\"2\" />",
+            "FWMarkdown" => "<FWMarkdown Text=\"# Visual notes\" BaseUri=\"https://jalium.dev/fluent/\" OpenLinksExternally=\"False\" />",
+            "FWQRCode" => "<FWQRCode Text=\"https://jalium.dev/fluent\" ErrorCorrectionLevel=\"Q\" ModuleShape=\"RoundedSquare\" EyeShape=\"Rounded\" />",
+            "Fluent shape controls" => "<FWRectangle RadiusX=\"8\" RadiusY=\"8\" />\n<FWEllipse />\n<FWLine X1=\"4\" Y1=\"42\" X2=\"84\" Y2=\"10\" />\n<FWPolyline Points=\"0,40 18,14 38,34\" />\n<FWPolygon Points=\"8,44 28,8 52,22\" />\n<FWPath Data=\"M 4,36 C 16,6 38,6 48,30\" />",
             "FWImage" => "<FWImage Stretch=\"UniformToFill\" IsZoomEnabled=\"True\" MinZoom=\"0.75\" MaxZoom=\"4\" />",
             "FWLabel and FWSeparator" => "<FWLabel Content=\"Name\" Target=\"{Binding ElementName=NameBox}\" AccessKey=\"N\" />\n<FWSeparator />",
             "FWViewbox" => "<FWViewbox Stretch=\"Uniform\" StretchDirection=\"Both\" />",
@@ -847,6 +1383,21 @@ internal sealed class GalleryVisualsPage
     {
         return value ? "on" : "off";
     }
+
+    private const string MarkdownOverviewText =
+        "# Visual notes\n\n" +
+        "- `FWMarkdown` renders headings, lists, links, and inline code.\n" +
+        "- Relative [gallery links](/gallery/visuals) resolve against `BaseUri`.\n\n" +
+        "> Fluent brushes keep quotes and code blocks readable.";
+
+    private const string MarkdownTableText =
+        "## Coverage\n\n" +
+        "| Control | Visual role |\n" +
+        "| --- | --- |\n" +
+        "| `FWMarkdown` | Rich document text |\n" +
+        "| `FWQRCode` | Encoded payload visual |\n" +
+        "| `FWPath` | Custom vector shape |\n\n" +
+        "`OpenLinksExternally` can be toggled from the sample.";
 
     private static BitmapImage CreateSampleBitmap()
     {

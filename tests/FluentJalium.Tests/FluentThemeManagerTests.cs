@@ -130,6 +130,10 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
             AssertBasedOnStyle<FWBitmapIcon, Image>(app.Resources);
             AssertBasedOnStyle<FWImageIcon, Image>(app.Resources);
+            AssertOwnedStyle<FWPersonPicture>(app.Resources);
+            var personPictureStyle = Assert.IsType<Style>(app.Resources[typeof(FWPersonPicture)]);
+            Assert.Contains(personPictureStyle.Setters.OfType<Setter>(), setter => setter.Property == FWPersonPicture.BadgeBackgroundProperty);
+            Assert.Contains(personPictureStyle.Setters.OfType<Setter>(), setter => setter.Property == FWPersonPicture.BadgeForegroundProperty);
             AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
             AssertContainsStyle<FWRichTextBlock>(app.Resources);
             AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
@@ -348,6 +352,7 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<Image>(dictionary);
         AssertContainsStyle<Markdown>(dictionary);
         AssertContainsStyle<QRCode>(dictionary);
+        AssertContainsStyle<FWPersonPicture>(dictionary);
         AssertContainsStyle<FontIcon>(dictionary);
         AssertContainsStyle<SymbolIcon>(dictionary);
         AssertContainsStyle<PathIcon>(dictionary);
@@ -841,6 +846,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
             AssertBasedOnStyle<FWBitmapIcon, Image>(app.Resources);
             AssertBasedOnStyle<FWImageIcon, Image>(app.Resources);
+            AssertOwnedStyle<FWPersonPicture>(app.Resources);
             AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
             AssertContainsStyle<FWRichTextBlock>(app.Resources);
             AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
@@ -1187,6 +1193,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWImage, Image>();
         AssertFluentControl<FWBitmapIcon, Image>();
         AssertFluentControl<FWImageIcon, Image>();
+        AssertFluentControl<FWPersonPicture, Control>();
         AssertFluentControl<FWMarkdown, Markdown>();
         AssertFluentControl<FWRichTextBlock, TextBlock>();
         AssertFluentControl<FWQRCode, QRCode>();
