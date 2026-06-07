@@ -11,6 +11,7 @@ using FWComboBoxItem = FluentJalium.Controls.FWComboBoxItem;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWRadioButton = FluentJalium.Controls.FWRadioButton;
+using FWRadioButtons = FluentJalium.Controls.FWRadioButtons;
 using FWRatingControl = FluentJalium.Controls.FWRatingControl;
 using FWRatingControlSize = FluentJalium.Controls.FWRatingControlSize;
 using FWSelectionDensity = FluentJalium.Controls.FWSelectionDensity;
@@ -41,6 +42,11 @@ internal sealed class GallerySelectionPage
             "FWRadioButton",
             "Named groups keep a single selected option and report the current choice.",
             CreateRadioButtonSelectionSample()));
+        examples.Children.Add(CreateSelectionExampleCard(
+            FluentIconRegular.RadioButton24,
+            "FWRadioButtons",
+            "A grouped Selector with header, generated radio items, selected index, and density control.",
+            CreateRadioButtonsSelectionSample()));
         examples.Children.Add(CreateSelectionExampleCard(
             FluentIconRegular.ChevronDown24,
             "FWComboBox",
@@ -186,6 +192,47 @@ internal sealed class GallerySelectionPage
                 CreateOption("Jalium"),
                 CreateOption("Disabled", false, false),
                 CreateSelectionStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateRadioButtonsSelectionSample()
+    {
+        var radioButtons = new FWRadioButtons
+        {
+            Header = "Launch target",
+            Width = 260,
+            Density = FWSelectionDensity.Comfortable
+        };
+        radioButtons.Items.Add("Windows desktop");
+        radioButtons.Items.Add("Gallery shell");
+        radioButtons.Items.Add("Control playground");
+        radioButtons.SelectedIndex = 1;
+
+        var output = CreateSelectionOutput("Selected: Gallery shell. Density: comfortable");
+
+        void UpdateOutput()
+        {
+            var selected = radioButtons.SelectedItem?.ToString() ?? "none";
+            output.Text = $"Selected: {selected}. Density: {FormatDensity(radioButtons.Density)}";
+        }
+
+        radioButtons.SelectionChanged += (_, _) => UpdateOutput();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                radioButtons,
+                CreateSelectionStatus(output),
+                CreateSelectionButtonRow(
+                    CreateSelectionActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        radioButtons.Density = NextDensity(radioButtons.Density);
+                        UpdateOutput();
+                    }))
             }
         };
     }
@@ -523,6 +570,7 @@ internal sealed class GallerySelectionPage
         {
             "FWCheckBox" => "<FWCheckBox Content=\"Fluent\" IsChecked=\"True\" />\n<FWCheckBox Content=\"Select all\" IsThreeState=\"True\" />",
             "FWRadioButton" => "<FWRadioButton Content=\"Windows\" GroupName=\"Platform\" IsChecked=\"True\" />\n<FWRadioButton Content=\"Jalium\" GroupName=\"Platform\" />",
+            "FWRadioButtons" => "<FWRadioButtons Header=\"Launch target\" SelectedIndex=\"1\">\n  <x:String>Windows desktop</x:String>\n  <x:String>Gallery shell</x:String>\n  <x:String>Control playground</x:String>\n</FWRadioButtons>",
             "FWComboBox" => "<FWComboBox PlaceholderText=\"Choose an item\">\n  <FWComboBoxItem Content=\"Control styles\" />\n</FWComboBox>",
             "FWComboBoxItem" => "<FWComboBoxItem Content=\"Selected item\" IsSelected=\"True\" />\n<FWComboBoxItem Content=\"Disabled item\" IsEnabled=\"False\" />",
             "FWRatingControl" => "<FWRatingControl Value=\"3\" Caption=\"Quality\" />\n<FWRatingControl PlaceholderValue=\"4\" Caption=\"Suggested\" />",

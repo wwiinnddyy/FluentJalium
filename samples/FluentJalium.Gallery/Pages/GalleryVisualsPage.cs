@@ -3,14 +3,17 @@ using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using FWBitmapIcon = FluentJalium.Controls.FWBitmapIcon;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWFontIcon = FluentJalium.Controls.FWFontIcon;
 using FWImage = FluentJalium.Controls.FWImage;
+using FWImageIcon = FluentJalium.Controls.FWImageIcon;
 using FWLabel = FluentJalium.Controls.FWLabel;
 using FWPathIcon = FluentJalium.Controls.FWPathIcon;
+using FWRichTextBlock = FluentJalium.Controls.FWRichTextBlock;
 using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWSymbolIcon = FluentJalium.Controls.FWSymbolIcon;
@@ -37,6 +40,11 @@ internal sealed class GalleryVisualsPage
             "Fluent icon library",
             "Regular, filled, font, symbol, and path icons share Fluent sizing, foreground, and command states.",
             CreateIconLibrarySample()));
+        examples.Children.Add(CreateVisualExampleCard(
+            FluentIconRegular.Image24,
+            "FWBitmapIcon, FWImageIcon, and FWRichTextBlock",
+            "Bitmap and image icon sizing plus selectable, wrapping rich text for WinUI-style visual compatibility.",
+            CreateCompatibilityVisualsSample()));
         examples.Children.Add(CreateVisualExampleCard(
             FluentIconRegular.Image24,
             "FWImage",
@@ -137,6 +145,87 @@ internal sealed class GalleryVisualsPage
                         SetIconTileSize(symbolIcon, 28);
                         SetIconTileSize(pathIcon, 28);
                         output.Text = "Icons: tiles resized to 28.";
+                    })),
+                CreateVisualStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateCompatibilityVisualsSample()
+    {
+        var output = CreateVisualOutput("BitmapIcon: 24px monochrome. ImageIcon: 32px. RichTextBlock: Wrap with selection.");
+        var bitmapIcon = new FWBitmapIcon
+        {
+            Source = CreateSampleBitmap(),
+            Width = 24,
+            Height = 24,
+            Stretch = Stretch.Uniform,
+            ShowAsMonochrome = true
+        };
+        var imageIcon = new FWImageIcon
+        {
+            Source = CreateSampleBitmap(),
+            Width = 32,
+            Height = 32,
+            Stretch = Stretch.UniformToFill
+        };
+        var richTextBlock = new FWRichTextBlock
+        {
+            Text = "FWRichTextBlock keeps long descriptive copy readable with wrapping and selectable text for copy-friendly gallery notes.",
+            Width = 300,
+            Foreground = ThemeBrush("TextPrimary"),
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "WinUI visual compatibility" },
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 8,
+                    VerticalSpacing = 8,
+                    Children =
+                    {
+                        CreateCompatibilityIconPreview("FWBitmapIcon", "24px / monochrome", bitmapIcon),
+                        CreateCompatibilityIconPreview("FWImageIcon", "32px / color image", imageIcon)
+                    }
+                },
+                CreateRichTextPreview(richTextBlock),
+                CreateVisualButtonRow(
+                    CreateVisualActionButton(FluentIconRegular.Color24, "Mono", () =>
+                    {
+                        bitmapIcon.ShowAsMonochrome = !bitmapIcon.ShowAsMonochrome;
+                        output.Text = $"BitmapIcon monochrome: {FormatOnOff(bitmapIcon.ShowAsMonochrome)}.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.ResizeLarge24, "Size", () =>
+                    {
+                        var useLargeSize = bitmapIcon.Width <= 24;
+                        var bitmapSize = useLargeSize ? 36 : 24;
+                        var imageSize = useLargeSize ? 44 : 32;
+
+                        bitmapIcon.Width = bitmapSize;
+                        bitmapIcon.Height = bitmapSize;
+                        imageIcon.Width = imageSize;
+                        imageIcon.Height = imageSize;
+                        output.Text = $"Icon sizes: bitmap {bitmapSize}px, image {imageSize}px.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.ArrowAutofitHeight24, "Wrap", () =>
+                    {
+                        richTextBlock.TextWrapping = richTextBlock.TextWrapping == TextWrapping.Wrap
+                            ? TextWrapping.NoWrap
+                            : TextWrapping.Wrap;
+                        output.Text = $"RichTextBlock wrapping: {richTextBlock.TextWrapping}.";
+                    }),
+                    CreateVisualActionButton(FluentIconRegular.TextEditStyle24, "Select", () =>
+                    {
+                        richTextBlock.IsTextSelectionEnabled = !richTextBlock.IsTextSelectionEnabled;
+                        output.Text = $"RichTextBlock selection: {FormatOnOff(richTextBlock.IsTextSelectionEnabled)}.";
                     })),
                 CreateVisualStatus(output)
             }
@@ -459,6 +548,58 @@ internal sealed class GalleryVisualsPage
         }
     }
 
+    private static FWBorder CreateCompatibilityIconPreview(string label, string detail, FrameworkElement icon)
+    {
+        return new FWBorder
+        {
+            Width = 150,
+            Height = 104,
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Children =
+                {
+                    icon,
+                    new FWTextBlock
+                    {
+                        Text = label,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    },
+                    new FWTextBlock
+                    {
+                        Text = detail,
+                        FontSize = 11,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    }
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateRichTextPreview(FWRichTextBlock richTextBlock)
+    {
+        return new FWBorder
+        {
+            Width = 320,
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = richTextBlock
+        };
+    }
+
     private static FWBorder CreateSeparatorMetric(string title, string detail)
     {
         return new FWBorder
@@ -584,6 +725,7 @@ internal sealed class GalleryVisualsPage
         return title switch
         {
             "Fluent icon library" => "<FluentIcon Icon=\"Save24\" />\n<FWFontIcon Glyph=\"&#xE72D;\" />\n<FWSymbolIcon Symbol=\"Save\" />",
+            "FWBitmapIcon, FWImageIcon, and FWRichTextBlock" => "<FWBitmapIcon Source=\"...\" ShowAsMonochrome=\"True\" Width=\"24\" Height=\"24\" />\n<FWImageIcon Source=\"...\" Width=\"32\" Height=\"32\" />\n<FWRichTextBlock TextWrapping=\"Wrap\" IsTextSelectionEnabled=\"True\" />",
             "FWImage" => "<FWImage Stretch=\"UniformToFill\" IsZoomEnabled=\"True\" MinZoom=\"0.75\" MaxZoom=\"4\" />",
             "FWLabel and FWSeparator" => "<FWLabel Content=\"Name\" Target=\"{Binding ElementName=NameBox}\" AccessKey=\"N\" />\n<FWSeparator />",
             "FWViewbox" => "<FWViewbox Stretch=\"Uniform\" StretchDirection=\"Both\" />",

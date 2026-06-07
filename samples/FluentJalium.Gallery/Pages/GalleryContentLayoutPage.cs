@@ -7,14 +7,21 @@ using Jalium.UI.Media.Animation;
 using FWAccessText = FluentJalium.Controls.FWAccessText;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWCanvas = FluentJalium.Controls.FWCanvas;
 using FWContentControl = FluentJalium.Controls.FWContentControl;
 using FWContentPresenter = FluentJalium.Controls.FWContentPresenter;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWLabel = FluentJalium.Controls.FWLabel;
+using FWParallaxView = FluentJalium.Controls.FWParallaxView;
+using FWRelativePanel = FluentJalium.Controls.FWRelativePanel;
+using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWTwoPaneView = FluentJalium.Controls.FWTwoPaneView;
+using FWTwoPaneViewMode = FluentJalium.Controls.FWTwoPaneViewMode;
+using FWTwoPaneViewPriority = FluentJalium.Controls.FWTwoPaneViewPriority;
 using FWTransitioningContentControl = FluentJalium.Controls.FWTransitioningContentControl;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
@@ -46,6 +53,16 @@ internal sealed class GalleryContentLayoutPage
             "Stack, wrap, and grid layout",
             "StackPanel spacing, WrapPanel chips, Grid spacing, rows, columns, and spanning cells.",
             CreatePanelLayoutSample()));
+        examples.Children.Add(CreateLayoutExampleCard(
+            FluentIconRegular.DualScreenTablet24,
+            "Adaptive settings layout",
+            "TwoPaneView and SettingsCard compose adaptive master-detail settings surfaces.",
+            CreateAdaptiveSettingsLayoutSample()));
+        examples.Children.Add(CreateLayoutExampleCard(
+            FluentIconRegular.LayerDiagonalSparkle24,
+            "Canvas, relative, and parallax layout",
+            "Canvas placement, RelativePanel compatibility, and ParallaxView offset recipes for rich layout surfaces.",
+            CreatePositioningParallaxSample()));
         examples.Children.Add(CreateLayoutExampleCard(
             FluentIconRegular.SlideTransition24,
             "Transitioning content",
@@ -223,6 +240,192 @@ internal sealed class GalleryContentLayoutPage
         };
     }
 
+    private static UIElement CreateAdaptiveSettingsLayoutSample()
+    {
+        var output = CreateLayoutOutput("TwoPaneView: Wide, priority Pane1.");
+        var modeCard = new FWSettingsCard
+        {
+            Header = "Display mode",
+            Description = "Switches the sample between wide, tall, and single pane.",
+            HeaderIcon = CreateIcon(FluentIconRegular.LayoutColumnTwo24, 18, ThemeBrush("TextSecondary")),
+            ActionIcon = CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
+            Content = new FWButton { Content = "Configure" },
+            IsClickEnabled = true
+        };
+        var syncCard = new FWSettingsCard
+        {
+            Header = "Sync layout",
+            Description = "A compact settings row with a live command area.",
+            HeaderIcon = CreateIcon(FluentIconRegular.CloudSync24, 18, ThemeBrush("TextSecondary")),
+            Content = new FWButton { Content = "On" },
+            IsClickEnabled = true
+        };
+        var twoPaneView = new FWTwoPaneView
+        {
+            Width = 500,
+            Height = 230,
+            Mode = FWTwoPaneViewMode.Wide,
+            PanePriority = FWTwoPaneViewPriority.Pane1,
+            Background = ThemeBrush("SurfaceBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Pane1 = CreateAdaptivePane("Navigation", "Master pane"),
+            Pane2 = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    modeCard,
+                    syncCard
+                }
+            }
+        };
+
+        void UpdateState(string action)
+        {
+            output.Text = $"{action}. Mode: {twoPaneView.Mode}, priority: {twoPaneView.PanePriority}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 520,
+            Children =
+            {
+                twoPaneView,
+                CreateLayoutButtonRow(
+                    CreateLayoutActionButton(FluentIconRegular.LayoutColumnTwo24, "Wide", () =>
+                    {
+                        twoPaneView.Mode = FWTwoPaneViewMode.Wide;
+                        UpdateState("TwoPaneView arranged side by side");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.LayoutRowTwo24, "Tall", () =>
+                    {
+                        twoPaneView.Mode = FWTwoPaneViewMode.Tall;
+                        UpdateState("TwoPaneView arranged vertically");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.PanelLeftContract24, "Single", () =>
+                    {
+                        twoPaneView.Mode = FWTwoPaneViewMode.SinglePane;
+                        UpdateState("TwoPaneView collapsed to one pane");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.ChevronRight24, "Priority", () =>
+                    {
+                        twoPaneView.PanePriority = twoPaneView.PanePriority == FWTwoPaneViewPriority.Pane1
+                            ? FWTwoPaneViewPriority.Pane2
+                            : FWTwoPaneViewPriority.Pane1;
+                        UpdateState("Pane priority toggled");
+                    })),
+                CreateLayoutStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreatePositioningParallaxSample()
+    {
+        var output = CreateLayoutOutput("Parallax progress: 0.00, offset 0,0.");
+        var canvas = new FWCanvas
+        {
+            Width = 225,
+            Height = 118,
+            Background = ThemeBrush("LayerFillColorDefaultBrush")
+        };
+        var badge = CreatePositionedBadge("Canvas", FluentIconRegular.MoreHorizontal24);
+        var action = CreatePositionedBadge("Absolute", FluentIconRegular.TargetSparkle24);
+        var note = CreatePositionedBadge("42 px", FluentIconRegular.Ruler24);
+        Canvas.SetLeft(badge, 12);
+        Canvas.SetTop(badge, 12);
+        Canvas.SetLeft(action, 78);
+        Canvas.SetTop(action, 50);
+        Canvas.SetLeft(note, 146);
+        Canvas.SetTop(note, 24);
+        canvas.Children.Add(badge);
+        canvas.Children.Add(action);
+        canvas.Children.Add(note);
+
+        var relativePanel = new FWRelativePanel
+        {
+            Width = 225,
+            ColumnSpacing = 8,
+            RowSpacing = 8
+        };
+        relativePanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        relativePanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        relativePanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        relativePanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        var primary = CreateGridCell("RelativePanel", "Grid-compatible");
+        var secondary = CreateGridCell("Right", "Column 1");
+        var footer = CreateGridCell("Span", "Two columns");
+        Grid.SetColumn(secondary, 1);
+        Grid.SetRow(footer, 1);
+        Grid.SetColumnSpan(footer, 2);
+        relativePanel.Children.Add(primary);
+        relativePanel.Children.Add(secondary);
+        relativePanel.Children.Add(footer);
+
+        var parallaxView = new FWParallaxView
+        {
+            Width = 225,
+            Height = 82,
+            HorizontalShift = 18,
+            VerticalShift = 28,
+            IsHorizontalShiftEnabled = true,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Content = CreateTransitionCard("Depth layer", "ParallaxView")
+        };
+
+        void SetProgress(double progress)
+        {
+            var offset = parallaxView.GetParallaxOffset(progress);
+            parallaxView.Margin = new Thickness(offset.X, offset.Y, 0, 0);
+            output.Text = $"Parallax progress: {progress:0.00}, offset {offset.X:0},{offset.Y:0}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 520,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 12,
+                    VerticalSpacing = 12,
+                    Children =
+                    {
+                        CreateLayoutFrame("FWCanvas", canvas),
+                        CreateLayoutFrame("FWRelativePanel", relativePanel),
+                        CreateLayoutFrame("FWParallaxView", new FWBorder
+                        {
+                            Width = 225,
+                            Height = 116,
+                            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+                            BorderBrush = ThemeBrush("ControlBorder"),
+                            BorderThickness = new Thickness(1),
+                            CornerRadius = new CornerRadius(6),
+                            Padding = new Thickness(10),
+                            ClipToBounds = true,
+                            Child = parallaxView
+                        })
+                    }
+                },
+                CreateLayoutButtonRow(
+                    CreateLayoutActionButton(FluentIconRegular.NumberSymbol24, "0%", () => SetProgress(0)),
+                    CreateLayoutActionButton(FluentIconRegular.DataUsage24, "50%", () => SetProgress(0.5)),
+                    CreateLayoutActionButton(FluentIconRegular.CheckmarkCircle24, "100%", () => SetProgress(1))),
+                CreateLayoutStatus(output)
+            }
+        };
+    }
+
     private static UIElement CreateTransitioningContentSample()
     {
         var output = CreateLayoutOutput("Transition: SlideLeft with text content.");
@@ -392,6 +595,97 @@ internal sealed class GalleryContentLayoutPage
         };
     }
 
+    private static FWBorder CreateAdaptivePane(string title, string detail)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                Children =
+                {
+                    CreateIcon(FluentIconRegular.DualScreenTablet24, 22, ThemeBrush("TextPrimary")),
+                    new FWTextBlock
+                    {
+                        Text = title,
+                        FontSize = 14,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = detail,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreatePositionedBadge(string text, FluentIconRegular icon)
+    {
+        return new FWBorder
+        {
+            Width = 68,
+            Height = 36,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(6),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 4,
+                Children =
+                {
+                    CreateIcon(icon, 14, ThemeBrush("TextSecondary")),
+                    new FWTextBlock
+                    {
+                        Text = text,
+                        FontSize = 11,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateLayoutFrame(string label, UIElement content)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("SurfaceBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = label,
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary")
+                    },
+                    content
+                }
+            }
+        };
+    }
+
     private static FWStackPanel CreateMaterialHeader()
     {
         return new FWStackPanel
@@ -424,6 +718,8 @@ internal sealed class GalleryContentLayoutPage
             "Text and access text" => "<FWTextBlock Text=\"Selectable body copy\" IsTextSelectionEnabled=\"True\" />\n<FWAccessText Text=\"_Open command\" />",
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
+            "Adaptive settings layout" => "<FWTwoPaneView Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\" Description=\"Adaptive settings row\" />\n</FWTwoPaneView>",
+            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel />\n<FWParallaxView HorizontalShift=\"18\" VerticalShift=\"28\" />",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
         };

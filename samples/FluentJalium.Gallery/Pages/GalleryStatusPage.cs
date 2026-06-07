@@ -11,6 +11,7 @@ using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
 using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
+using FWSnackbar = FluentJalium.Controls.FWSnackbar;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
@@ -46,6 +47,11 @@ internal sealed class GalleryStatusPage
             "FWToastNotificationHost",
             "Interactive toast queue, severity actions, visible-count limit, position, and dismiss behavior.",
             CreateToastNotificationStatusSample()));
+        examples.Children.Add(CreateStatusExampleCard(
+            FluentIconRegular.AlertSnooze24,
+            "FWSnackbar",
+            "Transient in-app messages expose open state, severity, closability, action requests, and undo flows.",
+            CreateSnackbarStatusSample()));
         examples.Children.Add(CreateStatusExampleCard(
             FluentIconRegular.Status24,
             "FWStatusBar",
@@ -270,6 +276,69 @@ internal sealed class GalleryStatusPage
                 },
                 actionRow,
                 optionRow,
+                CreateStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateSnackbarStatusSample()
+    {
+        var output = CreateStatusOutput("Snackbar: open information message.");
+        var snackbar = new FWSnackbar
+        {
+            Width = 470,
+            Title = "Draft archived",
+            Message = "The current gallery draft moved to the archive.",
+            ActionContent = "Undo",
+            Severity = ToastSeverity.Information,
+            IsOpen = true,
+            IsClosable = true,
+            IsAutoDismissEnabled = false,
+            Duration = TimeSpan.FromSeconds(6)
+        };
+        snackbar.ActionClick += (_, args) =>
+        {
+            args.Handled = true;
+            snackbar.Message = "Undo requested; snackbar stayed open because the action was handled.";
+            output.Text = "Snackbar action handled: undo requested.";
+        };
+        snackbar.Closed += (_, _) => output.Text = "Snackbar closed event fired.";
+
+        void ShowSnackbar(ToastSeverity severity, string title, string message)
+        {
+            snackbar.Severity = severity;
+            snackbar.Title = title;
+            snackbar.Message = message;
+            snackbar.Show();
+            output.Text = $"Snackbar shown: {severity}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                snackbar,
+                CreateStatusButtonRow(
+                    CreateStatusActionButton(FluentIconRegular.Info24, "Info", () => ShowSnackbar(
+                        ToastSeverity.Information,
+                        "Draft archived",
+                        "The current gallery draft moved to the archive.")),
+                    CreateStatusActionButton(FluentIconRegular.CheckmarkCircle24, "Success", () => ShowSnackbar(
+                        ToastSeverity.Success,
+                        "Changes saved",
+                        "The local Gallery sample was saved successfully.")),
+                    CreateStatusActionButton(FluentIconRegular.Warning24, "Warning", () => ShowSnackbar(
+                        ToastSeverity.Warning,
+                        "Review before upload",
+                        "The next push includes Gallery-only changes.")),
+                    CreateStatusActionButton(FluentIconRegular.ArrowUndo24, "Action", () =>
+                    {
+                        var handled = snackbar.RequestAction();
+                        output.Text = $"Snackbar action requested. Handled: {handled}.";
+                    }),
+                    CreateStatusActionButton(FluentIconRegular.Dismiss24, "Close", () => snackbar.Close())),
                 CreateStatus(output)
             }
         };
@@ -597,6 +666,7 @@ internal sealed class GalleryStatusPage
             "FWInfoBar" => "<FWInfoBar Severity=\"Warning\" Title=\"Review required\" Message=\"Check settings before continuing\" IsOpen=\"True\" />",
             "FWInfoBadge" => "<FWInfoBadge Severity=\"Critical\" Value=\"128\" MaxValue=\"99\" />\n<FWInfoBadge Severity=\"Success\" IconGlyph=\"CheckmarkCircle24\" />",
             "FWToastNotificationHost" => "<FWToastNotificationHost MaxVisibleToasts=\"3\" Position=\"BottomRight\" />",
+            "FWSnackbar" => "<FWSnackbar Title=\"Draft archived\" Message=\"The current gallery draft moved to the archive\" ActionContent=\"Undo\" IsOpen=\"True\" />",
             "FWStatusBar" => "<FWStatusBar>\n    <FWStatusBarItem Content=\"Ready\" />\n    <FWStatusBarItem Content=\"UTF-8\" />\n</FWStatusBar>",
             "Material operations console" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWInfoBar Severity=\"Success\" IsOpen=\"True\" />\n    <FWStatusBar />\n</FWFluentMaterialSurface>",
             _ => "<FWInfoBar IsOpen=\"True\" />"

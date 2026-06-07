@@ -12,7 +12,11 @@ using FWExpander = FluentJalium.Controls.FWExpander;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWGroupBox = FluentJalium.Controls.FWGroupBox;
+using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
+using FWSettingsExpander = FluentJalium.Controls.FWSettingsExpander;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
+using FWTaskDialog = FluentJalium.Controls.FWTaskDialog;
+using FWTaskDialogButton = FluentJalium.Controls.FWTaskDialogButton;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWToolTip = FluentJalium.Controls.FWToolTip;
@@ -51,6 +55,16 @@ internal sealed class GalleryDisclosurePage
             "FWContentDialog",
             "Primary, secondary, close, default button, full-size, and disabled button configuration.",
             CreateContentDialogSample()));
+        examples.Children.Add(CreateDisclosureExampleCard(
+            FluentIconRegular.WindowWrench24,
+            "FWTaskDialog",
+            "Lightweight task prompts expose open state, result, default button, and requestable command events.",
+            CreateTaskDialogSample()));
+        examples.Children.Add(CreateDisclosureExampleCard(
+            FluentIconRegular.Settings24,
+            "FWSettingsExpander",
+            "Settings-style disclosure combines icon, description, grouped rows, and expand/collapse state.",
+            CreateSettingsExpanderSample()));
         examples.Children.Add(CreateDisclosureExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
             "Material disclosure panel",
@@ -277,6 +291,121 @@ internal sealed class GalleryDisclosurePage
         };
     }
 
+    private static UIElement CreateTaskDialogSample()
+    {
+        var output = CreateDisclosureOutput("TaskDialog: open, result None.");
+        var taskDialog = new FWTaskDialog
+        {
+            Title = "Delete temporary layout cache?",
+            Subtitle = "FWTaskDialog keeps command semantics without requiring a modal host.",
+            Icon = CreateIcon(FluentIconRegular.Warning24, 22, ThemeBrush("TextPrimary")),
+            PrimaryButtonText = "Delete",
+            SecondaryButtonText = "Archive",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Primary,
+            IsOpen = true,
+            Content = new FWTextBlock
+            {
+                Text = "Use request methods to exercise button events and result transitions in a lightweight task surface.",
+                Foreground = ThemeBrush("TextPrimary"),
+                TextWrapping = TextWrapping.Wrap
+            }
+        };
+        taskDialog.PrimaryButtonClick += (_, _) => output.Text = "TaskDialog primary requested.";
+        taskDialog.SecondaryButtonClick += (_, _) => output.Text = "TaskDialog secondary requested.";
+        taskDialog.CloseButtonClick += (_, _) => output.Text = "TaskDialog close requested.";
+
+        void UpdateAfterRequest(string action)
+        {
+            output.Text = $"{action}. Open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                taskDialog,
+                CreateDisclosureButtonRow(
+                    CreateDisclosureActionButton(FluentIconRegular.Open24, "Open", () =>
+                    {
+                        taskDialog.Open();
+                        UpdateAfterRequest("TaskDialog opened");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Delete24, "Primary", () =>
+                    {
+                        taskDialog.RequestPrimaryButtonClick();
+                        UpdateAfterRequest("Primary command completed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Archive24, "Secondary", () =>
+                    {
+                        taskDialog.RequestSecondaryButtonClick();
+                        UpdateAfterRequest("Secondary command completed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Dismiss24, "Close", () =>
+                    {
+                        taskDialog.RequestCloseButtonClick();
+                        UpdateAfterRequest("Close command completed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.CheckmarkCircle24, "Default", () =>
+                    {
+                        taskDialog.DefaultButton = taskDialog.DefaultButton == FWTaskDialogButton.Primary
+                            ? FWTaskDialogButton.Close
+                            : FWTaskDialogButton.Primary;
+                        output.Text = $"TaskDialog default button: {taskDialog.DefaultButton}.";
+                    })),
+                CreateDisclosureStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateSettingsExpanderSample()
+    {
+        var output = CreateDisclosureOutput("SettingsExpander: appearance settings open.");
+        var expander = new FWSettingsExpander
+        {
+            Header = "Appearance",
+            Description = "Theme, material, and density options grouped in settings rows.",
+            HeaderIcon = CreateIcon(FluentIconRegular.Settings24, 20, ThemeBrush("TextSecondary")),
+            IsExpanded = true,
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"),
+                    CreateSettingsRow("Window material", "Mica shell backdrop", FluentIconRegular.LayerDiagonalSparkle24, "Mica"),
+                    CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort")
+                }
+            }
+        };
+        expander.Expanded += (_, _) => output.Text = "SettingsExpander: appearance settings open.";
+        expander.Collapsed += (_, _) => output.Text = "SettingsExpander: appearance settings collapsed.";
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                expander,
+                CreateDisclosureButtonRow(
+                    CreateDisclosureActionButton(FluentIconRegular.PanelLeftExpand24, "Expand", () => expander.IsExpanded = true),
+                    CreateDisclosureActionButton(FluentIconRegular.PanelLeftContract24, "Collapse", () => expander.IsExpanded = false),
+                    CreateDisclosureActionButton(FluentIconRegular.TextDescription24, "Describe", () =>
+                    {
+                        expander.Description = expander.Description?.ToString()?.Contains("updated", StringComparison.OrdinalIgnoreCase) == true
+                            ? "Theme, material, and density options grouped in settings rows."
+                            : "Updated description shows SettingsExpander metadata can change live.";
+                        output.Text = "SettingsExpander description updated.";
+                    })),
+                CreateDisclosureStatus(output)
+            }
+        };
+    }
+
     private static UIElement CreateMaterialDisclosurePanelSample()
     {
         var output = CreateDisclosureOutput("Surface: LiquidGlass. Expander open, tooltip top, dialog primary.");
@@ -379,6 +508,19 @@ internal sealed class GalleryDisclosurePage
         };
     }
 
+    private static FWSettingsCard CreateSettingsRow(string header, string description, FluentIconRegular icon, string value)
+    {
+        return new FWSettingsCard
+        {
+            Header = header,
+            Description = description,
+            HeaderIcon = CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
+            ActionIcon = CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
+            Content = new FWButton { Content = value },
+            IsClickEnabled = true
+        };
+    }
+
     private static FWContentDialog CreateSampleContentDialog()
     {
         return new FWContentDialog
@@ -466,6 +608,8 @@ internal sealed class GalleryDisclosurePage
             "FWGroupBox" => "<FWGroupBox Header=\"Settings\">\n    <FWCheckBox Content=\"Sync group option\" />\n</FWGroupBox>",
             "FWToolTip" => "<FWButton Content=\"Hover for FWToolTip\">\n    <FWButton.ToolTip>\n        <FWToolTip Placement=\"Top\" />\n    </FWButton.ToolTip>\n</FWButton>",
             "FWContentDialog" => "<FWContentDialog Title=\"Save gallery changes?\" PrimaryButtonText=\"Save\" SecondaryButtonText=\"Review\" CloseButtonText=\"Cancel\" />",
+            "FWTaskDialog" => "<FWTaskDialog Title=\"Delete temporary layout cache?\" PrimaryButtonText=\"Delete\" SecondaryButtonText=\"Archive\" CloseButtonText=\"Cancel\" IsOpen=\"True\" />",
+            "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsCard Header=\"App theme\" />\n</FWSettingsExpander>",
             "Material disclosure panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWExpander Header=\"Surface options\" />\n    <FWGroupBox Header=\"Material settings\" />\n</FWFluentMaterialSurface>",
             _ => "<FWExpander />"
         };
