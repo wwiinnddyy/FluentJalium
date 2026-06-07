@@ -23,7 +23,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Gallery visibility gaps
 
-- Data depth: DataGrid/List/GridView now have direct Gallery coverage, but richer loading, empty, grouped, and high-density comparison states would make the collection story stronger.
+- Workflow depth: Gallery now covers the first-wave control/state matrix broadly; future visibility work should focus on longer end-to-end app patterns and diagnostics rather than raw page presence.
 
 ### Semantic-depth gaps
 
@@ -38,7 +38,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 1. Settings semantics package: continue deepening `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics where the current API is still thin.
 2. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
-3. Collection state package: extend FWListView/FWGridView/FWDataGrid samples with empty/loading/grouped/high-density states once the current direct `FWGridView` coverage is verified.
+3. Collection API semantics package: Gallery now demonstrates empty/loading/grouped/high-density states; consider native empty/loading/grouping APIs only if real app usage needs them beyond sample composition.
 
 ## Recently completed batches
 
@@ -50,3 +50,4 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Text input coverage: `FWAutoSuggestBox` has direct Gallery coverage, catalog metadata, registry-backed sample code, `QuerySubmitted`, `SuggestionChosen`, and text-change reason APIs while preserving `FWAutoCompleteBox` as the Jalium base.
 - Disclosure coverage: `FWTeachingTip` has a default popup presenter style, targeted tests, catalog metadata, and registry-backed sample code for placement/action/close states.
 - Materials coverage: `FWFluentWindowSurface` and derived material surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, and `FWFocusGlassSurface` are visible in Gallery with catalog metadata and copyable recipes.
+- Collection state coverage: `FWListView`, `FWGridView`, `FWListBox`, and `FWDataGrid` now show empty, loading, grouped, compact, comfortable, and spacious states in Gallery with updated catalog search metadata and registry-backed sample code.

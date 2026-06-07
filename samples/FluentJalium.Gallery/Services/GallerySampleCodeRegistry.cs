@@ -132,26 +132,37 @@ var repeater = new FWItemsRepeater
 };
 """,
         ["collections.gridview"] = """
-var gridView = new FWGridView
+var emptyList = new FWListView
 {
-    Width = 460,
-    Height = 190,
-    SelectionMode = SelectionMode.Single,
-    Density = FWCollectionDensity.Comfortable,
-    ItemsSource = rows
+    Density = FWCollectionDensity.Compact,
+    ItemsSource = Array.Empty<GalleryRow>()
 };
 
-if (gridView.View is GridView view)
+var loadingGrid = new FWGridView
 {
-    view.Columns.Add(new GridViewColumn { Header = "Control", DisplayMemberBinding = new Binding("Name") });
-    view.Columns.Add(new GridViewColumn { Header = "State", DisplayMemberBinding = new Binding("State") });
-}
+    Density = FWCollectionDensity.Compact,
+    IsEnabled = false,
+    ItemsSource = loadingRows
+};
 
-gridView.Items.Add(new FWGridViewItem
+var loadingProgress = new FWProgressBar
 {
-    Content = "Disabled container state",
-    IsEnabled = false
-});
+    Density = FWRangeDensity.Compact,
+    IsIndeterminate = true
+};
+
+var groupedList = new FWListBox
+{
+    Density = FWCollectionDensity.Compact,
+    ItemsSource = groupedRows
+};
+
+var compactTable = new FWDataGrid
+{
+    Density = FWDataGridDensity.Compact,
+    AutoGenerateColumns = false,
+    ItemsSource = rows
+};
 """,
         ["charts.family"] = """
 var chart = new FWLineChart

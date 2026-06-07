@@ -18,6 +18,8 @@ using FWGridViewItem = FluentJalium.Controls.FWGridViewItem;
 using FWListBox = FluentJalium.Controls.FWListBox;
 using FWListBoxItem = FluentJalium.Controls.FWListBoxItem;
 using FWListView = FluentJalium.Controls.FWListView;
+using FWProgressBar = FluentJalium.Controls.FWProgressBar;
+using FWRangeDensity = FluentJalium.Controls.FWRangeDensity;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTreeDataGrid = FluentJalium.Controls.FWTreeDataGrid;
@@ -54,6 +56,16 @@ internal sealed class GalleryCollectionsPage
             "FWGridView / FWGridViewItem",
             "Dedicated grid rows with columns, selection, density, and item container states.",
             CreateGridViewCollectionSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            FluentIconRegular.CollectionsEmpty24,
+            "Collection states",
+            "Empty, loading, grouped, and action-ready collection states for WinUI-style data pages.",
+            CreateCollectionStatesSample()));
+        examples.Children.Add(CreateCollectionExampleCard(
+            FluentIconRegular.TextDensity24,
+            "Density comparison",
+            "Compact, comfortable, and spacious collection density presets shown side by side.",
+            CreateDensityComparisonSample()));
         examples.Children.Add(CreateCollectionExampleCard(
             FluentIconRegular.BranchFork24,
             "FWTreeView",
@@ -315,6 +327,282 @@ internal sealed class GalleryCollectionsPage
                 CreateCollectionStatus(output)
             }
         };
+    }
+
+    private static UIElement CreateCollectionStatesSample()
+    {
+        var output = CreateCollectionOutput("States: empty list, loading grid, and grouped settings rows.");
+        var emptyList = new FWListView
+        {
+            Width = 220,
+            Height = 96,
+            Density = FWCollectionDensity.Compact
+        };
+        var loadingGrid = CreateLoadingGridState();
+        var progress = new FWProgressBar
+        {
+            Width = 220,
+            Density = FWRangeDensity.Compact,
+            IsIndeterminate = true
+        };
+        var groupedList = CreateGroupedStateList();
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 18,
+                    VerticalSpacing = 12,
+                    Children =
+                    {
+                        CreateCollectionStateColumn(
+                            "Empty",
+                            emptyList,
+                            new FWTextBlock
+                            {
+                                Text = "No controls match this filter.",
+                                FontSize = 12,
+                                Foreground = ThemeBrush("TextSecondary")
+                            }),
+                        CreateCollectionStateColumn(
+                            "Loading",
+                            loadingGrid,
+                            progress)
+                    }
+                },
+                CreateCollectionStateColumn("Grouped", groupedList),
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Load list", () =>
+                    {
+                        emptyList.Items.Clear();
+                        emptyList.Items.Add("FWListView - Active");
+                        emptyList.Items.Add("FWDataGrid - Updated");
+                        emptyList.SelectedIndex = 0;
+                        output.Text = "States: empty list replaced with loaded rows.";
+                    }),
+                    CreateCollectionActionButton("Clear list", () =>
+                    {
+                        emptyList.Items.Clear();
+                        output.Text = "States: empty list restored.";
+                    }),
+                    CreateCollectionActionButton("Finish load", () =>
+                    {
+                        loadingGrid.IsEnabled = true;
+                        progress.IsIndeterminate = false;
+                        progress.Value = 100;
+                        output.Text = "States: loading grid completed and enabled.";
+                    })),
+                CreateCollectionStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateDensityComparisonSample()
+    {
+        var rows = GallerySampleData.CreateRows();
+        var output = CreateCollectionOutput("Density: compact. List item height: 32. Table row height: 26.");
+        var listItems = rows.Select(row => new FWListBoxItem
+        {
+            Content = $"{row.Name} / {row.State}",
+            Density = FWCollectionDensity.Compact
+        }).ToArray();
+        var listBox = new FWListBox
+        {
+            Width = 220,
+            Height = 120,
+            Density = FWCollectionDensity.Compact,
+            SelectionMode = SelectionMode.Single
+        };
+        foreach (var item in listItems)
+        {
+            listBox.Items.Add(item);
+        }
+        listBox.SelectedIndex = 1;
+
+        var gridItems = rows.Select(row => new FWGridViewItem
+        {
+            Content = row,
+            Density = FWCollectionDensity.Compact
+        }).ToArray();
+        var gridView = new FWGridView
+        {
+            Width = 220,
+            Height = 120,
+            Density = FWCollectionDensity.Compact,
+            SelectionMode = SelectionMode.Single
+        };
+        if (gridView.View is GridView view)
+        {
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "Name",
+                DisplayMemberBinding = new Binding("Content.Name"),
+                Width = 115
+            });
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "State",
+                DisplayMemberBinding = new Binding("Content.State"),
+                Width = 88
+            });
+        }
+
+        foreach (var item in gridItems)
+        {
+            gridView.Items.Add(item);
+        }
+        gridView.SelectedIndex = 0;
+
+        var dataGrid = CreateSampleDataGrid(rows, width: 470, height: 126);
+        dataGrid.Density = FWDataGridDensity.Compact;
+        dataGrid.SelectedIndex = 0;
+
+        void ApplyDensity(string label, FWCollectionDensity collectionDensity, FWDataGridDensity dataGridDensity)
+        {
+            listBox.Density = collectionDensity;
+            gridView.Density = collectionDensity;
+            dataGrid.Density = dataGridDensity;
+
+            foreach (var item in listItems)
+            {
+                item.Density = collectionDensity;
+            }
+
+            foreach (var item in gridItems)
+            {
+                item.Density = collectionDensity;
+            }
+
+            output.Text = $"Density: {label}. List item height: {listItems[0].MinHeight:0}. Table row height: {dataGrid.RowHeight:0}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 18,
+                    VerticalSpacing = 12,
+                    Children =
+                    {
+                        CreateCollectionStateColumn("FWListBox", listBox),
+                        CreateCollectionStateColumn("FWGridView", gridView),
+                        CreateCollectionStateColumn("FWDataGrid", dataGrid)
+                    }
+                },
+                CreateCollectionButtonRow(
+                    CreateCollectionActionButton("Compact", () => ApplyDensity("compact", FWCollectionDensity.Compact, FWDataGridDensity.Compact)),
+                    CreateCollectionActionButton("Comfortable", () => ApplyDensity("comfortable", FWCollectionDensity.Comfortable, FWDataGridDensity.Comfortable)),
+                    CreateCollectionActionButton("Spacious", () => ApplyDensity("spacious", FWCollectionDensity.Spacious, FWDataGridDensity.Spacious))),
+                CreateCollectionStatus(output)
+            }
+        };
+    }
+
+    private static FWGridView CreateLoadingGridState()
+    {
+        var loadingGrid = new FWGridView
+        {
+            Width = 220,
+            Height = 96,
+            Density = FWCollectionDensity.Compact,
+            IsEnabled = false
+        };
+
+        if (loadingGrid.View is GridView view)
+        {
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "Control",
+                DisplayMemberBinding = new Binding("Content.Name"),
+                Width = 118
+            });
+            view.Columns.Add(new GridViewColumn
+            {
+                Header = "State",
+                DisplayMemberBinding = new Binding("Content.State"),
+                Width = 82
+            });
+        }
+
+        loadingGrid.Items.Add(new FWGridViewItem
+        {
+            Content = new GalleryRow("Rows", "Loading", 0),
+            Density = FWCollectionDensity.Compact,
+            IsEnabled = false
+        });
+        loadingGrid.Items.Add(new FWGridViewItem
+        {
+            Content = new GalleryRow("Tokens", "Pending", 0),
+            Density = FWCollectionDensity.Compact,
+            IsEnabled = false
+        });
+
+        return loadingGrid;
+    }
+
+    private static FWListBox CreateGroupedStateList()
+    {
+        var groupedList = new FWListBox
+        {
+            Width = 470,
+            Height = 148,
+            Density = FWCollectionDensity.Compact,
+            SelectionMode = SelectionMode.Single
+        };
+
+        groupedList.Items.Add(CreateGroupHeader("Input"));
+        groupedList.Items.Add("FWAutoSuggestBox - Query ready");
+        groupedList.Items.Add("FWRadioButtons - Selected");
+        groupedList.Items.Add(CreateGroupHeader("Data"));
+        groupedList.Items.Add("FWGridView - Group row");
+        groupedList.Items.Add("FWDataGrid - High density");
+        groupedList.SelectedIndex = 1;
+
+        return groupedList;
+    }
+
+    private static FWListBoxItem CreateGroupHeader(string text)
+    {
+        return new FWListBoxItem
+        {
+            Content = text,
+            Density = FWCollectionDensity.Compact,
+            IsEnabled = false
+        };
+    }
+
+    private static FWStackPanel CreateCollectionStateColumn(string title, UIElement content, UIElement? footer = null)
+    {
+        var column = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 6,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = title,
+                    FontSize = 12,
+                    Foreground = ThemeBrush("TextSecondary")
+                },
+                content
+            }
+        };
+
+        if (footer != null)
+        {
+            column.Children.Add(footer);
+        }
+
+        return column;
     }
 
     private static UIElement CreateTreeViewCollectionSample()
@@ -644,6 +932,8 @@ internal sealed class GalleryCollectionsPage
             "FWListBox" => "<FWListBox SelectionMode=\"Multiple\">\n    <FWListBoxItem Content=\"Fluent tokens\" />\n</FWListBox>",
             "FWListView" => "<FWListView ItemsSource=\"{Binding Rows}\">\n    <FWListView.View>\n        <GridView />\n    </FWListView.View>\n</FWListView>",
             "FWGridView / FWGridViewItem" => "<FWGridView SelectionMode=\"Single\" SelectedIndex=\"1\" Density=\"Comfortable\">\n    <FWGridView.View>\n        <GridView>\n            <GridViewColumn Header=\"Name\" DisplayMemberBinding=\"{Binding Content.Name}\" />\n        </GridView>\n    </FWGridView.View>\n    <FWGridViewItem Content=\"{Binding ActiveRow}\" IsSelected=\"True\" />\n    <FWGridViewItem Content=\"{Binding DisabledRow}\" IsEnabled=\"False\" />\n</FWGridView>",
+            "Collection states" => "<FWListView ItemsSource=\"{Binding EmptyRows}\" />\n<FWGridView IsEnabled=\"False\" ItemsSource=\"{Binding LoadingRows}\" />\n<FWProgressBar IsIndeterminate=\"True\" />\n<FWListBox ItemsSource=\"{Binding GroupedRows}\" />",
+            "Density comparison" => "<FWListBox Density=\"Compact\" />\n<FWGridView Density=\"Comfortable\" />\n<FWDataGrid Density=\"Spacious\" />",
             "FWTreeView" => "<FWTreeView>\n    <FWTreeViewItem Header=\"Workspace\" IsExpanded=\"True\" />\n</FWTreeView>",
             "FWDataGrid" => "<FWDataGrid AutoGenerateColumns=\"False\" GridLinesVisibility=\"All\" HeadersVisibility=\"All\" />",
             "FWTreeDataGrid" => "<FWTreeDataGrid ChildrenSelector=\"{Binding Children}\" GridLinesVisibility=\"Horizontal\" />",
