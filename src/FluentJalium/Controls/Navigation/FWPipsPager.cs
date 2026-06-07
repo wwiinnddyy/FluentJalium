@@ -32,11 +32,11 @@ public class FWPipsPager : Control, IFluentJaliumControl
 
     public static readonly DependencyProperty PreviousButtonVisibilityProperty =
         DependencyProperty.Register(nameof(PreviousButtonVisibility), typeof(PipsPagerButtonVisibility), typeof(FWPipsPager),
-            new PropertyMetadata(PipsPagerButtonVisibility.Visible));
+            new PropertyMetadata(PipsPagerButtonVisibility.Visible, OnButtonVisibilityChanged));
 
     public static readonly DependencyProperty NextButtonVisibilityProperty =
         DependencyProperty.Register(nameof(NextButtonVisibility), typeof(PipsPagerButtonVisibility), typeof(FWPipsPager),
-            new PropertyMetadata(PipsPagerButtonVisibility.Visible));
+            new PropertyMetadata(PipsPagerButtonVisibility.Visible, OnButtonVisibilityChanged));
 
     public static readonly RoutedEvent SelectedIndexChangedEvent =
         EventManager.RegisterRoutedEvent(nameof(SelectedIndexChanged), RoutingStrategy.Bubble,
@@ -140,16 +140,16 @@ public class FWPipsPager : Control, IFluentJaliumControl
         UpdateNavigationButtons();
     }
 
-    private static object CoerceNumberOfPages(DependencyObject d, object baseValue)
+    private static object CoerceNumberOfPages(DependencyObject d, object? baseValue)
     {
-        int value = (int)baseValue;
+        var value = ReadInt(baseValue);
         return Math.Max(0, value);
     }
 
-    private static object CoerceSelectedPageIndex(DependencyObject d, object baseValue)
+    private static object CoerceSelectedPageIndex(DependencyObject d, object? baseValue)
     {
         var pager = (FWPipsPager)d;
-        int value = (int)baseValue;
+        var value = ReadInt(baseValue);
         return Math.Max(0, Math.Min(value, pager.NumberOfPages - 1));
     }
 
@@ -172,8 +172,8 @@ public class FWPipsPager : Control, IFluentJaliumControl
 
             var args = new SelectedIndexChangedEventArgs(SelectedIndexChangedEvent, pager)
             {
-                OldIndex = (int)e.OldValue,
-                NewIndex = (int)e.NewValue
+                OldIndex = ReadInt(e.OldValue),
+                NewIndex = ReadInt(e.NewValue)
             };
             pager.RaiseEvent(args);
         }
@@ -192,6 +192,14 @@ public class FWPipsPager : Control, IFluentJaliumControl
         if (d is FWPipsPager pager)
         {
             pager.UpdatePips();
+        }
+    }
+
+    private static void OnButtonVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWPipsPager pager)
+        {
+            pager.UpdateNavigationButtons();
         }
     }
 
@@ -300,6 +308,11 @@ public class FWPipsPager : Control, IFluentJaliumControl
             PipsPagerButtonVisibility.VisibleOnPointerOver => canNavigate ? Visibility.Visible : Visibility.Collapsed,
             _ => Visibility.Visible
         };
+    }
+
+    private static int ReadInt(object? value)
+    {
+        return value is int number ? number : 0;
     }
 }
 

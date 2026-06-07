@@ -84,6 +84,8 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
+            AssertOwnedStyle<FWBreadcrumbBar>(app.Resources);
+            AssertOwnedStyle<FWPipsPager>(app.Resources);
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
@@ -311,6 +313,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<NavigationViewItem>(dictionary);
         AssertContainsStyle<NavigationViewItemHeader>(dictionary);
         AssertContainsStyle<NavigationViewItemSeparator>(dictionary);
+        AssertContainsStyle<FWBreadcrumbBar>(dictionary);
+        AssertContainsStyle<FWPipsPager>(dictionary);
         AssertContainsStyle<TabControl>(dictionary);
         AssertContainsStyle<TabItem>(dictionary);
         AssertContainsStyle<Frame>(dictionary);
@@ -1032,6 +1036,8 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
+            AssertOwnedStyle<FWBreadcrumbBar>(app.Resources);
+            AssertOwnedStyle<FWPipsPager>(app.Resources);
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
@@ -1283,8 +1289,14 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWNavigationViewItem, NavigationViewItem>();
         AssertFluentControl<FWNavigationViewItemHeader, NavigationViewItemHeader>();
         AssertFluentControl<FWNavigationViewItemSeparator, NavigationViewItemSeparator>();
+        AssertFluentControl<FWBreadcrumbBar, Control>();
+        AssertFluentControl<FWPipsPager, Control>();
         AssertFluentControl<FWTabControl, TabControl>();
         AssertFluentControl<FWTabItem, TabItem>();
+        AssertFluentControl<FWTabView, Selector>();
+        AssertFluentControl<FWTabViewItem, TabItem>();
+        AssertFluentControl<FWSelectorBar, Selector>();
+        AssertFluentControl<FWSelectorBarItem, ContentControl>();
         AssertFluentControl<FWFrame, Frame>();
     }
 

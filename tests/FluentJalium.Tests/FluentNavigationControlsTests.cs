@@ -75,6 +75,8 @@ public sealed class FluentNavigationControlsTests
             AssertBasedOnStyle<FWNavigationViewItem, NavigationViewItem>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemHeader, NavigationViewItemHeader>(app.Resources);
             AssertBasedOnStyle<FWNavigationViewItemSeparator, NavigationViewItemSeparator>(app.Resources);
+            AssertStyle<FWBreadcrumbBar>(app.Resources);
+            AssertStyle<FWPipsPager>(app.Resources);
             AssertBasedOnStyle<FWTabControl, TabControl>(app.Resources);
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertStyle<FWTabView>(app.Resources);
@@ -117,6 +119,16 @@ public sealed class FluentNavigationControlsTests
         var fwNavigationItemStyle = AssertStyle<FWNavigationViewItem>(dictionary);
         Assert.Equal(typeof(NavigationViewItem), fwNavigationItemStyle.BasedOn?.TargetType);
         AssertSetter(fwNavigationItemStyle, FWNavigationViewItem.DensityProperty);
+
+        var breadcrumbBarStyle = AssertStyle<FWBreadcrumbBar>(dictionary);
+        AssertSetter(breadcrumbBarStyle, FWBreadcrumbBar.DensityProperty);
+        AssertSetter(breadcrumbBarStyle, FWBreadcrumbBar.MaxItemsProperty);
+
+        var pipsPagerStyle = AssertStyle<FWPipsPager>(dictionary);
+        AssertSetter(pipsPagerStyle, FWPipsPager.NumberOfPagesProperty);
+        AssertSetter(pipsPagerStyle, FWPipsPager.MaxVisiblePipsProperty);
+        AssertSetter(pipsPagerStyle, FWPipsPager.PreviousButtonVisibilityProperty);
+        AssertSetter(pipsPagerStyle, FWPipsPager.NextButtonVisibilityProperty);
 
         var tabControlStyle = AssertStyle<TabControl>(dictionary);
         AssertSetter(tabControlStyle, Control.BackgroundProperty);
@@ -218,6 +230,69 @@ public sealed class FluentNavigationControlsTests
 
         Assert.Equal(32, tabItem.MinHeight);
         Assert.Equal(new Thickness(12, 7, 12, 7), tabItem.Padding);
+    }
+
+    [Fact]
+    public void FWBreadcrumbBar_ShouldExposeDensityItemsAndMaxItemsState()
+    {
+        var breadcrumbBar = new FWBreadcrumbBar
+        {
+            ItemsSource = new[] { "Home", "Library", "Docs", "Controls" },
+            MaxItems = 3
+        };
+
+        Assert.Equal(FWNavigationDensity.Comfortable, breadcrumbBar.Density);
+        Assert.Equal(36, breadcrumbBar.MinHeight);
+        Assert.Equal(new Thickness(10, 6, 10, 6), breadcrumbBar.Padding);
+        Assert.Equal(3, breadcrumbBar.MaxItems);
+        Assert.NotNull(breadcrumbBar.ItemsSource);
+
+        breadcrumbBar.Density = FWNavigationDensity.Compact;
+
+        Assert.Equal(32, breadcrumbBar.MinHeight);
+        Assert.Equal(new Thickness(8, 4, 8, 4), breadcrumbBar.Padding);
+
+        breadcrumbBar.Density = FWNavigationDensity.Spacious;
+
+        Assert.Equal(44, breadcrumbBar.MinHeight);
+        Assert.Equal(new Thickness(12, 8, 12, 8), breadcrumbBar.Padding);
+    }
+
+    [Fact]
+    public void FWPipsPager_ShouldCoerceSelectionAndExposeNavigationState()
+    {
+        var pager = new FWPipsPager
+        {
+            NumberOfPages = 4,
+            MaxVisiblePips = 3
+        };
+        var changes = new List<(int OldIndex, int NewIndex)>();
+        pager.SelectedIndexChanged += (_, args) => changes.Add((args.OldIndex, args.NewIndex));
+
+        pager.SelectedPageIndex = 2;
+
+        Assert.Equal(2, pager.SelectedPageIndex);
+        Assert.Single(changes);
+        Assert.Equal((0, 2), changes[0]);
+
+        pager.SelectedPageIndex = 99;
+
+        Assert.Equal(3, pager.SelectedPageIndex);
+        Assert.Equal((2, 3), changes[^1]);
+
+        pager.NumberOfPages = 2;
+
+        Assert.Equal(2, pager.NumberOfPages);
+        Assert.Equal(1, pager.SelectedPageIndex);
+        Assert.Equal(3, pager.MaxVisiblePips);
+
+        pager.PreviousButtonVisibility = PipsPagerButtonVisibility.VisibleOnPointerOver;
+        pager.NextButtonVisibility = PipsPagerButtonVisibility.Collapsed;
+        pager.Orientation = Orientation.Vertical;
+
+        Assert.Equal(PipsPagerButtonVisibility.VisibleOnPointerOver, pager.PreviousButtonVisibility);
+        Assert.Equal(PipsPagerButtonVisibility.Collapsed, pager.NextButtonVisibility);
+        Assert.Equal(Orientation.Vertical, pager.Orientation);
     }
 
     [Fact]

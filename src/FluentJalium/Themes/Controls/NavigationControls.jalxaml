@@ -215,6 +215,91 @@
 
     <Style TargetType="fluent:FWNavigationViewItemSeparator" BasedOn="{StaticResource {x:Type NavigationViewItemSeparator}}" />
 
+    <Style TargetType="fluent:FWBreadcrumbBar">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="10,6,10,6" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Density" Value="Comfortable" />
+        <Setter Property="MaxItems" Value="5" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWBreadcrumbBar">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ItemsControl Name="PART_ItemsControl">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="4" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="fluent:FWPipsPager">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="NumberOfPages" Value="5" />
+        <Setter Property="MaxVisiblePips" Value="7" />
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="PreviousButtonVisibility" Value="Visible" />
+        <Setter Property="NextButtonVisibility" Value="Visible" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWPipsPager">
+                <StackPanel Name="PART_RootPanel"
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <Button Name="PART_PreviousButton"
+                            Content="&lt;"
+                            Width="32"
+                            Height="32" />
+                    <StackPanel Name="PART_PipsPanel"
+                                Orientation="Horizontal"
+                                Spacing="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                    <Button Name="PART_NextButton"
+                            Content="&gt;"
+                            Width="32"
+                            Height="32" />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter TargetName="PART_RootPanel" Property="Orientation" Value="Vertical" />
+                <Setter TargetName="PART_PipsPanel" Property="Orientation" Value="Vertical" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="TabControl">
         <Setter Property="Background" Value="{ThemeResource TabContentBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
