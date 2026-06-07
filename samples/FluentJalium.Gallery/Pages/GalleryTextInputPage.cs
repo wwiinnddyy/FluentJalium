@@ -5,6 +5,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
+using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
@@ -16,6 +17,7 @@ using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
+using FWTextInputDensity = FluentJalium.Controls.FWTextInputDensity;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
@@ -46,6 +48,11 @@ internal sealed class GalleryTextInputPage
             "FWAutoCompleteBox",
             "Contains filtering, drop-down state, suggestion counts, and search-style placeholder text.",
             CreateAutoCompleteInputSample()));
+        examples.Children.Add(CreateTextInputExampleCard(
+            FluentIconRegular.SearchSparkle24,
+            "FWAutoSuggestBox",
+            "WinUI-style suggest naming with filtering, drop-down state, density, and live suggestion counts.",
+            CreateAutoSuggestInputSample()));
         examples.Children.Add(CreateTextInputExampleCard(
             FluentIconRegular.DocumentText24,
             "FWRichTextBox",
@@ -247,6 +254,68 @@ internal sealed class GalleryTextInputPage
         };
     }
 
+    private static UIElement CreateAutoSuggestInputSample()
+    {
+        var output = CreateTextInputOutput("AutoSuggestBox: ready");
+        var autoSuggestBox = new FWAutoSuggestBox
+        {
+            Width = 320,
+            ItemsSource = SearchItems,
+            Text = "Auto",
+            PlaceholderText = "Search FluentJalium",
+            FilterMode = AutoCompleteFilterMode.Contains,
+            MinimumPrefixLength = 1,
+            Density = FWTextInputDensity.Comfortable
+        };
+
+        void UpdateOutput(string reason)
+        {
+            output.Text = $"{reason}: {autoSuggestBox.Text}, matches: {autoSuggestBox.FilteredItems.Count}, density: {FormatDensity(autoSuggestBox.Density)}, drop-down: {FormatOnOff(autoSuggestBox.IsDropDownOpen)}";
+        }
+
+        autoSuggestBox.TextChanged += (_, _) => UpdateOutput("Suggest");
+        autoSuggestBox.DropDownOpened += (_, _) => UpdateOutput("Drop-down open");
+        autoSuggestBox.DropDownClosed += (_, _) => UpdateOutput("Drop-down closed");
+        UpdateOutput("Suggest");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                autoSuggestBox,
+                CreateTextInputButtonRow(
+                    CreateTextInputActionButton(FluentIconRegular.Search24, "Auto", () =>
+                    {
+                        autoSuggestBox.Text = "Auto";
+                        UpdateOutput("Suggest");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.SearchSparkle24, "Calendar", () =>
+                    {
+                        autoSuggestBox.Text = "Calendar";
+                        UpdateOutput("Suggest");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    {
+                        autoSuggestBox.Density = NextDensity(autoSuggestBox.Density);
+                        UpdateOutput("Density");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.ChevronDown24, "Drop-down", () =>
+                    {
+                        autoSuggestBox.IsDropDownOpen = !autoSuggestBox.IsDropDownOpen;
+                        UpdateOutput("Drop-down");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.DismissCircle24, "Clear", () =>
+                    {
+                        autoSuggestBox.Text = string.Empty;
+                        UpdateOutput("Clear");
+                    })),
+                CreateTextInputStatus(output)
+            }
+        };
+    }
+
     private static UIElement CreateRichTextInputSample()
     {
         var output = CreateTextInputOutput("RichTextBox: ready");
@@ -290,14 +359,15 @@ internal sealed class GalleryTextInputPage
     private static UIElement CreateMaterialInputPanelSample()
     {
         var output = CreateTextInputOutput("Material inputs: LiquidGlass, search ready, number 24.");
-        var searchBox = new FWAutoCompleteBox
+        var searchBox = new FWAutoSuggestBox
         {
             Width = 480,
             ItemsSource = SearchItems,
             Text = "Fluent",
             PlaceholderText = "Search FluentJalium",
             FilterMode = AutoCompleteFilterMode.Contains,
-            MinimumPrefixLength = 1
+            MinimumPrefixLength = 1,
+            Density = FWTextInputDensity.Comfortable
         };
         var numberBox = new FWNumberBox
         {
@@ -416,8 +486,9 @@ internal sealed class GalleryTextInputPage
             "FWTextBox" => "<FWTextBox PlaceholderText=\"Enter text\" />\n<FWTextBox AcceptsReturn=\"True\" TextWrapping=\"Wrap\" />",
             "FWPasswordBox and FWNumberBox" => "<FWPasswordBox RevealMode=\"Visible\" PlaceholderText=\"Password\" />\n<FWNumberBox Minimum=\"0\" Maximum=\"100\" Value=\"42\" SpinButtonPlacementMode=\"Inline\" />",
             "FWAutoCompleteBox" => "<FWAutoCompleteBox ItemsSource=\"{Binding SearchItems}\" FilterMode=\"Contains\" MinimumPrefixLength=\"1\" />",
+            "FWAutoSuggestBox" => "<FWAutoSuggestBox ItemsSource=\"{Binding SearchItems}\"\n                  Text=\"Auto\"\n                  FilterMode=\"Contains\"\n                  MinimumPrefixLength=\"1\"\n                  Density=\"Comfortable\" />",
             "FWRichTextBox" => "<FWRichTextBox AcceptsTab=\"True\" IsSpellCheckEnabled=\"True\" />",
-            "Material input panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWTextBox PlaceholderText=\"Search FluentJalium\" />\n</FWFluentMaterialSurface>",
+            "Material input panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWAutoSuggestBox PlaceholderText=\"Search FluentJalium\" />\n</FWFluentMaterialSurface>",
             _ => "<FWTextBox />"
         };
     }
@@ -519,6 +590,26 @@ internal sealed class GalleryTextInputPage
         };
     }
 
+    private static FWTextInputDensity NextDensity(FWTextInputDensity density)
+    {
+        return density switch
+        {
+            FWTextInputDensity.Compact => FWTextInputDensity.Comfortable,
+            FWTextInputDensity.Comfortable => FWTextInputDensity.Spacious,
+            _ => FWTextInputDensity.Compact
+        };
+    }
+
+    private static string FormatDensity(FWTextInputDensity density)
+    {
+        return density switch
+        {
+            FWTextInputDensity.Compact => "compact",
+            FWTextInputDensity.Spacious => "spacious",
+            _ => "comfortable"
+        };
+    }
+
     private static NumberBoxSpinButtonPlacementMode NextSpinPlacement(NumberBoxSpinButtonPlacementMode mode)
     {
         return mode switch
@@ -599,6 +690,7 @@ internal sealed class GalleryTextInputPage
         "PasswordBox",
         "NumberBox",
         "AutoCompleteBox",
+        "AutoSuggestBox",
         "RichTextBox"
     ];
 }

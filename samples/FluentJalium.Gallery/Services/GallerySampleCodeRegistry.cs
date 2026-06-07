@@ -11,6 +11,23 @@ internal static class GallerySampleCodeRegistry
         ["catalog.filter.updated"] = CreateCatalogFilterSample("Updated"),
         ["catalog.filter.preview"] = CreateCatalogFilterSample("Preview"),
         ["catalog.filter.diagnostic"] = CreateCatalogFilterSample("Diagnostic"),
+        ["textinput.autosuggestbox"] = """
+var autoSuggestBox = new FWAutoSuggestBox
+{
+    Width = 320,
+    ItemsSource = new[] { "Fluent tokens", "Fluent controls", "WinUI Gallery", "AutoSuggestBox" },
+    Text = "Fl",
+    PlaceholderText = "Search controls",
+    FilterMode = AutoCompleteFilterMode.Contains,
+    MinimumPrefixLength = 1,
+    Density = FWTextInputDensity.Comfortable
+};
+
+autoSuggestBox.TextChanged += (_, _) =>
+{
+    var matchCount = autoSuggestBox.FilteredItems.Count;
+};
+""",
         ["selection.radiobuttons"] = """
 var radioButtons = new FWRadioButtons
 {
