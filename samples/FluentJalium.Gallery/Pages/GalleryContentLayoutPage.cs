@@ -1,7 +1,9 @@
+using System.Windows.Input;
 using FluentJalium.Icon;
 using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using FWAccessText = FluentJalium.Controls.FWAccessText;
@@ -242,7 +244,11 @@ internal sealed class GalleryContentLayoutPage
 
     private static UIElement CreateAdaptiveSettingsLayoutSample()
     {
-        var output = CreateLayoutOutput("TwoPaneView: Wide, priority Pane1.");
+        var output = CreateLayoutOutput("TwoPaneView: Wide, priority Pane1. SettingsCard command enabled.");
+        var configureCommand = new GalleryLayoutCommand(parameter =>
+        {
+            output.Text = $"SettingsCard command executed: {parameter}.";
+        });
         var modeCard = new FWSettingsCard
         {
             Header = "Display mode",
@@ -250,7 +256,10 @@ internal sealed class GalleryContentLayoutPage
             HeaderIcon = CreateIcon(FluentIconRegular.LayoutColumnTwo24, 18, ThemeBrush("TextSecondary")),
             ActionIcon = CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
             Content = new FWButton { Content = "Configure" },
-            IsClickEnabled = true
+            IsClickEnabled = true,
+            Command = configureCommand,
+            CommandParameter = "display-mode",
+            ClickMode = ClickMode.Release
         };
         var syncCard = new FWSettingsCard
         {
@@ -319,6 +328,27 @@ internal sealed class GalleryContentLayoutPage
                             ? FWTwoPaneViewPriority.Pane2
                             : FWTwoPaneViewPriority.Pane1;
                         UpdateState("Pane priority toggled");
+                    })),
+                CreateLayoutButtonRow(
+                    CreateLayoutActionButton(FluentIconRegular.CursorClick24, "Invoke card", () =>
+                    {
+                        if (!modeCard.PerformClick())
+                        {
+                            output.Text = $"SettingsCard blocked. CanExecute: {modeCard.CanExecute}.";
+                        }
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.Power24, "Command", () =>
+                    {
+                        configureCommand.CanExecuteResult = !configureCommand.CanExecuteResult;
+                        configureCommand.RaiseCanExecuteChanged();
+                        output.Text = $"SettingsCard CanExecute: {modeCard.CanExecute}. IsEnabled: {modeCard.IsEnabled}.";
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.CursorHover24, "Hover mode", () =>
+                    {
+                        modeCard.ClickMode = modeCard.ClickMode == ClickMode.Hover
+                            ? ClickMode.Release
+                            : ClickMode.Hover;
+                        output.Text = $"SettingsCard ClickMode: {modeCard.ClickMode}.";
                     })),
                 CreateLayoutStatus(output)
             }
@@ -739,7 +769,7 @@ internal sealed class GalleryContentLayoutPage
             "Text and access text" => "<FWTextBlock Text=\"Selectable body copy\" IsTextSelectionEnabled=\"True\" />\n<FWAccessText Text=\"_Open command\" />",
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
-            "Adaptive settings layout" => "<FWTwoPaneView Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\" Description=\"Adaptive settings row\" />\n</FWTwoPaneView>",
+            "Adaptive settings layout" => "<FWTwoPaneView Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>",
             "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView HorizontalShift=\"18\" VerticalShift=\"28\" />",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
@@ -871,6 +901,32 @@ internal sealed class GalleryContentLayoutPage
                 }
             }
         };
+    }
+
+    private sealed class GalleryLayoutCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+
+        public GalleryLayoutCommand(Action<object?> execute)
+        {
+            _execute = execute;
+        }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecuteResult { get; set; } = true;
+
+        public bool CanExecute(object? parameter) => CanExecuteResult;
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static FWStackPanel CreateSection(string title)

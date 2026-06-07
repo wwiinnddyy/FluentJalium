@@ -83,8 +83,14 @@ var card = new FWSettingsCard
     Header = "Display mode",
     Description = "Switch between wide, tall, and single-pane layouts.",
     Content = new FWButton { Content = "Configure" },
-    IsClickEnabled = true
+    IsClickEnabled = true,
+    Command = ConfigureDisplayModeCommand,
+    CommandParameter = "display-mode",
+    ClickMode = ClickMode.Release
 };
+
+var canExecute = card.CanExecute;
+card.PerformClick();
 """,
         ["visuals.icons.richtext.personpicture.markdown.qrcode.shapes"] = """
 var visuals = new FWStackPanel
@@ -309,7 +315,29 @@ taskDialog.PrimaryButtonClick += (_, args) =>
     args.Cancel = false;
 };
 """,
-        ["disclosure.teachingtip"] = """
+        ["disclosure.settings.teachingtip"] = """
+var expander = new FWSettingsExpander
+{
+    Header = "Appearance",
+    Description = "Theme and material options",
+    IsExpanded = true
+};
+
+expander.AddSetting(new FWSettingsCard
+{
+    Header = "App theme",
+    Description = "Use system setting"
+});
+expander.AddSetting(new FWSettingsCard
+{
+    Header = "Window material",
+    Description = "Preview shell backdrop",
+    IsClickEnabled = true,
+    Command = PreviewMaterialCommand
+});
+
+var itemCount = expander.ItemCount;
+
 var target = new FWButton
 {
     Content = "Show onboarding tip"

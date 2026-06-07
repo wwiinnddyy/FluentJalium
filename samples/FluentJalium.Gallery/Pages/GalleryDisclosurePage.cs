@@ -636,7 +636,7 @@ internal sealed class GalleryDisclosurePage
 
     private static UIElement CreateSettingsExpanderSample()
     {
-        var output = CreateDisclosureOutput("SettingsExpander: appearance settings open.");
+        var output = CreateDisclosureOutput("SettingsExpander: appearance settings open. Items: 3.");
         var expander = new FWSettingsExpander
         {
             Header = "Appearance",
@@ -644,14 +644,15 @@ internal sealed class GalleryDisclosurePage
             HeaderIcon = CreateIcon(FluentIconRegular.Settings24, 20, ThemeBrush("TextSecondary")),
             IsExpanded = true
         };
-        expander.Items.Add(CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"));
-        expander.Items.Add(CreateCommandSettingsRow("Window material", "Preview the shell backdrop choice", FluentIconRegular.LayerDiagonalSparkle24, "Preview", () =>
+        expander.AddSetting(CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"));
+        expander.AddSetting(CreateCommandSettingsRow("Window material", "Preview the shell backdrop choice", FluentIconRegular.LayerDiagonalSparkle24, "Preview", () =>
         {
             output.Text = "SettingsExpander command: window material preview requested.";
         }));
-        expander.Items.Add(CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort"));
-        expander.Expanded += (_, _) => output.Text = "SettingsExpander: appearance settings open.";
-        expander.Collapsed += (_, _) => output.Text = "SettingsExpander: appearance settings collapsed.";
+        expander.AddSetting(CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort"));
+        expander.ItemsChanged += (_, e) => output.Text = $"SettingsExpander items: {expander.ItemCount}. Change: {e.Action}.";
+        expander.Expanded += (_, _) => output.Text = $"SettingsExpander: appearance settings open. Items: {expander.ItemCount}.";
+        expander.Collapsed += (_, _) => output.Text = $"SettingsExpander: appearance settings collapsed. Items: {expander.ItemCount}.";
 
         return new FWStackPanel
         {
@@ -669,6 +670,14 @@ internal sealed class GalleryDisclosurePage
                             ? "Theme, material, and density options grouped in settings rows."
                             : "Updated description shows SettingsExpander metadata can change live.";
                         output.Text = "SettingsExpander description updated.";
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Add24, "Add row", () =>
+                    {
+                        expander.AddSetting(CreateSettingsRow("Generated setting", "Added through the item host API", FluentIconRegular.Sparkle24, $"Row {expander.ItemCount + 1}"));
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Delete24, "Clear rows", () =>
+                    {
+                        expander.ClearSettings();
                     })),
                 CreateDisclosureStatus(output)
             }
@@ -934,7 +943,7 @@ internal sealed class GalleryDisclosurePage
             "FWTeachingTip" => "<FWButton x:Name=\"DensityButton\" Content=\"Open targeted tip\" />\n<FWTeachingTip Title=\"Review new density options\"\n               Subtitle=\"FWTeachingTip anchors guidance to a live target.\"\n               Target=\"{Binding ElementName=DensityButton}\"\n               ActionButtonContent=\"Apply\"\n               CloseButtonContent=\"Later\"\n               PreferredPlacement=\"Bottom\"\n               TailVisibility=\"Visible\">\n    <FWTeachingTip.HeroContent>\n        <FWBorder Background=\"{ThemeResource LayerFillColorDefaultBrush}\" />\n    </FWTeachingTip.HeroContent>\n    <FWTextBlock Text=\"Use targeted guidance for contextual onboarding.\" />\n</FWTeachingTip>",
             "FWContentDialog" => "<FWContentDialog Title=\"Save gallery changes?\" PrimaryButtonText=\"Save\" SecondaryButtonText=\"Review\" CloseButtonText=\"Cancel\" />",
             "FWTaskDialog" => "<FWTaskDialog Title=\"Delete temporary layout cache?\" PrimaryButtonText=\"Delete\" SecondaryButtonText=\"Archive\" CloseButtonText=\"Cancel\" IsOpen=\"True\" />",
-            "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsExpander.Items>\n        <FWSettingsCard Header=\"App theme\" />\n        <FWSettingsCard Header=\"Window material\" IsClickEnabled=\"True\" />\n        <FWSettingsCard Header=\"Control density\" />\n    </FWSettingsExpander.Items>\n</FWSettingsExpander>",
+            "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsCard Header=\"App theme\" />\n    <FWSettingsCard Header=\"Window material\" IsClickEnabled=\"True\" />\n    <FWSettingsCard Header=\"Control density\" />\n</FWSettingsExpander>",
             "Material disclosure panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWExpander Header=\"Surface options\" />\n    <FWGroupBox Header=\"Material settings\" />\n</FWFluentMaterialSurface>",
             _ => "<FWExpander />"
         };

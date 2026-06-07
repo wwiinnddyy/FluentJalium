@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
@@ -384,17 +385,32 @@ public sealed class FluentDisclosureControlsTests
             SettingsContent = settingsContent,
             Content = legacyContent
         };
+        var itemEvents = new List<NotifyCollectionChangedAction>();
+        expander.ItemsChanged += (_, e) => itemEvents.Add(e.Action);
 
-        expander.Items.Add(firstRow);
-        expander.Items.Add(secondRow);
+        var contentAttribute = typeof(FWSettingsExpander).GetCustomAttribute<ContentPropertyAttribute>();
+        Assert.Equal(nameof(FWSettingsExpander.Items), contentAttribute?.Name);
+
+        Assert.Equal(0, expander.ItemCount);
+
+        expander.AddSetting(firstRow);
+        expander.AddSetting(secondRow);
 
         Assert.Equal(2, expander.Items.Count);
-        Assert.Same(firstRow, expander.Items[0]);
-        Assert.Same(secondRow, expander.Items[1]);
+        Assert.Equal(2, expander.ItemCount);
+        Assert.Contains(firstRow, expander.Items);
+        Assert.Contains(secondRow, expander.Items);
         Assert.Same(itemTemplate, expander.ItemTemplate);
         Assert.Same(itemsPanel, expander.ItemsPanel);
         Assert.Same(settingsContent, expander.SettingsContent);
         Assert.Same(legacyContent, expander.Content);
+        Assert.Equal([NotifyCollectionChangedAction.Add, NotifyCollectionChangedAction.Add], itemEvents);
+
+        Assert.True(expander.RemoveSetting(firstRow));
+        Assert.Equal(1, expander.ItemCount);
+        Assert.Contains(NotifyCollectionChangedAction.Remove, itemEvents);
+
+        expander.AddSetting(firstRow);
 
         var rows = new ObservableCollection<object>
         {
@@ -407,6 +423,15 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.Same(rows, expander.ItemsSource);
         Assert.Equal(3, rows.Count);
+        Assert.Equal(3, expander.ItemCount);
+        Assert.Contains(NotifyCollectionChangedAction.Reset, itemEvents);
+        Assert.Equal(NotifyCollectionChangedAction.Add, itemEvents[^1]);
+
+        expander.ItemsSource = null;
+        expander.ClearSettings();
+
+        Assert.Equal(0, expander.ItemCount);
+        Assert.Contains(NotifyCollectionChangedAction.Reset, itemEvents);
     }
 
     [Fact]

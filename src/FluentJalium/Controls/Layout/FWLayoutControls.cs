@@ -955,6 +955,8 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 {
     private bool _isPointerPressed;
     private bool _isKeyboardPressed;
+    private bool _hasCommandCanExecuteOverride;
+    private bool _isEnabledBeforeCommandCanExecute = true;
 
     public static readonly DependencyProperty HeaderProperty =
         DependencyProperty.Register(nameof(Header), typeof(object), typeof(FWSettingsCard),
@@ -996,6 +998,12 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(FWSettingsCard),
             new PropertyMetadata(null, OnCommandParameterChanged));
 
+    private static readonly DependencyPropertyKey CanExecutePropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(CanExecute), typeof(bool), typeof(FWSettingsCard),
+            new PropertyMetadata(true));
+
+    public static readonly DependencyProperty CanExecuteProperty = CanExecutePropertyKey.DependencyProperty;
+
     public static readonly DependencyProperty ClickModeProperty =
         DependencyProperty.Register(nameof(ClickMode), typeof(ClickMode), typeof(FWSettingsCard),
             new PropertyMetadata(ClickMode.Release));
@@ -1010,6 +1018,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         Focusable = false;
         AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDownHandler));
         AddHandler(MouseUpEvent, new MouseButtonEventHandler(OnMouseUpHandler));
+        AddHandler(MouseEnterEvent, new MouseEventHandler(OnMouseEnterHandler));
         AddHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveHandler));
         AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownHandler));
         AddHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpHandler));
@@ -1083,6 +1092,12 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     {
         get => (IInputElement?)GetValue(CommandTargetProperty);
         set => SetValue(CommandTargetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool CanExecute
+    {
+        get => (bool)GetValue(CanExecuteProperty)!;
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
@@ -1169,12 +1184,26 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     private void UpdateCanExecute()
     {
         var command = Command;
-        if (command == null)
+        var canExecute = command == null || CanExecuteCommand(command);
+        SetValue(CanExecutePropertyKey.DependencyProperty, canExecute);
+
+        if (!canExecute)
         {
+            if (!_hasCommandCanExecuteOverride)
+            {
+                _isEnabledBeforeCommandCanExecute = IsEnabled;
+                _hasCommandCanExecuteOverride = true;
+            }
+
+            IsEnabled = false;
             return;
         }
 
-        IsEnabled = CanExecuteCommand(command);
+        if (_hasCommandCanExecuteOverride)
+        {
+            IsEnabled = _isEnabledBeforeCommandCanExecute;
+            _hasCommandCanExecuteOverride = false;
+        }
     }
 
     private bool CanInvoke()
@@ -1270,6 +1299,14 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         ReleaseMouseCapture();
     }
 
+    private void OnMouseEnterHandler(object sender, MouseEventArgs e)
+    {
+        if (ClickMode == ClickMode.Hover && CanInvoke())
+        {
+            Invoke();
+        }
+    }
+
     private void OnKeyDownHandler(object sender, KeyEventArgs e)
     {
         if (!CanInvoke())
@@ -1314,6 +1351,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 /// <summary>
 /// FluentJalium SettingsExpander control for grouped settings rows.
 /// </summary>
+[ContentProperty(nameof(Items))]
 public class FWSettingsExpander : Expander, IFluentJaliumControl
 {
     private readonly ObservableCollection<object> _items = new();
@@ -1343,6 +1381,12 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
         DependencyProperty.Register(nameof(ItemsPanel), typeof(ItemsPanelTemplate), typeof(FWSettingsExpander),
             new PropertyMetadata(null, OnItemsPresentationChanged));
 
+    private static readonly DependencyPropertyKey ItemCountPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(ItemCount), typeof(int), typeof(FWSettingsExpander),
+            new PropertyMetadata(0));
+
+    public static readonly DependencyProperty ItemCountProperty = ItemCountPropertyKey.DependencyProperty;
+
     public static readonly DependencyProperty SettingsContentProperty =
         DependencyProperty.Register(nameof(SettingsContent), typeof(object), typeof(FWSettingsExpander),
             new PropertyMetadata(null, OnSettingsPropertyChanged));
@@ -1354,7 +1398,10 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
     public FWSettingsExpander()
     {
         _items.CollectionChanged += OnItemsCollectionChanged;
+        UpdateItemCount();
     }
+
+    public event NotifyCollectionChangedEventHandler? ItemsChanged;
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
     public object? Description
@@ -1402,6 +1449,12 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public int ItemCount
+    {
+        get => (int)GetValue(ItemCountProperty)!;
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
     public object? SettingsContent
     {
         get => GetValue(SettingsContentProperty);
@@ -1421,6 +1474,21 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
 
         _itemsControl = GetTemplateChild("PART_ItemsControl") as ItemsControl;
         UpdateItemsControl();
+    }
+
+    public void AddSetting(object item)
+    {
+        _items.Add(item);
+    }
+
+    public bool RemoveSetting(object item)
+    {
+        return _items.Remove(item);
+    }
+
+    public void ClearSettings()
+    {
+        _items.Clear();
     }
 
     private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1447,6 +1515,7 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
             }
 
             expander.UpdateItemsControl();
+            expander.ItemsChanged?.Invoke(expander, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 
@@ -1461,10 +1530,13 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         UpdateItemsControl();
+        ItemsChanged?.Invoke(this, e);
     }
 
     private void UpdateItemsControl()
     {
+        UpdateItemCount();
+
         if (_itemsControl == null)
         {
             InvalidateMeasure();
@@ -1476,6 +1548,32 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
         _itemsControl.ItemsPanel = ItemsPanel;
         InvalidateMeasure();
         InvalidateVisual();
+    }
+
+    private void UpdateItemCount()
+    {
+        SetValue(ItemCountPropertyKey.DependencyProperty, CountItems(ItemsSource ?? _items));
+    }
+
+    private static int CountItems(IEnumerable items)
+    {
+        if (items is ICollection collection)
+        {
+            return collection.Count;
+        }
+
+        if (items is IReadOnlyCollection<object> readOnlyCollection)
+        {
+            return readOnlyCollection.Count;
+        }
+
+        var count = 0;
+        foreach (var _ in items)
+        {
+            count++;
+        }
+
+        return count;
     }
 }
 

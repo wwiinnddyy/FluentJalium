@@ -27,8 +27,8 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Semantic-depth gaps
 
-- `FWSettingsCard`: add Click/Command, keyboard invocation, action alignment, and command-state semantics.
-- `FWSettingsExpander`: evolve beyond an Expander with extra header metadata into a settings item collection host.
+- `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, and command-state restoration now exist; remaining work is mostly focus/pressed visuals, automation patterns, and action alignment polish.
+- `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, and add/remove/clear helpers; remaining work is richer item container styling and default data-row templates.
 - `FWSnackbar`: add host/service semantics, queueing, auto-dismiss timer, placement, and action command support.
 - `FWTaskDialog`: add awaitable result flow, modal host/overlay behavior, default/cancel button handling, and focus/escape behavior.
 - `FWItemsRepeater`: the API exists, but virtualization/recycling behavior remains the larger WinUI-style gap.
@@ -36,9 +36,9 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ## Next implementation batches
 
-1. Settings semantics package: continue deepening `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics where the current API is still thin.
-2. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
-3. Collection API semantics package: Gallery now demonstrates empty/loading/grouped/high-density states; consider native empty/loading/grouping APIs only if real app usage needs them beyond sample composition.
+1. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
+2. Collection API semantics package: Gallery now demonstrates empty/loading/grouped/high-density states; consider native empty/loading/grouping APIs only if real app usage needs them beyond sample composition.
+3. Settings visual/automation polish: add focus/pressed states, action alignment refinements, and automation/invoke patterns after the command and item-host semantics stabilize.
 
 ## Recently completed batches
 
@@ -51,3 +51,4 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Disclosure coverage: `FWTeachingTip` has a default popup presenter style, targeted tests, catalog metadata, and registry-backed sample code for placement/action/close states.
 - Materials coverage: `FWFluentWindowSurface` and derived material surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, and `FWFocusGlassSurface` are visible in Gallery with catalog metadata and copyable recipes.
 - Collection state coverage: `FWListView`, `FWGridView`, `FWListBox`, and `FWDataGrid` now show empty, loading, grouped, compact, comfortable, and spacious states in Gallery with updated catalog search metadata and registry-backed sample code.
+- Settings semantics coverage: `FWSettingsCard` now exposes read-only `CanExecute`, restores command-disabled state when commands are removed, supports `ClickMode.Hover`, and has keyboard/command tests; `FWSettingsExpander` now has direct content rows, `ItemCount`, `ItemsChanged`, and add/remove/clear helpers with Gallery and registry coverage.

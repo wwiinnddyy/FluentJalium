@@ -274,6 +274,7 @@ public sealed class FluentContentLayoutControlsTests
 
         Assert.True(card.Focusable);
         Assert.Equal(ClickMode.Release, card.ClickMode);
+        Assert.True(card.CanExecute);
 
         Assert.True(card.Invoke());
 
@@ -292,6 +293,7 @@ public sealed class FluentContentLayoutControlsTests
         command.CanExecuteResult = false;
         command.RaiseCanExecuteChanged();
 
+        Assert.False(card.CanExecute);
         Assert.False(card.IsEnabled);
         Assert.False(card.Invoke());
         Assert.Equal(1, clickCount);
@@ -300,10 +302,76 @@ public sealed class FluentContentLayoutControlsTests
         command.CanExecuteResult = true;
         command.RaiseCanExecuteChanged();
 
+        Assert.True(card.CanExecute);
         Assert.True(card.IsEnabled);
         Assert.True(card.Invoke());
         Assert.Equal(2, clickCount);
         Assert.Equal(2, command.ExecuteCount);
+    }
+
+    [Fact]
+    public void FWSettingsCard_ShouldRestoreCommandStateWhenCommandIsRemoved()
+    {
+        var command = new RecordingCommand
+        {
+            CanExecuteResult = false
+        };
+        var card = new FWSettingsCard
+        {
+            Header = "Accent color",
+            IsClickEnabled = true,
+            Command = command,
+            CommandParameter = "accent"
+        };
+        var clickCount = 0;
+        card.Click += (_, _) => clickCount++;
+
+        Assert.False(card.CanExecute);
+        Assert.False(card.IsEnabled);
+        Assert.False(card.Invoke());
+
+        card.Command = null;
+
+        Assert.True(card.CanExecute);
+        Assert.True(card.IsEnabled);
+        Assert.True(card.Invoke());
+        Assert.Equal(1, clickCount);
+        Assert.Equal(0, command.ExecuteCount);
+    }
+
+    [Fact]
+    public void FWSettingsCard_ShouldInvokeFromKeyboardAndHoverModes()
+    {
+        var command = new RecordingCommand();
+        var card = new FWSettingsCard
+        {
+            Header = "Window material",
+            IsClickEnabled = true,
+            Command = command,
+            CommandParameter = "material"
+        };
+
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Enter, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("material", command.LastParameter);
+
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        Assert.Equal(1, command.ExecuteCount);
+
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyUpEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: false, isRepeat: false, timestamp: 0));
+        Assert.Equal(2, command.ExecuteCount);
+
+        card.ClickMode = ClickMode.Press;
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        Assert.Equal(3, command.ExecuteCount);
+
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyUpEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: false, isRepeat: false, timestamp: 0));
+        Assert.Equal(3, command.ExecuteCount);
+
+        card.ClickMode = ClickMode.Hover;
+        card.RaiseEvent(new Jalium.UI.Input.MouseEventArgs(UIElement.MouseEnterEvent));
+        Assert.Equal(4, command.ExecuteCount);
     }
 
     [Fact]
