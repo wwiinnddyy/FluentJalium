@@ -23,7 +23,6 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Gallery visibility gaps
 
-- Text depth: `FWAutoSuggestBox` is visible by WinUI name, but query/text/suggestion-submission semantics should continue to deepen beyond the current `AutoCompleteBox` compatibility layer.
 - Data depth: DataGrid/List/GridView now have direct Gallery coverage, but richer loading, empty, grouped, and high-density comparison states would make the collection story stronger.
 
 ### Semantic-depth gaps
@@ -32,16 +31,14 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - `FWSettingsExpander`: evolve beyond an Expander with extra header metadata into a settings item collection host.
 - `FWSnackbar`: add host/service semantics, queueing, auto-dismiss timer, placement, and action command support.
 - `FWTaskDialog`: add awaitable result flow, modal host/overlay behavior, default/cancel button handling, and focus/escape behavior.
-- `FWAutoSuggestBox`: deepen query/text/suggestion-submission semantics beyond naming compatibility.
 - `FWItemsRepeater`: the API exists, but virtualization/recycling behavior remains the larger WinUI-style gap.
 - NavigationView shell: consider WPF UI style navigation service/page service/history patterns for app-shell ergonomics.
 
 ## Next implementation batches
 
-1. AutoSuggestBox semantics package: deepen query/text/suggestion-submission behavior beyond the current Jalium `AutoCompleteBox` compatibility layer.
-2. Settings semantics package: continue deepening `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics where the current API is still thin.
-3. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
-4. Collection state package: extend FWListView/FWGridView/FWDataGrid samples with empty/loading/grouped/high-density states once the current direct `FWGridView` coverage is verified.
+1. Settings semantics package: continue deepening `FWSettingsCard` command/click behavior and `FWSettingsExpander` item-host semantics where the current API is still thin.
+2. Snackbar/TaskDialog semantics package: continue deepening service/host result-flow ergonomics, especially modal focus, escape/cancel, and queue lifetime behavior.
+3. Collection state package: extend FWListView/FWGridView/FWDataGrid samples with empty/loading/grouped/high-density states once the current direct `FWGridView` coverage is verified.
 
 ## Recently completed batches
 
@@ -50,6 +47,6 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Charts Gallery coverage: the `FW*Chart` family has a dedicated Gallery entry/page.
 - Catalog metadata activation: `SourcePath`, `SampleCodeKey`, API/base/related controls, docs, and registry-backed sample code are visible in `GalleryHostPage`.
 - Date/Time and Collections coverage: `FWCalendarDatePicker`, `FWCalendarView`, `FWGridView`, and `FWGridViewItem` have direct Gallery samples and catalog metadata.
-- Text input visibility: `FWAutoSuggestBox` has direct Gallery coverage, catalog metadata, and registry-backed sample code while preserving `FWAutoCompleteBox` as the Jalium base.
+- Text input coverage: `FWAutoSuggestBox` has direct Gallery coverage, catalog metadata, registry-backed sample code, `QuerySubmitted`, `SuggestionChosen`, and text-change reason APIs while preserving `FWAutoCompleteBox` as the Jalium base.
 - Disclosure coverage: `FWTeachingTip` has a default popup presenter style, targeted tests, catalog metadata, and registry-backed sample code for placement/action/close states.
 - Materials coverage: `FWFluentWindowSurface` and derived material surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, and `FWFocusGlassSurface` are visible in Gallery with catalog metadata and copyable recipes.

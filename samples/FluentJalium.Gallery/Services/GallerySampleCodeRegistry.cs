@@ -27,6 +27,21 @@ autoSuggestBox.TextChanged += (_, _) =>
 {
     var matchCount = autoSuggestBox.FilteredItems.Count;
 };
+
+autoSuggestBox.SuggestionChosen += (_, args) =>
+{
+    var selected = args.SelectedItem;
+};
+
+autoSuggestBox.QuerySubmitted += (_, args) =>
+{
+    var query = args.QueryText;
+    var chosen = args.ChosenSuggestion;
+};
+
+autoSuggestBox.SetQueryText("Calendar", FWAutoSuggestBoxTextChangeReason.UserInput);
+autoSuggestBox.RequestSuggestionChosen(autoSuggestBox.FilteredItems.FirstOrDefault());
+autoSuggestBox.RequestQuerySubmitted();
 """,
         ["selection.radiobuttons"] = """
 var radioButtons = new FWRadioButtons

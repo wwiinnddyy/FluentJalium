@@ -4,6 +4,7 @@ using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
@@ -226,6 +227,93 @@ public sealed class FluentTextInputControlsTests
     }
 
     [Fact]
+    public void FWAutoSuggestBox_ShouldExposeQueryAndSuggestionSubmissionSemantics()
+    {
+        var autoSuggestBox = new FWAutoSuggestBox
+        {
+            ItemsSource = new[] { "CalendarView", "CalendarDatePicker", "GridView", "AutoSuggestBox" },
+            FilterMode = AutoCompleteFilterMode.StartsWith,
+            MinimumPrefixLength = 1
+        };
+        var suggestionChosenCount = 0;
+        var querySubmittedCount = 0;
+        FWAutoSuggestBoxSuggestionChosenEventArgs? chosenArgs = null;
+        FWAutoSuggestBoxQuerySubmittedEventArgs? submittedArgs = null;
+        autoSuggestBox.SuggestionChosen += (_, args) =>
+        {
+            suggestionChosenCount++;
+            chosenArgs = args;
+        };
+        autoSuggestBox.QuerySubmitted += (_, args) =>
+        {
+            querySubmittedCount++;
+            submittedArgs = args;
+        };
+
+        autoSuggestBox.SetQueryText("Cal", FWAutoSuggestBoxTextChangeReason.UserInput);
+
+        Assert.Equal("Cal", autoSuggestBox.Text);
+        Assert.Equal(FWAutoSuggestBoxTextChangeReason.UserInput, autoSuggestBox.LastTextChangeReason);
+        Assert.Equal(2, autoSuggestBox.FilteredItems.Count);
+
+        var suggestion = autoSuggestBox.FilteredItems[0];
+
+        Assert.True(autoSuggestBox.RequestSuggestionChosen(suggestion));
+        Assert.Equal(1, suggestionChosenCount);
+        Assert.NotNull(chosenArgs);
+        Assert.Same(suggestion, chosenArgs!.SelectedItem);
+        Assert.Same(suggestion, autoSuggestBox.SelectedItem);
+        Assert.Equal("CalendarView", autoSuggestBox.Text);
+        Assert.False(autoSuggestBox.IsDropDownOpen);
+        Assert.Equal(FWAutoSuggestBoxTextChangeReason.SuggestionChosen, autoSuggestBox.LastTextChangeReason);
+
+        var returnedArgs = autoSuggestBox.RequestQuerySubmitted();
+
+        Assert.Equal(1, querySubmittedCount);
+        Assert.Same(returnedArgs, submittedArgs);
+        Assert.Equal("CalendarView", submittedArgs!.QueryText);
+        Assert.Same(suggestion, submittedArgs.ChosenSuggestion);
+
+        var explicitSuggestion = "Manual suggestion";
+        var explicitArgs = autoSuggestBox.RequestQuerySubmitted(explicitSuggestion);
+
+        Assert.Equal(2, querySubmittedCount);
+        Assert.Same(explicitArgs, submittedArgs);
+        Assert.Same(explicitSuggestion, submittedArgs!.ChosenSuggestion);
+        Assert.False(autoSuggestBox.RequestSuggestionChosen(null));
+        Assert.Equal(1, suggestionChosenCount);
+
+        var memberPathBox = new FWAutoSuggestBox
+        {
+            TextMemberPath = nameof(AutoSuggestRow.Name)
+        };
+        var row = new AutoSuggestRow("CalendarDatePicker");
+
+        Assert.True(memberPathBox.RequestSuggestionChosen(row));
+        Assert.Same(row, memberPathBox.SelectedItem);
+        Assert.Equal("CalendarDatePicker", memberPathBox.Text);
+
+        var bridgedBox = new FWAutoSuggestBox();
+        var bridgedCount = 0;
+        object? bridgedItem = null;
+        bridgedBox.SuggestionChosen += (_, args) =>
+        {
+            bridgedCount++;
+            bridgedItem = args.SelectedItem;
+        };
+        var bridgedSuggestion = "AutoSuggestBox";
+        bridgedBox.SelectedItem = bridgedSuggestion;
+        bridgedBox.RaiseEvent(new SelectionChangedEventArgs(
+            AutoCompleteBox.SelectionChangedEvent,
+            Array.Empty<object>(),
+            new[] { bridgedSuggestion }));
+
+        Assert.Equal(1, bridgedCount);
+        Assert.Same(bridgedSuggestion, bridgedItem);
+        Assert.Equal(FWAutoSuggestBoxTextChangeReason.SuggestionChosen, bridgedBox.LastTextChangeReason);
+    }
+
+    [Fact]
     public void FWTextInputControls_ShouldExposeMaterialInputPanelState()
     {
         var textBox = new FWTextBox
@@ -354,6 +442,8 @@ public sealed class FluentTextInputControlsTests
 
         return Assert.IsType<ResourceDictionary>(loaded);
     }
+
+    private sealed record AutoSuggestRow(string Name);
 
     private static Style AssertStyle<TControl>(ResourceDictionary dictionary)
         where TControl : FrameworkElement

@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Input;
 
 namespace FluentJalium.Controls;
 
@@ -214,9 +217,34 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
         DependencyProperty.Register(nameof(Density), typeof(FWTextInputDensity), typeof(FWAutoSuggestBox),
             new PropertyMetadata(FWTextInputDensity.Comfortable, OnDensityChanged));
 
+    public static readonly DependencyProperty LastTextChangeReasonProperty =
+        DependencyProperty.Register(nameof(LastTextChangeReason), typeof(FWAutoSuggestBoxTextChangeReason), typeof(FWAutoSuggestBox),
+            new PropertyMetadata(FWAutoSuggestBoxTextChangeReason.ProgrammaticChange));
+
+    public static readonly RoutedEvent QuerySubmittedEvent =
+        EventManager.RegisterRoutedEvent(nameof(QuerySubmitted), RoutingStrategy.Bubble,
+            typeof(EventHandler<FWAutoSuggestBoxQuerySubmittedEventArgs>), typeof(FWAutoSuggestBox));
+
+    public static readonly RoutedEvent SuggestionChosenEvent =
+        EventManager.RegisterRoutedEvent(nameof(SuggestionChosen), RoutingStrategy.Bubble,
+            typeof(EventHandler<FWAutoSuggestBoxSuggestionChosenEventArgs>), typeof(FWAutoSuggestBox));
+
     public FWAutoSuggestBox()
     {
         ApplyDensity(this, Density);
+        SelectionChanged += OnAutoCompleteSelectionChanged;
+    }
+
+    public event EventHandler<FWAutoSuggestBoxQuerySubmittedEventArgs> QuerySubmitted
+    {
+        add => AddHandler(QuerySubmittedEvent, value);
+        remove => RemoveHandler(QuerySubmittedEvent, value);
+    }
+
+    public event EventHandler<FWAutoSuggestBoxSuggestionChosenEventArgs> SuggestionChosen
+    {
+        add => AddHandler(SuggestionChosenEvent, value);
+        remove => RemoveHandler(SuggestionChosenEvent, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
@@ -224,6 +252,60 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
     {
         get => (FWTextInputDensity)GetValue(DensityProperty)!;
         set => SetValue(DensityProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWAutoSuggestBoxTextChangeReason LastTextChangeReason
+    {
+        get => (FWAutoSuggestBoxTextChangeReason)GetValue(LastTextChangeReasonProperty)!;
+        private set => SetValue(LastTextChangeReasonProperty, value);
+    }
+
+    public void SetQueryText(string? text, FWAutoSuggestBoxTextChangeReason reason = FWAutoSuggestBoxTextChangeReason.ProgrammaticChange)
+    {
+        LastTextChangeReason = reason;
+        Text = text ?? string.Empty;
+    }
+
+    public bool RequestSuggestionChosen(object? suggestion)
+    {
+        if (suggestion == null)
+        {
+            return false;
+        }
+
+        LastTextChangeReason = FWAutoSuggestBoxTextChangeReason.SuggestionChosen;
+        SelectedItem = suggestion;
+        Text = ResolveSuggestionText(suggestion);
+        IsDropDownOpen = false;
+
+        var args = new FWAutoSuggestBoxSuggestionChosenEventArgs(SuggestionChosenEvent, this, suggestion);
+        RaiseEvent(args);
+        return true;
+    }
+
+    public FWAutoSuggestBoxQuerySubmittedEventArgs RequestQuerySubmitted()
+    {
+        return RequestQuerySubmitted(SelectedItem);
+    }
+
+    public FWAutoSuggestBoxQuerySubmittedEventArgs RequestQuerySubmitted(object? chosenSuggestion)
+    {
+        var args = new FWAutoSuggestBoxQuerySubmittedEventArgs(QuerySubmittedEvent, this, Text, chosenSuggestion);
+        RaiseEvent(args);
+        return args;
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        var submitQuery = e.Key == Key.Enter;
+
+        base.OnKeyDown(e);
+
+        if (submitQuery && e.Handled)
+        {
+            RequestQuerySubmitted(SelectedItem);
+        }
     }
 
     private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -241,6 +323,64 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
         autoSuggestBox.Padding = padding;
         autoSuggestBox.MaxDropDownHeight = maxDropDownHeight;
     }
+
+    private void OnAutoCompleteSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        var selectedItem = SelectedItem ?? e.AddedItems.FirstOrDefault();
+        if (selectedItem == null)
+        {
+            return;
+        }
+
+        LastTextChangeReason = FWAutoSuggestBoxTextChangeReason.SuggestionChosen;
+        RaiseEvent(new FWAutoSuggestBoxSuggestionChosenEventArgs(SuggestionChosenEvent, this, selectedItem));
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2075:UnrecognizedReflectionPattern",
+        Justification = "TextMemberPath mirrors AutoCompleteBox display-path behavior. Consumers that set TextMemberPath are responsible for preserving the referenced property under trimming/AOT.")]
+    private string ResolveSuggestionText(object suggestion)
+    {
+        if (string.IsNullOrWhiteSpace(TextMemberPath))
+        {
+            return suggestion.ToString() ?? string.Empty;
+        }
+
+        var property = suggestion.GetType().GetProperty(TextMemberPath);
+        return property?.GetValue(suggestion)?.ToString()
+            ?? suggestion.ToString()
+            ?? string.Empty;
+    }
+}
+
+public enum FWAutoSuggestBoxTextChangeReason
+{
+    ProgrammaticChange,
+    UserInput,
+    SuggestionChosen
+}
+
+public sealed class FWAutoSuggestBoxQuerySubmittedEventArgs : RoutedEventArgs
+{
+    public FWAutoSuggestBoxQuerySubmittedEventArgs(RoutedEvent routedEvent, object source, string queryText, object? chosenSuggestion)
+        : base(routedEvent, source)
+    {
+        QueryText = queryText;
+        ChosenSuggestion = chosenSuggestion;
+    }
+
+    public string QueryText { get; }
+    public object? ChosenSuggestion { get; }
+}
+
+public sealed class FWAutoSuggestBoxSuggestionChosenEventArgs : RoutedEventArgs
+{
+    public FWAutoSuggestBoxSuggestionChosenEventArgs(RoutedEvent routedEvent, object source, object selectedItem)
+        : base(routedEvent, source)
+    {
+        SelectedItem = selectedItem;
+    }
+
+    public object SelectedItem { get; }
 }
 
 /// <summary>

@@ -6,6 +6,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
 using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
+using FWAutoSuggestBoxTextChangeReason = FluentJalium.Controls.FWAutoSuggestBoxTextChangeReason;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
@@ -270,10 +271,13 @@ internal sealed class GalleryTextInputPage
 
         void UpdateOutput(string reason)
         {
-            output.Text = $"{reason}: {autoSuggestBox.Text}, matches: {autoSuggestBox.FilteredItems.Count}, density: {FormatDensity(autoSuggestBox.Density)}, drop-down: {FormatOnOff(autoSuggestBox.IsDropDownOpen)}";
+            var selected = autoSuggestBox.SelectedItem?.ToString() ?? "none";
+            output.Text = $"{reason}: {autoSuggestBox.Text}, matches: {autoSuggestBox.FilteredItems.Count}, selected: {selected}, reason: {autoSuggestBox.LastTextChangeReason}, density: {FormatDensity(autoSuggestBox.Density)}, drop-down: {FormatOnOff(autoSuggestBox.IsDropDownOpen)}";
         }
 
         autoSuggestBox.TextChanged += (_, _) => UpdateOutput("Suggest");
+        autoSuggestBox.SuggestionChosen += (_, args) => output.Text = $"Suggestion chosen: {args.SelectedItem}. Text: {autoSuggestBox.Text}, reason: {autoSuggestBox.LastTextChangeReason}.";
+        autoSuggestBox.QuerySubmitted += (_, args) => output.Text = $"Query submitted: {args.QueryText}, chosen: {args.ChosenSuggestion?.ToString() ?? "none"}.";
         autoSuggestBox.DropDownOpened += (_, _) => UpdateOutput("Drop-down open");
         autoSuggestBox.DropDownClosed += (_, _) => UpdateOutput("Drop-down closed");
         UpdateOutput("Suggest");
@@ -288,14 +292,26 @@ internal sealed class GalleryTextInputPage
                 CreateTextInputButtonRow(
                     CreateTextInputActionButton(FluentIconRegular.Search24, "Auto", () =>
                     {
-                        autoSuggestBox.Text = "Auto";
+                        autoSuggestBox.SetQueryText("Auto", FWAutoSuggestBoxTextChangeReason.UserInput);
                         UpdateOutput("Suggest");
                     }),
                     CreateTextInputActionButton(FluentIconRegular.SearchSparkle24, "Calendar", () =>
                     {
-                        autoSuggestBox.Text = "Calendar";
+                        autoSuggestBox.SetQueryText("Calendar", FWAutoSuggestBoxTextChangeReason.UserInput);
                         UpdateOutput("Suggest");
                     }),
+                    CreateTextInputActionButton(FluentIconRegular.CheckmarkCircle24, "Choose first", () =>
+                    {
+                        if (autoSuggestBox.FilteredItems.Count > 0)
+                        {
+                            autoSuggestBox.RequestSuggestionChosen(autoSuggestBox.FilteredItems[0]);
+                        }
+                        else
+                        {
+                            UpdateOutput("No suggestion");
+                        }
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.Send24, "Submit", () => autoSuggestBox.RequestQuerySubmitted()),
                     CreateTextInputActionButton(FluentIconRegular.TextDensity24, "Density", () =>
                     {
                         autoSuggestBox.Density = NextDensity(autoSuggestBox.Density);
