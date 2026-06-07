@@ -1,7 +1,13 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Input;
 using Jalium.UI.Media.Animation;
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
+using System.Windows.Input;
 using AnimationDuration = Jalium.UI.Media.Animation.Duration;
 using AnimationTransitionMode = Jalium.UI.Media.Animation.TransitionMode;
 
@@ -947,6 +953,9 @@ public class FWRelativePanel : Panel, IFluentJaliumControl
 /// </summary>
 public class FWSettingsCard : ContentControl, IFluentJaliumControl
 {
+    private bool _isPointerPressed;
+    private bool _isKeyboardPressed;
+
     public static readonly DependencyProperty HeaderProperty =
         DependencyProperty.Register(nameof(Header), typeof(object), typeof(FWSettingsCard),
             new PropertyMetadata(null, OnSettingsPropertyChanged));
@@ -973,11 +982,37 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty IsClickEnabledProperty =
         DependencyProperty.Register(nameof(IsClickEnabled), typeof(bool), typeof(FWSettingsCard),
-            new PropertyMetadata(false));
+            new PropertyMetadata(false, OnIsClickEnabledChanged));
+
+    public static readonly DependencyProperty CommandProperty =
+        DependencyProperty.Register(nameof(Command), typeof(ICommand), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnCommandChanged));
+
+    public static readonly DependencyProperty CommandParameterProperty =
+        DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnCommandParameterChanged));
+
+    public static readonly DependencyProperty CommandTargetProperty =
+        DependencyProperty.Register(nameof(CommandTarget), typeof(IInputElement), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnCommandParameterChanged));
+
+    public static readonly DependencyProperty ClickModeProperty =
+        DependencyProperty.Register(nameof(ClickMode), typeof(ClickMode), typeof(FWSettingsCard),
+            new PropertyMetadata(ClickMode.Release));
+
+    public static readonly RoutedEvent ClickEvent =
+        EventManager.RegisterRoutedEvent(nameof(Click), RoutingStrategy.Bubble,
+            typeof(RoutedEventHandler), typeof(FWSettingsCard));
 
     public FWSettingsCard()
     {
         UseTemplateContentManagement();
+        Focusable = false;
+        AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDownHandler));
+        AddHandler(MouseUpEvent, new MouseButtonEventHandler(OnMouseUpHandler));
+        AddHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveHandler));
+        AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownHandler));
+        AddHandler(KeyUpEvent, new KeyEventHandler(OnKeyUpHandler));
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
@@ -1029,6 +1064,57 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         set => SetValue(IsClickEnabledProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public ICommand? Command
+    {
+        get => (ICommand?)GetValue(CommandProperty);
+        set => SetValue(CommandProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public object? CommandParameter
+    {
+        get => GetValue(CommandParameterProperty);
+        set => SetValue(CommandParameterProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public IInputElement? CommandTarget
+    {
+        get => (IInputElement?)GetValue(CommandTargetProperty);
+        set => SetValue(CommandTargetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public ClickMode ClickMode
+    {
+        get => (ClickMode)GetValue(ClickModeProperty)!;
+        set => SetValue(ClickModeProperty, value);
+    }
+
+    public event RoutedEventHandler Click
+    {
+        add => AddHandler(ClickEvent, value);
+        remove => RemoveHandler(ClickEvent, value);
+    }
+
+    public bool Invoke()
+    {
+        if (!CanInvoke())
+        {
+            return false;
+        }
+
+        RaiseEvent(new RoutedEventArgs(ClickEvent, this));
+        ExecuteCommand();
+        return true;
+    }
+
+    public bool PerformClick()
+    {
+        return Invoke();
+    }
+
     private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSettingsCard card)
@@ -1037,6 +1123,192 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             card.InvalidateVisual();
         }
     }
+
+    private static void OnIsClickEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsCard card)
+        {
+            card.Focusable = card.IsClickEnabled;
+            card.InvalidateVisual();
+        }
+    }
+
+    private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not FWSettingsCard card)
+        {
+            return;
+        }
+
+        if (e.OldValue is ICommand oldCommand)
+        {
+            oldCommand.CanExecuteChanged -= card.OnCanExecuteChanged;
+        }
+
+        if (e.NewValue is ICommand newCommand)
+        {
+            newCommand.CanExecuteChanged += card.OnCanExecuteChanged;
+        }
+
+        card.UpdateCanExecute();
+    }
+
+    private static void OnCommandParameterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsCard card)
+        {
+            card.UpdateCanExecute();
+        }
+    }
+
+    private void OnCanExecuteChanged(object? sender, EventArgs e)
+    {
+        UpdateCanExecute();
+    }
+
+    private void UpdateCanExecute()
+    {
+        var command = Command;
+        if (command == null)
+        {
+            return;
+        }
+
+        IsEnabled = CanExecuteCommand(command);
+    }
+
+    private bool CanInvoke()
+    {
+        if (!IsClickEnabled || !IsEnabled)
+        {
+            return false;
+        }
+
+        var command = Command;
+        return command == null || CanExecuteCommand(command);
+    }
+
+    private bool CanExecuteCommand(ICommand command)
+    {
+        var parameter = CommandParameter;
+        if (command is RoutedCommand routedCommand)
+        {
+            return routedCommand.CanExecute(parameter, CommandTarget ?? this);
+        }
+
+        return command.CanExecute(parameter);
+    }
+
+    private void ExecuteCommand()
+    {
+        var command = Command;
+        if (command == null)
+        {
+            return;
+        }
+
+        var parameter = CommandParameter;
+        if (command is RoutedCommand routedCommand)
+        {
+            var target = CommandTarget ?? this;
+            if (routedCommand.CanExecute(parameter, target))
+            {
+                routedCommand.Execute(parameter, target);
+            }
+        }
+        else if (command.CanExecute(parameter))
+        {
+            command.Execute(parameter);
+        }
+    }
+
+    private void OnMouseDownHandler(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left || !CanInvoke())
+        {
+            return;
+        }
+
+        _isPointerPressed = true;
+        CaptureMouse();
+        Focus();
+
+        if (ClickMode == ClickMode.Press)
+        {
+            Invoke();
+        }
+
+        e.Handled = true;
+    }
+
+    private void OnMouseUpHandler(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Left)
+        {
+            return;
+        }
+
+        var wasPressed = _isPointerPressed;
+        _isPointerPressed = false;
+        ReleaseMouseCapture();
+
+        if (wasPressed && IsMouseOver && ClickMode == ClickMode.Release)
+        {
+            Invoke();
+            e.Handled = true;
+        }
+    }
+
+    private void OnMouseLeaveHandler(object sender, MouseEventArgs e)
+    {
+        if (!_isPointerPressed)
+        {
+            return;
+        }
+
+        _isPointerPressed = false;
+        ReleaseMouseCapture();
+    }
+
+    private void OnKeyDownHandler(object sender, KeyEventArgs e)
+    {
+        if (!CanInvoke())
+        {
+            return;
+        }
+
+        if (e.Key == Key.Space)
+        {
+            _isKeyboardPressed = true;
+            if (ClickMode == ClickMode.Press)
+            {
+                Invoke();
+            }
+
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Enter)
+        {
+            Invoke();
+            e.Handled = true;
+        }
+    }
+
+    private void OnKeyUpHandler(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Space || !_isKeyboardPressed)
+        {
+            return;
+        }
+
+        _isKeyboardPressed = false;
+        if (ClickMode == ClickMode.Release)
+        {
+            Invoke();
+        }
+
+        e.Handled = true;
+    }
 }
 
 /// <summary>
@@ -1044,6 +1316,9 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 /// </summary>
 public class FWSettingsExpander : Expander, IFluentJaliumControl
 {
+    private readonly ObservableCollection<object> _items = new();
+    private ItemsControl? _itemsControl;
+
     public static readonly DependencyProperty DescriptionProperty =
         DependencyProperty.Register(nameof(Description), typeof(object), typeof(FWSettingsExpander),
             new PropertyMetadata(null, OnSettingsPropertyChanged));
@@ -1055,6 +1330,31 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
     public static readonly DependencyProperty HeaderIconProperty =
         DependencyProperty.Register(nameof(HeaderIcon), typeof(object), typeof(FWSettingsExpander),
             new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty ItemsSourceProperty =
+        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnItemsSourceChanged));
+
+    public static readonly DependencyProperty ItemTemplateProperty =
+        DependencyProperty.Register(nameof(ItemTemplate), typeof(DataTemplate), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnItemsPresentationChanged));
+
+    public static readonly DependencyProperty ItemsPanelProperty =
+        DependencyProperty.Register(nameof(ItemsPanel), typeof(ItemsPanelTemplate), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnItemsPresentationChanged));
+
+    public static readonly DependencyProperty SettingsContentProperty =
+        DependencyProperty.Register(nameof(SettingsContent), typeof(object), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty SettingsContentTemplateProperty =
+        DependencyProperty.Register(nameof(SettingsContentTemplate), typeof(DataTemplate), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public FWSettingsExpander()
+    {
+        _items.CollectionChanged += OnItemsCollectionChanged;
+    }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
     public object? Description
@@ -1077,6 +1377,52 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
         set => SetValue(HeaderIconProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public IList<object> Items => _items;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public IEnumerable? ItemsSource
+    {
+        get => (IEnumerable?)GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? ItemTemplate
+    {
+        get => (DataTemplate?)GetValue(ItemTemplateProperty);
+        set => SetValue(ItemTemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public ItemsPanelTemplate? ItemsPanel
+    {
+        get => (ItemsPanelTemplate?)GetValue(ItemsPanelProperty);
+        set => SetValue(ItemsPanelProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? SettingsContent
+    {
+        get => GetValue(SettingsContentProperty);
+        set => SetValue(SettingsContentProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? SettingsContentTemplate
+    {
+        get => (DataTemplate?)GetValue(SettingsContentTemplateProperty);
+        set => SetValue(SettingsContentTemplateProperty, value);
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        _itemsControl = GetTemplateChild("PART_ItemsControl") as ItemsControl;
+        UpdateItemsControl();
+    }
+
     private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSettingsExpander expander)
@@ -1084,6 +1430,52 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
             expander.InvalidateMeasure();
             expander.InvalidateVisual();
         }
+    }
+
+    private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsExpander expander)
+        {
+            if (e.OldValue is INotifyCollectionChanged oldCollection)
+            {
+                oldCollection.CollectionChanged -= expander.OnItemsCollectionChanged;
+            }
+
+            if (e.NewValue is INotifyCollectionChanged newCollection)
+            {
+                newCollection.CollectionChanged += expander.OnItemsCollectionChanged;
+            }
+
+            expander.UpdateItemsControl();
+        }
+    }
+
+    private static void OnItemsPresentationChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsExpander expander)
+        {
+            expander.UpdateItemsControl();
+        }
+    }
+
+    private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        UpdateItemsControl();
+    }
+
+    private void UpdateItemsControl()
+    {
+        if (_itemsControl == null)
+        {
+            InvalidateMeasure();
+            return;
+        }
+
+        _itemsControl.ItemsSource = ItemsSource ?? _items;
+        _itemsControl.ItemTemplate = ItemTemplate;
+        _itemsControl.ItemsPanel = ItemsPanel;
+        InvalidateMeasure();
+        InvalidateVisual();
     }
 }
 

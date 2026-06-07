@@ -1,9 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
@@ -256,6 +258,55 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void FWSettingsCard_ShouldInvokeClickAndCommandWhenEnabled()
+    {
+        var command = new RecordingCommand();
+        var card = new FWSettingsCard
+        {
+            Header = "Window material",
+            Description = "Open a detail surface.",
+            Command = command,
+            CommandParameter = "material",
+            IsClickEnabled = true
+        };
+        var clickCount = 0;
+        card.Click += (_, _) => clickCount++;
+
+        Assert.True(card.Focusable);
+        Assert.Equal(ClickMode.Release, card.ClickMode);
+
+        Assert.True(card.Invoke());
+
+        Assert.Equal(1, clickCount);
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("material", command.LastParameter);
+
+        card.IsClickEnabled = false;
+
+        Assert.False(card.Focusable);
+        Assert.False(card.Invoke());
+        Assert.Equal(1, clickCount);
+        Assert.Equal(1, command.ExecuteCount);
+
+        card.IsClickEnabled = true;
+        command.CanExecuteResult = false;
+        command.RaiseCanExecuteChanged();
+
+        Assert.False(card.IsEnabled);
+        Assert.False(card.Invoke());
+        Assert.Equal(1, clickCount);
+        Assert.Equal(1, command.ExecuteCount);
+
+        command.CanExecuteResult = true;
+        command.RaiseCanExecuteChanged();
+
+        Assert.True(card.IsEnabled);
+        Assert.True(card.Invoke());
+        Assert.Equal(2, clickCount);
+        Assert.Equal(2, command.ExecuteCount);
+    }
+
+    [Fact]
     public void ContentTransitionRecipe_ShouldExposeFluentMotionProfiles()
     {
         var defaultRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Default);
@@ -453,6 +504,8 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(typeof(ContentControl), settingsCardStyle.BasedOn?.TargetType);
         AssertSetter(settingsCardStyle, FrameworkElement.MinHeightProperty);
         AssertSetter(settingsCardStyle, FWSettingsCard.IsClickEnabledProperty);
+        AssertSetter(settingsCardStyle, FWSettingsCard.ClickModeProperty);
+        AssertSetter(settingsCardStyle, UIElement.FocusableProperty);
 
         ResetApplicationState();
     }
@@ -495,6 +548,27 @@ public sealed class FluentContentLayoutControlsTests
     private static void AssertSetter(Style style, DependencyProperty property)
     {
         Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private sealed class RecordingCommand : ICommand
+    {
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecuteResult { get; set; } = true;
+
+        public int ExecuteCount { get; private set; }
+
+        public object? LastParameter { get; private set; }
+
+        public bool CanExecute(object? parameter) => CanExecuteResult;
+
+        public void Execute(object? parameter)
+        {
+            ExecuteCount++;
+            LastParameter = parameter;
+        }
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private static void ResetApplicationState()

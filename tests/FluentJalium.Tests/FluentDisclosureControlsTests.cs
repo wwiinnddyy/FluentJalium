@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
@@ -130,6 +131,7 @@ public sealed class FluentDisclosureControlsTests
         Assert.Same(expanderStyle, settingsExpanderStyle.BasedOn);
         AssertSetter(settingsExpanderStyle, FrameworkElement.MinHeightProperty);
         AssertSetter(settingsExpanderStyle, Control.PaddingProperty);
+        AssertSetter(settingsExpanderStyle, FWSettingsExpander.ItemsPanelProperty);
 
         var contentDialogStyle = AssertStyle<ContentDialog>(dictionary);
         AssertSetter(contentDialogStyle, Control.BackgroundProperty);
@@ -227,6 +229,59 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.Equal(new Thickness(10, 12, 10, 10), groupBox.Padding);
         Assert.Equal(48, groupBox.MinHeight);
+    }
+
+    [Fact]
+    public void FWSettingsExpander_ShouldExposeSettingsRowsAndSupplementaryContent()
+    {
+        var firstRow = new FWSettingsCard
+        {
+            Header = "App theme",
+            Description = "Use system setting"
+        };
+        var secondRow = new FWSettingsCard
+        {
+            Header = "Window material",
+            Description = "Open preview",
+            IsClickEnabled = true
+        };
+        var itemTemplate = new DataTemplate();
+        var itemsPanel = new ItemsPanelTemplate();
+        var settingsContent = new FWTextBlock { Text = "Footer" };
+        var legacyContent = new FWTextBlock { Text = "Legacy content" };
+        var expander = new FWSettingsExpander
+        {
+            Header = "Appearance",
+            Description = "Grouped settings rows",
+            HeaderIcon = new FWFontIcon(),
+            ItemTemplate = itemTemplate,
+            ItemsPanel = itemsPanel,
+            SettingsContent = settingsContent,
+            Content = legacyContent
+        };
+
+        expander.Items.Add(firstRow);
+        expander.Items.Add(secondRow);
+
+        Assert.Equal(2, expander.Items.Count);
+        Assert.Same(firstRow, expander.Items[0]);
+        Assert.Same(secondRow, expander.Items[1]);
+        Assert.Same(itemTemplate, expander.ItemTemplate);
+        Assert.Same(itemsPanel, expander.ItemsPanel);
+        Assert.Same(settingsContent, expander.SettingsContent);
+        Assert.Same(legacyContent, expander.Content);
+
+        var rows = new ObservableCollection<object>
+        {
+            "Density",
+            new FWSettingsCard { Header = "Accent color" }
+        };
+
+        expander.ItemsSource = rows;
+        rows.Add("Notifications");
+
+        Assert.Same(rows, expander.ItemsSource);
+        Assert.Equal(3, rows.Count);
     }
 
     [Fact]

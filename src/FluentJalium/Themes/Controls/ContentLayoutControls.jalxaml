@@ -244,6 +244,8 @@
         <Setter Property="Padding" Value="14" />
         <Setter Property="MinHeight" Value="64" />
         <Setter Property="IsClickEnabled" Value="False" />
+        <Setter Property="ClickMode" Value="Release" />
+        <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSettingsCard">
                 <Border Background="{TemplateBinding Background}"

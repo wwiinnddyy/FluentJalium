@@ -177,6 +177,11 @@
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="14" />
         <Setter Property="MinHeight" Value="64" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" Spacing="1" />
+            </ItemsPanelTemplate>
+        </Setter>
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSettingsExpander">
                 <Border Name="RootBorder"
@@ -227,7 +232,15 @@
                                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                                 BorderThickness="0,1,0,0"
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter />
+                            <StackPanel Orientation="Vertical" Spacing="8">
+                                <ItemsControl Name="PART_ItemsControl"
+                                              ItemTemplate="{TemplateBinding ItemTemplate}"
+                                              ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                <ContentPresenter Content="{TemplateBinding SettingsContent}"
+                                                  ContentTemplate="{TemplateBinding SettingsContentTemplate}" />
+                                <ContentPresenter Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>

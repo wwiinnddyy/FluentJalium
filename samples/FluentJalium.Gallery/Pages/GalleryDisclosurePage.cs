@@ -368,19 +368,14 @@ internal sealed class GalleryDisclosurePage
             Header = "Appearance",
             Description = "Theme, material, and density options grouped in settings rows.",
             HeaderIcon = CreateIcon(FluentIconRegular.Settings24, 20, ThemeBrush("TextSecondary")),
-            IsExpanded = true,
-            Content = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 8,
-                Children =
-                {
-                    CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"),
-                    CreateSettingsRow("Window material", "Mica shell backdrop", FluentIconRegular.LayerDiagonalSparkle24, "Mica"),
-                    CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort")
-                }
-            }
+            IsExpanded = true
         };
+        expander.Items.Add(CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"));
+        expander.Items.Add(CreateCommandSettingsRow("Window material", "Preview the shell backdrop choice", FluentIconRegular.LayerDiagonalSparkle24, "Preview", () =>
+        {
+            output.Text = "SettingsExpander command: window material preview requested.";
+        }));
+        expander.Items.Add(CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort"));
         expander.Expanded += (_, _) => output.Text = "SettingsExpander: appearance settings open.";
         expander.Collapsed += (_, _) => output.Text = "SettingsExpander: appearance settings collapsed.";
 
@@ -516,9 +511,34 @@ internal sealed class GalleryDisclosurePage
             Description = description,
             HeaderIcon = CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
             ActionIcon = CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
-            Content = new FWButton { Content = value },
+            Content = new FWTextBlock
+            {
+                Text = value,
+                Foreground = ThemeBrush("TextSecondary"),
+                VerticalAlignment = VerticalAlignment.Center
+            },
             IsClickEnabled = true
         };
+    }
+
+    private static FWSettingsCard CreateCommandSettingsRow(string header, string description, FluentIconRegular icon, string commandText, Action command)
+    {
+        var card = new FWSettingsCard
+        {
+            Header = header,
+            Description = description,
+            HeaderIcon = CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
+            ActionIcon = CreateIcon(FluentIconRegular.CursorClick24, 16, ThemeBrush("TextSecondary")),
+            Content = new FWTextBlock
+            {
+                Text = commandText,
+                Foreground = ThemeBrush("TextSecondary"),
+                VerticalAlignment = VerticalAlignment.Center
+            },
+            IsClickEnabled = true
+        };
+        card.Click += (_, _) => command();
+        return card;
     }
 
     private static FWContentDialog CreateSampleContentDialog()
@@ -609,7 +629,7 @@ internal sealed class GalleryDisclosurePage
             "FWToolTip" => "<FWButton Content=\"Hover for FWToolTip\">\n    <FWButton.ToolTip>\n        <FWToolTip Placement=\"Top\" />\n    </FWButton.ToolTip>\n</FWButton>",
             "FWContentDialog" => "<FWContentDialog Title=\"Save gallery changes?\" PrimaryButtonText=\"Save\" SecondaryButtonText=\"Review\" CloseButtonText=\"Cancel\" />",
             "FWTaskDialog" => "<FWTaskDialog Title=\"Delete temporary layout cache?\" PrimaryButtonText=\"Delete\" SecondaryButtonText=\"Archive\" CloseButtonText=\"Cancel\" IsOpen=\"True\" />",
-            "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsCard Header=\"App theme\" />\n</FWSettingsExpander>",
+            "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsExpander.Items>\n        <FWSettingsCard Header=\"App theme\" />\n        <FWSettingsCard Header=\"Window material\" IsClickEnabled=\"True\" />\n        <FWSettingsCard Header=\"Control density\" />\n    </FWSettingsExpander.Items>\n</FWSettingsExpander>",
             "Material disclosure panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWExpander Header=\"Surface options\" />\n    <FWGroupBox Header=\"Material settings\" />\n</FWFluentMaterialSurface>",
             _ => "<FWExpander />"
         };
