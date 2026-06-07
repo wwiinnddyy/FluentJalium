@@ -41,7 +41,44 @@ The fourteenth FW batch covers advanced input and media controls: `FWColorPicker
 
 The fifteenth FW batch covers content and layout foundation controls: `FWTextBlock`, `FWAccessText`, `FWBorder`, `FWContentControl`, `FWContentPresenter`, `FWStackPanel`, `FWWrapPanel`, and `FWGrid`.
 
+The sixteenth FW batch covers advanced WinUI 3 controls: `FWAnimatedIcon`, `FWAnimatedVisualPlayer`, `FWItemsRepeater`, `FWRefreshContainer`, `FWScroller`, `FWAnnotatedScrollBar`, and `FWBackdrop`.
+
 The gallery application uses a sidebar paged layout so each control batch can be reviewed independently, similar to WinUI Gallery, Community Toolkit Gallery, UI.WPF.Modern Gallery, and Jalium UI Gallery.
+
+## New Controls (Batch 16)
+
+### Motion and Animation
+- **FWAnimatedIcon**: Displays animated Fluent icons with state-based transitions
+- **FWAnimatedVisualPlayer**: Plays Lottie-like vector animations with playback controls
+
+### Advanced Collections
+- **FWItemsRepeater**: High-performance virtualizing list control with flexible layouts
+  - Supports custom `VirtualizingLayout` strategies
+  - Built-in `StackLayout` and `UniformGridLayout`
+  - Element animations support
+
+### Interaction
+- **FWRefreshContainer**: Pull-to-refresh functionality for scrollable content
+  - Supports multiple pull directions (TopToBottom, BottomToTop, etc.)
+  - Custom refresh visualizers
+  - Async deferral support
+- **FWScroller**: Advanced scrolling with snap points and chaining
+  - Scroll mode configuration (Enabled/Disabled/Auto)
+  - Chaining and railing modes
+  - Zoom support with min/max factors
+  - Snap points (Optional, Mandatory, OptionalSingle, MandatorySingle)
+- **FWAnnotatedScrollBar**: Enhanced scrollbar with position markers
+  - Visual labels at scroll positions
+  - Detail label events
+  - Custom label types (Default, Warning, Error, Info)
+
+### Materials and Effects
+- **FWBackdrop**: Background material effects
+  - Acrylic: Semi-transparent blur effect
+  - Mica: Subtle texture material
+  - MicaAlt: Darker variant for contrast
+  - Tabbed: Optimized for tabbed interfaces
+- **FWAcrylicBrush**: Reusable acrylic brush with tint and luminosity controls
 
 ## Usage
 
@@ -107,6 +144,25 @@ FW controls can be used from the Fluent namespace:
 <fluent:FWStackPanel Spacing="8" />
 <fluent:FWWrapPanel HorizontalSpacing="8" VerticalSpacing="8" />
 <fluent:FWGrid RowSpacing="8" ColumnSpacing="8" />
+<fluent:FWAnimatedIcon Source="{StaticResource MyAnimatedIcon}" AutoPlay="True" />
+<fluent:FWAnimatedVisualPlayer Source="{StaticResource LottieAnimation}" IsLooping="True" />
+<fluent:FWItemsRepeater ItemsSource="{Binding Items}">
+  <fluent:FWItemsRepeater.Layout>
+    <fluent:UniformGridLayout MinItemWidth="200" MinItemHeight="150" />
+  </fluent:FWItemsRepeater.Layout>
+</fluent:FWItemsRepeater>
+<fluent:FWRefreshContainer RefreshRequested="OnRefreshRequested">
+  <ScrollViewer>
+    <!-- Content -->
+  </ScrollViewer>
+</fluent:FWRefreshContainer>
+<fluent:FWScroller VerticalSnapPointsType="Mandatory" ZoomMode="Enabled">
+  <fluent:FWScroller.Content>
+    <!-- Zoomable content -->
+  </fluent:FWScroller.Content>
+</fluent:FWScroller>
+<fluent:FWAnnotatedScrollBar Orientation="Vertical" Labels="{Binding ScrollLabels}" />
+<fluent:FWBackdrop Type="Acrylic" TintColor="#F3F3F3" TintOpacity="0.8" />
 <fluent:FWDatePicker Header="Date" SelectedDateFormat="Long" />
 <fluent:FWTimePicker Header="Time" MinuteIncrement="15" />
 <fluent:FWCalendar FirstDayOfWeek="Monday" />
@@ -118,6 +174,38 @@ FW controls can be used from the Fluent namespace:
   <fluent:FWStatusBarItem Content="Ready" />
 </fluent:FWStatusBar>
 ```
+
+---
+
+## Documentation
+
+### Core Documentation
+- **[Getting Started](docs/GETTING_STARTED.md)** - Installation, setup, and first steps
+- **[API Reference](docs/API_REFERENCE.md)** - Complete API documentation with examples
+- **[Performance Testing](PERFORMANCE.md)** - Benchmarks and optimization strategies
+- **[Development Progress](PROGRESS.md)** - Feature roadmap and completion status
+
+### Guides & Tutorials
+- **Migration Guide** - Migrating from standard Jalium.UI controls
+- **Theming Guide** - Customizing colors, density, and visual styles
+- **Best Practices** - Performance, accessibility, and code quality
+
+---
+
+## Development Status
+
+FluentJalium is currently in **active development** (v0.1.0-preview.1). 
+
+**Current Phase**: Batch 16 completed with 150+ controls
+- ✅ Unit tests for all Batch 16 controls
+- ✅ Gallery demonstration pages
+- ✅ Control template implementations
+- ✅ Performance testing guide
+- ✅ Complete API documentation
+
+See [PROGRESS.md](PROGRESS.md) for detailed roadmap and completed features.
+
+---
 
 ## Build
 

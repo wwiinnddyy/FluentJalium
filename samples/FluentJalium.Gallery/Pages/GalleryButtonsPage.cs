@@ -1,5 +1,6 @@
 using FluentJalium.Icon;
 using FluentJalium.Gallery.Controls;
+using FluentJalium.Gallery.Resources;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -33,444 +34,316 @@ internal sealed class GalleryButtonsPage
 {
     public UIElement CreateContent()
     {
-        var panel = CreateSection("Buttons");
+        var panel = CreateSection(Strings.Buttons_Title);
         var examples = new FWWrapPanel
         {
             HorizontalSpacing = 16,
             VerticalSpacing = 16
         };
 
+        var buttonSurfaceOutput = CreateButtonOutput(Strings.Output_Ready);
         examples.Children.Add(CreateButtonExampleCard(
             FluentIconRegular.ControlButton24,
-            "Button surfaces",
-            "Button, RepeatButton, HyperlinkButton, DropDownButton, and disabled command states.",
-            CreateButtonSurfaceSample()));
+            Strings.Buttons_Surface_Title,
+            Strings.Buttons_Surface_Description,
+            CreateButtonSurfaceSample(buttonSurfaceOutput),
+            output: buttonSurfaceOutput,
+            options: CreateButtonOptions()));
+
+        var splitButtonOutput = CreateButtonOutput(Strings.Output_Ready);
         examples.Children.Add(CreateButtonExampleCard(
             FluentIconRegular.ChevronDown24,
-            "Split command buttons",
-            "Split, toggle split, and drop-down command surfaces with the same flyout menu affordance.",
-            CreateSplitCommandButtonsSample()));
+            Strings.Buttons_Split_Title,
+            Strings.Buttons_Split_Description,
+            CreateSplitCommandButtonsSample(splitButtonOutput),
+            output: splitButtonOutput,
+            options: CreateSplitButtonOptions()));
+
+        var commandBarOutput = CreateButtonOutput(Strings.Output_Ready);
         examples.Children.Add(CreateButtonExampleCard(
             FluentIconRegular.MoreHorizontal24,
-            "FWCommandBar",
-            "Primary and secondary commands with labels, overflow state, toggle commands, and live output.",
-            CreateCommandBarSample()));
-        examples.Children.Add(CreateButtonExampleCard(
-            FluentIconRegular.TextBold24,
-            "FWToolBar and FWToolBarTray",
-            "Document and formatting command groups hosted in a tray with band, index, lock, and overflow metadata.",
-            CreateToolBarCommandSample()));
-        examples.Children.Add(CreateButtonExampleCard(
-            FluentIconRegular.LayerDiagonalSparkle24,
-            "Material command surface",
-            "Buttons, split commands, CommandBar, and ToolBar remain readable on a LiquidGlass command deck.",
-            CreateMaterialCommandSurfaceSample()));
+            Strings.Buttons_CommandBar_Title,
+            Strings.Buttons_CommandBar_Description,
+            CreateCommandBarSample(commandBarOutput),
+            output: commandBarOutput,
+            options: CreateCommandBarOptions()));
 
         panel.Children.Add(examples);
         return panel;
     }
 
-    private static UIElement CreateButtonSurfaceSample()
+    private static UIElement CreateButtonSurfaceSample(FWTextBlock output)
     {
-        var output = CreateButtonOutput("Buttons: ready");
         var repeatCount = 0;
         var repeatButton = new FWRepeatButton
         {
-            Content = CreateButtonContent(FluentIconRegular.Play24, "Repeat"),
+            Content = CreateButtonContent(FluentIconRegular.Play24, Strings.Button_Label_Repeat),
             MinWidth = 112
         };
         repeatButton.Click += (_, _) =>
         {
             repeatCount++;
-            output.Text = $"Repeat invoked: {repeatCount}";
+            output.Text = string.Format(Strings.Output_Repeat, repeatCount);
         };
 
         var dropDown = new FWDropDownButton
         {
-            Content = CreateButtonContent(FluentIconRegular.ChevronDown24, "Drop down"),
-            MinWidth = 132,
+            Content = CreateButtonContent(FluentIconRegular.ChevronDown24, Strings.Button_Label_Menu),
+            MinWidth = 120,
             Flyout = CreateSampleFlyout()
         };
 
-        return new FWStackPanel
+        var standardButton = CreateSurfaceButton(FluentIconRegular.ControlButton24, Strings.Button_Label_Button, () => output.Text = Strings.Output_ButtonClicked);
+
+        return new FWWrapPanel
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
+            HorizontalSpacing = 12,
+            VerticalSpacing = 8,
             Children =
             {
-                new FWWrapPanel
+                standardButton,
+                repeatButton,
+                new FWHyperlinkButton
                 {
-                    HorizontalSpacing = 12,
-                    VerticalSpacing = 8,
-                    Children =
-                    {
-                        CreateSurfaceButton(FluentIconRegular.ControlButton24, "Button", () => output.Text = "Button clicked"),
-                        repeatButton,
-                        new FWHyperlinkButton
-                        {
-                            Content = CreateButtonContent(FluentIconRegular.Open24, "Hyperlink"),
-                            MinWidth = 128
-                        },
-                        dropDown,
-                        new FWButton
-                        {
-                            Content = CreateButtonContent(FluentIconRegular.DismissCircle24, "Disabled"),
-                            IsEnabled = false
-                        }
-                    }
+                    Content = CreateButtonContent(FluentIconRegular.Open24, Strings.Button_Label_Link),
+                    MinWidth = 100
                 },
-                CreateButtonButtonRow(
-                    CreateButtonActionButton(FluentIconRegular.ControlButton24, "Default", () => output.Text = "Button state: default"),
-                    CreateButtonActionButton(FluentIconRegular.ChevronDown24, "Open menu", () =>
-                    {
-                        dropDown.Flyout?.ShowAt(dropDown);
-                        output.Text = "DropDownButton flyout requested";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.InfoSparkle24, "Output", () => output.Text = "Buttons keep icon and text aligned.")),
-                CreateButtonStatus(output)
-            }
-        };
-    }
-
-    private static UIElement CreateSplitCommandButtonsSample()
-    {
-        var output = CreateButtonOutput("Split commands: ready");
-        var splitButton = new FWSplitButton
-        {
-            Content = CreateButtonContent(FluentIconRegular.Save24, "Split"),
-            Width = 150,
-            Flyout = CreateSampleFlyout()
-        };
-        var toggleSplitButton = new FWToggleSplitButton
-        {
-            Content = CreateButtonContent(FluentIconRegular.Pin24, "Toggle split"),
-            Width = 170,
-            IsChecked = true,
-            Flyout = CreateSampleFlyout()
-        };
-        splitButton.Click += (_, _) => output.Text = "Primary split command invoked";
-        toggleSplitButton.IsCheckedChanged += (_, e) =>
-        {
-            output.Text = $"Toggle split checked: {FormatOnOff(e.NewValue)}";
-        };
-
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                new FWWrapPanel
+                dropDown,
+                new FWButton
                 {
-                    HorizontalSpacing = 12,
-                    VerticalSpacing = 8,
-                    Children =
-                    {
-                        splitButton,
-                        toggleSplitButton,
-                        new FWDropDownButton
-                        {
-                            Content = CreateButtonContent(FluentIconRegular.ChevronDown24, "Drop down"),
-                            Width = 150,
-                            Flyout = CreateSampleFlyout()
-                        },
-                        new FWButton
-                        {
-                            Content = CreateButtonContent(FluentIconRegular.DismissCircle24, "Disabled"),
-                            IsEnabled = false
-                        }
-                    }
-                },
-                CreateButtonButtonRow(
-                    CreateButtonActionButton(FluentIconRegular.Save24, "Primary", () => output.Text = "Primary split command invoked"),
-                    CreateButtonActionButton(FluentIconRegular.Pin24, "Toggle", () =>
-                    {
-                        toggleSplitButton.IsChecked = !toggleSplitButton.IsChecked;
-                        output.Text = $"Toggle split checked: {FormatOnOff(toggleSplitButton.IsChecked == true)}";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.ChevronDown24, "Flyout", () =>
-                    {
-                        splitButton.Flyout?.ShowAt(splitButton);
-                        output.Text = "Split flyout requested";
-                    })),
-                CreateButtonStatus(output)
-            }
-        };
-    }
-
-    private static UIElement CreateCommandBarSample()
-    {
-        var output = CreateButtonOutput("CommandBar: closed, 2 secondary commands");
-        var commandBar = new FWCommandBar
-        {
-            Width = 500,
-            DefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom
-        };
-        commandBar.PrimaryCommands.Add(CreateAppBarButton("Add", FluentIconRegular.Add24, output));
-        commandBar.PrimaryCommands.Add(CreateAppBarButton("Edit", FluentIconRegular.Edit24, output));
-        commandBar.PrimaryCommands.Add(CreateAppBarButton("Share", FluentIconRegular.Share24, output));
-        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
-        commandBar.PrimaryCommands.Add(CreateAppBarToggleButton("Pin", FluentIconRegular.Pin24, output, isChecked: true));
-        commandBar.SecondaryCommands.Add(CreateAppBarButton("Settings", FluentIconRegular.Settings24, output));
-        commandBar.SecondaryCommands.Add(CreateAppBarButton("Open", FluentIconRegular.Open24, output));
-        commandBar.Opening += (_, _) => output.Text = $"CommandBar: opening, {commandBar.SecondaryCommands.Count} secondary commands";
-        commandBar.Opened += (_, _) => output.Text = $"CommandBar: open, {commandBar.SecondaryCommands.Count} secondary commands";
-        commandBar.Closing += (_, _) => output.Text = "CommandBar: closing";
-        commandBar.Closed += (_, _) => output.Text = $"CommandBar: closed, {commandBar.SecondaryCommands.Count} secondary commands";
-
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                commandBar,
-                CreateButtonButtonRow(
-                    CreateButtonActionButton(FluentIconRegular.ChevronDown24, "Open", () => commandBar.IsOpen = true),
-                    CreateButtonActionButton(FluentIconRegular.DismissCircle24, "Close", () => commandBar.IsOpen = false),
-                    CreateButtonActionButton(FluentIconRegular.TextBold24, "Labels", () =>
-                    {
-                        commandBar.DefaultLabelPosition = commandBar.DefaultLabelPosition == CommandBarDefaultLabelPosition.Bottom
-                            ? CommandBarDefaultLabelPosition.Collapsed
-                            : CommandBarDefaultLabelPosition.Bottom;
-                        commandBar.InvalidateMeasure();
-                        output.Text = $"DefaultLabelPosition: {commandBar.DefaultLabelPosition}";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.Add24, "Add secondary", () =>
-                    {
-                        commandBar.SecondaryCommands.Add(CreateAppBarButton("Export", FluentIconRegular.ArrowDownload24, output));
-                        output.Text = $"Secondary commands: {commandBar.SecondaryCommands.Count}";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.DismissCircle24, "Remove secondary", () =>
-                    {
-                        if (commandBar.SecondaryCommands.Count > 0)
-                        {
-                            commandBar.SecondaryCommands.RemoveAt(commandBar.SecondaryCommands.Count - 1);
-                        }
-
-                        output.Text = $"Secondary commands: {commandBar.SecondaryCommands.Count}";
-                    })),
-                CreateButtonStatus(output)
-            }
-        };
-    }
-
-    private static UIElement CreateToolBarCommandSample()
-    {
-        var output = CreateButtonOutput("ToolBarTray: unlocked, horizontal, 2 bands");
-        var documentBar = new FWToolBar
-        {
-            Header = "Document",
-            Band = 0,
-            BandIndex = 0,
-            Margin = new Thickness(0, 0, 8, 8)
-        };
-        documentBar.Items.Add(CreateToolBarButton(FluentIconRegular.Save24, "Save", output));
-        documentBar.Items.Add(CreateToolBarButton(FluentIconRegular.Share24, "Share", output));
-        documentBar.Items.Add(CreateToolBarSeparator());
-        var exportButton = CreateToolBarButton(FluentIconRegular.ArrowDownload24, "Export", output);
-        Jalium.UI.Controls.ToolBar.SetOverflowMode(exportButton, OverflowMode.Always);
-        documentBar.Items.Add(exportButton);
-
-        var formattingBar = new FWToolBar
-        {
-            Header = "Formatting",
-            Band = 1,
-            BandIndex = 0,
-            Margin = new Thickness(0, 0, 8, 8)
-        };
-        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextBold24, "Bold", output));
-        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextItalic24, "Italic", output));
-        formattingBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextUnderline24, "Underline", output));
-
-        var tray = new FWToolBarTray
-        {
-            Background = ThemeBrush("ToolBarTrayBackground"),
-            Orientation = Orientation.Horizontal
-        };
-        tray.ToolBars.Add(documentBar);
-        tray.ToolBars.Add(formattingBar);
-
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                tray,
-                CreateButtonButtonRow(
-                    CreateButtonActionButton(FluentIconRegular.Pin24, "Lock tray", () =>
-                    {
-                        tray.IsLocked = !tray.IsLocked;
-                        output.Text = $"ToolBarTray locked: {FormatOnOff(tray.IsLocked)}";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.TextUnderline24, "Vertical", () =>
-                    {
-                        tray.Orientation = tray.Orientation == Orientation.Horizontal
-                            ? Orientation.Vertical
-                            : Orientation.Horizontal;
-                        output.Text = $"ToolBarTray orientation: {tray.Orientation}";
-                    }),
-                    CreateButtonActionButton(FluentIconRegular.MoreHorizontal24, "Overflow", () =>
-                    {
-                        documentBar.IsOverflowOpen = !documentBar.IsOverflowOpen;
-                        output.Text = $"Document toolbar overflow open: {FormatOnOff(documentBar.IsOverflowOpen)}";
-                    })),
-                CreateButtonStatus(output)
-            }
-        };
-    }
-
-    private static UIElement CreateMaterialCommandSurfaceSample()
-    {
-        var output = CreateButtonOutput("Material commands: LiquidGlass, command bar closed, toolbar unlocked.");
-        var splitButton = new FWSplitButton
-        {
-            Content = CreateButtonContent(FluentIconRegular.Save24, "Save"),
-            Width = 132,
-            Flyout = CreateSampleFlyout()
-        };
-        var toggleSplitButton = new FWToggleSplitButton
-        {
-            Content = CreateButtonContent(FluentIconRegular.Pin24, "Pinned"),
-            Width = 136,
-            IsChecked = true,
-            Flyout = CreateSampleFlyout()
-        };
-        var commandBar = new FWCommandBar
-        {
-            Width = 500,
-            DefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom
-        };
-        commandBar.PrimaryCommands.Add(CreateAppBarButton("Add", FluentIconRegular.Add24, output));
-        commandBar.PrimaryCommands.Add(CreateAppBarButton("Edit", FluentIconRegular.Edit24, output));
-        commandBar.PrimaryCommands.Add(CreateAppBarToggleButton("Pin", FluentIconRegular.Pin24, output, isChecked: true));
-        commandBar.SecondaryCommands.Add(CreateAppBarButton("Settings", FluentIconRegular.Settings24, output));
-
-        var toolBar = new FWToolBar
-        {
-            Header = "Format",
-            Band = 0,
-            BandIndex = 0
-        };
-        toolBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextBold24, "Bold", output));
-        toolBar.Items.Add(CreateToolBarButton(FluentIconRegular.TextItalic24, "Italic", output));
-        toolBar.Items.Add(CreateToolBarSeparator());
-        toolBar.Items.Add(CreateToolBarButton(FluentIconRegular.ArrowDownload24, "Export", output));
-        var tray = new FWToolBarTray
-        {
-            Background = ThemeBrush("ToolBarTrayBackground"),
-            Orientation = Orientation.Horizontal
-        };
-        tray.ToolBars.Add(toolBar);
-
-        splitButton.Click += (_, _) => output.Text = "Material split command invoked";
-        toggleSplitButton.IsCheckedChanged += (_, e) =>
-        {
-            output.Text = $"Material toggle split checked: {FormatOnOff(e.NewValue)}";
-        };
-
-        return new FWFluentMaterialSurface
-        {
-            Width = 540,
-            MaterialKind = FWFluentMaterialKind.LiquidGlass,
-            TintColor = Color.FromArgb(180, 20, 84, 145),
-            TintOpacity = 0.2,
-            BlurRadius = 14,
-            RefractionAmount = 70,
-            ChromaticAberration = 0.42,
-            FusionRadius = 24,
-            Background = new SolidColorBrush(Color.FromArgb(66, 255, 255, 255)),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Shape = BorderShape.SuperEllipse,
-            SuperEllipseN = 4,
-            Padding = new Thickness(16),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 12,
-                Children =
-                {
-                    CreateMaterialHeader(),
-                    new FWWrapPanel
-                    {
-                        HorizontalSpacing = 10,
-                        VerticalSpacing = 8,
-                        Children =
-                        {
-                            CreateSurfaceButton(FluentIconRegular.ControlButton24, "Run", () => output.Text = "Material run command clicked"),
-                            splitButton,
-                            toggleSplitButton,
-                            new FWDropDownButton
-                            {
-                                Content = CreateButtonContent(FluentIconRegular.MoreHorizontal24, "More"),
-                                Width = 124,
-                                Flyout = CreateSampleFlyout()
-                            }
-                        }
-                    },
-                    commandBar,
-                    tray,
-                    CreateButtonButtonRow(
-                        CreateButtonActionButton(FluentIconRegular.ChevronDown24, "CommandBar", () =>
-                        {
-                            commandBar.IsOpen = !commandBar.IsOpen;
-                            output.Text = $"Material CommandBar open: {FormatOnOff(commandBar.IsOpen)}";
-                        }),
-                        CreateButtonActionButton(FluentIconRegular.Pin24, "Lock toolbar", () =>
-                        {
-                            tray.IsLocked = !tray.IsLocked;
-                            output.Text = $"Material toolbar locked: {FormatOnOff(tray.IsLocked)}";
-                        }),
-                        CreateButtonActionButton(FluentIconRegular.TextBold24, "Labels", () =>
-                        {
-                            commandBar.DefaultLabelPosition = commandBar.DefaultLabelPosition == CommandBarDefaultLabelPosition.Bottom
-                                ? CommandBarDefaultLabelPosition.Collapsed
-                                : CommandBarDefaultLabelPosition.Bottom;
-                            output.Text = $"Material labels: {commandBar.DefaultLabelPosition}";
-                        })),
-                    CreateButtonStatus(output)
+                    Content = CreateButtonContent(FluentIconRegular.DismissCircle24, Strings.Button_Label_Disabled),
+                    IsEnabled = false,
+                    MinWidth = 110
                 }
             }
         };
     }
 
-    private static FWStackPanel CreateMaterialHeader()
+    private static UIElement CreateButtonOptions()
     {
         return new FWStackPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
             Children =
             {
-                CreateIcon(FluentIconRegular.LayerDiagonalSparkle24, 18, ThemeBrush("TextPrimary")),
                 new FWTextBlock
                 {
-                    Text = "Layered command deck",
-                    FontSize = 15,
+                    Text = Strings.Options_MinWidth,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary")
+                },
+                new TextBox
+                {
+                    Text = "112",
+                    MinWidth = 140,
+                    PlaceholderText = "e.g., 100"
+                },
+                new FWTextBlock
+                {
+                    Text = Strings.Options_State,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
                     Foreground = ThemeBrush("TextPrimary"),
-                    VerticalAlignment = VerticalAlignment.Center
+                    Margin = new Thickness(0, 8, 0, 0)
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsEnabled,
+                    IsChecked = true
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsVisible,
+                    IsChecked = true
                 }
             }
         };
     }
 
-    private static FWBorder CreateButtonExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
+    private static UIElement CreateSplitCommandButtonsSample(FWTextBlock output)
     {
-        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+        var splitButton = new FWSplitButton
+        {
+            Content = CreateButtonContent(FluentIconRegular.Save24, Strings.Button_Label_Split),
+            Width = 140,
+            Flyout = CreateSampleFlyout()
+        };
+
+        var toggleSplitButton = new FWToggleSplitButton
+        {
+            Content = CreateButtonContent(FluentIconRegular.Pin24, Strings.Button_Label_Toggle),
+            Width = 140,
+            IsChecked = true,
+            Flyout = CreateSampleFlyout()
+        };
+
+        splitButton.Click += (_, _) => output.Text = Strings.Output_SplitClicked;
+        toggleSplitButton.IsCheckedChanged += (_, e) =>
+        {
+            output.Text = string.Format(Strings.Output_Checked, FormatOnOff(e.NewValue));
+        };
+
+        return new FWWrapPanel
+        {
+            HorizontalSpacing = 12,
+            VerticalSpacing = 8,
+            Children =
+            {
+                splitButton,
+                toggleSplitButton,
+                new FWDropDownButton
+                {
+                    Content = CreateButtonContent(FluentIconRegular.ChevronDown24, Strings.Button_Label_Menu),
+                    Width = 120,
+                    Flyout = CreateSampleFlyout()
+                }
+            }
+        };
+    }
+
+    private static UIElement CreateCommandBarSample(FWTextBlock output)
+    {
+        var commandBar = new FWCommandBar
+        {
+            Width = 480,
+            DefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom
+        };
+
+        commandBar.PrimaryCommands.Add(CreateAppBarButton(Strings.Command_Add, FluentIconRegular.Add24, output));
+        commandBar.PrimaryCommands.Add(CreateAppBarButton(Strings.Command_Edit, FluentIconRegular.Edit24, output));
+        commandBar.PrimaryCommands.Add(CreateAppBarButton(Strings.Command_Share, FluentIconRegular.Share24, output));
+        commandBar.PrimaryCommands.Add(new FWAppBarSeparator());
+        commandBar.PrimaryCommands.Add(CreateAppBarToggleButton(Strings.Command_Pin, FluentIconRegular.Pin24, output, isChecked: true));
+
+        commandBar.SecondaryCommands.Add(CreateAppBarButton(Strings.Command_Settings, FluentIconRegular.Settings24, output));
+        commandBar.SecondaryCommands.Add(CreateAppBarButton(Strings.Command_Open, FluentIconRegular.Open24, output));
+
+        commandBar.Opening += (_, _) => output.Text = Strings.Output_Opening;
+        commandBar.Opened += (_, _) => output.Text = Strings.Output_Opened;
+        commandBar.Closed += (_, _) => output.Text = Strings.Output_Closed;
+
+        return commandBar;
+    }
+
+    private static UIElement CreateSplitButtonOptions()
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = Strings.Options_Width,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary")
+                },
+                new TextBox
+                {
+                    Text = "140",
+                    MinWidth = 140,
+                    PlaceholderText = "e.g., 150"
+                },
+                new FWTextBlock
+                {
+                    Text = Strings.Options_State,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    Margin = new Thickness(0, 8, 0, 0)
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsChecked,
+                    IsChecked = true
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsEnabled,
+                    IsChecked = true
+                }
+            }
+        };
+    }
+
+    private static UIElement CreateCommandBarOptions()
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                new FWTextBlock
+                {
+                    Text = Strings.Options_LabelPosition,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary")
+                },
+                new ComboBox
+                {
+                    SelectedIndex = 1,
+                    MinWidth = 140,
+                    Items =
+                    {
+                        Strings.Options_LabelPosition_Right,
+                        Strings.Options_LabelPosition_Bottom,
+                        Strings.Options_LabelPosition_Collapsed
+                    }
+                },
+                new FWTextBlock
+                {
+                    Text = Strings.Options_State,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    Margin = new Thickness(0, 8, 0, 0)
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsOpen,
+                    IsChecked = false
+                },
+                new CheckBox
+                {
+                    Content = Strings.Options_IsEnabled,
+                    IsChecked = true
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateButtonExampleCard(
+        FluentIconRegular icon,
+        string title,
+        string description,
+        UIElement content,
+        UIElement? output = null,
+        UIElement? options = null)
+    {
+        return GallerySampleCard.Create(
+            icon,
+            title,
+            description,
+            content,
+            output: output,
+            options: options,
+            code: CreateSampleCode(title));
     }
 
     private static string CreateSampleCode(string title)
     {
         return title switch
         {
-            "Button surfaces" => "<FWButton Content=\"Button\" />\n<FWRepeatButton Content=\"Repeat\" />\n<FWHyperlinkButton Content=\"Hyperlink\" />",
-            "Split command buttons" => "<FWSplitButton Content=\"Split\" />\n<FWToggleSplitButton Content=\"Toggle split\" />\n<FWDropDownButton Content=\"Drop down\" />",
+            "Button surfaces" => "<FWButton Content=\"Button\" />\n<FWRepeatButton Content=\"Repeat\" />\n<FWHyperlinkButton Content=\"Link\" />",
+            "Split command buttons" => "<FWSplitButton Content=\"Split\" />\n<FWToggleSplitButton Content=\"Toggle\" IsChecked=\"True\" />\n<FWDropDownButton Content=\"Menu\" />",
             "FWCommandBar" => "<FWCommandBar DefaultLabelPosition=\"Bottom\">\n  <FWAppBarButton Label=\"Add\" />\n  <FWAppBarToggleButton Label=\"Pin\" />\n</FWCommandBar>",
-            "FWToolBar and FWToolBarTray" => "<FWToolBarTray>\n  <FWToolBar>\n    <FWButton Content=\"Bold\" />\n  </FWToolBar>\n</FWToolBarTray>",
-            _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWButton Content=\"Command\" />\n</FWFluentMaterialSurface>"
+            _ => "<FWButton Content=\"Button\" />"
         };
     }
 
@@ -502,124 +375,53 @@ internal sealed class GalleryButtonsPage
         };
     }
 
-    private static FWWrapPanel CreateButtonButtonRow(params FWButton[] buttons)
-    {
-        var row = new FWWrapPanel
-        {
-            HorizontalSpacing = 8,
-            VerticalSpacing = 8
-        };
-
-        foreach (var button in buttons)
-        {
-            row.Children.Add(button);
-        }
-
-        return row;
-    }
-
-    private static FWButton CreateButtonActionButton(FluentIconRegular icon, string text, Action action)
-    {
-        var button = new FWButton
-        {
-            Content = CreateButtonContent(icon, text)
-        };
-        button.Click += (_, _) => action();
-        return button;
-    }
-
-    private static TextBlock CreateButtonOutput(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            FontSize = 12,
-            Foreground = ThemeBrush("TextSecondary"),
-            TextWrapping = TextWrapping.Wrap
-        };
-    }
-
-    private static FWBorder CreateButtonStatus(TextBlock status)
-    {
-        return new FWBorder
-        {
-            Background = ThemeBrush("LayerFillColorDefaultBrush"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 8,
-                Children =
-                {
-                    CreateIcon(FluentIconRegular.InfoSparkle24, 18, ThemeBrush("TextSecondary")),
-                    status
-                }
-            }
-        };
-    }
-
-    private static FWAppBarButton CreateAppBarButton(string label, FluentIconRegular icon, TextBlock output)
+    private static FWAppBarButton CreateAppBarButton(string label, FluentIconRegular icon, FWTextBlock output)
     {
         var button = new FWAppBarButton
         {
             Label = label,
-            Icon = CreateIcon(icon)
+            Icon = CreateIcon(icon, 16)
         };
-        button.Click += (_, _) => output.Text = $"Command invoked: {label}";
+        button.Click += (_, _) => output.Text = string.Format(Strings.Command_Clicked, label);
         return button;
     }
 
-    private static FWAppBarToggleButton CreateAppBarToggleButton(string label, FluentIconRegular icon, TextBlock output, bool isChecked = false)
+    private static FWAppBarToggleButton CreateAppBarToggleButton(string label, FluentIconRegular icon, FWTextBlock output, bool isChecked = false)
     {
         var button = new FWAppBarToggleButton
         {
             Label = label,
-            Icon = CreateIcon(icon),
+            Icon = CreateIcon(icon, 16),
             IsChecked = isChecked
         };
-        button.Checked += (_, _) => output.Text = $"{label}: on";
-        button.Unchecked += (_, _) => output.Text = $"{label}: off";
+        button.Click += (_, _) => output.Text = $"{label}: {FormatOnOff(button.IsChecked == true)}";
         return button;
-    }
-
-    private static FWButton CreateToolBarButton(FluentIconRegular icon, string label, TextBlock output)
-    {
-        var button = new FWButton
-        {
-            Content = CreateButtonContent(icon, label),
-            MinWidth = 86
-        };
-        button.Click += (_, _) => output.Text = $"ToolBar command: {label}. OverflowMode: {Jalium.UI.Controls.ToolBar.GetOverflowMode(button)}";
-        return button;
-    }
-
-    private static FWSeparator CreateToolBarSeparator()
-    {
-        return new FWSeparator
-        {
-            Orientation = Orientation.Vertical,
-            Height = 24,
-            Margin = new Thickness(4, 4, 4, 4),
-            StrokeBrush = ThemeBrush("ToolBarSeparatorForeground")
-        };
     }
 
     private static FWMenuFlyout CreateSampleFlyout()
     {
         var flyout = new FWMenuFlyout();
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Create", Icon = IconGlyph(FluentIconRegular.Add24) });
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Open", Icon = IconGlyph(FluentIconRegular.Open24) });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = Strings.Command_Create, Icon = CreateIcon(FluentIconRegular.Add24, 16) });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = Strings.Command_Open, Icon = CreateIcon(FluentIconRegular.Open24, 16) });
         flyout.Items.Add(new FWMenuFlyoutSeparator());
-        flyout.Items.Add(new FWMenuFlyoutItem { Text = "Export", Icon = IconGlyph(FluentIconRegular.ArrowDownload24) });
+        flyout.Items.Add(new FWMenuFlyoutItem { Text = Strings.Command_Export, Icon = CreateIcon(FluentIconRegular.ArrowDownload24, 16) });
         return flyout;
     }
 
     private static string FormatOnOff(bool value)
     {
         return value ? "on" : "off";
+    }
+
+    private static FWTextBlock CreateButtonOutput(string initialText)
+    {
+        return new FWTextBlock
+        {
+            Text = initialText,
+            FontSize = 12,
+            Foreground = ThemeBrush("TextPrimary"),
+            TextWrapping = TextWrapping.Wrap
+        };
     }
 
     private static FWStackPanel CreateSection(string title)
@@ -653,11 +455,6 @@ internal sealed class GalleryButtonsPage
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
-    }
-
-    private static string IconGlyph(FluentIconRegular icon)
-    {
-        return icon.GetString();
     }
 
     private static Brush ThemeBrush(string key)

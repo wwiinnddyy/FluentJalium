@@ -144,4 +144,152 @@
   <data name="Color_Green" xml:space="preserve">
     <value>绿色</value>
   </data>
+
+  <!-- Buttons Page -->
+  <data name="Buttons_Title" xml:space="preserve">
+    <value>按钮</value>
+  </data>
+  <data name="Buttons_Surface_Title" xml:space="preserve">
+    <value>按钮表面</value>
+  </data>
+  <data name="Buttons_Surface_Description" xml:space="preserve">
+    <value>Button、RepeatButton、HyperlinkButton、DropDownButton 和禁用状态的按钮。</value>
+  </data>
+  <data name="Buttons_Split_Title" xml:space="preserve">
+    <value>分割命令按钮</value>
+  </data>
+  <data name="Buttons_Split_Description" xml:space="preserve">
+    <value>分割按钮、切换分割按钮和下拉命令按钮，具有相同的弹出菜单功能。</value>
+  </data>
+  <data name="Buttons_CommandBar_Title" xml:space="preserve">
+    <value>命令栏</value>
+  </data>
+  <data name="Buttons_CommandBar_Description" xml:space="preserve">
+    <value>主要和次要命令，带标签、溢出状态、切换命令和实时输出。</value>
+  </data>
+
+  <!-- Button Labels -->
+  <data name="Button_Label_Button" xml:space="preserve">
+    <value>按钮</value>
+  </data>
+  <data name="Button_Label_Repeat" xml:space="preserve">
+    <value>重复</value>
+  </data>
+  <data name="Button_Label_Link" xml:space="preserve">
+    <value>链接</value>
+  </data>
+  <data name="Button_Label_Menu" xml:space="preserve">
+    <value>菜单</value>
+  </data>
+  <data name="Button_Label_Disabled" xml:space="preserve">
+    <value>禁用</value>
+  </data>
+  <data name="Button_Label_Split" xml:space="preserve">
+    <value>分割</value>
+  </data>
+  <data name="Button_Label_Toggle" xml:space="preserve">
+    <value>切换</value>
+  </data>
+
+  <!-- Sample Card -->
+  <data name="SampleCard_Output" xml:space="preserve">
+    <value>输出</value>
+  </data>
+  <data name="SampleCard_Options" xml:space="preserve">
+    <value>选项</value>
+  </data>
+  <data name="SampleCard_Code" xml:space="preserve">
+    <value>代码 / XAML</value>
+  </data>
+
+  <!-- Options Labels -->
+  <data name="Options_MinWidth" xml:space="preserve">
+    <value>最小宽度</value>
+  </data>
+  <data name="Options_Width" xml:space="preserve">
+    <value>宽度</value>
+  </data>
+  <data name="Options_State" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Options_IsEnabled" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="Options_IsVisible" xml:space="preserve">
+    <value>可见</value>
+  </data>
+  <data name="Options_IsChecked" xml:space="preserve">
+    <value>选中</value>
+  </data>
+  <data name="Options_IsOpen" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="Options_LabelPosition" xml:space="preserve">
+    <value>标签位置</value>
+  </data>
+  <data name="Options_LabelPosition_Right" xml:space="preserve">
+    <value>右侧</value>
+  </data>
+  <data name="Options_LabelPosition_Bottom" xml:space="preserve">
+    <value>底部</value>
+  </data>
+  <data name="Options_LabelPosition_Collapsed" xml:space="preserve">
+    <value>折叠</value>
+  </data>
+
+  <!-- Output Messages -->
+  <data name="Output_Ready" xml:space="preserve">
+    <value>就绪</value>
+  </data>
+  <data name="Output_ButtonClicked" xml:space="preserve">
+    <value>按钮已点击</value>
+  </data>
+  <data name="Output_SplitClicked" xml:space="preserve">
+    <value>分割按钮已点击</value>
+  </data>
+  <data name="Output_Opening" xml:space="preserve">
+    <value>正在打开...</value>
+  </data>
+  <data name="Output_Opened" xml:space="preserve">
+    <value>已打开</value>
+  </data>
+  <data name="Output_Closed" xml:space="preserve">
+    <value>已关闭</value>
+  </data>
+  <data name="Output_Repeat" xml:space="preserve">
+    <value>重复: {0}</value>
+  </data>
+  <data name="Output_Checked" xml:space="preserve">
+    <value>选中: {0}</value>
+  </data>
+
+  <!-- Command Bar Labels -->
+  <data name="Command_Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Command_Edit" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="Command_Share" xml:space="preserve">
+    <value>分享</value>
+  </data>
+  <data name="Command_Pin" xml:space="preserve">
+    <value>固定</value>
+  </data>
+  <data name="Command_Settings" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="Command_Open" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="Command_Create" xml:space="preserve">
+    <value>创建</value>
+  </data>
+  <data name="Command_Export" xml:space="preserve">
+    <value>导出</value>
+  </data>
+  <data name="Command_Clicked" xml:space="preserve">
+    <value>{0}已点击</value>
+  </data>
+
 </root>

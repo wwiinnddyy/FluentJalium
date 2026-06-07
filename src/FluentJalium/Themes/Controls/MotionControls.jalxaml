@@ -1,0 +1,147 @@
+<ResourceDictionary xmlns="http://jalium.ui/xaml/2024"
+                    xmlns:x="http://jalium.ui/xaml/x/2024"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls">
+
+  <!-- FWAnimatedIcon Default Style -->
+  <Style TargetType="controls:FWAnimatedIcon">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FWAnimatedIcon">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <Panel x:Name="PART_RootPanel" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- FWAnimatedVisualPlayer Default Style -->
+  <Style TargetType="controls:FWAnimatedVisualPlayer">
+    <Setter Property="Width" Value="100" />
+    <Setter Property="Height" Value="100" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FWAnimatedVisualPlayer">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <Viewbox Stretch="{TemplateBinding Stretch}">
+              <ContentPresenter x:Name="PART_ContentPresenter" />
+            </Viewbox>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- FWItemsRepeater Default Style -->
+  <Style TargetType="controls:FWItemsRepeater">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalCacheLength" Value="200" />
+    <Setter Property="VerticalCacheLength" Value="200" />
+  </Style>
+
+  <!-- FWRefreshContainer Default Style -->
+  <Style TargetType="controls:FWRefreshContainer">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FWRefreshContainer">
+          <Grid>
+            <Border x:Name="PART_RefreshVisualizerBorder"
+                    VerticalAlignment="Top"
+                    Height="60"
+                    Background="{DynamicResource LayerFillColorDefaultBrush}"
+                    Visibility="Collapsed">
+              <ProgressRing x:Name="PART_RefreshIndicator"
+                           Width="24"
+                           Height="24"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+            </Border>
+            <ScrollViewer x:Name="PART_ScrollViewer"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Disabled">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </ScrollViewer>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- FWScroller Default Style -->
+  <Style TargetType="controls:FWScroller">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FWScroller">
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}">
+            <ScrollViewer x:Name="PART_ScrollViewer"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Auto">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </ScrollViewer>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- FWAnnotatedScrollBar Default Style -->
+  <Style TargetType="controls:FWAnnotatedScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FWAnnotatedScrollBar">
+          <Grid>
+            <Border Background="{DynamicResource ControlFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4">
+              <Track x:Name="PART_Track"
+                     Orientation="{TemplateBinding Orientation}"
+                     IsDirectionReversed="True">
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.LineUpCommand"
+                               Opacity="0" />
+                </Track.DecreaseRepeatButton>
+                <Track.Thumb>
+                  <Thumb Background="{DynamicResource ControlStrongFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="4" />
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.LineDownCommand"
+                               Opacity="0" />
+                </Track.IncreaseRepeatButton>
+              </Track>
+            </Border>
+            <Canvas x:Name="PART_DetailsCanvas"
+                   IsHitTestVisible="False" />
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- FWBackdrop Default Style -->
+  <Style TargetType="controls:FWBackdrop">
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="TintColor" Value="{DynamicResource LayerFillColorDefault}" />
+    <Setter Property="TintOpacity" Value="0.8" />
+    <Setter Property="LuminosityOpacity" Value="0.85" />
+  </Style>
+
+</ResourceDictionary>

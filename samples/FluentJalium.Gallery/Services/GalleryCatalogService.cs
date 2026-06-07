@@ -11,7 +11,8 @@ internal sealed class GalleryCatalogService
 {
     public GalleryPage[] CreatePages(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
     {
-        return GalleryCatalog.Create(CreateContentFactories(owner, applyTheme, applyAccent));
+        var localization = new GalleryLocalizationService();
+        return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent));
     }
 
     private static IReadOnlyDictionary<string, Func<UIElement>> CreateContentFactories(

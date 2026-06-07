@@ -37,7 +37,7 @@ public sealed class LocalizationService : INotifyPropertyChanged
             CultureInfo.CurrentCulture = value;
 
             OnPropertyChanged();
-            OnPropertyChanged(nameof(this[null!])); // Trigger all string updates
+            OnPropertyChanged("Item[]"); // Trigger all string updates
         }
     }
 

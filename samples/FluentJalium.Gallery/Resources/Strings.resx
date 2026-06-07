@@ -144,4 +144,152 @@
   <data name="Color_Green" xml:space="preserve">
     <value>Green</value>
   </data>
+
+  <!-- Buttons Page -->
+  <data name="Buttons_Title" xml:space="preserve">
+    <value>Buttons</value>
+  </data>
+  <data name="Buttons_Surface_Title" xml:space="preserve">
+    <value>Button surfaces</value>
+  </data>
+  <data name="Buttons_Surface_Description" xml:space="preserve">
+    <value>Button, RepeatButton, HyperlinkButton, DropDownButton, and disabled command states.</value>
+  </data>
+  <data name="Buttons_Split_Title" xml:space="preserve">
+    <value>Split command buttons</value>
+  </data>
+  <data name="Buttons_Split_Description" xml:space="preserve">
+    <value>Split, toggle split, and drop-down command surfaces with the same flyout menu affordance.</value>
+  </data>
+  <data name="Buttons_CommandBar_Title" xml:space="preserve">
+    <value>FWCommandBar</value>
+  </data>
+  <data name="Buttons_CommandBar_Description" xml:space="preserve">
+    <value>Primary and secondary commands with labels, overflow state, toggle commands, and live output.</value>
+  </data>
+
+  <!-- Button Labels -->
+  <data name="Button_Label_Button" xml:space="preserve">
+    <value>Button</value>
+  </data>
+  <data name="Button_Label_Repeat" xml:space="preserve">
+    <value>Repeat</value>
+  </data>
+  <data name="Button_Label_Link" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="Button_Label_Menu" xml:space="preserve">
+    <value>Menu</value>
+  </data>
+  <data name="Button_Label_Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Button_Label_Split" xml:space="preserve">
+    <value>Split</value>
+  </data>
+  <data name="Button_Label_Toggle" xml:space="preserve">
+    <value>Toggle</value>
+  </data>
+
+  <!-- Sample Card -->
+  <data name="SampleCard_Output" xml:space="preserve">
+    <value>Output</value>
+  </data>
+  <data name="SampleCard_Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="SampleCard_Code" xml:space="preserve">
+    <value>Code / XAML</value>
+  </data>
+
+  <!-- Options Labels -->
+  <data name="Options_MinWidth" xml:space="preserve">
+    <value>MinWidth</value>
+  </data>
+  <data name="Options_Width" xml:space="preserve">
+    <value>Width</value>
+  </data>
+  <data name="Options_State" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="Options_IsEnabled" xml:space="preserve">
+    <value>IsEnabled</value>
+  </data>
+  <data name="Options_IsVisible" xml:space="preserve">
+    <value>IsVisible</value>
+  </data>
+  <data name="Options_IsChecked" xml:space="preserve">
+    <value>IsChecked</value>
+  </data>
+  <data name="Options_IsOpen" xml:space="preserve">
+    <value>IsOpen</value>
+  </data>
+  <data name="Options_LabelPosition" xml:space="preserve">
+    <value>Label Position</value>
+  </data>
+  <data name="Options_LabelPosition_Right" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="Options_LabelPosition_Bottom" xml:space="preserve">
+    <value>Bottom</value>
+  </data>
+  <data name="Options_LabelPosition_Collapsed" xml:space="preserve">
+    <value>Collapsed</value>
+  </data>
+
+  <!-- Output Messages -->
+  <data name="Output_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Output_ButtonClicked" xml:space="preserve">
+    <value>Button clicked</value>
+  </data>
+  <data name="Output_SplitClicked" xml:space="preserve">
+    <value>Split clicked</value>
+  </data>
+  <data name="Output_Opening" xml:space="preserve">
+    <value>Opening...</value>
+  </data>
+  <data name="Output_Opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="Output_Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="Output_Repeat" xml:space="preserve">
+    <value>Repeat: {0}</value>
+  </data>
+  <data name="Output_Checked" xml:space="preserve">
+    <value>Checked: {0}</value>
+  </data>
+
+  <!-- Command Bar Labels -->
+  <data name="Command_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Command_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Command_Share" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="Command_Pin" xml:space="preserve">
+    <value>Pin</value>
+  </data>
+  <data name="Command_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Command_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Command_Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Command_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Command_Clicked" xml:space="preserve">
+    <value>{0} clicked</value>
+  </data>
+
 </root>
