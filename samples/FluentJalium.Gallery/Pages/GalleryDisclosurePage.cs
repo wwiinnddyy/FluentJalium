@@ -18,10 +18,13 @@ using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTaskDialog = FluentJalium.Controls.FWTaskDialog;
 using FWTaskDialogButton = FluentJalium.Controls.FWTaskDialogButton;
 using FWTaskDialogButtonClickEventArgs = FluentJalium.Controls.FWTaskDialogButtonClickEventArgs;
+using FWTeachingTip = FluentJalium.Controls.FWTeachingTip;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWToolTip = FluentJalium.Controls.FWToolTip;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+using TeachingTipPlacementMode = FluentJalium.Controls.TeachingTipPlacementMode;
+using TeachingTipTailVisibility = FluentJalium.Controls.TeachingTipTailVisibility;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -51,6 +54,11 @@ internal sealed class GalleryDisclosurePage
             "FWToolTip",
             "Tooltip placement, timing, open/close state, and icon button target.",
             CreateToolTipSample()));
+        examples.Children.Add(CreateDisclosureExampleCard(
+            FluentIconRegular.TargetSparkle24,
+            "FWTeachingTip",
+            "Targeted guidance with title, subtitle, hero content, action, close, placement, and tail states.",
+            CreateTeachingTipSample()));
         examples.Children.Add(CreateDisclosureExampleCard(
             FluentIconRegular.WindowNew24,
             "FWContentDialog",
@@ -238,6 +246,148 @@ internal sealed class GalleryDisclosurePage
                     {
                         toolTip.Placement = PlacementMode.Top;
                         output.Text = $"ToolTip placement: {toolTip.Placement}";
+                    })),
+                CreateDisclosureStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateTeachingTipSample()
+    {
+        var output = CreateDisclosureOutput("TeachingTip: open below target, tail visible.");
+        var placementIndex = 0;
+        var tailIndex = 0;
+        var heroUsesAccent = false;
+        var placements = new[]
+        {
+            TeachingTipPlacementMode.Bottom,
+            TeachingTipPlacementMode.Top,
+            TeachingTipPlacementMode.Right,
+            TeachingTipPlacementMode.Left
+        };
+        var tailStates = new[]
+        {
+            TeachingTipTailVisibility.Visible,
+            TeachingTipTailVisibility.Auto,
+            TeachingTipTailVisibility.Collapsed
+        };
+        var target = new FWButton
+        {
+            Content = CreateDisclosureButtonContent(FluentIconRegular.Target24, "Open targeted tip"),
+            MinWidth = 210
+        };
+        var teachingTip = new FWTeachingTip
+        {
+            Target = target,
+            IsOpen = true,
+            Title = "Review new density options",
+            Subtitle = "FWTeachingTip anchors guidance to a live target.",
+            IconSource = CreateIcon(FluentIconRegular.InfoSparkle24, 20, ThemeBrush("TextPrimary")),
+            ActionButtonContent = "Apply",
+            CloseButtonContent = "Later",
+            PreferredPlacement = placements[placementIndex],
+            TailVisibility = tailStates[tailIndex],
+            IsLightDismissEnabled = true,
+            Width = 340,
+            HeroContent = CreateTeachingTipHero(heroUsesAccent),
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = "Use the action button to accept the suggestion, or close it when the target no longer needs guidance.",
+                        Foreground = ThemeBrush("TextPrimary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "Content area: contextual onboarding copy and lightweight details.",
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
+            }
+        };
+
+        void UpdateTeachingTipStatus(string action)
+        {
+            output.Text = $"{action}. Open: {FormatOnOff(teachingTip.IsOpen)}, placement: {teachingTip.PreferredPlacement}, tail: {teachingTip.TailVisibility}, action: {teachingTip.ActionButtonContent}, close: {teachingTip.CloseButtonContent}.";
+        }
+
+        target.Click += (_, _) =>
+        {
+            teachingTip.IsOpen = true;
+            UpdateTeachingTipStatus("TeachingTip opened from target");
+        };
+        teachingTip.ActionButtonClick += (_, _) =>
+        {
+            teachingTip.IsOpen = false;
+            UpdateTeachingTipStatus("TeachingTip action clicked");
+        };
+        teachingTip.Closing += (_, args) =>
+        {
+            output.Text = $"TeachingTip closing: {args.Reason}.";
+        };
+        teachingTip.Closed += (_, args) =>
+        {
+            output.Text = $"TeachingTip closed: {args.Reason}.";
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                target,
+                teachingTip,
+                CreateDisclosureButtonRow(
+                    CreateDisclosureActionButton(FluentIconRegular.Open24, "Open", () =>
+                    {
+                        teachingTip.IsOpen = true;
+                        UpdateTeachingTipStatus("TeachingTip opened");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.DismissCircle24, "Close", () =>
+                    {
+                        teachingTip.IsOpen = false;
+                        UpdateTeachingTipStatus("TeachingTip closed programmatically");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.ArrowSortDown24, "Placement", () =>
+                    {
+                        placementIndex = (placementIndex + 1) % placements.Length;
+                        teachingTip.PreferredPlacement = placements[placementIndex];
+                        UpdateTeachingTipStatus("TeachingTip placement changed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Cursor24, "Tail", () =>
+                    {
+                        tailIndex = (tailIndex + 1) % tailStates.Length;
+                        teachingTip.TailVisibility = tailStates[tailIndex];
+                        UpdateTeachingTipStatus("TeachingTip tail visibility changed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.ImageSparkle24, "Hero", () =>
+                    {
+                        heroUsesAccent = !heroUsesAccent;
+                        teachingTip.HeroContent = CreateTeachingTipHero(heroUsesAccent);
+                        UpdateTeachingTipStatus("TeachingTip hero content refreshed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.ControlButton24, "Buttons", () =>
+                    {
+                        if (Equals(teachingTip.ActionButtonContent, "Apply"))
+                        {
+                            teachingTip.ActionButtonContent = "Learn more";
+                            teachingTip.CloseButtonContent = "Done";
+                        }
+                        else
+                        {
+                            teachingTip.ActionButtonContent = "Apply";
+                            teachingTip.CloseButtonContent = "Later";
+                        }
+
+                        UpdateTeachingTipStatus("TeachingTip button content changed");
                     })),
                 CreateDisclosureStatus(output)
             }
@@ -627,6 +777,36 @@ internal sealed class GalleryDisclosurePage
         };
     }
 
+    private static FWBorder CreateTeachingTipHero(bool accent)
+    {
+        var foreground = ThemeBrush(accent ? "TextOnAccent" : "TextPrimary");
+
+        return new FWBorder
+        {
+            Background = ThemeBrush(accent ? "AccentFillColorDefaultBrush" : "LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(accent ? FluentIconRegular.Sparkle24 : FluentIconRegular.TargetSparkle24, 18, foreground),
+                    new FWTextBlock
+                    {
+                        Text = accent ? "Accent hero content" : "Targeted hero content",
+                        FontSize = 13,
+                        Foreground = foreground,
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
+    }
+
     private static FWSettingsCard CreateSettingsRow(string header, string description, FluentIconRegular icon, string value)
     {
         return new FWSettingsCard
@@ -751,6 +931,7 @@ internal sealed class GalleryDisclosurePage
             "FWExpander" => "<FWExpander Header=\"Advanced options\" IsExpanded=\"True\">\n    <FWTextBlock Text=\"Expanded content\" />\n</FWExpander>",
             "FWGroupBox" => "<FWGroupBox Header=\"Settings\">\n    <FWCheckBox Content=\"Sync group option\" />\n</FWGroupBox>",
             "FWToolTip" => "<FWButton Content=\"Hover for FWToolTip\">\n    <FWButton.ToolTip>\n        <FWToolTip Placement=\"Top\" />\n    </FWButton.ToolTip>\n</FWButton>",
+            "FWTeachingTip" => "<FWButton x:Name=\"DensityButton\" Content=\"Open targeted tip\" />\n<FWTeachingTip Title=\"Review new density options\"\n               Subtitle=\"FWTeachingTip anchors guidance to a live target.\"\n               Target=\"{Binding ElementName=DensityButton}\"\n               ActionButtonContent=\"Apply\"\n               CloseButtonContent=\"Later\"\n               PreferredPlacement=\"Bottom\"\n               TailVisibility=\"Visible\">\n    <FWTeachingTip.HeroContent>\n        <FWBorder Background=\"{ThemeResource LayerFillColorDefaultBrush}\" />\n    </FWTeachingTip.HeroContent>\n    <FWTextBlock Text=\"Use targeted guidance for contextual onboarding.\" />\n</FWTeachingTip>",
             "FWContentDialog" => "<FWContentDialog Title=\"Save gallery changes?\" PrimaryButtonText=\"Save\" SecondaryButtonText=\"Review\" CloseButtonText=\"Cancel\" />",
             "FWTaskDialog" => "<FWTaskDialog Title=\"Delete temporary layout cache?\" PrimaryButtonText=\"Delete\" SecondaryButtonText=\"Archive\" CloseButtonText=\"Cancel\" IsOpen=\"True\" />",
             "FWSettingsExpander" => "<FWSettingsExpander Header=\"Appearance\" Description=\"Theme and material options\" IsExpanded=\"True\">\n    <FWSettingsExpander.Items>\n        <FWSettingsCard Header=\"App theme\" />\n        <FWSettingsCard Header=\"Window material\" IsClickEnabled=\"True\" />\n        <FWSettingsCard Header=\"Control density\" />\n    </FWSettingsExpander.Items>\n</FWSettingsExpander>",

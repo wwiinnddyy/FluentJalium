@@ -21,7 +21,7 @@ public class FWTeachingTip : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty TargetProperty =
         DependencyProperty.Register(nameof(Target), typeof(FrameworkElement), typeof(FWTeachingTip),
-            new PropertyMetadata(null));
+            new PropertyMetadata(null, OnPopupStatePropertyChanged));
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(string), typeof(FWTeachingTip),
@@ -53,11 +53,11 @@ public class FWTeachingTip : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty IsLightDismissEnabledProperty =
         DependencyProperty.Register(nameof(IsLightDismissEnabled), typeof(bool), typeof(FWTeachingTip),
-            new PropertyMetadata(true));
+            new PropertyMetadata(true, OnPopupStatePropertyChanged));
 
     public static readonly DependencyProperty PreferredPlacementProperty =
         DependencyProperty.Register(nameof(PreferredPlacement), typeof(TeachingTipPlacementMode), typeof(FWTeachingTip),
-            new PropertyMetadata(TeachingTipPlacementMode.Auto));
+            new PropertyMetadata(TeachingTipPlacementMode.Auto, OnPopupStatePropertyChanged));
 
     public static readonly DependencyProperty TailVisibilityProperty =
         DependencyProperty.Register(nameof(TailVisibility), typeof(TeachingTipTailVisibility), typeof(FWTeachingTip),
@@ -272,13 +272,22 @@ public class FWTeachingTip : ContentControl, IFluentJaliumControl
         }
     }
 
+    private static void OnPopupStatePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWTeachingTip tip)
+        {
+            tip.UpdatePopupState();
+        }
+    }
+
     private void UpdatePopupState()
     {
         if (_popup != null)
         {
+            _popup.StaysOpen = !IsLightDismissEnabled;
             _popup.IsOpen = IsOpen;
 
-            if (IsOpen && Target != null)
+            if (Target != null)
             {
                 _popup.PlacementTarget = Target;
                 _popup.Placement = ConvertPlacement(PreferredPlacement);

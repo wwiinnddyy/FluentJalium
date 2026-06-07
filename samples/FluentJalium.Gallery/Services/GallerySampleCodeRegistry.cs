@@ -245,6 +245,37 @@ taskDialog.PrimaryButtonClick += (_, args) =>
     args.Cancel = false;
 };
 """,
+        ["disclosure.teachingtip"] = """
+var target = new FWButton
+{
+    Content = "Show onboarding tip"
+};
+
+var teachingTip = new FWTeachingTip
+{
+    Target = target,
+    Title = "Use metadata filters",
+    Subtitle = "TeachingTip anchors guidance to a specific control.",
+    IconSource = FluentIconFactory.Regular(FluentIconRegular.Info24),
+    ActionButtonContent = "Open docs",
+    CloseButtonContent = "Got it",
+    PreferredPlacement = TeachingTipPlacementMode.Bottom,
+    TailVisibility = TeachingTipTailVisibility.Visible,
+    HeroContent = new FWBorder
+    {
+        Height = 56,
+        Background = new SolidColorBrush(Color.FromRgb(0xE8, 0xF2, 0xFF)),
+        CornerRadius = new CornerRadius(6)
+    },
+    Content = new FWTextBlock
+    {
+        Text = "Pair a short title with one primary action and a clear dismiss affordance.",
+        TextWrapping = TextWrapping.Wrap
+    }
+};
+
+teachingTip.IsOpen = true;
+""",
         ["advancedinteraction.scroller"] = """
 var scroller = new FWScroller
 {

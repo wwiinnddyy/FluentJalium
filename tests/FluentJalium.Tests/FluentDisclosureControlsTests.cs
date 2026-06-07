@@ -77,6 +77,7 @@ public sealed class FluentDisclosureControlsTests
             AssertStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTeachingTip>(app.Resources);
             AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
         }
@@ -143,6 +144,16 @@ public sealed class FluentDisclosureControlsTests
         var fwContentDialogStyle = AssertStyle<FWContentDialog>(dictionary);
         Assert.Same(contentDialogStyle, fwContentDialogStyle.BasedOn);
         AssertSetter(fwContentDialogStyle, FWContentDialog.DensityProperty);
+
+        var teachingTipStyle = AssertStyle<FWTeachingTip>(dictionary);
+        Assert.Null(teachingTipStyle.BasedOn);
+        AssertSetter(teachingTipStyle, Control.BackgroundProperty);
+        AssertSetter(teachingTipStyle, Control.ForegroundProperty);
+        AssertSetter(teachingTipStyle, Control.BorderBrushProperty);
+        AssertSetter(teachingTipStyle, Control.PaddingProperty);
+        AssertSetter(teachingTipStyle, FrameworkElement.MinWidthProperty);
+        AssertSetter(teachingTipStyle, FrameworkElement.MaxWidthProperty);
+        AssertSetter(teachingTipStyle, Control.TemplateProperty);
 
         var taskDialogStyle = AssertStyle<FWTaskDialog>(dictionary);
         Assert.Null(taskDialogStyle.BasedOn);
@@ -230,6 +241,60 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.Equal(new Thickness(10, 12, 10, 10), groupBox.Padding);
         Assert.Equal(48, groupBox.MinHeight);
+    }
+
+    [Fact]
+    public void FWTeachingTip_ShouldExposeTargetActionAndClosingSemantics()
+    {
+        var target = new FWButton { Content = "Target" };
+        var icon = new FWFontIcon();
+        var hero = new FWBorder { Width = 120, Height = 48 };
+        var content = new FWTextBlock { Text = "Keyboard hint" };
+        var tip = new FWTeachingTip
+        {
+            Target = target,
+            Title = "Try search suggestions",
+            Subtitle = "TeachingTip anchors contextual guidance to a control.",
+            IconSource = icon,
+            HeroContent = hero,
+            Content = content,
+            ActionButtonContent = "Open docs",
+            ActionButtonCommandParameter = "docs",
+            CloseButtonContent = "Got it",
+            PreferredPlacement = TeachingTipPlacementMode.BottomRight,
+            TailVisibility = TeachingTipTailVisibility.Visible,
+            IsLightDismissEnabled = false,
+            IsOpen = true
+        };
+
+        Assert.IsAssignableFrom<IFluentJaliumControl>(tip);
+        Assert.Same(target, tip.Target);
+        Assert.Equal("Try search suggestions", tip.Title);
+        Assert.Equal("TeachingTip anchors contextual guidance to a control.", tip.Subtitle);
+        Assert.Same(icon, tip.IconSource);
+        Assert.Same(hero, tip.HeroContent);
+        Assert.Same(content, tip.Content);
+        Assert.Equal("Open docs", tip.ActionButtonContent);
+        Assert.Equal("docs", tip.ActionButtonCommandParameter);
+        Assert.Equal("Got it", tip.CloseButtonContent);
+        Assert.Equal(TeachingTipPlacementMode.BottomRight, tip.PreferredPlacement);
+        Assert.Equal(TeachingTipTailVisibility.Visible, tip.TailVisibility);
+        Assert.False(tip.IsLightDismissEnabled);
+        Assert.True(tip.IsOpen);
+
+        var closingArgs = new TeachingTipClosingEventArgs(FWTeachingTip.ClosingEvent, tip)
+        {
+            Reason = TeachingTipCloseReason.CloseButton,
+            Cancel = true
+        };
+        var closedArgs = new TeachingTipClosedEventArgs(FWTeachingTip.ClosedEvent, tip)
+        {
+            Reason = TeachingTipCloseReason.Programmatic
+        };
+
+        Assert.Equal(TeachingTipCloseReason.CloseButton, closingArgs.Reason);
+        Assert.True(closingArgs.Cancel);
+        Assert.Equal(TeachingTipCloseReason.Programmatic, closedArgs.Reason);
     }
 
     [Fact]
@@ -417,6 +482,20 @@ public sealed class FluentDisclosureControlsTests
         taskDialog.CloseButtonClick += (_, _) => taskClosed++;
         taskDialog.Open();
         taskDialog.RequestCloseButtonClick();
+        var teachingTip = new FWTeachingTip
+        {
+            Target = target,
+            Title = "Preview control states",
+            Subtitle = "TeachingTip keeps contextual guidance anchored to the sample.",
+            IconSource = new FWFontIcon(),
+            HeroContent = new FWBorder { Width = 120, Height = 42 },
+            Content = new FWTextBlock { Text = "Open the action to inspect related metadata." },
+            ActionButtonContent = "View metadata",
+            CloseButtonContent = "Dismiss",
+            PreferredPlacement = TeachingTipPlacementMode.Bottom,
+            TailVisibility = TeachingTipTailVisibility.Auto,
+            IsOpen = true
+        };
         var panel = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
@@ -426,7 +505,8 @@ public sealed class FluentDisclosureControlsTests
                 expander,
                 settingsExpander,
                 groupBox,
-                target
+                target,
+                teachingTip
             }
         };
         var surface = new FWFluentMaterialSurface
@@ -471,6 +551,11 @@ public sealed class FluentDisclosureControlsTests
         Assert.Equal(FWTaskDialogResult.Close, taskDialog.Result);
         Assert.False(taskDialog.IsOpen);
         Assert.Equal(1, taskClosed);
+        Assert.Same(target, teachingTip.Target);
+        Assert.Equal("Preview control states", teachingTip.Title);
+        Assert.Equal("Dismiss", teachingTip.CloseButtonContent);
+        Assert.Equal(TeachingTipPlacementMode.Bottom, teachingTip.PreferredPlacement);
+        Assert.True(teachingTip.IsOpen);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);

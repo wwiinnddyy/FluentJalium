@@ -108,6 +108,7 @@ public sealed class FluentThemeManagerTests
             AssertContainsStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTeachingTip>(app.Resources);
             AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
             AssertBasedOnStyle<FWScrollBar, ScrollBar>(app.Resources);
@@ -1135,6 +1136,7 @@ public sealed class FluentThemeManagerTests
             AssertContainsStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTeachingTip>(app.Resources);
             AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
         }
@@ -1365,6 +1367,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWSettingsExpander, Expander>();
         AssertFluentControl<FWToolTip, ToolTip>();
         AssertFluentControl<FWContentDialog, ContentDialog>();
+        AssertFluentControl<FWTeachingTip, ContentControl>();
         AssertFluentControl<FWTaskDialog, ContentControl>();
         AssertFluentControl<FWGroupBox, GroupBox>();
     }
