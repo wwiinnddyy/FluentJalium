@@ -5,6 +5,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FluentJalium.Controls;
+using FWBorder = FluentJalium.Controls.FWBorder;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -74,7 +75,7 @@ public class InteractionControlsPage : Page
 
     private UIElement CreateRefreshContainerSection()
     {
-        var border = new Border
+        var border = new FWBorder
         {
             Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xF9, 0xF9)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
@@ -115,7 +116,7 @@ public class InteractionControlsPage : Page
         // Add sample content
         for (int i = 1; i <= 10; i++)
         {
-            contentStack.Children.Add(new Border
+            contentStack.Children.Add(new FWBorder
             {
                 Padding = new Thickness(8),
                 Background = new SolidColorBrush(Colors.White),
@@ -192,7 +193,7 @@ public class InteractionControlsPage : Page
         var stack = new StackPanel { Spacing = 8 };
         for (int i = 1; i <= 20; i++)
         {
-            stack.Children.Add(new Border
+            stack.Children.Add(new FWBorder
             {
                 Padding = new Thickness(8),
                 Child = new TextBlock { Text = $"Scrollable Item {i}" }
@@ -216,7 +217,7 @@ public class InteractionControlsPage : Page
         var stack = new StackPanel { Spacing = 0 };
         for (int i = 1; i <= 10; i++)
         {
-            stack.Children.Add(new Border
+            stack.Children.Add(new FWBorder
             {
                 Height = 60,
                 Background = i % 2 == 0
@@ -237,7 +238,7 @@ public class InteractionControlsPage : Page
 
     private UIElement CreateAnnotatedScrollBarSection()
     {
-        var border = new Border
+        var border = new FWBorder
         {
             Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xF9, 0xF9)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
@@ -264,7 +265,7 @@ public class InteractionControlsPage : Page
         var content = new StackPanel { Spacing = 8 };
         for (int i = 1; i <= 30; i++)
         {
-            content.Children.Add(new Border
+            content.Children.Add(new FWBorder
             {
                 Padding = new Thickness(8),
                 Child = new TextBlock
@@ -310,7 +311,7 @@ public class InteractionControlsPage : Page
 
         stack.Children.Add(content);
 
-        return new Border
+        return new FWBorder
         {
             Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xF9, 0xF9)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),

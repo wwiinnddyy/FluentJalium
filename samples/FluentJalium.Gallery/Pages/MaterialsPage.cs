@@ -3,6 +3,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FluentJalium.Controls;
+using FWBorder = FluentJalium.Controls.FWBorder;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -114,7 +115,7 @@ public class MaterialsPage : Page
 
     private Border CreateBackdropDemo(string title, FWBackdropType type, string description)
     {
-        var container = new Border
+        var container = new FWBorder
         {
             Height = 200,
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
@@ -210,7 +211,7 @@ public class MaterialsPage : Page
             BackgroundSource = AcrylicBackgroundSource.Backdrop
         };
 
-        var border = new Border
+        var border = new FWBorder
         {
             Height = 150,
             Background = brush.CreateBrush(), // Use CreateBrush() method

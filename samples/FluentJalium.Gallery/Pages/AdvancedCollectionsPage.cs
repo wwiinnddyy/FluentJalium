@@ -6,6 +6,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using Jalium.UI.Data;
 using FluentJalium.Controls;
+using FWBorder = FluentJalium.Controls.FWBorder;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -136,7 +137,7 @@ public class AdvancedCollectionsPage : Page
 
     private UIElement CreateItemsRepeaterDemo()
     {
-        var border = new Border
+        var border = new FWBorder
         {
             Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xF9, 0xF9)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
@@ -176,7 +177,7 @@ public class AdvancedCollectionsPage : Page
 
         template.SetVisualTree(() =>
         {
-            var border = new Border
+            var border = new FWBorder
             {
                 Background = new SolidColorBrush(Colors.White),
                 BorderBrush = new SolidColorBrush(Color.FromRgb(0xD0, 0xD0, 0xD0)),

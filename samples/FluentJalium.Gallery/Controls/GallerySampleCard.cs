@@ -195,7 +195,7 @@ internal static class GallerySampleCard
 
     private static UIElement CreateCodeBlock(string code)
     {
-        return new Border
+        return new FWBorder
         {
             Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
             BorderBrush = GalleryThemeResources.Brush("ControlBorder"),

@@ -1,5 +1,8 @@
+using System.Reflection;
 using FluentJalium.Controls;
+using FluentJalium.Icon;
 using Jalium.UI;
+using Jalium.UI.Controls;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests.Controls;
@@ -78,6 +81,50 @@ public class FWAnimatedIconTests
     }
 
     [Fact]
+    public void FallbackContent_ShouldUseFluentCompatibleFontForPrivateUseGlyphs()
+    {
+        var glyph = FluentIconRegular.Share24.GetString();
+        var icon = new FWAnimatedIcon
+        {
+            FallbackIconSource = glyph
+        };
+
+        var fallback = Assert.IsType<TextBlock>(CreateFallbackContent(icon));
+
+        Assert.Equal(glyph, fallback.Text);
+        Assert.Equal(FluentIconFonts.Regular, fallback.FontFamily);
+    }
+
+    [Fact]
+    public void FallbackContent_ShouldUseTextFontForPlainUnicodeGlyphs()
+    {
+        var icon = new FWAnimatedIcon
+        {
+            FallbackIconSource = ">"
+        };
+
+        var fallback = Assert.IsType<TextBlock>(CreateFallbackContent(icon));
+
+        Assert.Equal(">", fallback.Text);
+        Assert.Equal(FrameworkElement.DefaultFontFamilyName, fallback.FontFamily);
+    }
+
+    [Fact]
+    public void FallbackContent_ShouldCreateFluentIconForFluentIconEnums()
+    {
+        var icon = new FWAnimatedIcon
+        {
+            FallbackIconSource = FluentIconRegular.Save24
+        };
+
+        var fallback = Assert.IsType<FluentIcon>(CreateFallbackContent(icon));
+
+        Assert.Equal(FluentIconRegular.Save24.GetString(), fallback.Glyph);
+        Assert.Equal(FluentIconFonts.Regular, fallback.FontFamily?.ToString());
+        Assert.Equal(16, fallback.Size);
+    }
+
+    [Fact]
     public void Play_ShouldInvokeWithoutException()
     {
         // Arrange
@@ -107,6 +154,13 @@ public class FWAnimatedIconTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(icon);
+    }
+
+    private static FrameworkElement? CreateFallbackContent(FWAnimatedIcon icon)
+    {
+        var method = typeof(FWAnimatedIcon).GetMethod("CreateFallbackContent", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull(method);
+        return (FrameworkElement?)method.Invoke(icon, null);
     }
 }
 

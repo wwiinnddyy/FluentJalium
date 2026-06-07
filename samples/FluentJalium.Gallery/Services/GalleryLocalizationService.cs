@@ -120,16 +120,16 @@ internal sealed class GalleryLocalizationService
         Add("doc.fluentJaliumSource", "FluentJalium source", "FluentJalium 源码");
         Add("doc.relatedFwControl", "Related FW control", "相关 FW 控件");
 
-        Add("group.home", "Home", "主页");
-        Add("group.design", "Design", "设计");
-        Add("group.controlSurfaces", "Control surfaces", "控件表面");
-        Add("group.input", "Input", "输入");
-        Add("group.layoutAndMedia", "Layout and media", "布局与媒体");
-        Add("group.collectionsAndData", "Collections and data", "集合与数据");
-        Add("group.materials", "Materials", "材质");
-        Add("group.motion", "Motion", "动效");
-        Add("group.appStructure", "App structure", "应用结构");
-        Add("group.diagnostics", "Diagnostics", "诊断");
+        Add("group.Home", "Home", "主页");
+        Add("group.Design", "Design", "设计");
+        Add("group.Control surfaces", "Control surfaces", "控件表面");
+        Add("group.Input", "Input", "输入");
+        Add("group.Layout and media", "Layout and media", "布局与媒体");
+        Add("group.Collections and data", "Collections and data", "集合与数据");
+        Add("group.Materials", "Materials", "材质");
+        Add("group.Motion", "Motion", "动效");
+        Add("group.App structure", "App structure", "应用结构");
+        Add("group.Diagnostics", "Diagnostics", "诊断");
 
         AddPage(text, "overview", "Overview", "概览", "Theme, typography, and accent controls for validating FluentJalium across variants.", "用于验证 FluentJalium 多种变体的主题、排版和强调色控件。", "home design system theme typography accent light dark high contrast 主页 设计系统 主题 排版 强调色 亮色 暗色 高对比度");
         AddPage(text, "themearchitecture", "Theme Architecture", "主题架构", "How FluentJalium splits stable theme entry points, design resources, control dictionaries, and FW control surfaces.", "FluentJalium 如何拆分稳定主题入口、设计资源、控件字典和 FW 控件表面。", "Generic FluentResources FluentControls FluentThemeManager theme resources controls dictionary architecture 主题 架构 资源 控件 字典");

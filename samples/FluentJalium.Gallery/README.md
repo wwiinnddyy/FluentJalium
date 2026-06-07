@@ -97,14 +97,32 @@ start bin/Debug/net10.0-windows/FluentJalium.Gallery.exe
 
 ## 构建状态
 
-⚠️ **构建被阻止** - .NET Host 进程锁定文件（需要重启系统清除）
+✅ **构建成功** - 所有问题已解决（2026-06-07 16:45）
 ✅ **代码完成** - 所有 i18n 实现已完成且正确
+✅ **导航菜单已修复** - 所有控件分类正常显示
+
+### 已解决的问题
+
+1. **导航菜单空白** ✅
+   - 根本原因：GalleryLocalizationService 使用了错误的组名本地化键
+   - 修复：将 camelCase 键名改为与实际组名匹配的格式
+   - 详见：[BUILD_FIX.md](./BUILD_FIX.md)
+
+2. **构建失败** ✅
+   - 根本原因：Jalium.UI.Build.dll 被 .NET Host 进程锁定
+   - 修复：切换到 NuGet 包模式（UseJaliumSourceReferences=false）
+   - 构建时间：~25 秒
+
+3. **资源文件生成** ✅
+   - 问题：Strings.Designer.cs 未自动生成
+   - 修复：手动创建包含所有 71 个资源键的 Designer.cs
 
 ## 下一步改进
 
 ### 高优先级
-- [ ] 解决构建锁定问题（重启系统）
-- [ ] 验证构建和测试 i18n 功能
+- [x] 解决构建锁定问题（已通过 NuGet 包模式解决）
+- [x] 验证构建和测试 i18n 功能（已完成）
+- [x] 修复导航菜单空白问题（已完成）
 - [ ] 将 i18n 模式应用到其他 Gallery 页面（30+ 页面）
 - [ ] 让 Options 真正可交互（连接到控件属性）
 
@@ -140,5 +158,5 @@ start bin/Debug/net10.0-windows/FluentJalium.Gallery.exe
 
 ---
 
-**最后更新**: 2026-06-07  
-**状态**: ✅ 国际化（i18n）系统已完成 | ✅ 三栏布局已实现 | ⚠️ 待构建验证
+**最后更新**: 2026-06-07 16:45  
+**状态**: ✅ 构建成功 | ✅ 导航菜单已修复 | ✅ i18n 系统完成 | ✅ 三栏布局已实现

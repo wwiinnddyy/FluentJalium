@@ -1,5 +1,6 @@
 ﻿using Jalium.UI;
 using Jalium.UI.Controls;
+using FluentJalium.Icon;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 
@@ -179,23 +180,66 @@ public class FWAnimatedIcon : Control, IFluentJaliumControl
 
     private FrameworkElement? CreateFallbackContent()
     {
-        if (FallbackIconSource is string glyph)
+        return FallbackIconSource switch
         {
-            return new TextBlock
+            FluentIconRegular regularIcon => Center(FluentIconFactory.Regular(regularIcon, 16)),
+            FluentIconFilled filledIcon => Center(FluentIconFactory.Filled(filledIcon, 16)),
+            SegoeFluentIcon segoeIcon => Center(FluentIconFactory.Segoe(segoeIcon, 16)),
+            Symbol symbol => Center(new SymbolIcon(symbol) { Width = 16, Height = 16 }),
+            string glyph => new TextBlock
             {
                 Text = glyph,
-                FontFamily = "Segoe Fluent Icons",
+                FontFamily = ResolveFallbackFontFamily(glyph),
                 FontSize = 16,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
-            };
-        }
-        else if (FallbackIconSource is FrameworkElement element)
+            },
+            FrameworkElement element => element,
+            _ => null
+        };
+    }
+
+    private static FrameworkElement Center(FrameworkElement element)
+    {
+        element.HorizontalAlignment = HorizontalAlignment.Center;
+        element.VerticalAlignment = VerticalAlignment.Center;
+        return element;
+    }
+
+    private static string ResolveFallbackFontFamily(string glyph)
+    {
+        if (TryGetFirstCodePoint(glyph, out var codePoint) && IsPrivateUseCodePoint(codePoint))
         {
-            return element;
+            return FluentIconFonts.Regular;
         }
 
-        return null;
+        return FrameworkElement.DefaultFontFamilyName;
+    }
+
+    private static bool TryGetFirstCodePoint(string text, out int codePoint)
+    {
+        codePoint = 0;
+        if (string.IsNullOrEmpty(text))
+        {
+            return false;
+        }
+
+        var first = text[0];
+        if (char.IsHighSurrogate(first) && text.Length > 1 && char.IsLowSurrogate(text[1]))
+        {
+            codePoint = char.ConvertToUtf32(first, text[1]);
+            return true;
+        }
+
+        codePoint = first;
+        return true;
+    }
+
+    private static bool IsPrivateUseCodePoint(int codePoint)
+    {
+        return codePoint is >= 0xE000 and <= 0xF8FF
+            or >= 0xF0000 and <= 0xFFFFD
+            or >= 0x100000 and <= 0x10FFFD;
     }
 
     private void PlayAnimation()

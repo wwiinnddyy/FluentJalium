@@ -5,6 +5,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using Jalium.UI.Data;
 using FluentJalium.Controls;
+using FWBorder = FluentJalium.Controls.FWBorder;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -127,7 +128,7 @@ public class MotionControlsPage : Page
             MirroredWhenRightToLeft = mirrored,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            FallbackIconSource = "" // Play icon fallback
+            FallbackIconSource = "▶" // Play icon fallback
         };
 
         return icon;
@@ -230,7 +231,7 @@ public class MotionControlsPage : Page
         return stack;
     }
 
-    private Border CreateDemoCard(string title, UIElement content)
+    private FWBorder CreateDemoCard(string title, UIElement content)
     {
         var stack = new StackPanel { Spacing = 12 };
 
@@ -244,7 +245,7 @@ public class MotionControlsPage : Page
         stack.Children.Add(titleBlock);
         stack.Children.Add(content);
 
-        return new Border
+        return new FWBorder
         {
             Background = new SolidColorBrush(Color.FromRgb(0xF9, 0xF9, 0xF9)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
