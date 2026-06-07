@@ -408,7 +408,7 @@ var host = new FWSnackbarHost
 var service = new FWSnackbarService();
 service.SetHost(host);
 
-var snackbar = service.Enqueue(new FWSnackbar
+var snackbar = new FWSnackbar
 {
     Severity = ToastSeverity.Success,
     Title = "Preview refreshed",
@@ -418,11 +418,21 @@ var snackbar = service.Enqueue(new FWSnackbar
     ActionCommandParameter = "preview-refresh",
     IsClosable = true,
     IsAutoDismissEnabled = true,
+    IsAutoDismissPausedOnPointerOverEnabled = true,
+    IsAutoDismissPausedOnFocusEnabled = true,
     Duration = TimeSpan.FromSeconds(8)
-});
+};
 
+snackbar.Closing += (_, args) =>
+{
+    args.Cancel = ShouldKeepSnackbarOpen(args.Reason);
+};
+
+var closeTask = service.EnqueueForResultAsync(snackbar);
+snackbar.PauseAutoDismiss();
+snackbar.ResumeAutoDismiss();
 service.CloseCurrent();
-var closeReason = snackbar.LastCloseReason;
+var closeReason = await closeTask;
 """
     };
 

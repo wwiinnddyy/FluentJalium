@@ -1,5 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -74,6 +75,21 @@ public sealed class FWSnackbarActionEventArgs : EventArgs
 }
 
 /// <summary>
+/// Event data raised before a snackbar closes.
+/// </summary>
+public sealed class FWSnackbarClosingEventArgs : EventArgs
+{
+    public FWSnackbarClosingEventArgs(FWSnackbarCloseReason reason)
+    {
+        Reason = reason;
+    }
+
+    public FWSnackbarCloseReason Reason { get; }
+
+    public bool Cancel { get; set; }
+}
+
+/// <summary>
 /// Describes why a snackbar closed.
 /// </summary>
 public enum FWSnackbarCloseReason
@@ -104,6 +120,9 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     private Button? _closeButton;
     private CancellationTokenSource? _autoDismissCancellation;
     private TaskCompletionSource<FWSnackbarCloseReason>? _closedTask;
+    private bool _manualAutoDismissPause;
+    private bool _pointerAutoDismissPause;
+    private bool _focusAutoDismissPause;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWSnackbar),
@@ -145,15 +164,33 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         DependencyProperty.Register(nameof(Duration), typeof(TimeSpan), typeof(FWSnackbar),
             new PropertyMetadata(TimeSpan.FromSeconds(4), OnSnackbarPropertyChanged), IsValidDuration);
 
+    public static readonly DependencyProperty IsAutoDismissPausedOnPointerOverEnabledProperty =
+        DependencyProperty.Register(nameof(IsAutoDismissPausedOnPointerOverEnabled), typeof(bool), typeof(FWSnackbar),
+            new PropertyMetadata(true, OnAutoDismissPausePropertyChanged));
+
+    public static readonly DependencyProperty IsAutoDismissPausedOnFocusEnabledProperty =
+        DependencyProperty.Register(nameof(IsAutoDismissPausedOnFocusEnabled), typeof(bool), typeof(FWSnackbar),
+            new PropertyMetadata(true, OnAutoDismissPausePropertyChanged));
+
     private static readonly DependencyPropertyKey LastCloseReasonPropertyKey =
         DependencyProperty.RegisterReadOnly(nameof(LastCloseReason), typeof(FWSnackbarCloseReason), typeof(FWSnackbar),
             new PropertyMetadata(FWSnackbarCloseReason.None));
 
     public static readonly DependencyProperty LastCloseReasonProperty = LastCloseReasonPropertyKey.DependencyProperty;
 
+    private static readonly DependencyPropertyKey IsAutoDismissPausedPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsAutoDismissPaused), typeof(bool), typeof(FWSnackbar),
+            new PropertyMetadata(false));
+
+    public static readonly DependencyProperty IsAutoDismissPausedProperty = IsAutoDismissPausedPropertyKey.DependencyProperty;
+
     public FWSnackbar()
     {
         UseTemplateContentManagement();
+        AddHandler(MouseEnterEvent, new MouseEventHandler(OnMouseEnterHandler));
+        AddHandler(MouseLeaveEvent, new MouseEventHandler(OnMouseLeaveHandler));
+        AddHandler(GotKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnGotKeyboardFocusHandler));
+        AddHandler(LostKeyboardFocusEvent, new KeyboardFocusChangedEventHandler(OnLostKeyboardFocusHandler));
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
@@ -226,46 +263,113 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         set => SetValue(DurationProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsAutoDismissPausedOnPointerOverEnabled
+    {
+        get => (bool)GetValue(IsAutoDismissPausedOnPointerOverEnabledProperty)!;
+        set => SetValue(IsAutoDismissPausedOnPointerOverEnabledProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsAutoDismissPausedOnFocusEnabled
+    {
+        get => (bool)GetValue(IsAutoDismissPausedOnFocusEnabledProperty)!;
+        set => SetValue(IsAutoDismissPausedOnFocusEnabledProperty, value);
+    }
+
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public FWSnackbarCloseReason LastCloseReason
     {
         get => (FWSnackbarCloseReason)GetValue(LastCloseReasonProperty)!;
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsAutoDismissPaused
+    {
+        get => (bool)GetValue(IsAutoDismissPausedProperty)!;
+    }
+
     public event EventHandler<FWSnackbarActionEventArgs>? ActionClick;
 
     public event EventHandler? Opened;
+
+    public event EventHandler<FWSnackbarClosingEventArgs>? Closing;
 
     public event EventHandler? Closed;
 
     public void Show()
     {
         SetValue(LastCloseReasonPropertyKey.DependencyProperty, FWSnackbarCloseReason.None);
-        _closedTask = new TaskCompletionSource<FWSnackbarCloseReason>(TaskCreationOptions.RunContinuationsAsynchronously);
+        EnsureClosedTask();
         IsOpen = true;
     }
 
     public Task ShowAsync()
     {
         Show();
-        return _closedTask?.Task ?? Task.CompletedTask;
+        return EnsureClosedTask();
     }
 
     public Task<FWSnackbarCloseReason> ShowForResultAsync()
     {
         Show();
-        return _closedTask?.Task ?? Task.FromResult(LastCloseReason);
+        return EnsureClosedTask();
+    }
+
+    public Task<FWSnackbarCloseReason> WaitForCloseAsync()
+    {
+        return EnsureClosedTask();
+    }
+
+    public void PauseAutoDismiss()
+    {
+        _manualAutoDismissPause = true;
+        UpdateAutoDismissPauseState();
+    }
+
+    public void ResumeAutoDismiss()
+    {
+        _manualAutoDismissPause = false;
+        UpdateAutoDismissPauseState();
     }
 
     public void Close(FWSnackbarCloseReason reason = FWSnackbarCloseReason.Programmatic)
     {
-        SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
+        _ = RequestClose(reason);
+    }
+
+    public bool RequestClose(FWSnackbarCloseReason reason = FWSnackbarCloseReason.Programmatic)
+    {
+        return CloseCore(reason, suppressClosing: false);
+    }
+
+    internal bool CloseFromHost(FWSnackbarCloseReason reason)
+    {
+        return CloseCore(reason, suppressClosing: true);
+    }
+
+    private bool CloseCore(FWSnackbarCloseReason reason, bool suppressClosing)
+    {
         if (!IsOpen)
         {
-            return;
+            SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
+            CompleteCloseTask(reason);
+            return true;
         }
 
+        if (!suppressClosing)
+        {
+            var args = new FWSnackbarClosingEventArgs(reason);
+            Closing?.Invoke(this, args);
+            if (args.Cancel)
+            {
+                return false;
+            }
+        }
+
+        SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
         IsOpen = false;
+        return true;
     }
 
     public bool RequestAction()
@@ -321,6 +425,42 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         Close(FWSnackbarCloseReason.CloseButton);
     }
 
+    private void OnMouseEnterHandler(object sender, MouseEventArgs e)
+    {
+        if (IsAutoDismissPausedOnPointerOverEnabled)
+        {
+            _pointerAutoDismissPause = true;
+            UpdateAutoDismissPauseState();
+        }
+    }
+
+    private void OnMouseLeaveHandler(object sender, MouseEventArgs e)
+    {
+        if (_pointerAutoDismissPause)
+        {
+            _pointerAutoDismissPause = false;
+            UpdateAutoDismissPauseState();
+        }
+    }
+
+    private void OnGotKeyboardFocusHandler(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (IsAutoDismissPausedOnFocusEnabled)
+        {
+            _focusAutoDismissPause = true;
+            UpdateAutoDismissPauseState();
+        }
+    }
+
+    private void OnLostKeyboardFocusHandler(object sender, KeyboardFocusChangedEventArgs e)
+    {
+        if (_focusAutoDismissPause)
+        {
+            _focusAutoDismissPause = false;
+            UpdateAutoDismissPauseState();
+        }
+    }
+
     private bool ExecuteActionCommand()
     {
         var command = ActionCommand;
@@ -359,7 +499,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         _autoDismissCancellation?.Dispose();
         _autoDismissCancellation = null;
 
-        if (!IsOpen || !IsAutoDismissEnabled || Duration <= TimeSpan.Zero)
+        if (!IsOpen || !IsAutoDismissEnabled || IsAutoDismissPaused || Duration <= TimeSpan.Zero)
         {
             return;
         }
@@ -384,14 +524,47 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
     }
 
+    private void UpdateAutoDismissPauseState()
+    {
+        var isPaused = _manualAutoDismissPause
+            || (IsAutoDismissPausedOnPointerOverEnabled && _pointerAutoDismissPause)
+            || (IsAutoDismissPausedOnFocusEnabled && _focusAutoDismissPause);
+
+        if (IsAutoDismissPaused != isPaused)
+        {
+            SetValue(IsAutoDismissPausedPropertyKey.DependencyProperty, isPaused);
+        }
+
+        ScheduleAutoDismiss();
+    }
+
+    private Task<FWSnackbarCloseReason> EnsureClosedTask()
+    {
+        if (!IsOpen && _closedTask == null && LastCloseReason != FWSnackbarCloseReason.None)
+        {
+            return Task.FromResult(LastCloseReason);
+        }
+
+        _closedTask ??= new TaskCompletionSource<FWSnackbarCloseReason>(TaskCreationOptions.RunContinuationsAsynchronously);
+        return _closedTask.Task;
+    }
+
+    private void CompleteCloseTask(FWSnackbarCloseReason reason)
+    {
+        _closedTask?.TrySetResult(reason);
+        _closedTask = null;
+    }
+
     private void CompleteClose()
     {
         _autoDismissCancellation?.Cancel();
         _autoDismissCancellation?.Dispose();
         _autoDismissCancellation = null;
+        _pointerAutoDismissPause = false;
+        _focusAutoDismissPause = false;
+        UpdateAutoDismissPauseState();
         Closed?.Invoke(this, EventArgs.Empty);
-        _closedTask?.TrySetResult(LastCloseReason);
-        _closedTask = null;
+        CompleteCloseTask(LastCloseReason);
     }
 
     private static void OnActionCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -412,6 +585,27 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
 
         snackbar.UpdateTemplateState();
+        OnSnackbarPropertyChanged(d, e);
+    }
+
+    private static void OnAutoDismissPausePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not FWSnackbar snackbar)
+        {
+            return;
+        }
+
+        if (!snackbar.IsAutoDismissPausedOnPointerOverEnabled)
+        {
+            snackbar._pointerAutoDismissPause = false;
+        }
+
+        if (!snackbar.IsAutoDismissPausedOnFocusEnabled)
+        {
+            snackbar._focusAutoDismissPause = false;
+        }
+
+        snackbar.UpdateAutoDismissPauseState();
         OnSnackbarPropertyChanged(d, e);
     }
 
@@ -512,6 +706,12 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         return snackbar;
     }
 
+    public Task<FWSnackbarCloseReason> ShowForResultAsync(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
+    {
+        var snackbar = Show(severity, title, message, actionContent, duration);
+        return snackbar.WaitForCloseAsync();
+    }
+
     public FWSnackbar Enqueue(FWSnackbar snackbar)
     {
         ArgumentNullException.ThrowIfNull(snackbar);
@@ -534,6 +734,11 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         return snackbar;
     }
 
+    public Task<FWSnackbarCloseReason> EnqueueForResultAsync(FWSnackbar snackbar)
+    {
+        return Enqueue(snackbar).WaitForCloseAsync();
+    }
+
     public bool CloseCurrent()
     {
         var snackbar = CurrentSnackbar;
@@ -542,8 +747,7 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
             return false;
         }
 
-        snackbar.Close();
-        return true;
+        return snackbar.RequestClose();
     }
 
     public void Clear()
@@ -552,12 +756,12 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         {
             var pending = _queue.Dequeue();
             pending.Closed -= OnSnackbarClosed;
-            pending.Close(FWSnackbarCloseReason.HostCleared);
+            pending.CloseFromHost(FWSnackbarCloseReason.HostCleared);
         }
 
         foreach (var snackbar in new List<FWSnackbar>(_snackbars))
         {
-            snackbar.Close(FWSnackbarCloseReason.HostCleared);
+            snackbar.CloseFromHost(FWSnackbarCloseReason.HostCleared);
         }
     }
 
@@ -646,9 +850,19 @@ public class FWSnackbarService
         return RequireHost().Show(severity, title, message, actionContent, duration);
     }
 
+    public Task<FWSnackbarCloseReason> ShowForResultAsync(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
+    {
+        return RequireHost().ShowForResultAsync(severity, title, message, actionContent, duration);
+    }
+
     public FWSnackbar Enqueue(FWSnackbar snackbar)
     {
         return RequireHost().Enqueue(snackbar);
+    }
+
+    public Task<FWSnackbarCloseReason> EnqueueForResultAsync(FWSnackbar snackbar)
+    {
+        return RequireHost().EnqueueForResultAsync(snackbar);
     }
 
     public bool CloseCurrent()

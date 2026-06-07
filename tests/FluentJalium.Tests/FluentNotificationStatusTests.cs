@@ -119,6 +119,8 @@ public sealed class FluentNotificationStatusTests
         AssertSetter(snackbarStyle, FWSnackbar.SeverityProperty);
         AssertSetter(snackbarStyle, FWSnackbar.IsClosableProperty);
         AssertSetter(snackbarStyle, FWSnackbar.IsAutoDismissEnabledProperty);
+        AssertSetter(snackbarStyle, FWSnackbar.IsAutoDismissPausedOnPointerOverEnabledProperty);
+        AssertSetter(snackbarStyle, FWSnackbar.IsAutoDismissPausedOnFocusEnabledProperty);
         var snackbarHostStyle = AssertStyle<FWSnackbarHost>(dictionary);
         Assert.Null(snackbarHostStyle.BasedOn);
         AssertSetter(snackbarHostStyle, FWSnackbarHost.MaxVisibleSnackbarsProperty, 1);
@@ -315,6 +317,75 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public async Task FWSnackbar_ShouldAllowClosingCancellation()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Upload pending",
+            IsAutoDismissEnabled = false
+        };
+        var cancelClose = true;
+        var closingCount = 0;
+        var closedCount = 0;
+        snackbar.Closing += (_, args) =>
+        {
+            closingCount++;
+            Assert.Equal(FWSnackbarCloseReason.CloseButton, args.Reason);
+            args.Cancel = cancelClose;
+        };
+        snackbar.Closed += (_, _) => closedCount++;
+
+        var resultTask = snackbar.ShowForResultAsync();
+
+        Assert.False(snackbar.RequestClose(FWSnackbarCloseReason.CloseButton));
+        Assert.True(snackbar.IsOpen);
+        Assert.False(resultTask.IsCompleted);
+        Assert.Equal(FWSnackbarCloseReason.None, snackbar.LastCloseReason);
+
+        cancelClose = false;
+
+        Assert.True(snackbar.RequestClose(FWSnackbarCloseReason.CloseButton));
+
+        var result = await resultTask;
+
+        Assert.Equal(FWSnackbarCloseReason.CloseButton, result);
+        Assert.Equal(FWSnackbarCloseReason.CloseButton, snackbar.LastCloseReason);
+        Assert.False(snackbar.IsOpen);
+        Assert.Equal(2, closingCount);
+        Assert.Equal(1, closedCount);
+    }
+
+    [Fact]
+    public async Task FWSnackbar_ShouldPauseAutoDismissOnPointerOverAndResumeOnLeave()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Saved",
+            Duration = TimeSpan.FromMilliseconds(30),
+            IsAutoDismissEnabled = true
+        };
+
+        var resultTask = snackbar.ShowForResultAsync();
+        snackbar.RaiseEvent(new Jalium.UI.Input.MouseEventArgs(UIElement.MouseEnterEvent));
+
+        Assert.True(snackbar.IsAutoDismissPaused);
+
+        await Task.Delay(TimeSpan.FromMilliseconds(100));
+
+        Assert.True(snackbar.IsOpen);
+        Assert.False(resultTask.IsCompleted);
+
+        snackbar.RaiseEvent(new Jalium.UI.Input.MouseEventArgs(UIElement.MouseLeaveEvent));
+
+        var completed = await Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2)));
+
+        Assert.Same(resultTask, completed);
+        Assert.False(snackbar.IsAutoDismissPaused);
+        Assert.Equal(FWSnackbarCloseReason.Timeout, await resultTask);
+        Assert.False(snackbar.IsOpen);
+    }
+
+    [Fact]
     public void FWSnackbarHost_ShouldQueueAndPromoteSnackbarItems()
     {
         var host = new FWSnackbarHost
@@ -359,6 +430,59 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public async Task FWSnackbarHost_ShouldExposeResultTasksForQueuedItems()
+    {
+        var host = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1
+        };
+        var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
+        var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
+
+        var firstResult = host.EnqueueForResultAsync(first);
+        var secondResult = host.EnqueueForResultAsync(second);
+
+        Assert.True(first.IsOpen);
+        Assert.False(second.IsOpen);
+        Assert.False(secondResult.IsCompleted);
+
+        Assert.True(first.RequestClose(FWSnackbarCloseReason.Action));
+
+        Assert.Equal(FWSnackbarCloseReason.Action, await firstResult);
+        Assert.True(second.IsOpen);
+
+        host.Clear();
+
+        Assert.Equal(FWSnackbarCloseReason.HostCleared, await secondResult);
+        Assert.False(second.IsOpen);
+        Assert.Empty(host.Snackbars);
+    }
+
+    [Fact]
+    public void FWSnackbarHost_ShouldRespectClosingCancellationBeforePromotingPendingItems()
+    {
+        var host = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1
+        };
+        var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
+        var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
+        first.Closing += (_, args) => args.Cancel = true;
+
+        host.Enqueue(first);
+        host.Enqueue(second);
+
+        Assert.False(host.CloseCurrent());
+
+        Assert.Same(first, host.CurrentSnackbar);
+        Assert.True(first.IsOpen);
+        Assert.False(second.IsOpen);
+        Assert.Equal(1, host.PendingCount);
+
+        host.Clear();
+    }
+
+    [Fact]
     public void FWSnackbarService_ShouldRequireHostAndRouteMessages()
     {
         var service = new FWSnackbarService();
@@ -396,6 +520,27 @@ public sealed class FluentNotificationStatusTests
 
         Assert.Empty(host.Snackbars);
         Assert.Equal(FWSnackbarCloseReason.HostCleared, second.LastCloseReason);
+    }
+
+    [Fact]
+    public async Task FWSnackbarService_ShouldExposeResultTasks()
+    {
+        var host = new FWSnackbarHost();
+        var service = new FWSnackbarService();
+        service.SetHost(host);
+
+        var resultTask = service.EnqueueForResultAsync(new FWSnackbar
+        {
+            Title = "Awaitable",
+            IsAutoDismissEnabled = false
+        });
+
+        Assert.Single(host.Snackbars);
+
+        Assert.True(service.CloseCurrent());
+
+        Assert.Equal(FWSnackbarCloseReason.Programmatic, await resultTask);
+        Assert.Empty(host.Snackbars);
     }
 
     [Fact]

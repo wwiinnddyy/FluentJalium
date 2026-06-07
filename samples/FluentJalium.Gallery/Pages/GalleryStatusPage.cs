@@ -288,7 +288,7 @@ internal sealed class GalleryStatusPage
 
     private static UIElement CreateSnackbarStatusSample()
     {
-        var output = CreateStatusOutput("Host queue ready: current Draft archived. Visible 1/2, queued 1, closed 0, actions 0.");
+        var output = CreateStatusOutput("Host queue ready: current Draft archived. Visible 1/2, queued 1, closed 0, actions 0, paused off.");
         var host = new FWSnackbarHost
         {
             Width = 470,
@@ -312,7 +312,8 @@ internal sealed class GalleryStatusPage
         void UpdateOutput(string action)
         {
             var currentTitle = host.CurrentSnackbar?.Title?.ToString() ?? "none";
-            output.Text = $"{action}. Current: {currentTitle}. Visible: {host.Snackbars.Count}/{host.MaxVisibleSnackbars}. Queued: {host.PendingCount}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}.";
+            var isPaused = host.CurrentSnackbar?.IsAutoDismissPaused ?? false;
+            output.Text = $"{action}. Current: {currentTitle}. Visible: {host.Snackbars.Count}/{host.MaxVisibleSnackbars}. Queued: {host.PendingCount}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
         }
 
         FWSnackbar CreateQueuedSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
@@ -328,7 +329,18 @@ internal sealed class GalleryStatusPage
                 ActionCommandParameter = actionParameter,
                 IsClosable = true,
                 IsAutoDismissEnabled = autoDismissEnabled,
+                IsAutoDismissPausedOnPointerOverEnabled = true,
+                IsAutoDismissPausedOnFocusEnabled = true,
                 Duration = TimeSpan.FromSeconds(8)
+            };
+            snackbar.Closing += (_, args) =>
+            {
+                if (args.Reason == FWSnackbarCloseReason.CloseButton && actionParameter.Contains("review", StringComparison.OrdinalIgnoreCase))
+                {
+                    args.Cancel = true;
+                    snackbar.Message = "Close was canceled because this snackbar needs review first.";
+                    UpdateOutput("Snackbar closing canceled");
+                }
             };
             snackbar.ActionClick += (_, args) =>
             {
@@ -339,15 +351,24 @@ internal sealed class GalleryStatusPage
             return snackbar;
         }
 
+        async Task TrackSnackbarResultAsync(Task<FWSnackbarCloseReason> resultTask, string title)
+        {
+            var reason = await resultTask;
+            lastCloseReason = reason;
+            UpdateOutput($"Result task completed for {title}");
+        }
+
         void EnqueueSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
         {
-            var snackbar = service.Enqueue(CreateQueuedSnackbar(severity, title, message, actionContent, actionParameter));
+            var snackbar = CreateQueuedSnackbar(severity, title, message, actionContent, actionParameter);
+            var resultTask = service.EnqueueForResultAsync(snackbar);
             snackbar.Closed += (_, _) =>
             {
                 closedEvents++;
                 lastCloseReason = snackbar.LastCloseReason;
                 UpdateOutput($"Closed {title}");
             };
+            _ = TrackSnackbarResultAsync(resultTask, title);
             UpdateOutput($"Enqueued {severity}");
         }
 
@@ -426,6 +447,16 @@ internal sealed class GalleryStatusPage
                         }
                     }),
                     CreateStatusActionButton(FluentIconRegular.Clock24, "Auto", ToggleAutoDismiss),
+                    CreateStatusActionButton(FluentIconRegular.ClockPause24, "Pause", () =>
+                    {
+                        host.CurrentSnackbar?.PauseAutoDismiss();
+                        UpdateOutput("Current snackbar auto-dismiss paused");
+                    }),
+                    CreateStatusActionButton(FluentIconRegular.Play24, "Resume", () =>
+                    {
+                        host.CurrentSnackbar?.ResumeAutoDismiss();
+                        UpdateOutput("Current snackbar auto-dismiss resumed");
+                    }),
                     CreateStatusActionButton(FluentIconRegular.DismissCircle24, "Clear", () =>
                     {
                         service.Clear();
@@ -759,7 +790,7 @@ internal sealed class GalleryStatusPage
             "FWInfoBar" => "<FWInfoBar Severity=\"Warning\" Title=\"Review required\" Message=\"Check settings before continuing\" IsOpen=\"True\" />",
             "FWInfoBadge" => "<FWInfoBadge Severity=\"Critical\" Value=\"128\" MaxValue=\"99\" />\n<FWInfoBadge Severity=\"Success\" IconGlyph=\"CheckmarkCircle24\" />",
             "FWToastNotificationHost" => "<FWToastNotificationHost MaxVisibleToasts=\"3\" Position=\"BottomRight\" />",
-            "FWSnackbar" => "var service = new FWSnackbarService();\nservice.SetHost(snackbarHost);\nvar snackbar = service.Enqueue(new FWSnackbar\n{\n    Title = \"Draft archived\",\n    ActionContent = \"Undo\",\n    ActionCommand = UndoCommand,\n    ActionCommandParameter = \"draft-archive\"\n});\nvar closeReason = snackbar.LastCloseReason;",
+            "FWSnackbar" => "var service = new FWSnackbarService();\nservice.SetHost(snackbarHost);\nvar snackbar = new FWSnackbar\n{\n    Title = \"Draft archived\",\n    ActionContent = \"Undo\",\n    ActionCommand = UndoCommand,\n    ActionCommandParameter = \"draft-archive\",\n    IsAutoDismissPausedOnPointerOverEnabled = true\n};\nsnackbar.Closing += (_, args) => args.Cancel = ShouldKeepOpen(args.Reason);\nvar closeReason = await service.EnqueueForResultAsync(snackbar);",
             "FWStatusBar" => "<FWStatusBar>\n    <FWStatusBarItem Content=\"Ready\" />\n    <FWStatusBarItem Content=\"UTF-8\" />\n</FWStatusBar>",
             "Material operations console" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWInfoBar Severity=\"Success\" IsOpen=\"True\" />\n    <FWStatusBar />\n</FWFluentMaterialSurface>",
             _ => "<FWInfoBar IsOpen=\"True\" />"

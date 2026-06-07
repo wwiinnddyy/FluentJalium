@@ -64,6 +64,8 @@
         <Setter Property="Severity" Value="Information" />
         <Setter Property="IsClosable" Value="True" />
         <Setter Property="IsAutoDismissEnabled" Value="True" />
+        <Setter Property="IsAutoDismissPausedOnPointerOverEnabled" Value="True" />
+        <Setter Property="IsAutoDismissPausedOnFocusEnabled" Value="True" />
         <Setter Property="Duration" Value="0:0:4" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSnackbar">
