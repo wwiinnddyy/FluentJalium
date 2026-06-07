@@ -133,6 +133,10 @@
         <Setter Property="MaxVisibleSnackbars" Value="1" />
         <Setter Property="Placement" Value="Bottom" />
         <Setter Property="Spacing" Value="8" />
+        <Setter Property="IsTransitionEnabled" Value="True" />
+        <Setter Property="TransitionProfile" Value="Entrance" />
+        <Setter Property="SnackbarTransitionDuration" Value="0:0:0.32" />
+        <Setter Property="TransitionOffset" Value="16" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Bottom" />
         <Setter Property="Template">

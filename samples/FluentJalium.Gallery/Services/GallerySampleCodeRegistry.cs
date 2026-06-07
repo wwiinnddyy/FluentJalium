@@ -404,10 +404,14 @@ var host = new FWSnackbarHost
     Width = 470,
     MaxVisibleSnackbars = 2,
     Placement = FWSnackbarPlacement.Bottom,
-    Spacing = 8
+    Spacing = 8,
+    TransitionProfile = FWContentTransitionProfile.Entrance,
+    TransitionOffset = 16
 };
 var service = new FWSnackbarService();
 service.SetHost(host);
+host.TransitionRequested += (_, args) => LogTransition(args.Kind, args.Diagnostics);
+host.QueueChanged += (_, args) => LogQueueDiagnostics(args.Reason, host.GetDiagnostics());
 
 var snackbar = new FWSnackbar
 {
@@ -430,6 +434,7 @@ snackbar.Closing += (_, args) =>
 };
 
 var closeTask = service.EnqueueForResultAsync(snackbar);
+var diagnostics = host.GetDiagnostics();
 snackbar.PauseAutoDismiss();
 snackbar.ResumeAutoDismiss();
 service.CloseCurrent();

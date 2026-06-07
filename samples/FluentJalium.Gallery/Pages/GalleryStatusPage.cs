@@ -5,6 +5,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWContentTransitionProfile = FluentJalium.Controls.FWContentTransitionProfile;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWInfoBadge = FluentJalium.Controls.FWInfoBadge;
@@ -22,6 +23,7 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWSnackbarHost = FluentJalium.Controls.FWSnackbarHost;
 using FWSnackbarPlacement = FluentJalium.Controls.FWSnackbarPlacement;
 using FWSnackbarService = FluentJalium.Controls.FWSnackbarService;
+using FWSnackbarTransitionKind = FluentJalium.Controls.FWSnackbarTransitionKind;
 using System.Windows.Input;
 
 namespace FluentJalium.Gallery.Pages;
@@ -294,13 +296,18 @@ internal sealed class GalleryStatusPage
             Width = 470,
             MaxVisibleSnackbars = 2,
             Placement = FWSnackbarPlacement.Bottom,
-            Spacing = 8
+            Spacing = 8,
+            TransitionProfile = FWContentTransitionProfile.Entrance,
+            TransitionOffset = 16
         };
         var service = new FWSnackbarService();
         service.SetHost(host);
 
         var autoDismissEnabled = false;
         var closedEvents = 0;
+        var transitionRequests = 0;
+        var queueEvents = 0;
+        var lastTransition = FWSnackbarTransitionKind.Show;
         var lastCloseReason = FWSnackbarCloseReason.None;
         var actionRequests = 0;
         var lastCommandParameter = "none";
@@ -314,8 +321,21 @@ internal sealed class GalleryStatusPage
         {
             var currentTitle = host.CurrentSnackbar?.Title?.ToString() ?? "none";
             var isPaused = host.CurrentSnackbar?.IsAutoDismissPaused ?? false;
-            output.Text = $"{action}. Current: {currentTitle}. Visible: {host.Snackbars.Count}/{host.MaxVisibleSnackbars}. Queued: {host.PendingCount}. Placement: {host.Placement}/{host.VerticalContentAlignment}. Spacing: {host.Spacing}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
+            var diagnostics = host.GetDiagnostics();
+            output.Text = $"{action}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
         }
+
+        host.TransitionRequested += (_, args) =>
+        {
+            transitionRequests++;
+            lastTransition = args.Kind;
+            UpdateOutput($"Transition requested for {args.Snackbar.Title}");
+        };
+        host.QueueChanged += (_, _) =>
+        {
+            queueEvents++;
+            UpdateOutput("Snackbar host queue diagnostics updated");
+        };
 
         FWSnackbar CreateQueuedSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
         {
@@ -479,6 +499,21 @@ internal sealed class GalleryStatusPage
                     {
                         host.Spacing = Math.Abs(host.Spacing - 8) < 0.1 ? 14 : 8;
                         UpdateOutput("Snackbar host spacing changed");
+                    }),
+                    CreateStatusActionButton(FluentIconRegular.SlideTransition24, "Motion", () =>
+                    {
+                        if (host.TransitionProfile == FWContentTransitionProfile.Entrance)
+                        {
+                            host.TransitionProfile = FWContentTransitionProfile.Suppress;
+                            host.TransitionOffset = 0;
+                        }
+                        else
+                        {
+                            host.TransitionProfile = FWContentTransitionProfile.Entrance;
+                            host.TransitionOffset = 16;
+                        }
+
+                        UpdateOutput("Snackbar host transition profile changed");
                     })),
                 CreateStatus(output)
             }

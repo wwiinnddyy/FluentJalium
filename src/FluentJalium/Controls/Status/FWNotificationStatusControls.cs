@@ -112,6 +112,92 @@ public enum FWSnackbarPlacement
 }
 
 /// <summary>
+/// Describes the transition phase requested by <see cref="FWSnackbarHost"/>.
+/// </summary>
+public enum FWSnackbarTransitionKind
+{
+    Show,
+    Close
+}
+
+/// <summary>
+/// Describes why a snackbar host queue changed.
+/// </summary>
+public enum FWSnackbarHostQueueChangeReason
+{
+    Queued,
+    Shown,
+    Closed,
+    Cleared,
+    LayoutChanged
+}
+
+/// <summary>
+/// Snapshot of snackbar host layout, queue, and motion state.
+/// </summary>
+public readonly record struct FWSnackbarHostDiagnostics(
+    int VisibleCount,
+    int PendingCount,
+    int MaxVisibleSnackbars,
+    FWSnackbarPlacement Placement,
+    VerticalAlignment VerticalAlignment,
+    HorizontalAlignment HorizontalAlignment,
+    double Spacing,
+    bool IsTransitionEnabled,
+    FWContentTransitionProfile TransitionProfile,
+    TimeSpan SnackbarTransitionDuration,
+    double TransitionOffset)
+{
+    public bool HasCurrentSnackbar => VisibleCount > 0;
+
+    public bool HasPendingSnackbars => PendingCount > 0;
+}
+
+/// <summary>
+/// Event data raised when a snackbar host requests an entrance or exit transition.
+/// </summary>
+public sealed class FWSnackbarTransitionRequestedEventArgs : EventArgs
+{
+    public FWSnackbarTransitionRequestedEventArgs(
+        FWSnackbar snackbar,
+        FWSnackbarTransitionKind kind,
+        FWSnackbarHostDiagnostics diagnostics)
+    {
+        Snackbar = snackbar;
+        Kind = kind;
+        Diagnostics = diagnostics;
+    }
+
+    public FWSnackbar Snackbar { get; }
+
+    public FWSnackbarTransitionKind Kind { get; }
+
+    public FWSnackbarHostDiagnostics Diagnostics { get; }
+}
+
+/// <summary>
+/// Event data raised when a snackbar host queue or layout state changes.
+/// </summary>
+public sealed class FWSnackbarHostQueueChangedEventArgs : EventArgs
+{
+    public FWSnackbarHostQueueChangedEventArgs(
+        FWSnackbarHostQueueChangeReason reason,
+        FWSnackbar? snackbar,
+        FWSnackbarHostDiagnostics diagnostics)
+    {
+        Reason = reason;
+        Snackbar = snackbar;
+        Diagnostics = diagnostics;
+    }
+
+    public FWSnackbarHostQueueChangeReason Reason { get; }
+
+    public FWSnackbar? Snackbar { get; }
+
+    public FWSnackbarHostDiagnostics Diagnostics { get; }
+}
+
+/// <summary>
 /// FluentJalium Snackbar control for transient in-app messages and lightweight undo actions.
 /// </summary>
 public class FWSnackbar : ContentControl, IFluentJaliumControl
@@ -655,9 +741,11 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 public class FWSnackbarHost : Control, IFluentJaliumControl
 {
     private const double DefaultSpacing = 8.0;
+    private static readonly TimeSpan s_defaultTransitionDuration = TimeSpan.FromMilliseconds(320);
     private readonly Queue<FWSnackbar> _queue = new();
     private readonly ObservableCollection<FWSnackbar> _snackbars = new();
     private ItemsControl? _itemsControl;
+    private bool _applyingTransitionProfile;
 
     public static readonly DependencyProperty MaxVisibleSnackbarsProperty =
         DependencyProperty.Register(nameof(MaxVisibleSnackbars), typeof(int), typeof(FWSnackbarHost),
@@ -671,8 +759,25 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         DependencyProperty.Register(nameof(Spacing), typeof(double), typeof(FWSnackbarHost),
             new PropertyMetadata(DefaultSpacing, OnHostLayoutChanged), IsValidSpacing);
 
+    public static readonly DependencyProperty IsTransitionEnabledProperty =
+        DependencyProperty.Register(nameof(IsTransitionEnabled), typeof(bool), typeof(FWSnackbarHost),
+            new PropertyMetadata(true));
+
+    public static readonly DependencyProperty TransitionProfileProperty =
+        DependencyProperty.Register(nameof(TransitionProfile), typeof(FWContentTransitionProfile), typeof(FWSnackbarHost),
+            new PropertyMetadata(FWContentTransitionProfile.Entrance, OnTransitionProfileChanged), IsValidTransitionProfile);
+
+    public static readonly DependencyProperty SnackbarTransitionDurationProperty =
+        DependencyProperty.Register(nameof(SnackbarTransitionDuration), typeof(TimeSpan), typeof(FWSnackbarHost),
+            new PropertyMetadata(s_defaultTransitionDuration), IsValidTransitionDuration);
+
+    public static readonly DependencyProperty TransitionOffsetProperty =
+        DependencyProperty.Register(nameof(TransitionOffset), typeof(double), typeof(FWSnackbarHost),
+            new PropertyMetadata(16.0), IsValidTransitionOffset);
+
     public FWSnackbarHost()
     {
+        ApplyTransitionProfileState(FWContentTransitionProfile.Entrance);
         ApplyPlacementState();
     }
 
@@ -702,6 +807,54 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     {
         get => (double)GetValue(SpacingProperty)!;
         set => SetValue(SpacingProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsTransitionEnabled
+    {
+        get => (bool)GetValue(IsTransitionEnabledProperty)!;
+        set => SetValue(IsTransitionEnabledProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public FWContentTransitionProfile TransitionProfile
+    {
+        get => (FWContentTransitionProfile)GetValue(TransitionProfileProperty)!;
+        set => SetValue(TransitionProfileProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public TimeSpan SnackbarTransitionDuration
+    {
+        get => (TimeSpan)GetValue(SnackbarTransitionDurationProperty)!;
+        set => SetValue(SnackbarTransitionDurationProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public double TransitionOffset
+    {
+        get => (double)GetValue(TransitionOffsetProperty)!;
+        set => SetValue(TransitionOffsetProperty, value);
+    }
+
+    public event EventHandler<FWSnackbarTransitionRequestedEventArgs>? TransitionRequested;
+
+    public event EventHandler<FWSnackbarHostQueueChangedEventArgs>? QueueChanged;
+
+    public FWSnackbarHostDiagnostics GetDiagnostics()
+    {
+        return new FWSnackbarHostDiagnostics(
+            _snackbars.Count,
+            _queue.Count,
+            MaxVisibleSnackbars,
+            Placement,
+            VerticalContentAlignment,
+            HorizontalContentAlignment,
+            Spacing,
+            IsTransitionEnabled,
+            TransitionProfile,
+            SnackbarTransitionDuration,
+            TransitionOffset);
     }
 
     public FWSnackbar Show(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
@@ -735,6 +888,7 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         }
 
         snackbar.Closed += OnSnackbarClosed;
+        snackbar.Closing += OnSnackbarClosing;
         if (_snackbars.Count < MaxVisibleSnackbars)
         {
             OpenSnackbar(snackbar);
@@ -742,6 +896,7 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         else
         {
             _queue.Enqueue(snackbar);
+            RaiseQueueChanged(FWSnackbarHostQueueChangeReason.Queued, snackbar);
         }
 
         return snackbar;
@@ -769,11 +924,14 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         {
             var pending = _queue.Dequeue();
             pending.Closed -= OnSnackbarClosed;
+            pending.Closing -= OnSnackbarClosing;
             pending.CloseFromHost(FWSnackbarCloseReason.HostCleared);
+            RaiseQueueChanged(FWSnackbarHostQueueChangeReason.Cleared, pending);
         }
 
         foreach (var snackbar in new List<FWSnackbar>(_snackbars))
         {
+            RequestTransition(snackbar, FWSnackbarTransitionKind.Close);
             snackbar.CloseFromHost(FWSnackbarCloseReason.HostCleared);
         }
     }
@@ -798,14 +956,26 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         }
 
         snackbar.Closed -= OnSnackbarClosed;
+        snackbar.Closing -= OnSnackbarClosing;
         _snackbars.Remove(snackbar);
+        RaiseQueueChanged(FWSnackbarHostQueueChangeReason.Closed, snackbar);
         PromotePendingSnackbars();
+    }
+
+    private void OnSnackbarClosing(object? sender, FWSnackbarClosingEventArgs e)
+    {
+        if (sender is FWSnackbar snackbar && !e.Cancel)
+        {
+            RequestTransition(snackbar, FWSnackbarTransitionKind.Close);
+        }
     }
 
     private void OpenSnackbar(FWSnackbar snackbar)
     {
         _snackbars.Add(snackbar);
+        RequestTransition(snackbar, FWSnackbarTransitionKind.Show);
         snackbar.Show();
+        RaiseQueueChanged(FWSnackbarHostQueueChangeReason.Shown, snackbar);
         InvalidateMeasure();
         InvalidateVisual();
     }
@@ -839,6 +1009,35 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         _itemsControl.InvalidateVisual();
     }
 
+    private void RequestTransition(FWSnackbar snackbar, FWSnackbarTransitionKind kind)
+    {
+        if (!IsTransitionEnabled)
+        {
+            return;
+        }
+
+        TransitionRequested?.Invoke(this, new FWSnackbarTransitionRequestedEventArgs(snackbar, kind, GetDiagnostics()));
+    }
+
+    private void RaiseQueueChanged(FWSnackbarHostQueueChangeReason reason, FWSnackbar? snackbar)
+    {
+        QueueChanged?.Invoke(this, new FWSnackbarHostQueueChangedEventArgs(reason, snackbar, GetDiagnostics()));
+    }
+
+    private void ApplyTransitionProfileState(FWContentTransitionProfile profile)
+    {
+        _applyingTransitionProfile = true;
+        try
+        {
+            var duration = FWContentTransitionRecipe.Create(profile).Duration;
+            SetCurrentValue(SnackbarTransitionDurationProperty, duration.HasTimeSpan ? duration.TimeSpan : s_defaultTransitionDuration);
+        }
+        finally
+        {
+            _applyingTransitionProfile = false;
+        }
+    }
+
     private static ItemsPanelTemplate CreateItemsPanelTemplate(double spacing)
     {
         var template = new ItemsPanelTemplate();
@@ -857,8 +1056,19 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
         {
             host.ApplyPlacementState();
             host.PromotePendingSnackbars();
+            host.RaiseQueueChanged(FWSnackbarHostQueueChangeReason.LayoutChanged, null);
             host.InvalidateMeasure();
             host.InvalidateVisual();
+        }
+    }
+
+    private static void OnTransitionProfileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbarHost host &&
+            !host._applyingTransitionProfile &&
+            e.NewValue is FWContentTransitionProfile profile)
+        {
+            host.ApplyTransitionProfileState(profile);
         }
     }
 
@@ -875,6 +1085,21 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     private static bool IsValidSpacing(object? value)
     {
         return value is double spacing && spacing >= 0 && !double.IsNaN(spacing) && !double.IsInfinity(spacing);
+    }
+
+    private static bool IsValidTransitionProfile(object? value)
+    {
+        return value is FWContentTransitionProfile profile && Enum.IsDefined(profile);
+    }
+
+    private static bool IsValidTransitionDuration(object? value)
+    {
+        return value is TimeSpan duration && duration >= TimeSpan.Zero;
+    }
+
+    private static bool IsValidTransitionOffset(object? value)
+    {
+        return value is double offset && offset >= 0 && !double.IsNaN(offset) && !double.IsInfinity(offset);
     }
 }
 

@@ -126,6 +126,10 @@ public sealed class FluentNotificationStatusTests
         AssertSetter(snackbarHostStyle, FWSnackbarHost.MaxVisibleSnackbarsProperty, 1);
         AssertSetter(snackbarHostStyle, FWSnackbarHost.PlacementProperty, "Bottom");
         AssertSetter(snackbarHostStyle, FWSnackbarHost.SpacingProperty, 8.0);
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.IsTransitionEnabledProperty);
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.TransitionProfileProperty, "Entrance");
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.SnackbarTransitionDurationProperty);
+        AssertSetter(snackbarHostStyle, FWSnackbarHost.TransitionOffsetProperty, 16.0);
         AssertSetter(snackbarHostStyle, Control.HorizontalContentAlignmentProperty, "Stretch");
         AssertSetter(snackbarHostStyle, Control.VerticalContentAlignmentProperty, "Bottom");
         AssertContainsStyle<StatusBar>(dictionary);
@@ -456,6 +460,94 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal(VerticalAlignment.Bottom, host.VerticalContentAlignment);
         Assert.Equal(16, host.Spacing);
         Assert.Throws<ArgumentException>(() => host.Spacing = -1);
+    }
+
+    [Fact]
+    public void FWSnackbarHost_ShouldExposeTransitionDefaultsAndDiagnostics()
+    {
+        var host = new FWSnackbarHost();
+
+        Assert.True(host.IsTransitionEnabled);
+        Assert.Equal(FWContentTransitionProfile.Entrance, host.TransitionProfile);
+        Assert.Equal(TimeSpan.FromMilliseconds(320), host.SnackbarTransitionDuration);
+        Assert.Equal(16, host.TransitionOffset);
+
+        var diagnostics = host.GetDiagnostics();
+
+        Assert.Equal(0, diagnostics.VisibleCount);
+        Assert.Equal(0, diagnostics.PendingCount);
+        Assert.Equal(1, diagnostics.MaxVisibleSnackbars);
+        Assert.Equal(FWSnackbarPlacement.Bottom, diagnostics.Placement);
+        Assert.Equal(VerticalAlignment.Bottom, diagnostics.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, diagnostics.HorizontalAlignment);
+        Assert.Equal(8, diagnostics.Spacing);
+        Assert.True(diagnostics.IsTransitionEnabled);
+        Assert.Equal(FWContentTransitionProfile.Entrance, diagnostics.TransitionProfile);
+        Assert.Equal(TimeSpan.FromMilliseconds(320), diagnostics.SnackbarTransitionDuration);
+        Assert.Equal(16, diagnostics.TransitionOffset);
+        Assert.False(diagnostics.HasCurrentSnackbar);
+        Assert.False(diagnostics.HasPendingSnackbars);
+
+        host.TransitionProfile = FWContentTransitionProfile.Suppress;
+
+        Assert.Equal(TimeSpan.Zero, host.SnackbarTransitionDuration);
+
+        host.SnackbarTransitionDuration = TimeSpan.FromMilliseconds(180);
+        host.TransitionOffset = 24;
+
+        Assert.Equal(TimeSpan.FromMilliseconds(180), host.SnackbarTransitionDuration);
+        Assert.Equal(24, host.TransitionOffset);
+        Assert.Throws<ArgumentException>(() => host.TransitionProfile = (FWContentTransitionProfile)42);
+        Assert.Throws<ArgumentException>(() => host.SnackbarTransitionDuration = TimeSpan.FromMilliseconds(-1));
+        Assert.Throws<ArgumentException>(() => host.TransitionOffset = -1);
+    }
+
+    [Fact]
+    public void FWSnackbarHost_ShouldRaiseTransitionAndQueueDiagnostics()
+    {
+        var host = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1,
+            Placement = FWSnackbarPlacement.Top,
+            Spacing = 12,
+            TransitionProfile = FWContentTransitionProfile.Entrance,
+            TransitionOffset = 20
+        };
+        var transitions = new List<FWSnackbarTransitionRequestedEventArgs>();
+        var queueChanges = new List<FWSnackbarHostQueueChangedEventArgs>();
+        host.TransitionRequested += (_, args) => transitions.Add(args);
+        host.QueueChanged += (_, args) => queueChanges.Add(args);
+        var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
+        var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
+
+        host.Enqueue(first);
+        host.Enqueue(second);
+
+        Assert.Equal(new[] { FWSnackbarTransitionKind.Show }, transitions.Select(item => item.Kind).ToArray());
+        Assert.Equal(new[] { FWSnackbarHostQueueChangeReason.Shown, FWSnackbarHostQueueChangeReason.Queued }, queueChanges.Select(item => item.Reason).ToArray());
+        Assert.Same(first, transitions[0].Snackbar);
+        Assert.Equal(FWSnackbarPlacement.Top, transitions[0].Diagnostics.Placement);
+        Assert.Equal(20, transitions[0].Diagnostics.TransitionOffset);
+        Assert.Equal(1, host.GetDiagnostics().VisibleCount);
+        Assert.Equal(1, host.GetDiagnostics().PendingCount);
+        Assert.True(host.GetDiagnostics().HasPendingSnackbars);
+
+        first.Close();
+
+        Assert.Equal(
+            new[] { FWSnackbarTransitionKind.Show, FWSnackbarTransitionKind.Close, FWSnackbarTransitionKind.Show },
+            transitions.Select(item => item.Kind).ToArray());
+        Assert.Equal(FWSnackbarHostQueueChangeReason.Closed, queueChanges[^2].Reason);
+        Assert.Equal(FWSnackbarHostQueueChangeReason.Shown, queueChanges[^1].Reason);
+        Assert.Same(second, host.CurrentSnackbar);
+        Assert.Equal(1, host.GetDiagnostics().VisibleCount);
+        Assert.Equal(0, host.GetDiagnostics().PendingCount);
+
+        host.IsTransitionEnabled = false;
+        host.CloseCurrent();
+
+        Assert.Equal(3, transitions.Count);
+        Assert.Empty(host.Snackbars);
     }
 
     [Fact]
