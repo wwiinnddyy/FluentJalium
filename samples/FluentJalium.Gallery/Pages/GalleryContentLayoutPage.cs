@@ -350,19 +350,19 @@ internal sealed class GalleryContentLayoutPage
         var relativePanel = new FWRelativePanel
         {
             Width = 225,
+            Height = 118,
             ColumnSpacing = 8,
             RowSpacing = 8
         };
-        relativePanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-        relativePanel.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
-        relativePanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        relativePanel.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        var primary = CreateGridCell("RelativePanel", "Grid-compatible");
-        var secondary = CreateGridCell("Right", "Column 1");
-        var footer = CreateGridCell("Span", "Two columns");
-        Grid.SetColumn(secondary, 1);
-        Grid.SetRow(footer, 1);
-        Grid.SetColumnSpan(footer, 2);
+        var primary = CreateRelativeTile("Anchor", 92, 40);
+        var secondary = CreateRelativeTile("RightOf", 92, 40);
+        var footer = CreateRelativeTile("Below", 192, 40);
+        FWRelativePanel.SetAlignLeftWithPanel(primary, true);
+        FWRelativePanel.SetAlignTopWithPanel(primary, true);
+        FWRelativePanel.SetRightOf(secondary, primary);
+        FWRelativePanel.SetAlignTopWith(secondary, primary);
+        FWRelativePanel.SetBelow(footer, primary);
+        FWRelativePanel.SetAlignLeftWith(footer, primary);
         relativePanel.Children.Add(primary);
         relativePanel.Children.Add(secondary);
         relativePanel.Children.Add(footer);
@@ -659,6 +659,27 @@ internal sealed class GalleryContentLayoutPage
         };
     }
 
+    private static FWBorder CreateRelativeTile(string text, double width, double height)
+    {
+        return new FWBorder
+        {
+            Width = width,
+            Height = height,
+            Background = ThemeBrush("ControlBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(8),
+            Child = new FWTextBlock
+            {
+                Text = text,
+                FontSize = 12,
+                Foreground = ThemeBrush("TextPrimary"),
+                VerticalAlignment = VerticalAlignment.Center
+            }
+        };
+    }
+
     private static FWBorder CreateLayoutFrame(string label, UIElement content)
     {
         return new FWBorder
@@ -719,7 +740,7 @@ internal sealed class GalleryContentLayoutPage
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
             "Adaptive settings layout" => "<FWTwoPaneView Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\" Description=\"Adaptive settings row\" />\n</FWTwoPaneView>",
-            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel />\n<FWParallaxView HorizontalShift=\"18\" VerticalShift=\"28\" />",
+            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView HorizontalShift=\"18\" VerticalShift=\"28\" />",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
         };

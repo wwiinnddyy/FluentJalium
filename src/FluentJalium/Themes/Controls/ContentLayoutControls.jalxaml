@@ -148,7 +148,11 @@
 
     <Style TargetType="fluent:FWCanvas" BasedOn="{StaticResource {x:Type Canvas}}" />
 
-    <Style TargetType="fluent:FWRelativePanel" BasedOn="{StaticResource {x:Type Grid}}" />
+    <Style TargetType="fluent:FWRelativePanel">
+        <Setter Property="Background" Value="{ThemeResource ContentPanelBackground}" />
+        <Setter Property="RowSpacing" Value="0" />
+        <Setter Property="ColumnSpacing" Value="0" />
+    </Style>
 
     <Style TargetType="fluent:FWTwoPaneView">
         <Setter Property="Background" Value="{ThemeResource ContentSurfaceBackground}" />

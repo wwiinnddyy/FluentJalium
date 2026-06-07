@@ -285,6 +285,79 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void FWRelativePanel_ShouldExposeWinUIStyleRelativeConstraints()
+    {
+        var anchor = new FWBorder();
+        var detail = new FWBorder();
+
+        FWRelativePanel.SetAlignLeftWithPanel(anchor, true);
+        FWRelativePanel.SetAlignTopWithPanel(anchor, true);
+        FWRelativePanel.SetAlignRightWithPanel(anchor, true);
+        FWRelativePanel.SetAlignBottomWithPanel(anchor, true);
+        FWRelativePanel.SetAlignHorizontalCenterWithPanel(anchor, true);
+        FWRelativePanel.SetAlignVerticalCenterWithPanel(anchor, true);
+        FWRelativePanel.SetRightOf(detail, anchor);
+        FWRelativePanel.SetBelow(detail, anchor);
+        FWRelativePanel.SetAlignLeftWith(detail, anchor);
+        FWRelativePanel.SetAlignTopWith(detail, anchor);
+        FWRelativePanel.SetAlignRightWith(detail, anchor);
+        FWRelativePanel.SetAlignBottomWith(detail, anchor);
+        FWRelativePanel.SetAlignHorizontalCenterWith(detail, anchor);
+        FWRelativePanel.SetAlignVerticalCenterWith(detail, anchor);
+
+        Assert.True(FWRelativePanel.GetAlignLeftWithPanel(anchor));
+        Assert.True(FWRelativePanel.GetAlignTopWithPanel(anchor));
+        Assert.True(FWRelativePanel.GetAlignRightWithPanel(anchor));
+        Assert.True(FWRelativePanel.GetAlignBottomWithPanel(anchor));
+        Assert.True(FWRelativePanel.GetAlignHorizontalCenterWithPanel(anchor));
+        Assert.True(FWRelativePanel.GetAlignVerticalCenterWithPanel(anchor));
+        Assert.Same(anchor, FWRelativePanel.GetRightOf(detail));
+        Assert.Same(anchor, FWRelativePanel.GetBelow(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignLeftWith(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignTopWith(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignRightWith(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignBottomWith(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignHorizontalCenterWith(detail));
+        Assert.Same(anchor, FWRelativePanel.GetAlignVerticalCenterWith(detail));
+    }
+
+    [Fact]
+    public void FWRelativePanel_ShouldMeasureChildrenFromRelativeConstraints()
+    {
+        var anchor = new FWBorder { Width = 40, Height = 20 };
+        var right = new FWBorder { Width = 30, Height = 12 };
+        var below = new FWBorder { Width = 50, Height = 10 };
+        var panel = new FWRelativePanel
+        {
+            ColumnSpacing = 8,
+            RowSpacing = 6,
+            Children =
+            {
+                anchor,
+                right,
+                below
+            }
+        };
+
+        FWRelativePanel.SetAlignLeftWithPanel(anchor, true);
+        FWRelativePanel.SetAlignTopWithPanel(anchor, true);
+        FWRelativePanel.SetRightOf(right, anchor);
+        FWRelativePanel.SetAlignTopWith(right, anchor);
+        FWRelativePanel.SetBelow(below, anchor);
+        FWRelativePanel.SetAlignLeftWith(below, anchor);
+
+        panel.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        panel.Arrange(new Rect(0, 0, 120, 80));
+
+        Assert.Equal(78, panel.DesiredSize.Width);
+        Assert.Equal(36, panel.DesiredSize.Height);
+        Assert.Equal(new Size(120, 80), panel.RenderSize);
+        Assert.Equal(new Size(40, 20), anchor.RenderSize);
+        Assert.Equal(new Size(30, 12), right.RenderSize);
+        Assert.Equal(new Size(50, 10), below.RenderSize);
+    }
+
+    [Fact]
     public void ContentTransitionRecipe_ShouldCreateProfilesFromMotionResources()
     {
         var resources = new ResourceDictionary
@@ -361,7 +434,9 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(typeof(Canvas), canvasStyle.BasedOn?.TargetType);
 
         var relativePanelStyle = AssertStyle<FWRelativePanel>(dictionary);
-        Assert.Equal(typeof(Grid), relativePanelStyle.BasedOn?.TargetType);
+        AssertSetter(relativePanelStyle, Panel.BackgroundProperty);
+        AssertSetter(relativePanelStyle, FWRelativePanel.RowSpacingProperty);
+        AssertSetter(relativePanelStyle, FWRelativePanel.ColumnSpacingProperty);
 
         var twoPaneViewStyle = AssertStyle<FWTwoPaneView>(dictionary);
         AssertSetter(twoPaneViewStyle, FWTwoPaneView.ModeProperty);

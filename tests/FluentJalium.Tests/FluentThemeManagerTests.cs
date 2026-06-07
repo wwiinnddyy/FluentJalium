@@ -122,7 +122,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
             AssertBasedOnStyle<FWGrid, Grid>(app.Resources);
-            AssertBasedOnStyle<FWRelativePanel, Grid>(app.Resources);
+            AssertOwnedStyle<FWRelativePanel>(app.Resources);
             AssertBasedOnStyle<FWColorPicker, ColorPicker>(app.Resources);
             AssertOwnedStyle<FWInkCanvas>(app.Resources);
             AssertBasedOnStyle<FWInkPresenter, InkPresenter>(app.Resources);
@@ -917,7 +917,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
             AssertBasedOnStyle<FWGrid, Grid>(app.Resources);
-            AssertBasedOnStyle<FWRelativePanel, Grid>(app.Resources);
+            AssertOwnedStyle<FWRelativePanel>(app.Resources);
             Assert.IsType<SolidColorBrush>(app.Resources["ContentSurfaceBorderBrush"]);
             Assert.IsType<SolidColorBrush>(app.Resources["ContentPanelBackground"]);
         }
@@ -1231,7 +1231,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWStackPanel, StackPanel>();
         AssertFluentControl<FWWrapPanel, WrapPanel>();
         AssertFluentControl<FWGrid, Grid>();
-        AssertFluentControl<FWRelativePanel, Grid>();
+        AssertFluentControl<FWRelativePanel, Panel>();
     }
 
     [Fact]

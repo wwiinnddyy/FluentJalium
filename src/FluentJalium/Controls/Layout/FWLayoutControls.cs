@@ -445,10 +445,501 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
 }
 
 /// <summary>
-/// FluentJalium RelativePanel compatibility surface.
+/// FluentJalium RelativePanel control for arranging children relative to the panel or to sibling elements.
 /// </summary>
-public class FWRelativePanel : Grid, IFluentJaliumControl
+public class FWRelativePanel : Panel, IFluentJaliumControl
 {
+    public static readonly DependencyProperty RowSpacingProperty =
+        DependencyProperty.Register(nameof(RowSpacing), typeof(double), typeof(FWRelativePanel),
+            new PropertyMetadata(0.0, OnPanelLayoutPropertyChanged), IsValidSpacing);
+
+    public static readonly DependencyProperty ColumnSpacingProperty =
+        DependencyProperty.Register(nameof(ColumnSpacing), typeof(double), typeof(FWRelativePanel),
+            new PropertyMetadata(0.0, OnPanelLayoutPropertyChanged), IsValidSpacing);
+
+    public static readonly DependencyProperty AlignLeftWithPanelProperty =
+        RegisterBoolAttached("AlignLeftWithPanel");
+
+    public static readonly DependencyProperty AlignTopWithPanelProperty =
+        RegisterBoolAttached("AlignTopWithPanel");
+
+    public static readonly DependencyProperty AlignRightWithPanelProperty =
+        RegisterBoolAttached("AlignRightWithPanel");
+
+    public static readonly DependencyProperty AlignBottomWithPanelProperty =
+        RegisterBoolAttached("AlignBottomWithPanel");
+
+    public static readonly DependencyProperty AlignHorizontalCenterWithPanelProperty =
+        RegisterBoolAttached("AlignHorizontalCenterWithPanel");
+
+    public static readonly DependencyProperty AlignVerticalCenterWithPanelProperty =
+        RegisterBoolAttached("AlignVerticalCenterWithPanel");
+
+    public static readonly DependencyProperty RightOfProperty =
+        RegisterTargetAttached("RightOf");
+
+    public static readonly DependencyProperty LeftOfProperty =
+        RegisterTargetAttached("LeftOf");
+
+    public static readonly DependencyProperty BelowProperty =
+        RegisterTargetAttached("Below");
+
+    public static readonly DependencyProperty AboveProperty =
+        RegisterTargetAttached("Above");
+
+    public static readonly DependencyProperty AlignLeftWithProperty =
+        RegisterTargetAttached("AlignLeftWith");
+
+    public static readonly DependencyProperty AlignTopWithProperty =
+        RegisterTargetAttached("AlignTopWith");
+
+    public static readonly DependencyProperty AlignRightWithProperty =
+        RegisterTargetAttached("AlignRightWith");
+
+    public static readonly DependencyProperty AlignBottomWithProperty =
+        RegisterTargetAttached("AlignBottomWith");
+
+    public static readonly DependencyProperty AlignHorizontalCenterWithProperty =
+        RegisterTargetAttached("AlignHorizontalCenterWith");
+
+    public static readonly DependencyProperty AlignVerticalCenterWithProperty =
+        RegisterTargetAttached("AlignVerticalCenterWith");
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double RowSpacing
+    {
+        get => (double)GetValue(RowSpacingProperty)!;
+        set => SetValue(RowSpacingProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double ColumnSpacing
+    {
+        get => (double)GetValue(ColumnSpacingProperty)!;
+        set => SetValue(ColumnSpacingProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignLeftWithPanel(UIElement element) => GetBoolAttached(element, AlignLeftWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignLeftWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignLeftWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignTopWithPanel(UIElement element) => GetBoolAttached(element, AlignTopWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignTopWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignTopWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignRightWithPanel(UIElement element) => GetBoolAttached(element, AlignRightWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignRightWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignRightWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignBottomWithPanel(UIElement element) => GetBoolAttached(element, AlignBottomWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignBottomWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignBottomWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignHorizontalCenterWithPanel(UIElement element) => GetBoolAttached(element, AlignHorizontalCenterWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignHorizontalCenterWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignHorizontalCenterWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static bool GetAlignVerticalCenterWithPanel(UIElement element) => GetBoolAttached(element, AlignVerticalCenterWithPanelProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignVerticalCenterWithPanel(UIElement element, bool value) => SetBoolAttached(element, AlignVerticalCenterWithPanelProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetRightOf(UIElement element) => element.GetValue(RightOfProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetRightOf(UIElement element, object? value) => element.SetValue(RightOfProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetLeftOf(UIElement element) => element.GetValue(LeftOfProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetLeftOf(UIElement element, object? value) => element.SetValue(LeftOfProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetBelow(UIElement element) => element.GetValue(BelowProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetBelow(UIElement element, object? value) => element.SetValue(BelowProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAbove(UIElement element) => element.GetValue(AboveProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAbove(UIElement element, object? value) => element.SetValue(AboveProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignLeftWith(UIElement element) => element.GetValue(AlignLeftWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignLeftWith(UIElement element, object? value) => element.SetValue(AlignLeftWithProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignTopWith(UIElement element) => element.GetValue(AlignTopWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignTopWith(UIElement element, object? value) => element.SetValue(AlignTopWithProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignRightWith(UIElement element) => element.GetValue(AlignRightWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignRightWith(UIElement element, object? value) => element.SetValue(AlignRightWithProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignBottomWith(UIElement element) => element.GetValue(AlignBottomWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignBottomWith(UIElement element, object? value) => element.SetValue(AlignBottomWithProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignHorizontalCenterWith(UIElement element) => element.GetValue(AlignHorizontalCenterWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignHorizontalCenterWith(UIElement element, object? value) => element.SetValue(AlignHorizontalCenterWithProperty, value);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static object? GetAlignVerticalCenterWith(UIElement element) => element.GetValue(AlignVerticalCenterWithProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public static void SetAlignVerticalCenterWith(UIElement element, object? value) => element.SetValue(AlignVerticalCenterWithProperty, value);
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        foreach (var child in Children)
+        {
+            child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        }
+
+        var bounds = ResolveLayout(Size.Empty);
+        var desiredWidth = 0.0;
+        var desiredHeight = 0.0;
+        foreach (var rect in bounds.Values)
+        {
+            desiredWidth = Math.Max(desiredWidth, rect.Right);
+            desiredHeight = Math.Max(desiredHeight, rect.Bottom);
+        }
+
+        return new Size(desiredWidth, desiredHeight);
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        var bounds = ResolveLayout(finalSize);
+        foreach (var child in Children)
+        {
+            if (bounds.TryGetValue(child, out var rect))
+            {
+                child.Arrange(rect);
+            }
+        }
+
+        return finalSize;
+    }
+
+    private static DependencyProperty RegisterBoolAttached(string name)
+    {
+        return DependencyProperty.RegisterAttached(name, typeof(bool), typeof(FWRelativePanel),
+            new PropertyMetadata(false, OnRelativeConstraintChanged));
+    }
+
+    private static DependencyProperty RegisterTargetAttached(string name)
+    {
+        return DependencyProperty.RegisterAttached(name, typeof(object), typeof(FWRelativePanel),
+            new PropertyMetadata(null, OnRelativeConstraintChanged));
+    }
+
+    private static bool GetBoolAttached(UIElement element, DependencyProperty property)
+    {
+        return (bool)(element.GetValue(property) ?? false);
+    }
+
+    private static void SetBoolAttached(UIElement element, DependencyProperty property, bool value)
+    {
+        element.SetValue(property, value);
+    }
+
+    private static void OnPanelLayoutPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWRelativePanel panel)
+        {
+            panel.InvalidateMeasure();
+            panel.InvalidateVisual();
+        }
+    }
+
+    private static void OnRelativeConstraintChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is UIElement element && element.VisualParent is FWRelativePanel panel)
+        {
+            panel.InvalidateMeasure();
+            panel.InvalidateVisual();
+        }
+    }
+
+    private static bool IsValidSpacing(object? value)
+    {
+        return value is double number && double.IsFinite(number) && number >= 0;
+    }
+
+    private Dictionary<UIElement, Rect> ResolveLayout(Size panelSize)
+    {
+        var bounds = new Dictionary<UIElement, Rect>();
+        var unresolved = new List<UIElement>(Children);
+        var passCount = Math.Max(1, unresolved.Count);
+
+        for (var pass = 0; pass < passCount && unresolved.Count > 0; pass++)
+        {
+            for (var index = unresolved.Count - 1; index >= 0; index--)
+            {
+                var child = unresolved[index];
+                if (TryResolveChild(child, panelSize, bounds, out var rect))
+                {
+                    bounds[child] = rect;
+                    unresolved.RemoveAt(index);
+                }
+            }
+        }
+
+        foreach (var child in unresolved)
+        {
+            bounds[child] = CreateFallbackRect(child);
+        }
+
+        return bounds;
+    }
+
+    private bool TryResolveChild(
+        UIElement child,
+        Size panelSize,
+        IReadOnlyDictionary<UIElement, Rect> resolved,
+        out Rect rect)
+    {
+        var desired = child.DesiredSize;
+        var x = 0.0;
+        var y = 0.0;
+
+        if (GetAlignLeftWithPanel(child))
+        {
+            x = 0;
+        }
+        else if (GetAlignRightWithPanel(child))
+        {
+            x = Math.Max(0, panelSize.Width - desired.Width);
+        }
+        else if (GetAlignHorizontalCenterWithPanel(child))
+        {
+            x = Math.Max(0, (panelSize.Width - desired.Width) / 2.0);
+        }
+        else if (!TryResolveHorizontalTarget(child, desired, resolved, ref x))
+        {
+            rect = default;
+            return false;
+        }
+
+        if (GetAlignTopWithPanel(child))
+        {
+            y = 0;
+        }
+        else if (GetAlignBottomWithPanel(child))
+        {
+            y = Math.Max(0, panelSize.Height - desired.Height);
+        }
+        else if (GetAlignVerticalCenterWithPanel(child))
+        {
+            y = Math.Max(0, (panelSize.Height - desired.Height) / 2.0);
+        }
+        else if (!TryResolveVerticalTarget(child, desired, resolved, ref y))
+        {
+            rect = default;
+            return false;
+        }
+
+        rect = new Rect(x, y, desired.Width, desired.Height);
+        return true;
+    }
+
+    private bool TryResolveHorizontalTarget(
+        UIElement child,
+        Size desired,
+        IReadOnlyDictionary<UIElement, Rect> resolved,
+        ref double x)
+    {
+        if (!TryResolveTargetRect(GetRightOf(child), resolved, out var target, out var hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            x = target.Right + ColumnSpacing;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetLeftOf(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            x = target.Left - ColumnSpacing - desired.Width;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignLeftWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            x = target.Left;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignRightWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            x = target.Right - desired.Width;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignHorizontalCenterWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            x = target.Left + (target.Width - desired.Width) / 2.0;
+        }
+
+        return true;
+    }
+
+    private bool TryResolveVerticalTarget(
+        UIElement child,
+        Size desired,
+        IReadOnlyDictionary<UIElement, Rect> resolved,
+        ref double y)
+    {
+        if (!TryResolveTargetRect(GetBelow(child), resolved, out var target, out var hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            y = target.Bottom + RowSpacing;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAbove(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            y = target.Top - RowSpacing - desired.Height;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignTopWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            y = target.Top;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignBottomWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            y = target.Bottom - desired.Height;
+            return true;
+        }
+
+        if (!TryResolveTargetRect(GetAlignVerticalCenterWith(child), resolved, out target, out hasTarget))
+        {
+            return false;
+        }
+
+        if (hasTarget)
+        {
+            y = target.Top + (target.Height - desired.Height) / 2.0;
+        }
+
+        return true;
+    }
+
+    private bool TryResolveTargetRect(
+        object? target,
+        IReadOnlyDictionary<UIElement, Rect> resolved,
+        out Rect rect,
+        out bool hasTarget)
+    {
+        rect = default;
+        if (target == null)
+        {
+            hasTarget = false;
+            return true;
+        }
+
+        hasTarget = true;
+        var element = ResolveTargetElement(target);
+        if (element == null)
+        {
+            hasTarget = false;
+            return true;
+        }
+
+        return resolved.TryGetValue(element, out rect);
+    }
+
+    private UIElement? ResolveTargetElement(object target)
+    {
+        if (target is UIElement element)
+        {
+            return Children.Contains(element) ? element : null;
+        }
+
+        if (target is string name && !string.IsNullOrWhiteSpace(name))
+        {
+            return Children.OfType<FrameworkElement>().FirstOrDefault(child => child.Name == name);
+        }
+
+        return null;
+    }
+
+    private static Rect CreateFallbackRect(UIElement child)
+    {
+        var desired = child.DesiredSize;
+        return new Rect(0, 0, desired.Width, desired.Height);
+    }
 }
 
 /// <summary>
