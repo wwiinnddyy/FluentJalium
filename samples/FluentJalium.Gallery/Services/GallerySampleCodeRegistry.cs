@@ -394,17 +394,24 @@ var host = new FWSnackbarHost
     MaxVisibleSnackbars = 2,
     Placement = FWSnackbarPlacement.Bottom
 };
+var service = new FWSnackbarService();
+service.SetHost(host);
 
-host.Enqueue(new FWSnackbar
+var snackbar = service.Enqueue(new FWSnackbar
 {
     Severity = ToastSeverity.Success,
     Title = "Preview refreshed",
     Message = "The Gallery host keeps no more than two snackbar items visible.",
     ActionContent = "Open",
+    ActionCommand = OpenPreviewCommand,
+    ActionCommandParameter = "preview-refresh",
     IsClosable = true,
     IsAutoDismissEnabled = true,
     Duration = TimeSpan.FromSeconds(8)
 });
+
+service.CloseCurrent();
+var closeReason = snackbar.LastCloseReason;
 """
     };
 

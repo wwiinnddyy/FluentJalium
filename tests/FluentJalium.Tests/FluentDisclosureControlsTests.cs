@@ -358,6 +358,34 @@ public sealed class FluentDisclosureControlsTests
     }
 
     [Fact]
+    public async Task FWTaskDialog_ShouldReuseOpenShowTaskAndCloseFromCancellationToken()
+    {
+        var dialog = new FWTaskDialog
+        {
+            Title = "Upload changes?",
+            PrimaryButtonText = "Upload",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Close
+        };
+        using var cancellation = new CancellationTokenSource();
+
+        var firstShowTask = dialog.ShowAsync(cancellation.Token);
+        var secondShowTask = dialog.ShowAsync();
+
+        Assert.Same(firstShowTask, secondShowTask);
+        Assert.True(dialog.IsOpen);
+
+        cancellation.Cancel();
+
+        var result = await firstShowTask;
+
+        Assert.Equal(FWTaskDialogResult.Close, result);
+        Assert.Equal(FWTaskDialogResult.Close, dialog.Result);
+        Assert.False(dialog.IsOpen);
+    }
+
+    [Fact]
     public void FWSettingsExpander_ShouldExposeSettingsRowsAndSupplementaryContent()
     {
         var firstRow = new FWSettingsCard

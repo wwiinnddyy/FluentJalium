@@ -12,6 +12,7 @@ using FWInfoBadgeSeverity = FluentJalium.Controls.FWInfoBadgeSeverity;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWSnackbar = FluentJalium.Controls.FWSnackbar;
+using FWSnackbarCloseReason = FluentJalium.Controls.FWSnackbarCloseReason;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWStatusBar = FluentJalium.Controls.FWStatusBar;
 using FWStatusBarItem = FluentJalium.Controls.FWStatusBarItem;
@@ -20,6 +21,7 @@ using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWSnackbarHost = FluentJalium.Controls.FWSnackbarHost;
 using FWSnackbarPlacement = FluentJalium.Controls.FWSnackbarPlacement;
+using FWSnackbarService = FluentJalium.Controls.FWSnackbarService;
 using System.Windows.Input;
 
 namespace FluentJalium.Gallery.Pages;
@@ -293,9 +295,12 @@ internal sealed class GalleryStatusPage
             MaxVisibleSnackbars = 2,
             Placement = FWSnackbarPlacement.Bottom
         };
+        var service = new FWSnackbarService();
+        service.SetHost(host);
 
         var autoDismissEnabled = false;
         var closedEvents = 0;
+        var lastCloseReason = FWSnackbarCloseReason.None;
         var actionRequests = 0;
         var lastCommandParameter = "none";
         var actionCommand = new GallerySnackbarCommand(parameter =>
@@ -307,7 +312,7 @@ internal sealed class GalleryStatusPage
         void UpdateOutput(string action)
         {
             var currentTitle = host.CurrentSnackbar?.Title?.ToString() ?? "none";
-            output.Text = $"{action}. Current: {currentTitle}. Visible: {host.Snackbars.Count}/{host.MaxVisibleSnackbars}. Queued: {host.PendingCount}. Closed: {closedEvents}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}.";
+            output.Text = $"{action}. Current: {currentTitle}. Visible: {host.Snackbars.Count}/{host.MaxVisibleSnackbars}. Queued: {host.PendingCount}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}.";
         }
 
         FWSnackbar CreateQueuedSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
@@ -336,10 +341,11 @@ internal sealed class GalleryStatusPage
 
         void EnqueueSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
         {
-            var snackbar = host.Enqueue(CreateQueuedSnackbar(severity, title, message, actionContent, actionParameter));
+            var snackbar = service.Enqueue(CreateQueuedSnackbar(severity, title, message, actionContent, actionParameter));
             snackbar.Closed += (_, _) =>
             {
                 closedEvents++;
+                lastCloseReason = snackbar.LastCloseReason;
                 UpdateOutput($"Closed {title}");
             };
             UpdateOutput($"Enqueued {severity}");
@@ -413,7 +419,7 @@ internal sealed class GalleryStatusPage
                     }),
                     CreateStatusActionButton(FluentIconRegular.Dismiss24, "Close", () =>
                     {
-                        var closed = host.CloseCurrent();
+                        var closed = service.CloseCurrent();
                         if (!closed)
                         {
                             UpdateOutput("Close requested with no current snackbar");
@@ -422,7 +428,8 @@ internal sealed class GalleryStatusPage
                     CreateStatusActionButton(FluentIconRegular.Clock24, "Auto", ToggleAutoDismiss),
                     CreateStatusActionButton(FluentIconRegular.DismissCircle24, "Clear", () =>
                     {
-                        host.Clear();
+                        service.Clear();
+                        lastCloseReason = FWSnackbarCloseReason.HostCleared;
                         UpdateOutput("Cleared host queue");
                     })),
                 CreateStatus(output)
@@ -752,7 +759,7 @@ internal sealed class GalleryStatusPage
             "FWInfoBar" => "<FWInfoBar Severity=\"Warning\" Title=\"Review required\" Message=\"Check settings before continuing\" IsOpen=\"True\" />",
             "FWInfoBadge" => "<FWInfoBadge Severity=\"Critical\" Value=\"128\" MaxValue=\"99\" />\n<FWInfoBadge Severity=\"Success\" IconGlyph=\"CheckmarkCircle24\" />",
             "FWToastNotificationHost" => "<FWToastNotificationHost MaxVisibleToasts=\"3\" Position=\"BottomRight\" />",
-            "FWSnackbar" => "<FWSnackbarHost MaxVisibleSnackbars=\"2\" Placement=\"Bottom\" />\n<FWSnackbar Title=\"Draft archived\" ActionContent=\"Undo\" ActionCommand=\"{Binding UndoCommand}\" ActionCommandParameter=\"draft-archive\" />",
+            "FWSnackbar" => "var service = new FWSnackbarService();\nservice.SetHost(snackbarHost);\nvar snackbar = service.Enqueue(new FWSnackbar\n{\n    Title = \"Draft archived\",\n    ActionContent = \"Undo\",\n    ActionCommand = UndoCommand,\n    ActionCommandParameter = \"draft-archive\"\n});\nvar closeReason = snackbar.LastCloseReason;",
             "FWStatusBar" => "<FWStatusBar>\n    <FWStatusBarItem Content=\"Ready\" />\n    <FWStatusBarItem Content=\"UTF-8\" />\n</FWStatusBar>",
             "Material operations console" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWInfoBar Severity=\"Success\" IsOpen=\"True\" />\n    <FWStatusBar />\n</FWFluentMaterialSurface>",
             _ => "<FWInfoBar IsOpen=\"True\" />"

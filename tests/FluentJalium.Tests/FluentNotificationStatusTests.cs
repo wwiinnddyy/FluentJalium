@@ -257,6 +257,7 @@ public sealed class FluentNotificationStatusTests
 
         Assert.False(snackbar.IsOpen);
         Assert.Equal(1, closedCount);
+        Assert.Equal(FWSnackbarCloseReason.Programmatic, snackbar.LastCloseReason);
     }
 
     [Fact]
@@ -279,8 +280,38 @@ public sealed class FluentNotificationStatusTests
 
         Assert.Same(showTask, completed);
         Assert.False(snackbar.IsOpen);
+        Assert.Equal(FWSnackbarCloseReason.Timeout, snackbar.LastCloseReason);
         Assert.Equal(1, openedCount);
         Assert.Equal(1, closedCount);
+    }
+
+    [Fact]
+    public async Task FWSnackbar_ShouldCompleteResultFlowWithCloseReason()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Undo archive",
+            ActionContent = "Undo",
+            ActionCommand = new RecordingCommand(),
+            ActionCommandParameter = "archive",
+            IsAutoDismissEnabled = false
+        };
+
+        var showTask = snackbar.ShowForResultAsync();
+
+        Assert.True(snackbar.IsOpen);
+        Assert.Equal(FWSnackbarCloseReason.None, snackbar.LastCloseReason);
+        Assert.False(snackbar.RequestAction());
+
+        var result = await showTask;
+
+        Assert.Equal(FWSnackbarCloseReason.Action, result);
+        Assert.Equal(FWSnackbarCloseReason.Action, snackbar.LastCloseReason);
+        Assert.False(snackbar.IsOpen);
+
+        var command = Assert.IsType<RecordingCommand>(snackbar.ActionCommand);
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("archive", command.LastParameter);
     }
 
     [Fact]
@@ -323,6 +354,48 @@ public sealed class FluentNotificationStatusTests
 
         Assert.Empty(host.Snackbars);
         Assert.Equal(0, host.PendingCount);
+        Assert.Equal(FWSnackbarCloseReason.Programmatic, second.LastCloseReason);
+        Assert.Equal(FWSnackbarCloseReason.HostCleared, third.LastCloseReason);
+    }
+
+    [Fact]
+    public void FWSnackbarService_ShouldRequireHostAndRouteMessages()
+    {
+        var service = new FWSnackbarService();
+        var hostChanged = 0;
+        service.HostChanged += (_, _) => hostChanged++;
+
+        Assert.Throws<InvalidOperationException>(() => service.Show(ToastSeverity.Information, "Saved"));
+
+        var host = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1
+        };
+        service.SetHost(host);
+
+        var first = service.Show(ToastSeverity.Information, "Saved", "Local state persisted.", "Open", TimeSpan.FromSeconds(4));
+        var second = service.Enqueue(new FWSnackbar
+        {
+            Title = "Queued",
+            IsAutoDismissEnabled = false
+        });
+
+        Assert.Equal(1, hostChanged);
+        Assert.Same(host, service.Host);
+        Assert.Same(first, host.CurrentSnackbar);
+        Assert.Single(host.Snackbars);
+        Assert.Equal(1, host.PendingCount);
+        Assert.False(second.IsOpen);
+
+        Assert.True(service.CloseCurrent());
+
+        Assert.Same(second, host.CurrentSnackbar);
+        Assert.True(second.IsOpen);
+
+        service.Clear();
+
+        Assert.Empty(host.Snackbars);
+        Assert.Equal(FWSnackbarCloseReason.HostCleared, second.LastCloseReason);
     }
 
     [Fact]

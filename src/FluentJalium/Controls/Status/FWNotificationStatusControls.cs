@@ -74,6 +74,19 @@ public sealed class FWSnackbarActionEventArgs : EventArgs
 }
 
 /// <summary>
+/// Describes why a snackbar closed.
+/// </summary>
+public enum FWSnackbarCloseReason
+{
+    None,
+    Programmatic,
+    Action,
+    CloseButton,
+    Timeout,
+    HostCleared
+}
+
+/// <summary>
 /// Describes where an <see cref="FWSnackbarHost"/> prefers to place transient notifications.
 /// </summary>
 public enum FWSnackbarPlacement
@@ -90,7 +103,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     private Button? _actionButton;
     private Button? _closeButton;
     private CancellationTokenSource? _autoDismissCancellation;
-    private TaskCompletionSource<object?>? _closedTask;
+    private TaskCompletionSource<FWSnackbarCloseReason>? _closedTask;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWSnackbar),
@@ -131,6 +144,12 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     public static readonly DependencyProperty DurationProperty =
         DependencyProperty.Register(nameof(Duration), typeof(TimeSpan), typeof(FWSnackbar),
             new PropertyMetadata(TimeSpan.FromSeconds(4), OnSnackbarPropertyChanged), IsValidDuration);
+
+    private static readonly DependencyPropertyKey LastCloseReasonPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(LastCloseReason), typeof(FWSnackbarCloseReason), typeof(FWSnackbar),
+            new PropertyMetadata(FWSnackbarCloseReason.None));
+
+    public static readonly DependencyProperty LastCloseReasonProperty = LastCloseReasonPropertyKey.DependencyProperty;
 
     public FWSnackbar()
     {
@@ -207,6 +226,12 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         set => SetValue(DurationProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWSnackbarCloseReason LastCloseReason
+    {
+        get => (FWSnackbarCloseReason)GetValue(LastCloseReasonProperty)!;
+    }
+
     public event EventHandler<FWSnackbarActionEventArgs>? ActionClick;
 
     public event EventHandler? Opened;
@@ -215,7 +240,8 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     public void Show()
     {
-        _closedTask = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        SetValue(LastCloseReasonPropertyKey.DependencyProperty, FWSnackbarCloseReason.None);
+        _closedTask = new TaskCompletionSource<FWSnackbarCloseReason>(TaskCreationOptions.RunContinuationsAsynchronously);
         IsOpen = true;
     }
 
@@ -225,8 +251,15 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         return _closedTask?.Task ?? Task.CompletedTask;
     }
 
-    public void Close()
+    public Task<FWSnackbarCloseReason> ShowForResultAsync()
     {
+        Show();
+        return _closedTask?.Task ?? Task.FromResult(LastCloseReason);
+    }
+
+    public void Close(FWSnackbarCloseReason reason = FWSnackbarCloseReason.Programmatic)
+    {
+        SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
         if (!IsOpen)
         {
             return;
@@ -242,7 +275,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         ActionClick?.Invoke(this, args);
         if (!args.Handled)
         {
-            Close();
+            Close(FWSnackbarCloseReason.Action);
         }
 
         return args.Handled;
@@ -285,7 +318,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     private void OnCloseButtonClick(object sender, RoutedEventArgs e)
     {
-        Close();
+        Close(FWSnackbarCloseReason.CloseButton);
     }
 
     private bool ExecuteActionCommand()
@@ -343,7 +376,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
             await Task.Delay(Duration, cancellationToken).ConfigureAwait(false);
             if (!cancellationToken.IsCancellationRequested)
             {
-                Close();
+                Close(FWSnackbarCloseReason.Timeout);
             }
         }
         catch (OperationCanceledException)
@@ -357,7 +390,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         _autoDismissCancellation?.Dispose();
         _autoDismissCancellation = null;
         Closed?.Invoke(this, EventArgs.Empty);
-        _closedTask?.TrySetResult(null);
+        _closedTask?.TrySetResult(LastCloseReason);
         _closedTask = null;
     }
 
@@ -515,10 +548,16 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
 
     public void Clear()
     {
-        _queue.Clear();
+        while (_queue.Count > 0)
+        {
+            var pending = _queue.Dequeue();
+            pending.Closed -= OnSnackbarClosed;
+            pending.Close(FWSnackbarCloseReason.HostCleared);
+        }
+
         foreach (var snackbar in new List<FWSnackbar>(_snackbars))
         {
-            snackbar.Close();
+            snackbar.Close(FWSnackbarCloseReason.HostCleared);
         }
     }
 
@@ -579,6 +618,52 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     private static bool IsValidPlacement(object? value)
     {
         return value is FWSnackbarPlacement placement && Enum.IsDefined(placement);
+    }
+}
+
+/// <summary>
+/// Lightweight service wrapper that routes snackbar requests into a configured host.
+/// </summary>
+public class FWSnackbarService
+{
+    public FWSnackbarHost? Host { get; private set; }
+
+    public event EventHandler? HostChanged;
+
+    public void SetHost(FWSnackbarHost? host)
+    {
+        if (ReferenceEquals(Host, host))
+        {
+            return;
+        }
+
+        Host = host;
+        HostChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public FWSnackbar Show(ToastSeverity severity, object title, object? message = null, object? actionContent = null, TimeSpan? duration = null)
+    {
+        return RequireHost().Show(severity, title, message, actionContent, duration);
+    }
+
+    public FWSnackbar Enqueue(FWSnackbar snackbar)
+    {
+        return RequireHost().Enqueue(snackbar);
+    }
+
+    public bool CloseCurrent()
+    {
+        return RequireHost().CloseCurrent();
+    }
+
+    public void Clear()
+    {
+        RequireHost().Clear();
+    }
+
+    private FWSnackbarHost RequireHost()
+    {
+        return Host ?? throw new InvalidOperationException("Configure a FWSnackbarHost before showing snackbar messages.");
     }
 }
 
