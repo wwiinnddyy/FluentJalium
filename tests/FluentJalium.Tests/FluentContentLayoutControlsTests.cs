@@ -91,10 +91,61 @@ public sealed class FluentContentLayoutControlsTests
             TransitionMode = TransitionMode.LiquidMorph,
             Content = grid
         };
+        var canvasChild = new FWBorder
+        {
+            Width = 24,
+            Height = 24
+        };
+        var canvas = new FWCanvas
+        {
+            Children =
+            {
+                canvasChild
+            }
+        };
+        Canvas.SetLeft(canvasChild, 16);
+        Canvas.SetTop(canvasChild, 20);
+        var relativePanel = new FWRelativePanel
+        {
+            RowSpacing = 4,
+            ColumnSpacing = 4,
+            Children =
+            {
+                canvas
+            }
+        };
+        var twoPaneView = new FWTwoPaneView
+        {
+            Pane1 = relativePanel,
+            Pane2 = transitionHost,
+            Mode = FWTwoPaneViewMode.Tall,
+            PanePriority = FWTwoPaneViewPriority.Pane2,
+            MinWideModeWidth = 720,
+            MinTallModeHeight = 560
+        };
+        var parallaxView = new FWParallaxView
+        {
+            Content = twoPaneView,
+            Source = grid,
+            HorizontalShift = 12,
+            VerticalShift = 48,
+            StartOffset = 0.25,
+            EndOffset = 0.75,
+            IsHorizontalShiftEnabled = true
+        };
+        var settingsCard = new FWSettingsCard
+        {
+            Header = "Use adaptive panes",
+            Description = "Switches between wide, tall, and single-pane layouts.",
+            HeaderIcon = new FWFontIcon(),
+            ActionIcon = new FWFontIcon(),
+            Content = new FWToggleSwitch(),
+            IsClickEnabled = true
+        };
         var splitView = new FWSplitView
         {
             Pane = stack,
-            Content = transitionHost,
+            Content = parallaxView,
             DisplayMode = FWSplitViewDisplayMode.CompactInline,
             PanePlacement = FWSplitViewPanePlacement.Right,
             OpenPaneLength = 300,
@@ -143,8 +194,28 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Same(wrap, grid.Children[0]);
         Assert.Equal(TransitionMode.LiquidMorph, transitionHost.TransitionMode);
         Assert.Same(grid, transitionHost.Content);
+        Assert.IsAssignableFrom<IFluentJaliumControl>(canvas);
+        Assert.Single(canvas.Children);
+        Assert.Equal(16, Canvas.GetLeft(canvasChild));
+        Assert.Equal(20, Canvas.GetTop(canvasChild));
+        Assert.Same(canvas, relativePanel.Children[0]);
+        Assert.Equal(4, relativePanel.RowSpacing);
+        Assert.Equal(4, relativePanel.ColumnSpacing);
+        Assert.Same(relativePanel, twoPaneView.Pane1);
+        Assert.Same(transitionHost, twoPaneView.Pane2);
+        Assert.Equal(FWTwoPaneViewMode.Tall, twoPaneView.Mode);
+        Assert.Equal(FWTwoPaneViewPriority.Pane2, twoPaneView.PanePriority);
+        Assert.Same(transitionHost, twoPaneView.ActivePane);
+        Assert.Equal(720, twoPaneView.MinWideModeWidth);
+        Assert.Equal(560, twoPaneView.MinTallModeHeight);
+        Assert.Same(twoPaneView, parallaxView.Content);
+        Assert.Same(grid, parallaxView.Source);
+        Assert.Equal(new Point(6, 24), parallaxView.GetParallaxOffset(0.5));
+        Assert.Equal("Use adaptive panes", settingsCard.Header);
+        Assert.True(settingsCard.IsClickEnabled);
+        Assert.IsType<FWToggleSwitch>(settingsCard.Content);
         Assert.Same(stack, splitView.Pane);
-        Assert.Same(transitionHost, splitView.Content);
+        Assert.Same(parallaxView, splitView.Content);
         Assert.Equal(FWSplitViewDisplayMode.CompactInline, splitView.DisplayMode);
         Assert.Equal(FWSplitViewPanePlacement.Right, splitView.PanePlacement);
         Assert.Equal(56, splitView.ActualPaneLength);
@@ -285,6 +356,28 @@ public sealed class FluentContentLayoutControlsTests
         AssertSetter(splitViewStyle, FWSplitView.CompactPaneLengthProperty);
         AssertSetter(splitViewStyle, FWSplitView.PaneBackgroundProperty);
         AssertSetter(splitViewStyle, FWSplitView.ContentBackgroundProperty);
+
+        var canvasStyle = AssertStyle<FWCanvas>(dictionary);
+        Assert.Equal(typeof(Canvas), canvasStyle.BasedOn?.TargetType);
+
+        var relativePanelStyle = AssertStyle<FWRelativePanel>(dictionary);
+        Assert.Equal(typeof(Grid), relativePanelStyle.BasedOn?.TargetType);
+
+        var twoPaneViewStyle = AssertStyle<FWTwoPaneView>(dictionary);
+        AssertSetter(twoPaneViewStyle, FWTwoPaneView.ModeProperty);
+        AssertSetter(twoPaneViewStyle, FWTwoPaneView.PanePriorityProperty);
+        AssertSetter(twoPaneViewStyle, FWTwoPaneView.MinWideModeWidthProperty);
+        AssertSetter(twoPaneViewStyle, FWTwoPaneView.MinTallModeHeightProperty);
+
+        var parallaxViewStyle = AssertStyle<FWParallaxView>(dictionary);
+        Assert.Equal(typeof(ContentControl), parallaxViewStyle.BasedOn?.TargetType);
+        AssertSetter(parallaxViewStyle, FWParallaxView.VerticalShiftProperty);
+        AssertSetter(parallaxViewStyle, FWParallaxView.IsVerticalShiftEnabledProperty);
+
+        var settingsCardStyle = AssertStyle<FWSettingsCard>(dictionary);
+        Assert.Equal(typeof(ContentControl), settingsCardStyle.BasedOn?.TargetType);
+        AssertSetter(settingsCardStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(settingsCardStyle, FWSettingsCard.IsClickEnabledProperty);
 
         ResetApplicationState();
     }

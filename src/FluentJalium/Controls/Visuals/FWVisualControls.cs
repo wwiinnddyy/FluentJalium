@@ -1,3 +1,4 @@
+using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Shapes;
 using ShapePath = Jalium.UI.Controls.Shapes.Path;
@@ -12,9 +13,48 @@ public class FWImage : Image, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium BitmapIcon compatibility control.
+/// </summary>
+public class FWBitmapIcon : Image, IFluentJaliumControl
+{
+    public static readonly DependencyProperty ShowAsMonochromeProperty =
+        DependencyProperty.Register(nameof(ShowAsMonochrome), typeof(bool), typeof(FWBitmapIcon),
+            new PropertyMetadata(true, OnIconPropertyChanged));
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
+    public bool ShowAsMonochrome
+    {
+        get => (bool)GetValue(ShowAsMonochromeProperty)!;
+        set => SetValue(ShowAsMonochromeProperty, value);
+    }
+
+    private static void OnIconPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWBitmapIcon icon)
+        {
+            icon.InvalidateVisual();
+        }
+    }
+}
+
+/// <summary>
+/// FluentJalium ImageIcon compatibility control.
+/// </summary>
+public class FWImageIcon : Image, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium Markdown control.
 /// </summary>
 public class FWMarkdown : Markdown, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium RichTextBlock compatibility control.
+/// </summary>
+public class FWRichTextBlock : TextBlock, IFluentJaliumControl
 {
 }
 

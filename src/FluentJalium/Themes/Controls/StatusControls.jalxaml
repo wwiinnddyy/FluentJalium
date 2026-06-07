@@ -53,6 +53,78 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWSnackbar">
+        <Setter Property="Background" Value="{ThemeResource ToastInformationBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource ToastForeground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="14,10,14,10" />
+        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="Severity" Value="Information" />
+        <Setter Property="IsClosable" Value="True" />
+        <Setter Property="IsAutoDismissEnabled" Value="True" />
+        <Setter Property="Duration" Value="0:0:4" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSnackbar">
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0"
+                                    Orientation="Vertical"
+                                    Spacing="2"
+                                    VerticalAlignment="Center">
+                            <ContentPresenter Content="{TemplateBinding Title}" />
+                            <ContentPresenter Content="{TemplateBinding Message}" />
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+                        </StackPanel>
+
+                        <Button Name="PART_ActionButton"
+                                Grid.Column="1"
+                                Content="{TemplateBinding ActionContent}"
+                                VerticalAlignment="Center" />
+                        <Button Name="PART_CloseButton"
+                                Grid.Column="2"
+                                Content="X"
+                                MinWidth="32"
+                                VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Severity" Value="Success">
+                <Setter Property="Background" Value="{ThemeResource ToastSuccessBackground}" />
+            </Trigger>
+            <Trigger Property="Severity" Value="Warning">
+                <Setter Property="Background" Value="{ThemeResource ToastWarningBackground}" />
+            </Trigger>
+            <Trigger Property="Severity" Value="Error">
+                <Setter Property="Background" Value="{ThemeResource ToastErrorBackground}" />
+            </Trigger>
+            <Trigger Property="IsOpen" Value="False">
+                <Setter Property="Opacity" Value="0.96" />
+            </Trigger>
+            <Trigger Property="IsClosable" Value="False">
+                <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="fluent:FWInfoBadge">
         <Setter Property="Padding" Value="4,0,4,0" />
         <Setter Property="MinWidth" Value="6" />

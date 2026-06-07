@@ -142,6 +142,7 @@ public sealed class FluentSelectionControlsTests
 
             AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
+            AssertOwnedStyle<FWRadioButtons>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
             AssertOwnedStyle<FWRatingControl>(app.Resources);
@@ -186,6 +187,14 @@ public sealed class FluentSelectionControlsTests
         var fluentRadioButtonStyle = AssertStyle<FWRadioButton>(dictionary);
         Assert.Equal(typeof(RadioButton), fluentRadioButtonStyle.BasedOn?.TargetType);
         AssertSetter(fluentRadioButtonStyle, FWRadioButton.DensityProperty);
+
+        var radioButtonsStyle = AssertStyle<FWRadioButtons>(dictionary);
+        AssertSetter(radioButtonsStyle, Control.ForegroundProperty);
+        AssertSetter(radioButtonsStyle, Control.FontFamilyProperty);
+        AssertSetter(radioButtonsStyle, Control.FontSizeProperty);
+        AssertSetter(radioButtonsStyle, Control.PaddingProperty);
+        AssertSetter(radioButtonsStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(radioButtonsStyle, FWRadioButtons.DensityProperty);
 
         var comboBoxStyle = AssertStyle<ComboBox>(dictionary);
         AssertSetter(comboBoxStyle, Control.BackgroundProperty);
@@ -250,6 +259,28 @@ public sealed class FluentSelectionControlsTests
 
         Assert.Equal(32, radioButton.MinHeight);
         Assert.Equal(new Thickness(10, 0, 0, 0), radioButton.Padding);
+
+        var radioButtons = new FWRadioButtons();
+
+        Assert.IsAssignableFrom<IFluentJaliumControl>(radioButtons);
+        Assert.Equal(FWSelectionDensity.Comfortable, radioButtons.Density);
+        Assert.Equal(-1, radioButtons.SelectedIndex);
+        Assert.Null(radioButtons.SelectedItem);
+        Assert.Null(radioButtons.SelectedValue);
+        Assert.Null(radioButtons.Header);
+        Assert.Null(radioButtons.HeaderTemplate);
+        Assert.Equal(24, radioButtons.MinHeight);
+        Assert.Equal(new Thickness(0, 4, 0, 4), radioButtons.Padding);
+
+        radioButtons.Density = FWSelectionDensity.Compact;
+
+        Assert.Equal(22, radioButtons.MinHeight);
+        Assert.Equal(new Thickness(0, 2, 0, 2), radioButtons.Padding);
+
+        radioButtons.Density = FWSelectionDensity.Spacious;
+
+        Assert.Equal(32, radioButtons.MinHeight);
+        Assert.Equal(new Thickness(0, 6, 0, 6), radioButtons.Padding);
 
         var comboBox = new FWComboBox();
 
@@ -377,6 +408,88 @@ public sealed class FluentSelectionControlsTests
         Assert.True(second.IsChecked);
         Assert.Equal(2, checkedCount);
         Assert.Equal(1, uncheckedCount);
+    }
+
+    [Fact]
+    public void FWRadioButtons_ShouldSynchronizeGroupedSelection()
+    {
+        var radioButtons = new FWRadioButtons
+        {
+            Header = "Options"
+        };
+        radioButtons.Items.Add("First");
+        radioButtons.Items.Add("Second");
+        radioButtons.Items.Add("Third");
+
+        var selectionChanged = 0;
+        radioButtons.SelectionChanged += (_, _) => selectionChanged++;
+
+        radioButtons.Measure(new Size(240, 120));
+
+        var itemsHost = Assert.IsAssignableFrom<Panel>(FindVisualDescendant<Panel>(radioButtons, panel => panel.Children.Count == 3));
+
+        var first = Assert.IsType<FWRadioButton>(itemsHost.Children[0]);
+        var second = Assert.IsType<FWRadioButton>(itemsHost.Children[1]);
+        var third = Assert.IsType<FWRadioButton>(itemsHost.Children[2]);
+
+        Assert.Equal("First", first.Content);
+        Assert.Equal(FWSelectionDensity.Comfortable, first.Density);
+        Assert.False(first.IsChecked);
+
+        radioButtons.SelectedIndex = 1;
+
+        Assert.False(first.IsChecked);
+        Assert.True(second.IsChecked);
+        Assert.False(third.IsChecked);
+        Assert.Equal("Second", radioButtons.SelectedItem);
+        Assert.Equal("Second", radioButtons.SelectedValue);
+        Assert.Equal(1, selectionChanged);
+
+        InvokeToggleButtonClick(third);
+
+        Assert.False(second.IsChecked);
+        Assert.True(third.IsChecked);
+        Assert.Equal(2, radioButtons.SelectedIndex);
+        Assert.Equal("Third", radioButtons.SelectedItem);
+        Assert.Equal("Third", radioButtons.SelectedValue);
+        Assert.Equal(2, selectionChanged);
+
+        radioButtons.Density = FWSelectionDensity.Compact;
+
+        Assert.Equal(FWSelectionDensity.Compact, first.Density);
+        Assert.Equal(FWSelectionDensity.Compact, third.Density);
+    }
+
+    [Fact]
+    public void FWRadioButtons_ShouldHostExistingFwRadioButtonItems()
+    {
+        var first = new FWRadioButton { Content = "First" };
+        var second = new FWRadioButton { Content = "Second" };
+        var radioButtons = new FWRadioButtons
+        {
+            Density = FWSelectionDensity.Spacious
+        };
+        radioButtons.Items.Add(first);
+        radioButtons.Items.Add(second);
+
+        radioButtons.Measure(new Size(240, 80));
+
+        radioButtons.SelectedItem = second;
+
+        Assert.False(first.IsChecked);
+        Assert.True(second.IsChecked);
+        Assert.Equal(1, radioButtons.SelectedIndex);
+        Assert.Same(second, radioButtons.SelectedItem);
+        Assert.Same(second, radioButtons.SelectedValue);
+        Assert.Equal(FWSelectionDensity.Spacious, first.Density);
+        Assert.Equal(FWSelectionDensity.Spacious, second.Density);
+
+        InvokeToggleButtonClick(first);
+
+        Assert.Equal(0, radioButtons.SelectedIndex);
+        Assert.Same(first, radioButtons.SelectedItem);
+        Assert.True(first.IsChecked);
+        Assert.False(second.IsChecked);
     }
 
     [Fact]

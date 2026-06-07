@@ -57,6 +57,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWRichTextBox, RichTextBox>(app.Resources);
             AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
+            AssertOwnedStyle<FWRadioButtons>(app.Resources);
             AssertBasedOnStyle<FWToggleButton, ToggleButton>(app.Resources);
             AssertBasedOnStyle<FWToggleSwitch, ToggleSwitch>(app.Resources);
             AssertBasedOnStyle<FWSlider, Slider>(app.Resources);
@@ -87,8 +88,10 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWTabItem, TabItem>(app.Resources);
             AssertBasedOnStyle<FWFrame, Frame>(app.Resources);
             AssertBasedOnStyle<FWExpander, Expander>(app.Resources);
+            AssertContainsStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
             AssertBasedOnStyle<FWScrollBar, ScrollBar>(app.Resources);
             AssertBasedOnStyle<FWScrollViewer, ScrollViewer>(app.Resources);
@@ -96,6 +99,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWGridSplitter, GridSplitter>(app.Resources);
             AssertBasedOnStyle<FWTextBlock, TextBlock>(app.Resources);
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
+            AssertBasedOnStyle<FWCanvas, Canvas>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWTitleBar, TitleBar>(app.Resources);
             AssertBasedOnStyle<FWTitleBarButton, TitleBarButton>(app.Resources);
@@ -110,17 +114,24 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWFocusGlassSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentWindowSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
+            AssertOwnedStyle<FWTwoPaneView>(app.Resources);
+            AssertBasedOnStyle<FWParallaxView, ContentControl>(app.Resources);
+            AssertBasedOnStyle<FWSettingsCard, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
             AssertBasedOnStyle<FWGrid, Grid>(app.Resources);
+            AssertBasedOnStyle<FWRelativePanel, Grid>(app.Resources);
             AssertBasedOnStyle<FWColorPicker, ColorPicker>(app.Resources);
             AssertOwnedStyle<FWInkCanvas>(app.Resources);
             AssertBasedOnStyle<FWInkPresenter, InkPresenter>(app.Resources);
             AssertOwnedStyle<FWMediaElement>(app.Resources);
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWBitmapIcon, Image>(app.Resources);
+            AssertBasedOnStyle<FWImageIcon, Image>(app.Resources);
             AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
+            AssertContainsStyle<FWRichTextBlock>(app.Resources);
             AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
             AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
             AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
@@ -148,6 +159,7 @@ public sealed class FluentThemeManagerTests
             AssertBasedOnStyle<FWInfoBar, InfoBar>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
+            AssertOwnedStyle<FWSnackbar>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
             AssertOwnedStyle<FWInfoBadge>(app.Resources);
@@ -804,6 +816,7 @@ public sealed class FluentThemeManagerTests
 
             AssertBasedOnStyle<FWCheckBox, CheckBox>(app.Resources);
             AssertBasedOnStyle<FWRadioButton, RadioButton>(app.Resources);
+            AssertOwnedStyle<FWRadioButtons>(app.Resources);
             AssertBasedOnStyle<FWComboBox, ComboBox>(app.Resources);
             AssertBasedOnStyle<FWComboBoxItem, ComboBoxItem>(app.Resources);
         }
@@ -826,7 +839,10 @@ public sealed class FluentThemeManagerTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
+            AssertBasedOnStyle<FWBitmapIcon, Image>(app.Resources);
+            AssertBasedOnStyle<FWImageIcon, Image>(app.Resources);
             AssertBasedOnStyle<FWMarkdown, Markdown>(app.Resources);
+            AssertContainsStyle<FWRichTextBlock>(app.Resources);
             AssertBasedOnStyle<FWQRCode, QRCode>(app.Resources);
             AssertBasedOnStyle<FWFontIcon, FontIcon>(app.Resources);
             AssertBasedOnStyle<FWSymbolIcon, SymbolIcon>(app.Resources);
@@ -888,15 +904,20 @@ public sealed class FluentThemeManagerTests
 
             AssertBasedOnStyle<FWTextBlock, TextBlock>(app.Resources);
             AssertBasedOnStyle<FWAccessText, AccessText>(app.Resources);
+            AssertBasedOnStyle<FWCanvas, Canvas>(app.Resources);
             AssertBasedOnStyle<FWBorder, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentMaterialSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWFluentWindowSurface, Border>(app.Resources);
             AssertBasedOnStyle<FWContentControl, ContentControl>(app.Resources);
+            AssertOwnedStyle<FWTwoPaneView>(app.Resources);
+            AssertBasedOnStyle<FWParallaxView, ContentControl>(app.Resources);
+            AssertBasedOnStyle<FWSettingsCard, ContentControl>(app.Resources);
             AssertBasedOnStyle<FWTransitioningContentControl, TransitioningContentControl>(app.Resources);
             AssertBasedOnStyle<FWContentPresenter, ContentPresenter>(app.Resources);
             AssertBasedOnStyle<FWStackPanel, StackPanel>(app.Resources);
             AssertBasedOnStyle<FWWrapPanel, WrapPanel>(app.Resources);
             AssertBasedOnStyle<FWGrid, Grid>(app.Resources);
+            AssertBasedOnStyle<FWRelativePanel, Grid>(app.Resources);
             Assert.IsType<SolidColorBrush>(app.Resources["ContentSurfaceBorderBrush"]);
             Assert.IsType<SolidColorBrush>(app.Resources["ContentPanelBackground"]);
         }
@@ -1055,8 +1076,10 @@ public sealed class FluentThemeManagerTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWExpander, Expander>(app.Resources);
+            AssertContainsStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
         }
         finally
@@ -1103,6 +1126,7 @@ public sealed class FluentThemeManagerTests
             AssertOwnedStyle<FWInfoBadge>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
+            AssertOwnedStyle<FWSnackbar>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(app.Resources);
         }
@@ -1151,6 +1175,7 @@ public sealed class FluentThemeManagerTests
     {
         AssertFluentControl<FWCheckBox, CheckBox>();
         AssertFluentControl<FWRadioButton, RadioButton>();
+        AssertFluentControl<FWRadioButtons, Selector>();
         AssertFluentControl<FWComboBox, ComboBox>();
         AssertFluentControl<FWComboBoxItem, ComboBoxItem>();
         AssertFluentControl<FWRatingControl, Control>();
@@ -1160,7 +1185,10 @@ public sealed class FluentThemeManagerTests
     public void FluentVisualControls_ShouldExposeFwPrefixedSurface()
     {
         AssertFluentControl<FWImage, Image>();
+        AssertFluentControl<FWBitmapIcon, Image>();
+        AssertFluentControl<FWImageIcon, Image>();
         AssertFluentControl<FWMarkdown, Markdown>();
+        AssertFluentControl<FWRichTextBlock, TextBlock>();
         AssertFluentControl<FWQRCode, QRCode>();
         AssertFluentControl<FWFontIcon, FontIcon>();
         AssertFluentControl<FWSymbolIcon, SymbolIcon>();
@@ -1190,15 +1218,20 @@ public sealed class FluentThemeManagerTests
     {
         AssertFluentControl<FWTextBlock, TextBlock>();
         AssertFluentControl<FWAccessText, AccessText>();
+        AssertFluentControl<FWCanvas, Canvas>();
         AssertFluentControl<FWBorder, Border>();
         AssertFluentControl<FWFluentMaterialSurface, Border>();
         AssertFluentControl<FWFluentWindowSurface, Border>();
         AssertFluentControl<FWContentControl, ContentControl>();
+        AssertFluentControl<FWTwoPaneView, Control>();
+        AssertFluentControl<FWParallaxView, ContentControl>();
+        AssertFluentControl<FWSettingsCard, ContentControl>();
         AssertFluentControl<FWTransitioningContentControl, TransitioningContentControl>();
         AssertFluentControl<FWContentPresenter, ContentPresenter>();
         AssertFluentControl<FWStackPanel, StackPanel>();
         AssertFluentControl<FWWrapPanel, WrapPanel>();
         AssertFluentControl<FWGrid, Grid>();
+        AssertFluentControl<FWRelativePanel, Grid>();
     }
 
     [Fact]
@@ -1265,8 +1298,10 @@ public sealed class FluentThemeManagerTests
     public void FluentDisclosureDialogControls_ShouldExposeFwPrefixedSurface()
     {
         AssertFluentControl<FWExpander, Expander>();
+        AssertFluentControl<FWSettingsExpander, Expander>();
         AssertFluentControl<FWToolTip, ToolTip>();
         AssertFluentControl<FWContentDialog, ContentDialog>();
+        AssertFluentControl<FWTaskDialog, ContentControl>();
         AssertFluentControl<FWGroupBox, GroupBox>();
     }
 
@@ -1285,6 +1320,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWInfoBadge, Control>();
         AssertFluentControl<FWToastNotificationItem, ToastNotificationItem>();
         AssertFluentControl<FWToastNotificationHost, ToastNotificationHost>();
+        AssertFluentControl<FWSnackbar, ContentControl>();
         AssertFluentControl<FWStatusBar, StatusBar>();
         AssertFluentControl<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>();
     }

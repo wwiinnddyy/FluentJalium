@@ -173,6 +173,13 @@ public class FWAccessText : AccessText, IFluentJaliumControl
 }
 
 /// <summary>
+/// FluentJalium Canvas control.
+/// </summary>
+public class FWCanvas : Canvas, IFluentJaliumControl
+{
+}
+
+/// <summary>
 /// FluentJalium Border control.
 /// </summary>
 public class FWBorder : Border, IFluentJaliumControl
@@ -184,6 +191,409 @@ public class FWBorder : Border, IFluentJaliumControl
 /// </summary>
 public class FWContentControl : ContentControl, IFluentJaliumControl
 {
+}
+
+/// <summary>
+/// Describes how a <see cref="FWTwoPaneView"/> arranges its panes.
+/// </summary>
+public enum FWTwoPaneViewMode
+{
+    SinglePane,
+    Wide,
+    Tall
+}
+
+/// <summary>
+/// Describes which pane remains visible when <see cref="FWTwoPaneView"/> is in single-pane mode.
+/// </summary>
+public enum FWTwoPaneViewPriority
+{
+    Pane1,
+    Pane2
+}
+
+/// <summary>
+/// FluentJalium TwoPaneView control for foldable and adaptive master-detail layouts.
+/// </summary>
+public class FWTwoPaneView : Control, IFluentJaliumControl
+{
+    public static readonly DependencyProperty Pane1Property =
+        DependencyProperty.Register(nameof(Pane1), typeof(object), typeof(FWTwoPaneView),
+            new PropertyMetadata(null, OnLayoutStateChanged));
+
+    public static readonly DependencyProperty Pane1TemplateProperty =
+        DependencyProperty.Register(nameof(Pane1Template), typeof(DataTemplate), typeof(FWTwoPaneView),
+            new PropertyMetadata(null, OnLayoutStateChanged));
+
+    public static readonly DependencyProperty Pane2Property =
+        DependencyProperty.Register(nameof(Pane2), typeof(object), typeof(FWTwoPaneView),
+            new PropertyMetadata(null, OnLayoutStateChanged));
+
+    public static readonly DependencyProperty Pane2TemplateProperty =
+        DependencyProperty.Register(nameof(Pane2Template), typeof(DataTemplate), typeof(FWTwoPaneView),
+            new PropertyMetadata(null, OnLayoutStateChanged));
+
+    public static readonly DependencyProperty ModeProperty =
+        DependencyProperty.Register(nameof(Mode), typeof(FWTwoPaneViewMode), typeof(FWTwoPaneView),
+            new PropertyMetadata(FWTwoPaneViewMode.Wide, OnLayoutStateChanged), IsValidMode);
+
+    public static readonly DependencyProperty PanePriorityProperty =
+        DependencyProperty.Register(nameof(PanePriority), typeof(FWTwoPaneViewPriority), typeof(FWTwoPaneView),
+            new PropertyMetadata(FWTwoPaneViewPriority.Pane1, OnLayoutStateChanged), IsValidPriority);
+
+    public static readonly DependencyProperty MinWideModeWidthProperty =
+        DependencyProperty.Register(nameof(MinWideModeWidth), typeof(double), typeof(FWTwoPaneView),
+            new PropertyMetadata(641.0, OnLayoutStateChanged), IsValidNonNegativeDouble);
+
+    public static readonly DependencyProperty MinTallModeHeightProperty =
+        DependencyProperty.Register(nameof(MinTallModeHeight), typeof(double), typeof(FWTwoPaneView),
+            new PropertyMetadata(641.0, OnLayoutStateChanged), IsValidNonNegativeDouble);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Pane1
+    {
+        get => GetValue(Pane1Property);
+        set => SetValue(Pane1Property, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? Pane1Template
+    {
+        get => (DataTemplate?)GetValue(Pane1TemplateProperty);
+        set => SetValue(Pane1TemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Pane2
+    {
+        get => GetValue(Pane2Property);
+        set => SetValue(Pane2Property, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? Pane2Template
+    {
+        get => (DataTemplate?)GetValue(Pane2TemplateProperty);
+        set => SetValue(Pane2TemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWTwoPaneViewMode Mode
+    {
+        get => (FWTwoPaneViewMode)GetValue(ModeProperty)!;
+        set => SetValue(ModeProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWTwoPaneViewPriority PanePriority
+    {
+        get => (FWTwoPaneViewPriority)GetValue(PanePriorityProperty)!;
+        set => SetValue(PanePriorityProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double MinWideModeWidth
+    {
+        get => (double)GetValue(MinWideModeWidthProperty)!;
+        set => SetValue(MinWideModeWidthProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double MinTallModeHeight
+    {
+        get => (double)GetValue(MinTallModeHeightProperty)!;
+        set => SetValue(MinTallModeHeightProperty, value);
+    }
+
+    public object? ActivePane => PanePriority == FWTwoPaneViewPriority.Pane2 ? Pane2 : Pane1;
+
+    private static void OnLayoutStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWTwoPaneView twoPaneView)
+        {
+            twoPaneView.InvalidateMeasure();
+            twoPaneView.InvalidateVisual();
+        }
+    }
+
+    private static bool IsValidMode(object? value)
+    {
+        return value is FWTwoPaneViewMode mode && Enum.IsDefined(mode);
+    }
+
+    private static bool IsValidPriority(object? value)
+    {
+        return value is FWTwoPaneViewPriority priority && Enum.IsDefined(priority);
+    }
+
+    private static bool IsValidNonNegativeDouble(object? value)
+    {
+        return value is double number && double.IsFinite(number) && number >= 0;
+    }
+}
+
+/// <summary>
+/// FluentJalium ParallaxView control for expressing scroll-linked depth.
+/// </summary>
+public class FWParallaxView : ContentControl, IFluentJaliumControl
+{
+    public static readonly DependencyProperty SourceProperty =
+        DependencyProperty.Register(nameof(Source), typeof(object), typeof(FWParallaxView),
+            new PropertyMetadata(null, OnParallaxPropertyChanged));
+
+    public static readonly DependencyProperty HorizontalShiftProperty =
+        DependencyProperty.Register(nameof(HorizontalShift), typeof(double), typeof(FWParallaxView),
+            new PropertyMetadata(0.0, OnParallaxPropertyChanged), IsValidFiniteDouble);
+
+    public static readonly DependencyProperty VerticalShiftProperty =
+        DependencyProperty.Register(nameof(VerticalShift), typeof(double), typeof(FWParallaxView),
+            new PropertyMetadata(32.0, OnParallaxPropertyChanged), IsValidFiniteDouble);
+
+    public static readonly DependencyProperty StartOffsetProperty =
+        DependencyProperty.Register(nameof(StartOffset), typeof(double), typeof(FWParallaxView),
+            new PropertyMetadata(0.0, OnParallaxPropertyChanged), IsValidFiniteDouble);
+
+    public static readonly DependencyProperty EndOffsetProperty =
+        DependencyProperty.Register(nameof(EndOffset), typeof(double), typeof(FWParallaxView),
+            new PropertyMetadata(1.0, OnParallaxPropertyChanged), IsValidFiniteDouble);
+
+    public static readonly DependencyProperty IsVerticalShiftEnabledProperty =
+        DependencyProperty.Register(nameof(IsVerticalShiftEnabled), typeof(bool), typeof(FWParallaxView),
+            new PropertyMetadata(true, OnParallaxPropertyChanged));
+
+    public static readonly DependencyProperty IsHorizontalShiftEnabledProperty =
+        DependencyProperty.Register(nameof(IsHorizontalShiftEnabled), typeof(bool), typeof(FWParallaxView),
+            new PropertyMetadata(false, OnParallaxPropertyChanged));
+
+    public FWParallaxView()
+    {
+        UseTemplateContentManagement();
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public object? Source
+    {
+        get => GetValue(SourceProperty);
+        set => SetValue(SourceProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double HorizontalShift
+    {
+        get => (double)GetValue(HorizontalShiftProperty)!;
+        set => SetValue(HorizontalShiftProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double VerticalShift
+    {
+        get => (double)GetValue(VerticalShiftProperty)!;
+        set => SetValue(VerticalShiftProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double StartOffset
+    {
+        get => (double)GetValue(StartOffsetProperty)!;
+        set => SetValue(StartOffsetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double EndOffset
+    {
+        get => (double)GetValue(EndOffsetProperty)!;
+        set => SetValue(EndOffsetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsVerticalShiftEnabled
+    {
+        get => (bool)GetValue(IsVerticalShiftEnabledProperty)!;
+        set => SetValue(IsVerticalShiftEnabledProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsHorizontalShiftEnabled
+    {
+        get => (bool)GetValue(IsHorizontalShiftEnabledProperty)!;
+        set => SetValue(IsHorizontalShiftEnabledProperty, value);
+    }
+
+    public Point GetParallaxOffset(double progress)
+    {
+        var normalized = Math.Clamp(progress, 0.0, 1.0);
+        var span = EndOffset - StartOffset;
+        var position = StartOffset + span * normalized;
+        return new Point(
+            IsHorizontalShiftEnabled ? HorizontalShift * position : 0.0,
+            IsVerticalShiftEnabled ? VerticalShift * position : 0.0);
+    }
+
+    private static void OnParallaxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWParallaxView parallaxView)
+        {
+            parallaxView.InvalidateMeasure();
+            parallaxView.InvalidateVisual();
+        }
+    }
+
+    private static bool IsValidFiniteDouble(object? value)
+    {
+        return value is double number && double.IsFinite(number);
+    }
+}
+
+/// <summary>
+/// FluentJalium RelativePanel compatibility surface.
+/// </summary>
+public class FWRelativePanel : Grid, IFluentJaliumControl
+{
+}
+
+/// <summary>
+/// FluentJalium SettingsCard control for compact settings rows.
+/// </summary>
+public class FWSettingsCard : ContentControl, IFluentJaliumControl
+{
+    public static readonly DependencyProperty HeaderProperty =
+        DependencyProperty.Register(nameof(Header), typeof(object), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty HeaderTemplateProperty =
+        DependencyProperty.Register(nameof(HeaderTemplate), typeof(DataTemplate), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty DescriptionProperty =
+        DependencyProperty.Register(nameof(Description), typeof(object), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty DescriptionTemplateProperty =
+        DependencyProperty.Register(nameof(DescriptionTemplate), typeof(DataTemplate), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty HeaderIconProperty =
+        DependencyProperty.Register(nameof(HeaderIcon), typeof(object), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty ActionIconProperty =
+        DependencyProperty.Register(nameof(ActionIcon), typeof(object), typeof(FWSettingsCard),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty IsClickEnabledProperty =
+        DependencyProperty.Register(nameof(IsClickEnabled), typeof(bool), typeof(FWSettingsCard),
+            new PropertyMetadata(false));
+
+    public FWSettingsCard()
+    {
+        UseTemplateContentManagement();
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Header
+    {
+        get => GetValue(HeaderProperty);
+        set => SetValue(HeaderProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? HeaderTemplate
+    {
+        get => (DataTemplate?)GetValue(HeaderTemplateProperty);
+        set => SetValue(HeaderTemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? DescriptionTemplate
+    {
+        get => (DataTemplate?)GetValue(DescriptionTemplateProperty);
+        set => SetValue(DescriptionTemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? HeaderIcon
+    {
+        get => GetValue(HeaderIconProperty);
+        set => SetValue(HeaderIconProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? ActionIcon
+    {
+        get => GetValue(ActionIconProperty);
+        set => SetValue(ActionIconProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsClickEnabled
+    {
+        get => (bool)GetValue(IsClickEnabledProperty)!;
+        set => SetValue(IsClickEnabledProperty, value);
+    }
+
+    private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsCard card)
+        {
+            card.InvalidateMeasure();
+            card.InvalidateVisual();
+        }
+    }
+}
+
+/// <summary>
+/// FluentJalium SettingsExpander control for grouped settings rows.
+/// </summary>
+public class FWSettingsExpander : Expander, IFluentJaliumControl
+{
+    public static readonly DependencyProperty DescriptionProperty =
+        DependencyProperty.Register(nameof(Description), typeof(object), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty DescriptionTemplateProperty =
+        DependencyProperty.Register(nameof(DescriptionTemplate), typeof(DataTemplate), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    public static readonly DependencyProperty HeaderIconProperty =
+        DependencyProperty.Register(nameof(HeaderIcon), typeof(object), typeof(FWSettingsExpander),
+            new PropertyMetadata(null, OnSettingsPropertyChanged));
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Description
+    {
+        get => GetValue(DescriptionProperty);
+        set => SetValue(DescriptionProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public DataTemplate? DescriptionTemplate
+    {
+        get => (DataTemplate?)GetValue(DescriptionTemplateProperty);
+        set => SetValue(DescriptionTemplateProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? HeaderIcon
+    {
+        get => GetValue(HeaderIconProperty);
+        set => SetValue(HeaderIconProperty, value);
+    }
+
+    private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsExpander expander)
+        {
+            expander.InvalidateMeasure();
+            expander.InvalidateVisual();
+        }
+    }
 }
 
 /// <summary>

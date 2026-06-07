@@ -89,6 +89,7 @@ public sealed class FluentNotificationStatusTests
             AssertOwnedStyle<FWInfoBadge>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationItem, ToastNotificationItem>(app.Resources);
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
+            AssertOwnedStyle<FWSnackbar>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, StatusBarItem>(app.Resources);
         }
@@ -111,6 +112,11 @@ public sealed class FluentNotificationStatusTests
         AssertContainsStyle<InfoBar>(dictionary);
         AssertContainsStyle<ToastNotificationItem>(dictionary);
         AssertContainsStyle<ToastNotificationHost>(dictionary);
+        var snackbarStyle = AssertStyle<FWSnackbar>(dictionary);
+        Assert.Null(snackbarStyle.BasedOn);
+        AssertSetter(snackbarStyle, FWSnackbar.SeverityProperty);
+        AssertSetter(snackbarStyle, FWSnackbar.IsClosableProperty);
+        AssertSetter(snackbarStyle, FWSnackbar.IsAutoDismissEnabledProperty);
         AssertContainsStyle<StatusBar>(dictionary);
         AssertContainsStyle<StatusBarItem>(dictionary);
 
@@ -202,6 +208,47 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public void FWSnackbar_ShouldExposeActionCloseAndSeverityState()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Undo archive",
+            Message = "One item was archived.",
+            ActionContent = "Undo",
+            Content = new FWInfoBadge { Severity = FWInfoBadgeSeverity.Attention },
+            Severity = ToastSeverity.Warning,
+            Duration = TimeSpan.FromSeconds(8),
+            IsAutoDismissEnabled = false
+        };
+        var actionCount = 0;
+        var closedCount = 0;
+        snackbar.ActionClick += (_, args) =>
+        {
+            actionCount++;
+            args.Handled = true;
+        };
+        snackbar.Closed += (_, _) => closedCount++;
+
+        snackbar.Show();
+
+        Assert.True(snackbar.IsOpen);
+        Assert.Equal(ToastSeverity.Warning, snackbar.Severity);
+        Assert.Equal(TimeSpan.FromSeconds(8), snackbar.Duration);
+        Assert.False(snackbar.IsAutoDismissEnabled);
+
+        var handled = snackbar.RequestAction();
+
+        Assert.True(handled);
+        Assert.True(snackbar.IsOpen);
+        Assert.Equal(1, actionCount);
+
+        snackbar.Close();
+
+        Assert.False(snackbar.IsOpen);
+        Assert.Equal(1, closedCount);
+    }
+
+    [Fact]
     public void FWInfoBar_ClosableAndIconStateShouldRemainInteractive()
     {
         var infoBar = new FWInfoBar
@@ -279,6 +326,14 @@ public sealed class FluentNotificationStatusTests
         var warning = toastHost.ShowWarning("Latency warning", "West region is above the preferred threshold.", TimeSpan.FromSeconds(12));
         success.IsAutoDismissEnabled = false;
         warning.IsAutoDismissEnabled = false;
+        var snackbar = new FWSnackbar
+        {
+            Title = "Rollback available",
+            Message = "A staged deployment can be reverted.",
+            ActionContent = "Rollback",
+            Severity = ToastSeverity.Warning,
+            IsOpen = true
+        };
 
         var statusBar = new FWStatusBar();
         statusBar.Items.Add(new FWStatusBarItem { Content = "Ready" });
@@ -293,6 +348,7 @@ public sealed class FluentNotificationStatusTests
             Children =
             {
                 infoBar,
+                snackbar,
                 toastHost,
                 statusBar
             }
@@ -320,6 +376,9 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal(ToastPosition.BottomRight, toastHost.Position);
         Assert.Equal(400, toastHost.ToastWidth);
         Assert.Equal(8, toastHost.Spacing);
+        Assert.True(snackbar.IsOpen);
+        Assert.Equal("Rollback", snackbar.ActionContent);
+        Assert.Equal(ToastSeverity.Warning, snackbar.Severity);
         Assert.Equal(2, toastHost.Children.Count);
         Assert.Contains(success, toastHost.Children);
         Assert.Contains(warning, toastHost.Children);

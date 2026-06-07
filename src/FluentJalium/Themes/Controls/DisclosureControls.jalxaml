@@ -171,6 +171,84 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWSettingsExpander" BasedOn="{StaticResource {x:Type Expander}}">
+        <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="14" />
+        <Setter Property="MinHeight" Value="64" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSettingsExpander">
+                <Border Name="RootBorder"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        MinHeight="{TemplateBinding MinHeight}"
+                        ClipToBounds="True">
+                    <StackPanel>
+                        <Border Name="PART_HeaderBorder"
+                                Background="{TemplateBinding HeaderBackground}"
+                                Padding="14,10,14,10">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <ContentPresenter Grid.Column="0"
+                                                  Content="{TemplateBinding HeaderIcon}"
+                                                  VerticalAlignment="Center" />
+
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Vertical"
+                                            Spacing="3"
+                                            VerticalAlignment="Center">
+                                    <ContentPresenter Content="{TemplateBinding Header}" />
+                                    <ContentPresenter Content="{TemplateBinding Description}"
+                                                      ContentTemplate="{TemplateBinding DescriptionTemplate}" />
+                                </StackPanel>
+
+                                <Path Name="PART_Chevron"
+                                      Grid.Column="2"
+                                      Data="M 0,0 L 5,5 L 0,10 Z"
+                                      Fill="{ThemeResource ExpanderChevronForeground}"
+                                      Width="8"
+                                      Height="10"
+                                      Stretch="Uniform"
+                                      VerticalAlignment="Center"
+                                      RenderTransformOrigin="0.5,0.5" />
+                            </Grid>
+                        </Border>
+
+                        <Border Name="PART_ContentBorder"
+                                Visibility="Collapsed"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,1,0,0"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="HeaderBackground" Value="{ThemeResource ExpanderHeaderBackgroundHover}" />
+            </Trigger>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter Property="HeaderBackground" Value="{ThemeResource ExpanderHeaderBackgroundExpanded}" />
+                <Setter TargetName="PART_Chevron" Property="Fill" Value="{ThemeResource AccentBrush}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+                <Setter TargetName="PART_Chevron" Property="Fill" Value="{ThemeResource TextDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="ContentDialogAccentButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{ThemeResource AccentBrush}" />
         <Setter Property="Foreground" Value="{ThemeResource TextOnAccent}" />
@@ -289,5 +367,73 @@
 
     <Style TargetType="fluent:FWContentDialog" BasedOn="{StaticResource {x:Type ContentDialog}}">
         <Setter Property="Density" Value="Comfortable" />
+    </Style>
+
+    <Style TargetType="fluent:FWTaskDialog">
+        <Setter Property="Background" Value="{ThemeResource ContentDialogBackground}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="MinWidth" Value="320" />
+        <Setter Property="MaxWidth" Value="548" />
+        <Setter Property="Density" Value="Comfortable" />
+        <Setter Property="DefaultButton" Value="Primary" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWTaskDialog">
+                <Border Name="PART_DialogCard"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        MinWidth="{TemplateBinding MinWidth}"
+                        MaxWidth="{TemplateBinding MaxWidth}"
+                        Padding="{TemplateBinding Padding}">
+                    <StackPanel Orientation="Vertical" Spacing="16">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter Grid.Column="0"
+                                              Content="{TemplateBinding Icon}"
+                                              VerticalAlignment="Top" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Vertical"
+                                        Spacing="6">
+                                <ContentPresenter Content="{TemplateBinding Title}" />
+                                <ContentPresenter Content="{TemplateBinding Subtitle}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" />
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Spacing="8">
+                            <Button Name="PART_PrimaryButton"
+                                    Content="{TemplateBinding PrimaryButtonText}"
+                                    Style="{StaticResource ContentDialogAccentButtonStyle}" />
+                            <Button Name="PART_SecondaryButton"
+                                    Content="{TemplateBinding SecondaryButtonText}" />
+                            <Button Name="PART_CloseButton"
+                                    Content="{TemplateBinding CloseButtonText}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsOpen" Value="False">
+                <Setter Property="Opacity" Value="0.96" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

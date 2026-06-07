@@ -218,6 +218,28 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style TargetType="fluent:FWRadioButtons">
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+        <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="Density" Value="Comfortable" />
+        <Setter Property="Padding" Value="0,4,0,4" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWRadioButtons">
+                <StackPanel Orientation="Vertical"
+                            Margin="{TemplateBinding Padding}">
+                    <ContentPresenter Name="PART_HeaderPresenter"
+                                      Content="{TemplateBinding Header}"
+                                      ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      Margin="0,0,0,6" />
+                    <ItemsPresenter />
+                </StackPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
     <Style TargetType="fluent:FWRatingControl">
         <Setter Property="Foreground" Value="{ThemeResource RatingControlCaptionForeground}" />
         <Setter Property="FontFamily" Value="{ThemeResource BodyFontFamily}" />

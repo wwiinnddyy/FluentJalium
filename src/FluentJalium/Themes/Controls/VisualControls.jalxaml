@@ -31,6 +31,25 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWImage" BasedOn="{StaticResource {x:Type Image}}" />
+
+    <Style TargetType="fluent:FWBitmapIcon" BasedOn="{StaticResource {x:Type Image}}">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="ShowAsMonochrome" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style TargetType="fluent:FWImageIcon" BasedOn="{StaticResource {x:Type Image}}">
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
     <Style TargetType="Markdown">
         <Setter Property="Background" Value="{ThemeResource SurfaceBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -71,6 +90,11 @@
     </Style>
 
     <Style TargetType="fluent:FWMarkdown" BasedOn="{StaticResource {x:Type Markdown}}" />
+
+    <Style TargetType="fluent:FWRichTextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="IsTextSelectionEnabled" Value="True" />
+    </Style>
 
     <Style TargetType="QRCode">
         <Setter Property="Background" Value="{ThemeResource QRCodeBackground}" />

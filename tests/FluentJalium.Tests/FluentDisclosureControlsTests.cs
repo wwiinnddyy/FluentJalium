@@ -73,8 +73,10 @@ public sealed class FluentDisclosureControlsTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWExpander, Expander>(app.Resources);
+            AssertStyle<FWSettingsExpander>(app.Resources);
             AssertBasedOnStyle<FWToolTip, ToolTip>(app.Resources);
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
+            AssertOwnedStyle<FWTaskDialog>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
         }
         finally
@@ -124,6 +126,11 @@ public sealed class FluentDisclosureControlsTests
         Assert.Same(expanderStyle, fwExpanderStyle.BasedOn);
         AssertSetter(fwExpanderStyle, FWExpander.DensityProperty);
 
+        var settingsExpanderStyle = AssertStyle<FWSettingsExpander>(dictionary);
+        Assert.Same(expanderStyle, settingsExpanderStyle.BasedOn);
+        AssertSetter(settingsExpanderStyle, FrameworkElement.MinHeightProperty);
+        AssertSetter(settingsExpanderStyle, Control.PaddingProperty);
+
         var contentDialogStyle = AssertStyle<ContentDialog>(dictionary);
         AssertSetter(contentDialogStyle, Control.BackgroundProperty);
         AssertSetter(contentDialogStyle, Control.BorderBrushProperty);
@@ -134,6 +141,12 @@ public sealed class FluentDisclosureControlsTests
         var fwContentDialogStyle = AssertStyle<FWContentDialog>(dictionary);
         Assert.Same(contentDialogStyle, fwContentDialogStyle.BasedOn);
         AssertSetter(fwContentDialogStyle, FWContentDialog.DensityProperty);
+
+        var taskDialogStyle = AssertStyle<FWTaskDialog>(dictionary);
+        Assert.Null(taskDialogStyle.BasedOn);
+        AssertSetter(taskDialogStyle, FWTaskDialog.DensityProperty);
+        AssertSetter(taskDialogStyle, FWTaskDialog.DefaultButtonProperty);
+        AssertSetter(taskDialogStyle, Control.PaddingProperty);
 
         ResetApplicationState();
     }
@@ -188,6 +201,19 @@ public sealed class FluentDisclosureControlsTests
         Assert.Equal(new Thickness(28), dialog.Padding);
         Assert.Equal(340, dialog.MinWidth);
         Assert.Equal(600, dialog.MaxWidth);
+
+        var taskDialog = new FWTaskDialog();
+
+        Assert.Equal(FWDisclosureDensity.Comfortable, taskDialog.Density);
+        Assert.Equal(new Thickness(24), taskDialog.Padding);
+        Assert.Equal(320, taskDialog.MinWidth);
+        Assert.Equal(548, taskDialog.MaxWidth);
+
+        taskDialog.Density = FWDisclosureDensity.Compact;
+
+        Assert.Equal(new Thickness(20), taskDialog.Padding);
+        Assert.Equal(300, taskDialog.MinWidth);
+        Assert.Equal(520, taskDialog.MaxWidth);
 
         var groupBox = new FWGroupBox
         {
@@ -254,6 +280,28 @@ public sealed class FluentDisclosureControlsTests
             IsSecondaryButtonEnabled = true,
             FullSizeDesired = false
         };
+        var settingsExpander = new FWSettingsExpander
+        {
+            Header = "Advanced settings",
+            Description = "Secondary configuration rows",
+            HeaderIcon = new FWFontIcon(),
+            IsExpanded = true,
+            Content = new FWTextBlock { Text = "Nested setting" }
+        };
+        var taskDialog = new FWTaskDialog
+        {
+            Title = "Reset defaults?",
+            Subtitle = "This applies to the current profile.",
+            Content = "The action can be reviewed before saving.",
+            PrimaryButtonText = "Reset",
+            SecondaryButtonText = "Review",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Secondary
+        };
+        var taskClosed = 0;
+        taskDialog.CloseButtonClick += (_, _) => taskClosed++;
+        taskDialog.Open();
+        taskDialog.RequestCloseButtonClick();
         var panel = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
@@ -261,6 +309,7 @@ public sealed class FluentDisclosureControlsTests
             Children =
             {
                 expander,
+                settingsExpander,
                 groupBox,
                 target
             }
@@ -299,6 +348,14 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(dialog.IsPrimaryButtonEnabled);
         Assert.True(dialog.IsSecondaryButtonEnabled);
         Assert.False(dialog.FullSizeDesired);
+        Assert.Equal("Advanced settings", settingsExpander.Header);
+        Assert.Equal("Secondary configuration rows", settingsExpander.Description);
+        Assert.True(settingsExpander.IsExpanded);
+        Assert.Equal("Reset defaults?", taskDialog.Title);
+        Assert.Equal(FWTaskDialogButton.Secondary, taskDialog.DefaultButton);
+        Assert.Equal(FWTaskDialogResult.Close, taskDialog.Result);
+        Assert.False(taskDialog.IsOpen);
+        Assert.Equal(1, taskClosed);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);
@@ -345,6 +402,15 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
         Assert.Same(baseStyle, fluentStyle.BasedOn);
+    }
+
+    private static void AssertOwnedStyle<TFluentControl>(ResourceDictionary dictionary)
+        where TFluentControl : FrameworkElement, IFluentJaliumControl
+    {
+        var fluentStyle = AssertStyle<TFluentControl>(dictionary);
+
+        Assert.Equal(typeof(TFluentControl), fluentStyle.TargetType);
+        Assert.Null(fluentStyle.BasedOn);
     }
 
     private static void AssertSetter(Style style, DependencyProperty property)

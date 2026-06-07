@@ -24,6 +24,18 @@ public sealed class FluentVisualControlsTests
             MinZoom = 0.75,
             MaxZoom = 4
         };
+        var bitmapIcon = new FWBitmapIcon
+        {
+            Source = source,
+            ShowAsMonochrome = false,
+            Width = 20,
+            Height = 20
+        };
+        var imageIcon = new FWImageIcon
+        {
+            Source = source,
+            Stretch = Stretch.Uniform
+        };
         var fluentIcon = FluentIconFactory.Regular(FluentIconRegular.Image24, 24);
         var filledIcon = FluentIconFactory.Filled(FluentIconRegular.Share24, 24);
         var markdownBaseUri = new Uri("https://jalium.dev/");
@@ -32,6 +44,12 @@ public sealed class FluentVisualControlsTests
             Text = "# FluentJalium\n\n[Gallery](/gallery)",
             BaseUri = markdownBaseUri,
             OpenLinksExternally = false
+        };
+        var richTextBlock = new FWRichTextBlock
+        {
+            Text = "Rich text compatibility",
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true
         };
         var qrCode = new FWQRCode
         {
@@ -158,9 +176,12 @@ public sealed class FluentVisualControlsTests
             Children =
             {
                 image,
+                bitmapIcon,
+                imageIcon,
                 fluentIcon,
                 filledIcon,
                 markdown,
+                richTextBlock,
                 qrCode,
                 fontIcon,
                 symbolIcon,
@@ -195,6 +216,11 @@ public sealed class FluentVisualControlsTests
         Assert.True(image.IsZoomEnabled);
         Assert.Equal(0.75, image.MinZoom);
         Assert.Equal(4, image.MaxZoom);
+        Assert.Same(source, bitmapIcon.Source);
+        Assert.False(bitmapIcon.ShowAsMonochrome);
+        Assert.Equal(20, bitmapIcon.Width);
+        Assert.Same(source, imageIcon.Source);
+        Assert.Equal(Stretch.Uniform, imageIcon.Stretch);
         Assert.Equal(FluentIconRegular.Image24, fluentIcon.Icon);
         Assert.Equal(24, fluentIcon.Size);
         Assert.False(fluentIcon.Filled);
@@ -203,6 +229,9 @@ public sealed class FluentVisualControlsTests
         Assert.Equal("# FluentJalium\n\n[Gallery](/gallery)", markdown.Text);
         Assert.Same(markdownBaseUri, markdown.BaseUri);
         Assert.False(markdown.OpenLinksExternally);
+        Assert.Equal("Rich text compatibility", richTextBlock.Text);
+        Assert.Equal(TextWrapping.Wrap, richTextBlock.TextWrapping);
+        Assert.True(richTextBlock.IsTextSelectionEnabled);
         Assert.Equal("https://jalium.dev/fluent", qrCode.Text);
         Assert.Equal(3, qrCode.QuietZoneModules);
         Assert.Equal(QRCodeErrorCorrectionLevel.H, qrCode.ErrorCorrectionLevel);
@@ -244,7 +273,7 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(Stretch.Uniform, viewbox.Stretch);
         Assert.Equal(StretchDirection.DownOnly, viewbox.StretchDirection);
         Assert.Equal(10, stack.Spacing);
-        Assert.Equal(17, stack.Children.Count);
+        Assert.Equal(20, stack.Children.Count);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);
