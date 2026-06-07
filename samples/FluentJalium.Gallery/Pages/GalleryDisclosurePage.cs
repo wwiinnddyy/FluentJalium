@@ -25,6 +25,7 @@ using FWToolTip = FluentJalium.Controls.FWToolTip;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using TeachingTipPlacementMode = FluentJalium.Controls.TeachingTipPlacementMode;
 using TeachingTipTailVisibility = FluentJalium.Controls.TeachingTipTailVisibility;
+using ICommand = System.Windows.Input.ICommand;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -444,9 +445,26 @@ internal sealed class GalleryDisclosurePage
 
     private static UIElement CreateTaskDialogSample()
     {
-        var output = CreateDisclosureOutput("TaskDialog: ready for ShowAsync flow. Default: Primary, cancel guard: off.");
+        var output = CreateDisclosureOutput("TaskDialog: ready for ShowAsync flow. Default: Primary, primary command: on, cancel guard: off.");
         var cancelCloseRequests = false;
+        var commandExecutions = 0;
         var lastRequest = "No button requests yet.";
+        var lastCommand = "No button commands executed yet.";
+        var deleteCommand = new GalleryTaskDialogCommand(parameter =>
+        {
+            commandExecutions++;
+            lastCommand = $"Command {commandExecutions}: primary executed with parameter {parameter}.";
+        });
+        var archiveCommand = new GalleryTaskDialogCommand(parameter =>
+        {
+            commandExecutions++;
+            lastCommand = $"Command {commandExecutions}: secondary/cancel executed with parameter {parameter}.";
+        });
+        var closeCommand = new GalleryTaskDialogCommand(parameter =>
+        {
+            commandExecutions++;
+            lastCommand = $"Command {commandExecutions}: close executed with parameter {parameter}.";
+        });
         var taskDialog = new FWTaskDialog
         {
             Title = "Delete temporary layout cache?",
@@ -456,10 +474,17 @@ internal sealed class GalleryDisclosurePage
             SecondaryButtonText = "Archive",
             CloseButtonText = "Cancel",
             DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Close,
+            PrimaryButtonCommand = deleteCommand,
+            PrimaryButtonCommandParameter = "delete-cache",
+            SecondaryButtonCommand = archiveCommand,
+            SecondaryButtonCommandParameter = "archive-cache",
+            CloseButtonCommand = closeCommand,
+            CloseButtonCommandParameter = "cancel-dialog",
             IsOpen = true,
             Content = new FWTextBlock
             {
-                Text = "Start the async flow, then request the default, primary, secondary, or cancel command to complete or guard the result.",
+                Text = "Start the async flow, then request the default, primary, secondary, or cancel command. Escape routes through the configured CancelButton.",
                 Foreground = ThemeBrush("TextPrimary"),
                 TextWrapping = TextWrapping.Wrap
             }
@@ -474,7 +499,7 @@ internal sealed class GalleryDisclosurePage
 
         void UpdateRequestEvent(string command, FWTaskDialogButtonClickEventArgs args)
         {
-            lastRequest = $"{command} requested result {args.Result}; cancel: {FormatOnOff(args.Cancel)}.";
+            lastRequest = $"{command} requested result {args.Result}; command executed: {FormatOnOff(args.CommandExecuted)}; cancel: {FormatOnOff(args.Cancel)}.";
         }
 
         void UpdateAfterRequest(string action, bool? requestCompleted = null)
@@ -482,7 +507,7 @@ internal sealed class GalleryDisclosurePage
             var requestText = requestCompleted.HasValue
                 ? $", request: {(requestCompleted.Value ? "completed" : "canceled")}"
                 : string.Empty;
-            output.Text = $"{action}. Open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. {lastRequest}";
+            output.Text = $"{action}. Open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. {lastRequest} {lastCommand}";
         }
 
         bool RequestDefaultButton()
@@ -571,6 +596,12 @@ internal sealed class GalleryDisclosurePage
                         };
                         UpdateAfterRequest("Default button changed");
                     }),
+                    CreateDisclosureActionButton(FluentIconRegular.Prohibited24, "Primary command", () =>
+                    {
+                        deleteCommand.CanExecuteResult = !deleteCommand.CanExecuteResult;
+                        deleteCommand.RaiseCanExecuteChanged();
+                        UpdateAfterRequest("Primary command CanExecute changed");
+                    }),
                     CreateDisclosureActionButton(FluentIconRegular.ShieldDismiss24, "Guard close", () =>
                     {
                         cancelCloseRequests = !cancelCloseRequests;
@@ -632,6 +663,32 @@ internal sealed class GalleryDisclosurePage
         return ex is System.Reflection.TargetInvocationException { InnerException: not null }
             ? ex.InnerException.Message
             : ex.Message;
+    }
+
+    private sealed class GalleryTaskDialogCommand : ICommand
+    {
+        private readonly Action<object?> _execute;
+
+        public GalleryTaskDialogCommand(Action<object?> execute)
+        {
+            _execute = execute;
+        }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecuteResult { get; set; } = true;
+
+        public bool CanExecute(object? parameter) => CanExecuteResult;
+
+        public void Execute(object? parameter)
+        {
+            _execute(parameter);
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static UIElement CreateSettingsExpanderSample()

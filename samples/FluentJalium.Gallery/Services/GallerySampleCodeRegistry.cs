@@ -294,6 +294,10 @@ var player = new FWAnimatedVisualPlayer
 };
 """,
         ["disclosure.taskdialog"] = """
+var deleteCommand = new RelayCommand(parameter => DeleteTemporaryCache(parameter));
+var archiveCommand = new RelayCommand(parameter => ArchiveTemporaryCache(parameter));
+var cancelCommand = new RelayCommand(parameter => Debug.WriteLine(parameter));
+
 var taskDialog = new FWTaskDialog
 {
     Title = "Delete temporary layout cache?",
@@ -302,17 +306,24 @@ var taskDialog = new FWTaskDialog
     SecondaryButtonText = "Archive",
     CloseButtonText = "Cancel",
     DefaultButton = FWTaskDialogButton.Primary,
+    CancelButton = FWTaskDialogButton.Close,
+    PrimaryButtonCommand = deleteCommand,
+    PrimaryButtonCommandParameter = "delete-cache",
+    SecondaryButtonCommand = archiveCommand,
+    SecondaryButtonCommandParameter = "archive-cache",
+    CloseButtonCommand = cancelCommand,
+    CloseButtonCommandParameter = "cancel-dialog",
     IsOpen = true,
     Content = new FWTextBlock
     {
-        Text = "Start the async flow, then request a command.",
+        Text = "Start the async flow, then request a command. Escape routes through CancelButton.",
         TextWrapping = TextWrapping.Wrap
     }
 };
 
 taskDialog.PrimaryButtonClick += (_, args) =>
 {
-    args.Cancel = false;
+    Debug.WriteLine($"Primary requested. Command executed: {args.CommandExecuted}");
 };
 """,
         ["disclosure.settings.teachingtip"] = """

@@ -12,6 +12,7 @@ using Jalium.UI.Documents;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
+using ICommand = System.Windows.Input.ICommand;
 
 namespace FluentJalium.Tests;
 
@@ -386,6 +387,94 @@ public sealed class FluentDisclosureControlsTests
     }
 
     [Fact]
+    public async Task FWTaskDialog_ShouldExecuteButtonCommandsAndRespectCanExecute()
+    {
+        var primaryCommand = new RecordingCommand();
+        var secondaryCommand = new RecordingCommand
+        {
+            CanExecuteResult = false
+        };
+        var dialog = new FWTaskDialog
+        {
+            Title = "Delete temporary layout cache?",
+            PrimaryButtonText = "Delete",
+            SecondaryButtonText = "Archive",
+            CloseButtonText = "Cancel",
+            PrimaryButtonCommand = primaryCommand,
+            PrimaryButtonCommandParameter = "delete-cache",
+            SecondaryButtonCommand = secondaryCommand,
+            SecondaryButtonCommandParameter = "archive-cache",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Close
+        };
+        FWTaskDialogButtonClickEventArgs? primaryClick = null;
+        FWTaskDialogButtonClickEventArgs? secondaryClick = null;
+        dialog.PrimaryButtonClick += (_, args) => primaryClick = args;
+        dialog.SecondaryButtonClick += (_, args) => secondaryClick = args;
+
+        var showTask = dialog.ShowAsync();
+
+        Assert.False(dialog.RequestSecondaryButtonClick());
+        Assert.True(dialog.IsOpen);
+        Assert.False(showTask.IsCompleted);
+        Assert.Null(secondaryClick);
+        Assert.Equal(0, secondaryCommand.ExecuteCount);
+
+        Assert.True(dialog.RequestPrimaryButtonClick());
+
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Primary, result);
+        Assert.Equal(FWTaskDialogResult.Primary, dialog.Result);
+        Assert.False(dialog.IsOpen);
+        Assert.NotNull(primaryClick);
+        Assert.True(primaryClick.CommandExecuted);
+        Assert.Equal(FWTaskDialogResult.Primary, primaryClick.Result);
+        Assert.Equal(1, primaryCommand.ExecuteCount);
+        Assert.Equal("delete-cache", primaryCommand.LastParameter);
+    }
+
+    [Fact]
+    public async Task FWTaskDialog_ShouldRouteEscapeToCancelButtonCommand()
+    {
+        var secondaryCommand = new RecordingCommand();
+        var dialog = new FWTaskDialog
+        {
+            Title = "Archive draft?",
+            PrimaryButtonText = "Publish",
+            SecondaryButtonText = "Archive",
+            CloseButtonText = "Cancel",
+            SecondaryButtonCommand = secondaryCommand,
+            SecondaryButtonCommandParameter = "archive-draft",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Secondary
+        };
+        FWTaskDialogButtonClickEventArgs? secondaryClick = null;
+        dialog.SecondaryButtonClick += (_, args) => secondaryClick = args;
+
+        var showTask = dialog.ShowAsync();
+        var args = new Jalium.UI.Input.KeyEventArgs(
+            UIElement.KeyDownEvent,
+            Jalium.UI.Input.Key.Escape,
+            Jalium.UI.Input.ModifierKeys.None,
+            isDown: true,
+            isRepeat: false,
+            timestamp: 0);
+
+        dialog.RaiseEvent(args);
+        var result = await showTask;
+
+        Assert.True(args.Handled);
+        Assert.Equal(FWTaskDialogResult.Secondary, result);
+        Assert.Equal(FWTaskDialogResult.Secondary, dialog.Result);
+        Assert.False(dialog.IsOpen);
+        Assert.NotNull(secondaryClick);
+        Assert.True(secondaryClick.CommandExecuted);
+        Assert.Equal(1, secondaryCommand.ExecuteCount);
+        Assert.Equal("archive-draft", secondaryCommand.LastParameter);
+    }
+
+    [Fact]
     public void FWSettingsExpander_ShouldExposeSettingsRowsAndSupplementaryContent()
     {
         var firstRow = new FWSettingsCard
@@ -669,6 +758,27 @@ public sealed class FluentDisclosureControlsTests
     private static void AssertSetter(Style style, DependencyProperty property)
     {
         Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private sealed class RecordingCommand : ICommand
+    {
+        public event EventHandler? CanExecuteChanged;
+
+        public bool CanExecuteResult { get; set; } = true;
+
+        public int ExecuteCount { get; private set; }
+
+        public object? LastParameter { get; private set; }
+
+        public bool CanExecute(object? parameter) => CanExecuteResult;
+
+        public void Execute(object? parameter)
+        {
+            ExecuteCount++;
+            LastParameter = parameter;
+        }
+
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private static void ResetApplicationState()
