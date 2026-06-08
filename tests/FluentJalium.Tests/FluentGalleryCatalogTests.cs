@@ -74,4 +74,18 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWSettingsCard", sampleCode);
         Assert.Contains("GetAutomationDiagnostics", sampleCode);
     }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeSettingsExpanderItemHostTemplateSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "disclosure");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWSettingsExpander", sampleCode);
+        Assert.Contains("ItemsSource = new[]", sampleCode);
+        Assert.Contains("new SettingsRow", sampleCode);
+        Assert.Contains("PreviewMaterialCommand", sampleCode);
+    }
 }

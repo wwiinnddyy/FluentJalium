@@ -675,22 +675,33 @@ internal sealed class GalleryDisclosurePage
         }
     }
 
+    private sealed record SettingsExpanderRow(
+        string Header,
+        string Description,
+        UIElement HeaderIcon,
+        string Value,
+        UIElement ActionIcon,
+        ICommand? Command = null,
+        object? CommandParameter = null,
+        bool IsClickEnabled = false);
+
     private static UIElement CreateSettingsExpanderSample()
     {
         var output = CreateDisclosureOutput("SettingsExpander: appearance settings open. Items: 3.");
+        var rows = new List<SettingsExpanderRow>
+        {
+            CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"),
+            CreateCommandSettingsRow("Window material", "Preview the shell backdrop choice", FluentIconRegular.LayerDiagonalSparkle24, "Preview", output),
+            CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort")
+        };
         var expander = new FWSettingsExpander
         {
             Header = "Appearance",
             Description = "Theme, material, and density options grouped in settings rows.",
             HeaderIcon = CreateIcon(FluentIconRegular.Settings24, 20, ThemeBrush("TextSecondary")),
-            IsExpanded = true
+            IsExpanded = true,
+            ItemsSource = rows
         };
-        expander.AddSetting(CreateSettingsRow("App theme", "Use system setting", FluentIconRegular.DarkTheme24, "System"));
-        expander.AddSetting(CreateCommandSettingsRow("Window material", "Preview the shell backdrop choice", FluentIconRegular.LayerDiagonalSparkle24, "Preview", () =>
-        {
-            output.Text = "SettingsExpander command: window material preview requested.";
-        }));
-        expander.AddSetting(CreateSettingsRow("Control density", "Comfortable touch targets", FluentIconRegular.TextDensity24, "Comfort"));
         expander.ItemsChanged += (_, e) => output.Text = $"SettingsExpander items: {expander.ItemCount}. Change: {e.Action}.";
         expander.Expanded += (_, _) => output.Text = $"SettingsExpander: appearance settings open. Items: {expander.ItemCount}.";
         expander.Collapsed += (_, _) => output.Text = $"SettingsExpander: appearance settings collapsed. Items: {expander.ItemCount}.";
@@ -714,11 +725,17 @@ internal sealed class GalleryDisclosurePage
                     }),
                     CreateDisclosureActionButton(FluentIconRegular.Add24, "Add row", () =>
                     {
-                        expander.AddSetting(CreateSettingsRow("Generated setting", "Added through the item host API", FluentIconRegular.Sparkle24, $"Row {expander.ItemCount + 1}"));
+                        rows.Add(CreateSettingsRow("Generated setting", "Added through the item host template", FluentIconRegular.Sparkle24, $"Row {rows.Count + 1}"));
+                        expander.ItemsSource = null;
+                        expander.ItemsSource = rows;
+                        output.Text = $"SettingsExpander item template rows: {rows.Count}.";
                     }),
                     CreateDisclosureActionButton(FluentIconRegular.Delete24, "Clear rows", () =>
                     {
-                        expander.ClearSettings();
+                        rows.Clear();
+                        expander.ItemsSource = null;
+                        expander.ItemsSource = rows;
+                        output.Text = "SettingsExpander item template rows cleared.";
                     })),
                 CreateDisclosureStatus(output)
             }
@@ -857,42 +874,28 @@ internal sealed class GalleryDisclosurePage
         };
     }
 
-    private static FWSettingsCard CreateSettingsRow(string header, string description, FluentIconRegular icon, string value)
+    private static SettingsExpanderRow CreateSettingsRow(string header, string description, FluentIconRegular icon, string value)
     {
-        return new FWSettingsCard
-        {
-            Header = header,
-            Description = description,
-            HeaderIcon = CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
-            ActionIcon = CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
-            Content = new FWTextBlock
-            {
-                Text = value,
-                Foreground = ThemeBrush("TextSecondary"),
-                VerticalAlignment = VerticalAlignment.Center
-            },
-            IsClickEnabled = true
-        };
+        return new SettingsExpanderRow(
+            header,
+            description,
+            CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
+            value,
+            CreateIcon(FluentIconRegular.ChevronRight24, 16, ThemeBrush("TextSecondary")),
+            IsClickEnabled: true);
     }
 
-    private static FWSettingsCard CreateCommandSettingsRow(string header, string description, FluentIconRegular icon, string commandText, Action command)
+    private static SettingsExpanderRow CreateCommandSettingsRow(string header, string description, FluentIconRegular icon, string commandText, TextBlock output)
     {
-        var card = new FWSettingsCard
-        {
-            Header = header,
-            Description = description,
-            HeaderIcon = CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
-            ActionIcon = CreateIcon(FluentIconRegular.CursorClick24, 16, ThemeBrush("TextSecondary")),
-            Content = new FWTextBlock
-            {
-                Text = commandText,
-                Foreground = ThemeBrush("TextSecondary"),
-                VerticalAlignment = VerticalAlignment.Center
-            },
-            IsClickEnabled = true
-        };
-        card.Click += (_, _) => command();
-        return card;
+        return new SettingsExpanderRow(
+            header,
+            description,
+            CreateIcon(icon, 18, ThemeBrush("TextSecondary")),
+            commandText,
+            CreateIcon(FluentIconRegular.CursorClick24, 16, ThemeBrush("TextSecondary")),
+            new GalleryTaskDialogCommand(_ => output.Text = "SettingsExpander command: window material preview requested."),
+            "window-material",
+            true);
     }
 
     private static FWContentDialog CreateSampleContentDialog()

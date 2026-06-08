@@ -177,9 +177,44 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
+    <Style x:Key="FWSettingsExpanderHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="FWSettingsExpanderDescriptionTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="FWSettingsExpanderHeaderAccessTextStyle" TargetType="AccessText">
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="FWSettingsExpanderDescriptionAccessTextStyle" TargetType="AccessText">
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+    </Style>
+
     <Style x:Key="FWSettingsExpanderItemHostStyle" TargetType="ItemsControl">
         <Setter Property="Background" Value="{ThemeResource ContentPanelBackground}" />
     </Style>
+
+    <DataTemplate x:Key="FWSettingsExpanderDefaultItemTemplate">
+        <fluent:FWSettingsCard Header="{Binding Header}"
+                               Description="{Binding Description}"
+                               HeaderIcon="{Binding HeaderIcon}"
+                               ActionIcon="{Binding ActionIcon}"
+                               Content="{Binding Value}"
+                               Command="{Binding Command}"
+                               CommandParameter="{Binding CommandParameter}"
+                               IsClickEnabled="{Binding IsClickEnabled}" />
+    </DataTemplate>
 
     <Style TargetType="fluent:FWSettingsExpander" BasedOn="{StaticResource {x:Type Expander}}">
         <Setter Property="Background" Value="{ThemeResource ControlBackground}" />

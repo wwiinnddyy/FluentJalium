@@ -260,6 +260,42 @@
         </Setter>
     </Style>
 
+    <Style x:Key="FWSettingsIconPresenterStyle" TargetType="ContentPresenter">
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="FWSettingsHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="FWSettingsDescriptionTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="FWSettingsHeaderAccessTextStyle" TargetType="AccessText">
+        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="FWSettingsDescriptionAccessTextStyle" TargetType="AccessText">
+        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+    </Style>
+
+    <Style x:Key="FWSettingsActionPresenterStyle" TargetType="ContentPresenter">
+        <Setter Property="MinWidth" Value="32" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
     <Style TargetType="fluent:FWSettingsCard" BasedOn="{StaticResource {x:Type ContentControl}}">
         <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
@@ -297,31 +333,15 @@
                             <ContentPresenter Content="{TemplateBinding Header}"
                                               ContentTemplate="{TemplateBinding HeaderTemplate}">
                                 <ContentPresenter.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-                                        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-                                        <Setter Property="FontWeight" Value="SemiBold" />
-                                        <Setter Property="TextWrapping" Value="Wrap" />
-                                    </Style>
-                                    <Style TargetType="AccessText">
-                                        <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-                                        <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-                                        <Setter Property="FontWeight" Value="SemiBold" />
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource FWSettingsHeaderTextStyle}" />
+                                    <Style TargetType="AccessText" BasedOn="{StaticResource FWSettingsHeaderAccessTextStyle}" />
                                 </ContentPresenter.Resources>
                             </ContentPresenter>
                             <ContentPresenter Content="{TemplateBinding Description}"
                                               ContentTemplate="{TemplateBinding DescriptionTemplate}">
                                 <ContentPresenter.Resources>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
-                                        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
-                                        <Setter Property="TextWrapping" Value="Wrap" />
-                                    </Style>
-                                    <Style TargetType="AccessText">
-                                        <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
-                                        <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
-                                    </Style>
+                                    <Style TargetType="TextBlock" BasedOn="{StaticResource FWSettingsDescriptionTextStyle}" />
+                                    <Style TargetType="AccessText" BasedOn="{StaticResource FWSettingsDescriptionAccessTextStyle}" />
                                 </ContentPresenter.Resources>
                             </ContentPresenter>
                         </StackPanel>

@@ -4,7 +4,9 @@ using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
+using Jalium.UI.Documents;
 using Jalium.UI.Markup;
+using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 
 namespace FluentJalium.Tests;
@@ -32,6 +34,16 @@ public sealed class FluentSettingsVisualTemplateTests
         AssertSetter(actionStyle, FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Right);
         AssertSetter(actionStyle, FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
 
+        var headerTextStyle = AssertKeyedStyle<TextBlock>(dictionary, "FWSettingsHeaderTextStyle");
+        AssertSetter(headerTextStyle, TextElement.FontWeightProperty, FontWeights.SemiBold);
+        AssertSetter(headerTextStyle, TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+
+        var descriptionTextStyle = AssertKeyedStyle<TextBlock>(dictionary, "FWSettingsDescriptionTextStyle");
+        AssertSetter(descriptionTextStyle, TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+
+        var headerAccessTextStyle = AssertKeyedStyle<AccessText>(dictionary, "FWSettingsHeaderAccessTextStyle");
+        AssertSetter(headerAccessTextStyle, AccessText.FontWeightProperty, FontWeights.SemiBold);
+
         ResetApplicationState();
     }
 
@@ -53,8 +65,19 @@ public sealed class FluentSettingsVisualTemplateTests
         var itemHostStyle = AssertKeyedStyle<ItemsControl>(dictionary, "FWSettingsExpanderItemHostStyle");
         AssertSetter(itemHostStyle, Control.BackgroundProperty);
 
+        Assert.True(dictionary.TryGetValue("FWSettingsExpanderDefaultItemTemplate", out var itemTemplate), "FWSettingsExpanderDefaultItemTemplate was not found.");
+        Assert.IsType<DataTemplate>(itemTemplate);
+
+        var headerTextStyle = AssertKeyedStyle<TextBlock>(dictionary, "FWSettingsExpanderHeaderTextStyle");
+        AssertSetter(headerTextStyle, TextElement.FontWeightProperty, FontWeights.SemiBold);
+        AssertSetter(headerTextStyle, TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+
+        var descriptionTextStyle = AssertKeyedStyle<TextBlock>(dictionary, "FWSettingsExpanderDescriptionTextStyle");
+        AssertSetter(descriptionTextStyle, TextBlock.TextWrappingProperty, TextWrapping.Wrap);
+
         var settingsExpanderStyle = AssertStyle<FWSettingsExpander>(dictionary);
         AssertSetter(settingsExpanderStyle, FWSettingsExpander.ItemsPanelProperty);
+        AssertSetter(settingsExpanderStyle, FWSettingsExpander.ItemTemplateProperty);
 
         ResetApplicationState();
     }

@@ -30,7 +30,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 - `FWFlyout`: content, density, placement, explicit presenter style, theme presenter lookup, Gallery metadata, and menu sample code now exist. Its visual chrome is intentionally owned by the keyed `FWFlyoutPresenterStyle` for `FWFlyoutPresenter`; `FWFlyout` itself remains a `FlyoutBase` behavior object rather than an implicit style target.
 - `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, command-state restoration, focus/pressed visuals, interaction diagnostics, automation peer metadata, InvokePattern support, and default row typography/action alignment now exist; remaining work is mostly real-window visual QA.
-- `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, add/remove/clear helpers, default row spacing, and header typography; remaining work is richer data-row templates and visual QA.
+- `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, add/remove/clear helpers, default row spacing, header typography, and default data-row item templates for richer settings rows; remaining work is real-window visual QA.
 - `FWTwoPaneView` and `FWParallaxView`: actual layout mode, visible-pane state, progress-driven offset state, and diagnostics now exist; remaining work is deeper ScrollViewer/FWScroller source synchronization and visual QA.
 - `FWSnackbar`: host queueing, auto-dismiss, action command support, close reasons, result-style async flow, pause-on-hover/focus lifetime, closing cancellation, host/service async result APIs, top/bottom host placement with spacing, overlay/root host presentation, transition timing hooks, queue diagnostics, and animated presenter choreography now exist; remaining work is visual QA and root-window integration refinements.
 - `FWTaskDialog`: awaitable result flow, button command DPs, `CommandExecuted` request metadata, default/cancel requests, Escape-to-cancel, default focus, empty/disabled button states, focus target helpers, automation peers, button automation metadata, `FWTaskDialogAutomationDiagnostics`, template visual-tree focus traversal, and `FWTaskDialogHost` modal overlay with light dismiss, focus restore/trap hooks, keyboard diagnostics, and host reentry guards now exist; remaining work is visual QA and root-window focus integration.
@@ -41,7 +41,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 1. TaskDialog visual QA package: validate real app-window focus restore/trap behavior and modal layering after the automation and template focus traversal base.
 2. ItemsRepeater lifecycle integration package: connect viewport realization windows to automatic ScrollViewer/FWScroller lifecycle updates without breaking the current `Panel` API.
-3. Settings visual QA package: validate default row typography/action alignment and richer SettingsExpander item-host templates in a real app window.
+3. Settings visual QA package: default row typography/action alignment and richer SettingsExpander item-host template contracts now have theme/Gallery coverage; remaining work is real-window visual QA.
 
 ## Recently completed batches
 
