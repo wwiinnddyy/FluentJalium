@@ -19,6 +19,7 @@ using FWLabel = FluentJalium.Controls.FWLabel;
 using FWParallaxView = FluentJalium.Controls.FWParallaxView;
 using FWRelativePanel = FluentJalium.Controls.FWRelativePanel;
 using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
+using FWSettingsCardAutomationDiagnostics = FluentJalium.Controls.FWSettingsCardAutomationDiagnostics;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTwoPaneView = FluentJalium.Controls.FWTwoPaneView;
@@ -245,11 +246,15 @@ internal sealed class GalleryContentLayoutPage
     private static UIElement CreateAdaptiveSettingsLayoutSample()
     {
         var output = CreateLayoutOutput("TwoPaneView diagnostics ready.");
+        FWSettingsCard? modeCard = null;
         var configureCommand = new GalleryLayoutCommand(parameter =>
         {
-            output.Text = $"SettingsCard command executed: {parameter}.";
+            var automation = modeCard != null
+                ? FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())
+                : "pending";
+            output.Text = $"SettingsCard command executed: {parameter}. Automation: {automation}.";
         });
-        var modeCard = new FWSettingsCard
+        modeCard = new FWSettingsCard
         {
             Header = "Display mode",
             Description = "Switches the sample between wide, tall, and single pane.",
@@ -298,7 +303,7 @@ internal sealed class GalleryContentLayoutPage
         void UpdateState(string action)
         {
             var diagnostics = twoPaneView.GetDiagnostics();
-            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}.";
+            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}. SettingsCard automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
         }
 
         return new FWStackPanel
@@ -345,19 +350,26 @@ internal sealed class GalleryContentLayoutPage
                     {
                         configureCommand.CanExecuteResult = !configureCommand.CanExecuteResult;
                         configureCommand.RaiseCanExecuteChanged();
-                        output.Text = $"SettingsCard CanExecute: {modeCard.CanExecute}. IsEnabled: {modeCard.IsEnabled}.";
+                        output.Text = $"SettingsCard CanExecute: {modeCard.CanExecute}. IsEnabled: {modeCard.IsEnabled}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
                     }),
                     CreateLayoutActionButton(FluentIconRegular.CursorHover24, "Hover mode", () =>
                     {
                         modeCard.ClickMode = modeCard.ClickMode == ClickMode.Hover
                             ? ClickMode.Release
                             : ClickMode.Hover;
-                        output.Text = $"SettingsCard ClickMode: {modeCard.ClickMode}.";
+                        output.Text = $"SettingsCard ClickMode: {modeCard.ClickMode}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
                     })),
                 CreateLayoutStatus(output)
             }
         };
     }
+
+    private static string FormatSettingsCardAutomation(FWSettingsCardAutomationDiagnostics diagnostics)
+    {
+        return $"{diagnostics.ControlType}/{diagnostics.Name}; invoke: {FormatOnOff(diagnostics.IsInvokePatternAvailable)}; help: {diagnostics.HelpText}";
+    }
+
+    private static string FormatOnOff(bool value) => value ? "on" : "off";
 
     private static UIElement CreatePositioningParallaxSample()
     {

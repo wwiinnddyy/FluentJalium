@@ -4,6 +4,7 @@ using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
+using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
@@ -560,6 +561,60 @@ public sealed class FluentContentLayoutControlsTests
         Assert.False(card.IsKeyboardPressed);
         Assert.False(card.IsInteractionPressed);
         Assert.False(card.GetDiagnostics().IsInvokable);
+    }
+
+    [Fact]
+    public void FWSettingsCard_ShouldExposeAutomationPeerAndInvokePattern()
+    {
+        var command = new RecordingCommand();
+        var card = new FWSettingsCard
+        {
+            Header = "Display mode",
+            Description = "Switch between wide, tall, and single-pane layouts.",
+            Content = new FWButton { Content = "Configure" },
+            IsClickEnabled = true,
+            Command = command,
+            CommandParameter = "display-mode"
+        };
+        var clickCount = 0;
+        card.Click += (_, _) => clickCount++;
+
+        var peer = Assert.IsType<FWSettingsCardAutomationPeer>(card.GetAutomationPeer());
+
+        Assert.Equal(nameof(FWSettingsCard), peer.GetClassName());
+        Assert.Equal(AutomationControlType.Button, peer.GetAutomationControlType());
+        Assert.Equal("Display mode", peer.GetName());
+        Assert.Equal("Switch between wide, tall, and single-pane layouts.", peer.GetHelpText());
+        Assert.True(peer.IsKeyboardFocusable());
+
+        var diagnostics = card.GetAutomationDiagnostics();
+
+        Assert.Equal(nameof(FWSettingsCard), diagnostics.ClassName);
+        Assert.Equal(AutomationControlType.Button, diagnostics.ControlType);
+        Assert.Equal("Display mode", diagnostics.Name);
+        Assert.Equal("Switch between wide, tall, and single-pane layouts.", diagnostics.HelpText);
+        Assert.True(diagnostics.IsInvokePatternAvailable);
+        Assert.True(diagnostics.IsKeyboardFocusable);
+
+        var invokeProvider = Assert.IsAssignableFrom<IInvokeProvider>(peer.GetPattern(PatternInterface.Invoke));
+        invokeProvider.Invoke();
+
+        Assert.Equal(1, clickCount);
+        Assert.Equal(1, command.ExecuteCount);
+        Assert.Equal("display-mode", command.LastParameter);
+
+        card.IsClickEnabled = false;
+
+        Assert.Equal(AutomationControlType.Group, peer.GetAutomationControlType());
+        Assert.Null(peer.GetPattern(PatternInterface.Invoke));
+        Assert.False(card.GetAutomationDiagnostics().IsInvokePatternAvailable);
+
+        card.IsClickEnabled = true;
+        command.CanExecuteResult = false;
+        command.RaiseCanExecuteChanged();
+
+        Assert.Throws<InvalidOperationException>(() => invokeProvider.Invoke());
+        Assert.Equal(1, command.ExecuteCount);
     }
 
     [Fact]

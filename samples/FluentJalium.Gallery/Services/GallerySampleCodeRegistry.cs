@@ -255,6 +255,9 @@ var card = new FWSettingsCard
 };
 
 var canExecute = card.CanExecute;
+var automation = card.GetAutomationDiagnostics();
+Debug.WriteLine($"SettingsCard automation: {automation.Name}; invoke: {automation.IsInvokePatternAvailable}.");
+
 card.PerformClick();
 """,
         ["visuals.icons.richtext.personpicture.markdown.qrcode.shapes"] = """

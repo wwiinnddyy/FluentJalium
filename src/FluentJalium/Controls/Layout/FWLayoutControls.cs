@@ -1,4 +1,5 @@
 using Jalium.UI;
+using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Input;
@@ -1159,6 +1160,17 @@ public readonly record struct FWSettingsCardDiagnostics(
     ClickMode ClickMode);
 
 /// <summary>
+/// Lightweight state snapshot for <see cref="FWSettingsCard"/> automation metadata.
+/// </summary>
+public readonly record struct FWSettingsCardAutomationDiagnostics(
+    string ClassName,
+    AutomationControlType ControlType,
+    string Name,
+    string HelpText,
+    bool IsInvokePatternAvailable,
+    bool IsKeyboardFocusable);
+
+/// <summary>
 /// FluentJalium SettingsCard control for compact settings rows.
 /// </summary>
 public class FWSettingsCard : ContentControl, IFluentJaliumControl
@@ -1377,6 +1389,23 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             IsInteractionPressed,
             Command != null,
             ClickMode);
+    }
+
+    public FWSettingsCardAutomationDiagnostics GetAutomationDiagnostics()
+    {
+        var peer = GetAutomationPeer();
+        return new FWSettingsCardAutomationDiagnostics(
+            peer?.GetClassName() ?? nameof(FWSettingsCard),
+            peer?.GetAutomationControlType() ?? AutomationControlType.Button,
+            peer?.GetName() ?? ResolveAutomationName(this),
+            peer?.GetHelpText() ?? ResolveAutomationHelpText(this),
+            peer?.GetPattern(PatternInterface.Invoke) is IInvokeProvider,
+            peer?.IsKeyboardFocusable() ?? Focusable);
+    }
+
+    protected override AutomationPeer? OnCreateAutomationPeer()
+    {
+        return new FWSettingsCardAutomationPeer(this);
     }
 
     private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -1668,6 +1697,88 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         if (!isFocused)
         {
             SetKeyboardPressed(false);
+        }
+    }
+
+    internal static string ResolveAutomationName(FWSettingsCard card)
+    {
+        var header = ResolveAutomationText(card.Header);
+        if (!string.IsNullOrWhiteSpace(header))
+        {
+            return header;
+        }
+
+        var content = ResolveAutomationText(card.Content);
+        return string.IsNullOrWhiteSpace(content) ? nameof(FWSettingsCard) : content;
+    }
+
+    internal static string ResolveAutomationHelpText(FWSettingsCard card)
+    {
+        var description = ResolveAutomationText(card.Description);
+        if (!string.IsNullOrWhiteSpace(description))
+        {
+            return description;
+        }
+
+        var content = ResolveAutomationText(card.Content);
+        return string.IsNullOrWhiteSpace(content) ? "Settings card" : content;
+    }
+
+    private static string ResolveAutomationText(object? value)
+    {
+        if (value is string text)
+        {
+            return string.IsNullOrWhiteSpace(text) ? string.Empty : text;
+        }
+
+        var resolved = value?.ToString();
+        return string.IsNullOrWhiteSpace(resolved) ? string.Empty : resolved;
+    }
+}
+
+/// <summary>
+/// Automation peer for <see cref="FWSettingsCard"/>.
+/// </summary>
+public sealed class FWSettingsCardAutomationPeer : FrameworkElementAutomationPeer, IInvokeProvider
+{
+    public FWSettingsCardAutomationPeer(FWSettingsCard owner) : base(owner)
+    {
+    }
+
+    private FWSettingsCard SettingsCardOwner => (FWSettingsCard)Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore()
+    {
+        return SettingsCardOwner.IsClickEnabled ? AutomationControlType.Button : AutomationControlType.Group;
+    }
+
+    protected override string GetClassNameCore()
+    {
+        return nameof(FWSettingsCard);
+    }
+
+    protected override string GetNameCore()
+    {
+        return FWSettingsCard.ResolveAutomationName(SettingsCardOwner);
+    }
+
+    protected override string GetHelpTextCore()
+    {
+        return FWSettingsCard.ResolveAutomationHelpText(SettingsCardOwner);
+    }
+
+    protected override object? GetPatternCore(PatternInterface patternInterface)
+    {
+        return patternInterface == PatternInterface.Invoke && SettingsCardOwner.IsClickEnabled
+            ? this
+            : base.GetPatternCore(patternInterface);
+    }
+
+    public void Invoke()
+    {
+        if (!SettingsCardOwner.Invoke())
+        {
+            throw new InvalidOperationException("Cannot invoke a disabled settings card.");
         }
     }
 }
