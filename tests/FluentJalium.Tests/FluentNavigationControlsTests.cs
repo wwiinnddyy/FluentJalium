@@ -233,6 +233,130 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWNavigationViewItem_ShouldExposeRouteKey()
+    {
+        var item = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+
+        Assert.Equal("overview", item.RouteKey);
+        Assert.Equal("overview", item.GetValue(FWNavigationViewItem.RouteKeyProperty));
+
+        item.SetValue(FWNavigationViewItem.RouteKeyProperty, "details");
+
+        Assert.Equal("details", item.RouteKey);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises FWNavigationService Frame page activation by type.")]
+    public void FWNavigationService_ShouldNavigateSelectionAndSynchronizeHistory()
+    {
+        var navigationView = new FWNavigationView
+        {
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Visible
+        };
+        var overviewItem = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var detailsItem = new FWNavigationViewItem
+        {
+            Content = "Details"
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(detailsItem);
+
+        var frame = new FWFrame();
+        var service = new FWNavigationService();
+        var navigatedRoutes = new List<string>();
+        service.Navigated += (_, route) => navigatedRoutes.Add(route.RouteKey);
+        var overviewRoute = service.RegisterRoute(overviewItem, typeof(NavigationOverviewPage), "overview-parameter");
+        var detailsRoute = service.RegisterRoute(detailsItem, typeof(NavigationDetailsPage), "details-parameter");
+
+        service.Attach(navigationView, frame);
+        navigationView.SelectedItem = overviewItem;
+
+        Assert.Equal("overview", overviewRoute.RouteKey);
+        Assert.Equal("Details", detailsRoute.RouteKey);
+        Assert.Equal("Overview", overviewRoute.Item?.Content);
+        Assert.Equal(typeof(NavigationOverviewPage), frame.SourcePageType);
+        Assert.Equal("overview-parameter", frame.CurrentPage!.NavigationParameter);
+        Assert.Equal("overview", service.CurrentRouteKey);
+        Assert.False(navigationView.IsBackEnabled);
+        Assert.Equal(["overview"], navigatedRoutes);
+
+        navigationView.SelectedItem = detailsItem;
+
+        Assert.Equal(typeof(NavigationDetailsPage), frame.SourcePageType);
+        Assert.Equal("details-parameter", frame.CurrentPage!.NavigationParameter);
+        Assert.Equal("Details", service.CurrentRouteKey);
+        Assert.True(navigationView.IsBackEnabled);
+        Assert.Equal(1, frame.BackStackDepth);
+
+        Assert.True(service.GoBack());
+
+        Assert.Equal(typeof(NavigationOverviewPage), frame.SourcePageType);
+        Assert.Equal(overviewItem, navigationView.SelectedItem);
+        Assert.Equal("overview", service.CurrentRouteKey);
+        Assert.False(navigationView.IsBackEnabled);
+        Assert.True(frame.CanGoForward);
+
+        Assert.True(service.GoForward());
+
+        Assert.Equal(typeof(NavigationDetailsPage), frame.SourcePageType);
+        Assert.Equal(detailsItem, navigationView.SelectedItem);
+        Assert.Equal("Details", service.CurrentRouteKey);
+
+        var diagnostics = service.GetDiagnostics();
+        Assert.True(diagnostics.IsAttached);
+        Assert.Equal(2, diagnostics.RouteCount);
+        Assert.Equal("Details", diagnostics.CurrentRouteKey);
+        Assert.Equal(typeof(NavigationDetailsPage), diagnostics.CurrentPageType);
+        Assert.True(diagnostics.CanGoBack);
+        Assert.False(diagnostics.CanGoForward);
+        Assert.Equal(1, diagnostics.BackStackDepth);
+        Assert.False(diagnostics.IsSynchronizingSelection);
+        Assert.Equal(["overview", "Details", "overview", "Details"], navigatedRoutes);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises FWNavigationService Frame page activation by type.")]
+    public void FWNavigationService_ShouldDetachAndUnregisterRoutes()
+    {
+        var navigationView = new FWNavigationView();
+        var item = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var frame = new FWFrame();
+        var service = new FWNavigationService();
+        service.RegisterRoute(item, typeof(NavigationOverviewPage));
+
+        service.Attach(navigationView, frame);
+
+        Assert.True(service.NavigateToRoute("overview"));
+        Assert.Equal("overview", service.CurrentRouteKey);
+        Assert.True(service.UnregisterRoute("overview"));
+        Assert.Null(service.CurrentRouteKey);
+        Assert.False(service.NavigateToRoute("overview"));
+
+        service.RegisterRoute(item, typeof(NavigationOverviewPage));
+        Assert.True(service.NavigateToRoute("overview"));
+
+        service.Detach();
+
+        Assert.False(service.IsAttached);
+        Assert.Null(service.CurrentRouteKey);
+        Assert.False(service.NavigateToRoute("overview"));
+        Assert.False(service.GoBack());
+        Assert.False(service.GoForward());
+    }
+
+    [Fact]
     public void FWBreadcrumbBar_ShouldExposeDensityItemsAndMaxItemsState()
     {
         var breadcrumbBar = new FWBreadcrumbBar

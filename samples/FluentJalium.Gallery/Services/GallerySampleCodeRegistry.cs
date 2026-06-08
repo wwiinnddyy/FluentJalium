@@ -388,16 +388,30 @@ var navigationView = new FWNavigationView
     CompactPaneLength = 48
 };
 
-navigationView.MenuItems.Add(new FWNavigationViewItem
+var frame = new FWFrame();
+var navigationService = new FWNavigationService();
+var overviewItem = new FWNavigationViewItem
 {
     Content = "Overview",
+    RouteKey = "overview",
     Icon = FluentIconFactory.Regular(FluentIconRegular.Home24)
-});
-navigationView.FooterMenuItems.Add(new FWNavigationViewItem
+};
+var settingsItem = new FWNavigationViewItem
 {
     Content = "Settings",
+    RouteKey = "settings",
     Icon = FluentIconFactory.Regular(FluentIconRegular.Settings24)
-});
+};
+
+navigationView.MenuItems.Add(overviewItem);
+navigationView.FooterMenuItems.Add(settingsItem);
+navigationService.RegisterRoute(overviewItem, typeof(OverviewPage), "overview");
+navigationService.RegisterRoute(settingsItem, typeof(SettingsPage), "settings");
+navigationService.Attach(navigationView, frame);
+navigationService.NavigateToRoute("overview");
+
+var diagnostics = navigationService.GetDiagnostics();
+Debug.WriteLine($"Navigation route: {diagnostics.CurrentRouteKey}; back: {diagnostics.CanGoBack}.");
 
 var pager = new FWPipsPager
 {

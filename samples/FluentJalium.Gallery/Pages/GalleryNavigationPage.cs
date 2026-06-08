@@ -12,6 +12,8 @@ using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWFrame = FluentJalium.Controls.FWFrame;
 using FWNavigationDensity = FluentJalium.Controls.FWNavigationDensity;
+using FWNavigationService = FluentJalium.Controls.FWNavigationService;
+using FWNavigationServiceDiagnostics = FluentJalium.Controls.FWNavigationServiceDiagnostics;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemHeader = FluentJalium.Controls.FWNavigationViewItemHeader;
@@ -63,8 +65,8 @@ internal sealed class GalleryNavigationPage
             CreateTabControlNavigationSample()));
         examples.Children.Add(CreateNavigationExampleCard(
             FluentIconRegular.Window24,
-            "FWFrame",
-            "Frame navigation, back stack, forward stack, and content host surface.",
+            "FWNavigationService + FWFrame",
+            "Route NavigationView selection into Frame pages while keeping back/forward diagnostics synchronized.",
             CreateFrameNavigationSample()));
         examples.Children.Add(CreateNavigationExampleCard(
             FluentIconRegular.BranchFork24,
@@ -313,20 +315,47 @@ internal sealed class GalleryNavigationPage
     [RequiresUnreferencedCode("Gallery sample navigates to local Page types by typeof literals.")]
     private static UIElement CreateFrameNavigationSample()
     {
-        var output = CreateNavigationOutput("Frame: not navigated");
+        var output = CreateNavigationOutput("Route: not navigated");
         var frame = new FWFrame
         {
-            Width = 500,
+            Width = 300,
             Height = 160,
             Padding = new Thickness(14),
             BorderThickness = new Thickness(1)
         };
-        frame.Navigated += (_, _) =>
+        var overviewItem = new FWNavigationViewItem
         {
-            output.Text = $"Frame: {frame.SourcePageType?.Name}, BackStack: {frame.BackStackDepth}, CanGoForward: {frame.CanGoForward}";
+            Content = "Overview",
+            RouteKey = "overview",
+            Icon = CreateIcon(FluentIconRegular.Home24)
         };
+        var detailsItem = new FWNavigationViewItem
+        {
+            Content = "Details",
+            RouteKey = "details",
+            Icon = CreateIcon(FluentIconRegular.Document24)
+        };
+        var navigationView = new FWNavigationView
+        {
+            Width = 180,
+            Height = 160,
+            PaneTitle = "Routes",
+            Header = "Service shell",
+            PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Visible,
+            OpenPaneLength = 160,
+            CompactPaneLength = 40
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(detailsItem);
+        navigationView.UpdateMenuItems();
 
-        frame.Navigate(typeof(GalleryNavigationOverviewPage), "Overview");
+        var service = new FWNavigationService();
+        service.RegisterRoute(overviewItem, typeof(GalleryNavigationOverviewPage), "Overview route");
+        service.RegisterRoute(detailsItem, typeof(GalleryNavigationDetailsPage), "Details route");
+        service.Attach(navigationView, frame);
+        service.Navigated += (_, _) => output.Text = FormatNavigationServiceDiagnostics(service.GetDiagnostics());
+        service.NavigateToRoute("overview");
 
         return new FWStackPanel
         {
@@ -334,27 +363,41 @@ internal sealed class GalleryNavigationPage
             Spacing = 10,
             Children =
             {
-                frame,
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 10,
+                    VerticalSpacing = 10,
+                    Children =
+                    {
+                        navigationView,
+                        frame
+                    }
+                },
                 CreateNavigationButtonRow(
-                    CreateNavigationActionButton(FluentIconRegular.Home24, "Overview", () => frame.Navigate(typeof(GalleryNavigationOverviewPage), "Overview")),
-                    CreateNavigationActionButton(FluentIconRegular.Document24, "Details", () => frame.Navigate(typeof(GalleryNavigationDetailsPage), "Details")),
+                    CreateNavigationActionButton(FluentIconRegular.Home24, "Overview", () => service.NavigateToRoute("overview")),
+                    CreateNavigationActionButton(FluentIconRegular.Document24, "Details", () => service.NavigateToRoute("details")),
                     CreateNavigationActionButton(FluentIconRegular.ArrowLeft24, "Back", () =>
                     {
-                        if (!frame.GoBack())
+                        if (!service.GoBack())
                         {
-                            output.Text = "Frame: no back entry";
+                            output.Text = "Route: no back entry";
                         }
                     }),
                     CreateNavigationActionButton(FluentIconRegular.ArrowRight24, "Forward", () =>
                     {
-                        if (!frame.GoForward())
+                        if (!service.GoForward())
                         {
-                            output.Text = "Frame: no forward entry";
+                            output.Text = "Route: no forward entry";
                         }
                     })),
                 CreateNavigationStatus(output)
             }
         };
+    }
+
+    private static string FormatNavigationServiceDiagnostics(FWNavigationServiceDiagnostics diagnostics)
+    {
+        return $"Route: {diagnostics.CurrentRouteKey ?? "none"}, Page: {diagnostics.CurrentPageType?.Name ?? "none"}, Back: {diagnostics.CanGoBack}, Forward: {diagnostics.CanGoForward}, Stack: {diagnostics.BackStackDepth}";
     }
 
     private static UIElement CreateMaterialNavigationShellSample()
@@ -1003,7 +1046,7 @@ internal sealed class GalleryNavigationPage
             "FWNavigationView" => "<FWNavigationView PaneTitle=\"FluentJalium\" Header=\"NavigationView\">\n    <FWNavigationViewItem Content=\"Dashboard\" />\n    <FWNavigationViewItem Content=\"Controls\" />\n</FWNavigationView>",
             "Pane modes and hierarchy" => "<FWNavigationView PaneDisplayMode=\"LeftCompact\" IsPaneOpen=\"False\">\n    <FWNavigationViewItem Content=\"Document options\" IsExpanded=\"True\" SelectsOnInvoked=\"False\" />\n</FWNavigationView>",
             "FWTabControl" => "<FWTabControl TabStripPlacement=\"Top\" IsSwipeEnabled=\"True\">\n    <FWTabItem Header=\"Overview\" />\n    <FWTabItem Header=\"Details\" />\n</FWTabControl>",
-            "FWFrame" => "var frame = new FWFrame();\nframe.Navigate(typeof(GalleryNavigationOverviewPage), \"Overview\");\nframe.GoBack();",
+            "FWNavigationService + FWFrame" => "var navigationView = new FWNavigationView();\nvar frame = new FWFrame();\nvar service = new FWNavigationService();\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Overview\", RouteKey = \"overview\" }, typeof(GalleryNavigationOverviewPage));\nservice.Attach(navigationView, frame);\nservice.NavigateToRoute(\"overview\");\nservice.GoBack();",
             "FWBreadcrumbBar" => "<FWBreadcrumbBar ItemsSource=\"{Binding PathSegments}\" MaxItems=\"5\" ItemClicked=\"OnBreadcrumbClicked\" />",
             "FWPipsPager" => "<FWPipsPager NumberOfPages=\"10\" SelectedPageIndex=\"0\" MaxVisiblePips=\"5\" SelectedIndexChanged=\"OnPageChanged\" />",
             "FWSelectorBar" => "<FWSelectorBar SelectionIndicatorPlacement=\"Auto\">\n    <FWSelectorBarItem Text=\"Overview\" />\n    <FWSelectorBarItem Text=\"Activity\" />\n</FWSelectorBar>",

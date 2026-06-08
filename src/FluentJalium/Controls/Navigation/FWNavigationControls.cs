@@ -1,5 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FluentJalium.Controls;
 
@@ -11,6 +12,321 @@ public enum FWNavigationDensity
     Compact,
     Comfortable,
     Spacious
+}
+
+/// <summary>
+/// Route metadata used by <see cref="FWNavigationService"/>.
+/// </summary>
+public sealed class FWNavigationRoute
+{
+    public FWNavigationRoute(string routeKey, Type pageType, object? parameter = null, FWNavigationViewItem? item = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(routeKey);
+        ArgumentNullException.ThrowIfNull(pageType);
+
+        if (!typeof(Page).IsAssignableFrom(pageType))
+        {
+            throw new ArgumentException("Navigation routes must target a Page type.", nameof(pageType));
+        }
+
+        RouteKey = routeKey;
+        PageType = pageType;
+        Parameter = parameter;
+        Item = item;
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public string RouteKey { get; }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public Type PageType { get; }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public object? Parameter { get; }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public FWNavigationViewItem? Item { get; }
+}
+
+/// <summary>
+/// Snapshot of <see cref="FWNavigationService"/> shell routing and history state.
+/// </summary>
+public readonly record struct FWNavigationServiceDiagnostics(
+    bool IsAttached,
+    int RouteCount,
+    string? CurrentRouteKey,
+    Type? CurrentPageType,
+    bool CanGoBack,
+    bool CanGoForward,
+    int BackStackDepth,
+    bool IsSynchronizingSelection);
+
+/// <summary>
+/// Lightweight NavigationView + Frame coordinator for app-shell routing.
+/// </summary>
+public sealed class FWNavigationService
+{
+    private readonly Dictionary<string, FWNavigationRoute> _routes = new(StringComparer.Ordinal);
+    private FWNavigationView? _navigationView;
+    private FWFrame? _frame;
+    private bool _isSynchronizingSelection;
+
+    public event EventHandler<FWNavigationRoute>? Navigated;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsAttached => _navigationView != null && _frame != null;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int RouteCount => _routes.Count;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public string? CurrentRouteKey { get; private set; }
+
+    public IReadOnlyCollection<FWNavigationRoute> Routes => _routes.Values;
+
+    public void Attach(FWNavigationView navigationView, FWFrame frame)
+    {
+        ArgumentNullException.ThrowIfNull(navigationView);
+        ArgumentNullException.ThrowIfNull(frame);
+
+        Detach();
+
+        _navigationView = navigationView;
+        _frame = frame;
+        _navigationView.SelectionChanged += OnNavigationSelectionChanged;
+        _navigationView.BackRequested += OnNavigationBackRequested;
+        _frame.Navigated += OnFrameNavigated;
+        UpdateNavigationViewBackState();
+        SynchronizeSelectionFromFrame();
+    }
+
+    public void Detach()
+    {
+        if (_navigationView != null)
+        {
+            _navigationView.SelectionChanged -= OnNavigationSelectionChanged;
+            _navigationView.BackRequested -= OnNavigationBackRequested;
+        }
+
+        if (_frame != null)
+        {
+            _frame.Navigated -= OnFrameNavigated;
+        }
+
+        _navigationView = null;
+        _frame = null;
+        _isSynchronizingSelection = false;
+        CurrentRouteKey = null;
+    }
+
+    public FWNavigationRoute RegisterRoute(string routeKey, Type pageType, object? parameter = null)
+    {
+        var route = new FWNavigationRoute(routeKey, pageType, parameter);
+        _routes[route.RouteKey] = route;
+        return route;
+    }
+
+    public FWNavigationRoute RegisterRoute(FWNavigationViewItem item, Type pageType, object? parameter = null)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+
+        var routeKey = string.IsNullOrWhiteSpace(item.RouteKey)
+            ? ResolveRouteKey(item, pageType)
+            : item.RouteKey;
+        item.RouteKey = routeKey;
+
+        var route = new FWNavigationRoute(routeKey, pageType, parameter, item);
+        _routes[route.RouteKey] = route;
+        return route;
+    }
+
+    public bool UnregisterRoute(string routeKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(routeKey);
+
+        if (!_routes.Remove(routeKey))
+        {
+            return false;
+        }
+
+        if (string.Equals(CurrentRouteKey, routeKey, StringComparison.Ordinal))
+        {
+            CurrentRouteKey = null;
+        }
+
+        return true;
+    }
+
+    [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
+    public bool NavigateToRoute(string routeKey, object? parameter = null)
+    {
+        return NavigateToRoute(routeKey, parameter, updateSelection: true);
+    }
+
+    [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
+    public bool GoBack()
+    {
+        if (_frame?.GoBack() == true)
+        {
+            UpdateNavigationViewBackState();
+            return true;
+        }
+
+        return false;
+    }
+
+    [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
+    public bool GoForward()
+    {
+        if (_frame?.GoForward() == true)
+        {
+            UpdateNavigationViewBackState();
+            return true;
+        }
+
+        return false;
+    }
+
+    public FWNavigationServiceDiagnostics GetDiagnostics()
+    {
+        return new FWNavigationServiceDiagnostics(
+            IsAttached,
+            RouteCount,
+            CurrentRouteKey,
+            _frame?.SourcePageType,
+            _frame?.CanGoBack ?? false,
+            _frame?.CanGoForward ?? false,
+            _frame?.BackStackDepth ?? 0,
+            _isSynchronizingSelection);
+    }
+
+    [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
+    private bool NavigateToRoute(string routeKey, object? parameter, bool updateSelection)
+    {
+        if (_frame == null || !_routes.TryGetValue(routeKey, out var route))
+        {
+            return false;
+        }
+
+        var navigationParameter = parameter ?? route.Parameter ?? route.RouteKey;
+        if (!_frame.Navigate(route.PageType, navigationParameter))
+        {
+            UpdateNavigationViewBackState();
+            return false;
+        }
+
+        CurrentRouteKey = route.RouteKey;
+        if (updateSelection)
+        {
+            SynchronizeSelection(route);
+        }
+
+        UpdateNavigationViewBackState();
+        return true;
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "FWNavigationService routes through registered Page types; public navigation APIs carry the trimming annotation.")]
+    private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
+    {
+        if (_isSynchronizingSelection || e.SelectedItem is not FWNavigationViewItem item)
+        {
+            return;
+        }
+
+        var routeKey = ResolveRouteKey(item);
+        if (!string.IsNullOrWhiteSpace(routeKey))
+        {
+            NavigateToRoute(routeKey, null, updateSelection: false);
+        }
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "FWNavigationService routes through registered Page types; public navigation APIs carry the trimming annotation.")]
+    private void OnNavigationBackRequested(object? sender, NavigationViewBackRequestedEventArgs e)
+    {
+        e.Handled = GoBack();
+    }
+
+    private void OnFrameNavigated(object? sender, NavigationEventArgs e)
+    {
+        CurrentRouteKey = ResolveRouteKey(e.SourcePageType);
+        UpdateNavigationViewBackState();
+        SynchronizeSelectionFromFrame();
+
+        if (CurrentRouteKey != null && _routes.TryGetValue(CurrentRouteKey, out var route))
+        {
+            Navigated?.Invoke(this, route);
+        }
+    }
+
+    private void SynchronizeSelectionFromFrame()
+    {
+        var routeKey = _frame?.SourcePageType != null ? ResolveRouteKey(_frame.SourcePageType) : null;
+        if (routeKey != null && _routes.TryGetValue(routeKey, out var route))
+        {
+            CurrentRouteKey = route.RouteKey;
+            SynchronizeSelection(route);
+            return;
+        }
+
+        CurrentRouteKey = null;
+    }
+
+    private void SynchronizeSelection(FWNavigationRoute route)
+    {
+        if (_navigationView == null || route.Item == null || ReferenceEquals(_navigationView.SelectedItem, route.Item))
+        {
+            return;
+        }
+
+        _isSynchronizingSelection = true;
+        try
+        {
+            _navigationView.SelectedItem = route.Item;
+        }
+        finally
+        {
+            _isSynchronizingSelection = false;
+        }
+    }
+
+    private void UpdateNavigationViewBackState()
+    {
+        if (_navigationView != null && _frame != null)
+        {
+            _navigationView.IsBackEnabled = _frame.CanGoBack;
+        }
+    }
+
+    private string? ResolveRouteKey(Type? pageType)
+    {
+        if (pageType == null)
+        {
+            return null;
+        }
+
+        foreach (var route in _routes.Values)
+        {
+            if (route.PageType == pageType)
+            {
+                return route.RouteKey;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ResolveRouteKey(FWNavigationViewItem item)
+    {
+        return string.IsNullOrWhiteSpace(item.RouteKey)
+            ? item.Content?.ToString()
+            : item.RouteKey;
+    }
+
+    private static string ResolveRouteKey(FWNavigationViewItem item, Type pageType)
+    {
+        var contentKey = item.Content?.ToString();
+        return string.IsNullOrWhiteSpace(contentKey) ? pageType.Name : contentKey;
+    }
 }
 
 /// <summary>
@@ -65,6 +381,10 @@ public class FWNavigationView : NavigationView, IFluentJaliumControl
 /// </summary>
 public class FWNavigationViewItem : NavigationViewItem, IFluentJaliumControl
 {
+    public static readonly DependencyProperty RouteKeyProperty =
+        DependencyProperty.Register(nameof(RouteKey), typeof(string), typeof(FWNavigationViewItem),
+            new PropertyMetadata(string.Empty));
+
     public static readonly DependencyProperty DensityProperty =
         DependencyProperty.Register(nameof(Density), typeof(FWNavigationDensity), typeof(FWNavigationViewItem),
             new PropertyMetadata(FWNavigationDensity.Comfortable, OnDensityChanged));
@@ -79,6 +399,13 @@ public class FWNavigationViewItem : NavigationViewItem, IFluentJaliumControl
     {
         get => (FWNavigationDensity)GetValue(DensityProperty)!;
         set => SetValue(DensityProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
+    public string RouteKey
+    {
+        get => (string)(GetValue(RouteKeyProperty) ?? string.Empty);
+        set => SetValue(RouteKeyProperty, value);
     }
 
     internal static (double MinHeight, Thickness Margin) GetItemMetrics(FWNavigationDensity density)
