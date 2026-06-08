@@ -24,15 +24,10 @@ internal sealed class GalleryCatalogFilterPage
 
     public UIElement CreateContent()
     {
-        var matches = _controls
-            .Where(MatchesFilter)
-            .OrderBy(page => page.Group, StringComparer.Ordinal)
-            .ThenBy(page => page.Page.Title, StringComparer.Ordinal)
-            .ThenBy(page => page.Name, StringComparer.Ordinal)
-            .ToArray();
+        var snapshot = CreateSnapshot();
 
         var panel = CreateSection();
-        panel.Children.Add(CreateSummary(matches));
+        panel.Children.Add(CreateSummary(snapshot));
 
         var cards = new FWWrapPanel
         {
@@ -40,12 +35,12 @@ internal sealed class GalleryCatalogFilterPage
             VerticalSpacing = 14
         };
 
-        foreach (var control in matches)
+        foreach (var control in snapshot.Matches)
         {
             cards.Children.Add(CreateControlCard(control));
         }
 
-        if (matches.Length == 0)
+        if (snapshot.Matches.Length == 0)
         {
             cards.Children.Add(CreateEmptyState());
         }
@@ -54,17 +49,9 @@ internal sealed class GalleryCatalogFilterPage
         return panel;
     }
 
-    private bool MatchesFilter(GalleryControlInfo control)
+    internal GalleryCatalogFilterSnapshot CreateSnapshot()
     {
-        return _filter switch
-        {
-            GalleryCatalogFilter.AllControls => true,
-            GalleryCatalogFilter.New => control.IsNew,
-            GalleryCatalogFilter.Updated => control.IsUpdated,
-            GalleryCatalogFilter.Preview => control.Status == GalleryPageStatus.Preview,
-            GalleryCatalogFilter.Diagnostic => control.Status == GalleryPageStatus.Diagnostic,
-            _ => false
-        };
+        return GalleryCatalogFilterSnapshot.Create(_filter, _controls);
     }
 
     private FWStackPanel CreateSection()
@@ -76,14 +63,8 @@ internal sealed class GalleryCatalogFilterPage
         };
     }
 
-    private FWBorder CreateSummary(IReadOnlyCollection<GalleryControlInfo> matches)
+    private FWBorder CreateSummary(GalleryCatalogFilterSnapshot snapshot)
     {
-        var previewCount = matches.Count(control => control.Status == GalleryPageStatus.Preview);
-        var diagnosticCount = matches.Count(control => control.Status == GalleryPageStatus.Diagnostic);
-        var newCount = matches.Count(control => control.IsNew);
-        var updatedCount = matches.Count(control => control.IsUpdated);
-        var pageCount = matches.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count();
-
         return new FWBorder
         {
             Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
@@ -97,12 +78,12 @@ internal sealed class GalleryCatalogFilterPage
                 VerticalSpacing = 8,
                 Children =
                 {
-                    CreateSummaryPill(FluentIconRegular.ControlButton24, $"{matches.Count} controls"),
-                    CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{pageCount} pages"),
-                    CreateSummaryPill(FluentIconRegular.New24, $"{newCount} new"),
-                    CreateSummaryPill(FluentIconRegular.ArrowClockwise24, $"{updatedCount} updated"),
-                    CreateSummaryPill(FluentIconRegular.Sparkle24, $"{previewCount} preview"),
-                    CreateSummaryPill(FluentIconRegular.DataUsage24, $"{diagnosticCount} diagnostic")
+                    CreateSummaryPill(FluentIconRegular.ControlButton24, $"{snapshot.ControlCount} controls"),
+                    CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{snapshot.PageCount} pages"),
+                    CreateSummaryPill(FluentIconRegular.New24, $"{snapshot.NewCount} new"),
+                    CreateSummaryPill(FluentIconRegular.ArrowClockwise24, $"{snapshot.UpdatedCount} updated"),
+                    CreateSummaryPill(FluentIconRegular.Sparkle24, $"{snapshot.PreviewCount} preview"),
+                    CreateSummaryPill(FluentIconRegular.DataUsage24, $"{snapshot.DiagnosticCount} diagnostic")
                 }
             }
         };

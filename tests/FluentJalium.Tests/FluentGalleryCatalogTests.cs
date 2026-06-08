@@ -1,4 +1,5 @@
 using FluentJalium.Gallery.Models;
+using FluentJalium.Gallery.Pages;
 using FluentJalium.Gallery.Services;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -376,6 +377,80 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryCatalogFilterSnapshots_ShouldMatchCatalogMetadata()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var controls = GalleryControlInfo.CreateFromPages(pages);
+        var all = GalleryCatalogFilterSnapshot.Create(GalleryCatalogFilter.AllControls, controls);
+        var newest = GalleryCatalogFilterSnapshot.Create(GalleryCatalogFilter.New, controls);
+        var updated = GalleryCatalogFilterSnapshot.Create(GalleryCatalogFilter.Updated, controls);
+        var preview = GalleryCatalogFilterSnapshot.Create(GalleryCatalogFilter.Preview, controls);
+        var diagnostic = GalleryCatalogFilterSnapshot.Create(GalleryCatalogFilter.Diagnostic, controls);
+
+        Assert.Equal(controls.Length, all.ControlCount);
+        Assert.Equal(controls.Count(control => control.IsNew), all.NewCount);
+        Assert.Equal(controls.Count(control => control.IsUpdated), all.UpdatedCount);
+        Assert.Equal(controls.Count(control => control.Status == GalleryPageStatus.Preview), all.PreviewCount);
+        Assert.Equal(controls.Count(IsDiagnosticCatalogControl), all.DiagnosticCount);
+        Assert.Equal(controls.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count(), all.PageCount);
+
+        Assert.NotEmpty(newest.Matches);
+        Assert.All(newest.Matches, control => Assert.True(control.IsNew));
+        Assert.True(newest.ContainsControl("FWItemsRepeater"));
+
+        Assert.NotEmpty(updated.Matches);
+        Assert.All(updated.Matches, control => Assert.True(control.IsUpdated));
+        Assert.True(updated.ContainsControl("FWTaskDialog"));
+        Assert.True(updated.ContainsControl("FWSnackbar"));
+
+        Assert.NotEmpty(preview.Matches);
+        Assert.All(preview.Matches, control => Assert.Equal(GalleryPageStatus.Preview, control.Status));
+        Assert.True(preview.ContainsControl("FWItemsRepeater"));
+        Assert.True(preview.ContainsControl("FWAnimatedIcon"));
+
+        Assert.NotEmpty(diagnostic.Matches);
+        Assert.All(diagnostic.Matches, control => Assert.True(IsDiagnosticCatalogControl(control)));
+        Assert.True(diagnostic.ContainsControl("FWRefreshContainerDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWAnnotatedScrollBarDiagnostics"));
+    }
+
+    [Fact]
+    public void GalleryCatalogFilterPage_ShouldExposeSnapshotUsedByFilterEntryPages()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var filterPage = new GalleryCatalogFilterPage(GalleryCatalogFilter.Preview, pages);
+
+        var snapshot = filterPage.CreateSnapshot();
+        var content = filterPage.CreateContent();
+
+        Assert.True(snapshot.ControlCount > 0);
+        Assert.Equal(snapshot.ControlCount, snapshot.PreviewCount);
+        Assert.True(snapshot.PageCount > 0);
+        Assert.True(snapshot.ContainsControl("FWItemsRepeater"));
+        Assert.IsAssignableFrom<UIElement>(content);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeCatalogFilterSnapshotSamples()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
+            .Where(page => page.Group == GalleryNavigationGroup.Catalog)
+            .ToArray();
+
+        Assert.Equal(5, pages.Length);
+
+        foreach (var page in pages)
+        {
+            Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+            Assert.Contains("new GalleryCatalogFilterPage", sampleCode);
+            Assert.Contains("CreateSnapshot()", sampleCode);
+            Assert.Contains("snapshot.ControlCount", sampleCode);
+            Assert.Contains("snapshot.PageCount", sampleCode);
+            Assert.DoesNotContain("Generated from", sampleCode);
+        }
+    }
+
+    [Fact]
     public void GalleryCatalogService_ShouldRegisterFactoryForEveryCatalogPage()
     {
         var expectedPageIds = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
@@ -439,5 +514,11 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
         Assert.Contains(firstExpected, sampleCode);
         Assert.Contains(secondExpected, sampleCode);
+    }
+
+    private static bool IsDiagnosticCatalogControl(GalleryControlInfo control)
+    {
+        return control.Status == GalleryPageStatus.Diagnostic
+            || control.Name.Contains("Diagnostics", StringComparison.Ordinal);
     }
 }

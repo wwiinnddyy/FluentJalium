@@ -1221,7 +1221,9 @@ var filterPage = new GalleryCatalogFilterPage(
     GalleryCatalogFilter.{{filter}},
     pageInfos);
 
+var snapshot = filterPage.CreateSnapshot();
 var content = filterPage.CreateContent();
+Debug.WriteLine($"{{filter}}: {snapshot.ControlCount} controls across {snapshot.PageCount} pages.");
 """;
     }
 
