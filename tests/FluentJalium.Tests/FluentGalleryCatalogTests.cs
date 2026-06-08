@@ -310,6 +310,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("DetailLabelRequested", sampleCode);
         Assert.Contains("FWAnnotatedScrollBarDiagnostics", sampleCode);
         Assert.Contains("RegisteredLabelCount", sampleCode);
+        Assert.Contains("pendingRefreshDeferral", sampleCode);
+        Assert.Contains("FormatRefreshContainerDiagnostics", sampleCode);
+        Assert.Contains("Snap requested", sampleCode);
+        Assert.Contains("FormatScrollerDiagnostics", sampleCode);
+        Assert.Contains("FormatAnnotatedScrollBarDetail", sampleCode);
+        Assert.Contains("Error marker", sampleCode);
     }
 
     [Fact]

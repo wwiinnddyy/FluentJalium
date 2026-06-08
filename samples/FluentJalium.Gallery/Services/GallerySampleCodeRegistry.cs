@@ -1047,15 +1047,23 @@ var refreshContainer = new FWRefreshContainer
         }
     }
 };
+RefreshRequestedDeferral? pendingRefreshDeferral = null;
 refreshContainer.RefreshRequested += (_, args) =>
 {
     var deferral = args.GetDeferral();
-    RefreshFeedAsync().ContinueWith(_ => deferral.Complete());
+    pendingRefreshDeferral = deferral;
+    RefreshFeedAsync().ContinueWith(_ =>
+    {
+        deferral.Complete();
+        pendingRefreshDeferral = null;
+    });
 };
 refreshContainer.RequestRefresh();
+pendingRefreshDeferral?.Complete(); // Complete or cancel from Gallery QA buttons.
 
 var refreshDiagnostics = refreshContainer.GetDiagnostics();
 Debug.WriteLine($"RefreshContainer: refreshing {refreshDiagnostics.IsRefreshing}; progress {refreshDiagnostics.PullProgress:P0}; visualizer {refreshDiagnostics.VisualizerState}.");
+Debug.WriteLine(InteractionControlsPage.FormatRefreshContainerDiagnostics("Refresh QA", refreshDiagnostics));
 
 var scroller = new FWScroller
 {
@@ -1089,9 +1097,12 @@ var scrollViewer = new FWScrollViewer
 };
 scroller.AttachScrollViewer(scrollViewer);
 scroller.ScrollTo(0, 80);
+scroller.VerticalSnapPointsType = SnapPointsType.Mandatory;
+scroller.ScrollTo(0, 180);
 
 var diagnostics = scroller.GetViewportDiagnostics();
 Debug.WriteLine($"Scroller viewport: {diagnostics.ViewportWidth}x{diagnostics.ViewportHeight}; offset: {diagnostics.VerticalOffset}; extent: {diagnostics.ExtentHeight}.");
+Debug.WriteLine(InteractionControlsPage.FormatScrollerDiagnostics("Snap requested", scroller, diagnostics));
 
 var annotatedScrollBar = new FWAnnotatedScrollBar
 {
@@ -1108,10 +1119,13 @@ var annotatedScrollBar = new FWAnnotatedScrollBar
 annotatedScrollBar.DetailLabelRequested += (_, args) =>
 {
     Debug.WriteLine($"Annotated label: {args.LabelType} {args.Content} at {args.ScrollOffset}.");
+    Debug.WriteLine(InteractionControlsPage.FormatAnnotatedScrollBarDetail(args, annotatedScrollBar.GetDiagnostics()));
 };
+annotatedScrollBar.Value = 250;
 
 FWAnnotatedScrollBarDiagnostics annotationDiagnostics = annotatedScrollBar.GetDiagnostics();
 Debug.WriteLine($"AnnotatedScrollBar labels: {annotationDiagnostics.RegisteredLabelCount}/{annotationDiagnostics.SourceLabelCount}; value: {annotationDiagnostics.Value}; range: {annotationDiagnostics.Minimum}-{annotationDiagnostics.Maximum}.");
+Debug.WriteLine(InteractionControlsPage.FormatAnnotatedScrollBarDiagnostics("Error marker", annotationDiagnostics));
 """,
         ["status.snackbar"] = """
 var rootHost = new FWSnackbarHost

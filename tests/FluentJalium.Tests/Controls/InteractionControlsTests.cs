@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
@@ -110,6 +111,34 @@ public class FWRefreshContainerTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(container);
+    }
+
+    [Fact]
+    public void GalleryDiagnostics_ShouldFormatRefreshDeferralState()
+    {
+        var text = InteractionControlsPage.FormatRefreshContainerDiagnostics(
+            "Refresh QA",
+            new FWRefreshContainerDiagnostics(
+                RefreshPullDirection.TopToBottom,
+                IsRefreshing: true,
+                IsPulling: false,
+                PullDistance: 50,
+                PullThreshold: 100,
+                MaxPullDistance: 150,
+                PullProgress: 0.5,
+                HasScrollViewer: true,
+                HasRefreshVisualizerBorder: true,
+                HasRefreshIndicator: true,
+                HasCustomVisualizer: true,
+                RefreshVisualizerState.Refreshing));
+
+        Assert.Contains("Refresh QA", text);
+        Assert.Contains("refreshing on", text);
+        Assert.Contains("deferral pending", text);
+        Assert.Contains("progress 50", text);
+        Assert.Contains("distance 50/100/150", text);
+        Assert.Contains("direction TopToBottom", text);
+        Assert.Contains("custom visualizer on", text);
     }
 
     private sealed class TestRefreshVisualizer : RefreshVisualizer
@@ -355,6 +384,37 @@ public class FWScrollerTests
         Assert.IsAssignableFrom<IFluentJaliumControl>(scroller);
     }
 
+    [Fact]
+    public void GalleryDiagnostics_ShouldFormatSnapAndViewportState()
+    {
+        var scroller = new FWScroller
+        {
+            HorizontalSnapPointsType = SnapPointsType.Optional,
+            VerticalSnapPointsType = SnapPointsType.Mandatory,
+            IsAnchoredAtVerticalExtent = true
+        };
+        var text = InteractionControlsPage.FormatScrollerDiagnostics(
+            "Snap requested",
+            scroller,
+            new FWScrollerViewportDiagnostics(
+                HasScrollViewer: true,
+                HorizontalOffset: 12,
+                VerticalOffset: 180,
+                ViewportWidth: 320,
+                ViewportHeight: 180,
+                ExtentWidth: 320,
+                ExtentHeight: 900,
+                ZoomFactor: 1.25));
+
+        Assert.Contains("Snap requested", text);
+        Assert.Contains("offset 12,180", text);
+        Assert.Contains("viewport 320x180", text);
+        Assert.Contains("extent 320x900", text);
+        Assert.Contains("zoom 1.25", text);
+        Assert.Contains("snap H/V Optional/Mandatory", text);
+        Assert.Contains("anchored H/V off/on", text);
+    }
+
     private static ScrollViewer CreateScrollViewer(
         double viewportWidth = 100,
         double viewportHeight = 100,
@@ -456,6 +516,40 @@ public class FWAnnotatedScrollBarTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(scrollBar);
+    }
+
+    [Fact]
+    public void GalleryDiagnostics_ShouldFormatAnnotationDetailState()
+    {
+        var args = new DetailLabelRequestedEventArgs(FWAnnotatedScrollBar.DetailLabelRequestedEvent, new FWAnnotatedScrollBar())
+        {
+            ScrollOffset = 250,
+            Content = "Error",
+            LabelType = ScrollBarLabelType.Error
+        };
+        var text = InteractionControlsPage.FormatAnnotatedScrollBarDetail(
+            args,
+            new FWAnnotatedScrollBarDiagnostics(
+                HasDetailsCanvas: true,
+                SourceLabelCount: 3,
+                RegisteredLabelCount: 3,
+                HasLabels: true,
+                Orientation: Orientation.Vertical,
+                Minimum: 0,
+                Maximum: 500,
+                Value: 250,
+                ViewportSize: 40,
+                TrackLength: 300,
+                LastRequestedScrollOffset: 250,
+                LastRequestedContent: "Error",
+                LastRequestedLabelType: ScrollBarLabelType.Error));
+
+        Assert.Contains("Error: Error at 250", text);
+        Assert.Contains("Detail requested", text);
+        Assert.Contains("labels 3/3", text);
+        Assert.Contains("value 250/500", text);
+        Assert.Contains("viewport 40", text);
+        Assert.Contains("last Error at 250", text);
     }
 }
 
