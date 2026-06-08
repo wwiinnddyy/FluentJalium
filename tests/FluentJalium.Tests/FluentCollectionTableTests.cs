@@ -331,6 +331,41 @@ public sealed class FluentCollectionTableTests
     }
 
     [Fact]
+    public void FWGridView_ShouldUseGridViewPresentationAndPreserveItemState()
+    {
+        var gridView = new FWGridView
+        {
+            Density = FWCollectionDensity.Compact,
+            SelectionMode = Jalium.UI.Controls.Primitives.SelectionMode.Multiple
+        };
+        var first = new CollectionRow("Buttons", "Complete", 9);
+        var second = new CollectionRow("Navigation", "Active", 7);
+        gridView.Items.Add(first);
+        gridView.Items.Add(second);
+
+        Assert.IsType<GridView>(gridView.View);
+        Assert.Equal(new Thickness(2), gridView.Padding);
+
+        gridView.SelectAll();
+
+        Assert.Equal(2, gridView.SelectedItems.Count);
+
+        var generated = Assert.IsType<FWGridViewItem>(new TestGridView
+        {
+            Density = FWCollectionDensity.Spacious
+        }.CreateContainer(second));
+        generated.Content = second;
+        generated.IsSelected = true;
+        generated.IsEnabled = false;
+
+        Assert.Equal(FWCollectionDensity.Spacious, generated.Density);
+        Assert.True(generated.IsSelected);
+        Assert.False(generated.IsEnabled);
+        Assert.Same(second, generated.Content);
+        Assert.IsAssignableFrom<ListViewItem>(generated);
+    }
+
+    [Fact]
     public void FWDataGrid_ShouldToggleTableOptionsAndSynchronizeExtendedSelection()
     {
         var rows = new[]
