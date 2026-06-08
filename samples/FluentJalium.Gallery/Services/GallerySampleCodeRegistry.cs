@@ -523,7 +523,11 @@ taskDialog.PrimaryButtonClick += (_, args) =>
     Debug.WriteLine($"Primary requested. Command executed: {args.CommandExecuted}");
 };
 
-var result = await host.ShowAsync(taskDialog);
+var showTask = host.ShowAsync(taskDialog);
+var diagnostics = host.GetDiagnostics();
+Debug.WriteLine($"TaskDialog open: {diagnostics.IsOpen}; focus trap: {diagnostics.IsFocusTrapEnabled}.");
+
+var result = await showTask;
 Debug.WriteLine($"TaskDialog completed with {result}.");
 """,
         ["disclosure.settings.teachingtip"] = """

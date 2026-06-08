@@ -227,6 +227,30 @@ public sealed class FWTaskDialogClosedEventArgs : EventArgs
 }
 
 /// <summary>
+/// Describes the last keyboard request handled by <see cref="FWTaskDialogHost"/>.
+/// </summary>
+public enum FWTaskDialogHostKeyboardRequest
+{
+    None,
+    EscapeCancel,
+    TabForward,
+    TabBackward
+}
+
+/// <summary>
+/// Lightweight state snapshot for host-level dialog diagnostics and Gallery samples.
+/// </summary>
+public readonly record struct FWTaskDialogHostDiagnostics(
+    bool IsOpen,
+    bool HasCurrentDialog,
+    bool IsLightDismissEnabled,
+    bool IsFocusTrapEnabled,
+    bool RestoreFocusOnClose,
+    bool HasFocusRestoreTarget,
+    FWTaskDialogHostKeyboardRequest LastKeyboardRequest,
+    bool LastKeyboardRequestHandled);
+
+/// <summary>
 /// FluentJalium TaskDialog control for command confirmation and rich status prompts.
 /// </summary>
 public class FWTaskDialog : ContentControl, IFluentJaliumControl
@@ -792,19 +816,42 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
     public bool FocusDefaultButton()
     {
+        return FocusButtonCandidate(
+            DefaultButton,
+            FWTaskDialogButton.Primary,
+            FWTaskDialogButton.Secondary,
+            FWTaskDialogButton.Close);
+    }
+
+    public bool FocusFirstAvailableButton()
+    {
+        return FocusButtonCandidate(
+            FWTaskDialogButton.Primary,
+            FWTaskDialogButton.Secondary,
+            FWTaskDialogButton.Close);
+    }
+
+    public bool FocusLastAvailableButton()
+    {
+        return FocusButtonCandidate(
+            FWTaskDialogButton.Close,
+            FWTaskDialogButton.Secondary,
+            FWTaskDialogButton.Primary);
+    }
+
+    private bool FocusButtonCandidate(params FWTaskDialogButton[] candidates)
+    {
         if (!IsOpen)
         {
             return false;
         }
 
-        var button = ButtonFor(DefaultButton)
-            ?? ButtonFor(FWTaskDialogButton.Primary)
-            ?? ButtonFor(FWTaskDialogButton.Secondary)
-            ?? ButtonFor(FWTaskDialogButton.Close);
-
-        if (button != null)
+        foreach (var candidate in candidates)
         {
-            return button.Focus();
+            if (ButtonFor(candidate) is { } button)
+            {
+                return button.Focus();
+            }
         }
 
         return Focus();
@@ -892,6 +939,8 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
             new PropertyMetadata(null));
 
     private Task<FWTaskDialogResult>? _currentShowTask;
+    private FWTaskDialogHostKeyboardRequest _lastKeyboardRequest;
+    private bool _lastKeyboardRequestHandled;
 
     public FWTaskDialogHost()
     {
@@ -931,6 +980,25 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
     {
         get => (UIElement?)GetValue(FocusRestoreTargetProperty);
         set => SetValue(FocusRestoreTargetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWTaskDialogHostKeyboardRequest LastKeyboardRequest => _lastKeyboardRequest;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool LastKeyboardRequestHandled => _lastKeyboardRequestHandled;
+
+    public FWTaskDialogHostDiagnostics GetDiagnostics()
+    {
+        return new FWTaskDialogHostDiagnostics(
+            IsOpen,
+            CurrentDialog != null,
+            IsLightDismissEnabled,
+            IsFocusTrapEnabled,
+            RestoreFocusOnClose,
+            FocusRestoreTarget != null,
+            LastKeyboardRequest,
+            LastKeyboardRequestHandled);
     }
 
     public Task<FWTaskDialogResult> ShowAsync(FWTaskDialog dialog, CancellationToken cancellationToken = default)
@@ -991,6 +1059,7 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
     private void AttachDialog(FWTaskDialog dialog)
     {
         dialog.Closed += OnCurrentDialogClosed;
+        RecordKeyboardRequest(FWTaskDialogHostKeyboardRequest.None, handled: false);
         SetValue(CurrentDialogPropertyKey.DependencyProperty, dialog);
         SetValue(IsOpenPropertyKey.DependencyProperty, true);
         Content = dialog;
@@ -1037,14 +1106,41 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
         {
             _ = RequestCancel();
             e.Handled = true;
+            RecordKeyboardRequest(FWTaskDialogHostKeyboardRequest.EscapeCancel, handled: true);
             return;
         }
 
         if (IsFocusTrapEnabled && e.Key == Key.Tab)
         {
-            _ = CurrentDialog?.FocusDefaultButton();
+            var request = e.IsShiftDown
+                ? FWTaskDialogHostKeyboardRequest.TabBackward
+                : FWTaskDialogHostKeyboardRequest.TabForward;
+            if (e.IsShiftDown)
+            {
+                _ = CurrentDialog?.FocusLastAvailableButton();
+            }
+            else
+            {
+                _ = CurrentDialog?.FocusFirstAvailableButton();
+            }
+
             e.Handled = true;
+            RecordKeyboardRequest(request, handled: true);
+            return;
         }
+
+        if (e.Key == Key.Tab)
+        {
+            RecordKeyboardRequest(
+                e.IsShiftDown ? FWTaskDialogHostKeyboardRequest.TabBackward : FWTaskDialogHostKeyboardRequest.TabForward,
+                handled: false);
+        }
+    }
+
+    private void RecordKeyboardRequest(FWTaskDialogHostKeyboardRequest request, bool handled)
+    {
+        _lastKeyboardRequest = request;
+        _lastKeyboardRequestHandled = handled;
     }
 }
 

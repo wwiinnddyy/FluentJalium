@@ -507,6 +507,13 @@ public sealed class FluentDisclosureControlsTests
         Assert.Same(dialog, host.CurrentDialog);
         Assert.Same(dialog, host.Content);
         Assert.True(dialog.IsOpen);
+        var diagnostics = host.GetDiagnostics();
+        Assert.True(diagnostics.IsOpen);
+        Assert.True(diagnostics.HasCurrentDialog);
+        Assert.True(diagnostics.IsLightDismissEnabled);
+        Assert.True(diagnostics.IsFocusTrapEnabled);
+        Assert.True(diagnostics.RestoreFocusOnClose);
+        Assert.True(diagnostics.HasFocusRestoreTarget);
 
         Assert.True(dialog.RequestPrimaryButtonClick());
 
@@ -592,6 +599,8 @@ public sealed class FluentDisclosureControlsTests
         host.RaiseEvent(tabArgs);
 
         Assert.True(tabArgs.Handled);
+        Assert.Equal(FWTaskDialogHostKeyboardRequest.TabForward, host.LastKeyboardRequest);
+        Assert.True(host.LastKeyboardRequestHandled);
         Assert.True(host.IsOpen);
         Assert.Same(dialog, host.CurrentDialog);
 
@@ -608,10 +617,86 @@ public sealed class FluentDisclosureControlsTests
         var result = await showTask;
 
         Assert.True(escapeArgs.Handled);
+        Assert.Equal(FWTaskDialogHostKeyboardRequest.EscapeCancel, host.GetDiagnostics().LastKeyboardRequest);
+        Assert.True(host.GetDiagnostics().LastKeyboardRequestHandled);
         Assert.Equal(FWTaskDialogResult.Secondary, result);
         Assert.Equal(1, secondaryCommand.ExecuteCount);
         Assert.Equal("archive", secondaryCommand.LastParameter);
         Assert.False(host.IsOpen);
+    }
+
+    [Fact]
+    public async Task FWTaskDialogHost_ShouldExposeFocusDiagnosticsAndReuseCurrentDialogTask()
+    {
+        var host = new FWTaskDialogHost
+        {
+            IsFocusTrapEnabled = false,
+            RestoreFocusOnClose = false
+        };
+        var dialog = new FWTaskDialog
+        {
+            Title = "Replace runtime settings?",
+            PrimaryButtonText = "Replace",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Close
+        };
+        var otherDialog = new FWTaskDialog
+        {
+            Title = "Other dialog",
+            CloseButtonText = "Close"
+        };
+
+        var showTask = host.ShowAsync(dialog);
+        var duplicateTask = host.ShowAsync(dialog);
+
+        Assert.Same(showTask, duplicateTask);
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            _ = host.ShowAsync(otherDialog);
+        });
+
+        var shiftTabArgs = new KeyEventArgs(
+            UIElement.KeyDownEvent,
+            Key.Tab,
+            ModifierKeys.Shift,
+            isDown: true,
+            isRepeat: false,
+            timestamp: 0);
+
+        host.RaiseEvent(shiftTabArgs);
+
+        Assert.False(shiftTabArgs.Handled);
+        Assert.Equal(FWTaskDialogHostKeyboardRequest.TabBackward, host.LastKeyboardRequest);
+        Assert.False(host.LastKeyboardRequestHandled);
+        var diagnostics = host.GetDiagnostics();
+        Assert.True(diagnostics.IsOpen);
+        Assert.True(diagnostics.HasCurrentDialog);
+        Assert.False(diagnostics.IsFocusTrapEnabled);
+        Assert.False(diagnostics.RestoreFocusOnClose);
+        Assert.False(diagnostics.HasFocusRestoreTarget);
+
+        host.IsFocusTrapEnabled = true;
+        var tabArgs = new KeyEventArgs(
+            UIElement.KeyDownEvent,
+            Key.Tab,
+            ModifierKeys.None,
+            isDown: true,
+            isRepeat: false,
+            timestamp: 0);
+
+        host.RaiseEvent(tabArgs);
+
+        Assert.True(tabArgs.Handled);
+        Assert.Equal(FWTaskDialogHostKeyboardRequest.TabForward, host.LastKeyboardRequest);
+        Assert.True(host.LastKeyboardRequestHandled);
+
+        Assert.True(host.Close(FWTaskDialogResult.Close));
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Close, result);
+        Assert.False(host.IsOpen);
+        Assert.False(host.GetDiagnostics().HasCurrentDialog);
     }
 
     [Fact]
