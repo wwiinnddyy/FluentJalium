@@ -22,10 +22,32 @@ public enum FWItemsRepeaterRealizationMode
 }
 
 /// <summary>
+/// Describes where <see cref="FWItemsRepeater"/> receives its realization window.
+/// </summary>
+public enum FWItemsRepeaterRealizationSource
+{
+    /// <summary>
+    /// The full item set is realized.
+    /// </summary>
+    All,
+
+    /// <summary>
+    /// The window was explicitly requested through <see cref="FWItemsRepeater.RealizeRange"/>.
+    /// </summary>
+    Manual,
+
+    /// <summary>
+    /// The window was calculated from viewport and cache metrics.
+    /// </summary>
+    Viewport
+}
+
+/// <summary>
 /// Snapshot of realized item and recycle-pool state for <see cref="FWItemsRepeater"/>.
 /// </summary>
 public readonly record struct FWItemsRepeaterDiagnostics(
     FWItemsRepeaterRealizationMode RealizationMode,
+    FWItemsRepeaterRealizationSource RealizationSource,
     int ItemCount,
     int RealizedElementCount,
     int RecycledElementCount,
@@ -33,6 +55,11 @@ public readonly record struct FWItemsRepeaterDiagnostics(
     int LastRealizedIndex,
     int RequestedFirstRealizedIndex,
     int RequestedRealizedItemCount,
+    double ViewportStart,
+    double ViewportLength,
+    Orientation ViewportOrientation,
+    double EstimatedItemExtent,
+    double ActiveCacheLength,
     double HorizontalCacheLength,
     double VerticalCacheLength,
     int LastCreatedElementCount,
@@ -62,6 +89,8 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     private int _lastCreatedElementCount;
     private int _lastReusedElementCount;
     private bool _hasRealizationRange;
+    private FWItemsRepeaterRealizationSource _realizationSource = FWItemsRepeaterRealizationSource.All;
+    private Orientation _viewportOrientation = Orientation.Vertical;
 
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FWItemsRepeater),
@@ -77,11 +106,23 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
 
     public static readonly DependencyProperty HorizontalCacheLengthProperty =
         DependencyProperty.Register(nameof(HorizontalCacheLength), typeof(double), typeof(FWItemsRepeater),
-            new PropertyMetadata(0.0));
+            new PropertyMetadata(0.0, OnViewportMetricChanged));
 
     public static readonly DependencyProperty VerticalCacheLengthProperty =
         DependencyProperty.Register(nameof(VerticalCacheLength), typeof(double), typeof(FWItemsRepeater),
-            new PropertyMetadata(0.0));
+            new PropertyMetadata(0.0, OnViewportMetricChanged));
+
+    public static readonly DependencyProperty EstimatedItemExtentProperty =
+        DependencyProperty.Register(nameof(EstimatedItemExtent), typeof(double), typeof(FWItemsRepeater),
+            new PropertyMetadata(0.0, OnViewportMetricChanged));
+
+    public static readonly DependencyProperty ViewportStartProperty =
+        DependencyProperty.Register(nameof(ViewportStart), typeof(double), typeof(FWItemsRepeater),
+            new PropertyMetadata(0.0, OnViewportMetricChanged));
+
+    public static readonly DependencyProperty ViewportLengthProperty =
+        DependencyProperty.Register(nameof(ViewportLength), typeof(double), typeof(FWItemsRepeater),
+            new PropertyMetadata(0.0, OnViewportMetricChanged));
 
     public static readonly DependencyProperty AnimatorProperty =
         DependencyProperty.Register(nameof(Animator), typeof(ElementAnimator), typeof(FWItemsRepeater),
@@ -145,6 +186,36 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     }
 
     /// <summary>
+    /// Gets or sets the estimated item extent in the scroll direction used to convert viewport pixels into item indices.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double EstimatedItemExtent
+    {
+        get => (double)GetValue(EstimatedItemExtentProperty)!;
+        set => SetValue(EstimatedItemExtentProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the viewport start offset in the scroll direction.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double ViewportStart
+    {
+        get => (double)GetValue(ViewportStartProperty)!;
+        set => SetValue(ViewportStartProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the viewport length in the scroll direction.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public double ViewportLength
+    {
+        get => (double)GetValue(ViewportLengthProperty)!;
+        set => SetValue(ViewportLengthProperty, value);
+    }
+
+    /// <summary>
     /// Gets or sets the animator for element transitions.
     /// </summary>
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
@@ -157,6 +228,12 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public FWItemsRepeaterRealizationMode RealizationMode =>
         _hasRealizationRange ? FWItemsRepeaterRealizationMode.Range : FWItemsRepeaterRealizationMode.All;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWItemsRepeaterRealizationSource RealizationSource => _realizationSource;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public Orientation ViewportOrientation => _viewportOrientation;
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public int ItemCount => _items.Count;
@@ -219,9 +296,55 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         }
 
         _hasRealizationRange = true;
+        _realizationSource = FWItemsRepeaterRealizationSource.Manual;
         _realizationStartIndex = startIndex;
         _realizationItemCount = itemCount;
         RefreshItems();
+    }
+
+    /// <summary>
+    /// Calculates and realizes the item range that intersects a viewport plus cache length.
+    /// </summary>
+    public void ApplyViewport(double viewportStart, double viewportLength)
+    {
+        ApplyViewport(viewportStart, viewportLength, Orientation.Vertical);
+    }
+
+    /// <summary>
+    /// Calculates and realizes the item range that intersects a viewport plus cache length.
+    /// </summary>
+    public void ApplyViewport(double viewportStart, double viewportLength, Orientation orientation)
+    {
+        if (!IsFiniteNonNegative(viewportStart))
+        {
+            throw new ArgumentOutOfRangeException(nameof(viewportStart), "Viewport start must be a finite, non-negative value.");
+        }
+
+        if (!IsFiniteNonNegative(viewportLength))
+        {
+            throw new ArgumentOutOfRangeException(nameof(viewportLength), "Viewport length must be a finite, non-negative value.");
+        }
+
+        _viewportOrientation = orientation;
+        ViewportStart = viewportStart;
+        ViewportLength = viewportLength;
+        ApplyViewportRealizationWindow();
+    }
+
+    /// <summary>
+    /// Calculates and realizes the item range that intersects a <see cref="ScrollViewer"/> viewport.
+    /// </summary>
+    public void ApplyViewport(ScrollViewer scrollViewer, Orientation orientation = Orientation.Vertical)
+    {
+        ArgumentNullException.ThrowIfNull(scrollViewer);
+
+        if (orientation == Orientation.Horizontal)
+        {
+            ApplyViewport(scrollViewer.HorizontalOffset, scrollViewer.ViewportWidth, Orientation.Horizontal);
+            return;
+        }
+
+        ApplyViewport(scrollViewer.VerticalOffset, scrollViewer.ViewportHeight, Orientation.Vertical);
     }
 
     /// <summary>
@@ -235,6 +358,7 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         }
 
         _hasRealizationRange = false;
+        _realizationSource = FWItemsRepeaterRealizationSource.All;
         _realizationStartIndex = 0;
         _realizationItemCount = int.MaxValue;
         RefreshItems();
@@ -247,6 +371,7 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     {
         return new FWItemsRepeaterDiagnostics(
             RealizationMode,
+            RealizationSource,
             ItemCount,
             RealizedElementCount,
             RecycledElementCount,
@@ -254,6 +379,11 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
             LastRealizedIndex,
             RequestedFirstRealizedIndex,
             RequestedRealizedItemCount,
+            ViewportStart,
+            ViewportLength,
+            ViewportOrientation,
+            EstimatedItemExtent,
+            GetActiveCacheLength(),
             HorizontalCacheLength,
             VerticalCacheLength,
             _lastCreatedElementCount,
@@ -343,6 +473,14 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         }
     }
 
+    private static void OnViewportMetricChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWItemsRepeater repeater && repeater.RealizationSource == FWItemsRepeaterRealizationSource.Viewport)
+        {
+            repeater.ApplyViewportRealizationWindow();
+        }
+    }
+
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         RefreshItems();
@@ -421,6 +559,33 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         return (startIndex, startIndex + realizedCount);
     }
 
+    private void ApplyViewportRealizationWindow()
+    {
+        if (EstimatedItemExtent <= 0 || !IsFinite(EstimatedItemExtent))
+        {
+            _hasRealizationRange = false;
+            _realizationSource = FWItemsRepeaterRealizationSource.All;
+            _realizationStartIndex = 0;
+            _realizationItemCount = int.MaxValue;
+            RefreshItems();
+            return;
+        }
+
+        var activeCacheLength = GetActiveCacheLength();
+        var cacheBefore = activeCacheLength;
+        var cacheAfter = activeCacheLength;
+        var windowStart = Math.Max(0, ViewportStart - cacheBefore);
+        var windowEnd = Math.Max(windowStart, ViewportStart + ViewportLength + cacheAfter);
+        var startIndex = (int)Math.Floor(windowStart / EstimatedItemExtent);
+        var endIndex = (int)Math.Ceiling(windowEnd / EstimatedItemExtent);
+
+        _hasRealizationRange = true;
+        _realizationSource = FWItemsRepeaterRealizationSource.Viewport;
+        _realizationStartIndex = Math.Max(0, startIndex);
+        _realizationItemCount = Math.Max(0, endIndex - _realizationStartIndex);
+        RefreshItems();
+    }
+
     private FrameworkElement? GetOrCreateElement()
     {
         if (_recyclePool.Count > 0)
@@ -497,6 +662,24 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         }
 
         return last;
+    }
+
+    private static bool IsFiniteNonNegative(double value)
+    {
+        return value >= 0 && IsFinite(value);
+    }
+
+    private static bool IsFinite(double value)
+    {
+        return !double.IsNaN(value) && !double.IsInfinity(value);
+    }
+
+    private double GetActiveCacheLength()
+    {
+        var cacheLength = _viewportOrientation == Orientation.Horizontal
+            ? HorizontalCacheLength
+            : VerticalCacheLength;
+        return IsFinite(cacheLength) ? Math.Max(0, cacheLength) : 0;
     }
 }
 

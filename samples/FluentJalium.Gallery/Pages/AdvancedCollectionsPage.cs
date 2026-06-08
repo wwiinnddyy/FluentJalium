@@ -16,6 +16,7 @@ namespace FluentJalium.Gallery.Pages;
 public class AdvancedCollectionsPage : Page
 {
     private FWItemsRepeater? _repeater;
+    private ScrollViewer? _repeaterScrollViewer;
     private TextBlock? _repeaterDiagnosticsText;
     private ObservableCollection<SampleItem> _items;
 
@@ -161,6 +162,20 @@ public class AdvancedCollectionsPage : Page
         };
         allItemsButton.Click += (s, e) => ResetRealizationWindow();
 
+        var viewportButton = new Button
+        {
+            Content = "Viewport",
+            MinWidth = 100
+        };
+        viewportButton.Click += (s, e) => ApplyViewportWindow();
+
+        var cacheButton = new Button
+        {
+            Content = "Cache 80/200",
+            MinWidth = 120
+        };
+        cacheButton.Click += (s, e) => ToggleViewportCache();
+
         _repeaterDiagnosticsText = new TextBlock
         {
             FontSize = 13,
@@ -175,6 +190,8 @@ public class AdvancedCollectionsPage : Page
         panel.Children.Add(firstWindowButton);
         panel.Children.Add(laterWindowButton);
         panel.Children.Add(allItemsButton);
+        panel.Children.Add(viewportButton);
+        panel.Children.Add(cacheButton);
 
         stack.Children.Add(panel);
         stack.Children.Add(_repeaterDiagnosticsText);
@@ -193,10 +210,17 @@ public class AdvancedCollectionsPage : Page
             Padding = new Thickness(12)
         };
 
-        var scrollViewer = new ScrollViewer
+        _repeaterScrollViewer = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+        };
+        _repeaterScrollViewer.ScrollChanged += (_, _) =>
+        {
+            if (_repeater?.RealizationSource == FWItemsRepeaterRealizationSource.Viewport)
+            {
+                ApplyViewportWindow();
+            }
         };
 
         _repeater = new FWItemsRepeater
@@ -209,11 +233,13 @@ public class AdvancedCollectionsPage : Page
                 Spacing = 8
             },
             HorizontalCacheLength = 200,
-            VerticalCacheLength = 200
+            VerticalCacheLength = 80,
+            EstimatedItemExtent = 98
         };
 
-        scrollViewer.Content = _repeater;
-        border.Child = scrollViewer;
+        _repeaterScrollViewer.Content = _repeater;
+        border.Child = _repeaterScrollViewer;
+        ApplyViewportWindow();
         UpdateRepeaterDiagnostics();
 
         return border;
@@ -322,6 +348,38 @@ public class AdvancedCollectionsPage : Page
         UpdateRepeaterDiagnostics();
     }
 
+    private void ApplyViewportWindow()
+    {
+        if (_repeater == null || _repeaterScrollViewer == null)
+        {
+            return;
+        }
+
+        var viewportLength = _repeaterScrollViewer.ViewportHeight > 0
+            ? _repeaterScrollViewer.ViewportHeight
+            : 360;
+        _repeater.ApplyViewport(_repeaterScrollViewer.VerticalOffset, viewportLength);
+        UpdateRepeaterDiagnostics();
+    }
+
+    private void ToggleViewportCache()
+    {
+        if (_repeater == null)
+        {
+            return;
+        }
+
+        _repeater.VerticalCacheLength = Math.Abs(_repeater.VerticalCacheLength - 80) < 0.1 ? 200 : 80;
+        if (_repeater.RealizationSource == FWItemsRepeaterRealizationSource.Viewport)
+        {
+            ApplyViewportWindow();
+        }
+        else
+        {
+            UpdateRepeaterDiagnostics();
+        }
+    }
+
     private void UpdateRepeaterDiagnostics()
     {
         if (_repeater == null || _repeaterDiagnosticsText == null)
@@ -334,7 +392,7 @@ public class AdvancedCollectionsPage : Page
             ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
             : "none";
         _repeaterDiagnosticsText.Text =
-            $"Mode: {diagnostics.RealizationMode} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Range: {range} | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
+            $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
     }
 
     private ObservableCollection<SampleItem> GenerateSampleItems()

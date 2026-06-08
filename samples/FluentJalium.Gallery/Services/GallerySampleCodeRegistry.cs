@@ -302,11 +302,26 @@ var repeater = new FWItemsRepeater
         Spacing = 8
     },
     HorizontalCacheLength = 200,
-    VerticalCacheLength = 200
+    VerticalCacheLength = 80,
+    EstimatedItemExtent = 48
 };
 
-repeater.RealizeRange(0, 5);
+var scrollViewer = new FWScrollViewer
+{
+    Content = repeater
+};
+
+scrollViewer.ScrollChanged += (_, _) =>
+{
+    repeater.ApplyViewport(scrollViewer.VerticalOffset, scrollViewer.ViewportHeight);
+};
+
+repeater.ApplyViewport(0, 160);
 var diagnostics = repeater.GetDiagnostics();
+Debug.WriteLine($"Viewport source: {diagnostics.RealizationSource}; window: {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}.");
+repeater.ApplyViewport(0, 160, Orientation.Horizontal);
+
+repeater.RealizeRange(0, 5);
 repeater.ResetRealizationWindow();
 """,
         ["collections.gridview"] = """

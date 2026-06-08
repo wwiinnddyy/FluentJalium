@@ -22,6 +22,7 @@ public class FWItemsRepeaterTests
         Assert.Equal(0.0, repeater.VerticalCacheLength);
         Assert.Null(repeater.Animator);
         Assert.Equal(FWItemsRepeaterRealizationMode.All, repeater.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.All, repeater.RealizationSource);
         Assert.Equal(0, repeater.ItemCount);
         Assert.Equal(0, repeater.RealizedElementCount);
         Assert.Equal(0, repeater.RecycledElementCount);
@@ -29,6 +30,12 @@ public class FWItemsRepeaterTests
         Assert.Equal(-1, repeater.LastRealizedIndex);
         Assert.Equal(0, repeater.RequestedFirstRealizedIndex);
         Assert.Equal(0, repeater.RequestedRealizedItemCount);
+        Assert.Equal(0, repeater.ViewportStart);
+        Assert.Equal(0, repeater.ViewportLength);
+        Assert.Equal(Orientation.Vertical, repeater.ViewportOrientation);
+        Assert.Equal(0, repeater.EstimatedItemExtent);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+        Assert.Equal(0, diagnostics.ActiveCacheLength);
         Assert.False(diagnostics.HasRealizedElements);
         Assert.False(diagnostics.HasRecycledElements);
     }
@@ -131,6 +138,7 @@ public class FWItemsRepeaterTests
         // Assert
         Assert.NotNull(element);
         Assert.Equal(FWItemsRepeaterRealizationMode.All, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.All, diagnostics.RealizationSource);
         Assert.Equal(3, diagnostics.ItemCount);
         Assert.Equal(3, diagnostics.RealizedElementCount);
         Assert.Equal(0, diagnostics.RecycledElementCount);
@@ -138,6 +146,11 @@ public class FWItemsRepeaterTests
         Assert.Equal(2, diagnostics.LastRealizedIndex);
         Assert.Equal(0, diagnostics.RequestedFirstRealizedIndex);
         Assert.Equal(3, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(0, diagnostics.ViewportStart);
+        Assert.Equal(0, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+        Assert.Equal(0, diagnostics.EstimatedItemExtent);
+        Assert.Equal(240, diagnostics.ActiveCacheLength);
         Assert.Equal(120, diagnostics.HorizontalCacheLength);
         Assert.Equal(240, diagnostics.VerticalCacheLength);
         Assert.Equal(3, diagnostics.LastCreatedElementCount);
@@ -163,6 +176,7 @@ public class FWItemsRepeaterTests
 
         // Assert
         Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Manual, diagnostics.RealizationSource);
         Assert.Equal(6, diagnostics.ItemCount);
         Assert.Equal(3, diagnostics.RealizedElementCount);
         Assert.Equal(3, diagnostics.RecycledElementCount);
@@ -199,6 +213,7 @@ public class FWItemsRepeaterTests
         // Assert
         Assert.NotNull(firstWindowElement);
         Assert.Equal(FWItemsRepeaterRealizationMode.Range, movedDiagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Manual, movedDiagnostics.RealizationSource);
         Assert.Equal(2, movedDiagnostics.RealizedElementCount);
         Assert.Equal(4, movedDiagnostics.RecycledElementCount);
         Assert.Equal(3, movedDiagnostics.FirstRealizedIndex);
@@ -206,6 +221,7 @@ public class FWItemsRepeaterTests
         Assert.Equal(0, movedDiagnostics.LastCreatedElementCount);
         Assert.Equal(2, movedDiagnostics.LastReusedElementCount);
         Assert.Equal(FWItemsRepeaterRealizationMode.All, resetDiagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.All, resetDiagnostics.RealizationSource);
         Assert.Equal(6, resetDiagnostics.RealizedElementCount);
         Assert.Equal(0, resetDiagnostics.RecycledElementCount);
         Assert.Equal(0, resetDiagnostics.FirstRealizedIndex);
@@ -230,6 +246,7 @@ public class FWItemsRepeaterTests
 
         // Assert
         Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Manual, diagnostics.RealizationSource);
         Assert.Equal(3, diagnostics.ItemCount);
         Assert.Equal(0, diagnostics.RealizedElementCount);
         Assert.Equal(3, diagnostics.RecycledElementCount);
@@ -272,11 +289,164 @@ public class FWItemsRepeaterTests
 
         // Assert
         Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Manual, diagnostics.RealizationSource);
         Assert.Equal(4, diagnostics.ItemCount);
         Assert.Equal(2, diagnostics.RealizedElementCount);
         Assert.Equal(1, diagnostics.RecycledElementCount);
         Assert.Equal(0, diagnostics.LastCreatedElementCount);
         Assert.Equal(2, diagnostics.LastReusedElementCount);
+    }
+
+    [Fact]
+    public void ApplyViewport_ShouldRealizeViewportWindowWithCache()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 20,
+            VerticalCacheLength = 20
+        };
+
+        // Act
+        repeater.ApplyViewport(50, 60);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(1, diagnostics.FirstRealizedIndex);
+        Assert.Equal(6, diagnostics.LastRealizedIndex);
+        Assert.Equal(1, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(6, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(50, diagnostics.ViewportStart);
+        Assert.Equal(60, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+        Assert.Equal(20, diagnostics.EstimatedItemExtent);
+        Assert.Equal(20, diagnostics.ActiveCacheLength);
+        Assert.Equal(20, diagnostics.VerticalCacheLength);
+        Assert.Null(repeater.TryGetElement(0));
+        Assert.NotNull(repeater.TryGetElement(1));
+        Assert.NotNull(repeater.TryGetElement(6));
+        Assert.Null(repeater.TryGetElement(7));
+    }
+
+    [Fact]
+    public void ApplyViewport_WhenCacheLengthChanges_ShouldRecalculateViewportWindow()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 10,
+            VerticalCacheLength = 0
+        };
+        repeater.ApplyViewport(30, 20);
+
+        // Act
+        repeater.VerticalCacheLength = 10;
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(2, diagnostics.FirstRealizedIndex);
+        Assert.Equal(5, diagnostics.LastRealizedIndex);
+        Assert.Equal(2, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(4, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(10, diagnostics.ActiveCacheLength);
+    }
+
+    [Fact]
+    public void ApplyViewport_WithoutEstimatedItemExtent_ShouldRealizeAllItems()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = new[] { "A", "B", "C" }
+        };
+
+        // Act
+        repeater.ApplyViewport(40, 120);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationMode.All, diagnostics.RealizationMode);
+        Assert.Equal(FWItemsRepeaterRealizationSource.All, diagnostics.RealizationSource);
+        Assert.Equal(3, diagnostics.RealizedElementCount);
+        Assert.Equal(0, diagnostics.FirstRealizedIndex);
+        Assert.Equal(2, diagnostics.LastRealizedIndex);
+        Assert.Equal(40, diagnostics.ViewportStart);
+        Assert.Equal(120, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+    }
+
+    [Fact]
+    public void ApplyViewport_WithInvalidMetrics_ShouldThrow()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater();
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() => repeater.ApplyViewport(-1, 100));
+        Assert.Throws<ArgumentOutOfRangeException>(() => repeater.ApplyViewport(0, double.NaN));
+    }
+
+    [Fact]
+    public void ApplyViewport_WithScrollViewer_ShouldUseVerticalViewportMetrics()
+    {
+        // Arrange
+        var scrollViewer = new ScrollViewer
+        {
+            Height = 30
+        };
+        scrollViewer.ScrollToVerticalOffset(20);
+
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 10).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 10
+        };
+
+        // Act
+        repeater.ApplyViewport(scrollViewer);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(scrollViewer.VerticalOffset, diagnostics.ViewportStart);
+        Assert.Equal(scrollViewer.ViewportHeight, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+    }
+
+    [Fact]
+    public void ApplyViewport_WithHorizontalOrientation_ShouldUseHorizontalCacheLength()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 25,
+            HorizontalCacheLength = 50,
+            VerticalCacheLength = 0
+        };
+
+        // Act
+        repeater.ApplyViewport(100, 50, Orientation.Horizontal);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(Orientation.Horizontal, diagnostics.ViewportOrientation);
+        Assert.Equal(50, diagnostics.ActiveCacheLength);
+        Assert.Equal(2, diagnostics.FirstRealizedIndex);
+        Assert.Equal(7, diagnostics.LastRealizedIndex);
+        Assert.Equal(2, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(6, diagnostics.RequestedRealizedItemCount);
     }
 
     private static DataTemplate CreateTextTemplate()
