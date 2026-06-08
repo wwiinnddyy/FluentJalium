@@ -55,8 +55,23 @@ public sealed class FluentGalleryCatalogTests
 
         var splitView = Assert.Single(controls, control => control.Name == "FWSplitView");
         Assert.True(splitView.IsUpdated);
-        Assert.Equal("layout.settingscard", splitView.SampleCodeKey);
+        Assert.Equal("layout.splitview.settingscard", splitView.SampleCodeKey);
         Assert.Contains("ContentControl", splitView.BaseClasses);
         Assert.Equal("/Layout/FWSplitView", splitView.SourcePath);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeSplitViewAndSettingsCardLayoutSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "contentandlayout");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWSplitView", sampleCode);
+        Assert.Contains("FWSplitViewDisplayMode.CompactInline", sampleCode);
+        Assert.Contains("ActualPaneLength", sampleCode);
+        Assert.Contains("new FWSettingsCard", sampleCode);
+        Assert.Contains("GetAutomationDiagnostics", sampleCode);
     }
 }

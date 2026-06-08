@@ -242,7 +242,7 @@ var options = FWConnectedAnimationOptions.CreateProfile(FWConnectedAnimationProf
 connected.PrepareToAnimate("card", sourceElement, options);
 connected.TryStart("card", destinationElement);
 """,
-        ["layout.settingscard"] = """
+        ["layout.splitview.settingscard"] = """
 var splitView = new FWSplitView
 {
     DisplayMode = FWSplitViewDisplayMode.CompactInline,
