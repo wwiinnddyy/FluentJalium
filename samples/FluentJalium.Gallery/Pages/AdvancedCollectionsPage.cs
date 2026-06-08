@@ -16,6 +16,7 @@ namespace FluentJalium.Gallery.Pages;
 public class AdvancedCollectionsPage : Page
 {
     private FWItemsRepeater? _repeater;
+    private FWScroller? _repeaterScroller;
     private ScrollViewer? _repeaterScrollViewer;
     private TextBlock? _repeaterDiagnosticsText;
     private ObservableCollection<SampleItem> _items;
@@ -210,6 +211,12 @@ public class AdvancedCollectionsPage : Page
             Padding = new Thickness(12)
         };
 
+        _repeaterScroller = new FWScroller
+        {
+            VerticalScrollMode = ScrollMode.Auto,
+            HorizontalScrollMode = ScrollMode.Disabled
+        };
+
         _repeaterScrollViewer = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -231,6 +238,7 @@ public class AdvancedCollectionsPage : Page
         };
 
         _repeaterScrollViewer.Content = _repeater;
+        _repeaterScroller.AttachScrollViewer(_repeaterScrollViewer);
         border.Child = _repeaterScrollViewer;
         AttachViewportWindow();
         UpdateRepeaterDiagnostics();
@@ -344,12 +352,12 @@ public class AdvancedCollectionsPage : Page
 
     private void AttachViewportWindow()
     {
-        if (_repeater == null || _repeaterScrollViewer == null)
+        if (_repeater == null || _repeaterScroller == null)
         {
             return;
         }
 
-        _repeater.AttachViewport(_repeaterScrollViewer);
+        _repeater.AttachViewport(_repeaterScroller);
         UpdateRepeaterDiagnostics();
     }
 
@@ -382,7 +390,7 @@ public class AdvancedCollectionsPage : Page
         var range = diagnostics.HasRealizedElements
             ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
             : "none";
-        var viewportState = diagnostics.IsViewportAttached ? "attached" : "manual";
+        var viewportState = diagnostics.IsViewportAttached ? $"attached/{diagnostics.AttachedViewportSource}" : "manual";
         _repeaterDiagnosticsText.Text =
             $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} ({viewportState}) | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
     }

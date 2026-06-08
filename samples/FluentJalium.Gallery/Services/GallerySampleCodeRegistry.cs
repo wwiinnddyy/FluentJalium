@@ -474,14 +474,16 @@ var repeater = new FWItemsRepeater
     EstimatedItemExtent = 48
 };
 
+var scroller = new FWScroller();
 var scrollViewer = new FWScrollViewer
 {
     Content = repeater
 };
+scroller.AttachScrollViewer(scrollViewer);
 
-repeater.AttachViewport(scrollViewer);
+repeater.AttachViewport(scroller);
 var diagnostics = repeater.GetDiagnostics();
-Debug.WriteLine($"Viewport source: {diagnostics.RealizationSource}; window: {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}.");
+Debug.WriteLine($"Viewport source: {diagnostics.AttachedViewportSource}; window: {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}.");
 repeater.ApplyViewport(0, 160, Orientation.Horizontal);
 
 repeater.RealizeRange(0, 5);

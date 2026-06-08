@@ -43,6 +43,27 @@ public enum FWItemsRepeaterRealizationSource
 }
 
 /// <summary>
+/// Describes the type of viewport source currently attached to <see cref="FWItemsRepeater"/>.
+/// </summary>
+public enum FWItemsRepeaterViewportSource
+{
+    /// <summary>
+    /// No live viewport source is attached.
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// A raw <see cref="ScrollViewer"/> drives viewport updates.
+    /// </summary>
+    ScrollViewer,
+
+    /// <summary>
+    /// An <see cref="FWScroller"/> drives viewport updates.
+    /// </summary>
+    Scroller
+}
+
+/// <summary>
 /// Snapshot of realized item and recycle-pool state for <see cref="FWItemsRepeater"/>.
 /// </summary>
 public readonly record struct FWItemsRepeaterDiagnostics(
@@ -64,7 +85,8 @@ public readonly record struct FWItemsRepeaterDiagnostics(
     double VerticalCacheLength,
     int LastCreatedElementCount,
     int LastReusedElementCount,
-    bool IsViewportAttached)
+    bool IsViewportAttached,
+    FWItemsRepeaterViewportSource AttachedViewportSource)
 {
     /// <summary>
     /// Gets the orientation used by the attached viewport, or <see langword="null" /> when no viewport is attached.
@@ -98,6 +120,7 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     private FWItemsRepeaterRealizationSource _realizationSource = FWItemsRepeaterRealizationSource.All;
     private Orientation _viewportOrientation = Orientation.Vertical;
     private ScrollViewer? _attachedViewportScrollViewer;
+    private FWScroller? _attachedViewportScroller;
     private Orientation _attachedViewportOrientation = Orientation.Vertical;
 
     public static readonly DependencyProperty ItemsSourceProperty =
@@ -269,7 +292,15 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public Orientation? AttachedViewportOrientation =>
-        _attachedViewportScrollViewer == null ? null : _attachedViewportOrientation;
+        !IsViewportAttached ? null : _attachedViewportOrientation;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWItemsRepeaterViewportSource AttachedViewportSource =>
+        _attachedViewportScroller != null
+            ? FWItemsRepeaterViewportSource.Scroller
+            : _attachedViewportScrollViewer != null
+                ? FWItemsRepeaterViewportSource.ScrollViewer
+                : FWItemsRepeaterViewportSource.None;
 
     /// <summary>
     /// Gets the realized element at the specified item index.
@@ -363,6 +394,27 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     }
 
     /// <summary>
+    /// Calculates and realizes the item range that intersects an <see cref="FWScroller"/> viewport.
+    /// </summary>
+    public void ApplyViewport(FWScroller scroller, Orientation orientation = Orientation.Vertical)
+    {
+        ArgumentNullException.ThrowIfNull(scroller);
+
+        if (scroller.ScrollViewer == null)
+        {
+            throw new InvalidOperationException("FWScroller must have an attached ScrollViewer before it can drive an FWItemsRepeater viewport.");
+        }
+
+        if (orientation == Orientation.Horizontal)
+        {
+            ApplyViewport(scroller.HorizontalOffset, scroller.ViewportWidth, Orientation.Horizontal);
+            return;
+        }
+
+        ApplyViewport(scroller.VerticalOffset, scroller.ViewportHeight, Orientation.Vertical);
+    }
+
+    /// <summary>
     /// Attaches the realization window to a <see cref="ScrollViewer"/> so scroll changes automatically refresh realized items.
     /// </summary>
     public void AttachViewport(ScrollViewer scrollViewer, Orientation orientation = Orientation.Vertical)
@@ -370,6 +422,7 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         ArgumentNullException.ThrowIfNull(scrollViewer);
 
         if (ReferenceEquals(_attachedViewportScrollViewer, scrollViewer) &&
+            _attachedViewportScroller == null &&
             _attachedViewportOrientation == orientation)
         {
             ApplyViewport(scrollViewer, orientation);
@@ -385,16 +438,55 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     }
 
     /// <summary>
-    /// Detaches any <see cref="ScrollViewer"/> previously attached through <see cref="AttachViewport"/>.
+    /// Attaches the realization window to an <see cref="FWScroller"/> so scroller view changes automatically refresh realized items.
+    /// </summary>
+    public void AttachViewport(FWScroller scroller, Orientation orientation = Orientation.Vertical)
+    {
+        ArgumentNullException.ThrowIfNull(scroller);
+
+        var scrollViewer = scroller.ScrollViewer;
+        if (scrollViewer == null)
+        {
+            throw new InvalidOperationException("FWScroller must have an attached ScrollViewer before it can drive an FWItemsRepeater viewport.");
+        }
+
+        if (ReferenceEquals(_attachedViewportScroller, scroller) &&
+            _attachedViewportOrientation == orientation)
+        {
+            _attachedViewportScrollViewer = scrollViewer;
+            ApplyViewport(scroller, orientation);
+            return;
+        }
+
+        DetachViewport();
+
+        _attachedViewportScroller = scroller;
+        _attachedViewportScrollViewer = scrollViewer;
+        _attachedViewportOrientation = orientation;
+        scroller.ViewChanged += OnAttachedViewportScrollerViewChanged;
+        ApplyViewport(scroller, orientation);
+    }
+
+    /// <summary>
+    /// Detaches any <see cref="ScrollViewer"/> or <see cref="FWScroller"/> previously attached as a viewport source.
     /// </summary>
     public void DetachViewport()
     {
-        if (_attachedViewportScrollViewer == null)
+        if (!IsViewportAttached)
         {
             return;
         }
 
-        _attachedViewportScrollViewer.ScrollChanged -= OnAttachedViewportScrollChanged;
+        if (_attachedViewportScroller != null)
+        {
+            _attachedViewportScroller.ViewChanged -= OnAttachedViewportScrollerViewChanged;
+        }
+        else
+        {
+            _attachedViewportScrollViewer!.ScrollChanged -= OnAttachedViewportScrollChanged;
+        }
+
+        _attachedViewportScroller = null;
         _attachedViewportScrollViewer = null;
         _attachedViewportOrientation = Orientation.Vertical;
     }
@@ -440,7 +532,8 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
             VerticalCacheLength,
             _lastCreatedElementCount,
             _lastReusedElementCount,
-            IsViewportAttached)
+            IsViewportAttached,
+            AttachedViewportSource)
         {
             AttachedViewportOrientation = AttachedViewportOrientation
         };
@@ -551,6 +644,18 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         }
 
         ApplyViewport(_attachedViewportScrollViewer, _attachedViewportOrientation);
+    }
+
+    private void OnAttachedViewportScrollerViewChanged(object? sender, ScrollerViewChangedEventArgs e)
+    {
+        if (!ReferenceEquals(sender, _attachedViewportScroller) ||
+            _attachedViewportScroller == null)
+        {
+            return;
+        }
+
+        _attachedViewportScrollViewer = _attachedViewportScroller.ScrollViewer;
+        ApplyViewport(_attachedViewportScroller, _attachedViewportOrientation);
     }
 
     private void RefreshItems()

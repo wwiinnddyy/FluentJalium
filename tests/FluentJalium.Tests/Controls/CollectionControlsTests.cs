@@ -37,6 +37,8 @@ public class FWItemsRepeaterTests
         Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
         Assert.Null(repeater.AttachedViewportOrientation);
         Assert.Null(diagnostics.AttachedViewportOrientation);
+        Assert.Equal(FWItemsRepeaterViewportSource.None, repeater.AttachedViewportSource);
+        Assert.Equal(FWItemsRepeaterViewportSource.None, diagnostics.AttachedViewportSource);
         Assert.Equal(0, diagnostics.ActiveCacheLength);
         Assert.False(repeater.IsViewportAttached);
         Assert.False(diagnostics.IsViewportAttached);
@@ -424,6 +426,36 @@ public class FWItemsRepeaterTests
     }
 
     [Fact]
+    public void ApplyViewport_WithScroller_ShouldUseScrollerViewportMetrics()
+    {
+        // Arrange
+        var scrollViewer = CreateScrollViewer(viewportHeight: 40, contentHeight: 240);
+        scrollViewer.ScrollToVerticalOffset(50);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(scrollViewer);
+
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 10
+        };
+
+        // Act
+        repeater.ApplyViewport(scroller);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(FWItemsRepeaterViewportSource.None, diagnostics.AttachedViewportSource);
+        Assert.Equal(scrollViewer.VerticalOffset, diagnostics.ViewportStart);
+        Assert.Equal(scrollViewer.ViewportHeight, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Vertical, diagnostics.ViewportOrientation);
+        Assert.Equal(5, diagnostics.FirstRealizedIndex);
+        Assert.Equal(8, diagnostics.LastRealizedIndex);
+    }
+
+    [Fact]
     public void AttachViewport_WhenScrollViewerScrolls_ShouldRefreshRealizationWindow()
     {
         // Arrange
@@ -455,6 +487,43 @@ public class FWItemsRepeaterTests
         Assert.Equal(6, scrolledDiagnostics.LastRealizedIndex);
         Assert.True(scrolledDiagnostics.IsViewportAttached);
         Assert.Equal(Orientation.Vertical, scrolledDiagnostics.AttachedViewportOrientation);
+        Assert.Equal(FWItemsRepeaterViewportSource.ScrollViewer, scrolledDiagnostics.AttachedViewportSource);
+    }
+
+    [Fact]
+    public void AttachViewport_WhenScrollerViewChanges_ShouldRefreshRealizationWindow()
+    {
+        // Arrange
+        var scrollViewer = CreateScrollViewer(viewportHeight: 30, contentHeight: 200);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(scrollViewer);
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 10
+        };
+
+        // Act
+        repeater.AttachViewport(scroller);
+        var attachedDiagnostics = repeater.GetDiagnostics();
+        scroller.ScrollTo(0, 40);
+        var scrolledDiagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.True(repeater.IsViewportAttached);
+        Assert.Equal(FWItemsRepeaterViewportSource.Scroller, repeater.AttachedViewportSource);
+        Assert.True(attachedDiagnostics.IsViewportAttached);
+        Assert.Equal(FWItemsRepeaterViewportSource.Scroller, attachedDiagnostics.AttachedViewportSource);
+        Assert.Equal(0, attachedDiagnostics.FirstRealizedIndex);
+        Assert.Equal(2, attachedDiagnostics.LastRealizedIndex);
+        Assert.Equal(40, scrolledDiagnostics.ViewportStart);
+        Assert.Equal(30, scrolledDiagnostics.ViewportLength);
+        Assert.Equal(4, scrolledDiagnostics.FirstRealizedIndex);
+        Assert.Equal(6, scrolledDiagnostics.LastRealizedIndex);
+        Assert.True(scrolledDiagnostics.IsViewportAttached);
+        Assert.Equal(Orientation.Vertical, scrolledDiagnostics.AttachedViewportOrientation);
+        Assert.Equal(FWItemsRepeaterViewportSource.Scroller, scrolledDiagnostics.AttachedViewportSource);
     }
 
     [Fact]
@@ -481,7 +550,40 @@ public class FWItemsRepeaterTests
         Assert.False(diagnostics.IsViewportAttached);
         Assert.Null(repeater.AttachedViewportOrientation);
         Assert.Null(diagnostics.AttachedViewportOrientation);
+        Assert.Equal(FWItemsRepeaterViewportSource.None, diagnostics.AttachedViewportSource);
         Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(40, diagnostics.ViewportStart);
+        Assert.Equal(4, diagnostics.FirstRealizedIndex);
+        Assert.Equal(6, diagnostics.LastRealizedIndex);
+    }
+
+    [Fact]
+    public void DetachViewport_WhenScrollerViewChanges_ShouldLeaveCurrentRealizationWindow()
+    {
+        // Arrange
+        var scrollViewer = CreateScrollViewer(viewportHeight: 30, contentHeight: 200);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(scrollViewer);
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = Enumerable.Range(0, 20).Select(index => $"Item {index}").ToArray(),
+            EstimatedItemExtent = 10
+        };
+        repeater.AttachViewport(scroller);
+        scroller.ScrollTo(0, 40);
+
+        // Act
+        repeater.DetachViewport();
+        scroller.ScrollTo(0, 80);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.False(repeater.IsViewportAttached);
+        Assert.False(diagnostics.IsViewportAttached);
+        Assert.Null(repeater.AttachedViewportOrientation);
+        Assert.Null(diagnostics.AttachedViewportOrientation);
+        Assert.Equal(FWItemsRepeaterViewportSource.None, diagnostics.AttachedViewportSource);
         Assert.Equal(40, diagnostics.ViewportStart);
         Assert.Equal(4, diagnostics.FirstRealizedIndex);
         Assert.Equal(6, diagnostics.LastRealizedIndex);
@@ -590,7 +692,20 @@ public class FWItemsRepeaterTests
         var repeater = new FWItemsRepeater();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => repeater.AttachViewport(null!));
+        Assert.Throws<ArgumentNullException>(() => repeater.AttachViewport((ScrollViewer)null!));
+        Assert.Throws<ArgumentNullException>(() => repeater.AttachViewport((FWScroller)null!));
+    }
+
+    [Fact]
+    public void AttachViewport_WithScrollerWithoutScrollViewer_ShouldThrow()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater();
+        var scroller = new FWScroller();
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => repeater.ApplyViewport(scroller));
+        Assert.Throws<InvalidOperationException>(() => repeater.AttachViewport(scroller));
     }
 
     [Fact]

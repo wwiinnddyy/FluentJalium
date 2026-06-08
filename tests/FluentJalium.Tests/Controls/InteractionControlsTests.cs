@@ -1,5 +1,6 @@
 using FluentJalium.Controls;
 using Jalium.UI;
+using Jalium.UI.Controls;
 using Jalium.UI.Input;
 
 namespace FluentJalium.Tests.Controls;
@@ -81,6 +82,10 @@ public class FWScrollerTests
         Assert.Equal(SnapPointsType.None, scroller.VerticalSnapPointsType);
         Assert.False(scroller.IsAnchoredAtHorizontalExtent);
         Assert.False(scroller.IsAnchoredAtVerticalExtent);
+        Assert.Null(scroller.ScrollViewer);
+        Assert.Equal(0, scroller.HorizontalOffset);
+        Assert.Equal(0, scroller.VerticalOffset);
+        Assert.False(scroller.GetViewportDiagnostics().HasScrollViewer);
     }
 
     [Theory]
@@ -223,6 +228,40 @@ public class FWScrollerTests
     }
 
     [Fact]
+    public void AttachScrollViewer_ShouldExposeViewportDiagnosticsAndRaiseViewEvents()
+    {
+        // Arrange
+        var scrollViewer = CreateScrollViewer(viewportWidth: 50, viewportHeight: 40, contentWidth: 160, contentHeight: 220);
+        var scroller = new FWScroller();
+        var viewChanging = 0;
+        var viewChanged = 0;
+        scroller.ViewChanging += (_, e) =>
+        {
+            viewChanging++;
+        };
+        scroller.ViewChanged += (_, e) =>
+        {
+            viewChanged++;
+        };
+
+        // Act
+        scroller.AttachScrollViewer(scrollViewer);
+        scroller.ScrollTo(30, 60);
+        var diagnostics = scroller.GetViewportDiagnostics();
+
+        // Assert
+        Assert.Same(scrollViewer, scroller.ScrollViewer);
+        Assert.True(diagnostics.HasScrollViewer);
+        Assert.Equal(30, diagnostics.HorizontalOffset);
+        Assert.Equal(60, diagnostics.VerticalOffset);
+        Assert.Equal(scrollViewer.ViewportWidth, diagnostics.ViewportWidth);
+        Assert.Equal(scrollViewer.ViewportHeight, diagnostics.ViewportHeight);
+        Assert.Equal(1.0, diagnostics.ZoomFactor);
+        Assert.True(viewChanging > 0);
+        Assert.True(viewChanged > 0);
+    }
+
+    [Fact]
     public void ScrollBy_ShouldInvokeWithoutException()
     {
         // Arrange
@@ -252,6 +291,28 @@ public class FWScrollerTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(scroller);
+    }
+
+    private static ScrollViewer CreateScrollViewer(
+        double viewportWidth = 100,
+        double viewportHeight = 100,
+        double contentWidth = 100,
+        double contentHeight = 100)
+    {
+        var scrollViewer = new ScrollViewer
+        {
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new Border
+            {
+                Width = contentWidth,
+                Height = contentHeight
+            }
+        };
+        var viewportSize = new Size(viewportWidth, viewportHeight);
+        scrollViewer.Measure(viewportSize);
+        scrollViewer.Arrange(new Rect(0, 0, viewportWidth, viewportHeight));
+        return scrollViewer;
     }
 }
 

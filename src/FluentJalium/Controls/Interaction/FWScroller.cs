@@ -6,6 +6,19 @@ using Jalium.UI.Input;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// Snapshot of the scroll viewport hosted by <see cref="FWScroller"/>.
+/// </summary>
+public readonly record struct FWScrollerViewportDiagnostics(
+    bool HasScrollViewer,
+    double HorizontalOffset,
+    double VerticalOffset,
+    double ViewportWidth,
+    double ViewportHeight,
+    double ExtentWidth,
+    double ExtentHeight,
+    double ZoomFactor);
+
+/// <summary>
 /// FluentJalium Scroller control for advanced scrolling scenarios with snap points and chaining.
 /// </summary>
 public class FWScroller : ContentControl, IFluentJaliumControl
@@ -242,22 +255,53 @@ public class FWScroller : ContentControl, IFluentJaliumControl
         remove => RemoveHandler(ViewChangingEvent, value);
     }
 
+    /// <summary>
+    /// Gets the template scroll viewer currently hosted by the scroller.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public ScrollViewer? ScrollViewer => _scrollViewer;
+
+    /// <summary>
+    /// Gets the current horizontal scroll offset from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double HorizontalOffset => _scrollViewer?.HorizontalOffset ?? 0;
+
+    /// <summary>
+    /// Gets the current vertical scroll offset from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double VerticalOffset => _scrollViewer?.VerticalOffset ?? 0;
+
+    /// <summary>
+    /// Gets the current horizontal viewport length from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double ViewportWidth => _scrollViewer?.ViewportWidth ?? 0;
+
+    /// <summary>
+    /// Gets the current vertical viewport length from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double ViewportHeight => _scrollViewer?.ViewportHeight ?? 0;
+
+    /// <summary>
+    /// Gets the current horizontal content extent from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double ExtentWidth => _scrollViewer?.ExtentWidth ?? 0;
+
+    /// <summary>
+    /// Gets the current vertical content extent from the hosted scroll viewer.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double ExtentHeight => _scrollViewer?.ExtentHeight ?? 0;
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
-        if (_scrollViewer != null)
-        {
-            _scrollViewer.ScrollChanged -= OnScrollChanged;
-        }
-
-        _scrollViewer = GetTemplateChild("PART_ScrollViewer") as ScrollViewer;
-
-        if (_scrollViewer != null)
-        {
-            _scrollViewer.ScrollChanged += OnScrollChanged;
-            UpdateScrollViewerProperties();
-        }
+        SetScrollViewer(GetTemplateChild("PART_ScrollViewer") as ScrollViewer);
     }
 
     /// <summary>
@@ -290,6 +334,31 @@ public class FWScroller : ContentControl, IFluentJaliumControl
     public void ZoomTo(double zoomFactor, Point? centerPoint = null)
     {
         ZoomFactor = Math.Clamp(zoomFactor, MinZoomFactor, MaxZoomFactor);
+    }
+
+    /// <summary>
+    /// Gets a snapshot of the current scroll viewport.
+    /// </summary>
+    public FWScrollerViewportDiagnostics GetViewportDiagnostics()
+    {
+        return new FWScrollerViewportDiagnostics(
+            _scrollViewer != null,
+            HorizontalOffset,
+            VerticalOffset,
+            ViewportWidth,
+            ViewportHeight,
+            ExtentWidth,
+            ExtentHeight,
+            ZoomFactor);
+    }
+
+    /// <summary>
+    /// Connects an existing scroll viewer as the viewport source for custom host scenarios.
+    /// </summary>
+    public void AttachScrollViewer(ScrollViewer scrollViewer)
+    {
+        ArgumentNullException.ThrowIfNull(scrollViewer);
+        SetScrollViewer(scrollViewer);
     }
 
     private static void OnScrollModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -370,6 +439,22 @@ public class FWScroller : ContentControl, IFluentJaliumControl
         RaiseEvent(changedArgs);
 
         _lastPosition = currentPosition;
+    }
+
+    private void SetScrollViewer(ScrollViewer? scrollViewer)
+    {
+        if (_scrollViewer != null)
+        {
+            _scrollViewer.ScrollChanged -= OnScrollChanged;
+        }
+
+        _scrollViewer = scrollViewer;
+
+        if (_scrollViewer != null)
+        {
+            _scrollViewer.ScrollChanged += OnScrollChanged;
+            UpdateScrollViewerProperties();
+        }
     }
 }
 
