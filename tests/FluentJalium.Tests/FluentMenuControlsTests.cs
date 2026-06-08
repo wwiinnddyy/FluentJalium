@@ -139,6 +139,9 @@ public sealed class FluentMenuControlsTests
         Assert.True(dictionary.TryGetValue("FWFlyoutPresenterStyle", out var flyoutPresenterStyle));
         var flyoutStyle = Assert.IsType<Style>(flyoutPresenterStyle);
         Assert.Equal(typeof(FWFlyoutPresenter), flyoutStyle.TargetType);
+        Assert.False(
+            dictionary.Contains(typeof(FWFlyout)),
+            "FWFlyout chrome is intentionally styled through FWFlyoutPresenterStyle because the flyout itself is a FlyoutBase, not the popup chrome.");
         AssertSetter(flyoutStyle, Control.BackgroundProperty);
         AssertSetter(flyoutStyle, Control.BorderBrushProperty);
         AssertSetter(flyoutStyle, Control.PaddingProperty);

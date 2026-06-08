@@ -28,6 +28,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Semantic-depth gaps
 
+- `FWFlyout`: content, density, placement, explicit presenter style, theme presenter lookup, Gallery metadata, and menu sample code now exist. Its visual chrome is intentionally owned by the keyed `FWFlyoutPresenterStyle` for `FWFlyoutPresenter`; `FWFlyout` itself remains a `FlyoutBase` behavior object rather than an implicit style target.
 - `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, command-state restoration, focus/pressed visuals, interaction diagnostics, automation peer metadata, InvokePattern support, and default row typography/action alignment now exist; remaining work is mostly real-window visual QA.
 - `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, add/remove/clear helpers, default row spacing, and header typography; remaining work is richer data-row templates and visual QA.
 - `FWTwoPaneView` and `FWParallaxView`: actual layout mode, visible-pane state, progress-driven offset state, and diagnostics now exist; remaining work is deeper ScrollViewer/FWScroller source synchronization and visual QA.
