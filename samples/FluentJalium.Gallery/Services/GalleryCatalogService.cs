@@ -16,6 +16,16 @@ internal sealed class GalleryCatalogService
         return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent, pageInfos));
     }
 
+    public string[] CreateRegisteredPageIds(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
+    {
+        var localization = new GalleryLocalizationService();
+        var pageInfos = GalleryCatalog.CreatePageInfos(localization);
+        return CreateContentFactories(owner, applyTheme, applyAccent, pageInfos)
+            .Keys
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+    }
+
     private static IReadOnlyDictionary<string, Func<UIElement>> CreateContentFactories(
         Window owner,
         Action<FluentThemeVariant> applyTheme,

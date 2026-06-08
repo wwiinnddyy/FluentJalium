@@ -1,5 +1,7 @@
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
+using Jalium.UI;
+using Jalium.UI.Controls;
 
 namespace FluentJalium.Tests;
 
@@ -345,6 +347,21 @@ public sealed class FluentGalleryCatalogTests
             Assert.False(string.IsNullOrWhiteSpace(sampleCode));
             Assert.DoesNotContain("Generated from", sampleCode);
         }
+    }
+
+    [Fact]
+    public void GalleryCatalogService_ShouldRegisterFactoryForEveryCatalogPage()
+    {
+        var expectedPageIds = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
+            .Select(page => page.UniqueId)
+            .Order(StringComparer.Ordinal)
+            .ToArray();
+        var service = new GalleryCatalogService();
+        var owner = new Window();
+
+        var registeredPageIds = service.CreateRegisteredPageIds(owner, _ => { }, _ => { });
+
+        Assert.Equal(expectedPageIds, registeredPageIds);
     }
 
     [Fact]
