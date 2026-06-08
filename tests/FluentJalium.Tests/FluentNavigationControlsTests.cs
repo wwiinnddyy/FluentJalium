@@ -156,6 +156,7 @@ public sealed class FluentNavigationControlsTests
         var fwTabViewItemStyle = AssertStyle<FWTabViewItem>(dictionary);
         Assert.Equal(typeof(TabItem), fwTabViewItemStyle.BasedOn?.TargetType);
         AssertSetter(fwTabViewItemStyle, FWTabViewItem.IsClosableProperty);
+        AssertSetter(fwTabViewItemStyle, FWTabViewItem.CloseButtonWidthProperty);
 
         var selectorBarStyle = AssertStyle<FWSelectorBar>(dictionary);
         AssertSetter(selectorBarStyle, FWSelectorBar.DensityProperty);
@@ -483,6 +484,9 @@ public sealed class FluentNavigationControlsTests
         Assert.True(tabView.CanReorderTabs);
         Assert.True(details.IsSelected);
         Assert.False(overview.IsSelected);
+        Assert.Equal(32, details.CloseButtonWidth);
+        Assert.True(details.IsCloseButtonVisible);
+        Assert.True(overview.IsCloseButtonVisible);
         Assert.Equal("Details content", tabView.SelectedContent);
 
         Assert.True(tabView.RequestCloseTab(details));
@@ -500,6 +504,97 @@ public sealed class FluentNavigationControlsTests
         Assert.False(((FWTabViewItem)tabView.SelectedItem!).IsClosable);
         Assert.Equal(1, addRequested);
         Assert.True(selectionChanged >= 3);
+    }
+
+    [Fact]
+    public void FWTabViewItem_ShouldUpdateCloseButtonVisibilityByOverlayMode()
+    {
+        var selected = new FWTabViewItem
+        {
+            Header = "Selected"
+        };
+        var background = new FWTabViewItem
+        {
+            Header = "Background"
+        };
+        var tabView = new FWTabView();
+        tabView.Items.Add(selected);
+        tabView.Items.Add(background);
+        tabView.SelectedItem = selected;
+
+        Assert.Equal(FWTabViewCloseButtonOverlayMode.Auto, tabView.CloseButtonOverlayMode);
+        Assert.Equal(32, selected.CloseButtonWidth);
+        Assert.True(selected.IsCloseButtonVisible);
+        Assert.False(background.IsCloseButtonVisible);
+
+        tabView.CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always;
+
+        Assert.True(selected.IsCloseButtonVisible);
+        Assert.True(background.IsCloseButtonVisible);
+
+        background.IsClosable = false;
+
+        Assert.False(background.IsCloseButtonVisible);
+        Assert.False(background.RequestClose());
+
+        tabView.CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Never;
+
+        Assert.False(selected.IsCloseButtonVisible);
+        Assert.Equal(Rect.Empty, selected.GetCloseButtonBounds(new Size(120, 40)));
+    }
+
+    [Fact]
+    public void FWTabViewItem_ShouldExposeCloseButtonHitTesting()
+    {
+        var item = new FWTabViewItem
+        {
+            Header = "Details"
+        };
+        var tabView = new FWTabView
+        {
+            CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always
+        };
+        tabView.Items.Add(item);
+        tabView.SelectedItem = item;
+
+        var bounds = item.GetCloseButtonBounds(new Size(120, 40));
+
+        Assert.Equal(new Rect(88, 4, 32, 32), bounds);
+        Assert.True(item.IsPointInCloseButton(new Point(100, 20), new Size(120, 40)));
+        Assert.False(item.IsPointInCloseButton(new Point(20, 20), new Size(120, 40)));
+    }
+
+    [Fact]
+    public void FWTabViewItem_RequestClose_ShouldRaiseEventAndRemoveItem()
+    {
+        var overview = new FWTabViewItem
+        {
+            Header = "Overview",
+            Content = "Overview content"
+        };
+        var details = new FWTabViewItem
+        {
+            Header = "Details",
+            Content = "Details content"
+        };
+        var tabView = new FWTabView();
+        var closeRequested = 0;
+        tabView.TabCloseRequested += (_, args) =>
+        {
+            closeRequested++;
+            Assert.Same(details, args.Tab);
+            Assert.Equal(1, args.Index);
+        };
+        tabView.Items.Add(overview);
+        tabView.Items.Add(details);
+        tabView.SelectedItem = details;
+
+        Assert.True(details.RequestClose());
+
+        Assert.Single(tabView.Items);
+        Assert.Same(overview, tabView.SelectedItem);
+        Assert.True(overview.IsSelected);
+        Assert.Equal(1, closeRequested);
     }
 
     [Fact]

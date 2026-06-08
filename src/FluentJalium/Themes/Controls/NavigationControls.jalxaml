@@ -437,6 +437,7 @@
 
     <Style TargetType="fluent:FWTabViewItem" BasedOn="{StaticResource {x:Type TabItem}}">
         <Setter Property="IsClosable" Value="True" />
+        <Setter Property="CloseButtonWidth" Value="32" />
     </Style>
 
     <Style TargetType="fluent:FWSelectorBar">
