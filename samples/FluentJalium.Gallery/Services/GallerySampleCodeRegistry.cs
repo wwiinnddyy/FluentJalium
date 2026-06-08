@@ -11,6 +11,50 @@ internal static class GallerySampleCodeRegistry
         ["catalog.filter.updated"] = CreateCatalogFilterSample("Updated"),
         ["catalog.filter.preview"] = CreateCatalogFilterSample("Preview"),
         ["catalog.filter.diagnostic"] = CreateCatalogFilterSample("Diagnostic"),
+        ["buttons.commandbar"] = """
+var primaryButton = new FWButton { Content = "Save" };
+var splitButton = new FWSplitButton
+{
+    Content = "Publish",
+    Flyout = CreatePublishFlyout()
+};
+
+var commandBar = new FWCommandBar
+{
+    Density = FWCommandSurfaceDensity.Compact
+};
+commandBar.PrimaryCommands.Add(new FWAppBarButton { Label = "Copy", Icon = IconGlyph(FluentIconRegular.Copy24) });
+commandBar.PrimaryCommands.Add(new FWAppBarToggleButton { Label = "Pin", Icon = IconGlyph(FluentIconRegular.Pin24), IsChecked = true });
+commandBar.SecondaryCommands.Add(new FWAppBarButton { Label = "Rename", Icon = IconGlyph(FluentIconRegular.Rename24) });
+
+var toolBar = new FWToolBar
+{
+    Density = FWCommandSurfaceDensity.Compact,
+    Items = { new FWButton { Content = "Run" }, new FWToggleButton { Content = "Live" } }
+};
+""",
+        ["switches.toggle"] = """
+var toggleButton = new FWToggleButton
+{
+    Content = "Live preview",
+    IsChecked = true
+};
+
+var toggleSwitch = new FWToggleSwitch
+{
+    Header = "Use system theme",
+    OnContent = "On",
+    OffContent = "Off",
+    IsChecked = true
+};
+
+var indeterminate = new FWCheckBox
+{
+    Content = "Apply to selected profiles",
+    IsThreeState = true,
+    IsChecked = null
+};
+""",
         ["textinput.autosuggestbox"] = """
 var autoSuggestBox = new FWAutoSuggestBox
 {
@@ -140,6 +184,63 @@ var media = new FWMediaElement
     Stretch = Stretch.Uniform,
     ScrubbingEnabled = true
 };
+""",
+        ["selectors.properties"] = """
+var selector = new FWTreeSelector
+{
+    PlaceholderText = "Control families",
+    SelectionMode = SelectionMode.Multiple,
+    IsSearchEnabled = true,
+    SearchText = "data"
+};
+selector.Items.Add(new FWTreeSelectorItem { Header = "Inputs", IsChecked = true });
+selector.Items.Add(new FWTreeSelectorItem { Header = "Navigation" });
+
+var propertyGrid = new FWPropertyGrid
+{
+    SelectedObject = new
+    {
+        Name = "FWTreeSelector",
+        Category = "Collections",
+        IsPreview = false
+    },
+    SearchText = "density"
+};
+""",
+        ["datainspectors.viewers"] = """
+var diffViewer = new FWDiffViewer
+{
+    OriginalText = previousDocument,
+    ModifiedText = currentDocument,
+    ShowMinimap = true
+};
+
+var hexEditor = new FWHexEditor
+{
+    Data = Encoding.UTF8.GetBytes("FluentJalium"),
+    BytesPerRow = 16,
+    IsReadOnly = true
+};
+
+var jsonViewer = new FWJsonTreeViewer
+{
+    JsonText = "{ \"control\": \"FWJsonTreeViewer\", \"state\": \"ready\" }",
+    ExpandDepth = 2
+};
+""",
+        ["motion.transitions"] = """
+var transitionHost = new FWTransitioningContentControl
+{
+    TransitionProfile = FWContentTransitionProfile.Entrance,
+    Content = new FWTextBlock { Text = "Incoming content" }
+};
+
+transitionHost.ApplyTransitionProfile(FWContentTransitionProfile.BackNavigation);
+
+var connected = new FWConnectedAnimationService();
+var options = FWConnectedAnimationOptions.CreateProfile(FWConnectedAnimationProfile.Navigation);
+connected.PrepareToAnimate("card", sourceElement, options);
+connected.TryStart("card", destinationElement);
 """,
         ["layout.settingscard"] = """
 var card = new FWSettingsCard
