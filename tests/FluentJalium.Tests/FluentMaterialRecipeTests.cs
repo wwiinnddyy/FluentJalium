@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -366,11 +367,55 @@ public sealed class FluentMaterialRecipeTests
 
         Assert.Equal(FWFluentWindowMaterialProfile.FocusGlassShell, surface.WindowMaterialProfile);
         Assert.Equal(FWFluentWindowBackdropKind.MicaAlt, surface.WindowBackdropKind);
+        Assert.True(surface.AutoApplyWindowBackdrop);
         Assert.Equal(FWFluentMaterialRole.FocusGlass, surface.MaterialRole);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(WindowBackdropType.MicaAlt, window.SystemBackdrop);
+    }
+
+    [Fact]
+    public void WindowSurfaceGalleryDiagnostics_ShouldFormatRequestedActualAndApplyState()
+    {
+        var surface = new FWFluentWindowSurface
+        {
+            AutoApplyWindowBackdrop = false
+        };
+        surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.FocusGlassShell);
+
+        var pending = GalleryWindowSurfaceDiagnostics.Create(surface, WindowBackdropType.Mica, wasApplied: false);
+        var pendingText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(pending);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.FocusGlassShell, pending.Profile);
+        Assert.Equal("Focus glass shell", pending.Role);
+        Assert.Equal(FWFluentWindowBackdropKind.MicaAlt, pending.RequestedBackdropKind);
+        Assert.Equal(WindowBackdropType.MicaAlt, pending.RequestedSystemBackdrop);
+        Assert.Equal(WindowBackdropType.Mica, pending.ActualSystemBackdrop);
+        Assert.Equal(FWFluentMaterialRole.FocusGlass, pending.SurfaceRole);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, pending.SurfaceMaterialKind);
+        Assert.Equal(BorderShape.SuperEllipse, pending.SurfaceShape);
+        Assert.False(pending.AutoApplyWindowBackdrop);
+        Assert.False(pending.IsMatched);
+        Assert.Equal("pending", pending.MatchState);
+        Assert.Equal("not applied", pending.ApplyState);
+        Assert.Contains("Profile: Focus glass shell", pendingText);
+        Assert.Contains("requested: MicaAlt/MicaAlt", pendingText);
+        Assert.Contains("actual: Mica", pendingText);
+        Assert.Contains("surface: FocusGlass/LiquidGlass/SuperEllipse", pendingText);
+        Assert.Contains("auto apply: Off", pendingText);
+        Assert.Contains("window: pending, not applied", pendingText);
+
+        surface.AutoApplyWindowBackdrop = true;
+        var matched = GalleryWindowSurfaceDiagnostics.Create(surface, WindowBackdropType.MicaAlt, wasApplied: true);
+        var matchedText = GalleryWindowBackdropsPage.CreateWindowSurfaceDiagnosticsText(surface, WindowBackdropType.MicaAlt, wasApplied: true);
+
+        Assert.True(matched.AutoApplyWindowBackdrop);
+        Assert.True(matched.IsMatched);
+        Assert.Equal("matched", matched.MatchState);
+        Assert.Equal("applied", matched.ApplyState);
+        Assert.Contains("auto apply: On", matchedText);
+        Assert.Contains("window: matched, applied", matchedText);
     }
 
     [Fact]

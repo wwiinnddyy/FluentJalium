@@ -284,6 +284,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("window.SystemBackdrop", sampleCode);
         Assert.Contains("isMatched", sampleCode);
         Assert.Contains("Window backdrop QA", sampleCode);
+        Assert.Contains("GalleryWindowSurfaceDiagnostics.Create", sampleCode);
+        Assert.Contains("FormatWindowSurfaceDiagnostics", sampleCode);
     }
 
     [Fact]

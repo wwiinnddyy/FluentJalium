@@ -803,6 +803,12 @@ var isMatched = actualBackdrop == FWFluentWindowMaterialProfileRecipe
     .Create(windowSurface.WindowMaterialProfile)
     .SystemBackdrop;
 Debug.WriteLine($"Window backdrop QA: actual {actualBackdrop}; matched {isMatched}; auto apply {windowSurface.AutoApplyWindowBackdrop}.");
+
+var diagnostics = GalleryWindowSurfaceDiagnostics.Create(
+    windowSurface,
+    actualBackdrop,
+    wasApplied: true);
+Debug.WriteLine(GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(diagnostics));
 """,
         ["materials.derivedsurfaces"] = """
 var card = new FWCardSurface

@@ -1,5 +1,6 @@
 using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
+using FluentJalium.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -17,6 +18,48 @@ using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
+
+internal sealed record GalleryWindowSurfaceDiagnostics(
+    FWFluentWindowMaterialProfile Profile,
+    string Role,
+    FWFluentWindowBackdropKind RequestedBackdropKind,
+    WindowBackdropType RequestedSystemBackdrop,
+    WindowBackdropType ActualSystemBackdrop,
+    FWFluentMaterialRole SurfaceRole,
+    FWFluentMaterialKind SurfaceMaterialKind,
+    BorderShape SurfaceShape,
+    bool AutoApplyWindowBackdrop,
+    bool WasApplied)
+{
+    public bool IsMatched => ActualSystemBackdrop == RequestedSystemBackdrop;
+
+    public string MatchState => IsMatched ? "matched" : "pending";
+
+    public string ApplyState => WasApplied ? "applied" : "not applied";
+
+    public string AutoApplyText => AutoApplyWindowBackdrop ? "On" : "Off";
+
+    public static GalleryWindowSurfaceDiagnostics Create(
+        FWFluentWindowSurface surface,
+        WindowBackdropType actualSystemBackdrop,
+        bool wasApplied)
+    {
+        ArgumentNullException.ThrowIfNull(surface);
+
+        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
+        return new GalleryWindowSurfaceDiagnostics(
+            recipe.Profile,
+            recipe.Role,
+            recipe.WindowBackdropKind,
+            recipe.SystemBackdrop,
+            actualSystemBackdrop,
+            surface.MaterialRole,
+            surface.MaterialKind,
+            surface.Shape,
+            surface.AutoApplyWindowBackdrop,
+            wasApplied);
+    }
+}
 
 internal sealed class GalleryWindowBackdropsPage
 {
@@ -94,7 +137,7 @@ internal sealed class GalleryWindowBackdropsPage
             AutoApplyWindowBackdrop = false
         };
         surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.MicaShell);
-        surface.Child = CreateWindowSurfacePreviewContent(surface);
+        surface.Child = CreateWindowSurfacePreviewContent(surface, _window.SystemBackdrop, wasApplied: false);
 
         var status = CreateBackdropOutputText(CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: false));
 
@@ -168,9 +211,12 @@ internal sealed class GalleryWindowBackdropsPage
         return shell;
     }
 
-    private static FWBorder CreateWindowSurfacePreviewContent(FWFluentWindowSurface surface)
+    private static FWBorder CreateWindowSurfacePreviewContent(
+        FWFluentWindowSurface surface,
+        WindowBackdropType actualSystemBackdrop,
+        bool wasApplied)
     {
-        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
+        var diagnostics = GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied);
 
         return new FWBorder
         {
@@ -208,15 +254,18 @@ internal sealed class GalleryWindowBackdropsPage
                         VerticalSpacing = 6,
                         Children =
                         {
-                            CreateSystemBackdropBadge(recipe.Profile.ToString()),
-                            CreateSystemBackdropBadge(recipe.SystemBackdrop.ToString()),
-                            CreateSystemBackdropBadge(recipe.SurfaceRole.ToString()),
-                            CreateSystemBackdropBadge(recipe.MaterialKind.ToString())
+                            CreateSystemBackdropBadge($"Profile {diagnostics.Profile}"),
+                            CreateSystemBackdropBadge($"Requested {diagnostics.RequestedSystemBackdrop}"),
+                            CreateSystemBackdropBadge($"Actual {diagnostics.ActualSystemBackdrop}"),
+                            CreateSystemBackdropBadge($"Surface {diagnostics.SurfaceRole}"),
+                            CreateSystemBackdropBadge($"Material {diagnostics.SurfaceMaterialKind}"),
+                            CreateSystemBackdropBadge(diagnostics.MatchState),
+                            CreateSystemBackdropBadge(diagnostics.ApplyState)
                         }
                     },
                     new FWTextBlock
                     {
-                        Text = recipe.Description,
+                        Text = FormatWindowSurfaceDiagnostics(diagnostics),
                         FontSize = 12,
                         TextWrapping = TextWrapping.Wrap,
                         Foreground = ThemeBrush("TextSecondary")
@@ -267,8 +316,8 @@ internal sealed class GalleryWindowBackdropsPage
         TextBlock status)
     {
         surface.ApplyWindowMaterialProfile(profile);
-        surface.Child = CreateWindowSurfacePreviewContent(surface);
         surface.ApplyWindowBackdrop(_window);
+        surface.Child = CreateWindowSurfacePreviewContent(surface, _window.SystemBackdrop, wasApplied: true);
         status.Text = CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: true);
     }
 
@@ -285,16 +334,19 @@ internal sealed class GalleryWindowBackdropsPage
         return $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
     }
 
-    private static string CreateWindowSurfaceDiagnosticsText(
+    internal static string CreateWindowSurfaceDiagnosticsText(
         FWFluentWindowSurface surface,
         WindowBackdropType actualSystemBackdrop,
         bool wasApplied)
     {
-        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
-        var state = actualSystemBackdrop == recipe.SystemBackdrop ? "matched" : "pending";
-        var applyState = wasApplied ? "applied" : "not applied";
+        return FormatWindowSurfaceDiagnostics(GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied));
+    }
 
-        return $"Profile: {recipe.Role}; requested: {recipe.SystemBackdrop}; surface: {surface.MaterialRole}/{surface.MaterialKind}; auto apply: {FormatOnOff(surface.AutoApplyWindowBackdrop)}; window: {actualSystemBackdrop} ({state}, {applyState}).";
+    internal static string FormatWindowSurfaceDiagnostics(GalleryWindowSurfaceDiagnostics diagnostics)
+    {
+        ArgumentNullException.ThrowIfNull(diagnostics);
+
+        return $"Profile: {diagnostics.Role}; requested: {diagnostics.RequestedSystemBackdrop}/{diagnostics.RequestedBackdropKind}; actual: {diagnostics.ActualSystemBackdrop}; surface: {diagnostics.SurfaceRole}/{diagnostics.SurfaceMaterialKind}/{diagnostics.SurfaceShape}; auto apply: {diagnostics.AutoApplyText}; window: {diagnostics.MatchState}, {diagnostics.ApplyState}.";
     }
 
     private static FWBorder CreateRecipeTile(FluentIconRegular icon, FWFluentWindowBackdropKind backdropKind)
