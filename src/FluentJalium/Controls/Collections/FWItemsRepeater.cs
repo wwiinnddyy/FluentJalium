@@ -67,6 +67,11 @@ public readonly record struct FWItemsRepeaterDiagnostics(
     bool IsViewportAttached)
 {
     /// <summary>
+    /// Gets the orientation used by the attached viewport, or <see langword="null" /> when no viewport is attached.
+    /// </summary>
+    public Orientation? AttachedViewportOrientation { get; init; }
+
+    /// <summary>
     /// Gets a value indicating whether the repeater has any realized elements.
     /// </summary>
     public bool HasRealizedElements => RealizedElementCount > 0;
@@ -262,6 +267,10 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public bool IsViewportAttached => _attachedViewportScrollViewer != null;
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public Orientation? AttachedViewportOrientation =>
+        _attachedViewportScrollViewer == null ? null : _attachedViewportOrientation;
+
     /// <summary>
     /// Gets the realized element at the specified item index.
     /// </summary>
@@ -431,7 +440,10 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
             VerticalCacheLength,
             _lastCreatedElementCount,
             _lastReusedElementCount,
-            IsViewportAttached);
+            IsViewportAttached)
+        {
+            AttachedViewportOrientation = AttachedViewportOrientation
+        };
     }
 
     protected override Size MeasureOverride(Size availableSize)
