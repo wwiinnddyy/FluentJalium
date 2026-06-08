@@ -374,6 +374,9 @@ var canExecute = card.CanExecute;
 var automation = card.GetAutomationDiagnostics();
 Debug.WriteLine($"SettingsCard automation: {automation.Name}; invoke: {automation.IsInvokePatternAvailable}.");
 
+var interaction = card.GetDiagnostics();
+Debug.WriteLine($"SettingsCard interaction: invokable {interaction.IsInvokable}; pressed {interaction.IsInteractionPressed}; click mode {interaction.ClickMode}.");
+
 card.PerformClick();
 
 var scrollViewer = new FWScrollViewer

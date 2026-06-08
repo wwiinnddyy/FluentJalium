@@ -20,6 +20,7 @@ using FWParallaxView = FluentJalium.Controls.FWParallaxView;
 using FWRelativePanel = FluentJalium.Controls.FWRelativePanel;
 using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
 using FWSettingsCardAutomationDiagnostics = FluentJalium.Controls.FWSettingsCardAutomationDiagnostics;
+using FWSettingsCardDiagnostics = FluentJalium.Controls.FWSettingsCardDiagnostics;
 using FWScroller = FluentJalium.Controls.FWScroller;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWSplitView = FluentJalium.Controls.FWSplitView;
@@ -313,7 +314,7 @@ internal sealed class GalleryContentLayoutPage
         void UpdateState(string action)
         {
             var diagnostics = twoPaneView.GetDiagnostics();
-            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}. SettingsCard automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}. SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
         }
 
         return new FWStackPanel
@@ -360,14 +361,14 @@ internal sealed class GalleryContentLayoutPage
                     {
                         configureCommand.CanExecuteResult = !configureCommand.CanExecuteResult;
                         configureCommand.RaiseCanExecuteChanged();
-                        output.Text = $"SettingsCard CanExecute: {modeCard.CanExecute}. IsEnabled: {modeCard.IsEnabled}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+                        output.Text = $"SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
                     }),
                     CreateLayoutActionButton(FluentIconRegular.CursorHover24, "Hover mode", () =>
                     {
                         modeCard.ClickMode = modeCard.ClickMode == ClickMode.Hover
                             ? ClickMode.Release
                             : ClickMode.Hover;
-                        output.Text = $"SettingsCard ClickMode: {modeCard.ClickMode}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+                        output.Text = $"SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
                     })),
                 CreateLayoutStatus(output)
             }
@@ -437,6 +438,11 @@ internal sealed class GalleryContentLayoutPage
                 CreateLayoutStatus(output)
             }
         };
+    }
+
+    private static string FormatSettingsCardDiagnostics(FWSettingsCardDiagnostics diagnostics)
+    {
+        return $"invokable {FormatOnOff(diagnostics.IsInvokable)}, click {FormatOnOff(diagnostics.IsClickEnabled)}, can execute {FormatOnOff(diagnostics.CanExecute)}, pressed {FormatOnOff(diagnostics.IsInteractionPressed)}, mode {diagnostics.ClickMode}";
     }
 
     private static string FormatSettingsCardAutomation(FWSettingsCardAutomationDiagnostics diagnostics)

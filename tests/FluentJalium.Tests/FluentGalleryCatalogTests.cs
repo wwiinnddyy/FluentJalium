@@ -26,6 +26,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWSplitView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWTwoPaneView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWParallaxView" && control.Page.UniqueId == "contentandlayout");
+        Assert.Contains(controls, control => control.Name == "FWSettingsCardDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWRadioButtons" && control.Page.UniqueId == "selection");
         Assert.Contains(controls, control => control.Name == "FWScrollViewer" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWSwipeControl" && control.Page.UniqueId == "interaction");
@@ -113,6 +114,9 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("FWSplitViewDisplayMode.CompactInline", sampleCode);
         Assert.Contains("ActualPaneLength", sampleCode);
         Assert.Contains("new FWSettingsCard", sampleCode);
+        Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("IsInvokable", sampleCode);
+        Assert.Contains("IsInteractionPressed", sampleCode);
         Assert.Contains("GetAutomationDiagnostics", sampleCode);
     }
 
