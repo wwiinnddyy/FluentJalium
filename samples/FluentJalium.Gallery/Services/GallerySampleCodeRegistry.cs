@@ -375,6 +375,30 @@ var automation = card.GetAutomationDiagnostics();
 Debug.WriteLine($"SettingsCard automation: {automation.Name}; invoke: {automation.IsInvokePatternAvailable}.");
 
 card.PerformClick();
+
+var scrollViewer = new FWScrollViewer
+{
+    Height = 120,
+    Content = new FWStackPanel
+    {
+        Children =
+        {
+            new FWTextBlock { Text = "Parallax source" },
+            new FWTextBlock { Text = "Scroll to update depth" }
+        }
+    }
+};
+var sourceScroller = new FWScroller();
+sourceScroller.AttachScrollViewer(scrollViewer);
+
+var parallaxView = new FWParallaxView
+{
+    Source = sourceScroller,
+    HorizontalShift = 18,
+    VerticalShift = 28,
+    IsHorizontalShiftEnabled = true
+};
+parallaxView.RefreshProgressFromSource();
 """,
         ["visuals.icons.richtext.personpicture.markdown.qrcode.shapes"] = """
 var visuals = new FWStackPanel

@@ -442,7 +442,11 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
 {
     public static readonly DependencyProperty SourceProperty =
         DependencyProperty.Register(nameof(Source), typeof(object), typeof(FWParallaxView),
-            new PropertyMetadata(null, OnParallaxPropertyChanged));
+            new PropertyMetadata(null, OnParallaxSourceChanged));
+
+    public static readonly DependencyProperty SourceOrientationProperty =
+        DependencyProperty.Register(nameof(SourceOrientation), typeof(Orientation), typeof(FWParallaxView),
+            new PropertyMetadata(Orientation.Vertical, OnParallaxPropertyChanged), IsValidOrientation);
 
     public static readonly DependencyProperty HorizontalShiftProperty =
         DependencyProperty.Register(nameof(HorizontalShift), typeof(double), typeof(FWParallaxView),
@@ -480,6 +484,8 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
 
     private ContentPresenter? _contentHost;
     private TranslateTransform? _contentTransform;
+    private ScrollViewer? _sourceScrollViewer;
+    private FWScroller? _sourceScroller;
 
     public FWParallaxView()
     {
@@ -492,6 +498,13 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
     {
         get => GetValue(SourceProperty);
         set => SetValue(SourceProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public Orientation SourceOrientation
+    {
+        get => (Orientation)GetValue(SourceOrientationProperty)!;
+        set => SetValue(SourceOrientationProperty, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
@@ -546,6 +559,15 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public Point CurrentOffset => (Point)GetValue(CurrentOffsetProperty)!;
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsSourceAttached => _sourceScrollViewer != null || _sourceScroller != null;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public string SourceKind =>
+        _sourceScroller != null ? nameof(FWScroller) :
+        _sourceScrollViewer != null ? nameof(ScrollViewer) :
+        Source is null ? "None" : Source.GetType().Name;
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
@@ -576,13 +598,54 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
             StartOffset,
             EndOffset,
             IsHorizontalShiftEnabled,
-            IsVerticalShiftEnabled);
+            IsVerticalShiftEnabled,
+            IsSourceAttached,
+            SourceKind,
+            SourceOrientation);
+    }
+
+    public void RefreshProgressFromSource()
+    {
+        if (_sourceScroller != null)
+        {
+            RefreshProgressFromMetrics(
+                SourceOrientation == Orientation.Horizontal ? _sourceScroller.HorizontalOffset : _sourceScroller.VerticalOffset,
+                SourceOrientation == Orientation.Horizontal ? _sourceScroller.ViewportWidth : _sourceScroller.ViewportHeight,
+                SourceOrientation == Orientation.Horizontal ? _sourceScroller.ExtentWidth : _sourceScroller.ExtentHeight);
+            return;
+        }
+
+        if (_sourceScrollViewer != null)
+        {
+            RefreshProgressFromMetrics(
+                SourceOrientation == Orientation.Horizontal ? _sourceScrollViewer.HorizontalOffset : _sourceScrollViewer.VerticalOffset,
+                SourceOrientation == Orientation.Horizontal ? _sourceScrollViewer.ViewportWidth : _sourceScrollViewer.ViewportHeight,
+                SourceOrientation == Orientation.Horizontal ? _sourceScrollViewer.ExtentWidth : _sourceScrollViewer.ExtentHeight);
+        }
+    }
+
+    private static void OnParallaxSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWParallaxView parallaxView)
+        {
+            parallaxView.DetachSource();
+            parallaxView.AttachSource(e.NewValue);
+            parallaxView.RefreshProgressFromSource();
+            parallaxView.UpdateCurrentOffset();
+            parallaxView.InvalidateMeasure();
+            parallaxView.InvalidateVisual();
+        }
     }
 
     private static void OnParallaxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWParallaxView parallaxView)
         {
+            if (e.Property == SourceOrientationProperty)
+            {
+                parallaxView.RefreshProgressFromSource();
+            }
+
             parallaxView.UpdateCurrentOffset();
             parallaxView.InvalidateMeasure();
             parallaxView.InvalidateVisual();
@@ -594,6 +657,61 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
         var offset = GetParallaxOffset(Progress);
         SetValue(CurrentOffsetPropertyKey.DependencyProperty, offset);
         UpdateContentTransform(offset);
+    }
+
+    private void AttachSource(object? source)
+    {
+        if (source is FWScroller scroller)
+        {
+            _sourceScroller = scroller;
+            _sourceScroller.ViewChanged += OnScrollerViewChanged;
+            return;
+        }
+
+        if (source is ScrollViewer scrollViewer)
+        {
+            _sourceScrollViewer = scrollViewer;
+            _sourceScrollViewer.ScrollChanged += OnScrollViewerScrollChanged;
+        }
+    }
+
+    private void DetachSource()
+    {
+        if (_sourceScroller != null)
+        {
+            _sourceScroller.ViewChanged -= OnScrollerViewChanged;
+            _sourceScroller = null;
+        }
+
+        if (_sourceScrollViewer != null)
+        {
+            _sourceScrollViewer.ScrollChanged -= OnScrollViewerScrollChanged;
+            _sourceScrollViewer = null;
+        }
+    }
+
+    private void OnScrollerViewChanged(object? sender, ScrollerViewChangedEventArgs e)
+    {
+        if (ReferenceEquals(sender, _sourceScroller))
+        {
+            RefreshProgressFromSource();
+        }
+    }
+
+    private void OnScrollViewerScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (ReferenceEquals(sender, _sourceScrollViewer))
+        {
+            RefreshProgressFromSource();
+        }
+    }
+
+    private void RefreshProgressFromMetrics(double offset, double viewportLength, double extentLength)
+    {
+        var scrollableLength = extentLength - viewportLength;
+        Progress = scrollableLength <= 0 || !double.IsFinite(scrollableLength)
+            ? 0
+            : Math.Clamp(offset / scrollableLength, 0.0, 1.0);
     }
 
     private void EnsureContentTransform()
@@ -631,6 +749,11 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
     {
         return value is double number && double.IsFinite(number) && number >= 0.0 && number <= 1.0;
     }
+
+    private static bool IsValidOrientation(object? value)
+    {
+        return value is Orientation orientation && Enum.IsDefined(orientation);
+    }
 }
 
 /// <summary>
@@ -645,7 +768,10 @@ public readonly record struct FWParallaxViewDiagnostics(
     double StartOffset,
     double EndOffset,
     bool IsHorizontalShiftEnabled,
-    bool IsVerticalShiftEnabled);
+    bool IsVerticalShiftEnabled,
+    bool IsSourceAttached,
+    string SourceKind,
+    Orientation SourceOrientation);
 
 /// <summary>
 /// FluentJalium RelativePanel control for arranging children relative to the panel or to sibling elements.

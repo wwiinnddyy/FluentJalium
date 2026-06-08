@@ -20,6 +20,8 @@ using FWParallaxView = FluentJalium.Controls.FWParallaxView;
 using FWRelativePanel = FluentJalium.Controls.FWRelativePanel;
 using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
 using FWSettingsCardAutomationDiagnostics = FluentJalium.Controls.FWSettingsCardAutomationDiagnostics;
+using FWScroller = FluentJalium.Controls.FWScroller;
+using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWSplitView = FluentJalium.Controls.FWSplitView;
 using FWSplitViewDisplayMode = FluentJalium.Controls.FWSplitViewDisplayMode;
 using FWSplitViewPanePlacement = FluentJalium.Controls.FWSplitViewPanePlacement;
@@ -499,12 +501,40 @@ internal sealed class GalleryContentLayoutPage
             CornerRadius = new CornerRadius(6),
             Content = CreateTransitionCard("Depth layer", "ParallaxView")
         };
+        var sourceScrollViewer = new FWScrollViewer
+        {
+            Width = 225,
+            Height = 52,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Children =
+                {
+                    new FWTextBlock { Text = "Scroll source 0", Margin = new Thickness(8) },
+                    new FWTextBlock { Text = "Scroll source 50", Margin = new Thickness(8) },
+                    new FWTextBlock { Text = "Scroll source 100", Margin = new Thickness(8) },
+                    new FWTextBlock { Text = "Scroll source end", Margin = new Thickness(8) }
+                }
+            }
+        };
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(sourceScrollViewer);
+        parallaxView.Source = scroller;
 
         void SetProgress(double progress)
         {
             parallaxView.Progress = progress;
             var diagnostics = parallaxView.GetDiagnostics();
-            output.Text = $"Parallax progress: {diagnostics.Progress:0.00}, current offset {diagnostics.CurrentOffset.X:0},{diagnostics.CurrentOffset.Y:0}.";
+            output.Text = $"Parallax progress: {diagnostics.Progress:0.00}, source {diagnostics.SourceKind}, current offset {diagnostics.CurrentOffset.X:0},{diagnostics.CurrentOffset.Y:0}.";
+        }
+
+        void ScrollSource(double offset)
+        {
+            sourceScrollViewer.ScrollToVerticalOffset(offset);
+            parallaxView.RefreshProgressFromSource();
+            var diagnostics = parallaxView.GetDiagnostics();
+            output.Text = $"Parallax progress: {diagnostics.Progress:0.00}, source {diagnostics.SourceKind}, current offset {diagnostics.CurrentOffset.X:0},{diagnostics.CurrentOffset.Y:0}.";
         }
 
         return new FWStackPanel
@@ -533,13 +563,15 @@ internal sealed class GalleryContentLayoutPage
                             Padding = new Thickness(10),
                             ClipToBounds = true,
                             Child = parallaxView
-                        })
+                        }),
+                        CreateLayoutFrame("Source", sourceScrollViewer)
                     }
                 },
                 CreateLayoutButtonRow(
                     CreateLayoutActionButton(FluentIconRegular.NumberSymbol24, "0%", () => SetProgress(0)),
                     CreateLayoutActionButton(FluentIconRegular.DataUsage24, "50%", () => SetProgress(0.5)),
-                    CreateLayoutActionButton(FluentIconRegular.CheckmarkCircle24, "100%", () => SetProgress(1))),
+                    CreateLayoutActionButton(FluentIconRegular.CheckmarkCircle24, "100%", () => SetProgress(1)),
+                    CreateLayoutActionButton(FluentIconRegular.ArrowDown24, "Scroll source", () => ScrollSource(84))),
                 CreateLayoutStatus(output)
             }
         };
@@ -860,7 +892,7 @@ internal sealed class GalleryContentLayoutPage
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
             "SplitView pane layout" => "<FWSplitView DisplayMode=\"CompactInline\"\n             PanePlacement=\"Left\"\n             IsPaneOpen=\"False\"\n             OpenPaneLength=\"208\"\n             CompactPaneLength=\"56\">\n  <FWSplitView.Pane>\n    <FWStackPanel Spacing=\"8\" />\n  </FWSplitView.Pane>\n  <FWBorder Padding=\"14\">\n    <FWTextBlock Text=\"Primary content\" />\n  </FWBorder>\n</FWSplitView>\n<!-- ActualPaneLength reflects compact, open, and overlay states. -->",
             "Adaptive settings layout" => "<FWTwoPaneView x:Name=\"AdaptiveView\" Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>\n<!-- AdaptiveView.ActualMode / AdaptiveView.VisiblePane expose the resolved state. -->",
-            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView x:Name=\"Depth\" Progress=\"0.5\" HorizontalShift=\"18\" VerticalShift=\"28\" />\n<!-- Depth.CurrentOffset exposes the resolved parallax offset. -->",
+            "Canvas, relative, and parallax layout" => "var source = new FWScroller();\nsource.AttachScrollViewer(scrollViewer);\nvar parallax = new FWParallaxView\n{\n    Source = source,\n    HorizontalShift = 18,\n    VerticalShift = 28,\n    IsHorizontalShiftEnabled = true\n};\nparallax.RefreshProgressFromSource();\n// parallax.CurrentOffset exposes the resolved parallax offset.",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
         };

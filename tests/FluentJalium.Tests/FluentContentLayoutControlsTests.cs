@@ -530,6 +530,59 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(0.75, diagnostics.EndOffset);
         Assert.False(diagnostics.IsHorizontalShiftEnabled);
         Assert.True(diagnostics.IsVerticalShiftEnabled);
+        Assert.True(diagnostics.HasSource);
+        Assert.False(diagnostics.IsSourceAttached);
+        Assert.Equal(nameof(FWGrid), diagnostics.SourceKind);
+        Assert.Equal(Orientation.Vertical, diagnostics.SourceOrientation);
+    }
+
+    [Fact]
+    public void FWParallaxView_ShouldTrackScrollViewerSourceProgress()
+    {
+        var scrollViewer = CreateScrollViewer(viewportHeight: 50, contentHeight: 250);
+        var parallaxView = new FWParallaxView
+        {
+            Source = scrollViewer,
+            VerticalShift = 40
+        };
+
+        scrollViewer.ScrollToVerticalOffset(100);
+
+        var diagnostics = parallaxView.GetDiagnostics();
+
+        Assert.Equal(0.5, parallaxView.Progress);
+        Assert.Equal(new Point(0, 20), parallaxView.CurrentOffset);
+        Assert.True(diagnostics.IsSourceAttached);
+        Assert.Equal(nameof(ScrollViewer), diagnostics.SourceKind);
+        Assert.Equal(Orientation.Vertical, diagnostics.SourceOrientation);
+    }
+
+    [Fact]
+    public void FWParallaxView_ShouldTrackScrollerSourceProgressAndDetachOldSource()
+    {
+        var oldScrollViewer = CreateScrollViewer(viewportHeight: 50, contentHeight: 250);
+        var newScrollViewer = CreateScrollViewer(viewportHeight: 50, contentHeight: 250);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(newScrollViewer);
+        var parallaxView = new FWParallaxView
+        {
+            Source = oldScrollViewer,
+            SourceOrientation = Orientation.Vertical,
+            VerticalShift = 40
+        };
+        oldScrollViewer.ScrollToVerticalOffset(100);
+
+        parallaxView.Source = scroller;
+        newScrollViewer.ScrollToVerticalOffset(150);
+        oldScrollViewer.ScrollToVerticalOffset(0);
+
+        var diagnostics = parallaxView.GetDiagnostics();
+
+        Assert.Equal(0.75, parallaxView.Progress);
+        Assert.Equal(new Point(0, 30), parallaxView.CurrentOffset);
+        Assert.True(diagnostics.IsSourceAttached);
+        Assert.Equal(nameof(FWScroller), diagnostics.SourceKind);
+        Assert.Equal(Orientation.Vertical, diagnostics.SourceOrientation);
     }
 
     [Fact]
@@ -1059,6 +1112,28 @@ public sealed class FluentContentLayoutControlsTests
         }
 
         return string.Equals(actual.ToString(), expected.ToString(), StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ScrollViewer CreateScrollViewer(
+        double viewportWidth = 100,
+        double viewportHeight = 100,
+        double contentWidth = 100,
+        double contentHeight = 100)
+    {
+        var scrollViewer = new ScrollViewer
+        {
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = new Border
+            {
+                Width = contentWidth,
+                Height = contentHeight
+            }
+        };
+        var viewportSize = new Size(viewportWidth, viewportHeight);
+        scrollViewer.Measure(viewportSize);
+        scrollViewer.Arrange(new Rect(0, 0, viewportWidth, viewportHeight));
+        return scrollViewer;
     }
 
     private sealed class RecordingCommand : ICommand
