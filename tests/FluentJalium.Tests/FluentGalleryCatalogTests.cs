@@ -202,6 +202,24 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeTaskDialogRealWindowQaSample()
+    {
+        Assert.True(GallerySampleCodeRegistry.TryGetRegisteredSampleCode("disclosure.taskdialog", out var sampleCode));
+
+        Assert.Contains("new FWTaskDialogHost", sampleCode);
+        Assert.Contains("FocusRestoreTarget", sampleCode);
+        Assert.Contains("Panel.SetZIndex", sampleCode);
+        Assert.Contains("TaskDialog real-window QA", sampleCode);
+        Assert.Contains("new KeyEventArgs", sampleCode);
+        Assert.Contains("Key.Tab", sampleCode);
+        Assert.Contains("ModifierKeys.Shift", sampleCode);
+        Assert.Contains("RequestLightDismiss", sampleCode);
+        Assert.Contains("LastKeyboardRequest", sampleCode);
+        Assert.Contains("GetAutomationDiagnostics", sampleCode);
+        Assert.Contains("PrimaryButton.AutomationId", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeScrollViewerSwipeAndSplitterSample()
     {
         var page = Assert.Single(

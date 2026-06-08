@@ -2,6 +2,7 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Input;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
@@ -449,10 +450,16 @@ internal sealed class GalleryDisclosurePage
     private static UIElement CreateTaskDialogSample()
     {
         var output = CreateDisclosureOutput("TaskDialogHost: modal host ready. Default: Primary, primary command: on, cancel guard: off.");
+        var hostStatus = CreateDisclosureOutput("Host: waiting for diagnostics.");
+        var focusStatus = CreateDisclosureOutput("Focus QA: restore target not focused yet.");
+        var automationStatus = CreateDisclosureOutput("Automation: waiting for button metadata.");
+        var keyboardStatus = CreateDisclosureOutput("Keyboard: no host key requests yet.");
         var cancelCloseRequests = false;
         var commandExecutions = 0;
         var lastRequest = "No button requests yet.";
         var lastCommand = "No button commands executed yet.";
+        var lastKeyboard = "No keyboard requests yet.";
+        var lastFocus = "Restore target not focused yet.";
         var deleteCommand = new GalleryTaskDialogCommand(parameter =>
         {
             commandExecutions++;
@@ -492,14 +499,57 @@ internal sealed class GalleryDisclosurePage
                 TextWrapping = TextWrapping.Wrap
             }
         };
+        var restoreTarget = new FWButton
+        {
+            Content = CreateDisclosureButtonContent(FluentIconRegular.CursorClick24, "Restore focus target"),
+            Focusable = true,
+            MinWidth = 210
+        };
         var taskDialogHost = new FWTaskDialogHost
         {
             Width = 470,
             Height = 260,
-            FocusRestoreTarget = output,
+            FocusRestoreTarget = restoreTarget,
             IsLightDismissEnabled = true,
             IsFocusTrapEnabled = true
         };
+        var hostStage = new Grid
+        {
+            Width = 470,
+            Height = 260
+        };
+        var appSurface = new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = "App surface behind FWTaskDialogHost",
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "The modal host is layered above this content and restores focus to the target button after close.",
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    restoreTarget
+                }
+            }
+        };
+        hostStage.Children.Add(appSurface);
+        hostStage.Children.Add(taskDialogHost);
+        Panel.SetZIndex(appSurface, 0);
+        Panel.SetZIndex(taskDialogHost, 10);
         taskDialog.PrimaryButtonClick += (_, args) => UpdateRequestEvent("Primary", args);
         taskDialog.SecondaryButtonClick += (_, args) => UpdateRequestEvent("Secondary", args);
         taskDialog.CloseButtonClick += (_, args) =>
@@ -521,6 +571,10 @@ internal sealed class GalleryDisclosurePage
                 ? $", request: {(requestCompleted.Value ? "completed" : "canceled")}"
                 : string.Empty;
             output.Text = $"{action}. Dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. Host diagnostics: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}. Automation: {FormatTaskDialogAutomation(automation)}. {lastRequest} {lastCommand}";
+            hostStatus.Text = $"Host QA: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}; layer {Panel.GetZIndex(taskDialogHost)} over app {Panel.GetZIndex(appSurface)}.";
+            focusStatus.Text = $"Focus QA: restore focus {FormatOnOff(hostDiagnostics.RestoreFocusOnClose)}, restore target {FormatOnOff(hostDiagnostics.HasFocusRestoreTarget)}, last dialog focus {automation.LastFocusTarget}. {lastFocus}";
+            automationStatus.Text = $"Automation QA: {FormatTaskDialogAutomation(automation)}; close {automation.CloseButton.AutomationId}/{automation.CloseButton.Name}/{automation.CloseButton.HelpText}.";
+            keyboardStatus.Text = $"Keyboard QA: {hostDiagnostics.LastKeyboardRequest}/{FormatOnOff(hostDiagnostics.LastKeyboardRequestHandled)}. {lastKeyboard}";
         }
 
         bool RequestDefaultButton()
@@ -543,6 +597,20 @@ internal sealed class GalleryDisclosurePage
                 () => taskDialog.RequestCloseButtonClick());
         }
 
+        bool RaiseHostKey(Key key, ModifierKeys modifiers)
+        {
+            var args = new KeyEventArgs(
+                UIElement.KeyDownEvent,
+                key,
+                modifiers,
+                isDown: true,
+                isRepeat: false,
+                timestamp: Environment.TickCount);
+            taskDialogHost.RaiseEvent(args);
+            lastKeyboard = $"{(modifiers == ModifierKeys.Shift ? "Shift+" : string.Empty)}{key} requested; handled {FormatOnOff(args.Handled)}.";
+            return args.Handled;
+        }
+
         async Task RunShowAsyncFlowAsync()
         {
             output.Text = $"TaskDialogHost ShowAsync flow started. Default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}.";
@@ -559,6 +627,7 @@ internal sealed class GalleryDisclosurePage
         }
 
         _ = taskDialogHost.ShowAsync(taskDialog);
+        lastFocus = $"Restore target focus requested: {FormatOnOff(restoreTarget.Focus())}.";
         UpdateAfterRequest("TaskDialogHost opened");
 
         return new FWStackPanel
@@ -567,7 +636,7 @@ internal sealed class GalleryDisclosurePage
             Spacing = 10,
             Children =
             {
-                taskDialogHost,
+                hostStage,
                 CreateDisclosureButtonRow(
                     CreateDisclosureActionButton(FluentIconRegular.Play24, "ShowAsync", () => _ = RunShowAsyncFlowAsync()),
                     CreateDisclosureActionButton(FluentIconRegular.Open24, "Open", () =>
@@ -600,6 +669,21 @@ internal sealed class GalleryDisclosurePage
                         var completed = taskDialogHost.RequestLightDismiss();
                         UpdateAfterRequest("Light dismiss requested", completed);
                     }),
+                    CreateDisclosureActionButton(FluentIconRegular.KeyboardTab24, "Tab", () =>
+                    {
+                        var handled = RaiseHostKey(Key.Tab, ModifierKeys.None);
+                        UpdateAfterRequest("Host Tab routed", handled);
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.SkipForwardTab24, "Shift+Tab", () =>
+                    {
+                        var handled = RaiseHostKey(Key.Tab, ModifierKeys.Shift);
+                        UpdateAfterRequest("Host Shift+Tab routed", handled);
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.Keyboard24, "Escape", () =>
+                    {
+                        var handled = RaiseHostKey(Key.Escape, ModifierKeys.None);
+                        UpdateAfterRequest("Host Escape routed", handled);
+                    }),
                     CreateDisclosureActionButton(FluentIconRegular.CheckmarkCircle24, "Default", () =>
                     {
                         taskDialog.DefaultButton = taskDialog.DefaultButton switch
@@ -621,8 +705,24 @@ internal sealed class GalleryDisclosurePage
                     {
                         cancelCloseRequests = !cancelCloseRequests;
                         UpdateAfterRequest("Cancel close guard changed");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.CursorClick24, "Focus target", () =>
+                    {
+                        lastFocus = $"Restore target focus requested: {FormatOnOff(restoreTarget.Focus())}.";
+                        UpdateAfterRequest("Restore focus target prepared");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.AccessibilityCheckmark24, "Focus trap", () =>
+                    {
+                        taskDialogHost.IsFocusTrapEnabled = !taskDialogHost.IsFocusTrapEnabled;
+                        UpdateAfterRequest("Focus trap toggled");
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.WindowWrench24, "Restore focus", () =>
+                    {
+                        taskDialogHost.RestoreFocusOnClose = !taskDialogHost.RestoreFocusOnClose;
+                        UpdateAfterRequest("Restore focus toggled");
                     })),
-                CreateDisclosureStatus(output)
+                CreateDisclosureStatus(output),
+                CreateTaskDialogDiagnosticsPanel(hostStatus, focusStatus, keyboardStatus, automationStatus)
             }
         };
     }
@@ -1074,6 +1174,46 @@ internal sealed class GalleryDisclosurePage
                     status
                 }
             }
+        };
+    }
+
+    private static FWBorder CreateTaskDialogDiagnosticsPanel(params TextBlock[] statuses)
+    {
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 6
+        };
+        panel.Children.Add(new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children =
+            {
+                CreateIcon(FluentIconRegular.TextBulletListSquare24, 18, ThemeBrush("TextSecondary")),
+                new FWTextBlock
+                {
+                    Text = "TaskDialog real-window QA",
+                    FontSize = 13,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
+        });
+
+        foreach (var status in statuses)
+        {
+            panel.Children.Add(status);
+        }
+
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = panel
         };
     }
 

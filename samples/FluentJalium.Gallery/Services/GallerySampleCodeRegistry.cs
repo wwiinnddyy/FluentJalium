@@ -847,12 +847,22 @@ commandFlyout.SecondaryCommands.Add(new FWAppBarButton { Label = "Rename", Icon 
 var deleteCommand = new RelayCommand(parameter => DeleteTemporaryCache(parameter));
 var archiveCommand = new RelayCommand(parameter => ArchiveTemporaryCache(parameter));
 var cancelCommand = new RelayCommand(parameter => Debug.WriteLine(parameter));
+var restoreTarget = new FWButton
+{
+    Content = "Restore focus target",
+    Focusable = true
+};
 var host = new FWTaskDialogHost
 {
     IsLightDismissEnabled = true,
     IsFocusTrapEnabled = true,
-    RestoreFocusOnClose = true
+    RestoreFocusOnClose = true,
+    FocusRestoreTarget = restoreTarget
 };
+var root = new Grid();
+root.Children.Add(new FWTextBlock { Text = "App content behind the modal layer" });
+root.Children.Add(host);
+Panel.SetZIndex(host, 10);
 
 var taskDialog = new FWTaskDialog
 {
@@ -884,7 +894,14 @@ taskDialog.PrimaryButtonClick += (_, args) =>
 
 var showTask = host.ShowAsync(taskDialog);
 var diagnostics = host.GetDiagnostics();
-Debug.WriteLine($"TaskDialog open: {diagnostics.IsOpen}; focus trap: {diagnostics.IsFocusTrapEnabled}.");
+Debug.WriteLine($"TaskDialog real-window QA: open {diagnostics.IsOpen}; focus trap {diagnostics.IsFocusTrapEnabled}; restore target {diagnostics.HasFocusRestoreTarget}; z {Panel.GetZIndex(host)}.");
+
+var tabArgs = new KeyEventArgs(UIElement.KeyDownEvent, Key.Tab, ModifierKeys.None, isDown: true, isRepeat: false, timestamp: Environment.TickCount);
+host.RaiseEvent(tabArgs);
+var shiftTabArgs = new KeyEventArgs(UIElement.KeyDownEvent, Key.Tab, ModifierKeys.Shift, isDown: true, isRepeat: false, timestamp: Environment.TickCount);
+host.RaiseEvent(shiftTabArgs);
+var lightDismissed = host.RequestLightDismiss();
+Debug.WriteLine($"TaskDialog keyboard QA: {host.LastKeyboardRequest}; handled {host.LastKeyboardRequestHandled}; light dismiss {lightDismissed}.");
 
 var automation = taskDialog.GetAutomationDiagnostics();
 Debug.WriteLine($"TaskDialog automation: {automation.Name}; primary id: {automation.PrimaryButton.AutomationId}; primary help: {automation.PrimaryButton.HelpText}.");
@@ -1089,6 +1106,20 @@ var closeReason = await closeTask;
         }
 
         return TryCreateFallbackSample(page, out sampleCode);
+    }
+
+    public static bool TryGetRegisteredSampleCode(string sampleCodeKey, out string sampleCode)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sampleCodeKey);
+
+        if (SampleCodeByKey.TryGetValue(sampleCodeKey.Trim(), out var registeredSampleCode))
+        {
+            sampleCode = registeredSampleCode.Trim();
+            return true;
+        }
+
+        sampleCode = string.Empty;
+        return false;
     }
 
     public static bool ContainsRegisteredSampleCodeKey(string? sampleCodeKey)
