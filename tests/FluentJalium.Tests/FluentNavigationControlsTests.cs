@@ -591,6 +591,22 @@ public sealed class FluentNavigationControlsTests
         Assert.True(overview.IsCloseButtonVisible);
         Assert.Equal("Details content", tabView.SelectedContent);
 
+        var selectedDiagnostics = tabView.GetDiagnostics();
+        Assert.Equal(2, selectedDiagnostics.ItemCount);
+        Assert.Equal(1, selectedDiagnostics.SelectedIndex);
+        Assert.Same(details, selectedDiagnostics.SelectedItem);
+        Assert.Equal("Details", selectedDiagnostics.SelectedHeader);
+        Assert.Equal("Details content", selectedDiagnostics.SelectedContent);
+        Assert.True(selectedDiagnostics.HasSelection);
+        Assert.Equal(FWNavigationDensity.Spacious, selectedDiagnostics.Density);
+        Assert.Equal(Jalium.UI.Controls.Dock.Bottom, selectedDiagnostics.TabStripPlacement);
+        Assert.Equal(FWTabViewWidthMode.SizeToContent, selectedDiagnostics.TabWidthMode);
+        Assert.Equal(FWTabViewCloseButtonOverlayMode.Always, selectedDiagnostics.CloseButtonOverlayMode);
+        Assert.True(selectedDiagnostics.IsAddTabButtonVisible);
+        Assert.True(selectedDiagnostics.CanReorderTabs);
+        Assert.Equal(52, selectedDiagnostics.MinHeight);
+        Assert.Equal(new Thickness(16, 10, 16, 10), selectedDiagnostics.Padding);
+
         Assert.True(tabView.RequestCloseTab(details));
 
         Assert.Single(tabView.Items);
@@ -604,6 +620,7 @@ public sealed class FluentNavigationControlsTests
         Assert.Equal("New content", tabView.SelectedContent);
         Assert.IsType<FWTabViewItem>(tabView.SelectedItem);
         Assert.False(((FWTabViewItem)tabView.SelectedItem!).IsClosable);
+        Assert.Equal("New", tabView.GetDiagnostics().SelectedHeader);
         Assert.Equal(1, addRequested);
         Assert.True(selectionChanged >= 3);
     }
@@ -736,6 +753,36 @@ public sealed class FluentNavigationControlsTests
 
         Assert.Same(diagnostics, tabView.SelectedItem);
         Assert.Same(diagnostics, tabView.SelectedContent);
+        Assert.Equal(diagnostics.ToString(), tabView.GetDiagnostics().SelectedHeader);
+        Assert.Same(diagnostics, tabView.GetDiagnostics().SelectedContent);
+    }
+
+    [Fact]
+    public void FWTabView_ShouldExposeEmptyDiagnostics()
+    {
+        var tabView = new FWTabView
+        {
+            IsAddTabButtonVisible = false,
+            CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Never,
+            TabWidthMode = FWTabViewWidthMode.Compact
+        };
+
+        var diagnostics = tabView.GetDiagnostics();
+
+        Assert.Equal(0, diagnostics.ItemCount);
+        Assert.Equal(-1, diagnostics.SelectedIndex);
+        Assert.Null(diagnostics.SelectedItem);
+        Assert.Equal(string.Empty, diagnostics.SelectedHeader);
+        Assert.Null(diagnostics.SelectedContent);
+        Assert.False(diagnostics.HasSelection);
+        Assert.Equal(FWNavigationDensity.Comfortable, diagnostics.Density);
+        Assert.Equal(Jalium.UI.Controls.Dock.Top, diagnostics.TabStripPlacement);
+        Assert.Equal(FWTabViewWidthMode.Compact, diagnostics.TabWidthMode);
+        Assert.Equal(FWTabViewCloseButtonOverlayMode.Never, diagnostics.CloseButtonOverlayMode);
+        Assert.False(diagnostics.IsAddTabButtonVisible);
+        Assert.False(diagnostics.CanReorderTabs);
+        Assert.Equal(44, diagnostics.MinHeight);
+        Assert.Equal(new Thickness(12, 6, 12, 6), diagnostics.Padding);
     }
 
     [Fact]

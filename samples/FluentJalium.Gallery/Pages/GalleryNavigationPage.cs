@@ -754,8 +754,9 @@ internal sealed class GalleryNavigationPage
 
         void UpdateStatus(string reason)
         {
-            tabView.Footer = $"{tabView.Items.Count} tabs";
-            output.Text = $"{reason}: {(tabView.SelectedItem as FWTabViewItem)?.Header ?? "none"}. Tabs: {tabView.Items.Count}. Width: {tabView.TabWidthMode}. Close: {tabView.CloseButtonOverlayMode}. Placement: {tabView.TabStripPlacement}";
+            var diagnostics = tabView.GetDiagnostics();
+            tabView.Footer = $"{diagnostics.ItemCount} tabs";
+            output.Text = $"{reason}: {(diagnostics.HasSelection ? diagnostics.SelectedHeader : "none")}. Index: {diagnostics.SelectedIndex}/{diagnostics.ItemCount}. Width: {diagnostics.TabWidthMode}. Close: {diagnostics.CloseButtonOverlayMode}. Placement: {diagnostics.TabStripPlacement}. Reorder: {diagnostics.CanReorderTabs}";
         }
 
         tabView.SelectionChanged += (_, _) => UpdateStatus("Selected tab");

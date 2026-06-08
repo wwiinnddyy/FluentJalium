@@ -56,6 +56,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("Selector", selectorBarDiagnostics.BaseClasses);
         Assert.Equal("/Navigation/FWNavigationService/FWSelectorBarDiagnostics", selectorBarDiagnostics.SourcePath);
 
+        var tabViewDiagnostics = Assert.Single(controls, control => control.Name == "FWTabViewDiagnostics");
+        Assert.True(tabViewDiagnostics.IsUpdated);
+        Assert.Equal("navigation.breadcrumb.pips.selector.tabview.titlebar", tabViewDiagnostics.SampleCodeKey);
+        Assert.Contains("TabItem", tabViewDiagnostics.BaseClasses);
+        Assert.Equal("/Navigation/FWNavigationService/FWTabViewDiagnostics", tabViewDiagnostics.SourcePath);
+
         var flyout = Assert.Single(controls, control => control.Name == "FWFlyout");
         Assert.True(flyout.IsUpdated);
         Assert.Equal("menus.flyout.commandbar", flyout.SampleCodeKey);
@@ -90,6 +96,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWSelectorBar", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
         Assert.Contains("SelectedText", sampleCode);
+        Assert.Contains("SelectedHeader", sampleCode);
         Assert.Contains("ItemCount", sampleCode);
     }
 

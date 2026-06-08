@@ -625,6 +625,18 @@ selectorBar.SelectedIndex = 0;
 
 var selectorDiagnostics = selectorBar.GetDiagnostics();
 Debug.WriteLine($"SelectorBar selected: {selectorDiagnostics.SelectedText}; index: {selectorDiagnostics.SelectedIndex}/{selectorDiagnostics.ItemCount}.");
+
+var tabView = new FWTabView
+{
+    TabWidthMode = FWTabViewWidthMode.SizeToContent,
+    CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always
+};
+tabView.Items.Add(new FWTabViewItem { Header = "Overview", Content = "Overview content", IsClosable = false });
+tabView.Items.Add(new FWTabViewItem { Header = "Details", Content = "Details content" });
+tabView.SelectedIndex = 0;
+
+var tabDiagnostics = tabView.GetDiagnostics();
+Debug.WriteLine($"TabView selected: {tabDiagnostics.SelectedHeader}; tabs: {tabDiagnostics.ItemCount}; close: {tabDiagnostics.CloseButtonOverlayMode}.");
 """,
         ["materials.windowbackdrop"] = """
 var windowSurface = new FWFluentWindowSurface

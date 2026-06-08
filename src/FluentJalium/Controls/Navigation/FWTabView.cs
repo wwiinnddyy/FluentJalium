@@ -245,6 +245,25 @@ public class FWTabView : Selector, IFluentJaliumControl
         return true;
     }
 
+    public FWTabViewDiagnostics GetDiagnostics()
+    {
+        return new FWTabViewDiagnostics(
+            GetItemCount(),
+            SelectedIndex,
+            SelectedItem,
+            SelectedItem is FWTabViewItem tab ? tab.Header?.ToString() ?? string.Empty : SelectedItem?.ToString() ?? string.Empty,
+            SelectedContent,
+            SelectedItem != null,
+            Density,
+            TabStripPlacement,
+            TabWidthMode,
+            CloseButtonOverlayMode,
+            IsAddTabButtonVisible,
+            CanReorderTabs,
+            MinHeight,
+            Padding);
+    }
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
@@ -394,6 +413,25 @@ public class FWTabView : Selector, IFluentJaliumControl
         return value is FWNavigationDensity density && Enum.IsDefined(density);
     }
 }
+
+/// <summary>
+/// Snapshot of tab view state for Gallery diagnostics and tests.
+/// </summary>
+public readonly record struct FWTabViewDiagnostics(
+    int ItemCount,
+    int SelectedIndex,
+    object? SelectedItem,
+    string SelectedHeader,
+    object? SelectedContent,
+    bool HasSelection,
+    FWNavigationDensity Density,
+    TabDock TabStripPlacement,
+    FWTabViewWidthMode TabWidthMode,
+    FWTabViewCloseButtonOverlayMode CloseButtonOverlayMode,
+    bool IsAddTabButtonVisible,
+    bool CanReorderTabs,
+    double MinHeight,
+    Thickness Padding);
 
 /// <summary>
 /// FluentJalium TabView item.
