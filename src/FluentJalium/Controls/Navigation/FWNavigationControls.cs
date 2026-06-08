@@ -15,6 +15,11 @@ public enum FWNavigationDensity
 }
 
 /// <summary>
+/// Resolves the concrete page type that should be used for a navigation route.
+/// </summary>
+public delegate Type? FWNavigationPageTypeProvider(FWNavigationRoute route, object? parameter);
+
+/// <summary>
 /// Route metadata used by <see cref="FWNavigationService"/>.
 /// </summary>
 public sealed class FWNavigationRoute
@@ -59,7 +64,8 @@ public readonly record struct FWNavigationServiceDiagnostics(
     bool CanGoBack,
     bool CanGoForward,
     int BackStackDepth,
-    bool IsSynchronizingSelection);
+    bool IsSynchronizingSelection,
+    bool HasPageTypeProvider);
 
 /// <summary>
 /// Lightweight NavigationView + Frame coordinator for app-shell routing.
@@ -67,6 +73,7 @@ public readonly record struct FWNavigationServiceDiagnostics(
 public sealed class FWNavigationService
 {
     private readonly Dictionary<string, FWNavigationRoute> _routes = new(StringComparer.Ordinal);
+    private readonly Dictionary<Type, string> _resolvedPageRouteKeys = new();
     private FWNavigationView? _navigationView;
     private FWFrame? _frame;
     private bool _isSynchronizingSelection;
@@ -83,6 +90,12 @@ public sealed class FWNavigationService
     public string? CurrentRouteKey { get; private set; }
 
     public IReadOnlyCollection<FWNavigationRoute> Routes => _routes.Values;
+
+    /// <summary>
+    /// Gets or sets an optional route page-type resolver for DI-backed or generated app shells.
+    /// </summary>
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public FWNavigationPageTypeProvider? PageTypeProvider { get; set; }
 
     public void Attach(FWNavigationView navigationView, FWFrame frame)
     {
@@ -122,6 +135,7 @@ public sealed class FWNavigationService
     public FWNavigationRoute RegisterRoute(string routeKey, Type pageType, object? parameter = null)
     {
         var route = new FWNavigationRoute(routeKey, pageType, parameter);
+        RemoveResolvedRouteKeys(route.RouteKey);
         _routes[route.RouteKey] = route;
         return route;
     }
@@ -136,6 +150,7 @@ public sealed class FWNavigationService
         item.RouteKey = routeKey;
 
         var route = new FWNavigationRoute(routeKey, pageType, parameter, item);
+        RemoveResolvedRouteKeys(route.RouteKey);
         _routes[route.RouteKey] = route;
         return route;
     }
@@ -149,6 +164,7 @@ public sealed class FWNavigationService
             return false;
         }
 
+        RemoveResolvedRouteKeys(routeKey);
         if (string.Equals(CurrentRouteKey, routeKey, StringComparison.Ordinal))
         {
             CurrentRouteKey = null;
@@ -197,7 +213,8 @@ public sealed class FWNavigationService
             _frame?.CanGoBack ?? false,
             _frame?.CanGoForward ?? false,
             _frame?.BackStackDepth ?? 0,
-            _isSynchronizingSelection);
+            _isSynchronizingSelection,
+            PageTypeProvider != null);
     }
 
     [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
@@ -209,8 +226,17 @@ public sealed class FWNavigationService
         }
 
         var navigationParameter = parameter ?? route.Parameter ?? route.RouteKey;
-        if (!_frame.Navigate(route.PageType, navigationParameter))
+        var pageType = ResolvePageType(route, navigationParameter);
+        if (pageType == null)
         {
+            UpdateNavigationViewBackState();
+            return false;
+        }
+
+        _resolvedPageRouteKeys[pageType] = route.RouteKey;
+        if (!_frame.Navigate(pageType, navigationParameter))
+        {
+            _resolvedPageRouteKeys.Remove(pageType);
             UpdateNavigationViewBackState();
             return false;
         }
@@ -255,6 +281,23 @@ public sealed class FWNavigationService
         if (CurrentRouteKey != null && _routes.TryGetValue(CurrentRouteKey, out var route))
         {
             Navigated?.Invoke(this, route);
+        }
+    }
+
+    private Type? ResolvePageType(FWNavigationRoute route, object? parameter)
+    {
+        var pageType = PageTypeProvider?.Invoke(route, parameter) ?? route.PageType;
+        return pageType != null && typeof(Page).IsAssignableFrom(pageType) ? pageType : null;
+    }
+
+    private void RemoveResolvedRouteKeys(string routeKey)
+    {
+        foreach (var resolvedPageType in _resolvedPageRouteKeys
+            .Where(pair => string.Equals(pair.Value, routeKey, StringComparison.Ordinal))
+            .Select(pair => pair.Key)
+            .ToArray())
+        {
+            _resolvedPageRouteKeys.Remove(resolvedPageType);
         }
     }
 
@@ -310,6 +353,12 @@ public sealed class FWNavigationService
             {
                 return route.RouteKey;
             }
+        }
+
+        if (_resolvedPageRouteKeys.TryGetValue(pageType, out var resolvedRouteKey) &&
+            _routes.ContainsKey(resolvedRouteKey))
+        {
+            return resolvedRouteKey;
         }
 
         return null;

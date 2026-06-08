@@ -323,7 +323,109 @@ public sealed class FluentNavigationControlsTests
         Assert.False(diagnostics.CanGoForward);
         Assert.Equal(1, diagnostics.BackStackDepth);
         Assert.False(diagnostics.IsSynchronizingSelection);
+        Assert.False(diagnostics.HasPageTypeProvider);
         Assert.Equal(["overview", "Details", "overview", "Details"], navigatedRoutes);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises FWNavigationService Frame page activation by type.")]
+    public void FWNavigationService_ShouldUsePageTypeProviderForRouteNavigation()
+    {
+        var navigationView = new FWNavigationView();
+        var overviewItem = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var detailsItem = new FWNavigationViewItem
+        {
+            Content = "Details",
+            RouteKey = "details"
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(detailsItem);
+
+        var frame = new FWFrame();
+        var service = new FWNavigationService
+        {
+            PageTypeProvider = (route, parameter) =>
+                string.Equals(route.RouteKey, "details", StringComparison.Ordinal) &&
+                parameter is string parameterText &&
+                string.Equals(parameterText, "provided", StringComparison.Ordinal)
+                    ? typeof(NavigationProviderPage)
+                    : route.PageType
+        };
+        var navigatedRoutes = new List<string>();
+        service.Navigated += (_, route) => navigatedRoutes.Add(route.RouteKey);
+        service.RegisterRoute(overviewItem, typeof(NavigationOverviewPage), "overview");
+        service.RegisterRoute(detailsItem, typeof(NavigationDetailsPage), "provided");
+
+        service.Attach(navigationView, frame);
+
+        Assert.True(service.NavigateToRoute("details"));
+
+        Assert.Equal(typeof(NavigationProviderPage), frame.SourcePageType);
+        Assert.IsType<NavigationProviderPage>(frame.CurrentPage);
+        Assert.Equal("provided", frame.CurrentPage!.NavigationParameter);
+        Assert.Equal("details", service.CurrentRouteKey);
+        Assert.Equal(detailsItem, navigationView.SelectedItem);
+        Assert.Equal(["details"], navigatedRoutes);
+
+        var diagnostics = service.GetDiagnostics();
+        Assert.True(diagnostics.HasPageTypeProvider);
+        Assert.Equal("details", diagnostics.CurrentRouteKey);
+        Assert.Equal(typeof(NavigationProviderPage), diagnostics.CurrentPageType);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises FWNavigationService Frame page activation by type.")]
+    public void FWNavigationService_ShouldRejectInvalidProviderPageTypes()
+    {
+        var navigationView = new FWNavigationView();
+        var item = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var frame = new FWFrame();
+        var service = new FWNavigationService
+        {
+            PageTypeProvider = (_, _) => typeof(string)
+        };
+        service.RegisterRoute(item, typeof(NavigationOverviewPage));
+        service.Attach(navigationView, frame);
+
+        Assert.False(service.NavigateToRoute("overview"));
+
+        Assert.Null(frame.SourcePageType);
+        Assert.Null(service.CurrentRouteKey);
+        Assert.True(service.GetDiagnostics().HasPageTypeProvider);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises FWNavigationService Frame page activation by type.")]
+    public void FWNavigationService_ShouldFallbackToRegisteredPageWhenProviderReturnsNull()
+    {
+        var navigationView = new FWNavigationView();
+        var item = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var frame = new FWFrame();
+        var service = new FWNavigationService
+        {
+            PageTypeProvider = (_, _) => null
+        };
+        service.RegisterRoute(item, typeof(NavigationOverviewPage), "registered");
+        service.Attach(navigationView, frame);
+
+        Assert.True(service.NavigateToRoute("overview"));
+
+        Assert.Equal(typeof(NavigationOverviewPage), frame.SourcePageType);
+        Assert.Equal("registered", frame.CurrentPage!.NavigationParameter);
+        Assert.Equal("overview", service.CurrentRouteKey);
+        Assert.Equal(item, navigationView.SelectedItem);
     }
 
     [Fact]
@@ -921,6 +1023,10 @@ public sealed class FluentNavigationControlsTests
     }
 
     private sealed class NavigationDetailsPage : Page
+    {
+    }
+
+    private sealed class NavigationProviderPage : Page
     {
     }
 

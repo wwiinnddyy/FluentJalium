@@ -66,7 +66,7 @@ internal sealed class GalleryNavigationPage
         examples.Children.Add(CreateNavigationExampleCard(
             FluentIconRegular.Window24,
             "FWNavigationService + FWFrame",
-            "Route NavigationView selection into Frame pages while keeping back/forward diagnostics synchronized.",
+            "Route NavigationView selection into Frame pages with optional provider-based page resolution and synchronized diagnostics.",
             CreateFrameNavigationSample()));
         examples.Children.Add(CreateNavigationExampleCard(
             FluentIconRegular.BranchFork24,
@@ -351,6 +351,10 @@ internal sealed class GalleryNavigationPage
         navigationView.UpdateMenuItems();
 
         var service = new FWNavigationService();
+        service.PageTypeProvider = (route, parameter) =>
+            route.RouteKey == "details" && Equals(parameter, "Details route")
+                ? typeof(GalleryNavigationProviderPage)
+                : route.PageType;
         service.RegisterRoute(overviewItem, typeof(GalleryNavigationOverviewPage), "Overview route");
         service.RegisterRoute(detailsItem, typeof(GalleryNavigationDetailsPage), "Details route");
         service.Attach(navigationView, frame);
@@ -397,7 +401,7 @@ internal sealed class GalleryNavigationPage
 
     private static string FormatNavigationServiceDiagnostics(FWNavigationServiceDiagnostics diagnostics)
     {
-        return $"Route: {diagnostics.CurrentRouteKey ?? "none"}, Page: {diagnostics.CurrentPageType?.Name ?? "none"}, Back: {diagnostics.CanGoBack}, Forward: {diagnostics.CanGoForward}, Stack: {diagnostics.BackStackDepth}";
+        return $"Route: {diagnostics.CurrentRouteKey ?? "none"}, Page: {diagnostics.CurrentPageType?.Name ?? "none"}, Back: {diagnostics.CanGoBack}, Forward: {diagnostics.CanGoForward}, Stack: {diagnostics.BackStackDepth}, Provider: {(diagnostics.HasPageTypeProvider ? "On" : "Off")}";
     }
 
     private static UIElement CreateMaterialNavigationShellSample()
@@ -1046,7 +1050,7 @@ internal sealed class GalleryNavigationPage
             "FWNavigationView" => "<FWNavigationView PaneTitle=\"FluentJalium\" Header=\"NavigationView\">\n    <FWNavigationViewItem Content=\"Dashboard\" />\n    <FWNavigationViewItem Content=\"Controls\" />\n</FWNavigationView>",
             "Pane modes and hierarchy" => "<FWNavigationView PaneDisplayMode=\"LeftCompact\" IsPaneOpen=\"False\">\n    <FWNavigationViewItem Content=\"Document options\" IsExpanded=\"True\" SelectsOnInvoked=\"False\" />\n</FWNavigationView>",
             "FWTabControl" => "<FWTabControl TabStripPlacement=\"Top\" IsSwipeEnabled=\"True\">\n    <FWTabItem Header=\"Overview\" />\n    <FWTabItem Header=\"Details\" />\n</FWTabControl>",
-            "FWNavigationService + FWFrame" => "var navigationView = new FWNavigationView();\nvar frame = new FWFrame();\nvar service = new FWNavigationService();\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Overview\", RouteKey = \"overview\" }, typeof(GalleryNavigationOverviewPage));\nservice.Attach(navigationView, frame);\nservice.NavigateToRoute(\"overview\");\nservice.GoBack();",
+            "FWNavigationService + FWFrame" => "var navigationView = new FWNavigationView();\nvar frame = new FWFrame();\nvar service = new FWNavigationService\n{\n    PageTypeProvider = (route, parameter) => route.RouteKey == \"details\"\n        ? typeof(GalleryNavigationProviderPage)\n        : route.PageType\n};\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Overview\", RouteKey = \"overview\" }, typeof(GalleryNavigationOverviewPage));\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Details\", RouteKey = \"details\" }, typeof(GalleryNavigationDetailsPage));\nservice.Attach(navigationView, frame);\nservice.NavigateToRoute(\"overview\");\nservice.NavigateToRoute(\"details\");",
             "FWBreadcrumbBar" => "<FWBreadcrumbBar ItemsSource=\"{Binding PathSegments}\" MaxItems=\"5\" ItemClicked=\"OnBreadcrumbClicked\" />",
             "FWPipsPager" => "<FWPipsPager NumberOfPages=\"10\" SelectedPageIndex=\"0\" MaxVisiblePips=\"5\" SelectedIndexChanged=\"OnPageChanged\" />",
             "FWSelectorBar" => "<FWSelectorBar SelectionIndicatorPlacement=\"Auto\">\n    <FWSelectorBarItem Text=\"Overview\" />\n    <FWSelectorBarItem Text=\"Activity\" />\n</FWSelectorBar>",

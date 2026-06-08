@@ -26,6 +26,16 @@ internal sealed class GalleryNavigationDetailsPage : Page
     }
 }
 
+internal sealed class GalleryNavigationProviderPage : Page
+{
+    public GalleryNavigationProviderPage()
+    {
+        Content = GalleryNavigationPageContent.Create(
+            "Provider detail",
+            "The service resolved this route through PageTypeProvider for DI-ready shell routing.");
+    }
+}
+
 internal static class GalleryNavigationPageContent
 {
     public static UIElement Create(string title, string text)

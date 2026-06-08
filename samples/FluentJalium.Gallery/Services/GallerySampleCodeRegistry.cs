@@ -552,7 +552,12 @@ var navigationView = new FWNavigationView
 };
 
 var frame = new FWFrame();
-var navigationService = new FWNavigationService();
+var navigationService = new FWNavigationService
+{
+    PageTypeProvider = (route, parameter) => route.RouteKey == "settings"
+        ? typeof(SettingsShellPage)
+        : route.PageType
+};
 var overviewItem = new FWNavigationViewItem
 {
     Content = "Overview",
@@ -572,9 +577,10 @@ navigationService.RegisterRoute(overviewItem, typeof(OverviewPage), "overview");
 navigationService.RegisterRoute(settingsItem, typeof(SettingsPage), "settings");
 navigationService.Attach(navigationView, frame);
 navigationService.NavigateToRoute("overview");
+navigationService.NavigateToRoute("settings");
 
 var diagnostics = navigationService.GetDiagnostics();
-Debug.WriteLine($"Navigation route: {diagnostics.CurrentRouteKey}; back: {diagnostics.CanGoBack}.");
+Debug.WriteLine($"Navigation route: {diagnostics.CurrentRouteKey}; provider: {diagnostics.HasPageTypeProvider}.");
 
 var pager = new FWPipsPager
 {
