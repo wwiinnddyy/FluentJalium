@@ -227,6 +227,7 @@
                 <StackPanel Orientation="Vertical" Spacing="2" />
             </ItemsPanelTemplate>
         </Setter>
+        <Setter Property="ItemTemplate" Value="{StaticResource FWSettingsExpanderDefaultItemTemplate}" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSettingsExpander">
                 <Border Name="RootBorder"
@@ -257,31 +258,15 @@
                                             VerticalAlignment="Center">
                                     <ContentPresenter Content="{TemplateBinding Header}">
                                         <ContentPresenter.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-                                                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-                                                <Setter Property="FontWeight" Value="SemiBold" />
-                                                <Setter Property="TextWrapping" Value="Wrap" />
-                                            </Style>
-                                            <Style TargetType="AccessText">
-                                                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
-                                                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
-                                                <Setter Property="FontWeight" Value="SemiBold" />
-                                            </Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource FWSettingsExpanderHeaderTextStyle}" />
+                                            <Style TargetType="AccessText" BasedOn="{StaticResource FWSettingsExpanderHeaderAccessTextStyle}" />
                                         </ContentPresenter.Resources>
                                     </ContentPresenter>
                                     <ContentPresenter Content="{TemplateBinding Description}"
                                                       ContentTemplate="{TemplateBinding DescriptionTemplate}">
                                         <ContentPresenter.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
-                                                <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
-                                                <Setter Property="TextWrapping" Value="Wrap" />
-                                            </Style>
-                                            <Style TargetType="AccessText">
-                                                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
-                                                <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
-                                            </Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource FWSettingsExpanderDescriptionTextStyle}" />
+                                            <Style TargetType="AccessText" BasedOn="{StaticResource FWSettingsExpanderDescriptionAccessTextStyle}" />
                                         </ContentPresenter.Resources>
                                     </ContentPresenter>
                                 </StackPanel>
@@ -577,13 +562,15 @@
             <ControlTemplate TargetType="fluent:FWTaskDialogHost">
                 <Grid Name="PART_Root">
                     <Border Name="PART_Overlay"
-                            Background="{TemplateBinding Background}" />
+                            Background="{TemplateBinding Background}"
+                            Panel.ZIndex="0" />
                     <ContentPresenter Name="PART_DialogPresenter"
                                       Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                      Margin="{TemplateBinding Padding}" />
+                                      Margin="{TemplateBinding Padding}"
+                                      Panel.ZIndex="1" />
                 </Grid>
             </ControlTemplate>
         </Setter>

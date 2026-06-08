@@ -802,6 +802,105 @@ public sealed class FluentDisclosureControlsTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public async Task FWTaskDialogHost_ShouldRestoreCapturedWindowFocusAndLayerDialogAboveOverlay()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var previousProvider = FocusService.Provider;
+        var focusProvider = new RecordingFocusProvider();
+        var app = new Application();
+        FocusService.Provider = focusProvider;
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var appContent = new FWTextBlock
+            {
+                Text = "App content behind the modal layer"
+            };
+            var restoreTarget = new FWButton
+            {
+                Content = "Toolbar action",
+                Focusable = true
+            };
+            var closeCommand = new RecordingCommand();
+            var dialog = new FWTaskDialog
+            {
+                Title = "Replace runtime settings?",
+                Subtitle = "The host should restore the previously focused app action.",
+                PrimaryButtonText = "Replace",
+                SecondaryButtonText = "Review",
+                CloseButtonText = "Cancel",
+                DefaultButton = FWTaskDialogButton.Primary,
+                CancelButton = FWTaskDialogButton.Close,
+                CloseButtonCommand = closeCommand,
+                CloseButtonCommandParameter = "escape",
+                Style = AssertStyle<FWTaskDialog>(app.Resources)
+            };
+            var host = new FWTaskDialogHost
+            {
+                Style = AssertStyle<FWTaskDialogHost>(app.Resources),
+                IsFocusTrapEnabled = true,
+                RestoreFocusOnClose = true
+            };
+            var root = new Grid();
+            root.Children.Add(appContent);
+            root.Children.Add(host);
+            Panel.SetZIndex(appContent, 0);
+            Panel.SetZIndex(host, 100);
+
+            Assert.True(restoreTarget.Focus());
+            Assert.Same(restoreTarget, focusProvider.FocusedElement);
+
+            var showTask = host.ShowAsync(dialog);
+            host.ApplyTemplate();
+            dialog.ApplyTemplate();
+            root.Measure(new Size(640, 420));
+            root.Arrange(new Rect(0, 0, 640, 420));
+
+            Assert.True(host.IsOpen);
+            Assert.True(host.GetDiagnostics().HasFocusRestoreTarget);
+            Assert.Same(host, root.GetVisualChild(1));
+            var hostRoot = Assert.IsAssignableFrom<Grid>(host.GetVisualChild(0));
+            Assert.Equal(2, hostRoot.VisualChildrenCount);
+            var overlay = Assert.IsAssignableFrom<Border>(hostRoot.GetVisualChild(0));
+            var presenter = Assert.IsAssignableFrom<ContentPresenter>(hostRoot.GetVisualChild(1));
+            Assert.Equal(0, Panel.GetZIndex(overlay));
+            Assert.Equal(1, Panel.GetZIndex(presenter));
+            Assert.Same(dialog, presenter.Content);
+
+            var focusedDefaultButton = Assert.IsAssignableFrom<DependencyObject>(focusProvider.FocusedElement);
+            Assert.Equal("PrimaryButton", AutomationProperties.GetAutomationId(focusedDefaultButton));
+            Assert.Equal(FWTaskDialogButton.Primary, dialog.LastFocusTarget);
+
+            var escapeArgs = new KeyEventArgs(
+                UIElement.KeyDownEvent,
+                Key.Escape,
+                ModifierKeys.None,
+                isDown: true,
+                isRepeat: false,
+                timestamp: 0);
+
+            host.RaiseEvent(escapeArgs);
+            var result = await showTask;
+
+            Assert.True(escapeArgs.Handled);
+            Assert.Equal(FWTaskDialogResult.Close, result);
+            Assert.Equal(1, closeCommand.ExecuteCount);
+            Assert.Equal("escape", closeCommand.LastParameter);
+            Assert.False(host.IsOpen);
+            Assert.Null(host.Content);
+            Assert.Same(restoreTarget, focusProvider.FocusedElement);
+        }
+        finally
+        {
+            FocusService.Provider = previousProvider;
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public async Task FWTaskDialogHost_ShouldExposeFocusDiagnosticsAndReuseCurrentDialogTask()
     {
         var host = new FWTaskDialogHost

@@ -1286,10 +1286,12 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
     private Task<FWTaskDialogResult>? _currentShowTask;
     private FWTaskDialogHostKeyboardRequest _lastKeyboardRequest;
     private bool _lastKeyboardRequestHandled;
+    private UIElement? _capturedFocusRestoreTarget;
 
     public FWTaskDialogHost()
     {
         Focusable = true;
+        UseTemplateContentManagement();
         AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownHandler));
     }
 
@@ -1341,7 +1343,7 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
             IsLightDismissEnabled,
             IsFocusTrapEnabled,
             RestoreFocusOnClose,
-            FocusRestoreTarget != null,
+            FocusRestoreTarget != null || _capturedFocusRestoreTarget != null,
             LastKeyboardRequest,
             LastKeyboardRequestHandled);
     }
@@ -1405,6 +1407,7 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
     {
         dialog.Closed += OnCurrentDialogClosed;
         RecordKeyboardRequest(FWTaskDialogHostKeyboardRequest.None, handled: false);
+        CaptureFocusRestoreTarget(dialog);
         SetValue(CurrentDialogPropertyKey.DependencyProperty, dialog);
         SetValue(IsOpenPropertyKey.DependencyProperty, true);
         Content = dialog;
@@ -1421,15 +1424,43 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
             Content = null;
             _currentShowTask = null;
             RestoreFocus();
+            _capturedFocusRestoreTarget = null;
         }
+    }
+
+    private void CaptureFocusRestoreTarget(FWTaskDialog dialog)
+    {
+        if (!RestoreFocusOnClose ||
+            FocusRestoreTarget != null ||
+            FocusService.FocusedElement is not UIElement focusedElement ||
+            ReferenceEquals(focusedElement, this) ||
+            ReferenceEquals(focusedElement, dialog) ||
+            !CanRestoreFocusTo(focusedElement))
+        {
+            _capturedFocusRestoreTarget = null;
+            return;
+        }
+
+        _capturedFocusRestoreTarget = focusedElement;
     }
 
     private void RestoreFocus()
     {
         if (RestoreFocusOnClose)
         {
-            _ = FocusRestoreTarget?.Focus();
+            var target = FocusRestoreTarget ?? _capturedFocusRestoreTarget;
+            if (target != null && CanRestoreFocusTo(target))
+            {
+                _ = target.Focus();
+            }
         }
+    }
+
+    private static bool CanRestoreFocusTo(UIElement element)
+    {
+        return element.Focusable &&
+               element.IsEnabled &&
+               element.Visibility == Visibility.Visible;
     }
 
     private void OnCurrentDialogClosed(object? sender, FWTaskDialogClosedEventArgs e)
