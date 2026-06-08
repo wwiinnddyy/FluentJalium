@@ -671,6 +671,21 @@ navigationService.NavigateToRoute("settings");
 var diagnostics = navigationService.GetDiagnostics();
 Debug.WriteLine($"Navigation route: {diagnostics.CurrentRouteKey}; provider: {diagnostics.HasPageTypeProvider}.");
 
+var routeSuggestions = new[] { "Overview", "Activity", "Settings" };
+var search = new FWAutoSuggestBox
+{
+    ItemsSource = routeSuggestions,
+    FilterMode = AutoCompleteFilterMode.Contains,
+    PlaceholderText = "Search routes"
+};
+search.QuerySubmitted += (_, args) => navigationService.NavigateToRoute(args.QueryText);
+
+var breadcrumb = new FWBreadcrumbBar
+{
+    ItemsSource = new ObservableCollection<string> { "Home", "Overview" },
+    MaxItems = 4
+};
+
 var pager = new FWPipsPager
 {
     NumberOfPages = 10,
@@ -700,6 +715,9 @@ tabView.SelectedIndex = 0;
 
 var tabDiagnostics = tabView.GetDiagnostics();
 Debug.WriteLine($"TabView selected: {tabDiagnostics.SelectedHeader}; tabs: {tabDiagnostics.ItemCount}; close: {tabDiagnostics.CloseButtonOverlayMode}.");
+
+var shellDiagnostics = navigationService.GetDiagnostics();
+Debug.WriteLine($"App shell: route {shellDiagnostics.CurrentRouteKey}; back {shellDiagnostics.CanGoBack}; provider {shellDiagnostics.HasPageTypeProvider}.");
 """,
         ["materials.windowbackdrop"] = """
 var windowSurface = new FWFluentWindowSurface

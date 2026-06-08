@@ -157,6 +157,14 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("SelectedText", sampleCode);
         Assert.Contains("SelectedHeader", sampleCode);
         Assert.Contains("ItemCount", sampleCode);
+        Assert.Contains("new FWAutoSuggestBox", sampleCode);
+        Assert.Contains("new FWBreadcrumbBar", sampleCode);
+        Assert.Contains("new FWNavigationService", sampleCode);
+        Assert.Contains("new FWPipsPager", sampleCode);
+        Assert.Contains("new FWSelectorBar", sampleCode);
+        Assert.Contains("new FWTabView", sampleCode);
+        Assert.Contains("App shell", sampleCode);
+        Assert.Contains("HasPageTypeProvider", sampleCode);
     }
 
     [Fact]

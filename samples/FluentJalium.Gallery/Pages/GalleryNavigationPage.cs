@@ -7,6 +7,8 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWBreadcrumbBar = FluentJalium.Controls.FWBreadcrumbBar;
+using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
+using FWAutoSuggestBoxTextChangeReason = FluentJalium.Controls.FWAutoSuggestBoxTextChangeReason;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
@@ -31,6 +33,7 @@ using FWTabViewItem = FluentJalium.Controls.FWTabViewItem;
 using FWTabViewWidthMode = FluentJalium.Controls.FWTabViewWidthMode;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
+using FWTextInputDensity = FluentJalium.Controls.FWTextInputDensity;
 using FWTitleBar = FluentJalium.Controls.FWTitleBar;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using PipsPagerButtonVisibility = FluentJalium.Controls.PipsPagerButtonVisibility;
@@ -68,6 +71,12 @@ internal sealed class GalleryNavigationPage
             "FWNavigationService + FWFrame",
             "Route NavigationView selection into Frame pages with optional provider-based page resolution and synchronized diagnostics.",
             CreateFrameNavigationSample()));
+        examples.Children.Add(CreateNavigationExampleCard(
+            FluentIconRegular.WindowApps24,
+            "App shell walkthrough",
+            "A cohesive shell combines route provider navigation, breadcrumb, search, document tabs, footer settings, pager state, and selector diagnostics.",
+            CreateAppShellWalkthroughSample(),
+            width: 760));
         examples.Children.Add(CreateNavigationExampleCard(
             FluentIconRegular.BranchFork24,
             "FWBreadcrumbBar",
@@ -402,6 +411,272 @@ internal sealed class GalleryNavigationPage
     private static string FormatNavigationServiceDiagnostics(FWNavigationServiceDiagnostics diagnostics)
     {
         return $"Route: {diagnostics.CurrentRouteKey ?? "none"}, Page: {diagnostics.CurrentPageType?.Name ?? "none"}, Back: {diagnostics.CanGoBack}, Forward: {diagnostics.CanGoForward}, Stack: {diagnostics.BackStackDepth}, Provider: {(diagnostics.HasPageTypeProvider ? "On" : "Off")}";
+    }
+
+    [RequiresUnreferencedCode("Gallery sample navigates to local Page types by typeof literals.")]
+    private static UIElement CreateAppShellWalkthroughSample()
+    {
+        var output = CreateNavigationOutput("Shell ready: route overview, breadcrumb Home / Overview, tab Overview, page 1.");
+        var breadcrumbPath = new ObservableCollection<string> { "Home", "Overview" };
+        var breadcrumbBar = new FWBreadcrumbBar
+        {
+            Width = 290,
+            MaxItems = 4,
+            Density = FWNavigationDensity.Compact,
+            ItemsSource = breadcrumbPath
+        };
+        var pager = new FWPipsPager
+        {
+            Width = 188,
+            Height = 40,
+            NumberOfPages = 3,
+            MaxVisiblePips = 3,
+            SelectedPageIndex = 0
+        };
+        var frame = new FWFrame
+        {
+            Width = 300,
+            Height = 140,
+            Padding = new Thickness(14),
+            BorderThickness = new Thickness(1)
+        };
+        var tabView = new FWTabView
+        {
+            Width = 300,
+            Height = 140,
+            Header = "Documents",
+            Footer = "2 tabs",
+            Density = FWNavigationDensity.Compact,
+            TabWidthMode = FWTabViewWidthMode.SizeToContent,
+            CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.OnPointerOver,
+            CanReorderTabs = true
+        };
+        tabView.Items.Add(CreateTabViewItem("Overview", FluentIconRegular.Home24, "Overview document follows the current app route.", isClosable: false));
+        tabView.Items.Add(CreateTabViewItem("Activity", FluentIconRegular.Clock24, "Activity document tracks provider-backed route changes."));
+        tabView.SelectedIndex = 0;
+
+        var overviewSelectorItem = new FWSelectorBarItem { Text = "Overview", Icon = CreateIcon(FluentIconRegular.Home24, 16) };
+        var activitySelectorItem = new FWSelectorBarItem { Text = "Activity", Icon = CreateIcon(FluentIconRegular.Clock24, 16) };
+        var settingsSelectorItem = new FWSelectorBarItem { Text = "Settings", Icon = CreateIcon(FluentIconRegular.Settings24, 16) };
+        var selectorBar = new FWSelectorBar
+        {
+            Width = 620,
+            Density = FWNavigationDensity.Compact,
+            SelectionIndicatorPlacement = FWSelectorBarSelectionIndicatorPlacement.Auto
+        };
+        selectorBar.Items.Add(overviewSelectorItem);
+        selectorBar.Items.Add(activitySelectorItem);
+        selectorBar.Items.Add(settingsSelectorItem);
+        selectorBar.SelectedItem = overviewSelectorItem;
+
+        var searchBox = new FWAutoSuggestBox
+        {
+            Width = 180,
+            Text = "Overview",
+            ItemsSource = ShellRouteSuggestions,
+            PlaceholderText = "Search routes",
+            FilterMode = AutoCompleteFilterMode.Contains,
+            MinimumPrefixLength = 1,
+            Density = FWTextInputDensity.Compact
+        };
+
+        var overviewItem = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview",
+            Icon = CreateIcon(FluentIconRegular.Home24)
+        };
+        var activityItem = new FWNavigationViewItem
+        {
+            Content = "Activity",
+            RouteKey = "activity",
+            Icon = CreateIcon(FluentIconRegular.History24)
+        };
+        var settingsItem = new FWNavigationViewItem
+        {
+            Content = "Settings",
+            RouteKey = "settings",
+            Icon = CreateIcon(FluentIconRegular.Settings24)
+        };
+        var navigationView = new FWNavigationView
+        {
+            Width = 720,
+            Height = 430,
+            PaneTitle = "Jalium Studio",
+            Header = "Route provider shell",
+            PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact,
+            IsPaneOpen = false,
+            IsSettingsVisible = false,
+            IsBackButtonVisible = NavigationViewBackButtonVisible.Visible,
+            OpenPaneLength = 220,
+            CompactPaneLength = 52,
+            PaneHeader = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                Children =
+                {
+                    new FWTextBlock { Text = "Route search", FontSize = 12, Foreground = ThemeBrush("TextSecondary") },
+                    searchBox
+                }
+            },
+            PaneFooter = CreateNavigationPaneFooter("Provider on")
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(activityItem);
+        navigationView.FooterMenuItems.Add(settingsItem);
+        navigationView.UpdateMenuItems();
+
+        var service = new FWNavigationService
+        {
+            PageTypeProvider = (route, parameter) => route.RouteKey == "settings"
+                ? typeof(GalleryNavigationProviderPage)
+                : route.PageType
+        };
+        service.RegisterRoute(overviewItem, typeof(GalleryNavigationOverviewPage), "Overview route");
+        service.RegisterRoute(activityItem, typeof(GalleryNavigationDetailsPage), "Activity route");
+        service.RegisterRoute(settingsItem, typeof(GalleryNavigationDetailsPage), "Settings route");
+        service.Attach(navigationView, frame);
+
+        var isSynchronizingShell = false;
+
+        void UpdateBreadcrumb(string routeKey)
+        {
+            breadcrumbPath.Clear();
+            breadcrumbPath.Add("Home");
+            breadcrumbPath.Add(ResolveShellRouteTitle(routeKey));
+        }
+
+        void EnsureRouteTab(string routeKey)
+        {
+            var title = ResolveShellRouteTitle(routeKey);
+            var existingTab = tabView.Items.OfType<FWTabViewItem>()
+                .FirstOrDefault(tab => string.Equals(tab.Header?.ToString(), title, StringComparison.Ordinal));
+            if (existingTab == null)
+            {
+                existingTab = CreateTabViewItem(
+                    title,
+                    ResolveShellRouteIcon(routeKey),
+                    $"{title} document was opened from the app-shell route.");
+                tabView.Items.Add(existingTab);
+            }
+
+            tabView.SelectedItem = existingTab;
+            tabView.Footer = $"{tabView.Items.Count} tabs";
+        }
+
+        void SynchronizeShell(string routeKey, string reason)
+        {
+            isSynchronizingShell = true;
+            try
+            {
+                searchBox.SetQueryText(ResolveShellRouteTitle(routeKey), FWAutoSuggestBoxTextChangeReason.ProgrammaticChange);
+                selectorBar.SelectedItem = ResolveShellSelectorItem(routeKey, overviewSelectorItem, activitySelectorItem, settingsSelectorItem);
+                pager.SelectedPageIndex = ResolveShellPageIndex(routeKey);
+                UpdateBreadcrumb(routeKey);
+                EnsureRouteTab(routeKey);
+            }
+            finally
+            {
+                isSynchronizingShell = false;
+            }
+
+            var serviceDiagnostics = service.GetDiagnostics();
+            var selectorDiagnostics = selectorBar.GetDiagnostics();
+            var tabDiagnostics = tabView.GetDiagnostics();
+            output.Text = $"{reason}: route {serviceDiagnostics.CurrentRouteKey ?? "none"}, page {serviceDiagnostics.CurrentPageType?.Name ?? "none"}, provider {FormatOnOff(serviceDiagnostics.HasPageTypeProvider)}, breadcrumb {string.Join(" / ", breadcrumbPath)}, selector {selectorDiagnostics.SelectedText}, tab {tabDiagnostics.SelectedHeader}, pips {pager.SelectedPageIndex + 1}/{pager.NumberOfPages}.";
+        }
+
+        bool NavigateShell(string routeKey, string reason)
+        {
+            if (!service.NavigateToRoute(routeKey))
+            {
+                output.Text = $"{reason}: route {routeKey} is not registered.";
+                return false;
+            }
+
+            return true;
+        }
+
+        service.Navigated += (_, route) => SynchronizeShell(route.RouteKey, "Navigated");
+        selectorBar.SelectionChanged += (_, _) =>
+        {
+            if (!isSynchronizingShell)
+            {
+                NavigateShell(ResolveShellRouteKey(selectorBar.SelectedItem), "Selector");
+            }
+        };
+        pager.SelectedIndexChanged += (_, _) =>
+        {
+            if (!isSynchronizingShell)
+            {
+                NavigateShell(ResolveShellRouteKey(pager.SelectedPageIndex), "Pager");
+            }
+        };
+        tabView.SelectionChanged += (_, _) =>
+        {
+            if (!isSynchronizingShell)
+            {
+                NavigateShell(ResolveShellRouteKey(tabView.SelectedItem), "Tab");
+            }
+        };
+        tabView.AddTabButtonClick += (_, e) =>
+        {
+            var nextNumber = tabView.Items.Count + 1;
+            e.NewItem = CreateTabViewItem($"Scratch {nextNumber}", FluentIconRegular.Document24, $"Scratch {nextNumber} is a local tab without a route.");
+            output.Text = $"Shell tab added: Scratch {nextNumber}.";
+        };
+        searchBox.SuggestionChosen += (_, args) => NavigateShell(ResolveShellRouteKey(args.SelectedItem), "Search suggestion");
+        searchBox.QuerySubmitted += (_, args) => NavigateShell(ResolveShellRouteKey(args.QueryText), "Search submit");
+
+        navigationView.Content = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Margin = new Thickness(14),
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 10,
+                    VerticalSpacing = 8,
+                    Children =
+                    {
+                        breadcrumbBar,
+                        pager
+                    }
+                },
+                selectorBar,
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 12,
+                    VerticalSpacing = 10,
+                    Children =
+                    {
+                        frame,
+                        tabView
+                    }
+                },
+                CreateNavigationButtonRow(
+                    CreateNavigationActionButton(FluentIconRegular.Home24, "Overview", () => NavigateShell("overview", "Button")),
+                    CreateNavigationActionButton(FluentIconRegular.Clock24, "Activity", () => NavigateShell("activity", "Button")),
+                    CreateNavigationActionButton(FluentIconRegular.Settings24, "Settings", () => NavigateShell("settings", "Button")),
+                    CreateNavigationActionButton(FluentIconRegular.PanelLeft24, "Pane", () =>
+                    {
+                        navigationView.IsPaneOpen = !navigationView.IsPaneOpen;
+                        SynchronizeShell(service.CurrentRouteKey ?? "overview", "Pane toggled");
+                    }),
+                    CreateNavigationActionButton(FluentIconRegular.Add24, "Tab", () =>
+                    {
+                        _ = tabView.RequestAddTab();
+                        SynchronizeShell(service.CurrentRouteKey ?? "overview", "Tab requested");
+                    })),
+                CreateNavigationStatus(output)
+            }
+        };
+
+        service.NavigateToRoute("overview");
+        return navigationView;
     }
 
     private static UIElement CreateMaterialNavigationShellSample()
@@ -1040,9 +1315,91 @@ internal sealed class GalleryNavigationPage
         };
     }
 
-    private static FWBorder CreateNavigationExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
+    private static string FormatOnOff(bool value)
     {
-        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title));
+        return value ? "on" : "off";
+    }
+
+    private static string ResolveShellRouteKey(object? routeHint)
+    {
+        var text = routeHint switch
+        {
+            FWSelectorBarItem selectorItem => selectorItem.Text,
+            FWTabViewItem tabItem => tabItem.Header?.ToString(),
+            string routeText => routeText,
+            _ => routeHint?.ToString()
+        };
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "overview";
+        }
+
+        return text.Contains("setting", StringComparison.OrdinalIgnoreCase)
+            ? "settings"
+            : text.Contains("activity", StringComparison.OrdinalIgnoreCase)
+                || text.Contains("detail", StringComparison.OrdinalIgnoreCase)
+                ? "activity"
+                : "overview";
+    }
+
+    private static string ResolveShellRouteKey(int pageIndex)
+    {
+        return pageIndex switch
+        {
+            1 => "activity",
+            2 => "settings",
+            _ => "overview"
+        };
+    }
+
+    private static string ResolveShellRouteTitle(string routeKey)
+    {
+        return routeKey switch
+        {
+            "activity" => "Activity",
+            "settings" => "Settings",
+            _ => "Overview"
+        };
+    }
+
+    private static int ResolveShellPageIndex(string routeKey)
+    {
+        return routeKey switch
+        {
+            "activity" => 1,
+            "settings" => 2,
+            _ => 0
+        };
+    }
+
+    private static FluentIconRegular ResolveShellRouteIcon(string routeKey)
+    {
+        return routeKey switch
+        {
+            "activity" => FluentIconRegular.Clock24,
+            "settings" => FluentIconRegular.Settings24,
+            _ => FluentIconRegular.Home24
+        };
+    }
+
+    private static FWSelectorBarItem ResolveShellSelectorItem(
+        string routeKey,
+        FWSelectorBarItem overviewItem,
+        FWSelectorBarItem activityItem,
+        FWSelectorBarItem settingsItem)
+    {
+        return routeKey switch
+        {
+            "activity" => activityItem,
+            "settings" => settingsItem,
+            _ => overviewItem
+        };
+    }
+
+    private static FWBorder CreateNavigationExampleCard(FluentIconRegular icon, string title, string description, UIElement content, double width = 600)
+    {
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title), width: width);
     }
 
     private static string CreateSampleCode(string title)
@@ -1053,6 +1410,7 @@ internal sealed class GalleryNavigationPage
             "Pane modes and hierarchy" => "<FWNavigationView PaneDisplayMode=\"LeftCompact\" IsPaneOpen=\"False\">\n    <FWNavigationViewItem Content=\"Document options\" IsExpanded=\"True\" SelectsOnInvoked=\"False\" />\n</FWNavigationView>",
             "FWTabControl" => "<FWTabControl TabStripPlacement=\"Top\" IsSwipeEnabled=\"True\">\n    <FWTabItem Header=\"Overview\" />\n    <FWTabItem Header=\"Details\" />\n</FWTabControl>",
             "FWNavigationService + FWFrame" => "var navigationView = new FWNavigationView();\nvar frame = new FWFrame();\nvar service = new FWNavigationService\n{\n    PageTypeProvider = (route, parameter) => route.RouteKey == \"details\"\n        ? typeof(GalleryNavigationProviderPage)\n        : route.PageType\n};\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Overview\", RouteKey = \"overview\" }, typeof(GalleryNavigationOverviewPage));\nservice.RegisterRoute(new FWNavigationViewItem { Content = \"Details\", RouteKey = \"details\" }, typeof(GalleryNavigationDetailsPage));\nservice.Attach(navigationView, frame);\nservice.NavigateToRoute(\"overview\");\nservice.NavigateToRoute(\"details\");",
+            "App shell walkthrough" => "var navigationView = new FWNavigationView { PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact };\nvar frame = new FWFrame();\nvar service = new FWNavigationService\n{\n    PageTypeProvider = (route, parameter) => route.RouteKey == \"settings\"\n        ? typeof(SettingsShellPage)\n        : route.PageType\n};\nvar breadcrumb = new FWBreadcrumbBar { ItemsSource = pathSegments };\nvar search = new FWAutoSuggestBox { ItemsSource = routeSuggestions };\nvar tabView = new FWTabView { TabWidthMode = FWTabViewWidthMode.SizeToContent };\nvar pager = new FWPipsPager { NumberOfPages = 3 };\nvar selector = new FWSelectorBar();\nservice.Attach(navigationView, frame);\nservice.NavigateToRoute(\"overview\");\nvar diagnostics = service.GetDiagnostics();",
             "FWBreadcrumbBar" => "<FWBreadcrumbBar ItemsSource=\"{Binding PathSegments}\" MaxItems=\"5\" ItemClicked=\"OnBreadcrumbClicked\" />",
             "FWPipsPager" => "<FWPipsPager NumberOfPages=\"10\" SelectedPageIndex=\"0\" MaxVisiblePips=\"5\" SelectedIndexChanged=\"OnPageChanged\" />",
             "FWSelectorBar" => "<FWSelectorBar SelectionIndicatorPlacement=\"Auto\">\n    <FWSelectorBarItem Text=\"Overview\" />\n    <FWSelectorBarItem Text=\"Activity\" />\n</FWSelectorBar>",
@@ -1177,4 +1535,11 @@ internal sealed class GalleryNavigationPage
 
         return new SolidColorBrush(Colors.Transparent);
     }
+
+    private static readonly string[] ShellRouteSuggestions =
+    [
+        "Overview",
+        "Activity",
+        "Settings"
+    ];
 }
