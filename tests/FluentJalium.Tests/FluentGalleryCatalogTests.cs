@@ -238,6 +238,26 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeWindowBackdropDiagnosticsSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "windowbackdrops");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWFluentWindowSurface", sampleCode);
+        Assert.Contains("FWFluentWindowMaterialProfile.MicaShell", sampleCode);
+        Assert.Contains("FWFluentWindowMaterialProfileRecipe.Create", sampleCode);
+        Assert.Contains("profileRecipe.SystemBackdrop", sampleCode);
+        Assert.Contains("ApplyWindowMaterialProfile", sampleCode);
+        Assert.Contains("FWFluentWindowMaterialProfile.FocusGlassShell", sampleCode);
+        Assert.Contains("ApplyWindowBackdrop", sampleCode);
+        Assert.Contains("window.SystemBackdrop", sampleCode);
+        Assert.Contains("isMatched", sampleCode);
+        Assert.Contains("Window backdrop QA", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeAdvancedInteractionScrollerDiagnosticsSample()
     {
         var page = Assert.Single(

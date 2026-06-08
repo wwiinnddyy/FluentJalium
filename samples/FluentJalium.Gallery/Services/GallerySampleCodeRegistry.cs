@@ -731,8 +731,17 @@ var windowSurface = new FWFluentWindowSurface
     }
 };
 
-// For an explicit host window:
+var profileRecipe = FWFluentWindowMaterialProfileRecipe.Create(windowSurface.WindowMaterialProfile);
+Debug.WriteLine($"Profile {profileRecipe.Role}; requested {profileRecipe.SystemBackdrop}; surface {profileRecipe.SurfaceRole}/{profileRecipe.MaterialKind}.");
+
+windowSurface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.FocusGlassShell);
 windowSurface.ApplyWindowBackdrop(window);
+
+var actualBackdrop = window.SystemBackdrop;
+var isMatched = actualBackdrop == FWFluentWindowMaterialProfileRecipe
+    .Create(windowSurface.WindowMaterialProfile)
+    .SystemBackdrop;
+Debug.WriteLine($"Window backdrop QA: actual {actualBackdrop}; matched {isMatched}; auto apply {windowSurface.AutoApplyWindowBackdrop}.");
 """,
         ["materials.derivedsurfaces"] = """
 var card = new FWCardSurface

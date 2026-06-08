@@ -8,6 +8,9 @@ using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWFluentWindowBackdropKind = FluentJalium.Controls.FWFluentWindowBackdropKind;
 using FWFluentWindowBackdropRecipe = FluentJalium.Controls.FWFluentWindowBackdropRecipe;
+using FWFluentWindowMaterialProfile = FluentJalium.Controls.FWFluentWindowMaterialProfile;
+using FWFluentWindowMaterialProfileRecipe = FluentJalium.Controls.FWFluentWindowMaterialProfileRecipe;
+using FWFluentWindowSurface = FluentJalium.Controls.FWFluentWindowSurface;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
@@ -44,6 +47,11 @@ internal sealed class GalleryWindowBackdropsPage
             "FluentJalium maps each shell material to an explicit role, system backdrop, and fallback behavior.",
             CreateBackdropRecipeMap()));
         examples.Children.Add(CreateWindowBackdropExampleCard(
+            FluentIconRegular.DataUsage24,
+            "Window surface diagnostics",
+            "FWFluentWindowSurface exposes the requested profile, surface role, and actual host Window.SystemBackdrop for shell QA.",
+            CreateWindowSurfaceDiagnostics()));
+        examples.Children.Add(CreateWindowBackdropExampleCard(
             FluentIconRegular.AppGeneric24,
             "Shell layering",
             "Window backdrops sit behind opaque or translucent content layers, while element effects remain inside the page.",
@@ -72,6 +80,37 @@ internal sealed class GalleryWindowBackdropsPage
                     CreateBackdropActionButton(FluentIconRegular.WindowBrush24, "Mica", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Mica, status)),
                     CreateBackdropActionButton(FluentIconRegular.LayerDiagonal24, "Mica Alt", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.MicaAlt, status)),
                     CreateBackdropActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => ApplySystemBackdrop(FWFluentWindowBackdropKind.Acrylic, status))),
+                CreateBackdropStatus(status)
+            }
+        };
+    }
+
+    private UIElement CreateWindowSurfaceDiagnostics()
+    {
+        var surface = new FWFluentWindowSurface
+        {
+            Width = 490,
+            Height = 182,
+            AutoApplyWindowBackdrop = false
+        };
+        surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.MicaShell);
+        surface.Child = CreateWindowSurfacePreviewContent(surface);
+
+        var status = CreateBackdropOutputText(CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: false));
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                surface,
+                CreateBackdropButtonRow(
+                    CreateWindowProfileActionButton(FluentIconRegular.DismissCircle24, "Solid", FWFluentWindowMaterialProfile.Solid, surface, status),
+                    CreateWindowProfileActionButton(FluentIconRegular.WindowBrush24, "Mica", FWFluentWindowMaterialProfile.MicaShell, surface, status),
+                    CreateWindowProfileActionButton(FluentIconRegular.LayerDiagonal24, "Tabbed", FWFluentWindowMaterialProfile.TabbedMicaAlt, surface, status),
+                    CreateWindowProfileActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", FWFluentWindowMaterialProfile.TransientAcrylic, surface, status),
+                    CreateWindowProfileActionButton(FluentIconRegular.Glasses24, "Focus", FWFluentWindowMaterialProfile.FocusGlassShell, surface, status)),
                 CreateBackdropStatus(status)
             }
         };
@@ -129,6 +168,64 @@ internal sealed class GalleryWindowBackdropsPage
         return shell;
     }
 
+    private static FWBorder CreateWindowSurfacePreviewContent(FWFluentWindowSurface surface)
+    {
+        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
+
+        return new FWBorder
+        {
+            Margin = new Thickness(14),
+            Background = ThemeBrush("FluentMaterialContentLayerBrush"),
+            BorderBrush = ThemeBrush("FluentMaterialLayerBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWStackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Children =
+                        {
+                            CreateIcon(FluentIconRegular.WindowBrush24, 18, ThemeBrush("TextPrimary")),
+                            new FWTextBlock
+                            {
+                                Text = "FWFluentWindowSurface",
+                                FontSize = 15,
+                                Foreground = ThemeBrush("TextPrimary"),
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
+                    },
+                    new FWWrapPanel
+                    {
+                        HorizontalSpacing = 6,
+                        VerticalSpacing = 6,
+                        Children =
+                        {
+                            CreateSystemBackdropBadge(recipe.Profile.ToString()),
+                            CreateSystemBackdropBadge(recipe.SystemBackdrop.ToString()),
+                            CreateSystemBackdropBadge(recipe.SurfaceRole.ToString()),
+                            CreateSystemBackdropBadge(recipe.MaterialKind.ToString())
+                        }
+                    },
+                    new FWTextBlock
+                    {
+                        Text = recipe.Description,
+                        FontSize = 12,
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = ThemeBrush("TextSecondary")
+                    }
+                }
+            }
+        };
+    }
+
     private static FWBorder CreateLayeredShellContent()
     {
         return new FWBorder
@@ -164,6 +261,17 @@ internal sealed class GalleryWindowBackdropsPage
         status.Text = $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
     }
 
+    private void ApplyWindowSurfaceProfile(
+        FWFluentWindowMaterialProfile profile,
+        FWFluentWindowSurface surface,
+        TextBlock status)
+    {
+        surface.ApplyWindowMaterialProfile(profile);
+        surface.Child = CreateWindowSurfacePreviewContent(surface);
+        surface.ApplyWindowBackdrop(_window);
+        status.Text = CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: true);
+    }
+
     private static string CreateWindowBackdropStatusText(WindowBackdropType systemBackdrop)
     {
         var kind = systemBackdrop switch
@@ -175,6 +283,18 @@ internal sealed class GalleryWindowBackdropsPage
         };
         var recipe = FWFluentWindowBackdropRecipe.Create(kind);
         return $"Current window backdrop: {recipe.SystemBackdrop} ({recipe.Role})";
+    }
+
+    private static string CreateWindowSurfaceDiagnosticsText(
+        FWFluentWindowSurface surface,
+        WindowBackdropType actualSystemBackdrop,
+        bool wasApplied)
+    {
+        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
+        var state = actualSystemBackdrop == recipe.SystemBackdrop ? "matched" : "pending";
+        var applyState = wasApplied ? "applied" : "not applied";
+
+        return $"Profile: {recipe.Role}; requested: {recipe.SystemBackdrop}; surface: {surface.MaterialRole}/{surface.MaterialKind}; auto apply: {FormatOnOff(surface.AutoApplyWindowBackdrop)}; window: {actualSystemBackdrop} ({state}, {applyState}).";
     }
 
     private static FWBorder CreateRecipeTile(FluentIconRegular icon, FWFluentWindowBackdropKind backdropKind)
@@ -369,6 +489,7 @@ internal sealed class GalleryWindowBackdropsPage
         {
             "SystemBackdrop selector" => "var recipe = FWFluentWindowBackdropRecipe.Create(FWFluentWindowBackdropKind.Mica);\nrecipe.ApplyTo(window);",
             "Backdrop recipe map" => "FWFluentWindowBackdropRecipe.Create(FWFluentWindowBackdropKind.MicaAlt);\nFWFluentWindowBackdropRecipe.Create(FWFluentWindowBackdropKind.Acrylic);",
+            "Window surface diagnostics" => "var surface = new FWFluentWindowSurface { AutoApplyWindowBackdrop = false };\nsurface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.FocusGlassShell);\nsurface.ApplyWindowBackdrop(window);\nvar recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);",
             "Shell layering" => "<Window SystemBackdrop=\"Mica\">\n    <FWNavigationView PaneDisplayMode=\"Left\" />\n    <FWBorder Background=\"{ThemeResource FluentMaterialContentLayerBrush}\" />\n</Window>",
             _ => "<Window SystemBackdrop=\"Mica\" />"
         };
@@ -398,6 +519,16 @@ internal sealed class GalleryWindowBackdropsPage
         };
         button.Click += (_, _) => action();
         return button;
+    }
+
+    private FWButton CreateWindowProfileActionButton(
+        FluentIconRegular icon,
+        string text,
+        FWFluentWindowMaterialProfile profile,
+        FWFluentWindowSurface surface,
+        TextBlock status)
+    {
+        return CreateBackdropActionButton(icon, text, () => ApplyWindowSurfaceProfile(profile, surface, status));
     }
 
     private static FWStackPanel CreateBackdropButtonContent(FluentIconRegular icon, string text)
@@ -482,6 +613,11 @@ internal sealed class GalleryWindowBackdropsPage
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+    }
+
+    private static string FormatOnOff(bool value)
+    {
+        return value ? "On" : "Off";
     }
 
     private static Brush ThemeBrush(string key)
