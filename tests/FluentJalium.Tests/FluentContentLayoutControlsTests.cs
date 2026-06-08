@@ -333,6 +333,60 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void FWSplitView_ShouldRaisePaneOpenedAndPaneClosedOnlyWhenStateChanges()
+    {
+        var splitView = new FWSplitView
+        {
+            DisplayMode = FWSplitViewDisplayMode.CompactInline,
+            OpenPaneLength = 280,
+            CompactPaneLength = 44
+        };
+        var opened = 0;
+        var closed = 0;
+        splitView.PaneOpened += (_, _) => opened++;
+        splitView.PaneClosed += (_, _) => closed++;
+
+        splitView.OpenPane();
+
+        Assert.True(splitView.IsPaneOpen);
+        Assert.Equal(280, splitView.ActualPaneLength);
+        Assert.Equal(0, opened);
+        Assert.Equal(0, closed);
+
+        splitView.ClosePane();
+
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(44, splitView.ActualPaneLength);
+        Assert.Equal(0, opened);
+        Assert.Equal(1, closed);
+
+        splitView.ClosePane();
+
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(0, opened);
+        Assert.Equal(1, closed);
+
+        splitView.TogglePane();
+
+        Assert.True(splitView.IsPaneOpen);
+        Assert.Equal(280, splitView.ActualPaneLength);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+
+        splitView.IsPaneOpen = true;
+
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+
+        splitView.TogglePane();
+
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(44, splitView.ActualPaneLength);
+        Assert.Equal(1, opened);
+        Assert.Equal(2, closed);
+    }
+
+    [Fact]
     public void FWParallaxView_ShouldExposeProgressCurrentOffsetAndDiagnostics()
     {
         var source = new FWGrid();

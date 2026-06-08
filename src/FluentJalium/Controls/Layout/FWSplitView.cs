@@ -39,7 +39,7 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty IsPaneOpenProperty =
         DependencyProperty.Register(nameof(IsPaneOpen), typeof(bool), typeof(FWSplitView),
-            new PropertyMetadata(true, OnLayoutStateChanged));
+            new PropertyMetadata(true, OnIsPaneOpenChanged));
 
     public static readonly DependencyProperty DisplayModeProperty =
         DependencyProperty.Register(nameof(DisplayMode), typeof(FWSplitViewDisplayMode), typeof(FWSplitView),
@@ -80,6 +80,10 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
         UseTemplateContentManagement();
         UpdateActualPaneLength();
     }
+
+    public event EventHandler? PaneOpened;
+
+    public event EventHandler? PaneClosed;
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
     public object? Pane
@@ -178,6 +182,28 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
             splitView.UpdateActualPaneLength();
             splitView.InvalidateMeasure();
             splitView.InvalidateVisual();
+        }
+    }
+
+    private static void OnIsPaneOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        OnLayoutStateChanged(d, e);
+
+        if (d is not FWSplitView splitView ||
+            e.OldValue is not bool oldValue ||
+            e.NewValue is not bool newValue ||
+            oldValue == newValue)
+        {
+            return;
+        }
+
+        if (newValue)
+        {
+            splitView.PaneOpened?.Invoke(splitView, EventArgs.Empty);
+        }
+        else
+        {
+            splitView.PaneClosed?.Invoke(splitView, EventArgs.Empty);
         }
     }
 
