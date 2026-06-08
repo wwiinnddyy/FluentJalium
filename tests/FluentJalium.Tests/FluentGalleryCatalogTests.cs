@@ -40,6 +40,44 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryControlInfo_ShouldExposeImplementedFamilySubControls()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var controls = GalleryControlInfo.CreateFromPages(pages);
+
+        AssertCatalogControl(controls, "FWAppBarSeparator", "buttons");
+        AssertCatalogControl(controls, "FWToolBarTray", "buttons");
+
+        AssertCatalogControl(controls, "FWTextBlock", "contentandlayout");
+        AssertCatalogControl(controls, "FWAccessText", "contentandlayout");
+        AssertCatalogControl(controls, "FWCanvas", "contentandlayout");
+        AssertCatalogControl(controls, "FWBorder", "contentandlayout");
+        AssertCatalogControl(controls, "FWContentPresenter", "contentandlayout");
+        AssertCatalogControl(controls, "FWWrapPanel", "contentandlayout");
+        AssertCatalogControl(controls, "FWRelativePanel", "contentandlayout");
+
+        AssertCatalogControl(controls, "FWLine", "visuals");
+        AssertCatalogControl(controls, "FWPolyline", "visuals");
+        AssertCatalogControl(controls, "FWPolygon", "visuals");
+
+        AssertCatalogControl(controls, "FWListBoxItem", "collections");
+        AssertCatalogControl(controls, "FWListViewItem", "collections");
+        AssertCatalogControl(controls, "FWTreeViewItem", "collections");
+
+        AssertCatalogControl(controls, "FWTabControl", "navigation");
+        AssertCatalogControl(controls, "FWTabItem", "navigation");
+
+        AssertCatalogControl(controls, "FWMenuBarItem", "menus");
+        AssertCatalogControl(controls, "FWMenuItem", "menus");
+        AssertCatalogControl(controls, "FWToggleMenuFlyoutItem", "menus");
+        AssertCatalogControl(controls, "FWMenuFlyoutSeparator", "menus");
+
+        AssertCatalogControl(controls, "FWSnackbarHostDiagnostics", "status");
+        AssertCatalogControl(controls, "FWToastNotificationItem", "status");
+        AssertCatalogControl(controls, "FWStatusBarItem", "status");
+    }
+
+    [Fact]
     public void GalleryControlInfo_ShouldPreserveControlMetadataForFilters()
     {
         var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
@@ -564,6 +602,17 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
         Assert.Contains(firstExpected, sampleCode);
         Assert.Contains(secondExpected, sampleCode);
+    }
+
+    private static void AssertCatalogControl(GalleryControlInfo[] controls, string name, string pageId)
+    {
+        var control = Assert.Single(controls, control => control.Name == name);
+
+        Assert.Equal(pageId, control.Page.UniqueId);
+        Assert.True(control.IsUpdated);
+        Assert.Equal("FluentJalium.Controls", control.ApiNamespace);
+        Assert.False(string.IsNullOrWhiteSpace(control.SourcePath));
+        Assert.False(string.IsNullOrWhiteSpace(control.SampleCodeKey));
     }
 
     private static bool IsDiagnosticCatalogControl(GalleryControlInfo control)
