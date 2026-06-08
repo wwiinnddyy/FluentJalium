@@ -295,6 +295,48 @@ public sealed class FluentMenuControlsTests
     }
 
     [Fact]
+    public void FWFlyout_ShouldResolvePresenterStyleFromApplicationResources()
+    {
+        ResetApplicationState();
+        var app = new Application();
+        var target = new FWButton { Content = "Open flyout" };
+        var contentTemplate = new DataTemplate();
+        var style = new Style(typeof(FWFlyoutPresenter));
+        style.Setters.Add(new Setter(Control.MinWidthProperty, 280.0));
+        app.Resources["FWFlyoutPresenterStyle"] = style;
+
+        try
+        {
+            var flyout = new FWFlyout
+            {
+                Content = "Resources",
+                ContentTemplate = contentTemplate,
+                Density = FWMenuDensity.Compact
+            };
+
+            flyout.ShowAt(target);
+
+            var presenter = GetFlyoutPresenter<FWFlyoutPresenter>(flyout);
+            Assert.Same(style, presenter.Style);
+            Assert.Equal("Resources", presenter.Content);
+            Assert.Same(contentTemplate, presenter.ContentTemplate);
+            Assert.Equal(FWMenuDensity.Compact, presenter.Density);
+
+            flyout.Content = "Updated resources";
+            flyout.Density = FWMenuDensity.Spacious;
+
+            Assert.Equal("Updated resources", presenter.Content);
+            Assert.Equal(FWMenuDensity.Spacious, presenter.Density);
+
+            flyout.Hide();
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FWMenuFlyout_ShouldApplyDensityToItemsAndPresenter()
     {
         var target = new FWButton { Content = "Open menu" };
