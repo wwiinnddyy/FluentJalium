@@ -185,6 +185,10 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("IsInvokable", sampleCode);
         Assert.Contains("IsInteractionPressed", sampleCode);
         Assert.Contains("GetAutomationDiagnostics", sampleCode);
+        Assert.Contains("Settings visual QA", sampleCode);
+        Assert.Contains("ClickMode.Hover", sampleCode);
+        Assert.Contains("disabledCard", sampleCode);
+        Assert.Contains("IsEnabled = false", sampleCode);
     }
 
     [Fact]

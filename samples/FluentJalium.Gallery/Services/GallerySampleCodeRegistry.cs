@@ -429,6 +429,20 @@ var card = new FWSettingsCard
     CommandParameter = "display-mode",
     ClickMode = ClickMode.Release
 };
+var hoverCard = new FWSettingsCard
+{
+    Header = "Sync layout",
+    Description = "Hover mode keeps the settings row invokable without a nested button.",
+    IsClickEnabled = true,
+    ClickMode = ClickMode.Hover
+};
+var disabledCard = new FWSettingsCard
+{
+    Header = "Enterprise policy",
+    Description = "Disabled row keeps icon/text/action alignment visible.",
+    IsClickEnabled = true,
+    IsEnabled = false
+};
 
 var canExecute = card.CanExecute;
 var automation = card.GetAutomationDiagnostics();
@@ -436,6 +450,7 @@ Debug.WriteLine($"SettingsCard automation: {automation.Name}; invoke: {automatio
 
 var interaction = card.GetDiagnostics();
 Debug.WriteLine($"SettingsCard interaction: invokable {interaction.IsInvokable}; pressed {interaction.IsInteractionPressed}; click mode {interaction.ClickMode}.");
+Debug.WriteLine($"Settings visual QA: primary {card.GetDiagnostics().IsInvokable}; hover {hoverCard.GetDiagnostics().ClickMode}; disabled {disabledCard.GetDiagnostics().IsEnabled}.");
 
 card.PerformClick();
 

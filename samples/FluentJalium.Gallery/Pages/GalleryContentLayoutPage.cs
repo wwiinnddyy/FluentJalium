@@ -257,7 +257,13 @@ internal sealed class GalleryContentLayoutPage
     private static UIElement CreateAdaptiveSettingsLayoutSample()
     {
         var output = CreateLayoutOutput("TwoPaneView diagnostics ready.");
+        var layoutStatus = CreateLayoutOutput("Layout QA: waiting for TwoPaneView diagnostics.");
+        var primaryStatus = CreateLayoutOutput("Primary row: waiting for SettingsCard diagnostics.");
+        var syncStatus = CreateLayoutOutput("Sync row: waiting for SettingsCard diagnostics.");
+        var disabledStatus = CreateLayoutOutput("Disabled row: command unavailable.");
         FWSettingsCard? modeCard = null;
+        FWSettingsCard? syncCard = null;
+        FWSettingsCard? disabledCard = null;
         var configureCommand = new GalleryLayoutCommand(parameter =>
         {
             var automation = modeCard != null
@@ -277,13 +283,29 @@ internal sealed class GalleryContentLayoutPage
             CommandParameter = "display-mode",
             ClickMode = ClickMode.Release
         };
-        var syncCard = new FWSettingsCard
+        syncCard = new FWSettingsCard
         {
             Header = "Sync layout",
-            Description = "A compact settings row with a live command area.",
+            Description = "A compact settings row with a live action area.",
             HeaderIcon = CreateIcon(FluentIconRegular.CloudSync24, 18, ThemeBrush("TextSecondary")),
             Content = new FWButton { Content = "On" },
-            IsClickEnabled = true
+            ActionIcon = CreateIcon(FluentIconRegular.AccessibilityCheckmark24, 16, ThemeBrush("TextSecondary")),
+            IsClickEnabled = true,
+            ClickMode = ClickMode.Hover
+        };
+        disabledCard = new FWSettingsCard
+        {
+            Header = "Enterprise policy",
+            Description = "Disabled row keeps icon, text, action alignment, and automation state visible.",
+            HeaderIcon = CreateIcon(FluentIconRegular.ShieldDismiss24, 18, ThemeBrush("TextSecondary")),
+            Content = new FWTextBlock
+            {
+                Text = "Managed",
+                Foreground = ThemeBrush("TextSecondary")
+            },
+            ActionIcon = CreateIcon(FluentIconRegular.AlertOff24, 16, ThemeBrush("TextSecondary")),
+            IsClickEnabled = true,
+            IsEnabled = false
         };
         var twoPaneView = new FWTwoPaneView
         {
@@ -306,7 +328,8 @@ internal sealed class GalleryContentLayoutPage
                 Children =
                 {
                     modeCard,
-                    syncCard
+                    syncCard,
+                    disabledCard
                 }
             }
         };
@@ -315,7 +338,13 @@ internal sealed class GalleryContentLayoutPage
         {
             var diagnostics = twoPaneView.GetDiagnostics();
             output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}. SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+            layoutStatus.Text = $"Layout QA: requested {diagnostics.RequestedMode}, actual {diagnostics.ActualMode}, visible {diagnostics.VisiblePane}, priority {diagnostics.PanePriority}.";
+            primaryStatus.Text = $"Primary row: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+            syncStatus.Text = $"Sync row: {FormatSettingsCardDiagnostics(syncCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(syncCard.GetAutomationDiagnostics())}.";
+            disabledStatus.Text = $"Disabled row: {FormatSettingsCardDiagnostics(disabledCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(disabledCard.GetAutomationDiagnostics())}.";
         }
+
+        UpdateState("Settings visual QA initialized");
 
         return new FWStackPanel
         {
@@ -361,16 +390,27 @@ internal sealed class GalleryContentLayoutPage
                     {
                         configureCommand.CanExecuteResult = !configureCommand.CanExecuteResult;
                         configureCommand.RaiseCanExecuteChanged();
-                        output.Text = $"SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+                        UpdateState("Primary command CanExecute toggled");
                     }),
                     CreateLayoutActionButton(FluentIconRegular.CursorHover24, "Hover mode", () =>
                     {
                         modeCard.ClickMode = modeCard.ClickMode == ClickMode.Hover
                             ? ClickMode.Release
                             : ClickMode.Hover;
-                        output.Text = $"SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+                        UpdateState("Primary hover mode toggled");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.AccessibilityCheckmark24, "Sync state", () =>
+                    {
+                        syncCard.IsClickEnabled = !syncCard.IsClickEnabled;
+                        UpdateState("Sync row click state toggled");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.ShieldDismiss24, "Policy", () =>
+                    {
+                        disabledCard.IsEnabled = !disabledCard.IsEnabled;
+                        UpdateState("Policy row enabled state toggled");
                     })),
-                CreateLayoutStatus(output)
+                CreateLayoutStatus(output),
+                CreateSettingsVisualQaPanel(layoutStatus, primaryStatus, syncStatus, disabledStatus)
             }
         };
     }
@@ -897,7 +937,7 @@ internal sealed class GalleryContentLayoutPage
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
             "SplitView pane layout" => "<FWSplitView DisplayMode=\"CompactInline\"\n             PanePlacement=\"Left\"\n             IsPaneOpen=\"False\"\n             OpenPaneLength=\"208\"\n             CompactPaneLength=\"56\">\n  <FWSplitView.Pane>\n    <FWStackPanel Spacing=\"8\" />\n  </FWSplitView.Pane>\n  <FWBorder Padding=\"14\">\n    <FWTextBlock Text=\"Primary content\" />\n  </FWBorder>\n</FWSplitView>\n<!-- ActualPaneLength reflects compact, open, and overlay states. -->",
-            "Adaptive settings layout" => "<FWTwoPaneView x:Name=\"AdaptiveView\" Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>\n<!-- AdaptiveView.ActualMode / AdaptiveView.VisiblePane expose the resolved state. -->",
+            "Adaptive settings layout" => "<FWTwoPaneView x:Name=\"AdaptiveView\" Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n  <FWSettingsCard Header=\"Enterprise policy\"\n                  Description=\"Disabled row keeps icon/text/action alignment visible\"\n                  IsClickEnabled=\"True\"\n                  IsEnabled=\"False\" />\n</FWTwoPaneView>\n<!-- SettingsCard.GetDiagnostics and GetAutomationDiagnostics expose visual QA state. -->",
             "Canvas, relative, and parallax layout" => "var source = new FWScroller();\nsource.AttachScrollViewer(scrollViewer);\nvar parallax = new FWParallaxView\n{\n    Source = source,\n    HorizontalShift = 18,\n    VerticalShift = 28,\n    IsHorizontalShiftEnabled = true\n};\nparallax.RefreshProgressFromSource();\n// parallax.CurrentOffset exposes the resolved parallax offset.",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
@@ -978,6 +1018,46 @@ internal sealed class GalleryContentLayoutPage
                     status
                 }
             }
+        };
+    }
+
+    private static FWBorder CreateSettingsVisualQaPanel(params TextBlock[] statuses)
+    {
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 6
+        };
+        panel.Children.Add(new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children =
+            {
+                CreateIcon(FluentIconRegular.TableSettings24, 18, ThemeBrush("TextSecondary")),
+                new FWTextBlock
+                {
+                    Text = "Settings visual QA",
+                    FontSize = 13,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
+        });
+
+        foreach (var status in statuses)
+        {
+            panel.Children.Add(status);
+        }
+
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = panel
         };
     }
 
