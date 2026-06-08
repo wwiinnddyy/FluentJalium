@@ -636,6 +636,42 @@ Debug.WriteLine($"Horizontal QA: {diagnostics.AttachedViewportSource}/{diagnosti
 repeater.AttachViewport(scroller, Orientation.Horizontal);
 repeater.RealizeRange(0, 5);
 repeater.ResetRealizationWindow();
+
+var itemsViewRecipe = AdvancedCollectionsPage.CreateCollectionRecipeState(
+    AdvancedCollectionsPage.CollectionRecipeKind.ItemsViewSelection);
+itemsViewRecipe = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+    itemsViewRecipe,
+    AdvancedCollectionsPage.CollectionRecipeCommand.Next);
+itemsViewRecipe = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+    itemsViewRecipe,
+    AdvancedCollectionsPage.CollectionRecipeCommand.Invoke);
+
+var flipViewRecipe = AdvancedCollectionsPage.CreateCollectionRecipeState(
+    AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging);
+var pager = new FWPipsPager
+{
+    NumberOfPages = flipViewRecipe.ItemCount,
+    MaxVisiblePips = 5,
+    SelectedPageIndex = flipViewRecipe.PageIndex
+};
+flipViewRecipe = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+    flipViewRecipe,
+    AdvancedCollectionsPage.CollectionRecipeCommand.Next);
+pager.SelectedPageIndex = flipViewRecipe.PageIndex;
+
+var semanticZoomRecipe = AdvancedCollectionsPage.CreateCollectionRecipeState(
+    AdvancedCollectionsPage.CollectionRecipeKind.SemanticZoomGrouping);
+semanticZoomRecipe = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+    semanticZoomRecipe,
+    AdvancedCollectionsPage.CollectionRecipeCommand.SelectNextGroup);
+semanticZoomRecipe = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+    semanticZoomRecipe,
+    AdvancedCollectionsPage.CollectionRecipeCommand.ToggleZoom);
+
+Debug.WriteLine(AdvancedCollectionsPage.CreateCollectionRecipeDiagnosticsText(itemsViewRecipe, diagnostics));
+Debug.WriteLine($"ItemsView recipe selected {itemsViewRecipe.SelectedIndex}, invoked {itemsViewRecipe.InvokedIndex}.");
+Debug.WriteLine($"FlipView recipe page {flipViewRecipe.PageIndex + 1}/{flipViewRecipe.ItemCount}.");
+Debug.WriteLine($"SemanticZoom recipe group {semanticZoomRecipe.GroupIndex}, zoomed out {semanticZoomRecipe.IsZoomedOut}.");
 """,
         ["collections.gridview"] = """
 var emptyList = new FWListView

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -20,9 +21,22 @@ public class AdvancedCollectionsPage : Page
     private ScrollViewer? _repeaterScrollViewer;
     private TextBlock? _repeaterScenarioText;
     private TextBlock? _repeaterDiagnosticsText;
+    private FWItemsRepeater? _itemsViewRecipeRepeater;
+    private FWItemsRepeater? _flipViewRecipeRepeater;
+    private FWItemsRepeater? _semanticZoomRecipeRepeater;
+    private FWPipsPager? _flipViewPager;
+    private TextBlock? _itemsViewRecipeText;
+    private TextBlock? _flipViewRecipeText;
+    private TextBlock? _flipViewPreviewText;
+    private TextBlock? _semanticZoomRecipeText;
+    private TextBlock? _semanticZoomPreviewText;
     private ObservableCollection<SampleItem> _items;
     private ItemsRepeaterGalleryProfile _currentProfile;
+    private CollectionRecipeState _itemsViewRecipeState;
+    private CollectionRecipeState _flipViewRecipeState;
+    private CollectionRecipeState _semanticZoomRecipeState;
     private int _cacheProfileIndex;
+    private bool _suppressFlipPagerChange;
     private string _lastQaAction = "Initialized";
 
     internal enum ItemsRepeaterGalleryScenario
@@ -57,11 +71,54 @@ public class AdvancedCollectionsPage : Page
         double HorizontalCacheLength,
         double VerticalCacheLength);
 
+    internal enum CollectionRecipeKind
+    {
+        ItemsViewSelection,
+        FlipViewPaging,
+        SemanticZoomGrouping
+    }
+
+    internal enum CollectionRecipeCommand
+    {
+        Previous,
+        Next,
+        Home,
+        End,
+        Invoke,
+        SelectIndex,
+        ToggleZoom,
+        SelectPreviousGroup,
+        SelectNextGroup
+    }
+
+    internal readonly record struct CollectionRecipeItem(
+        int Index,
+        string Group,
+        string Title,
+        string Description);
+
+    internal readonly record struct CollectionRecipeState(
+        CollectionRecipeKind Kind,
+        string Name,
+        int ItemCount,
+        int SelectedIndex,
+        int InvokedIndex,
+        int PageIndex,
+        int GroupIndex,
+        bool IsZoomedOut,
+        string LastInput)
+    {
+        public bool HasInvocation => InvokedIndex >= 0;
+    }
+
     public AdvancedCollectionsPage()
     {
         Title = "Advanced Collections";
         _currentProfile = CreateItemsRepeaterQaProfile(ItemsRepeaterGalleryScenario.Baseline);
         _items = CreateItemsRepeaterSampleItems(_currentProfile);
+        _itemsViewRecipeState = CreateCollectionRecipeState(CollectionRecipeKind.ItemsViewSelection);
+        _flipViewRecipeState = CreateCollectionRecipeState(CollectionRecipeKind.FlipViewPaging);
+        _semanticZoomRecipeState = CreateCollectionRecipeState(CollectionRecipeKind.SemanticZoomGrouping);
         InitializeComponent();
     }
 
@@ -86,6 +143,10 @@ public class AdvancedCollectionsPage : Page
         mainStack.Children.Add(CreateSectionHeader("FWItemsRepeater",
             "High-performance virtualizing list with flexible layouts"));
         mainStack.Children.Add(CreateItemsRepeaterSection());
+
+        mainStack.Children.Add(CreateSectionHeader("Collection navigation recipes",
+            "ItemsView-like selection, FlipView-like paging, and SemanticZoom-like grouping built from existing primitives"));
+        mainStack.Children.Add(CreateCollectionRecipesSection());
 
         scrollViewer.Content = mainStack;
         Content = scrollViewer;
@@ -136,6 +197,165 @@ public class AdvancedCollectionsPage : Page
         mainGrid.Children.Add(repeaterContainer);
 
         return mainGrid;
+    }
+
+    private UIElement CreateCollectionRecipesSection()
+    {
+        return new StackPanel
+        {
+            Spacing = 16,
+            Children =
+            {
+                CreateItemsViewRecipe(),
+                CreateFlipViewRecipe(),
+                CreateSemanticZoomRecipe()
+            }
+        };
+    }
+
+    private UIElement CreateItemsViewRecipe()
+    {
+        _itemsViewRecipeText = CreateRecipeOutput();
+        _itemsViewRecipeRepeater = CreateRecipeRepeater(_itemsViewRecipeState);
+        var scrollViewer = CreateRecipeViewport(_itemsViewRecipeRepeater, 220);
+        _itemsViewRecipeRepeater.AttachViewport(scrollViewer);
+
+        var content = new StackPanel
+        {
+            Spacing = 10,
+            Children =
+            {
+                CreateRecipeButtonRow(
+                    CreateRecipeButton("Previous", () => ApplyItemsViewRecipeCommand(CollectionRecipeCommand.Previous)),
+                    CreateRecipeButton("Next", () => ApplyItemsViewRecipeCommand(CollectionRecipeCommand.Next)),
+                    CreateRecipeButton("Home", () => ApplyItemsViewRecipeCommand(CollectionRecipeCommand.Home)),
+                    CreateRecipeButton("End", () => ApplyItemsViewRecipeCommand(CollectionRecipeCommand.End)),
+                    CreateRecipeButton("Invoke", () => ApplyItemsViewRecipeCommand(CollectionRecipeCommand.Invoke))),
+                scrollViewer,
+                _itemsViewRecipeText
+            }
+        };
+
+        UpdateCollectionRecipeVisuals(_itemsViewRecipeRepeater, _itemsViewRecipeState, _itemsViewRecipeText);
+
+        return CreateRecipeSurface(
+            "ItemsView-like selection recipe",
+            "Proves selected item, invocation, keyboard-style movement, and viewport realization without publishing a new ItemsView API.",
+            content);
+    }
+
+    private UIElement CreateFlipViewRecipe()
+    {
+        _flipViewRecipeText = CreateRecipeOutput();
+        _flipViewPreviewText = CreateRecipeOutput(fontSize: 16, opacity: 0.9);
+        _flipViewRecipeRepeater = CreateRecipeRepeater(_flipViewRecipeState);
+        _flipViewPager = new FWPipsPager
+        {
+            Width = 500,
+            Height = 40,
+            NumberOfPages = _flipViewRecipeState.ItemCount,
+            MaxVisiblePips = 5,
+            SelectedPageIndex = _flipViewRecipeState.PageIndex
+        };
+        _flipViewPager.SelectedIndexChanged += (_, e) =>
+        {
+            if (_suppressFlipPagerChange)
+            {
+                return;
+            }
+
+            ApplyFlipViewRecipeCommand(CollectionRecipeCommand.SelectIndex, e.NewIndex);
+        };
+
+        var scrollViewer = CreateRecipeViewport(_flipViewRecipeRepeater, 128);
+        _flipViewRecipeRepeater.AttachViewport(scrollViewer, Orientation.Horizontal);
+
+        var content = new StackPanel
+        {
+            Spacing = 10,
+            Children =
+            {
+                CreatePreviewSurface(_flipViewPreviewText),
+                _flipViewPager,
+                CreateRecipeButtonRow(
+                    CreateRecipeButton("Previous page", () => ApplyFlipViewRecipeCommand(CollectionRecipeCommand.Previous)),
+                    CreateRecipeButton("Next page", () => ApplyFlipViewRecipeCommand(CollectionRecipeCommand.Next)),
+                    CreateRecipeButton("First", () => ApplyFlipViewRecipeCommand(CollectionRecipeCommand.Home)),
+                    CreateRecipeButton("Last", () => ApplyFlipViewRecipeCommand(CollectionRecipeCommand.End)),
+                    CreateRecipeButton("Invoke page", () => ApplyFlipViewRecipeCommand(CollectionRecipeCommand.Invoke))),
+                scrollViewer,
+                _flipViewRecipeText
+            }
+        };
+
+        UpdateFlipViewRecipeVisuals();
+
+        return CreateRecipeSurface(
+            "FlipView-like paging recipe",
+            "Uses FWPipsPager plus FWItemsRepeater viewport windows to validate paged navigation before a dedicated FlipView surface exists.",
+            content);
+    }
+
+    private UIElement CreateSemanticZoomRecipe()
+    {
+        _semanticZoomRecipeText = CreateRecipeOutput();
+        _semanticZoomPreviewText = CreateRecipeOutput(fontSize: 16, opacity: 0.9);
+        _semanticZoomRecipeRepeater = CreateRecipeRepeater(_semanticZoomRecipeState);
+        var scrollViewer = CreateRecipeViewport(_semanticZoomRecipeRepeater, 190);
+        _semanticZoomRecipeRepeater.AttachViewport(scrollViewer);
+
+        var content = new StackPanel
+        {
+            Spacing = 10,
+            Children =
+            {
+                CreatePreviewSurface(_semanticZoomPreviewText),
+                CreateRecipeButtonRow(
+                    CreateRecipeButton("Previous group", () => ApplySemanticZoomRecipeCommand(CollectionRecipeCommand.SelectPreviousGroup)),
+                    CreateRecipeButton("Next group", () => ApplySemanticZoomRecipeCommand(CollectionRecipeCommand.SelectNextGroup)),
+                    CreateRecipeButton("Overview/details", () => ApplySemanticZoomRecipeCommand(CollectionRecipeCommand.ToggleZoom)),
+                    CreateRecipeButton("Open group", () => ApplySemanticZoomRecipeCommand(CollectionRecipeCommand.Invoke))),
+                scrollViewer,
+                _semanticZoomRecipeText
+            }
+        };
+
+        UpdateSemanticZoomRecipeVisuals();
+
+        return CreateRecipeSurface(
+            "SemanticZoom-like grouping recipe",
+            "Keeps grouped overview/detail navigation as a Gallery recipe while Jalium lacks a native SemanticZoom base.",
+            content);
+    }
+
+    private UIElement CreateRecipeSurface(string title, string description, UIElement content)
+    {
+        var stack = new StackPanel { Spacing = 10 };
+        stack.Children.Add(new TextBlock
+        {
+            Text = title,
+            FontSize = 18,
+            FontWeight = FontWeights.SemiBold,
+            TextWrapping = TextWrapping.Wrap
+        });
+        stack.Children.Add(new TextBlock
+        {
+            Text = description,
+            FontSize = 13,
+            Opacity = 0.72,
+            TextWrapping = TextWrapping.Wrap
+        });
+        stack.Children.Add(content);
+
+        return new FWBorder
+        {
+            Background = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xE0, 0xE0, 0xE0)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14),
+            Child = stack
+        };
     }
 
     private UIElement CreateLayoutControls()
@@ -532,6 +752,81 @@ public class AdvancedCollectionsPage : Page
         UpdateRepeaterDiagnostics();
     }
 
+    private void ApplyItemsViewRecipeCommand(CollectionRecipeCommand command, int? index = null)
+    {
+        _itemsViewRecipeState = ApplyCollectionRecipeCommand(_itemsViewRecipeState, command, index);
+        UpdateCollectionRecipeVisuals(_itemsViewRecipeRepeater, _itemsViewRecipeState, _itemsViewRecipeText);
+    }
+
+    private void ApplyFlipViewRecipeCommand(CollectionRecipeCommand command, int? index = null)
+    {
+        _flipViewRecipeState = ApplyCollectionRecipeCommand(_flipViewRecipeState, command, index);
+        UpdateFlipViewRecipeVisuals();
+    }
+
+    private void ApplySemanticZoomRecipeCommand(CollectionRecipeCommand command, int? index = null)
+    {
+        _semanticZoomRecipeState = ApplyCollectionRecipeCommand(_semanticZoomRecipeState, command, index);
+        UpdateSemanticZoomRecipeVisuals();
+    }
+
+    private void UpdateFlipViewRecipeVisuals()
+    {
+        if (_flipViewPager != null)
+        {
+            _suppressFlipPagerChange = true;
+            _flipViewPager.SelectedPageIndex = _flipViewRecipeState.PageIndex;
+            _suppressFlipPagerChange = false;
+        }
+
+        if (_flipViewPreviewText != null)
+        {
+            var item = GetCollectionRecipeItem(_flipViewRecipeState);
+            _flipViewPreviewText.Text = $"{item.Title}: {item.Description}";
+        }
+
+        UpdateCollectionRecipeVisuals(_flipViewRecipeRepeater, _flipViewRecipeState, _flipViewRecipeText);
+    }
+
+    private void UpdateSemanticZoomRecipeVisuals()
+    {
+        if (_semanticZoomPreviewText != null)
+        {
+            var groups = CreateCollectionRecipeGroups();
+            var group = groups[Math.Min(_semanticZoomRecipeState.GroupIndex, groups.Count - 1)];
+            _semanticZoomPreviewText.Text = _semanticZoomRecipeState.IsZoomedOut
+                ? $"Overview: {group} group selected. Toggle to inspect its first item."
+                : $"Details: {GetCollectionRecipeItem(_semanticZoomRecipeState).Title} in {group}.";
+        }
+
+        UpdateCollectionRecipeVisuals(_semanticZoomRecipeRepeater, _semanticZoomRecipeState, _semanticZoomRecipeText);
+    }
+
+    private static void UpdateCollectionRecipeVisuals(
+        FWItemsRepeater? repeater,
+        CollectionRecipeState state,
+        TextBlock? output)
+    {
+        if (repeater == null || output == null)
+        {
+            return;
+        }
+
+        var viewportStart = GetRecipeViewportStart(state);
+        var viewportLength = GetRecipeViewportLength(state);
+        var orientation = state.Kind == CollectionRecipeKind.FlipViewPaging
+            ? Orientation.Horizontal
+            : Orientation.Vertical;
+
+        repeater.ItemsSource = CreateCollectionRecipeItems(state);
+        repeater.Layout = CreateCollectionRecipeLayout(state);
+        repeater.EstimatedItemExtent = GetRecipeEstimatedItemExtent(state);
+        repeater.HorizontalCacheLength = state.Kind == CollectionRecipeKind.FlipViewPaging ? 96 : 0;
+        repeater.VerticalCacheLength = state.Kind == CollectionRecipeKind.FlipViewPaging ? 0 : 96;
+        repeater.ApplyViewport(viewportStart, viewportLength, orientation);
+        output.Text = CreateCollectionRecipeDiagnosticsText(state, repeater.GetDiagnostics());
+    }
+
     private void UpdateRepeaterDiagnostics()
     {
         if (_repeater == null || _repeaterDiagnosticsText == null)
@@ -737,6 +1032,341 @@ public class AdvancedCollectionsPage : Page
 
         return
             $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} ({viewportState}) | QA: {virtualizationState} | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Requested: {requested} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
+    }
+
+    internal static CollectionRecipeState CreateCollectionRecipeState(CollectionRecipeKind kind)
+    {
+        var itemCount = kind == CollectionRecipeKind.FlipViewPaging
+            ? 6
+            : 18;
+        var state = new CollectionRecipeState(
+            kind,
+            kind switch
+            {
+                CollectionRecipeKind.FlipViewPaging => "FlipView-like paging",
+                CollectionRecipeKind.SemanticZoomGrouping => "SemanticZoom-like grouping",
+                _ => "ItemsView-like selection"
+            },
+            itemCount,
+            0,
+            -1,
+            0,
+            0,
+            kind == CollectionRecipeKind.SemanticZoomGrouping,
+            "Initialized");
+
+        return NormalizeCollectionRecipeState(state);
+    }
+
+    internal static IReadOnlyList<string> CreateCollectionRecipeGroups()
+    {
+        return new[] { "Inbox", "Review", "Archive" };
+    }
+
+    internal static IReadOnlyList<CollectionRecipeItem> CreateCollectionRecipeItems(CollectionRecipeState state)
+    {
+        var groups = CreateCollectionRecipeGroups();
+        var items = new List<CollectionRecipeItem>();
+
+        for (var index = 0; index < state.ItemCount; index++)
+        {
+            var group = groups[index % groups.Count];
+            items.Add(new CollectionRecipeItem(
+                index,
+                group,
+                $"{group} item {index + 1:00}",
+                state.Kind switch
+                {
+                    CollectionRecipeKind.FlipViewPaging => $"Paged item {index + 1} of {state.ItemCount}.",
+                    CollectionRecipeKind.SemanticZoomGrouping => $"Grouped item for {group} overview/detail navigation.",
+                    _ => $"Selectable item {index + 1} with keyboard and invocation semantics."
+                }));
+        }
+
+        return items;
+    }
+
+    internal static CollectionRecipeState ApplyCollectionRecipeCommand(
+        CollectionRecipeState state,
+        CollectionRecipeCommand command,
+        int? index = null)
+    {
+        var selectedIndex = state.SelectedIndex;
+        var invokedIndex = state.InvokedIndex;
+        var pageIndex = state.PageIndex;
+        var groupIndex = state.GroupIndex;
+        var isZoomedOut = state.IsZoomedOut;
+        var lastInput = command.ToString();
+
+        switch (command)
+        {
+            case CollectionRecipeCommand.Previous:
+                selectedIndex--;
+                pageIndex--;
+                break;
+            case CollectionRecipeCommand.Next:
+                selectedIndex++;
+                pageIndex++;
+                break;
+            case CollectionRecipeCommand.Home:
+                selectedIndex = 0;
+                pageIndex = 0;
+                break;
+            case CollectionRecipeCommand.End:
+                selectedIndex = state.ItemCount - 1;
+                pageIndex = state.ItemCount - 1;
+                break;
+            case CollectionRecipeCommand.Invoke:
+                invokedIndex = state.Kind == CollectionRecipeKind.FlipViewPaging
+                    ? state.PageIndex
+                    : state.SelectedIndex;
+                isZoomedOut = state.Kind == CollectionRecipeKind.SemanticZoomGrouping && state.IsZoomedOut
+                    ? false
+                    : state.IsZoomedOut;
+                break;
+            case CollectionRecipeCommand.SelectIndex:
+                selectedIndex = index ?? selectedIndex;
+                pageIndex = index ?? pageIndex;
+                break;
+            case CollectionRecipeCommand.ToggleZoom:
+                isZoomedOut = !isZoomedOut;
+                break;
+            case CollectionRecipeCommand.SelectPreviousGroup:
+                groupIndex--;
+                break;
+            case CollectionRecipeCommand.SelectNextGroup:
+                groupIndex++;
+                break;
+        }
+
+        return NormalizeCollectionRecipeState(state with
+        {
+            SelectedIndex = selectedIndex,
+            InvokedIndex = invokedIndex,
+            PageIndex = pageIndex,
+            GroupIndex = groupIndex,
+            IsZoomedOut = isZoomedOut,
+            LastInput = lastInput
+        });
+    }
+
+    internal static CollectionRecipeState NormalizeCollectionRecipeState(CollectionRecipeState state)
+    {
+        var itemCount = Math.Max(0, state.ItemCount);
+        var lastIndex = Math.Max(0, itemCount - 1);
+        var selectedIndex = itemCount == 0 ? -1 : Math.Clamp(state.SelectedIndex, 0, lastIndex);
+        var pageIndex = itemCount == 0 ? -1 : Math.Clamp(state.PageIndex, 0, lastIndex);
+        var groups = CreateCollectionRecipeGroups();
+        var groupIndex = Math.Clamp(state.GroupIndex, 0, groups.Count - 1);
+
+        if (state.Kind == CollectionRecipeKind.FlipViewPaging)
+        {
+            selectedIndex = pageIndex;
+        }
+
+        if (state.Kind == CollectionRecipeKind.SemanticZoomGrouping)
+        {
+            var selectedGroup = groups[groupIndex];
+            var firstGroupItem = CreateCollectionRecipeItems(state with { ItemCount = itemCount })
+                .Where(item => string.Equals(item.Group, selectedGroup, StringComparison.Ordinal))
+                .Cast<CollectionRecipeItem?>()
+                .FirstOrDefault();
+            if (firstGroupItem is CollectionRecipeItem item)
+            {
+                selectedIndex = item.Index;
+                pageIndex = item.Index;
+            }
+        }
+
+        return state with
+        {
+            ItemCount = itemCount,
+            SelectedIndex = selectedIndex,
+            PageIndex = pageIndex,
+            GroupIndex = groupIndex
+        };
+    }
+
+    internal static string CreateCollectionRecipeDiagnosticsText(
+        CollectionRecipeState state,
+        FWItemsRepeaterDiagnostics diagnostics)
+    {
+        var realizedRange = diagnostics.HasRealizedElements
+            ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
+            : "none";
+        var item = GetCollectionRecipeItem(state);
+        var invocation = state.HasInvocation
+            ? state.InvokedIndex.ToString()
+            : "none";
+        var zoom = state.Kind == CollectionRecipeKind.SemanticZoomGrouping
+            ? $" | Zoom: {(state.IsZoomedOut ? "overview" : "details")} group {CreateCollectionRecipeGroups()[state.GroupIndex]}"
+            : string.Empty;
+
+        return
+            $"Recipe: {state.Name} | Selected: {state.SelectedIndex} ({item.Title}) | Invoked: {invocation} | Page: {state.PageIndex + 1}/{state.ItemCount} | Last input: {state.LastInput}{zoom} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} | Realized: {realizedRange}/{diagnostics.ItemCount} | Source: {diagnostics.RealizationSource}";
+    }
+
+    internal static VirtualizingLayout CreateCollectionRecipeLayout(CollectionRecipeState state)
+    {
+        return new StackLayout
+        {
+            Orientation = state.Kind == CollectionRecipeKind.FlipViewPaging
+                ? Orientation.Horizontal
+                : Orientation.Vertical,
+            Spacing = 8
+        };
+    }
+
+    internal static double GetRecipeEstimatedItemExtent(CollectionRecipeState state)
+    {
+        return state.Kind switch
+        {
+            CollectionRecipeKind.FlipViewPaging => 240,
+            CollectionRecipeKind.SemanticZoomGrouping => state.IsZoomedOut ? 58 : 72,
+            _ => 64
+        };
+    }
+
+    internal static double GetRecipeViewportStart(CollectionRecipeState state)
+    {
+        var focusIndex = state.Kind == CollectionRecipeKind.FlipViewPaging
+            ? state.PageIndex
+            : state.SelectedIndex;
+        return Math.Max(0, focusIndex) * GetRecipeEstimatedItemExtent(state);
+    }
+
+    internal static double GetRecipeViewportLength(CollectionRecipeState state)
+    {
+        return state.Kind == CollectionRecipeKind.FlipViewPaging
+            ? GetRecipeEstimatedItemExtent(state)
+            : GetRecipeEstimatedItemExtent(state) * 3;
+    }
+
+    internal static CollectionRecipeItem GetCollectionRecipeItem(CollectionRecipeState state)
+    {
+        var items = CreateCollectionRecipeItems(state);
+        if (items.Count == 0 || state.SelectedIndex < 0)
+        {
+            return new CollectionRecipeItem(-1, string.Empty, "No item", string.Empty);
+        }
+
+        return items[Math.Clamp(state.SelectedIndex, 0, items.Count - 1)];
+    }
+
+    private static FWItemsRepeater CreateRecipeRepeater(CollectionRecipeState state)
+    {
+        return new FWItemsRepeater
+        {
+            ItemsSource = CreateCollectionRecipeItems(state),
+            ItemTemplate = CreateRecipeItemTemplate(),
+            Layout = CreateCollectionRecipeLayout(state),
+            EstimatedItemExtent = GetRecipeEstimatedItemExtent(state),
+            HorizontalCacheLength = state.Kind == CollectionRecipeKind.FlipViewPaging ? 96 : 0,
+            VerticalCacheLength = state.Kind == CollectionRecipeKind.FlipViewPaging ? 0 : 96
+        };
+    }
+
+    private static DataTemplate CreateRecipeItemTemplate()
+    {
+        var template = new DataTemplate();
+
+        template.SetVisualTree(() =>
+        {
+            var border = new FWBorder
+            {
+                Background = new SolidColorBrush(Color.FromRgb(0xF7, 0xFA, 0xFF)),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xD8, 0xF2)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(10),
+                Margin = new Thickness(0, 0, 8, 8),
+                MinWidth = 220
+            };
+
+            var stack = new StackPanel { Spacing = 3 };
+            var title = new TextBlock
+            {
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold
+            };
+            title.SetBinding(TextBlock.TextProperty, new Binding("Title"));
+            var description = new TextBlock
+            {
+                FontSize = 12,
+                Opacity = 0.7,
+                TextWrapping = TextWrapping.Wrap
+            };
+            description.SetBinding(TextBlock.TextProperty, new Binding("Description"));
+            stack.Children.Add(title);
+            stack.Children.Add(description);
+            border.Child = stack;
+
+            return border;
+        });
+
+        template.Seal();
+        return template;
+    }
+
+    private static ScrollViewer CreateRecipeViewport(UIElement content, double height)
+    {
+        return new ScrollViewer
+        {
+            Height = height,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Content = content
+        };
+    }
+
+    private static FWBorder CreatePreviewSurface(UIElement content)
+    {
+        return new FWBorder
+        {
+            Background = new SolidColorBrush(Color.FromRgb(0xF4, 0xF8, 0xFD)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xD8, 0xE4, 0xF4)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Child = content
+        };
+    }
+
+    private static TextBlock CreateRecipeOutput(double fontSize = 13, double opacity = 0.76)
+    {
+        return new TextBlock
+        {
+            FontSize = fontSize,
+            Opacity = opacity,
+            TextWrapping = TextWrapping.Wrap
+        };
+    }
+
+    private static FWWrapPanel CreateRecipeButtonRow(params UIElement[] buttons)
+    {
+        var panel = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
+        };
+
+        foreach (var button in buttons)
+        {
+            panel.Children.Add(button);
+        }
+
+        return panel;
+    }
+
+    private static Button CreateRecipeButton(string text, Action action)
+    {
+        var button = new Button
+        {
+            Content = text,
+            MinWidth = 104
+        };
+        button.Click += (_, _) => action();
+        return button;
     }
 
     internal sealed class SampleItem

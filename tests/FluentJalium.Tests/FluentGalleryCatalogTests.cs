@@ -171,6 +171,27 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeAdvancedCollectionNavigationRecipes()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "advancedcollections");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWItemsRepeater", sampleCode);
+        Assert.Contains("AttachViewport", sampleCode);
+        Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("ItemsViewSelection", sampleCode);
+        Assert.Contains("FlipViewPaging", sampleCode);
+        Assert.Contains("SemanticZoomGrouping", sampleCode);
+        Assert.Contains("new FWPipsPager", sampleCode);
+        Assert.Contains("ApplyCollectionRecipeCommand", sampleCode);
+        Assert.Contains("CreateCollectionRecipeDiagnosticsText", sampleCode);
+        Assert.Contains("SelectedIndex", sampleCode);
+        Assert.Contains("InvokedIndex", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeSplitViewAndSettingsCardLayoutSample()
     {
         var page = Assert.Single(

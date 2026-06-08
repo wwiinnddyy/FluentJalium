@@ -872,6 +872,117 @@ public class CollectionControlsTests
         Assert.Contains("Reattached ScrollViewer -> Scroller", scenarioText);
     }
 
+    [Fact]
+    public void GalleryItemsViewRecipe_ShouldTrackSelectionInvocationAndViewport()
+    {
+        // Arrange
+        var state = AdvancedCollectionsPage.CreateCollectionRecipeState(
+            AdvancedCollectionsPage.CollectionRecipeKind.ItemsViewSelection);
+
+        // Act
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.Next);
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.Invoke);
+        var repeater = CreateRepeaterFromRecipeState(state);
+        repeater.ApplyViewport(
+            AdvancedCollectionsPage.GetRecipeViewportStart(state),
+            AdvancedCollectionsPage.GetRecipeViewportLength(state));
+        var diagnostics = repeater.GetDiagnostics();
+        var diagnosticsText = AdvancedCollectionsPage.CreateCollectionRecipeDiagnosticsText(state, diagnostics);
+
+        // Assert
+        Assert.Equal(18, state.ItemCount);
+        Assert.Equal(1, state.SelectedIndex);
+        Assert.Equal(1, state.InvokedIndex);
+        Assert.Equal("Review item 02", AdvancedCollectionsPage.GetCollectionRecipeItem(state).Title);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(64, diagnostics.ViewportStart);
+        Assert.Equal(192, diagnostics.ViewportLength);
+        Assert.Contains("ItemsView-like selection", diagnosticsText);
+        Assert.Contains("Selected: 1", diagnosticsText);
+        Assert.Contains("Invoked: 1", diagnosticsText);
+        Assert.Contains("Last input: Invoke", diagnosticsText);
+    }
+
+    [Fact]
+    public void GalleryFlipViewRecipe_ShouldSynchronizePageSelectionAndHorizontalWindow()
+    {
+        // Arrange
+        var state = AdvancedCollectionsPage.CreateCollectionRecipeState(
+            AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging);
+
+        // Act
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.SelectIndex,
+            4);
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.Invoke);
+        var repeater = CreateRepeaterFromRecipeState(state);
+        repeater.ApplyViewport(
+            AdvancedCollectionsPage.GetRecipeViewportStart(state),
+            AdvancedCollectionsPage.GetRecipeViewportLength(state),
+            Orientation.Horizontal);
+        var diagnostics = repeater.GetDiagnostics();
+        var diagnosticsText = AdvancedCollectionsPage.CreateCollectionRecipeDiagnosticsText(state, diagnostics);
+
+        // Assert
+        var layout = Assert.IsType<StackLayout>(AdvancedCollectionsPage.CreateCollectionRecipeLayout(state));
+        Assert.Equal(Orientation.Horizontal, layout.Orientation);
+        Assert.Equal(4, state.PageIndex);
+        Assert.Equal(4, state.SelectedIndex);
+        Assert.Equal(4, state.InvokedIndex);
+        Assert.Equal(960, diagnostics.ViewportStart);
+        Assert.Equal(240, diagnostics.ViewportLength);
+        Assert.Equal(Orientation.Horizontal, diagnostics.ViewportOrientation);
+        Assert.Contains("FlipView-like paging", diagnosticsText);
+        Assert.Contains("Page: 5/6", diagnosticsText);
+        Assert.Contains("Invoked: 4", diagnosticsText);
+    }
+
+    [Fact]
+    public void GallerySemanticZoomRecipe_ShouldTrackGroupOverviewAndDetails()
+    {
+        // Arrange
+        var state = AdvancedCollectionsPage.CreateCollectionRecipeState(
+            AdvancedCollectionsPage.CollectionRecipeKind.SemanticZoomGrouping);
+
+        // Act
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.SelectNextGroup);
+        var overviewState = state;
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.ToggleZoom);
+        state = AdvancedCollectionsPage.ApplyCollectionRecipeCommand(
+            state,
+            AdvancedCollectionsPage.CollectionRecipeCommand.Invoke);
+        var repeater = CreateRepeaterFromRecipeState(state);
+        repeater.ApplyViewport(
+            AdvancedCollectionsPage.GetRecipeViewportStart(state),
+            AdvancedCollectionsPage.GetRecipeViewportLength(state));
+        var diagnostics = repeater.GetDiagnostics();
+        var diagnosticsText = AdvancedCollectionsPage.CreateCollectionRecipeDiagnosticsText(state, diagnostics);
+
+        // Assert
+        Assert.True(overviewState.IsZoomedOut);
+        Assert.Equal(1, overviewState.GroupIndex);
+        Assert.Equal(1, overviewState.SelectedIndex);
+        Assert.False(state.IsZoomedOut);
+        Assert.Equal("Review item 02", AdvancedCollectionsPage.GetCollectionRecipeItem(state).Title);
+        Assert.Equal(1, state.InvokedIndex);
+        Assert.Equal(72, diagnostics.ViewportStart);
+        Assert.Equal(216, diagnostics.ViewportLength);
+        Assert.Contains("SemanticZoom-like grouping", diagnosticsText);
+        Assert.Contains("Zoom: details group Review", diagnosticsText);
+        Assert.Contains("Invoked: 1", diagnosticsText);
+    }
+
     private static DataTemplate CreateTextTemplate()
     {
         var template = new DataTemplate();
@@ -891,6 +1002,20 @@ public class CollectionControlsTests
             EstimatedItemExtent = profile.EstimatedItemExtent,
             HorizontalCacheLength = profile.HorizontalCacheLength,
             VerticalCacheLength = profile.VerticalCacheLength
+        };
+    }
+
+    private static FWItemsRepeater CreateRepeaterFromRecipeState(
+        AdvancedCollectionsPage.CollectionRecipeState state)
+    {
+        return new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = AdvancedCollectionsPage.CreateCollectionRecipeItems(state),
+            Layout = AdvancedCollectionsPage.CreateCollectionRecipeLayout(state),
+            EstimatedItemExtent = AdvancedCollectionsPage.GetRecipeEstimatedItemExtent(state),
+            HorizontalCacheLength = state.Kind == AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging ? 96 : 0,
+            VerticalCacheLength = state.Kind == AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging ? 0 : 96
         };
     }
 
