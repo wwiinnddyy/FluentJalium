@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Automation;
 using Jalium.UI.Controls;
@@ -330,6 +331,70 @@ public sealed class FluentContentLayoutControlsTests
         twoPaneView.Measure(new Size(800, 480));
 
         Assert.Equal(FWTwoPaneViewMode.SinglePane, twoPaneView.ActualMode);
+    }
+
+    [Fact]
+    public void GalleryContentLayoutPage_ShouldFormatSettingsVisualQaSnapshot()
+    {
+        var twoPaneView = new FWTwoPaneView
+        {
+            Pane1 = new FWTextBlock { Text = "Navigation" },
+            Pane2 = new FWTextBlock { Text = "Settings" },
+            Mode = FWTwoPaneViewMode.SinglePane,
+            PanePriority = FWTwoPaneViewPriority.Pane2
+        };
+        var primaryCard = new FWSettingsCard
+        {
+            Header = "Display mode",
+            Description = "Adaptive settings row",
+            IsClickEnabled = true,
+            Command = new RecordingCommand(),
+            CommandParameter = "display-mode"
+        };
+        var syncCard = new FWSettingsCard
+        {
+            Header = "Sync layout",
+            IsClickEnabled = true,
+            ClickMode = ClickMode.Hover
+        };
+        var disabledCard = new FWSettingsCard
+        {
+            Header = "Enterprise policy",
+            Description = "Disabled row keeps visual alignment visible.",
+            IsClickEnabled = true,
+            IsEnabled = false
+        };
+
+        var snapshot = GalleryContentLayoutPage.CreateSettingsVisualQaSnapshot(
+            twoPaneView,
+            primaryCard,
+            syncCard,
+            disabledCard);
+        var text = GalleryContentLayoutPage.FormatSettingsVisualQa(
+            "Settings visual QA initialized",
+            snapshot);
+
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, snapshot.Layout.RequestedMode);
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, snapshot.Layout.ActualMode);
+        Assert.Equal(FWTwoPaneViewPriority.Pane2, snapshot.Layout.PanePriority);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Pane2, snapshot.Layout.VisiblePane);
+        Assert.True(snapshot.PrimaryCard.IsInvokable);
+        Assert.True(snapshot.PrimaryCard.CanExecute);
+        Assert.Equal(ClickMode.Release, snapshot.PrimaryCard.ClickMode);
+        Assert.Equal("Display mode", snapshot.PrimaryAutomation.Name);
+        Assert.True(snapshot.PrimaryAutomation.IsInvokePatternAvailable);
+        Assert.Equal(ClickMode.Hover, snapshot.SyncCard.ClickMode);
+        Assert.True(snapshot.SyncCard.IsInvokable);
+        Assert.False(snapshot.DisabledCard.IsEnabled);
+        Assert.False(snapshot.DisabledCard.IsInvokable);
+        Assert.Contains("Settings visual QA initialized", text);
+        Assert.Contains("requested SinglePane", text);
+        Assert.Contains("visible Pane2", text);
+        Assert.Contains("Primary invokable on", text);
+        Assert.Contains("automation Button/Display mode", text);
+        Assert.Contains("Sync invokable on", text);
+        Assert.Contains("mode Hover", text);
+        Assert.Contains("Disabled invokable off", text);
     }
 
     [Fact]

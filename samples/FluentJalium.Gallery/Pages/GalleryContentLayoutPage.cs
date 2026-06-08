@@ -29,6 +29,7 @@ using FWSplitViewPanePlacement = FluentJalium.Controls.FWSplitViewPanePlacement;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTwoPaneView = FluentJalium.Controls.FWTwoPaneView;
+using FWTwoPaneViewDiagnostics = FluentJalium.Controls.FWTwoPaneViewDiagnostics;
 using FWTwoPaneViewMode = FluentJalium.Controls.FWTwoPaneViewMode;
 using FWTwoPaneViewPriority = FluentJalium.Controls.FWTwoPaneViewPriority;
 using FWTransitioningContentControl = FluentJalium.Controls.FWTransitioningContentControl;
@@ -38,6 +39,15 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryContentLayoutPage
 {
+    internal readonly record struct SettingsVisualQaSnapshot(
+        FWTwoPaneViewDiagnostics Layout,
+        FWSettingsCardDiagnostics PrimaryCard,
+        FWSettingsCardAutomationDiagnostics PrimaryAutomation,
+        FWSettingsCardDiagnostics SyncCard,
+        FWSettingsCardAutomationDiagnostics SyncAutomation,
+        FWSettingsCardDiagnostics DisabledCard,
+        FWSettingsCardAutomationDiagnostics DisabledAutomation);
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Content and Layout");
@@ -336,12 +346,12 @@ internal sealed class GalleryContentLayoutPage
 
         void UpdateState(string action)
         {
-            var diagnostics = twoPaneView.GetDiagnostics();
-            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}. SettingsCard: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
-            layoutStatus.Text = $"Layout QA: requested {diagnostics.RequestedMode}, actual {diagnostics.ActualMode}, visible {diagnostics.VisiblePane}, priority {diagnostics.PanePriority}.";
-            primaryStatus.Text = $"Primary row: {FormatSettingsCardDiagnostics(modeCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
-            syncStatus.Text = $"Sync row: {FormatSettingsCardDiagnostics(syncCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(syncCard.GetAutomationDiagnostics())}.";
-            disabledStatus.Text = $"Disabled row: {FormatSettingsCardDiagnostics(disabledCard.GetDiagnostics())}; automation {FormatSettingsCardAutomation(disabledCard.GetAutomationDiagnostics())}.";
+            var snapshot = CreateSettingsVisualQaSnapshot(twoPaneView, modeCard, syncCard, disabledCard);
+            output.Text = FormatSettingsVisualQa(action, snapshot);
+            layoutStatus.Text = $"Layout QA: requested {snapshot.Layout.RequestedMode}, actual {snapshot.Layout.ActualMode}, visible {snapshot.Layout.VisiblePane}, priority {snapshot.Layout.PanePriority}.";
+            primaryStatus.Text = $"Primary row: {FormatSettingsCardDiagnostics(snapshot.PrimaryCard)}; automation {FormatSettingsCardAutomation(snapshot.PrimaryAutomation)}.";
+            syncStatus.Text = $"Sync row: {FormatSettingsCardDiagnostics(snapshot.SyncCard)}; automation {FormatSettingsCardAutomation(snapshot.SyncAutomation)}.";
+            disabledStatus.Text = $"Disabled row: {FormatSettingsCardDiagnostics(snapshot.DisabledCard)}; automation {FormatSettingsCardAutomation(snapshot.DisabledAutomation)}.";
         }
 
         UpdateState("Settings visual QA initialized");
@@ -413,6 +423,34 @@ internal sealed class GalleryContentLayoutPage
                 CreateSettingsVisualQaPanel(layoutStatus, primaryStatus, syncStatus, disabledStatus)
             }
         };
+    }
+
+    internal static SettingsVisualQaSnapshot CreateSettingsVisualQaSnapshot(
+        FWTwoPaneView twoPaneView,
+        FWSettingsCard primaryCard,
+        FWSettingsCard syncCard,
+        FWSettingsCard disabledCard)
+    {
+        ArgumentNullException.ThrowIfNull(twoPaneView);
+        ArgumentNullException.ThrowIfNull(primaryCard);
+        ArgumentNullException.ThrowIfNull(syncCard);
+        ArgumentNullException.ThrowIfNull(disabledCard);
+
+        return new SettingsVisualQaSnapshot(
+            twoPaneView.GetDiagnostics(),
+            primaryCard.GetDiagnostics(),
+            primaryCard.GetAutomationDiagnostics(),
+            syncCard.GetDiagnostics(),
+            syncCard.GetAutomationDiagnostics(),
+            disabledCard.GetDiagnostics(),
+            disabledCard.GetAutomationDiagnostics());
+    }
+
+    internal static string FormatSettingsVisualQa(string action, SettingsVisualQaSnapshot snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
+        return $"{action}. Settings visual QA: requested {snapshot.Layout.RequestedMode}, actual {snapshot.Layout.ActualMode}, visible {snapshot.Layout.VisiblePane}, priority {snapshot.Layout.PanePriority}. Primary {FormatSettingsCardDiagnostics(snapshot.PrimaryCard)}; automation {FormatSettingsCardAutomation(snapshot.PrimaryAutomation)}. Sync {FormatSettingsCardDiagnostics(snapshot.SyncCard)}. Disabled {FormatSettingsCardDiagnostics(snapshot.DisabledCard)}.";
     }
 
     private static UIElement CreateSplitViewLayoutSample()
