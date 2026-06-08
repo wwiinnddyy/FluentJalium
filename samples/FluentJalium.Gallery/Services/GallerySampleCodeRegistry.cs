@@ -1091,6 +1091,12 @@ var closeReason = await closeTask;
         return TryCreateFallbackSample(page, out sampleCode);
     }
 
+    public static bool ContainsRegisteredSampleCodeKey(string? sampleCodeKey)
+    {
+        return !string.IsNullOrWhiteSpace(sampleCodeKey)
+            && SampleCodeByKey.ContainsKey(sampleCodeKey.Trim());
+    }
+
     private static string CreateCatalogFilterSample(string filter)
     {
         return $$"""

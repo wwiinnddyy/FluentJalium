@@ -327,6 +327,27 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExplicitlyRegisterEveryCatalogSampleKey()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
+            .Where(page => !page.IsFooter && !string.IsNullOrWhiteSpace(page.SampleCodeKey))
+            .ToArray();
+
+        Assert.NotEmpty(pages);
+
+        foreach (var page in pages)
+        {
+            Assert.True(
+                GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(page.SampleCodeKey),
+                $"{page.UniqueId} references unregistered sample key '{page.SampleCodeKey}'.");
+
+            Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+            Assert.False(string.IsNullOrWhiteSpace(sampleCode));
+            Assert.DoesNotContain("Generated from", sampleCode);
+        }
+    }
+
+    [Fact]
     public void FluentControlBacklogMatrix_ShouldKeepReferenceAndExecutionCoverage()
     {
         var document = File.ReadAllText(FindRepositoryFile("docs", "FLUENT_CONTROL_BACKLOG_MATRIX.md"));
