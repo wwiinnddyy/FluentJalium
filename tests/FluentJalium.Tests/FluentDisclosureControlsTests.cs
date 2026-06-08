@@ -723,8 +723,8 @@ public sealed class FluentDisclosureControlsTests
         ThemeLoader.Initialize();
         var previousProvider = FocusService.Provider;
         var focusProvider = new RecordingFocusProvider();
-        FocusService.Provider = focusProvider;
         var app = new Application();
+        FocusService.Provider = focusProvider;
 
         try
         {

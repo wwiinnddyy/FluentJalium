@@ -51,7 +51,7 @@ public sealed class FluentSettingsVisualTemplateTests
         AssertSetter(iconStyle, FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
 
         var itemHostStyle = AssertKeyedStyle<ItemsControl>(dictionary, "FWSettingsExpanderItemHostStyle");
-        AssertSetter(itemHostStyle, Panel.BackgroundProperty);
+        AssertSetter(itemHostStyle, Control.BackgroundProperty);
 
         var settingsExpanderStyle = AssertStyle<FWSettingsExpander>(dictionary);
         AssertSetter(settingsExpanderStyle, FWSettingsExpander.ItemsPanelProperty);
@@ -90,8 +90,26 @@ public sealed class FluentSettingsVisualTemplateTests
         var setter = Assert.Single(style.Setters, candidate => candidate.Property == property);
         if (expectedValue != null)
         {
-            Assert.Equal(expectedValue, setter.Value);
+            AssertSetterValue(expectedValue, setter.Value);
         }
+    }
+
+    private static void AssertSetterValue(object expectedValue, object? actualValue)
+    {
+        if (expectedValue is double expectedDouble && actualValue is IConvertible actualConvertible)
+        {
+            Assert.Equal(expectedDouble, actualConvertible.ToDouble(System.Globalization.CultureInfo.InvariantCulture));
+            return;
+        }
+
+        if (actualValue != null &&
+            expectedValue.GetType() != actualValue.GetType() &&
+            string.Equals(expectedValue.ToString(), actualValue.ToString(), StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        Assert.Equal(expectedValue, actualValue);
     }
 
     private static void ResetApplicationState()

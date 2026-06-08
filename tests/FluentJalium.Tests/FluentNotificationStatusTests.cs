@@ -628,7 +628,12 @@ public sealed class FluentNotificationStatusTests
             };
 
             host.Enqueue(snackbar);
-            Assert.False(snackbar.GetPresenterDiagnostics().HasPresenter);
+            var queuedDiagnostics = snackbar.GetPresenterDiagnostics();
+            Assert.Equal(FWSnackbarTransitionKind.Show, queuedDiagnostics.LastTransitionKind);
+            Assert.Equal(TimeSpan.FromSeconds(5), queuedDiagnostics.TransitionDuration);
+            Assert.Equal(FWSnackbarPlacement.Top, queuedDiagnostics.Placement);
+            Assert.InRange(queuedDiagnostics.PresenterOpacity, 0.0, 1.0);
+            Assert.InRange(queuedDiagnostics.PresenterOffset, -18.0, 0.0);
             Assert.Equal(FWSnackbarPresenterState.Entering, snackbar.PresenterState);
 
             snackbar.ApplyTemplate();

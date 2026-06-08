@@ -1045,7 +1045,9 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
     private bool FocusVisualTreeElement(bool reverse)
     {
         var focusableElements = new List<UIElement>();
-        CollectFocusableElements(this, focusableElements);
+        var visited = new HashSet<UIElement>();
+        AddFocusableContentElement(focusableElements, visited);
+        CollectFocusableElements(this, focusableElements, visited);
         if (reverse)
         {
             for (var index = focusableElements.Count - 1; index >= 0; index--)
@@ -1070,7 +1072,15 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         return false;
     }
 
-    private void CollectFocusableElements(Visual root, List<UIElement> focusableElements)
+    private void AddFocusableContentElement(List<UIElement> focusableElements, HashSet<UIElement> visited)
+    {
+        if (Content is UIElement contentElement && IsVisualTreeFocusCandidate(contentElement))
+        {
+            AddFocusableElement(contentElement, focusableElements, visited);
+        }
+    }
+
+    private void CollectFocusableElements(Visual root, List<UIElement> focusableElements, HashSet<UIElement> visited)
     {
         for (var index = 0; index < root.VisualChildrenCount; index++)
         {
@@ -1081,10 +1091,18 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
             if (child is UIElement element && IsVisualTreeFocusCandidate(element))
             {
-                focusableElements.Add(element);
+                AddFocusableElement(element, focusableElements, visited);
             }
 
-            CollectFocusableElements(child, focusableElements);
+            CollectFocusableElements(child, focusableElements, visited);
+        }
+    }
+
+    private static void AddFocusableElement(UIElement element, List<UIElement> focusableElements, HashSet<UIElement> visited)
+    {
+        if (visited.Add(element))
+        {
+            focusableElements.Add(element);
         }
     }
 
