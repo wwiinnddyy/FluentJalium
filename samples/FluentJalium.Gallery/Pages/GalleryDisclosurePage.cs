@@ -20,6 +20,7 @@ using FWTaskDialogAutomationDiagnostics = FluentJalium.Controls.FWTaskDialogAuto
 using FWTaskDialogButton = FluentJalium.Controls.FWTaskDialogButton;
 using FWTaskDialogButtonClickEventArgs = FluentJalium.Controls.FWTaskDialogButtonClickEventArgs;
 using FWTaskDialogHost = FluentJalium.Controls.FWTaskDialogHost;
+using FWTaskDialogHostDiagnostics = FluentJalium.Controls.FWTaskDialogHostDiagnostics;
 using FWTeachingTip = FluentJalium.Controls.FWTeachingTip;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
@@ -515,10 +516,11 @@ internal sealed class GalleryDisclosurePage
         void UpdateAfterRequest(string action, bool? requestCompleted = null)
         {
             var automation = taskDialog.GetAutomationDiagnostics();
+            var hostDiagnostics = taskDialogHost.GetDiagnostics();
             var requestText = requestCompleted.HasValue
                 ? $", request: {(requestCompleted.Value ? "completed" : "canceled")}"
                 : string.Empty;
-            output.Text = $"{action}. Host open: {FormatOnOff(taskDialogHost.IsOpen)}, dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, focus trap: {FormatOnOff(taskDialogHost.IsFocusTrapEnabled)}, light dismiss: {FormatOnOff(taskDialogHost.IsLightDismissEnabled)}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. Automation: {FormatTaskDialogAutomation(automation)}. {lastRequest} {lastCommand}";
+            output.Text = $"{action}. Dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. Host diagnostics: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}. Automation: {FormatTaskDialogAutomation(automation)}. {lastRequest} {lastCommand}";
         }
 
         bool RequestDefaultButton()
@@ -548,11 +550,11 @@ internal sealed class GalleryDisclosurePage
             try
             {
                 var result = await taskDialogHost.ShowAsync(taskDialog);
-                output.Text = $"TaskDialog ShowAsync completed. Final result: {result}. Open: {FormatOnOff(taskDialog.IsOpen)}, default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}. Automation: {FormatTaskDialogAutomation(taskDialog.GetAutomationDiagnostics())}.";
+                output.Text = $"TaskDialog ShowAsync completed. Final result: {result}. Dialog open: {FormatOnOff(taskDialog.IsOpen)}, default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}. Host diagnostics: {FormatTaskDialogHostDiagnostics(taskDialogHost.GetDiagnostics())}. Automation: {FormatTaskDialogAutomation(taskDialog.GetAutomationDiagnostics())}.";
             }
             catch (Exception ex)
             {
-                output.Text = $"TaskDialog ShowAsync failed: {GetTaskDialogExceptionMessage(ex)}";
+                output.Text = $"TaskDialog ShowAsync failed: {GetTaskDialogExceptionMessage(ex)}. Host diagnostics: {FormatTaskDialogHostDiagnostics(taskDialogHost.GetDiagnostics())}.";
             }
         }
 
@@ -628,6 +630,11 @@ internal sealed class GalleryDisclosurePage
     private static string FormatTaskDialogAutomation(FWTaskDialogAutomationDiagnostics diagnostics)
     {
         return $"{diagnostics.Name}; primary {diagnostics.PrimaryButton.AutomationId}/{diagnostics.PrimaryButton.Name}/{diagnostics.PrimaryButton.HelpText}; last focus {diagnostics.LastFocusTarget}";
+    }
+
+    private static string FormatTaskDialogHostDiagnostics(FWTaskDialogHostDiagnostics diagnostics)
+    {
+        return $"open {FormatOnOff(diagnostics.IsOpen)}, current dialog {FormatOnOff(diagnostics.HasCurrentDialog)}, light dismiss {FormatOnOff(diagnostics.IsLightDismissEnabled)}, focus trap {FormatOnOff(diagnostics.IsFocusTrapEnabled)}, restore target {FormatOnOff(diagnostics.HasFocusRestoreTarget)}, keyboard {diagnostics.LastKeyboardRequest}/{FormatOnOff(diagnostics.LastKeyboardRequestHandled)}";
     }
 
     private static bool InvokeTaskDialogBooleanRequest(FWTaskDialog taskDialog, string methodName, Func<bool> fallback)
