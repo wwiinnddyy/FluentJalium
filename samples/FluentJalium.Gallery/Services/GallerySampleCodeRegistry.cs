@@ -531,6 +531,10 @@ var showTask = host.ShowAsync(taskDialog);
 var diagnostics = host.GetDiagnostics();
 Debug.WriteLine($"TaskDialog open: {diagnostics.IsOpen}; focus trap: {diagnostics.IsFocusTrapEnabled}.");
 
+var automation = taskDialog.GetAutomationDiagnostics();
+Debug.WriteLine($"TaskDialog automation: {automation.Name}; primary id: {automation.PrimaryButton.AutomationId}; primary help: {automation.PrimaryButton.HelpText}.");
+Debug.WriteLine($"Close button automation: {automation.CloseButton.Name}; cancel: {automation.CloseButton.IsCancel}.");
+
 var result = await showTask;
 Debug.WriteLine($"TaskDialog completed with {result}.");
 """,

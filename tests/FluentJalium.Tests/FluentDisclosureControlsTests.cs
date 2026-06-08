@@ -5,6 +5,7 @@ using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
+using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Controls.Primitives;
@@ -485,6 +486,95 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(secondaryClick.CommandExecuted);
         Assert.Equal(1, secondaryCommand.ExecuteCount);
         Assert.Equal("archive-draft", secondaryCommand.LastParameter);
+    }
+
+    [Fact]
+    public void FWTaskDialog_ShouldExposeAutomationPeerAndDiagnostics()
+    {
+        var secondaryCommand = new RecordingCommand
+        {
+            CanExecuteResult = false
+        };
+        var dialog = new FWTaskDialog
+        {
+            Title = "Delete temporary layout cache?",
+            Subtitle = "This action can be reviewed before it closes the dialog.",
+            PrimaryButtonText = "Delete",
+            SecondaryButtonText = "Archive",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Close,
+            SecondaryButtonCommand = secondaryCommand
+        };
+
+        var peer = Assert.IsType<FWTaskDialogAutomationPeer>(dialog.GetAutomationPeer());
+
+        Assert.Equal(nameof(FWTaskDialog), peer.GetClassName());
+        Assert.Equal(AutomationControlType.Window, peer.GetAutomationControlType());
+        Assert.Equal("Delete temporary layout cache?", peer.GetName());
+        Assert.Equal("This action can be reviewed before it closes the dialog.", peer.GetHelpText());
+
+        var diagnostics = dialog.GetAutomationDiagnostics();
+
+        Assert.Equal(nameof(FWTaskDialog), diagnostics.ClassName);
+        Assert.Equal(AutomationControlType.Window, diagnostics.ControlType);
+        Assert.Equal("Delete temporary layout cache?", diagnostics.Name);
+        Assert.Equal("This action can be reviewed before it closes the dialog.", diagnostics.HelpText);
+        Assert.Equal(FWTaskDialogButton.None, diagnostics.LastFocusTarget);
+
+        Assert.Equal(FWTaskDialogButton.Primary, diagnostics.PrimaryButton.Button);
+        Assert.Equal("PrimaryButton", diagnostics.PrimaryButton.AutomationId);
+        Assert.Equal("Delete", diagnostics.PrimaryButton.Name);
+        Assert.Equal("Default button", diagnostics.PrimaryButton.HelpText);
+        Assert.True(diagnostics.PrimaryButton.IsVisible);
+        Assert.True(diagnostics.PrimaryButton.IsEnabled);
+        Assert.True(diagnostics.PrimaryButton.IsDefault);
+        Assert.False(diagnostics.PrimaryButton.IsCancel);
+
+        Assert.Equal("SecondaryButton", diagnostics.SecondaryButton.AutomationId);
+        Assert.Equal("Archive", diagnostics.SecondaryButton.Name);
+        Assert.Equal("Task dialog button", diagnostics.SecondaryButton.HelpText);
+        Assert.True(diagnostics.SecondaryButton.IsVisible);
+        Assert.False(diagnostics.SecondaryButton.IsEnabled);
+
+        Assert.Equal("CloseButton", diagnostics.CloseButton.AutomationId);
+        Assert.Equal("Cancel", diagnostics.CloseButton.Name);
+        Assert.Equal("Cancel button", diagnostics.CloseButton.HelpText);
+        Assert.True(diagnostics.CloseButton.IsVisible);
+        Assert.True(diagnostics.CloseButton.IsEnabled);
+        Assert.False(diagnostics.CloseButton.IsDefault);
+        Assert.True(diagnostics.CloseButton.IsCancel);
+    }
+
+    [Fact]
+    public async Task FWTaskDialogHost_ShouldExposeAutomationPeerForCurrentDialog()
+    {
+        var host = new FWTaskDialogHost();
+        var dialog = new FWTaskDialog
+        {
+            Title = "Replace runtime settings?",
+            Subtitle = "The current profile will be updated.",
+            PrimaryButtonText = "Replace",
+            CloseButtonText = "Cancel"
+        };
+        var peer = Assert.IsType<FWTaskDialogHostAutomationPeer>(host.GetAutomationPeer());
+
+        Assert.Equal(nameof(FWTaskDialogHost), peer.GetClassName());
+        Assert.Equal(AutomationControlType.Pane, peer.GetAutomationControlType());
+        Assert.Equal(nameof(FWTaskDialogHost), peer.GetName());
+        Assert.Equal("Task dialog modal host with light dismiss", peer.GetHelpText());
+
+        var showTask = host.ShowAsync(dialog);
+
+        Assert.Equal("Replace runtime settings?", peer.GetName());
+        Assert.Equal("The current profile will be updated.", peer.GetHelpText());
+
+        Assert.True(dialog.RequestPrimaryButtonClick());
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Primary, result);
+        Assert.Equal(nameof(FWTaskDialogHost), peer.GetName());
+        Assert.Equal("Task dialog modal host with light dismiss", peer.GetHelpText());
     }
 
     [Fact]

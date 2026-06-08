@@ -315,11 +315,11 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty DefaultButtonProperty =
         DependencyProperty.Register(nameof(DefaultButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
-            new PropertyMetadata(FWTaskDialogButton.Primary, OnDefaultButtonChanged), IsValidButton);
+            new PropertyMetadata(FWTaskDialogButton.Primary, OnButtonRoleChanged), IsValidButton);
 
     public static readonly DependencyProperty CancelButtonProperty =
         DependencyProperty.Register(nameof(CancelButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
-            new PropertyMetadata(FWTaskDialogButton.Close), IsValidButton);
+            new PropertyMetadata(FWTaskDialogButton.Close, OnButtonRoleChanged), IsValidButton);
 
     public static readonly DependencyProperty PrimaryButtonCommandProperty =
         DependencyProperty.Register(nameof(PrimaryButtonCommand), typeof(ICommand), typeof(FWTaskDialog),
@@ -757,10 +757,11 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         }
     }
 
-    private static void OnDefaultButtonChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    private static void OnButtonRoleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWTaskDialog dialog)
         {
+            dialog.UpdateButtonState();
             dialog.FocusDefaultButton();
         }
     }
@@ -865,6 +866,101 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         ApplyButtonAutomationMetadata(button, text, taskDialogButton, this);
     }
 
+    internal static string ResolveAutomationText(object? value, string fallback = "")
+    {
+        if (value is string text)
+        {
+            return string.IsNullOrWhiteSpace(text) ? fallback : text;
+        }
+
+        var resolved = value?.ToString();
+        return string.IsNullOrWhiteSpace(resolved) ? fallback : resolved;
+    }
+
+    internal static string ResolveDialogHelpText(FWTaskDialog dialog)
+    {
+        var subtitle = ResolveAutomationText(dialog.Subtitle);
+        if (!string.IsNullOrWhiteSpace(subtitle))
+        {
+            return subtitle;
+        }
+
+        var content = ResolveAutomationText(dialog.Content);
+        return string.IsNullOrWhiteSpace(content) ? "Task dialog" : content;
+    }
+
+    internal static FWTaskDialogButtonAutomationMetadata CreateButtonAutomationMetadata(
+        FWTaskDialogButton button,
+        string text,
+        Button? templateButton,
+        FWTaskDialog dialog)
+    {
+        var fallbackName = ResolveAutomationText(text, button.ToString());
+        var automationId = templateButton != null
+            ? ResolveAutomationText(AutomationProperties.GetAutomationId(templateButton), AutomationIdForButton(button))
+            : AutomationIdForButton(button);
+        var name = templateButton != null
+            ? ResolveAutomationText(AutomationProperties.GetName(templateButton), fallbackName)
+            : fallbackName;
+        var helpText = templateButton != null
+            ? ResolveAutomationText(AutomationProperties.GetHelpText(templateButton), HelpTextForButton(dialog, button))
+            : HelpTextForButton(dialog, button);
+
+        return new FWTaskDialogButtonAutomationMetadata(
+            button,
+            automationId,
+            name,
+            helpText,
+            templateButton != null ? templateButton.Visibility == Visibility.Visible : !string.IsNullOrWhiteSpace(text),
+            templateButton?.IsEnabled ?? dialog.CanExecuteButtonCommand(button),
+            dialog.DefaultButton == button,
+            dialog.CancelButton == button);
+    }
+
+    private static void ApplyButtonAutomationMetadata(
+        Button button,
+        string text,
+        FWTaskDialogButton taskDialogButton,
+        FWTaskDialog dialog)
+    {
+        AutomationProperties.SetAutomationId(button, AutomationIdForButton(taskDialogButton));
+        AutomationProperties.SetName(button, ResolveAutomationText(text, taskDialogButton.ToString()));
+        AutomationProperties.SetHelpText(button, HelpTextForButton(dialog, taskDialogButton));
+    }
+
+    private static string AutomationIdForButton(FWTaskDialogButton button)
+    {
+        return button switch
+        {
+            FWTaskDialogButton.Primary => "PrimaryButton",
+            FWTaskDialogButton.Secondary => "SecondaryButton",
+            FWTaskDialogButton.Close => "CloseButton",
+            _ => "None"
+        };
+    }
+
+    private static string HelpTextForButton(FWTaskDialog dialog, FWTaskDialogButton button)
+    {
+        var isDefault = dialog.DefaultButton == button;
+        var isCancel = dialog.CancelButton == button;
+        if (isDefault && isCancel)
+        {
+            return "Default and cancel button";
+        }
+
+        if (isDefault)
+        {
+            return "Default button";
+        }
+
+        if (isCancel)
+        {
+            return "Cancel button";
+        }
+
+        return "Task dialog button";
+    }
+
     public bool FocusDefaultButton()
     {
         return FocusButtonCandidate(
@@ -963,6 +1059,38 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         _showCancellationRegistration.Dispose();
         _showTask?.TrySetResult(result);
         _showTask = null;
+    }
+}
+
+/// <summary>
+/// Automation peer for <see cref="FWTaskDialog"/>.
+/// </summary>
+public sealed class FWTaskDialogAutomationPeer : FrameworkElementAutomationPeer
+{
+    public FWTaskDialogAutomationPeer(FWTaskDialog owner) : base(owner)
+    {
+    }
+
+    private FWTaskDialog TaskDialogOwner => (FWTaskDialog)Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore()
+    {
+        return AutomationControlType.Window;
+    }
+
+    protected override string GetClassNameCore()
+    {
+        return nameof(FWTaskDialog);
+    }
+
+    protected override string GetNameCore()
+    {
+        return FWTaskDialog.ResolveAutomationText(TaskDialogOwner.Title, nameof(FWTaskDialog));
+    }
+
+    protected override string GetHelpTextCore()
+    {
+        return FWTaskDialog.ResolveDialogHelpText(TaskDialogOwner);
     }
 }
 
@@ -1202,6 +1330,53 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
     {
         _lastKeyboardRequest = request;
         _lastKeyboardRequestHandled = handled;
+    }
+
+    protected override AutomationPeer? OnCreateAutomationPeer()
+    {
+        return new FWTaskDialogHostAutomationPeer(this);
+    }
+}
+
+/// <summary>
+/// Automation peer for <see cref="FWTaskDialogHost"/>.
+/// </summary>
+public sealed class FWTaskDialogHostAutomationPeer : FrameworkElementAutomationPeer
+{
+    public FWTaskDialogHostAutomationPeer(FWTaskDialogHost owner) : base(owner)
+    {
+    }
+
+    private FWTaskDialogHost TaskDialogHostOwner => (FWTaskDialogHost)Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore()
+    {
+        return AutomationControlType.Pane;
+    }
+
+    protected override string GetClassNameCore()
+    {
+        return nameof(FWTaskDialogHost);
+    }
+
+    protected override string GetNameCore()
+    {
+        return FWTaskDialog.ResolveAutomationText(
+            TaskDialogHostOwner.CurrentDialog?.Title,
+            nameof(FWTaskDialogHost));
+    }
+
+    protected override string GetHelpTextCore()
+    {
+        var currentDialog = TaskDialogHostOwner.CurrentDialog;
+        if (currentDialog != null)
+        {
+            return FWTaskDialog.ResolveDialogHelpText(currentDialog);
+        }
+
+        return TaskDialogHostOwner.IsLightDismissEnabled
+            ? "Task dialog modal host with light dismiss"
+            : "Task dialog modal host";
     }
 }
 
