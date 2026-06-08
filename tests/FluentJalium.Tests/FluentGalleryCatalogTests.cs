@@ -255,8 +255,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWInfoBar", sampleCode);
         Assert.Contains("new FWToggleSwitch", sampleCode);
         Assert.Contains("new FWSettingsCard", sampleCode);
+        Assert.Contains("new FWProgressBar", sampleCode);
         Assert.Contains("new FWButton", sampleCode);
-        Assert.Contains("ValidateAndSubmit", sampleCode);
+        Assert.Contains("RunSubmitAsync", sampleCode);
+        Assert.Contains("Disable reviewer fields", sampleCode);
+        Assert.Contains("Focus QA", sampleCode);
+        Assert.Contains("Forms visual QA", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
         Assert.Contains("forms.submit", sampleCode);
     }

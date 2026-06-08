@@ -2,6 +2,7 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
 using FWAutoSuggestBoxTextChangeReason = FluentJalium.Controls.FWAutoSuggestBoxTextChangeReason;
@@ -10,6 +11,8 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWLabel = FluentJalium.Controls.FWLabel;
+using FWProgressBar = FluentJalium.Controls.FWProgressBar;
+using FWRangeDensity = FluentJalium.Controls.FWRangeDensity;
 using FWRadioButtons = FluentJalium.Controls.FWRadioButtons;
 using FWSelectionDensity = FluentJalium.Controls.FWSelectionDensity;
 using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
@@ -180,6 +183,8 @@ internal sealed class GalleryFormsPage
     private static UIElement CreateSubmissionSettingsSample()
     {
         var output = CreateFormsOutput("Submission settings ready. Approval on, confirmation on, compact density off.");
+        var qaStatus = CreateFormsOutput("Forms visual QA: comfortable density, submit enabled, async idle.");
+        var focusStatus = CreateFormsOutput("Focus path: approver -> review note -> submit settings row.");
         var summary = new FWInfoBar
         {
             Title = "Submission workflow",
@@ -225,6 +230,25 @@ internal sealed class GalleryFormsPage
             Content = "Compact input density",
             IsChecked = false
         };
+        var asyncSubmit = new FWCheckBox
+        {
+            Content = "Async submit progress",
+            IsChecked = true
+        };
+        var disableFields = new FWCheckBox
+        {
+            Content = "Disable reviewer fields",
+            IsChecked = false
+        };
+        var progress = new FWProgressBar
+        {
+            Width = 220,
+            Minimum = 0,
+            Maximum = 100,
+            Value = 0,
+            Density = FWRangeDensity.Compact,
+            Visibility = Visibility.Collapsed
+        };
 
         var submitCommand = new GalleryFormsCommand(parameter =>
         {
@@ -246,7 +270,8 @@ internal sealed class GalleryFormsPage
             },
             IsClickEnabled = true,
             Command = submitCommand,
-            CommandParameter = "forms.submit"
+            CommandParameter = "forms.submit",
+            ClickMode = ClickMode.Release
         };
 
         void RefreshSummary(string reason)
@@ -254,24 +279,60 @@ internal sealed class GalleryFormsPage
             var approval = requireApproval.IsOn ? "approval required" : "approval optional";
             var confirmation = sendConfirmation.IsOn ? "confirmation on" : "confirmation off";
             var density = compactDensity.IsChecked == true ? FWTextInputDensity.Compact : FWTextInputDensity.Comfortable;
+            var disabled = disableFields.IsChecked == true;
             approver.Density = density;
             note.Density = density;
+            approver.IsEnabled = !disabled;
+            note.IsEnabled = !disabled;
             summary.Severity = requireApproval.IsOn && string.IsNullOrWhiteSpace(approver.Text)
                 ? InfoBarSeverity.Warning
                 : InfoBarSeverity.Informational;
             summary.Title = summary.Severity == InfoBarSeverity.Warning ? "Approver needed" : "Submission workflow";
-            summary.Message = $"{approval}, {confirmation}, {FormatDensity(density)} density.";
+            summary.Message = $"{approval}, {confirmation}, {FormatDensity(density)} density, reviewer fields {(disabled ? "disabled" : "enabled")}.";
 
             var diagnostics = submitCard.GetDiagnostics();
             output.Text = $"{reason}: {summary.Message} Can execute {FormatOnOff(diagnostics.CanExecute)}. Invokable {FormatOnOff(diagnostics.IsInvokable)}.";
+            qaStatus.Text = $"Forms visual QA: {FormatDensity(density)} density, fields {(disabled ? "disabled" : "enabled")}, submit enabled {FormatOnOff(submitCard.IsEnabled)}, async {(progress.Visibility == Visibility.Visible ? $"running {progress.Value:0}%" : "idle")}.";
+            focusStatus.Text = $"Focus path: approver {FormatOnOff(approver.Focusable)}/{FormatOnOff(approver.IsEnabled)}, note {FormatOnOff(note.Focusable)}/{FormatOnOff(note.IsEnabled)}, submit row {FormatOnOff(submitCard.Focusable)}/{submitCard.ClickMode}.";
+        }
+
+        async Task RunAsyncSubmitAsync()
+        {
+            if (progress.Visibility == Visibility.Visible)
+            {
+                output.Text = "Async submit already running.";
+                return;
+            }
+
+            progress.Visibility = Visibility.Visible;
+            progress.Value = 12;
+            submitCard.IsEnabled = false;
+            summary.Severity = InfoBarSeverity.Informational;
+            summary.Title = "Submitting";
+            summary.Message = "Async submit is validating reviewer fields and command state.";
+            RefreshSummary("Async submit started");
+            await Task.Delay(120);
+            progress.Value = 64;
+            RefreshSummary("Async submit progress");
+            await Task.Delay(120);
+            progress.Value = 100;
+            submitCard.IsEnabled = true;
+            submitCard.PerformClick();
+            progress.Visibility = Visibility.Collapsed;
+            RefreshSummary("Async submit completed");
         }
 
         requireApproval.Toggled += (_, _) => RefreshSummary("Approval changed");
         sendConfirmation.Toggled += (_, _) => RefreshSummary("Confirmation changed");
         compactDensity.Checked += (_, _) => RefreshSummary("Density changed");
         compactDensity.Unchecked += (_, _) => RefreshSummary("Density changed");
+        asyncSubmit.Checked += (_, _) => RefreshSummary("Async submit enabled");
+        asyncSubmit.Unchecked += (_, _) => RefreshSummary("Async submit disabled");
+        disableFields.Checked += (_, _) => RefreshSummary("Disabled fields enabled");
+        disableFields.Unchecked += (_, _) => RefreshSummary("Disabled fields cleared");
         approver.TextChanged += (_, _) => RefreshSummary("Approver changed");
         note.TextChanged += (_, _) => RefreshSummary("Note changed");
+        RefreshSummary("Submission settings initialized");
 
         return new FWStackPanel
         {
@@ -287,7 +348,9 @@ internal sealed class GalleryFormsPage
                     {
                         CreateSettingsRow(FluentIconRegular.Shield24, "Approval", "Route submissions through a named reviewer.", requireApproval),
                         CreateSettingsRow(FluentIconRegular.Mail24, "Confirmation", "Send a receipt after submit.", sendConfirmation),
-                        CreateSettingsRow(FluentIconRegular.TextDensity24, "Density", "Apply compact density to form fields.", compactDensity)
+                        CreateSettingsRow(FluentIconRegular.TextDensity24, "Density", "Apply compact density to form fields.", compactDensity),
+                        CreateSettingsRow(FluentIconRegular.Hourglass24, "Async submit", "Show progress and temporarily disable the submit row.", asyncSubmit),
+                        CreateSettingsRow(FluentIconRegular.KeyboardTab24, "Field state", "Disable reviewer fields while preserving the focus path diagnostics.", disableFields)
                     }
                 },
                 new FWWrapPanel
@@ -301,7 +364,33 @@ internal sealed class GalleryFormsPage
                     }
                 },
                 submitCard,
+                progress,
                 summary,
+                CreateFormsButtonRow(
+                    CreateFormsActionButton(FluentIconRegular.Send24, "Submit", () =>
+                    {
+                        if (asyncSubmit.IsChecked == true)
+                        {
+                            _ = RunAsyncSubmitAsync();
+                        }
+                        else
+                        {
+                            submitCard.PerformClick();
+                            RefreshSummary("Submit invoked synchronously");
+                        }
+                    }),
+                    CreateFormsActionButton(FluentIconRegular.KeyboardTab24, "Focus QA", () =>
+                    {
+                        var focused = approver.Focus();
+                        focusStatus.Text = $"Focus path: approver focus requested {FormatOnOff(focused)}, approver enabled {FormatOnOff(approver.IsEnabled)}, note enabled {FormatOnOff(note.IsEnabled)}, submit row {FormatOnOff(submitCard.Focusable)}.";
+                    }),
+                    CreateFormsActionButton(FluentIconRegular.Prohibited24, "Command", () =>
+                    {
+                        submitCommand.CanExecuteResult = !submitCommand.CanExecuteResult;
+                        submitCommand.RaiseCanExecuteChanged();
+                        RefreshSummary("Submit command CanExecute toggled");
+                    })),
+                CreateFormsQaPanel(qaStatus, focusStatus),
                 CreateFormsStatus(output)
             }
         };
@@ -472,6 +561,46 @@ var diagnostics = submitCard.GetDiagnostics();
         };
     }
 
+    private static FWBorder CreateFormsQaPanel(params TextBlock[] statuses)
+    {
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 6
+        };
+        panel.Children.Add(new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Children =
+            {
+                CreateIcon(FluentIconRegular.FormMultiple24, 18, ThemeBrush("TextSecondary")),
+                new FWTextBlock
+                {
+                    Text = "Forms visual QA",
+                    FontSize = 13,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
+                }
+            }
+        });
+
+        foreach (var status in statuses)
+        {
+            panel.Children.Add(status);
+        }
+
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = panel
+        };
+    }
+
     private static FWStackPanel CreateSection(string title)
     {
         return new FWStackPanel
@@ -539,15 +668,18 @@ var diagnostics = submitCard.GetDiagnostics();
             _execute = execute;
         }
 
-        public event EventHandler? CanExecuteChanged
-        {
-            add { }
-            remove { }
-        }
+        public event EventHandler? CanExecuteChanged;
 
-        public bool CanExecute(object? parameter) => true;
+        public bool CanExecuteResult { get; set; } = true;
+
+        public bool CanExecute(object? parameter) => CanExecuteResult;
 
         public void Execute(object? parameter) => _execute(parameter);
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static readonly string[] TeamSuggestions =

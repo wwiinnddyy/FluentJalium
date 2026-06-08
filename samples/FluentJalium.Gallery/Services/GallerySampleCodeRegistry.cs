@@ -234,6 +234,23 @@ var requireApproval = new FWToggleSwitch
     OnContent = "Required",
     OffContent = "Optional"
 };
+var asyncSubmit = new FWCheckBox
+{
+    Content = "Async submit progress",
+    IsChecked = true
+};
+var disableFields = new FWCheckBox
+{
+    Content = "Disable reviewer fields"
+};
+var progress = new FWProgressBar
+{
+    Density = FWRangeDensity.Compact,
+    Minimum = 0,
+    Maximum = 100,
+    Value = 0,
+    Visibility = Visibility.Collapsed
+};
 
 var submitCard = new FWSettingsCard
 {
@@ -246,9 +263,20 @@ var submitCard = new FWSettingsCard
 };
 
 var submitButton = new FWButton { Content = "Submit" };
-submitButton.Click += (_, _) => ValidateAndSubmit(displayName.Text, team.Text, accountType.SelectedItem);
+submitButton.Click += async (_, _) =>
+{
+    approver.IsEnabled = disableFields.IsChecked != true;
+    progress.Visibility = Visibility.Visible;
+    submitCard.IsEnabled = false;
+    await RunSubmitAsync(displayName.Text, team.Text, accountType.SelectedItem);
+    submitCard.IsEnabled = true;
+    progress.Visibility = Visibility.Collapsed;
+};
+var focusButton = new FWButton { Content = "Focus QA" };
+focusButton.Click += (_, _) => displayName.Focus();
 
 var diagnostics = submitCard.GetDiagnostics();
+Debug.WriteLine($"Forms visual QA: invokable {diagnostics.IsInvokable}; disabled fields {disableFields.IsChecked}; async {asyncSubmit.IsChecked}; focusable {submitCard.Focusable}.");
 """,
         ["range.slider.progress"] = """
 var slider = new FWSlider
