@@ -298,7 +298,6 @@ internal sealed class GalleryMenusPage
 
     private static UIElement CreateFlyoutSample()
     {
-        var output = CreateMenuOutput("Flyout: closed");
         var flyout = new FWFlyout
         {
             Placement = FlyoutPlacementMode.Right,
@@ -334,17 +333,18 @@ internal sealed class GalleryMenusPage
                 }
             }
         };
+        var output = CreateMenuOutput(FormatFlyoutQa("Flyout QA", flyout));
         var button = new FWButton
         {
             Content = CreateMenuButtonContent(FluentIconRegular.AppFolder24, "Open content flyout"),
             MinWidth = 190
         };
-        flyout.Opened += (_, _) => output.Text = $"Flyout: open at {flyout.Placement}, density {flyout.Density}";
-        flyout.Closed += (_, _) => output.Text = "Flyout: closed";
+        flyout.Opened += (_, _) => output.Text = FormatFlyoutQa("Flyout QA", flyout);
+        flyout.Closed += (_, _) => output.Text = FormatFlyoutQa("Flyout QA", flyout);
         button.Click += (_, _) =>
         {
             flyout.ShowAt(button);
-            output.Text = $"Flyout: open at {flyout.Placement}";
+            output.Text = FormatFlyoutQa("Flyout QA", flyout);
         };
 
         return new FWStackPanel
@@ -358,22 +358,22 @@ internal sealed class GalleryMenusPage
                     CreateMenuActionButton(FluentIconRegular.Open24, "Open", () =>
                     {
                         flyout.ShowAt(button);
-                        output.Text = $"Flyout: open at {flyout.Placement}";
+                        output.Text = FormatFlyoutQa("Flyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.ArrowRight24, "Right", () =>
                     {
                         flyout.Placement = FlyoutPlacementMode.Right;
-                        output.Text = $"Flyout placement: {flyout.Placement}";
+                        output.Text = FormatFlyoutQa("Flyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.ChevronDown24, "Bottom", () =>
                     {
                         flyout.Placement = FlyoutPlacementMode.Bottom;
-                        output.Text = $"Flyout placement: {flyout.Placement}";
+                        output.Text = FormatFlyoutQa("Flyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.DismissCircle24, "Hide", () =>
                     {
                         flyout.Hide();
-                        output.Text = "Flyout: hidden";
+                        output.Text = FormatFlyoutQa("Flyout QA", flyout);
                     })),
                 CreateMenuStatus(output)
             }
@@ -382,8 +382,9 @@ internal sealed class GalleryMenusPage
 
     private static UIElement CreateMenuFlyoutItemSample()
     {
-        var output = CreateMenuOutput("MenuFlyout: ready");
+        var output = CreateMenuOutput(string.Empty);
         var flyout = CreateMenuControlsFlyout(output);
+        output.Text = FormatMenuFlyoutQa("MenuFlyout QA", flyout);
         var button = new FWDropDownButton
         {
             Content = CreateMenuButtonContent(FluentIconRegular.ChevronDown24, "Actions"),
@@ -404,22 +405,22 @@ internal sealed class GalleryMenusPage
                     CreateMenuActionButton(FluentIconRegular.Open24, "Open", () =>
                     {
                         flyout.ShowAt(button);
-                        output.Text = "MenuFlyout: open";
+                        output.Text = FormatMenuFlyoutQa("MenuFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.DismissCircle24, "Hide", () =>
                     {
                         flyout.Hide();
-                        output.Text = "MenuFlyout: hidden";
+                        output.Text = FormatMenuFlyoutQa("MenuFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.Badge24, "Badges", () =>
                     {
                         toggle.IsChecked = !toggle.IsChecked;
-                        output.Text = $"MenuFlyout: badges {FormatOnOff(toggle.IsChecked)}";
+                        output.Text = FormatMenuFlyoutQa("MenuFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.Prohibited24, "Disable", () =>
                     {
                         disabled.IsEnabled = !disabled.IsEnabled;
-                        output.Text = $"MenuFlyout: disabled item enabled {disabled.IsEnabled}";
+                        output.Text = FormatMenuFlyoutQa("MenuFlyout QA", flyout);
                     })),
                 CreateMenuStatus(output)
             }
@@ -526,11 +527,11 @@ internal sealed class GalleryMenusPage
 
     private static UIElement CreateCommandBarFlyoutSample()
     {
-        var output = CreateMenuOutput("CommandBarFlyout: ready");
         var flyout = new FWCommandBarFlyout
         {
             AlwaysExpanded = true
         };
+        var output = CreateMenuOutput(FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout));
         var button = new FWButton
         {
             Content = CreateMenuButtonContent(FluentIconRegular.MoreHorizontal24, "More commands"),
@@ -545,7 +546,7 @@ internal sealed class GalleryMenusPage
         button.Click += (_, _) =>
         {
             flyout.ShowAt(button);
-            output.Text = "CommandBarFlyout: open";
+            output.Text = FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout);
         };
 
         return new FWStackPanel
@@ -559,22 +560,22 @@ internal sealed class GalleryMenusPage
                     CreateMenuActionButton(FluentIconRegular.Open24, "Open", () =>
                     {
                         flyout.ShowAt(button);
-                        output.Text = "CommandBarFlyout: open";
+                        output.Text = FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.DismissCircle24, "Hide", () =>
                     {
                         flyout.Hide();
-                        output.Text = "CommandBarFlyout: hidden";
+                        output.Text = FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.ChevronUp24, "Collapse", () =>
                     {
                         flyout.AlwaysExpanded = false;
-                        output.Text = "CommandBarFlyout: secondary commands collapsed on next open";
+                        output.Text = FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout);
                     }),
                     CreateMenuActionButton(FluentIconRegular.ChevronDown24, "Expand", () =>
                     {
                         flyout.AlwaysExpanded = true;
-                        output.Text = "CommandBarFlyout: secondary commands expanded on next open";
+                        output.Text = FormatCommandBarFlyoutQa("CommandBarFlyout QA", flyout);
                     })),
                 CreateMenuStatus(output)
             }
@@ -901,6 +902,31 @@ internal sealed class GalleryMenusPage
     private static string FormatOnOff(bool value)
     {
         return value ? "on" : "off";
+    }
+
+    internal static string FormatFlyoutQa(string label, FWFlyout flyout)
+    {
+        ArgumentNullException.ThrowIfNull(flyout);
+
+        var contentState = flyout.Content == null ? "empty" : "content";
+        return $"{label}: {(flyout.IsOpen ? "open" : "closed")}; placement {flyout.Placement}; density {flyout.Density}; presenter {contentState}.";
+    }
+
+    internal static string FormatMenuFlyoutQa(string label, FWMenuFlyout flyout)
+    {
+        ArgumentNullException.ThrowIfNull(flyout);
+
+        var enabledItems = flyout.Items.Count(item => item.IsEnabled);
+        var checkedToggles = flyout.Items.OfType<FWToggleMenuFlyoutItem>().Count(item => item.IsChecked);
+        var separators = flyout.Items.OfType<FWMenuFlyoutSeparator>().Count();
+        return $"{label}: {(flyout.IsOpen ? "open" : "closed")}; placement {flyout.Placement}; density {flyout.Density}; items {flyout.Items.Count}; enabled {enabledItems}; checked toggles {checkedToggles}; separators {separators}.";
+    }
+
+    internal static string FormatCommandBarFlyoutQa(string label, FWCommandBarFlyout flyout)
+    {
+        ArgumentNullException.ThrowIfNull(flyout);
+
+        return $"{label}: {(flyout.IsOpen ? "open" : "closed")}; primary {flyout.PrimaryCommands.Count}; secondary {flyout.SecondaryCommands.Count}; expanded {FormatOnOff(flyout.AlwaysExpanded)}.";
     }
 
     private static FWMenuBarItem CreateMenuBarItem(string title, params (string Text, string Shortcut, object? Icon)[] items)

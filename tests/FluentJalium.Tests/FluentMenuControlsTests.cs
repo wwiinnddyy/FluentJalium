@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -626,6 +627,61 @@ public sealed class FluentMenuControlsTests
         Assert.True(commandBar.IsOpen);
 
         flyout.Hide();
+    }
+
+    [Fact]
+    public void GalleryMenusPage_ShouldFormatFlyoutQaText()
+    {
+        var contentFlyout = new FWFlyout
+        {
+            Content = new FWTextBlock { Text = "Details" },
+            Placement = FlyoutPlacementMode.Right,
+            Density = FWMenuDensity.Spacious
+        };
+        var menuFlyout = new FWMenuFlyout
+        {
+            Placement = FlyoutPlacementMode.Bottom,
+            Density = FWMenuDensity.Compact
+        };
+        var toggle = new FWToggleMenuFlyoutItem
+        {
+            Text = "Show badges",
+            IsChecked = true
+        };
+        menuFlyout.Items.Add(new FWMenuFlyoutItem { Text = "Pin" });
+        menuFlyout.Items.Add(toggle);
+        menuFlyout.Items.Add(new FWMenuFlyoutSeparator());
+        menuFlyout.Items.Add(new FWMenuFlyoutItem { Text = "Disabled", IsEnabled = false });
+
+        var commandFlyout = new FWCommandBarFlyout
+        {
+            AlwaysExpanded = true
+        };
+        commandFlyout.PrimaryCommands.Add(new FWAppBarButton { Label = "Copy" });
+        commandFlyout.PrimaryCommands.Add(new FWAppBarButton { Label = "Share" });
+        commandFlyout.SecondaryCommands.Add(new FWAppBarButton { Label = "Rename" });
+
+        var flyoutText = GalleryMenusPage.FormatFlyoutQa("Flyout QA", contentFlyout);
+        var menuFlyoutText = GalleryMenusPage.FormatMenuFlyoutQa("MenuFlyout QA", menuFlyout);
+        var commandFlyoutText = GalleryMenusPage.FormatCommandBarFlyoutQa("CommandBarFlyout QA", commandFlyout);
+
+        Assert.Contains("Flyout QA: closed", flyoutText);
+        Assert.Contains("placement Right", flyoutText);
+        Assert.Contains("density Spacious", flyoutText);
+        Assert.Contains("presenter content", flyoutText);
+
+        Assert.Contains("MenuFlyout QA: closed", menuFlyoutText);
+        Assert.Contains("placement Bottom", menuFlyoutText);
+        Assert.Contains("density Compact", menuFlyoutText);
+        Assert.Contains("items 4", menuFlyoutText);
+        Assert.Contains("enabled 3", menuFlyoutText);
+        Assert.Contains("checked toggles 1", menuFlyoutText);
+        Assert.Contains("separators 1", menuFlyoutText);
+
+        Assert.Contains("CommandBarFlyout QA: closed", commandFlyoutText);
+        Assert.Contains("primary 2", commandFlyoutText);
+        Assert.Contains("secondary 1", commandFlyoutText);
+        Assert.Contains("expanded on", commandFlyoutText);
     }
 
     [Fact]
