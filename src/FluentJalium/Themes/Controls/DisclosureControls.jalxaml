@@ -171,6 +171,16 @@
         <Setter Property="Density" Value="Comfortable" />
     </Style>
 
+    <Style x:Key="FWSettingsExpanderIconPresenterStyle" TargetType="ContentPresenter">
+        <Setter Property="MinWidth" Value="20" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="FWSettingsExpanderItemHostStyle" TargetType="ItemsControl">
+        <Setter Property="Background" Value="{ThemeResource ContentPanelBackground}" />
+    </Style>
+
     <Style TargetType="fluent:FWSettingsExpander" BasedOn="{StaticResource {x:Type Expander}}">
         <Setter Property="Background" Value="{ThemeResource ControlBackground}" />
         <Setter Property="BorderBrush" Value="{ThemeResource ControlBorder}" />
@@ -179,7 +189,7 @@
         <Setter Property="MinHeight" Value="64" />
         <Setter Property="ItemsPanel">
             <ItemsPanelTemplate>
-                <StackPanel Orientation="Vertical" Spacing="1" />
+                <StackPanel Orientation="Vertical" Spacing="2" />
             </ItemsPanelTemplate>
         </Setter>
         <Setter Property="Template">
@@ -204,15 +214,41 @@
 
                                 <ContentPresenter Grid.Column="0"
                                                   Content="{TemplateBinding HeaderIcon}"
-                                                  VerticalAlignment="Center" />
+                                                  Style="{StaticResource FWSettingsExpanderIconPresenterStyle}" />
 
                                 <StackPanel Grid.Column="1"
                                             Orientation="Vertical"
                                             Spacing="3"
                                             VerticalAlignment="Center">
-                                    <ContentPresenter Content="{TemplateBinding Header}" />
+                                    <ContentPresenter Content="{TemplateBinding Header}">
+                                        <ContentPresenter.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+                                                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+                                            <Style TargetType="AccessText">
+                                                <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />
+                                                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}" />
+                                                <Setter Property="FontWeight" Value="SemiBold" />
+                                            </Style>
+                                        </ContentPresenter.Resources>
+                                    </ContentPresenter>
                                     <ContentPresenter Content="{TemplateBinding Description}"
-                                                      ContentTemplate="{TemplateBinding DescriptionTemplate}" />
+                                                      ContentTemplate="{TemplateBinding DescriptionTemplate}">
+                                        <ContentPresenter.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+                                                <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+                                            <Style TargetType="AccessText">
+                                                <Setter Property="Foreground" Value="{ThemeResource TextSecondary}" />
+                                                <Setter Property="FontSize" Value="{ThemeResource FluentCaptionFontSize}" />
+                                            </Style>
+                                        </ContentPresenter.Resources>
+                                    </ContentPresenter>
                                 </StackPanel>
 
                                 <Path Name="PART_Chevron"
@@ -234,6 +270,7 @@
                                 Padding="{TemplateBinding Padding}">
                             <StackPanel Orientation="Vertical" Spacing="8">
                                 <ItemsControl Name="PART_ItemsControl"
+                                              Style="{StaticResource FWSettingsExpanderItemHostStyle}"
                                               ItemTemplate="{TemplateBinding ItemTemplate}"
                                               ItemsPanel="{TemplateBinding ItemsPanel}" />
                                 <ContentPresenter Content="{TemplateBinding SettingsContent}"

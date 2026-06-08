@@ -28,8 +28,8 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Semantic-depth gaps
 
-- `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, command-state restoration, focus/pressed visuals, interaction diagnostics, automation peer metadata, and InvokePattern support now exist; remaining work is mostly action alignment and default template polish.
-- `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, and add/remove/clear helpers; remaining work is richer item container styling and default data-row templates.
+- `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, command-state restoration, focus/pressed visuals, interaction diagnostics, automation peer metadata, InvokePattern support, and default row typography/action alignment now exist; remaining work is mostly real-window visual QA.
+- `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, add/remove/clear helpers, default row spacing, and header typography; remaining work is richer data-row templates and visual QA.
 - `FWTwoPaneView` and `FWParallaxView`: actual layout mode, visible-pane state, progress-driven offset state, and diagnostics now exist; remaining work is deeper ScrollViewer/FWScroller source synchronization and visual QA.
 - `FWSnackbar`: host queueing, auto-dismiss, action command support, close reasons, result-style async flow, pause-on-hover/focus lifetime, closing cancellation, host/service async result APIs, top/bottom host placement with spacing, overlay/root host presentation, transition timing hooks, queue diagnostics, and animated presenter choreography now exist; remaining work is visual QA and root-window integration refinements.
 - `FWTaskDialog`: awaitable result flow, button command DPs, `CommandExecuted` request metadata, default/cancel requests, Escape-to-cancel, default focus, empty/disabled button states, focus target helpers, automation peers, button automation metadata, `FWTaskDialogAutomationDiagnostics`, template visual-tree focus traversal, and `FWTaskDialogHost` modal overlay with light dismiss, focus restore/trap hooks, keyboard diagnostics, and host reentry guards now exist; remaining work is visual QA and root-window focus integration.
@@ -40,7 +40,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 1. TaskDialog visual QA package: validate real app-window focus restore/trap behavior and modal layering after the automation and template focus traversal base.
 2. ItemsRepeater viewport virtualization package: connect realization windows to ScrollViewer/FWScroller viewport state and decide how cache lengths map onto the Jalium.UI virtualizing panel pipeline without breaking the current `Panel` API.
-3. Settings visual polish: refine action alignment/default data-row templates after the command, item-host, interaction-state, and automation semantics stabilize.
+3. Settings visual QA package: validate default row typography/action alignment and richer SettingsExpander item-host templates in a real app window.
 
 ## Recently completed batches
 
@@ -56,6 +56,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Settings semantics coverage: `FWSettingsCard` now exposes read-only `CanExecute`, restores command-disabled state when commands are removed, supports `ClickMode.Hover`, and has keyboard/command tests; `FWSettingsExpander` now has direct content rows, `ItemCount`, `ItemsChanged`, and add/remove/clear helpers with Gallery and registry coverage.
 - Settings interaction coverage: `FWSettingsCard` now exposes `FWSettingsCardDiagnostics`, `IsPointerPressed`, `IsKeyboardPressed`, and `IsInteractionPressed`; the default style consumes pressed, focus, and disabled states so settings rows provide WinUI-style interaction feedback without stale pressed visuals.
 - Settings automation coverage: `FWSettingsCard` now exposes `FWSettingsCardAutomationPeer`, `FWSettingsCardAutomationDiagnostics`, resolved automation name/help text, and InvokePattern support for command rows, with Gallery and registry examples showing the automation state.
+- Settings visual polish coverage: `FWSettingsCard` and `FWSettingsExpander` now provide aligned icon/action presenters, Fluent row typography for header/description content, and SettingsExpander item-host spacing/background polish with targeted theme tests.
 - Adaptive layout diagnostics coverage: `FWTwoPaneView` now exposes `ActualMode`, `VisiblePane`, `FWTwoPaneViewDiagnostics`, and pane-priority-aware single-pane styling; `FWParallaxView` now exposes `Progress`, `CurrentOffset`, and diagnostics while applying the resolved offset to template content, with Gallery surfacing the state.
 - Snackbar result/service coverage: `FWSnackbar` now exposes `FWSnackbarCloseReason`, `LastCloseReason`, and `ShowForResultAsync`; `FWSnackbarHost.Clear` marks visible and pending items as host-cleared; `FWSnackbarService` routes service-style show/enqueue/close/clear calls into a configured host with Gallery, registry, and tests updated.
 - TaskDialog command/focus coverage: `FWTaskDialog` now exposes button command DPs and command parameters, records `CommandExecuted` on button request events, respects command `CanExecute`, routes Escape through the configured cancel button, focuses the default template button when opened, and hides/disables empty or unavailable buttons.
