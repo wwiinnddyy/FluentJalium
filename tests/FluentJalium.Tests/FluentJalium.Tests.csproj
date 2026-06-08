@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+    <ProjectReference Include="..\..\samples\FluentJalium.Gallery\FluentJalium.Gallery.csproj" />
   </ItemGroup>
 
 </Project>

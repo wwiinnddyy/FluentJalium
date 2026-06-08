@@ -14,22 +14,21 @@ namespace FluentJalium.Gallery.Pages;
 internal sealed class GalleryCatalogFilterPage
 {
     private readonly GalleryCatalogFilter _filter;
-    private readonly GalleryPageInfo[] _pages;
+    private readonly GalleryControlInfo[] _controls;
 
     public GalleryCatalogFilterPage(GalleryCatalogFilter filter, IEnumerable<GalleryPageInfo> pages)
     {
         _filter = filter;
-        _pages = pages
-            .Where(page => page.Group != GalleryNavigationGroup.Catalog)
-            .ToArray();
+        _controls = GalleryControlInfo.CreateFromPages(pages);
     }
 
     public UIElement CreateContent()
     {
-        var matches = _pages
+        var matches = _controls
             .Where(MatchesFilter)
             .OrderBy(page => page.Group, StringComparer.Ordinal)
-            .ThenBy(page => page.Title, StringComparer.Ordinal)
+            .ThenBy(page => page.Page.Title, StringComparer.Ordinal)
+            .ThenBy(page => page.Name, StringComparer.Ordinal)
             .ToArray();
 
         var panel = CreateSection();
@@ -41,9 +40,9 @@ internal sealed class GalleryCatalogFilterPage
             VerticalSpacing = 14
         };
 
-        foreach (var page in matches)
+        foreach (var control in matches)
         {
-            cards.Children.Add(CreatePageCard(page));
+            cards.Children.Add(CreateControlCard(control));
         }
 
         if (matches.Length == 0)
@@ -55,24 +54,17 @@ internal sealed class GalleryCatalogFilterPage
         return panel;
     }
 
-    private bool MatchesFilter(GalleryPageInfo page)
+    private bool MatchesFilter(GalleryControlInfo control)
     {
         return _filter switch
         {
-            GalleryCatalogFilter.AllControls => IsControlEntry(page),
-            GalleryCatalogFilter.New => IsControlEntry(page) && page.IsNew,
-            GalleryCatalogFilter.Updated => IsControlEntry(page) && page.IsUpdated,
-            GalleryCatalogFilter.Preview => IsControlEntry(page) && page.Status == GalleryPageStatus.Preview,
-            GalleryCatalogFilter.Diagnostic => page.Status == GalleryPageStatus.Diagnostic,
+            GalleryCatalogFilter.AllControls => true,
+            GalleryCatalogFilter.New => control.IsNew,
+            GalleryCatalogFilter.Updated => control.IsUpdated,
+            GalleryCatalogFilter.Preview => control.Status == GalleryPageStatus.Preview,
+            GalleryCatalogFilter.Diagnostic => control.Status == GalleryPageStatus.Diagnostic,
             _ => false
         };
-    }
-
-    private static bool IsControlEntry(GalleryPageInfo page)
-    {
-        return !page.IsFooter
-            && page.Group != GalleryNavigationGroup.Home
-            && page.Tags.Any(tag => tag.StartsWith("FW", StringComparison.Ordinal));
     }
 
     private FWStackPanel CreateSection()
@@ -84,12 +76,13 @@ internal sealed class GalleryCatalogFilterPage
         };
     }
 
-    private FWBorder CreateSummary(IReadOnlyCollection<GalleryPageInfo> matches)
+    private FWBorder CreateSummary(IReadOnlyCollection<GalleryControlInfo> matches)
     {
-        var previewCount = matches.Count(page => page.Status == GalleryPageStatus.Preview);
-        var diagnosticCount = matches.Count(page => page.Status == GalleryPageStatus.Diagnostic);
-        var newCount = matches.Count(page => page.IsNew);
-        var updatedCount = matches.Count(page => page.IsUpdated);
+        var previewCount = matches.Count(control => control.Status == GalleryPageStatus.Preview);
+        var diagnosticCount = matches.Count(control => control.Status == GalleryPageStatus.Diagnostic);
+        var newCount = matches.Count(control => control.IsNew);
+        var updatedCount = matches.Count(control => control.IsUpdated);
+        var pageCount = matches.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count();
 
         return new FWBorder
         {
@@ -104,7 +97,8 @@ internal sealed class GalleryCatalogFilterPage
                 VerticalSpacing = 8,
                 Children =
                 {
-                    CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{matches.Count} entries"),
+                    CreateSummaryPill(FluentIconRegular.ControlButton24, $"{matches.Count} controls"),
+                    CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{pageCount} pages"),
                     CreateSummaryPill(FluentIconRegular.New24, $"{newCount} new"),
                     CreateSummaryPill(FluentIconRegular.ArrowClockwise24, $"{updatedCount} updated"),
                     CreateSummaryPill(FluentIconRegular.Sparkle24, $"{previewCount} preview"),
@@ -114,7 +108,7 @@ internal sealed class GalleryCatalogFilterPage
         };
     }
 
-    private static FWBorder CreatePageCard(GalleryPageInfo page)
+    private static FWBorder CreateControlCard(GalleryControlInfo control)
     {
         var body = new FWStackPanel
         {
@@ -122,15 +116,23 @@ internal sealed class GalleryCatalogFilterPage
             Spacing = 9,
             Children =
             {
-                CreateCardHeader(page),
+                CreateCardHeader(control),
                 new FWTextBlock
                 {
-                    Text = page.Description,
+                    Text = control.Page.Title,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = GalleryThemeResources.Brush("TextSecondary"),
+                    TextWrapping = TextWrapping.Wrap
+                },
+                new FWTextBlock
+                {
+                    Text = control.Page.Description,
                     FontSize = 12,
                     Foreground = GalleryThemeResources.Brush("TextSecondary"),
                     TextWrapping = TextWrapping.Wrap
                 },
-                CreateMetadataWrap(page)
+                CreateMetadataWrap(control)
             }
         };
 
@@ -147,7 +149,7 @@ internal sealed class GalleryCatalogFilterPage
         };
     }
 
-    private static UIElement CreateCardHeader(GalleryPageInfo page)
+    private static UIElement CreateCardHeader(GalleryControlInfo control)
     {
         return new FWStackPanel
         {
@@ -155,20 +157,21 @@ internal sealed class GalleryCatalogFilterPage
             Spacing = 8,
             Children =
             {
-                FluentIconFactory.Regular(page.Icon, 20, GalleryThemeResources.Brush("TextPrimary")),
+                FluentIconFactory.Regular(control.Icon, 20, GalleryThemeResources.Brush("TextPrimary")),
                 new FWTextBlock
                 {
-                    Text = page.Title,
+                    Text = control.Name,
                     FontSize = 15,
                     FontWeight = FontWeights.SemiBold,
                     Foreground = GalleryThemeResources.Brush("TextPrimary"),
+                    TextWrapping = TextWrapping.Wrap,
                     VerticalAlignment = VerticalAlignment.Center
                 }
             }
         };
     }
 
-    private static FWWrapPanel CreateMetadataWrap(GalleryPageInfo page)
+    private static FWWrapPanel CreateMetadataWrap(GalleryControlInfo control)
     {
         var wrap = new FWWrapPanel
         {
@@ -176,31 +179,27 @@ internal sealed class GalleryCatalogFilterPage
             VerticalSpacing = 6
         };
 
-        wrap.Children.Add(CreateChip(page.Group));
-        wrap.Children.Add(CreateChip(page.Status.ToString()));
+        wrap.Children.Add(CreateChip(control.Group));
+        wrap.Children.Add(CreateChip(control.Status.ToString()));
 
-        if (page.IsNew)
+        if (control.IsNew)
         {
             wrap.Children.Add(CreateChip("New"));
         }
 
-        if (page.IsUpdated)
+        if (control.IsUpdated)
         {
             wrap.Children.Add(CreateChip("Updated"));
         }
 
-        AddOptionalChip(wrap, page.ApiNamespace);
-        AddOptionalChip(wrap, page.SourcePath);
-        AddOptionalChip(wrap, page.SampleCodeKey);
+        AddOptionalChip(wrap, control.ApiNamespace);
+        AddOptionalChip(wrap, control.SourcePath);
+        AddOptionalChip(wrap, control.SampleCodeKey);
+        AddOptionalChip(wrap, control.Page.UniqueId);
 
-        foreach (var baseClass in page.BaseClasses ?? [])
+        foreach (var baseClass in control.BaseClasses)
         {
             wrap.Children.Add(CreateChip(baseClass));
-        }
-
-        foreach (var relatedControl in page.RelatedControls.Take(5))
-        {
-            wrap.Children.Add(CreateChip(relatedControl));
         }
 
         return wrap;
@@ -246,6 +245,7 @@ internal sealed class GalleryCatalogFilterPage
     {
         return new FWBorder
         {
+            MaxWidth = 330,
             Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
             BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
             BorderThickness = new Thickness(1),
@@ -255,7 +255,8 @@ internal sealed class GalleryCatalogFilterPage
             {
                 Text = text,
                 FontSize = 11,
-                Foreground = GalleryThemeResources.Brush("TextSecondary")
+                Foreground = GalleryThemeResources.Brush("TextSecondary"),
+                TextWrapping = TextWrapping.Wrap
             }
         };
     }
