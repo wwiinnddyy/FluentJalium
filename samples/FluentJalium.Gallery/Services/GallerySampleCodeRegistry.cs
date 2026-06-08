@@ -877,6 +877,24 @@ var scroller = new FWScroller
         }
     }
 };
+
+var scrollViewer = new FWScrollViewer
+{
+    Content = new FWStackPanel
+    {
+        Children =
+        {
+            new FWTextBlock { Text = "Scrollable item 1" },
+            new FWTextBlock { Text = "Scrollable item 2" },
+            new FWTextBlock { Text = "Scrollable item 3" }
+        }
+    }
+};
+scroller.AttachScrollViewer(scrollViewer);
+scroller.ScrollTo(0, 80);
+
+var diagnostics = scroller.GetViewportDiagnostics();
+Debug.WriteLine($"Scroller viewport: {diagnostics.ViewportWidth}x{diagnostics.ViewportHeight}; offset: {diagnostics.VerticalOffset}; extent: {diagnostics.ExtentHeight}.");
 """,
         ["status.snackbar"] = """
 var host = new FWSnackbarOverlayHost

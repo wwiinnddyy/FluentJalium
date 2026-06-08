@@ -30,6 +30,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWScrollViewer" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWSwipeControl" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWGridSplitter" && control.Page.UniqueId == "interaction");
+        Assert.Contains(controls, control => control.Name == "FWScrollerViewportDiagnostics" && control.Page.UniqueId == "advancedinteraction");
     }
 
     [Fact]
@@ -144,6 +145,21 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new SwipeItems", sampleCode);
         Assert.Contains("new FWGridSplitter", sampleCode);
         Assert.Contains("KeyboardIncrement = 12", sampleCode);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeAdvancedInteractionScrollerDiagnosticsSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "advancedinteraction");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWScroller", sampleCode);
+        Assert.Contains("AttachScrollViewer", sampleCode);
+        Assert.Contains("GetViewportDiagnostics", sampleCode);
+        Assert.Contains("ViewportWidth", sampleCode);
+        Assert.Contains("VerticalOffset", sampleCode);
     }
 
     [Fact]

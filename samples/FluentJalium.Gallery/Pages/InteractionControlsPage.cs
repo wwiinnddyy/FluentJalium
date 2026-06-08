@@ -190,6 +190,13 @@ public class InteractionControlsPage : Page
 
     private UIElement CreateBasicScroller()
     {
+        var output = new TextBlock
+        {
+            Text = "Viewport diagnostics: not attached",
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            Opacity = 0.75
+        };
         var scroller = new FWScroller
         {
             VerticalScrollMode = ScrollMode.Enabled,
@@ -197,6 +204,45 @@ public class InteractionControlsPage : Page
             Height = 200
         };
 
+        var stack = CreateScrollerItemsStack();
+        scroller.Content = stack;
+
+        void UpdateDiagnostics(string reason)
+        {
+            var diagnostics = scroller.GetViewportDiagnostics();
+            output.Text = diagnostics.HasScrollViewer
+                ? $"{reason}: offset {diagnostics.HorizontalOffset:0},{diagnostics.VerticalOffset:0}; viewport {diagnostics.ViewportWidth:0}x{diagnostics.ViewportHeight:0}; extent {diagnostics.ExtentWidth:0}x{diagnostics.ExtentHeight:0}."
+                : $"{reason}: viewport template pending.";
+        }
+
+        scroller.ViewChanged += (_, _) => UpdateDiagnostics("Scrolled");
+        UpdateDiagnostics("Viewport diagnostics");
+
+        var scrollButton = new FWButton
+        {
+            Content = "Scroll to 80",
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+        scrollButton.Click += (_, _) =>
+        {
+            scroller.ScrollTo(0, 80);
+            UpdateDiagnostics("Scrolled");
+        };
+
+        return new StackPanel
+        {
+            Spacing = 8,
+            Children =
+            {
+                scroller,
+                output,
+                scrollButton
+            }
+        };
+    }
+
+    private static StackPanel CreateScrollerItemsStack()
+    {
         var stack = new StackPanel { Spacing = 8 };
         for (int i = 1; i <= 20; i++)
         {
@@ -207,8 +253,7 @@ public class InteractionControlsPage : Page
             });
         }
 
-        scroller.Content = stack;
-        return scroller;
+        return stack;
     }
 
     private UIElement CreateSnapScroller()
