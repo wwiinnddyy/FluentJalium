@@ -40,6 +40,26 @@ using PipsPagerButtonVisibility = FluentJalium.Controls.PipsPagerButtonVisibilit
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryNavigationShellQaSnapshot(
+    string CurrentRouteKey,
+    string CurrentPageType,
+    bool HasPageTypeProvider,
+    bool CanGoBack,
+    bool CanGoForward,
+    int BackStackDepth,
+    int ForwardStackDepth,
+    string BreadcrumbPath,
+    string SelectorText,
+    int SelectorIndex,
+    int SelectorItemCount,
+    string TabHeader,
+    int TabIndex,
+    int TabItemCount,
+    FWTabViewCloseButtonOverlayMode CloseButtonOverlayMode,
+    int SelectedPageNumber,
+    int PageCount,
+    string SearchText);
+
 internal sealed class GalleryNavigationPage
 {
     public UIElement CreateContent()
@@ -413,6 +433,52 @@ internal sealed class GalleryNavigationPage
         return $"Route: {diagnostics.CurrentRouteKey ?? "none"}, Page: {diagnostics.CurrentPageType?.Name ?? "none"}, Back: {diagnostics.CanGoBack}, Forward: {diagnostics.CanGoForward}, Stack: {diagnostics.BackStackDepth}, Provider: {(diagnostics.HasPageTypeProvider ? "On" : "Off")}";
     }
 
+    internal static GalleryNavigationShellQaSnapshot CreateNavigationShellQaSnapshot(
+        FWNavigationService service,
+        IEnumerable<string> breadcrumbPath,
+        FWSelectorBar selectorBar,
+        FWTabView tabView,
+        FWPipsPager pager,
+        FWAutoSuggestBox searchBox)
+    {
+        ArgumentNullException.ThrowIfNull(service);
+        ArgumentNullException.ThrowIfNull(breadcrumbPath);
+        ArgumentNullException.ThrowIfNull(selectorBar);
+        ArgumentNullException.ThrowIfNull(tabView);
+        ArgumentNullException.ThrowIfNull(pager);
+        ArgumentNullException.ThrowIfNull(searchBox);
+
+        var serviceDiagnostics = service.GetDiagnostics();
+        var selectorDiagnostics = selectorBar.GetDiagnostics();
+        var tabDiagnostics = tabView.GetDiagnostics();
+        return new GalleryNavigationShellQaSnapshot(
+            serviceDiagnostics.CurrentRouteKey ?? "none",
+            serviceDiagnostics.CurrentPageType?.Name ?? "none",
+            serviceDiagnostics.HasPageTypeProvider,
+            serviceDiagnostics.CanGoBack,
+            serviceDiagnostics.CanGoForward,
+            serviceDiagnostics.BackStackDepth,
+            serviceDiagnostics.CanGoForward ? 1 : 0,
+            string.Join(" / ", breadcrumbPath),
+            string.IsNullOrWhiteSpace(selectorDiagnostics.SelectedText) ? "none" : selectorDiagnostics.SelectedText,
+            selectorDiagnostics.SelectedIndex,
+            selectorDiagnostics.ItemCount,
+            string.IsNullOrWhiteSpace(tabDiagnostics.SelectedHeader) ? "none" : tabDiagnostics.SelectedHeader,
+            tabDiagnostics.SelectedIndex,
+            tabDiagnostics.ItemCount,
+            tabDiagnostics.CloseButtonOverlayMode,
+            pager.SelectedPageIndex + 1,
+            pager.NumberOfPages,
+            string.IsNullOrWhiteSpace(searchBox.Text) ? "none" : searchBox.Text);
+    }
+
+    internal static string FormatNavigationShellQa(string action, GalleryNavigationShellQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Route: {snapshot.CurrentRouteKey}. Page: {snapshot.CurrentPageType}. Provider: {FormatOnOff(snapshot.HasPageTypeProvider)}. Back: {FormatOnOff(snapshot.CanGoBack)} ({snapshot.BackStackDepth}). Forward: {FormatOnOff(snapshot.CanGoForward)} ({snapshot.ForwardStackDepth}). Breadcrumb: {snapshot.BreadcrumbPath}. Selector: {snapshot.SelectorText} ({FormatIndex(snapshot.SelectorIndex, snapshot.SelectorItemCount)}). Tab: {snapshot.TabHeader} ({FormatIndex(snapshot.TabIndex, snapshot.TabItemCount)}), close {snapshot.CloseButtonOverlayMode}. Pips: {snapshot.SelectedPageNumber}/{snapshot.PageCount}. Search: {snapshot.SearchText}.";
+    }
+
     [RequiresUnreferencedCode("Gallery sample navigates to local Page types by typeof literals.")]
     private static UIElement CreateAppShellWalkthroughSample()
     {
@@ -581,10 +647,14 @@ internal sealed class GalleryNavigationPage
                 isSynchronizingShell = false;
             }
 
-            var serviceDiagnostics = service.GetDiagnostics();
-            var selectorDiagnostics = selectorBar.GetDiagnostics();
-            var tabDiagnostics = tabView.GetDiagnostics();
-            output.Text = $"{reason}: route {serviceDiagnostics.CurrentRouteKey ?? "none"}, page {serviceDiagnostics.CurrentPageType?.Name ?? "none"}, provider {FormatOnOff(serviceDiagnostics.HasPageTypeProvider)}, breadcrumb {string.Join(" / ", breadcrumbPath)}, selector {selectorDiagnostics.SelectedText}, tab {tabDiagnostics.SelectedHeader}, pips {pager.SelectedPageIndex + 1}/{pager.NumberOfPages}.";
+            var snapshot = CreateNavigationShellQaSnapshot(
+                service,
+                breadcrumbPath,
+                selectorBar,
+                tabView,
+                pager,
+                searchBox);
+            output.Text = FormatNavigationShellQa(reason, snapshot);
         }
 
         bool NavigateShell(string routeKey, string reason)
@@ -1318,6 +1388,11 @@ internal sealed class GalleryNavigationPage
     private static string FormatOnOff(bool value)
     {
         return value ? "on" : "off";
+    }
+
+    private static string FormatIndex(int index, int count)
+    {
+        return count <= 0 || index < 0 ? $"none/{count}" : $"{index + 1}/{count}";
     }
 
     private static string ResolveShellRouteKey(object? routeHint)

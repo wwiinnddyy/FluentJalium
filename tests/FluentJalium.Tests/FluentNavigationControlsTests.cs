@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
@@ -375,6 +376,106 @@ public sealed class FluentNavigationControlsTests
         Assert.True(diagnostics.HasPageTypeProvider);
         Assert.Equal("details", diagnostics.CurrentRouteKey);
         Assert.Equal(typeof(NavigationProviderPage), diagnostics.CurrentPageType);
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises Gallery shell QA snapshot over provider-backed route navigation.")]
+    public void GalleryNavigationPage_ShouldFormatAppShellQaSnapshot()
+    {
+        var navigationView = new FWNavigationView();
+        var overviewItem = new FWNavigationViewItem
+        {
+            Content = "Overview",
+            RouteKey = "overview"
+        };
+        var activityItem = new FWNavigationViewItem
+        {
+            Content = "Activity",
+            RouteKey = "activity"
+        };
+        var settingsItem = new FWNavigationViewItem
+        {
+            Content = "Settings",
+            RouteKey = "settings"
+        };
+        navigationView.MenuItems.Add(overviewItem);
+        navigationView.MenuItems.Add(activityItem);
+        navigationView.FooterMenuItems.Add(settingsItem);
+
+        var frame = new FWFrame();
+        var service = new FWNavigationService
+        {
+            PageTypeProvider = (route, _) => string.Equals(route.RouteKey, "settings", StringComparison.Ordinal)
+                ? typeof(NavigationProviderPage)
+                : route.PageType
+        };
+        service.RegisterRoute(overviewItem, typeof(NavigationOverviewPage));
+        service.RegisterRoute(activityItem, typeof(NavigationDetailsPage));
+        service.RegisterRoute(settingsItem, typeof(NavigationDetailsPage));
+        service.Attach(navigationView, frame);
+
+        Assert.True(service.NavigateToRoute("overview"));
+        Assert.True(service.NavigateToRoute("settings"));
+
+        var breadcrumbPath = new[] { "Home", "Settings" };
+        var selectorBar = new FWSelectorBar();
+        selectorBar.Items.Add(new FWSelectorBarItem { Text = "Overview" });
+        selectorBar.Items.Add(new FWSelectorBarItem { Text = "Activity" });
+        selectorBar.Items.Add(new FWSelectorBarItem { Text = "Settings" });
+        selectorBar.SelectedIndex = 2;
+
+        var tabView = new FWTabView
+        {
+            CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.OnPointerOver
+        };
+        tabView.Items.Add(new FWTabViewItem { Header = "Overview", Content = "Overview content" });
+        tabView.Items.Add(new FWTabViewItem { Header = "Settings", Content = "Settings content" });
+        tabView.SelectedIndex = 1;
+
+        var pager = new FWPipsPager
+        {
+            NumberOfPages = 3,
+            SelectedPageIndex = 2
+        };
+        var searchBox = new FWAutoSuggestBox
+        {
+            Text = "Settings"
+        };
+
+        var snapshot = GalleryNavigationPage.CreateNavigationShellQaSnapshot(
+            service,
+            breadcrumbPath,
+            selectorBar,
+            tabView,
+            pager,
+            searchBox);
+        var text = GalleryNavigationPage.FormatNavigationShellQa("App shell QA", snapshot);
+
+        Assert.Equal("settings", snapshot.CurrentRouteKey);
+        Assert.Equal(nameof(NavigationProviderPage), snapshot.CurrentPageType);
+        Assert.True(snapshot.HasPageTypeProvider);
+        Assert.True(snapshot.CanGoBack);
+        Assert.Equal(1, snapshot.BackStackDepth);
+        Assert.Equal("Home / Settings", snapshot.BreadcrumbPath);
+        Assert.Equal("Settings", snapshot.SelectorText);
+        Assert.Equal(2, snapshot.SelectorIndex);
+        Assert.Equal(3, snapshot.SelectorItemCount);
+        Assert.Equal("Settings", snapshot.TabHeader);
+        Assert.Equal(1, snapshot.TabIndex);
+        Assert.Equal(2, snapshot.TabItemCount);
+        Assert.Equal(FWTabViewCloseButtonOverlayMode.OnPointerOver, snapshot.CloseButtonOverlayMode);
+        Assert.Equal(3, snapshot.SelectedPageNumber);
+        Assert.Equal(3, snapshot.PageCount);
+        Assert.Equal("Settings", snapshot.SearchText);
+        Assert.Contains("App shell QA. Route: settings.", text);
+        Assert.Contains("Page: NavigationProviderPage.", text);
+        Assert.Contains("Provider: on.", text);
+        Assert.Contains("Back: on (1).", text);
+        Assert.Contains("Breadcrumb: Home / Settings.", text);
+        Assert.Contains("Selector: Settings (3/3).", text);
+        Assert.Contains("Tab: Settings (2/2), close OnPointerOver.", text);
+        Assert.Contains("Pips: 3/3.", text);
+        Assert.Contains("Search: Settings.", text);
     }
 
     [Fact]

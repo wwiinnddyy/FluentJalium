@@ -776,7 +776,8 @@ var search = new FWAutoSuggestBox
 {
     ItemsSource = routeSuggestions,
     FilterMode = AutoCompleteFilterMode.Contains,
-    PlaceholderText = "Search routes"
+    PlaceholderText = "Search routes",
+    Text = "Settings"
 };
 search.QuerySubmitted += (_, args) => navigationService.NavigateToRoute(args.QueryText);
 
@@ -816,8 +817,14 @@ tabView.SelectedIndex = 0;
 var tabDiagnostics = tabView.GetDiagnostics();
 Debug.WriteLine($"TabView selected: {tabDiagnostics.SelectedHeader}; tabs: {tabDiagnostics.ItemCount}; close: {tabDiagnostics.CloseButtonOverlayMode}.");
 
-var shellDiagnostics = navigationService.GetDiagnostics();
-Debug.WriteLine($"App shell: route {shellDiagnostics.CurrentRouteKey}; back {shellDiagnostics.CanGoBack}; provider {shellDiagnostics.HasPageTypeProvider}.");
+var shellQa = GalleryNavigationPage.CreateNavigationShellQaSnapshot(
+    navigationService,
+    (IEnumerable<string>)breadcrumb.ItemsSource,
+    selectorBar,
+    tabView,
+    pager,
+    search);
+Debug.WriteLine(GalleryNavigationPage.FormatNavigationShellQa("App shell QA", shellQa));
 """,
         ["materials.windowbackdrop"] = """
 var windowSurface = new FWFluentWindowSurface

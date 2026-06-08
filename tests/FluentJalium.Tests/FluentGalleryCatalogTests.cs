@@ -205,6 +205,9 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWSelectorBar", sampleCode);
         Assert.Contains("new FWTabView", sampleCode);
         Assert.Contains("App shell", sampleCode);
+        Assert.Contains("CreateNavigationShellQaSnapshot", sampleCode);
+        Assert.Contains("FormatNavigationShellQa", sampleCode);
+        Assert.Contains("App shell QA", sampleCode);
         Assert.Contains("HasPageTypeProvider", sampleCode);
     }
 
