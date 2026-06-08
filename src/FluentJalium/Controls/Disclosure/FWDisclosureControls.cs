@@ -1,4 +1,5 @@
 using Jalium.UI;
+using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
 using System.Threading;
@@ -251,6 +252,32 @@ public readonly record struct FWTaskDialogHostDiagnostics(
     bool LastKeyboardRequestHandled);
 
 /// <summary>
+/// Lightweight state snapshot for TaskDialog button automation metadata.
+/// </summary>
+public readonly record struct FWTaskDialogButtonAutomationMetadata(
+    FWTaskDialogButton Button,
+    string AutomationId,
+    string Name,
+    string HelpText,
+    bool IsVisible,
+    bool IsEnabled,
+    bool IsDefault,
+    bool IsCancel);
+
+/// <summary>
+/// Lightweight state snapshot for TaskDialog automation and focus metadata.
+/// </summary>
+public readonly record struct FWTaskDialogAutomationDiagnostics(
+    string ClassName,
+    AutomationControlType ControlType,
+    string Name,
+    string HelpText,
+    FWTaskDialogButton LastFocusTarget,
+    FWTaskDialogButtonAutomationMetadata PrimaryButton,
+    FWTaskDialogButtonAutomationMetadata SecondaryButton,
+    FWTaskDialogButtonAutomationMetadata CloseButton);
+
+/// <summary>
 /// FluentJalium TaskDialog control for command confirmation and rich status prompts.
 /// </summary>
 public class FWTaskDialog : ContentControl, IFluentJaliumControl
@@ -260,6 +287,7 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
     private Button? _closeButton;
     private TaskCompletionSource<FWTaskDialogResult>? _showTask;
     private CancellationTokenRegistration _showCancellationRegistration;
+    private FWTaskDialogButton _lastFocusTarget = FWTaskDialogButton.None;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWTaskDialog),
@@ -543,6 +571,23 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         return RequestButton(ToResult(CancelButton), HandlerFor(CancelButton));
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWTaskDialogButton LastFocusTarget => _lastFocusTarget;
+
+    public FWTaskDialogAutomationDiagnostics GetAutomationDiagnostics()
+    {
+        var peer = GetAutomationPeer();
+        return new FWTaskDialogAutomationDiagnostics(
+            peer?.GetClassName() ?? nameof(FWTaskDialog),
+            peer?.GetAutomationControlType() ?? AutomationControlType.Window,
+            peer?.GetName() ?? ResolveAutomationText(Title, nameof(FWTaskDialog)),
+            peer?.GetHelpText() ?? ResolveDialogHelpText(this),
+            LastFocusTarget,
+            CreateButtonAutomationMetadata(FWTaskDialogButton.Primary, PrimaryButtonText, _primaryButton, this),
+            CreateButtonAutomationMetadata(FWTaskDialogButton.Secondary, SecondaryButtonText, _secondaryButton, this),
+            CreateButtonAutomationMetadata(FWTaskDialogButton.Close, CloseButtonText, _closeButton, this));
+    }
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
@@ -583,6 +628,11 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
         UpdateButtonState();
         FocusDefaultButton();
+    }
+
+    protected override AutomationPeer? OnCreateAutomationPeer()
+    {
+        return new FWTaskDialogAutomationPeer(this);
     }
 
     private bool RequestButton(FWTaskDialogResult result, EventHandler<FWTaskDialogButtonClickEventArgs>? handler)
@@ -812,6 +862,7 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
         button.Visibility = string.IsNullOrWhiteSpace(text) ? Visibility.Collapsed : Visibility.Visible;
         button.IsEnabled = CanExecuteButtonCommand(taskDialogButton);
+        ApplyButtonAutomationMetadata(button, text, taskDialogButton, this);
     }
 
     public bool FocusDefaultButton()
@@ -850,11 +901,21 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         {
             if (ButtonFor(candidate) is { } button)
             {
-                return button.Focus();
+                if (button.Focus())
+                {
+                    _lastFocusTarget = candidate;
+                    return true;
+                }
             }
         }
 
-        return Focus();
+        var focused = Focus();
+        if (focused)
+        {
+            _lastFocusTarget = FWTaskDialogButton.None;
+        }
+
+        return focused;
     }
 
     private Button? ButtonFor(FWTaskDialogButton button)
