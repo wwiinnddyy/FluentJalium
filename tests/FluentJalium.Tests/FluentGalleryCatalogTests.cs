@@ -104,6 +104,47 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryCatalog_ShouldExposeFormsPatternMetadata()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+
+        var forms = Assert.Single(pages, page => page.UniqueId == "forms");
+        Assert.Equal("Forms", forms.Title);
+        Assert.Equal(GalleryNavigationGroup.Input, forms.Group);
+        Assert.True(forms.IsNew);
+        Assert.Equal("/Patterns/Forms", forms.SourcePath);
+        Assert.Equal("FluentJalium.Controls", forms.ApiNamespace);
+        Assert.Equal("patterns.forms", forms.SampleCodeKey);
+        Assert.Contains("FWLabel", forms.RelatedControls);
+        Assert.Contains("FWTextBox", forms.RelatedControls);
+        Assert.Contains("FWAutoSuggestBox", forms.RelatedControls);
+        Assert.Contains("FWRadioButtons", forms.RelatedControls);
+        Assert.Contains("FWInfoBar", forms.RelatedControls);
+        Assert.Contains("FWSettingsCard", forms.RelatedControls);
+        Assert.Contains("FWToggleSwitch", forms.RelatedControls);
+        Assert.Contains("FWButton", forms.RelatedControls);
+        Assert.Contains("Selector", forms.BaseClasses!);
+        Assert.True(forms.MatchesSearch("forms validation"));
+        Assert.True(forms.MatchesSearch("settingscard submit"));
+    }
+
+    [Fact]
+    public void GalleryControlInfo_ShouldPreferControlFamilyPagesOverPatternPages()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var controls = GalleryControlInfo.CreateFromPages(pages);
+
+        Assert.Equal("visuals", Assert.Single(controls, control => control.Name == "FWLabel").Page.UniqueId);
+        Assert.Equal("textinput", Assert.Single(controls, control => control.Name == "FWTextBox").Page.UniqueId);
+        Assert.Equal("textinput", Assert.Single(controls, control => control.Name == "FWAutoSuggestBox").Page.UniqueId);
+        Assert.Equal("selection", Assert.Single(controls, control => control.Name == "FWRadioButtons").Page.UniqueId);
+        Assert.Equal("status", Assert.Single(controls, control => control.Name == "FWInfoBar").Page.UniqueId);
+        Assert.Equal("contentandlayout", Assert.Single(controls, control => control.Name == "FWSettingsCard").Page.UniqueId);
+        Assert.Equal("switches", Assert.Single(controls, control => control.Name == "FWToggleSwitch").Page.UniqueId);
+        Assert.Equal("buttons", Assert.Single(controls, control => control.Name == "FWButton").Page.UniqueId);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeNavigationSelectorDiagnosticsSample()
     {
         var page = Assert.Single(
@@ -165,6 +206,27 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new SwipeItems", sampleCode);
         Assert.Contains("new FWGridSplitter", sampleCode);
         Assert.Contains("KeyboardIncrement = 12", sampleCode);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeFormsPatternSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "forms");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWLabel", sampleCode);
+        Assert.Contains("new FWTextBox", sampleCode);
+        Assert.Contains("new FWAutoSuggestBox", sampleCode);
+        Assert.Contains("new FWRadioButtons", sampleCode);
+        Assert.Contains("new FWInfoBar", sampleCode);
+        Assert.Contains("new FWToggleSwitch", sampleCode);
+        Assert.Contains("new FWSettingsCard", sampleCode);
+        Assert.Contains("new FWButton", sampleCode);
+        Assert.Contains("ValidateAndSubmit", sampleCode);
+        Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("forms.submit", sampleCode);
     }
 
     [Fact]

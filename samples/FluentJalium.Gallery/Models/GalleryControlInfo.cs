@@ -100,6 +100,12 @@ internal sealed record GalleryControlInfo(
             score += 2;
         }
 
+        if (!string.IsNullOrWhiteSpace(source) &&
+            source.StartsWith("/Patterns/", StringComparison.Ordinal))
+        {
+            score -= 1;
+        }
+
         return score;
     }
 }

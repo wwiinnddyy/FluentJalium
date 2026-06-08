@@ -39,6 +39,7 @@ internal sealed class GalleryCatalogService
             [PageId("Switches")] = () => CreatePageStack(new GallerySwitchesPage().CreateContent()),
             [PageId("Text Input")] = () => CreatePageStack(new GalleryTextInputPage().CreateContent()),
             [PageId("Selection")] = () => CreatePageStack(new GallerySelectionPage().CreateContent()),
+            [PageId("Forms")] = () => CreatePageStack(new GalleryFormsPage().CreateContent()),
             [PageId("Range")] = () => CreatePageStack(new GalleryRangePage().CreateContent()),
             [PageId("Date and Time")] = () => CreatePageStack(new GalleryDateTimePage().CreateContent()),
             [PageId("Content and Layout")] = () => CreatePageStack(new GalleryContentLayoutPage().CreateContent()),

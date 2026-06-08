@@ -190,6 +190,66 @@ radioButtons.Items.Add("Gallery shell");
 radioButtons.Items.Add("Control playground");
 radioButtons.SelectedIndex = 1;
 """,
+        ["patterns.forms"] = """
+var displayName = new FWTextBox
+{
+    PlaceholderText = "Full name",
+    Text = "Rhea Holloway"
+};
+
+var displayNameLabel = new FWLabel
+{
+    Content = "Display name",
+    Target = displayName
+};
+
+var team = new FWAutoSuggestBox
+{
+    ItemsSource = new[] { "Design Systems", "Platform Engineering", "Gallery Operations" },
+    FilterMode = AutoCompleteFilterMode.Contains,
+    MinimumPrefixLength = 1,
+    PlaceholderText = "Search teams"
+};
+
+var accountType = new FWRadioButtons
+{
+    Header = "Account type",
+    SelectedIndex = 0
+};
+accountType.Items.Add("Member");
+accountType.Items.Add("Maintainer");
+accountType.Items.Add("Guest");
+
+var validation = new FWInfoBar
+{
+    Title = "Review required",
+    Message = "Display name and email are required before submit.",
+    Severity = InfoBarSeverity.Warning,
+    IsOpen = true
+};
+
+var requireApproval = new FWToggleSwitch
+{
+    IsOn = true,
+    OnContent = "Required",
+    OffContent = "Optional"
+};
+
+var submitCard = new FWSettingsCard
+{
+    Header = "Submit action",
+    Description = "Invoke the submit command from a settings row.",
+    Content = requireApproval,
+    IsClickEnabled = true,
+    Command = SubmitCommand,
+    CommandParameter = "forms.submit"
+};
+
+var submitButton = new FWButton { Content = "Submit" };
+submitButton.Click += (_, _) => ValidateAndSubmit(displayName.Text, team.Text, accountType.SelectedItem);
+
+var diagnostics = submitCard.GetDiagnostics();
+""",
         ["range.slider.progress"] = """
 var slider = new FWSlider
 {
