@@ -27,6 +27,9 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWTwoPaneView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWParallaxView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWRadioButtons" && control.Page.UniqueId == "selection");
+        Assert.Contains(controls, control => control.Name == "FWScrollViewer" && control.Page.UniqueId == "interaction");
+        Assert.Contains(controls, control => control.Name == "FWSwipeControl" && control.Page.UniqueId == "interaction");
+        Assert.Contains(controls, control => control.Name == "FWGridSplitter" && control.Page.UniqueId == "interaction");
     }
 
     [Fact]
@@ -58,6 +61,16 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal("layout.splitview.settingscard", splitView.SampleCodeKey);
         Assert.Contains("ContentControl", splitView.BaseClasses);
         Assert.Equal("/Layout/FWSplitView", splitView.SourcePath);
+
+        var scrollViewer = Assert.Single(controls, control => control.Name == "FWScrollViewer");
+        Assert.True(scrollViewer.IsUpdated);
+        Assert.Equal("interaction.scrollviewer.swipe.splitter", scrollViewer.SampleCodeKey);
+        Assert.Equal("FluentJalium.Controls", scrollViewer.ApiNamespace);
+        Assert.Contains("ScrollViewer", scrollViewer.BaseClasses);
+        Assert.Equal("/Interaction/FWScrollViewer", scrollViewer.SourcePath);
+
+        var swipeControl = Assert.Single(controls, control => control.Name == "FWSwipeControl");
+        Assert.Equal("/Interaction/FWScrollViewer/FWSwipeControl", swipeControl.SourcePath);
     }
 
     [Fact]
@@ -87,5 +100,22 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("ItemsSource = new[]", sampleCode);
         Assert.Contains("new SettingsRow", sampleCode);
         Assert.Contains("PreviewMaterialCommand", sampleCode);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeScrollViewerSwipeAndSplitterSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "interaction");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWScrollViewer", sampleCode);
+        Assert.Contains("IsScrollBarAutoHideEnabled = false", sampleCode);
+        Assert.Contains("ScrollToVerticalOffset", sampleCode);
+        Assert.Contains("new FWSwipeControl", sampleCode);
+        Assert.Contains("new SwipeItems", sampleCode);
+        Assert.Contains("new FWGridSplitter", sampleCode);
+        Assert.Contains("KeyboardIncrement = 12", sampleCode);
     }
 }

@@ -317,6 +317,58 @@ var visuals = new FWStackPanel
     }
 };
 """,
+        ["interaction.scrollviewer.swipe.splitter"] = """
+var scrollViewer = new FWScrollViewer
+{
+    Width = 360,
+    Height = 180,
+    VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+    IsScrollBarAutoHideEnabled = false,
+    Content = CreateScrollablePreview()
+};
+
+scrollViewer.ScrollChanged += (_, args) =>
+{
+    Debug.WriteLine($"ScrollViewer offset: {args.VerticalOffset}; extent: {args.ExtentHeight}.");
+};
+
+scrollViewer.ScrollToVerticalOffset(96);
+
+var leftItems = new SwipeItems { Mode = SwipeMode.Reveal };
+leftItems.Add(new SwipeItem
+{
+    Text = "Archive",
+    IconSource = IconGlyph(FluentIconRegular.Archive24),
+    Command = ArchiveCommand,
+    CommandParameter = "archive-row"
+});
+
+var rightItems = new SwipeItems { Mode = SwipeMode.Execute };
+rightItems.Add(new SwipeItem
+{
+    Text = "Delete",
+    IconSource = IconGlyph(FluentIconRegular.Delete24),
+    Command = DeleteCommand,
+    CommandParameter = "delete-row",
+    BehaviorOnInvoked = BehaviorOnInvoked.Close
+});
+
+var swipeControl = new FWSwipeControl
+{
+    Density = FWInteractionDensity.Compact,
+    LeftItems = leftItems,
+    RightItems = rightItems,
+    Content = new FWTextBlock { Text = "Swipe this row for contextual commands." }
+};
+
+var splitter = new FWGridSplitter
+{
+    Density = FWInteractionDensity.Comfortable,
+    ResizeDirection = GridResizeDirection.Columns,
+    ResizeBehavior = GridResizeBehavior.PreviousAndNext,
+    KeyboardIncrement = 12
+};
+""",
         ["advancedcollections.itemsrepeater"] = """
 var repeater = new FWItemsRepeater
 {
