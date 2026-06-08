@@ -33,6 +33,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWGridSplitter" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWRefreshContainerDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWScrollerViewportDiagnostics" && control.Page.UniqueId == "advancedinteraction");
+        Assert.Contains(controls, control => control.Name == "FWAnnotatedScrollBarDiagnostics" && control.Page.UniqueId == "advancedinteraction");
     }
 
     [Fact]
@@ -93,6 +94,13 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal("advancedinteraction.scroller", refreshDiagnostics.SampleCodeKey);
         Assert.Contains("ContentControl", refreshDiagnostics.BaseClasses);
         Assert.Equal("/Interaction/FWScroller/FWRefreshContainerDiagnostics", refreshDiagnostics.SourcePath);
+
+        var annotatedDiagnostics = Assert.Single(controls, control => control.Name == "FWAnnotatedScrollBarDiagnostics");
+        Assert.True(annotatedDiagnostics.IsUpdated);
+        Assert.Equal(GalleryPageStatus.Preview, annotatedDiagnostics.Status);
+        Assert.Equal("advancedinteraction.scroller", annotatedDiagnostics.SampleCodeKey);
+        Assert.Contains("ScrollBar", annotatedDiagnostics.BaseClasses);
+        Assert.Equal("/Interaction/FWScroller/FWAnnotatedScrollBarDiagnostics", annotatedDiagnostics.SourcePath);
     }
 
     [Fact]
@@ -177,6 +185,10 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("GetViewportDiagnostics", sampleCode);
         Assert.Contains("ViewportWidth", sampleCode);
         Assert.Contains("VerticalOffset", sampleCode);
+        Assert.Contains("new FWAnnotatedScrollBar", sampleCode);
+        Assert.Contains("DetailLabelRequested", sampleCode);
+        Assert.Contains("FWAnnotatedScrollBarDiagnostics", sampleCode);
+        Assert.Contains("RegisteredLabelCount", sampleCode);
     }
 
     [Fact]

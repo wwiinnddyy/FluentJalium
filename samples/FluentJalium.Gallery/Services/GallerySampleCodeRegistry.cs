@@ -921,6 +921,26 @@ scroller.ScrollTo(0, 80);
 
 var diagnostics = scroller.GetViewportDiagnostics();
 Debug.WriteLine($"Scroller viewport: {diagnostics.ViewportWidth}x{diagnostics.ViewportHeight}; offset: {diagnostics.VerticalOffset}; extent: {diagnostics.ExtentHeight}.");
+
+var annotatedScrollBar = new FWAnnotatedScrollBar
+{
+    Orientation = Orientation.Vertical,
+    Minimum = 0,
+    Maximum = 500,
+    Labels = new List<ScrollBarLabel>
+    {
+        new() { ScrollOffset = 100, Content = "Warning", Type = ScrollBarLabelType.Warning },
+        new() { ScrollOffset = 250, Content = "Error", Type = ScrollBarLabelType.Error },
+        new() { ScrollOffset = 400, Content = "Info", Type = ScrollBarLabelType.Info }
+    }
+};
+annotatedScrollBar.DetailLabelRequested += (_, args) =>
+{
+    Debug.WriteLine($"Annotated label: {args.LabelType} {args.Content} at {args.ScrollOffset}.");
+};
+
+FWAnnotatedScrollBarDiagnostics annotationDiagnostics = annotatedScrollBar.GetDiagnostics();
+Debug.WriteLine($"AnnotatedScrollBar labels: {annotationDiagnostics.RegisteredLabelCount}/{annotationDiagnostics.SourceLabelCount}; value: {annotationDiagnostics.Value}; range: {annotationDiagnostics.Minimum}-{annotationDiagnostics.Maximum}.");
 """,
         ["status.snackbar"] = """
 var host = new FWSnackbarOverlayHost

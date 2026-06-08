@@ -389,6 +389,10 @@ public class FWAnnotatedScrollBarTests
         // Assert
         Assert.NotNull(scrollBar);
         Assert.Null(scrollBar.Labels);
+        Assert.False(scrollBar.GetDiagnostics().HasLabels);
+        Assert.Equal(0, scrollBar.GetDiagnostics().SourceLabelCount);
+        Assert.Equal(0, scrollBar.GetDiagnostics().RegisteredLabelCount);
+        Assert.Equal(Orientation.Vertical, scrollBar.GetDiagnostics().Orientation);
     }
 
     [Fact]
@@ -406,6 +410,42 @@ public class FWAnnotatedScrollBarTests
 
         // Assert
         Assert.Equal(labels, scrollBar.Labels);
+        Assert.Equal(1, scrollBar.GetDiagnostics().SourceLabelCount);
+        Assert.Equal(1, scrollBar.GetDiagnostics().RegisteredLabelCount);
+        Assert.True(scrollBar.GetDiagnostics().HasLabels);
+    }
+
+    [Fact]
+    public void ValueNearLabel_ShouldRaiseDetailLabelRequestedAndExposeDiagnostics()
+    {
+        // Arrange
+        var scrollBar = new FWAnnotatedScrollBar
+        {
+            Minimum = 0,
+            Maximum = 500,
+            Labels = new List<ScrollBarLabel>
+            {
+                new ScrollBarLabel { ScrollOffset = 100, Content = "Important", Type = ScrollBarLabelType.Warning }
+            }
+        };
+        DetailLabelRequestedEventArgs? requested = null;
+        scrollBar.DetailLabelRequested += (_, args) =>
+        {
+            requested = args;
+        };
+
+        // Act
+        scrollBar.Value = 104;
+        var diagnostics = scrollBar.GetDiagnostics();
+
+        // Assert
+        Assert.NotNull(requested);
+        Assert.Equal(100, requested.ScrollOffset);
+        Assert.Equal("Important", requested.Content);
+        Assert.Equal(ScrollBarLabelType.Warning, requested.LabelType);
+        Assert.Equal(100, diagnostics.LastRequestedScrollOffset);
+        Assert.Equal("Important", diagnostics.LastRequestedContent);
+        Assert.Equal(ScrollBarLabelType.Warning, diagnostics.LastRequestedLabelType);
     }
 
     [Fact]

@@ -6,12 +6,33 @@ using Jalium.UI.Media;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// Snapshot of the annotation state hosted by <see cref="FWAnnotatedScrollBar"/>.
+/// </summary>
+public readonly record struct FWAnnotatedScrollBarDiagnostics(
+    bool HasDetailsCanvas,
+    int SourceLabelCount,
+    int RegisteredLabelCount,
+    bool HasLabels,
+    Orientation Orientation,
+    double Minimum,
+    double Maximum,
+    double Value,
+    double ViewportSize,
+    double TrackLength,
+    double LastRequestedScrollOffset,
+    object? LastRequestedContent,
+    ScrollBarLabelType? LastRequestedLabelType);
+
+/// <summary>
 /// FluentJalium AnnotatedScrollBar control for enhanced scroll visualization.
 /// </summary>
 public class FWAnnotatedScrollBar : ScrollBar, IFluentJaliumControl
 {
     private Canvas? _detailsCanvas;
     private readonly List<ScrollBarLabel> _labels = new();
+    private double _lastRequestedScrollOffset;
+    private object? _lastRequestedContent;
+    private ScrollBarLabelType? _lastRequestedLabelType;
 
     public static readonly DependencyProperty LabelsProperty =
         DependencyProperty.Register(nameof(Labels), typeof(IList<ScrollBarLabel>), typeof(FWAnnotatedScrollBar),
@@ -55,6 +76,30 @@ public class FWAnnotatedScrollBar : ScrollBar, IFluentJaliumControl
         UpdateLabels();
     }
 
+    /// <summary>
+    /// Gets a snapshot of the current annotation and scroll state.
+    /// </summary>
+    public FWAnnotatedScrollBarDiagnostics GetDiagnostics()
+    {
+        var sourceLabelCount = Labels?.Count ?? 0;
+        var trackLength = Orientation == Orientation.Vertical ? ActualHeight : ActualWidth;
+
+        return new FWAnnotatedScrollBarDiagnostics(
+            _detailsCanvas != null,
+            sourceLabelCount,
+            _labels.Count,
+            sourceLabelCount > 0,
+            Orientation,
+            Minimum,
+            Maximum,
+            Value,
+            ViewportSize,
+            trackLength,
+            _lastRequestedScrollOffset,
+            _lastRequestedContent,
+            _lastRequestedLabelType);
+    }
+
     private static void OnLabelsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWAnnotatedScrollBar scrollBar)
@@ -65,19 +110,20 @@ public class FWAnnotatedScrollBar : ScrollBar, IFluentJaliumControl
 
     private void UpdateLabels()
     {
-        if (_detailsCanvas == null || Labels == null)
-            return;
-
-        _detailsCanvas.Children.Clear();
         _labels.Clear();
+        _detailsCanvas?.Children.Clear();
+
+        if (Labels == null)
+            return;
 
         foreach (var label in Labels)
         {
+            _labels.Add(label);
+
             var element = CreateLabelElement(label);
-            if (element != null)
+            if (_detailsCanvas != null && element != null)
             {
                 _detailsCanvas.Children.Add(element);
-                _labels.Add(label);
             }
         }
     }
@@ -120,10 +166,15 @@ public class FWAnnotatedScrollBar : ScrollBar, IFluentJaliumControl
         {
             if (Math.Abs(newValue - label.ScrollOffset) < 10)
             {
+                _lastRequestedScrollOffset = label.ScrollOffset;
+                _lastRequestedContent = label.Content;
+                _lastRequestedLabelType = label.Type;
+
                 var args = new DetailLabelRequestedEventArgs(DetailLabelRequestedEvent, this)
                 {
                     ScrollOffset = label.ScrollOffset,
-                    Content = label.Content
+                    Content = label.Content,
+                    LabelType = label.Type
                 };
                 RaiseEvent(args);
                 break;
@@ -187,4 +238,9 @@ public class DetailLabelRequestedEventArgs : RoutedEventArgs
     /// Gets the content of the label.
     /// </summary>
     public object? Content { get; init; }
+
+    /// <summary>
+    /// Gets the type of label that requested detail content.
+    /// </summary>
+    public ScrollBarLabelType LabelType { get; init; }
 }

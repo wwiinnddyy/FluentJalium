@@ -387,13 +387,38 @@ public class InteractionControlsPage : Page
                 new ScrollBarLabel { ScrollOffset = 400, Content = "Info", Type = ScrollBarLabelType.Info }
             }
         };
+        var output = new TextBlock
+        {
+            Text = FormatAnnotatedScrollBarDiagnostics("Initial", annotatedScrollBar.GetDiagnostics()),
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            Opacity = 0.75,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+        annotatedScrollBar.DetailLabelRequested += (_, args) =>
+        {
+            output.Text = $"{args.LabelType}: {args.Content} at {args.ScrollOffset:0}. {FormatAnnotatedScrollBarDiagnostics("Detail requested", annotatedScrollBar.GetDiagnostics())}";
+        };
         Grid.SetColumn(annotatedScrollBar, 1);
 
         grid.Children.Add(scrollViewer);
         grid.Children.Add(annotatedScrollBar);
-        border.Child = grid;
+        border.Child = new StackPanel
+        {
+            Spacing = 8,
+            Children =
+            {
+                grid,
+                output
+            }
+        };
 
         return border;
+    }
+
+    private static string FormatAnnotatedScrollBarDiagnostics(string reason, FWAnnotatedScrollBarDiagnostics diagnostics)
+    {
+        return $"{reason}: labels {diagnostics.RegisteredLabelCount}/{diagnostics.SourceLabelCount}; value {diagnostics.Value:0}/{diagnostics.Maximum:0}; orientation {diagnostics.Orientation}; canvas {FormatOnOff(diagnostics.HasDetailsCanvas)}.";
     }
 
     private Border CreateDemoCard(string title, UIElement content)
