@@ -775,6 +775,18 @@ public sealed class FluentNavigationControlsTests
         Assert.False(overview.IsSelected);
         Assert.True(activity.IsSelected);
         Assert.Equal(2, selectionChanged);
+
+        var diagnostics = selectorBar.GetDiagnostics();
+        Assert.Equal(2, diagnostics.ItemCount);
+        Assert.Equal(1, diagnostics.SelectedIndex);
+        Assert.Same(activity, diagnostics.SelectedItem);
+        Assert.Equal("Activity", diagnostics.SelectedText);
+        Assert.True(diagnostics.HasSelection);
+        Assert.Equal(Orientation.Vertical, diagnostics.Orientation);
+        Assert.Equal(FWNavigationDensity.Compact, diagnostics.Density);
+        Assert.Equal(FWSelectorBarSelectionIndicatorPlacement.Left, diagnostics.SelectionIndicatorPlacement);
+        Assert.Equal(32, diagnostics.MinHeight);
+        Assert.Equal(new Thickness(4), diagnostics.Padding);
     }
 
     [Fact]
@@ -798,6 +810,31 @@ public sealed class FluentNavigationControlsTests
 
         Assert.Same(plainItem, selectorBar.SelectedItem);
         Assert.False(overview.IsSelected);
+
+        var diagnostics = selectorBar.GetDiagnostics();
+        Assert.Equal(2, diagnostics.ItemCount);
+        Assert.Same(plainItem, diagnostics.SelectedItem);
+        Assert.Equal("Plain item", diagnostics.SelectedText);
+        Assert.True(diagnostics.HasSelection);
+    }
+
+    [Fact]
+    public void FWSelectorBar_ShouldExposeEmptyDiagnostics()
+    {
+        var selectorBar = new FWSelectorBar();
+
+        var diagnostics = selectorBar.GetDiagnostics();
+
+        Assert.Equal(0, diagnostics.ItemCount);
+        Assert.Equal(-1, diagnostics.SelectedIndex);
+        Assert.Null(diagnostics.SelectedItem);
+        Assert.Equal(string.Empty, diagnostics.SelectedText);
+        Assert.False(diagnostics.HasSelection);
+        Assert.Equal(Orientation.Horizontal, diagnostics.Orientation);
+        Assert.Equal(FWNavigationDensity.Comfortable, diagnostics.Density);
+        Assert.Equal(FWSelectorBarSelectionIndicatorPlacement.Auto, diagnostics.SelectionIndicatorPlacement);
+        Assert.Equal(40, diagnostics.MinHeight);
+        Assert.Equal(new Thickness(6), diagnostics.Padding);
     }
 
     [Fact]

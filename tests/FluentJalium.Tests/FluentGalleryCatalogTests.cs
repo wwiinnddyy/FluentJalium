@@ -50,6 +50,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(itemsRepeater.IsNew);
         Assert.Equal(GalleryPageStatus.Preview, itemsRepeater.Status);
 
+        var selectorBarDiagnostics = Assert.Single(controls, control => control.Name == "FWSelectorBarDiagnostics");
+        Assert.True(selectorBarDiagnostics.IsUpdated);
+        Assert.Equal("navigation.breadcrumb.pips.selector.tabview.titlebar", selectorBarDiagnostics.SampleCodeKey);
+        Assert.Contains("Selector", selectorBarDiagnostics.BaseClasses);
+        Assert.Equal("/Navigation/FWNavigationService/FWSelectorBarDiagnostics", selectorBarDiagnostics.SourcePath);
+
         var flyout = Assert.Single(controls, control => control.Name == "FWFlyout");
         Assert.True(flyout.IsUpdated);
         Assert.Equal("menus.flyout.commandbar", flyout.SampleCodeKey);
@@ -71,6 +77,20 @@ public sealed class FluentGalleryCatalogTests
 
         var swipeControl = Assert.Single(controls, control => control.Name == "FWSwipeControl");
         Assert.Equal("/Interaction/FWScrollViewer/FWSwipeControl", swipeControl.SourcePath);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeNavigationSelectorDiagnosticsSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "navigation");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWSelectorBar", sampleCode);
+        Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("SelectedText", sampleCode);
+        Assert.Contains("ItemCount", sampleCode);
     }
 
     [Fact]

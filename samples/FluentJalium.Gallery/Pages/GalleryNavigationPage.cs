@@ -656,7 +656,7 @@ internal sealed class GalleryNavigationPage
 
     private static UIElement CreateSelectorBarSample()
     {
-        var output = CreateNavigationOutput("Selected view: Overview. Indicator: Auto. Orientation: Horizontal");
+        var output = CreateNavigationOutput("Selected view: Overview. Index: 0/3. Indicator: Auto. Orientation: Horizontal");
         var preview = new FWTextBlock
         {
             Text = "Overview view: recent navigation health and shell links.",
@@ -679,9 +679,10 @@ internal sealed class GalleryNavigationPage
 
         void UpdateStatus(string reason)
         {
-            var selected = selectorBar.SelectedItem as FWSelectorBarItem;
-            preview.Text = $"{selected?.Text ?? "No"} view: {GetSelectorViewDescription(selected?.Text)}";
-            output.Text = $"{reason}: {selected?.Text ?? "none"}. Indicator: {selectorBar.SelectionIndicatorPlacement}. Orientation: {selectorBar.Orientation}. Density: {selectorBar.Density}";
+            var diagnostics = selectorBar.GetDiagnostics();
+            var selectedText = string.IsNullOrWhiteSpace(diagnostics.SelectedText) ? "No" : diagnostics.SelectedText;
+            preview.Text = $"{selectedText} view: {GetSelectorViewDescription(diagnostics.SelectedText)}";
+            output.Text = $"{reason}: {(diagnostics.HasSelection ? selectedText : "none")}. Index: {diagnostics.SelectedIndex}/{diagnostics.ItemCount}. Indicator: {diagnostics.SelectionIndicatorPlacement}. Orientation: {diagnostics.Orientation}. Density: {diagnostics.Density}";
         }
 
         selectorBar.SelectionChanged += (_, _) => UpdateStatus("Selected view");

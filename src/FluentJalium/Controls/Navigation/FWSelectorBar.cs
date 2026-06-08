@@ -65,6 +65,21 @@ public class FWSelectorBar : Selector, IFluentJaliumControl
         SelectedItem = item;
     }
 
+    public FWSelectorBarDiagnostics GetDiagnostics()
+    {
+        return new FWSelectorBarDiagnostics(
+            Items.Count,
+            SelectedIndex,
+            SelectedItem,
+            SelectedItem is FWSelectorBarItem selectorItem ? selectorItem.Text : SelectedItem?.ToString() ?? string.Empty,
+            SelectedItem != null,
+            Orientation,
+            Density,
+            SelectionIndicatorPlacement,
+            MinHeight,
+            Padding);
+    }
+
     protected override void OnSelectionChanged(SelectionChangedEventArgs e)
     {
         UpdateContainerSelection();
@@ -151,6 +166,21 @@ public class FWSelectorBar : Selector, IFluentJaliumControl
         return value is FWSelectorBarSelectionIndicatorPlacement placement && Enum.IsDefined(placement);
     }
 }
+
+/// <summary>
+/// Snapshot of selector bar state for Gallery diagnostics and tests.
+/// </summary>
+public readonly record struct FWSelectorBarDiagnostics(
+    int ItemCount,
+    int SelectedIndex,
+    object? SelectedItem,
+    string SelectedText,
+    bool HasSelection,
+    Orientation Orientation,
+    FWNavigationDensity Density,
+    FWSelectorBarSelectionIndicatorPlacement SelectionIndicatorPlacement,
+    double MinHeight,
+    Thickness Padding);
 
 /// <summary>
 /// FluentJalium SelectorBar item.

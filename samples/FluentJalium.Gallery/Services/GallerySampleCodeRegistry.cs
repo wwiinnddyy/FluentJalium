@@ -614,6 +614,17 @@ var pager = new FWPipsPager
     MaxVisiblePips = 5,
     SelectedPageIndex = 0
 };
+
+var selectorBar = new FWSelectorBar
+{
+    SelectionIndicatorPlacement = FWSelectorBarSelectionIndicatorPlacement.Auto
+};
+selectorBar.Items.Add(new FWSelectorBarItem { Text = "Overview" });
+selectorBar.Items.Add(new FWSelectorBarItem { Text = "Activity" });
+selectorBar.SelectedIndex = 0;
+
+var selectorDiagnostics = selectorBar.GetDiagnostics();
+Debug.WriteLine($"SelectorBar selected: {selectorDiagnostics.SelectedText}; index: {selectorDiagnostics.SelectedIndex}/{selectorDiagnostics.ItemCount}.");
 """,
         ["materials.windowbackdrop"] = """
 var windowSurface = new FWFluentWindowSurface
