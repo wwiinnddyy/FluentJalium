@@ -427,6 +427,67 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(2, closed);
     }
 
+    [Theory]
+    [InlineData(FWSplitViewDisplayMode.Overlay, true, 280)]
+    [InlineData(FWSplitViewDisplayMode.Overlay, false, 0)]
+    [InlineData(FWSplitViewDisplayMode.Inline, true, 280)]
+    [InlineData(FWSplitViewDisplayMode.Inline, false, 0)]
+    [InlineData(FWSplitViewDisplayMode.CompactOverlay, true, 280)]
+    [InlineData(FWSplitViewDisplayMode.CompactOverlay, false, 44)]
+    [InlineData(FWSplitViewDisplayMode.CompactInline, true, 280)]
+    [InlineData(FWSplitViewDisplayMode.CompactInline, false, 44)]
+    public void FWSplitView_ShouldResolveActualPaneLengthForDisplayModes(
+        FWSplitViewDisplayMode displayMode,
+        bool isPaneOpen,
+        double expectedPaneLength)
+    {
+        var splitView = new FWSplitView
+        {
+            DisplayMode = displayMode,
+            OpenPaneLength = 280,
+            CompactPaneLength = 44,
+            IsPaneOpen = isPaneOpen
+        };
+
+        Assert.Equal(expectedPaneLength, splitView.ActualPaneLength);
+        Assert.Equal(
+            displayMode is FWSplitViewDisplayMode.Overlay or FWSplitViewDisplayMode.CompactOverlay,
+            splitView.IsOverlayMode);
+
+        splitView.OpenPaneLength = 320;
+        splitView.CompactPaneLength = 52;
+
+        Assert.Equal(
+            isPaneOpen
+                ? 320
+                : displayMode is FWSplitViewDisplayMode.CompactOverlay or FWSplitViewDisplayMode.CompactInline ? 52 : 0,
+            splitView.ActualPaneLength);
+    }
+
+    [Fact]
+    public void FWSplitView_ShouldValidateModesPlacementsAndLengths()
+    {
+        var splitView = new FWSplitView
+        {
+            Pane = new FWTextBlock { Text = "Pane" },
+            Content = new FWTextBlock { Text = "Content" },
+            PaneTemplate = new DataTemplate(),
+            PaneBackground = new SolidColorBrush(Color.FromRgb(0x20, 0x20, 0x20)),
+            ContentBackground = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x30))
+        };
+
+        Assert.IsType<FWTextBlock>(splitView.Pane);
+        Assert.IsType<FWTextBlock>(splitView.Content);
+        Assert.NotNull(splitView.PaneTemplate);
+        Assert.NotNull(splitView.PaneBackground);
+        Assert.NotNull(splitView.ContentBackground);
+        Assert.Throws<ArgumentException>(() => splitView.DisplayMode = (FWSplitViewDisplayMode)99);
+        Assert.Throws<ArgumentException>(() => splitView.PanePlacement = (FWSplitViewPanePlacement)99);
+        Assert.Throws<ArgumentException>(() => splitView.OpenPaneLength = -1);
+        Assert.Throws<ArgumentException>(() => splitView.OpenPaneLength = double.NaN);
+        Assert.Throws<ArgumentException>(() => splitView.CompactPaneLength = double.PositiveInfinity);
+    }
+
     [Fact]
     public void FWParallaxView_ShouldExposeProgressCurrentOffsetAndDiagnostics()
     {
