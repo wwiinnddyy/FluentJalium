@@ -325,6 +325,42 @@ public readonly record struct FWFluentWindowMaterialProfileRecipe(
 }
 
 /// <summary>
+/// Snapshot of a FluentJalium window surface, its requested DWM backdrop, and the actual host backdrop.
+/// </summary>
+public readonly record struct FWFluentWindowSurfaceDiagnostics(
+    FWFluentWindowMaterialProfile Profile,
+    string Role,
+    FWFluentWindowBackdropKind RequestedBackdropKind,
+    WindowBackdropType RequestedSystemBackdrop,
+    WindowBackdropType ActualSystemBackdrop,
+    FWFluentMaterialRole SurfaceRole,
+    FWFluentMaterialKind SurfaceMaterialKind,
+    BorderShape SurfaceShape,
+    bool AutoApplyWindowBackdrop,
+    bool WasApplied)
+{
+    /// <summary>
+    /// Gets a value indicating whether the actual host backdrop matches the requested profile backdrop.
+    /// </summary>
+    public bool IsMatched => ActualSystemBackdrop == RequestedSystemBackdrop;
+
+    /// <summary>
+    /// Gets the text used by diagnostics surfaces to report whether automatic backdrop application is enabled.
+    /// </summary>
+    public string AutoApplyText => AutoApplyWindowBackdrop ? "On" : "Off";
+
+    /// <summary>
+    /// Gets the text used by diagnostics surfaces to report whether requested and actual backdrops match.
+    /// </summary>
+    public string MatchState => IsMatched ? "matched" : "pending";
+
+    /// <summary>
+    /// Gets the text used by diagnostics surfaces to report whether the request was applied to a window.
+    /// </summary>
+    public string ApplyState => WasApplied ? "applied" : "not applied";
+}
+
+/// <summary>
 /// Describes the visual surface role used by a FluentJalium material host.
 /// </summary>
 public readonly record struct FWFluentMaterialSurfaceRecipe(
@@ -1226,6 +1262,34 @@ public class FWFluentWindowSurface : FWFluentMaterialSurface
 
         ApplyWindowBackdrop(window);
         return true;
+    }
+
+    /// <summary>
+    /// Gets a diagnostics snapshot for this surface and the current host backdrop state.
+    /// </summary>
+    public FWFluentWindowSurfaceDiagnostics GetWindowSurfaceDiagnostics(Window window, bool wasApplied)
+    {
+        ArgumentNullException.ThrowIfNull(window);
+        return GetWindowSurfaceDiagnostics(window.SystemBackdrop, wasApplied);
+    }
+
+    /// <summary>
+    /// Gets a diagnostics snapshot for this surface and an explicitly supplied actual backdrop.
+    /// </summary>
+    public FWFluentWindowSurfaceDiagnostics GetWindowSurfaceDiagnostics(WindowBackdropType actualSystemBackdrop, bool wasApplied)
+    {
+        var recipe = FWFluentWindowMaterialProfileRecipe.Create(WindowMaterialProfile);
+        return new FWFluentWindowSurfaceDiagnostics(
+            recipe.Profile,
+            recipe.Role,
+            recipe.WindowBackdropKind,
+            recipe.SystemBackdrop,
+            actualSystemBackdrop,
+            MaterialRole,
+            MaterialKind,
+            Shape,
+            AutoApplyWindowBackdrop,
+            wasApplied);
     }
 
     private void OnLoaded(object? sender, RoutedEventArgs e)

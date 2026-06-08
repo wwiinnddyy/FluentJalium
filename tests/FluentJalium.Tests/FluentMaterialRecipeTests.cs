@@ -377,6 +377,43 @@ public sealed class FluentMaterialRecipeTests
     }
 
     [Fact]
+    public void WindowSurfaceDiagnostics_ShouldReportRequestedActualAndMaterialState()
+    {
+        var window = new Window();
+        var surface = new FWFluentWindowSurface
+        {
+            AutoApplyWindowBackdrop = false
+        };
+        surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.TransientAcrylic);
+
+        var pending = surface.GetWindowSurfaceDiagnostics(WindowBackdropType.Mica, wasApplied: false);
+
+        Assert.Equal(FWFluentWindowMaterialProfile.TransientAcrylic, pending.Profile);
+        Assert.Equal("Transient acrylic shell", pending.Role);
+        Assert.Equal(FWFluentWindowBackdropKind.Acrylic, pending.RequestedBackdropKind);
+        Assert.Equal(WindowBackdropType.Acrylic, pending.RequestedSystemBackdrop);
+        Assert.Equal(WindowBackdropType.Mica, pending.ActualSystemBackdrop);
+        Assert.Equal(FWFluentMaterialRole.Flyout, pending.SurfaceRole);
+        Assert.Equal(FWFluentMaterialKind.Acrylic, pending.SurfaceMaterialKind);
+        Assert.Equal(BorderShape.RoundedRectangle, pending.SurfaceShape);
+        Assert.False(pending.AutoApplyWindowBackdrop);
+        Assert.False(pending.WasApplied);
+        Assert.False(pending.IsMatched);
+        Assert.Equal("Off", pending.AutoApplyText);
+        Assert.Equal("pending", pending.MatchState);
+        Assert.Equal("not applied", pending.ApplyState);
+
+        surface.ApplyWindowBackdrop(window);
+        var applied = surface.GetWindowSurfaceDiagnostics(window, wasApplied: true);
+
+        Assert.Equal(WindowBackdropType.Acrylic, applied.ActualSystemBackdrop);
+        Assert.True(applied.IsMatched);
+        Assert.True(applied.WasApplied);
+        Assert.Equal("matched", applied.MatchState);
+        Assert.Equal("applied", applied.ApplyState);
+    }
+
+    [Fact]
     public void WindowSurfaceGalleryDiagnostics_ShouldFormatRequestedActualAndApplyState()
     {
         var surface = new FWFluentWindowSurface

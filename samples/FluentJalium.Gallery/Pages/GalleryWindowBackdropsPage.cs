@@ -52,27 +52,38 @@ internal readonly record struct GalleryWindowSurfaceEnvironment(
 }
 
 internal sealed record GalleryWindowSurfaceDiagnostics(
-    FWFluentWindowMaterialProfile Profile,
-    string Role,
-    FWFluentWindowBackdropKind RequestedBackdropKind,
-    WindowBackdropType RequestedSystemBackdrop,
-    WindowBackdropType ActualSystemBackdrop,
-    FWFluentMaterialRole SurfaceRole,
-    FWFluentMaterialKind SurfaceMaterialKind,
-    BorderShape SurfaceShape,
-    bool AutoApplyWindowBackdrop,
-    bool WasApplied,
+    FWFluentWindowSurfaceDiagnostics SurfaceDiagnostics,
     GalleryWindowSurfaceEnvironment Environment)
 {
-    public bool IsMatched => ActualSystemBackdrop == RequestedSystemBackdrop;
+    public FWFluentWindowMaterialProfile Profile => SurfaceDiagnostics.Profile;
+
+    public string Role => SurfaceDiagnostics.Role;
+
+    public FWFluentWindowBackdropKind RequestedBackdropKind => SurfaceDiagnostics.RequestedBackdropKind;
+
+    public WindowBackdropType RequestedSystemBackdrop => SurfaceDiagnostics.RequestedSystemBackdrop;
+
+    public WindowBackdropType ActualSystemBackdrop => SurfaceDiagnostics.ActualSystemBackdrop;
+
+    public FWFluentMaterialRole SurfaceRole => SurfaceDiagnostics.SurfaceRole;
+
+    public FWFluentMaterialKind SurfaceMaterialKind => SurfaceDiagnostics.SurfaceMaterialKind;
+
+    public BorderShape SurfaceShape => SurfaceDiagnostics.SurfaceShape;
+
+    public bool AutoApplyWindowBackdrop => SurfaceDiagnostics.AutoApplyWindowBackdrop;
+
+    public bool WasApplied => SurfaceDiagnostics.WasApplied;
+
+    public bool IsMatched => SurfaceDiagnostics.IsMatched;
 
     public bool UsesSolidFallback => Environment.UsesSolidFallback;
 
-    public string MatchState => IsMatched ? "matched" : "pending";
+    public string MatchState => SurfaceDiagnostics.MatchState;
 
-    public string ApplyState => WasApplied ? "applied" : "not applied";
+    public string ApplyState => SurfaceDiagnostics.ApplyState;
 
-    public string AutoApplyText => AutoApplyWindowBackdrop ? "On" : "Off";
+    public string AutoApplyText => SurfaceDiagnostics.AutoApplyText;
 
     public string EnvironmentState =>
         $"{Environment.ThemeState}, {Environment.ActivationState}, {Environment.HostState}";
@@ -87,18 +98,8 @@ internal sealed record GalleryWindowSurfaceDiagnostics(
     {
         ArgumentNullException.ThrowIfNull(surface);
 
-        var recipe = FWFluentWindowMaterialProfileRecipe.Create(surface.WindowMaterialProfile);
         return new GalleryWindowSurfaceDiagnostics(
-            recipe.Profile,
-            recipe.Role,
-            recipe.WindowBackdropKind,
-            recipe.SystemBackdrop,
-            actualSystemBackdrop,
-            surface.MaterialRole,
-            surface.MaterialKind,
-            surface.Shape,
-            surface.AutoApplyWindowBackdrop,
-            wasApplied,
+            surface.GetWindowSurfaceDiagnostics(actualSystemBackdrop, wasApplied),
             environment ?? GalleryWindowSurfaceEnvironment.Current);
     }
 }
