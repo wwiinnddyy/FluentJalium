@@ -26,6 +26,22 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryChartVisualQaSnapshot(
+    string Chart,
+    string Title,
+    double Width,
+    double Height,
+    int SeriesCount,
+    int DataPointCount,
+    bool HasPalette,
+    LegendPosition LegendPosition,
+    bool IsTooltipEnabled,
+    bool IsAnimationEnabled,
+    bool HasAxes,
+    bool IsGridVisible,
+    bool IsZoomEnabled,
+    bool IsPanEnabled);
+
 internal sealed class GalleryChartsPage
 {
     public UIElement CreateContent()
@@ -109,7 +125,6 @@ internal sealed class GalleryChartsPage
 
     private static UIElement CreateLineChartSample()
     {
-        var output = CreateOutput("Area: on. Smoothing: on. Points: visible.");
         var chart = PrepareAxisChart(new FWLineChart
         {
             LineSmoothing = true,
@@ -139,6 +154,7 @@ internal sealed class GalleryChartsPage
             Point("Thu", 63),
             Point("Fri", 68),
             Point("Sat", 72)));
+        var output = CreateOutput(FormatChartVisualQa("Line chart QA", chart));
 
         return new FWStackPanel
         {
@@ -151,26 +167,124 @@ internal sealed class GalleryChartsPage
                     CreateIconActionButton(FluentIconRegular.DataUsage24, "Area", () =>
                     {
                         chart.ShowArea = !chart.ShowArea;
-                        output.Text = $"Area: {FormatOnOff(chart.ShowArea)}. Smoothing: {FormatOnOff(chart.LineSmoothing)}. Points: {FormatOnOff(chart.ShowDataPoints)}.";
+                        output.Text = FormatChartVisualQa("Area toggled", chart);
                     }),
                     CreateIconActionButton(FluentIconRegular.TextSortAscending24, "Smooth", () =>
                     {
                         chart.LineSmoothing = !chart.LineSmoothing;
-                        output.Text = $"Area: {FormatOnOff(chart.ShowArea)}. Smoothing: {FormatOnOff(chart.LineSmoothing)}. Points: {FormatOnOff(chart.ShowDataPoints)}.";
+                        output.Text = FormatChartVisualQa("Smoothing toggled", chart);
                     }),
                     CreateIconActionButton(FluentIconRegular.InfoSparkle24, "Points", () =>
                     {
                         chart.ShowDataPoints = !chart.ShowDataPoints;
-                        output.Text = $"Area: {FormatOnOff(chart.ShowArea)}. Smoothing: {FormatOnOff(chart.LineSmoothing)}. Points: {FormatOnOff(chart.ShowDataPoints)}.";
+                        output.Text = FormatChartVisualQa("Data points toggled", chart);
                     }),
                     CreateIconActionButton(FluentIconRegular.ArrowCollapseAll24, "Reset", () =>
                     {
                         chart.ResetZoom();
-                        output.Text = "Viewport reset. Mouse wheel zoom remains enabled.";
+                        output.Text = FormatChartVisualQa("Viewport reset", chart);
                     })),
                 CreateStatus(output)
             }
         };
+    }
+
+    internal static GalleryChartVisualQaSnapshot CreateChartVisualQaSnapshot(ChartBase chart)
+    {
+        ArgumentNullException.ThrowIfNull(chart);
+
+        var axisChart = chart as AxisChartBase;
+        return new GalleryChartVisualQaSnapshot(
+            chart.GetType().Name,
+            chart.Title ?? string.Empty,
+            chart.Width,
+            chart.Height,
+            CountChartSeries(chart),
+            CountChartDataPoints(chart),
+            chart.ChartPalette is { Count: > 0 },
+            chart.LegendPosition,
+            chart.IsTooltipEnabled,
+            chart.IsAnimationEnabled,
+            axisChart != null,
+            axisChart?.IsGridLinesVisible ?? false,
+            axisChart?.IsZoomEnabled ?? false,
+            axisChart?.IsPanEnabled ?? false);
+    }
+
+    internal static string FormatChartVisualQa(string action, ChartBase chart)
+    {
+        return FormatChartVisualQa(action, CreateChartVisualQaSnapshot(chart));
+    }
+
+    internal static string FormatChartVisualQa(string action, GalleryChartVisualQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Chart: {snapshot.Chart}. Title: {snapshot.Title}. Size: {snapshot.Width:0}x{snapshot.Height:0}. Series: {snapshot.SeriesCount}. Points: {snapshot.DataPointCount}. Palette: {FormatOnOff(snapshot.HasPalette)}. Legend: {snapshot.LegendPosition}. Tooltip: {FormatOnOff(snapshot.IsTooltipEnabled)}. Animation: {FormatOnOff(snapshot.IsAnimationEnabled)}. Axes: {FormatOnOff(snapshot.HasAxes)}. Grid: {FormatOnOff(snapshot.IsGridVisible)}. Zoom: {FormatOnOff(snapshot.IsZoomEnabled)}. Pan: {FormatOnOff(snapshot.IsPanEnabled)}.";
+    }
+
+    private static int CountChartSeries(ChartBase chart)
+    {
+        return chart switch
+        {
+            LineChart lineChart => lineChart.Series.Count,
+            BarChart barChart => barChart.Series.Count,
+            ScatterPlot scatterPlot => scatterPlot.Series.Count,
+            PieChart pieChart => pieChart.Series.DataPoints.Count > 0 ? 1 : 0,
+            Heatmap heatmap => heatmap.Data != null ? 1 : 0,
+            GaugeChart gaugeChart => gaugeChart.Ranges.Count > 0 ? 1 : 0,
+            TreeMap treeMap => treeMap.Items.Count > 0 ? 1 : 0,
+            CandlestickChart candlestickChart => CountEnumerable(candlestickChart.ItemsSource) > 0 ? 1 : 0,
+            NetworkGraph networkGraph => networkGraph.Nodes.Count > 0 ? 1 : 0,
+            GanttChart ganttChart => ganttChart.Tasks.Count > 0 ? 1 : 0,
+            SankeyDiagram sankeyDiagram => sankeyDiagram.Nodes.Count > 0 ? 1 : 0,
+            _ => 0
+        };
+    }
+
+    private static int CountChartDataPoints(ChartBase chart)
+    {
+        return chart switch
+        {
+            LineChart lineChart => lineChart.Series.Sum(series => CountSeriesDataPoints(series.DataPoints, series.ItemsSource)),
+            BarChart barChart => barChart.Series.Sum(series => CountSeriesDataPoints(series.DataPoints, series.ItemsSource)),
+            ScatterPlot scatterPlot => scatterPlot.Series.Sum(series => CountSeriesDataPoints(series.DataPoints, series.ItemsSource)),
+            PieChart pieChart => pieChart.Series.DataPoints.Count,
+            Heatmap heatmap => heatmap.Data?.Length ?? 0,
+            GaugeChart gaugeChart => gaugeChart.Ranges.Count,
+            TreeMap treeMap => treeMap.Items.Sum(CountTreeMapItems),
+            CandlestickChart candlestickChart => CountEnumerable(candlestickChart.ItemsSource),
+            NetworkGraph networkGraph => networkGraph.Nodes.Count + networkGraph.Links.Count,
+            GanttChart ganttChart => ganttChart.Tasks.Count,
+            SankeyDiagram sankeyDiagram => sankeyDiagram.Nodes.Count + sankeyDiagram.Links.Count,
+            _ => 0
+        };
+    }
+
+    private static int CountSeriesDataPoints<TDataPoint>(ICollection<TDataPoint> dataPoints, System.Collections.IEnumerable? itemsSource)
+    {
+        return dataPoints.Count > 0 ? dataPoints.Count : CountEnumerable(itemsSource);
+    }
+
+    private static int CountTreeMapItems(TreeMapItem item)
+    {
+        return 1 + item.Children.Sum(CountTreeMapItems);
+    }
+
+    private static int CountEnumerable(System.Collections.IEnumerable? items)
+    {
+        if (items == null)
+        {
+            return 0;
+        }
+
+        var count = 0;
+        foreach (var _ in items)
+        {
+            count++;
+        }
+
+        return count;
     }
 
     private static UIElement CreateBarChartSample()

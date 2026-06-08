@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Charts;
@@ -91,6 +92,80 @@ public sealed class FluentChartControlsTests
         Assert.Null(tooltip.SeriesTitle);
         Assert.Null(tooltip.XValue);
         Assert.Null(tooltip.YValue);
+    }
+
+    [Fact]
+    public void GalleryChartsPage_ShouldFormatLineChartVisualQaSnapshot()
+    {
+        var chart = new FWLineChart
+        {
+            Title = "Pipeline signal",
+            Width = 482,
+            Height = 220,
+            IsTooltipEnabled = true,
+            IsAnimationEnabled = false,
+            IsZoomEnabled = true,
+            IsPanEnabled = true,
+            IsGridLinesVisible = true,
+            LegendPosition = LegendPosition.Right,
+            ChartPalette =
+            [
+                new SolidColorBrush(Color.FromRgb(0x41, 0x7E, 0xE0)),
+                new SolidColorBrush(Color.FromRgb(0x00, 0xBC, 0xD4))
+            ]
+        };
+        chart.Series.Add(new LineSeries
+        {
+            Title = "Current",
+            DataPoints =
+            {
+                new ChartDataPoint { XValue = "Mon", YValue = 62 },
+                new ChartDataPoint { XValue = "Tue", YValue = 70 },
+                new ChartDataPoint { XValue = "Wed", YValue = 66 }
+            }
+        });
+        chart.Series.Add(new LineSeries
+        {
+            Title = "Baseline",
+            DataPoints =
+            {
+                new ChartDataPoint { XValue = "Mon", YValue = 55 },
+                new ChartDataPoint { XValue = "Tue", YValue = 58 }
+            }
+        });
+
+        var snapshot = GalleryChartsPage.CreateChartVisualQaSnapshot(chart);
+        var text = GalleryChartsPage.FormatChartVisualQa("Chart visual QA", snapshot);
+
+        Assert.Equal("FWLineChart", snapshot.Chart);
+        Assert.Equal("Pipeline signal", snapshot.Title);
+        Assert.Equal(482, snapshot.Width);
+        Assert.Equal(220, snapshot.Height);
+        Assert.Equal(2, snapshot.SeriesCount);
+        Assert.Equal(5, snapshot.DataPointCount);
+        Assert.True(snapshot.HasPalette);
+        Assert.Equal(LegendPosition.Right, snapshot.LegendPosition);
+        Assert.True(snapshot.IsTooltipEnabled);
+        Assert.False(snapshot.IsAnimationEnabled);
+        Assert.True(snapshot.HasAxes);
+        Assert.True(snapshot.IsGridVisible);
+        Assert.True(snapshot.IsZoomEnabled);
+        Assert.True(snapshot.IsPanEnabled);
+
+        Assert.Contains("Chart visual QA", text, StringComparison.Ordinal);
+        Assert.Contains("Chart: FWLineChart", text, StringComparison.Ordinal);
+        Assert.Contains("Title: Pipeline signal", text, StringComparison.Ordinal);
+        Assert.Contains("Size: 482x220", text, StringComparison.Ordinal);
+        Assert.Contains("Series: 2", text, StringComparison.Ordinal);
+        Assert.Contains("Points: 5", text, StringComparison.Ordinal);
+        Assert.Contains("Palette: on", text, StringComparison.Ordinal);
+        Assert.Contains("Legend: Right", text, StringComparison.Ordinal);
+        Assert.Contains("Tooltip: on", text, StringComparison.Ordinal);
+        Assert.Contains("Animation: off", text, StringComparison.Ordinal);
+        Assert.Contains("Axes: on", text, StringComparison.Ordinal);
+        Assert.Contains("Grid: on", text, StringComparison.Ordinal);
+        Assert.Contains("Zoom: on", text, StringComparison.Ordinal);
+        Assert.Contains("Pan: on", text, StringComparison.Ordinal);
     }
 
     [Theory]

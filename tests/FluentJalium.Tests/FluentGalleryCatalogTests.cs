@@ -192,6 +192,21 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeChartVisualQaSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "charts");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWLineChart", sampleCode);
+        Assert.Contains("CreateLineSeries", sampleCode);
+        Assert.Contains("CreateChartVisualQaSnapshot", sampleCode);
+        Assert.Contains("FormatChartVisualQa", sampleCode);
+        Assert.Contains("Chart visual QA", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeSplitViewAndSettingsCardLayoutSample()
     {
         var page = Assert.Single(

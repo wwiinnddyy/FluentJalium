@@ -727,6 +727,9 @@ chart.Series.Add(CreateLineSeries(
     Point("Wed", 66),
     Point("Thu", 82),
     Point("Fri", 78)));
+
+var chartQa = GalleryChartsPage.CreateChartVisualQaSnapshot(chart);
+Debug.WriteLine(GalleryChartsPage.FormatChartVisualQa("Chart visual QA", chartQa));
 """,
         ["navigation.breadcrumb.pips.selector.tabview.titlebar"] = """
 var navigationView = new FWNavigationView
