@@ -387,6 +387,47 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void FWSplitView_ShouldRequestLightDismissOnlyForOpenOverlayPanes()
+    {
+        var splitView = new FWSplitView
+        {
+            DisplayMode = FWSplitViewDisplayMode.Inline,
+            IsLightDismissEnabled = true,
+            IsPaneOpen = true
+        };
+        var closed = 0;
+        splitView.PaneClosed += (_, _) => closed++;
+
+        Assert.False(splitView.RequestLightDismiss());
+        Assert.True(splitView.IsPaneOpen);
+        Assert.Equal(0, closed);
+
+        splitView.DisplayMode = FWSplitViewDisplayMode.Overlay;
+        splitView.IsLightDismissEnabled = false;
+
+        Assert.False(splitView.RequestLightDismiss());
+        Assert.True(splitView.IsPaneOpen);
+        Assert.Equal(0, closed);
+
+        splitView.IsLightDismissEnabled = true;
+
+        Assert.True(splitView.RequestLightDismiss());
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(1, closed);
+
+        Assert.False(splitView.RequestLightDismiss());
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(1, closed);
+
+        splitView.OpenPane();
+        splitView.DisplayMode = FWSplitViewDisplayMode.CompactOverlay;
+
+        Assert.True(splitView.RequestLightDismiss());
+        Assert.False(splitView.IsPaneOpen);
+        Assert.Equal(2, closed);
+    }
+
+    [Fact]
     public void FWParallaxView_ShouldExposeProgressCurrentOffsetAndDiagnostics()
     {
         var source = new FWGrid();

@@ -170,6 +170,17 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
         IsPaneOpen = !IsPaneOpen;
     }
 
+    public bool RequestLightDismiss()
+    {
+        if (!IsOverlayMode || !IsLightDismissEnabled || !IsPaneOpen)
+        {
+            return false;
+        }
+
+        ClosePane();
+        return true;
+    }
+
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public double ActualPaneLength => (double)GetValue(ActualPaneLengthProperty)!;
 
