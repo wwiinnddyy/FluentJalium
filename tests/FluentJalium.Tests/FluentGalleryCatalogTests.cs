@@ -236,6 +236,48 @@ public sealed class FluentGalleryCatalogTests
         AssertDesignSample(pages, "motiontokens", "FWConnectedAnimationService", "FluentMotionDurationNormal");
     }
 
+    [Fact]
+    public void FluentControlBacklogMatrix_ShouldKeepReferenceAndExecutionCoverage()
+    {
+        var document = File.ReadAllText(FindRepositoryFile("docs", "FLUENT_CONTROL_BACKLOG_MATRIX.md"));
+
+        Assert.Contains("WinUI / WinUI Gallery", document);
+        Assert.Contains("WPF UI", document);
+        Assert.Contains("UI.WPF.Modern", document);
+        Assert.Contains("FluentAvalonia", document);
+        Assert.Contains("Community Toolkit", document);
+        Assert.Contains("FW*", document);
+        Assert.Contains("P0", document);
+        Assert.Contains("P1", document);
+        Assert.Contains("Evaluate", document);
+        Assert.Contains("TaskDialog real-window QA", document);
+        Assert.Contains("ItemsRepeater visual QA", document);
+        Assert.Contains("Settings visual QA", document);
+        Assert.Contains("Navigation app-shell recipes", document);
+        Assert.Contains("Forms pattern Gallery page", document);
+        Assert.Contains("FWSemanticZoom", document);
+        Assert.Contains("FWFlipView", document);
+        Assert.Contains("IFluentJaliumControl", document);
+        Assert.Contains("Gallery changes must include catalog metadata", document);
+    }
+
+    private static string FindRepositoryFile(params string[] pathSegments)
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory != null)
+        {
+            var candidate = Path.Combine(new[] { directory.FullName }.Concat(pathSegments).ToArray());
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            directory = directory.Parent;
+        }
+
+        throw new FileNotFoundException($"Could not find repository file '{Path.Combine(pathSegments)}'.", Path.Combine(pathSegments));
+    }
+
     private static void AssertDesignSample(GalleryPageInfo[] pages, string uniqueId, string firstExpected, string secondExpected)
     {
         var page = Assert.Single(pages, page => page.UniqueId == uniqueId);
