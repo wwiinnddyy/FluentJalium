@@ -303,6 +303,45 @@ public sealed class FluentDateTimeControlsTests
     }
 
     [Fact]
+    public void FWCalendarDatePicker_ShouldTrackSelectedDateBoundsAndCalendarEvents()
+    {
+        var today = DateTime.Today;
+        var calendarDatePicker = new FWCalendarDatePicker
+        {
+            Header = "Review date",
+            PlaceholderText = "Choose a date",
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(90),
+            SelectedDateFormat = DatePickerFormat.Long
+        };
+        var changed = 0;
+        var opened = 0;
+        var closed = 0;
+        calendarDatePicker.SelectedDateChanged += (_, e) =>
+        {
+            changed++;
+            Assert.Contains(today.AddDays(7), e.AddedItems.Cast<DateTime>());
+        };
+        calendarDatePicker.CalendarOpened += (_, _) => opened++;
+        calendarDatePicker.CalendarClosed += (_, _) => closed++;
+
+        calendarDatePicker.SelectedDate = today.AddDays(7);
+        calendarDatePicker.IsDropDownOpen = true;
+        calendarDatePicker.IsDropDownOpen = false;
+
+        Assert.Equal("Review date", calendarDatePicker.Header);
+        Assert.Equal("Choose a date", calendarDatePicker.PlaceholderText);
+        Assert.Equal(today, calendarDatePicker.DisplayDateStart);
+        Assert.Equal(today.AddDays(90), calendarDatePicker.DisplayDateEnd);
+        Assert.Equal(DatePickerFormat.Long, calendarDatePicker.SelectedDateFormat);
+        Assert.Equal(today.AddDays(7), calendarDatePicker.SelectedDate);
+        Assert.False(calendarDatePicker.IsDropDownOpen);
+        Assert.Equal(1, changed);
+        Assert.Equal(1, opened);
+        Assert.Equal(1, closed);
+    }
+
+    [Fact]
     public void FWTimePicker_ShouldTrackSelectedTimeClockIdentifierIncrementAndDropDown()
     {
         var timePicker = new FWTimePicker
@@ -390,6 +429,50 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(today.AddDays(40), calendarView.DisplayDateEnd);
         Assert.Equal(DayOfWeek.Monday, calendarView.FirstDayOfWeek);
         Assert.True(calendarView.IsTodayHighlighted);
+    }
+
+    [Fact]
+    public void FWCalendarView_ShouldTrackSelectionDisplayAndBlackouts()
+    {
+        var today = DateTime.Today;
+        var calendarView = new FWCalendarView
+        {
+            DisplayDate = today,
+            DisplayDateStart = today.AddDays(-5),
+            DisplayDateEnd = today.AddDays(45),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        calendarView.BlackoutDates.Add(today.AddDays(4).Date);
+        var selectedChanged = 0;
+        var displayChanges = new List<CalendarDateChangedEventArgs>();
+        calendarView.SelectedDateChanged += (_, e) =>
+        {
+            selectedChanged++;
+            Assert.Contains(today.AddDays(2), e.AddedItems.Cast<DateTime>());
+        };
+        calendarView.DisplayDateChanged += (_, e) => displayChanges.Add(e);
+
+        calendarView.SelectedDate = today.AddDays(2);
+        calendarView.DisplayDate = today.AddMonths(1);
+        calendarView.FirstDayOfWeek = DayOfWeek.Sunday;
+        calendarView.IsTodayHighlighted = false;
+
+        Assert.Equal(today.AddDays(2), calendarView.SelectedDate);
+        Assert.Equal(today.AddMonths(1), calendarView.DisplayDate);
+        Assert.Equal(today.AddDays(-5), calendarView.DisplayDateStart);
+        Assert.Equal(today.AddDays(45), calendarView.DisplayDateEnd);
+        Assert.Contains(today.AddDays(4).Date, calendarView.BlackoutDates);
+        Assert.Equal(DayOfWeek.Sunday, calendarView.FirstDayOfWeek);
+        Assert.False(calendarView.IsTodayHighlighted);
+        Assert.Equal(CalendarSelectionMode.SingleDate, calendarView.SelectionMode);
+        Assert.Equal(1, selectedChanged);
+        Assert.Equal(2, displayChanges.Count);
+        Assert.Equal(today, displayChanges[0].RemovedDate);
+        Assert.Equal(today.AddMonths(1), displayChanges[0].AddedDate);
+        Assert.Null(displayChanges[1].RemovedDate);
+        Assert.Null(displayChanges[1].AddedDate);
     }
 
     [Fact]
