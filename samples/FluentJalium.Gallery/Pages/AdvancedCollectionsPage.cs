@@ -18,13 +18,50 @@ public class AdvancedCollectionsPage : Page
     private FWItemsRepeater? _repeater;
     private FWScroller? _repeaterScroller;
     private ScrollViewer? _repeaterScrollViewer;
+    private TextBlock? _repeaterScenarioText;
     private TextBlock? _repeaterDiagnosticsText;
     private ObservableCollection<SampleItem> _items;
+    private ItemsRepeaterGalleryProfile _currentProfile;
+    private int _cacheProfileIndex;
+    private string _lastQaAction = "Initialized";
+
+    internal enum ItemsRepeaterGalleryScenario
+    {
+        Baseline,
+        LargeListStress,
+        HorizontalVirtualization
+    }
+
+    internal readonly record struct ItemsRepeaterGalleryProfile(
+        ItemsRepeaterGalleryScenario Scenario,
+        string Name,
+        string Intent,
+        int ItemCount,
+        string ItemTitlePrefix,
+        Orientation Orientation,
+        bool UseUniformGridLayout,
+        double EstimatedItemExtent,
+        double HorizontalCacheLength,
+        double VerticalCacheLength,
+        double ViewportStart,
+        double ViewportLength,
+        FWItemsRepeaterViewportSource PreferredViewportSource)
+    {
+        public double ActiveCacheLength => Orientation == Orientation.Horizontal
+            ? HorizontalCacheLength
+            : VerticalCacheLength;
+    }
+
+    internal readonly record struct ItemsRepeaterCacheProfile(
+        string Name,
+        double HorizontalCacheLength,
+        double VerticalCacheLength);
 
     public AdvancedCollectionsPage()
     {
         Title = "Advanced Collections";
-        _items = GenerateSampleItems();
+        _currentProfile = CreateItemsRepeaterQaProfile(ItemsRepeaterGalleryScenario.Baseline);
+        _items = CreateItemsRepeaterSampleItems(_currentProfile);
         InitializeComponent();
     }
 
@@ -142,6 +179,27 @@ public class AdvancedCollectionsPage : Page
         };
         removeItemButton.Click += (s, e) => RemoveItem();
 
+        var baselineButton = new Button
+        {
+            Content = "Baseline 20",
+            MinWidth = 110
+        };
+        baselineButton.Click += (s, e) => ApplyItemsRepeaterProfile(ItemsRepeaterGalleryScenario.Baseline);
+
+        var largeListButton = new Button
+        {
+            Content = "Large list",
+            MinWidth = 110
+        };
+        largeListButton.Click += (s, e) => ApplyItemsRepeaterProfile(ItemsRepeaterGalleryScenario.LargeListStress);
+
+        var horizontalButton = new Button
+        {
+            Content = "Horizontal",
+            MinWidth = 110
+        };
+        horizontalButton.Click += (s, e) => ApplyItemsRepeaterProfile(ItemsRepeaterGalleryScenario.HorizontalVirtualization);
+
         var firstWindowButton = new Button
         {
             Content = "Window 0-5",
@@ -168,14 +226,43 @@ public class AdvancedCollectionsPage : Page
             Content = "Viewport",
             MinWidth = 100
         };
-        viewportButton.Click += (s, e) => AttachViewportWindow();
+        viewportButton.Click += (s, e) => AttachViewportSource(_currentProfile.PreferredViewportSource, "Restored seeded viewport");
+
+        var scrollViewerButton = new Button
+        {
+            Content = "Attach ScrollViewer",
+            MinWidth = 150
+        };
+        scrollViewerButton.Click += (s, e) => AttachViewportSource(FWItemsRepeaterViewportSource.ScrollViewer, "Attached raw ScrollViewer");
+
+        var scrollerButton = new Button
+        {
+            Content = "Attach FWScroller",
+            MinWidth = 140
+        };
+        scrollerButton.Click += (s, e) => AttachViewportSource(FWItemsRepeaterViewportSource.Scroller, "Attached FWScroller");
+
+        var reattachButton = new Button
+        {
+            Content = "Reattach swap",
+            MinWidth = 130
+        };
+        reattachButton.Click += (s, e) => ReattachViewportSource();
 
         var cacheButton = new Button
         {
-            Content = "Cache 80/200",
+            Content = "Cycle cache",
             MinWidth = 120
         };
-        cacheButton.Click += (s, e) => ToggleViewportCache();
+        cacheButton.Click += (s, e) => CycleViewportCache();
+
+        _repeaterScenarioText = new TextBlock
+        {
+            FontSize = 13,
+            FontWeight = FontWeights.Medium,
+            Opacity = 0.86,
+            TextWrapping = TextWrapping.Wrap
+        };
 
         _repeaterDiagnosticsText = new TextBlock
         {
@@ -188,13 +275,20 @@ public class AdvancedCollectionsPage : Page
         panel.Children.Add(gridLayoutButton);
         panel.Children.Add(addItemButton);
         panel.Children.Add(removeItemButton);
+        panel.Children.Add(baselineButton);
+        panel.Children.Add(largeListButton);
+        panel.Children.Add(horizontalButton);
         panel.Children.Add(firstWindowButton);
         panel.Children.Add(laterWindowButton);
         panel.Children.Add(allItemsButton);
         panel.Children.Add(viewportButton);
+        panel.Children.Add(scrollViewerButton);
+        panel.Children.Add(scrollerButton);
+        panel.Children.Add(reattachButton);
         panel.Children.Add(cacheButton);
 
         stack.Children.Add(panel);
+        stack.Children.Add(_repeaterScenarioText);
         stack.Children.Add(_repeaterDiagnosticsText);
 
         return stack;
@@ -227,20 +321,17 @@ public class AdvancedCollectionsPage : Page
         {
             ItemsSource = _items,
             ItemTemplate = CreateItemTemplate(),
-            Layout = new StackLayout
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 8
-            },
-            HorizontalCacheLength = 200,
-            VerticalCacheLength = 80,
-            EstimatedItemExtent = 98
+            Layout = CreateItemsRepeaterLayout(_currentProfile),
+            HorizontalCacheLength = _currentProfile.HorizontalCacheLength,
+            VerticalCacheLength = _currentProfile.VerticalCacheLength,
+            EstimatedItemExtent = _currentProfile.EstimatedItemExtent
         };
 
         _repeaterScrollViewer.Content = _repeater;
         _repeaterScroller.AttachScrollViewer(_repeaterScrollViewer);
         border.Child = _repeaterScrollViewer;
-        AttachViewportWindow();
+        UpdateScrollModes(_currentProfile);
+        AttachViewportSource(_currentProfile.PreferredViewportSource, "Initialized seeded viewport");
         UpdateRepeaterDiagnostics();
 
         return border;
@@ -259,7 +350,8 @@ public class AdvancedCollectionsPage : Page
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
                 Padding = new Thickness(12),
-                Margin = new Thickness(0, 0, 0, 8)
+                Margin = new Thickness(0, 0, 0, 8),
+                MinWidth = 168
             };
 
             var stack = new StackPanel { Spacing = 4 };
@@ -278,8 +370,16 @@ public class AdvancedCollectionsPage : Page
             };
             descBlock.SetBinding(TextBlock.TextProperty, new Binding("Description"));
 
+            var statusBlock = new TextBlock
+            {
+                FontSize = 12,
+                Opacity = 0.64
+            };
+            statusBlock.SetBinding(TextBlock.TextProperty, new Binding("Status"));
+
             stack.Children.Add(titleBlock);
             stack.Children.Add(descBlock);
+            stack.Children.Add(statusBlock);
             border.Child = stack;
 
             return border;
@@ -295,9 +395,10 @@ public class AdvancedCollectionsPage : Page
         {
             _repeater.Layout = new StackLayout
             {
-                Orientation = Orientation.Vertical,
+                Orientation = _currentProfile.Orientation,
                 Spacing = 8
             };
+            _lastQaAction = "Applied stack layout";
             UpdateRepeaterDiagnostics();
         }
     }
@@ -308,23 +409,21 @@ public class AdvancedCollectionsPage : Page
         {
             _repeater.Layout = new UniformGridLayout
             {
-                Orientation = Orientation.Vertical,
+                Orientation = _currentProfile.Orientation,
                 MinItemWidth = 250,
                 MinItemHeight = 80,
                 MinColumnSpacing = 8,
                 MinRowSpacing = 8
             };
+            _lastQaAction = "Applied grid layout";
             UpdateRepeaterDiagnostics();
         }
     }
 
     private void AddItem()
     {
-        _items.Add(new SampleItem
-        {
-            Title = $"Item {_items.Count + 1}",
-            Description = $"Description for item {_items.Count + 1}"
-        });
+        _items.Add(CreateItemsRepeaterSampleItem(_currentProfile, _items.Count + 1));
+        _lastQaAction = "Added one item";
         UpdateRepeaterDiagnostics();
     }
 
@@ -333,6 +432,7 @@ public class AdvancedCollectionsPage : Page
         if (_items.Count > 0)
         {
             _items.RemoveAt(_items.Count - 1);
+            _lastQaAction = "Removed one item";
             UpdateRepeaterDiagnostics();
         }
     }
@@ -340,6 +440,7 @@ public class AdvancedCollectionsPage : Page
     private void RealizeWindow(int startIndex, int itemCount)
     {
         _repeater?.RealizeRange(startIndex, itemCount);
+        _lastQaAction = $"Manual range {startIndex}-{startIndex + itemCount - 1}";
         UpdateRepeaterDiagnostics();
     }
 
@@ -347,36 +448,88 @@ public class AdvancedCollectionsPage : Page
     {
         _repeater?.DetachViewport();
         _repeater?.ResetRealizationWindow();
+        _lastQaAction = "Reset to all items";
         UpdateRepeaterDiagnostics();
     }
 
-    private void AttachViewportWindow()
+    private void ApplyItemsRepeaterProfile(ItemsRepeaterGalleryScenario scenario)
     {
-        if (_repeater == null || _repeaterScroller == null)
+        _currentProfile = CreateItemsRepeaterQaProfile(scenario);
+        _items = CreateItemsRepeaterSampleItems(_currentProfile);
+        _cacheProfileIndex = 0;
+
+        if (_repeater == null)
         {
             return;
         }
 
-        _repeater.AttachViewport(_repeaterScroller);
+        _repeater.DetachViewport();
+        _repeater.ItemsSource = _items;
+        _repeater.Layout = CreateItemsRepeaterLayout(_currentProfile);
+        _repeater.EstimatedItemExtent = _currentProfile.EstimatedItemExtent;
+        _repeater.HorizontalCacheLength = _currentProfile.HorizontalCacheLength;
+        _repeater.VerticalCacheLength = _currentProfile.VerticalCacheLength;
+        UpdateScrollModes(_currentProfile);
+        AttachViewportSource(_currentProfile.PreferredViewportSource, $"Applied {_currentProfile.Name}");
         UpdateRepeaterDiagnostics();
     }
 
-    private void ToggleViewportCache()
+    private void AttachViewportSource(FWItemsRepeaterViewportSource source, string action)
+    {
+        if (_repeater == null || _repeaterScrollViewer == null)
+        {
+            return;
+        }
+
+        if (source == FWItemsRepeaterViewportSource.Scroller)
+        {
+            if (_repeaterScroller == null)
+            {
+                return;
+            }
+
+            _repeaterScroller.AttachScrollViewer(_repeaterScrollViewer);
+            _repeater.AttachViewport(_repeaterScroller, _currentProfile.Orientation);
+        }
+        else
+        {
+            _repeater.AttachViewport(_repeaterScrollViewer, _currentProfile.Orientation);
+        }
+
+        SeedViewportFromCurrentProfile();
+        _lastQaAction = action;
+        UpdateRepeaterDiagnostics();
+    }
+
+    private void ReattachViewportSource()
     {
         if (_repeater == null)
         {
             return;
         }
 
-        _repeater.VerticalCacheLength = Math.Abs(_repeater.VerticalCacheLength - 80) < 0.1 ? 200 : 80;
-        if (_repeater.RealizationSource == FWItemsRepeaterRealizationSource.Viewport)
+        var previousSource = _repeater.AttachedViewportSource;
+        var nextSource = previousSource == FWItemsRepeaterViewportSource.Scroller
+            ? FWItemsRepeaterViewportSource.ScrollViewer
+            : FWItemsRepeaterViewportSource.Scroller;
+        AttachViewportSource(nextSource, $"Reattached {previousSource} -> {nextSource}");
+    }
+
+    private void CycleViewportCache()
+    {
+        if (_repeater == null)
         {
-            AttachViewportWindow();
+            return;
         }
-        else
-        {
-            UpdateRepeaterDiagnostics();
-        }
+
+        var cacheProfiles = CreateItemsRepeaterCacheProfiles();
+        _cacheProfileIndex = (_cacheProfileIndex + 1) % cacheProfiles.Count;
+        var cacheProfile = cacheProfiles[_cacheProfileIndex];
+        _repeater.HorizontalCacheLength = cacheProfile.HorizontalCacheLength;
+        _repeater.VerticalCacheLength = cacheProfile.VerticalCacheLength;
+        SeedViewportFromCurrentProfile();
+        _lastQaAction = $"Cache profile {cacheProfile.Name}";
+        UpdateRepeaterDiagnostics();
     }
 
     private void UpdateRepeaterDiagnostics()
@@ -387,31 +540,209 @@ public class AdvancedCollectionsPage : Page
         }
 
         var diagnostics = _repeater.GetDiagnostics();
-        var range = diagnostics.HasRealizedElements
-            ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
-            : "none";
-        var viewportState = diagnostics.IsViewportAttached ? $"attached/{diagnostics.AttachedViewportSource}" : "manual";
-        _repeaterDiagnosticsText.Text =
-            $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} ({viewportState}) | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
+        if (_repeaterScenarioText != null)
+        {
+            _repeaterScenarioText.Text = CreateItemsRepeaterScenarioText(_currentProfile, diagnostics, _lastQaAction);
+        }
+
+        _repeaterDiagnosticsText.Text = CreateItemsRepeaterDiagnosticsText(diagnostics);
     }
 
-    private ObservableCollection<SampleItem> GenerateSampleItems()
+    private void SeedViewportFromCurrentProfile()
     {
-        var items = new ObservableCollection<SampleItem>();
-        for (int i = 1; i <= 20; i++)
+        if (_repeater == null || _repeaterScrollViewer == null)
         {
-            items.Add(new SampleItem
-            {
-                Title = $"Sample Item {i}",
-                Description = $"This is a description for item {i} demonstrating FWItemsRepeater"
-            });
+            return;
         }
+
+        if (_currentProfile.Orientation == Orientation.Horizontal)
+        {
+            _repeaterScrollViewer.ScrollToHorizontalOffset(_currentProfile.ViewportStart);
+        }
+        else
+        {
+            _repeaterScrollViewer.ScrollToVerticalOffset(_currentProfile.ViewportStart);
+        }
+
+        _repeater.ApplyViewport(
+            _currentProfile.ViewportStart,
+            _currentProfile.ViewportLength,
+            _currentProfile.Orientation);
+    }
+
+    private void UpdateScrollModes(ItemsRepeaterGalleryProfile profile)
+    {
+        if (_repeaterScrollViewer != null)
+        {
+            _repeaterScrollViewer.HorizontalScrollBarVisibility = profile.Orientation == Orientation.Horizontal
+                ? ScrollBarVisibility.Auto
+                : ScrollBarVisibility.Disabled;
+            _repeaterScrollViewer.VerticalScrollBarVisibility = profile.Orientation == Orientation.Horizontal
+                ? ScrollBarVisibility.Disabled
+                : ScrollBarVisibility.Auto;
+        }
+
+        if (_repeaterScroller != null)
+        {
+            _repeaterScroller.HorizontalScrollMode = profile.Orientation == Orientation.Horizontal
+                ? ScrollMode.Auto
+                : ScrollMode.Disabled;
+            _repeaterScroller.VerticalScrollMode = profile.Orientation == Orientation.Horizontal
+                ? ScrollMode.Disabled
+                : ScrollMode.Auto;
+        }
+    }
+
+    internal static ItemsRepeaterGalleryProfile CreateItemsRepeaterQaProfile(ItemsRepeaterGalleryScenario scenario)
+    {
+        return scenario switch
+        {
+            ItemsRepeaterGalleryScenario.LargeListStress => new ItemsRepeaterGalleryProfile(
+                scenario,
+                "Large-list stress",
+                "1500 items seeded into a small viewport to verify recycler stability.",
+                1500,
+                "Stress Row",
+                Orientation.Vertical,
+                false,
+                64,
+                240,
+                320,
+                2560,
+                480,
+                FWItemsRepeaterViewportSource.Scroller),
+            ItemsRepeaterGalleryScenario.HorizontalVirtualization => new ItemsRepeaterGalleryProfile(
+                scenario,
+                "Horizontal virtualization",
+                "Horizontal stack window with horizontal cache and ScrollViewer reattachment checks.",
+                96,
+                "Lane",
+                Orientation.Horizontal,
+                false,
+                180,
+                360,
+                80,
+                720,
+                540,
+                FWItemsRepeaterViewportSource.ScrollViewer),
+            _ => new ItemsRepeaterGalleryProfile(
+                ItemsRepeaterGalleryScenario.Baseline,
+                "Baseline viewport",
+                "20 items with a seeded FWScroller viewport for quick visual QA.",
+                20,
+                "Sample Item",
+                Orientation.Vertical,
+                false,
+                98,
+                200,
+                80,
+                0,
+                320,
+                FWItemsRepeaterViewportSource.Scroller)
+        };
+    }
+
+    internal static IReadOnlyList<ItemsRepeaterCacheProfile> CreateItemsRepeaterCacheProfiles()
+    {
+        return new[]
+        {
+            new ItemsRepeaterCacheProfile("Balanced", 200, 80),
+            new ItemsRepeaterCacheProfile("Tight", 80, 40),
+            new ItemsRepeaterCacheProfile("Stress buffer", 360, 260)
+        };
+    }
+
+    internal static ObservableCollection<SampleItem> CreateItemsRepeaterSampleItems(ItemsRepeaterGalleryProfile profile)
+    {
+        if (profile.ItemCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(profile), "Item count cannot be negative.");
+        }
+
+        var items = new ObservableCollection<SampleItem>();
+        for (var index = 1; index <= profile.ItemCount; index++)
+        {
+            items.Add(CreateItemsRepeaterSampleItem(profile, index));
+        }
+
         return items;
     }
 
-    private class SampleItem
+    internal static SampleItem CreateItemsRepeaterSampleItem(ItemsRepeaterGalleryProfile profile, int index)
+    {
+        if (index <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Item index must be positive.");
+        }
+
+        var paddedIndex = index.ToString("0000");
+        return new SampleItem
+        {
+            Title = profile.Scenario == ItemsRepeaterGalleryScenario.Baseline
+                ? $"{profile.ItemTitlePrefix} {index}"
+                : $"{profile.ItemTitlePrefix} {paddedIndex}",
+            Description = $"{profile.Name} QA item {index} of {profile.ItemCount}. {profile.Intent}",
+            Status = $"{profile.Orientation} | extent {profile.EstimatedItemExtent:0}px | cache H{profile.HorizontalCacheLength:0}/V{profile.VerticalCacheLength:0}"
+        };
+    }
+
+    internal static VirtualizingLayout CreateItemsRepeaterLayout(ItemsRepeaterGalleryProfile profile)
+    {
+        if (profile.UseUniformGridLayout)
+        {
+            return new UniformGridLayout
+            {
+                Orientation = profile.Orientation,
+                MinItemWidth = profile.Orientation == Orientation.Horizontal ? 180 : 250,
+                MinItemHeight = 80,
+                MinColumnSpacing = 8,
+                MinRowSpacing = 8
+            };
+        }
+
+        return new StackLayout
+        {
+            Orientation = profile.Orientation,
+            Spacing = profile.Orientation == Orientation.Horizontal ? 10 : 8
+        };
+    }
+
+    internal static string CreateItemsRepeaterScenarioText(
+        ItemsRepeaterGalleryProfile profile,
+        FWItemsRepeaterDiagnostics diagnostics,
+        string lastAction)
+    {
+        var attachment = diagnostics.IsViewportAttached
+            ? $"{diagnostics.AttachedViewportSource}/{diagnostics.AttachedViewportOrientation}"
+            : "detached";
+
+        return
+            $"Scenario: {profile.Name} | Goal: {profile.Intent} | Source: {attachment} | Items: {diagnostics.ItemCount} | Seed viewport: {profile.ViewportStart:0}-{profile.ViewportStart + profile.ViewportLength:0} | Last action: {lastAction}";
+    }
+
+    internal static string CreateItemsRepeaterDiagnosticsText(FWItemsRepeaterDiagnostics diagnostics)
+    {
+        var range = diagnostics.HasRealizedElements
+            ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
+            : "none";
+        var requested = diagnostics.RequestedRealizedItemCount > 0
+            ? $"{diagnostics.RequestedFirstRealizedIndex}-{diagnostics.RequestedFirstRealizedIndex + diagnostics.RequestedRealizedItemCount - 1}"
+            : "none";
+        var viewportState = diagnostics.IsViewportAttached
+            ? $"attached/{diagnostics.AttachedViewportSource}/{diagnostics.AttachedViewportOrientation}"
+            : "detached/manual";
+        var virtualizationState = diagnostics.ItemCount > 0 && diagnostics.RealizedElementCount < diagnostics.ItemCount
+            ? "virtualized"
+            : "all-realized";
+
+        return
+            $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} ({viewportState}) | QA: {virtualizationState} | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Requested: {requested} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
+    }
+
+    internal sealed class SampleItem
     {
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
     }
 }

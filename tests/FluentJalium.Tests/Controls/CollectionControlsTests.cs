@@ -1,10 +1,11 @@
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 
 namespace FluentJalium.Tests.Controls;
 
-public class FWItemsRepeaterTests
+public class CollectionControlsTests
 {
     [Fact]
     public void Constructor_ShouldInitializeWithDefaultValues()
@@ -735,12 +736,162 @@ public class FWItemsRepeaterTests
         Assert.Equal(6, diagnostics.RequestedRealizedItemCount);
     }
 
+    [Fact]
+    public void GalleryProfileFactory_ShouldDescribeItemsRepeaterVisualQaScenarios()
+    {
+        // Arrange & Act
+        var baseline = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.Baseline);
+        var largeList = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.LargeListStress);
+        var horizontal = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.HorizontalVirtualization);
+        var cacheProfiles = AdvancedCollectionsPage.CreateItemsRepeaterCacheProfiles();
+
+        // Assert
+        Assert.Equal(20, baseline.ItemCount);
+        Assert.Equal(FWItemsRepeaterViewportSource.Scroller, baseline.PreferredViewportSource);
+        Assert.Equal(1500, largeList.ItemCount);
+        Assert.Equal(Orientation.Vertical, largeList.Orientation);
+        Assert.Equal(320, largeList.VerticalCacheLength);
+        Assert.Equal(96, horizontal.ItemCount);
+        Assert.Equal(Orientation.Horizontal, horizontal.Orientation);
+        Assert.Equal(horizontal.HorizontalCacheLength, horizontal.ActiveCacheLength);
+        Assert.Equal(FWItemsRepeaterViewportSource.ScrollViewer, horizontal.PreferredViewportSource);
+        Assert.Collection(
+            cacheProfiles,
+            profile => Assert.Equal("Balanced", profile.Name),
+            profile => Assert.Equal("Tight", profile.Name),
+            profile => Assert.Equal("Stress buffer", profile.Name));
+    }
+
+    [Fact]
+    public void GallerySampleItemFactory_ShouldCreateLargeListStressData()
+    {
+        // Arrange
+        var profile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.LargeListStress);
+
+        // Act
+        var items = AdvancedCollectionsPage.CreateItemsRepeaterSampleItems(profile);
+
+        // Assert
+        Assert.Equal(1500, items.Count);
+        Assert.Equal("Stress Row 0001", items[0].Title);
+        Assert.Equal("Stress Row 1500", items[^1].Title);
+        Assert.Contains("Large-list stress QA item 1 of 1500", items[0].Description);
+        Assert.Contains("Vertical", items[0].Status);
+        Assert.Contains("cache H240/V320", items[0].Status);
+    }
+
+    [Fact]
+    public void GalleryDiagnosticsText_ShouldSurfaceVirtualizationCacheAndAttachmentState()
+    {
+        // Arrange
+        var profile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.LargeListStress);
+        var repeater = CreateRepeaterFromGalleryProfile(profile);
+
+        // Act
+        repeater.ApplyViewport(profile.ViewportStart, profile.ViewportLength, profile.Orientation);
+        var diagnostics = repeater.GetDiagnostics();
+        var scenarioText = AdvancedCollectionsPage.CreateItemsRepeaterScenarioText(
+            profile,
+            diagnostics,
+            "Applied large-list stress");
+        var diagnosticsText = AdvancedCollectionsPage.CreateItemsRepeaterDiagnosticsText(diagnostics);
+
+        // Assert
+        Assert.Equal(1500, diagnostics.ItemCount);
+        Assert.True(diagnostics.RealizedElementCount < diagnostics.ItemCount);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.Equal(320, diagnostics.ActiveCacheLength);
+        Assert.Contains("Scenario: Large-list stress", scenarioText);
+        Assert.Contains("Items: 1500", scenarioText);
+        Assert.Contains("Last action: Applied large-list stress", scenarioText);
+        Assert.Contains("QA: virtualized", diagnosticsText);
+        Assert.Contains("Cache: active 320, H240/V320", diagnosticsText);
+        Assert.Contains("Requested:", diagnosticsText);
+        Assert.Contains("Range:", diagnosticsText);
+    }
+
+    [Fact]
+    public void GalleryHorizontalProfile_ShouldUseHorizontalCacheAndLayout()
+    {
+        // Arrange
+        var profile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.HorizontalVirtualization);
+        var repeater = CreateRepeaterFromGalleryProfile(profile);
+
+        // Act
+        repeater.ApplyViewport(profile.ViewportStart, profile.ViewportLength, profile.Orientation);
+        var diagnostics = repeater.GetDiagnostics();
+        var diagnosticsText = AdvancedCollectionsPage.CreateItemsRepeaterDiagnosticsText(diagnostics);
+
+        // Assert
+        var layout = Assert.IsType<StackLayout>(repeater.Layout);
+        Assert.Equal(Orientation.Horizontal, layout.Orientation);
+        Assert.Equal(Orientation.Horizontal, diagnostics.ViewportOrientation);
+        Assert.Equal(profile.HorizontalCacheLength, diagnostics.ActiveCacheLength);
+        Assert.Equal(FWItemsRepeaterRealizationSource.Viewport, diagnostics.RealizationSource);
+        Assert.True(diagnostics.RealizedElementCount < diagnostics.ItemCount);
+        Assert.Contains("Axis: Horizontal", diagnosticsText);
+        Assert.Contains("Cache: active 360, H360/V80", diagnosticsText);
+    }
+
+    [Fact]
+    public void GalleryReattachmentDiagnostics_ShouldReportLatestViewportSource()
+    {
+        // Arrange
+        var profile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.HorizontalVirtualization);
+        var oldScrollViewer = CreateScrollViewer(viewportWidth: 60, viewportHeight: 30, contentWidth: 400, contentHeight: 30);
+        var newScrollViewer = CreateScrollViewer(viewportWidth: 90, viewportHeight: 30, contentWidth: 800, contentHeight: 30);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(newScrollViewer);
+        var repeater = CreateRepeaterFromGalleryProfile(profile);
+        repeater.AttachViewport(oldScrollViewer, Orientation.Horizontal);
+        oldScrollViewer.ScrollToHorizontalOffset(180);
+
+        // Act
+        repeater.AttachViewport(scroller, Orientation.Horizontal);
+        newScrollViewer.ScrollToHorizontalOffset(360);
+        oldScrollViewer.ScrollToHorizontalOffset(540);
+        var diagnostics = repeater.GetDiagnostics();
+        var scenarioText = AdvancedCollectionsPage.CreateItemsRepeaterScenarioText(
+            profile,
+            diagnostics,
+            "Reattached ScrollViewer -> Scroller");
+
+        // Assert
+        Assert.True(diagnostics.IsViewportAttached);
+        Assert.Equal(FWItemsRepeaterViewportSource.Scroller, diagnostics.AttachedViewportSource);
+        Assert.Equal(Orientation.Horizontal, diagnostics.AttachedViewportOrientation);
+        Assert.Equal(360, diagnostics.ViewportStart);
+        Assert.Contains("Source: Scroller/Horizontal", scenarioText);
+        Assert.Contains("Reattached ScrollViewer -> Scroller", scenarioText);
+    }
+
     private static DataTemplate CreateTextTemplate()
     {
         var template = new DataTemplate();
         template.SetVisualTree(() => new TextBlock());
         template.Seal();
         return template;
+    }
+
+    private static FWItemsRepeater CreateRepeaterFromGalleryProfile(
+        AdvancedCollectionsPage.ItemsRepeaterGalleryProfile profile)
+    {
+        return new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = AdvancedCollectionsPage.CreateItemsRepeaterSampleItems(profile),
+            Layout = AdvancedCollectionsPage.CreateItemsRepeaterLayout(profile),
+            EstimatedItemExtent = profile.EstimatedItemExtent,
+            HorizontalCacheLength = profile.HorizontalCacheLength,
+            VerticalCacheLength = profile.VerticalCacheLength
+        };
     }
 
     private static ScrollViewer CreateScrollViewer(

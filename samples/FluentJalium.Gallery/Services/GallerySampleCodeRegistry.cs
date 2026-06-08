@@ -562,18 +562,22 @@ var splitter = new FWGridSplitter
 };
 """,
         ["advancedcollections.itemsrepeater"] = """
+var stressRows = Enumerable.Range(1, 1500)
+    .Select(index => $"Stress Row {index:0000}")
+    .ToArray();
+
 var repeater = new FWItemsRepeater
 {
-    ItemsSource = new[] { "Overview", "Inputs", "Charts", "Status" },
+    ItemsSource = stressRows,
     ItemTemplate = CreateItemTemplate(),
     Layout = new StackLayout
     {
         Orientation = Orientation.Vertical,
         Spacing = 8
     },
-    HorizontalCacheLength = 200,
-    VerticalCacheLength = 80,
-    EstimatedItemExtent = 48
+    HorizontalCacheLength = 240,
+    VerticalCacheLength = 320,
+    EstimatedItemExtent = 64
 };
 
 var scroller = new FWScroller();
@@ -584,10 +588,24 @@ var scrollViewer = new FWScrollViewer
 scroller.AttachScrollViewer(scrollViewer);
 
 repeater.AttachViewport(scroller);
+repeater.ApplyViewport(2560, 480);
 var diagnostics = repeater.GetDiagnostics();
-Debug.WriteLine($"Viewport source: {diagnostics.AttachedViewportSource}; window: {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}.");
-repeater.ApplyViewport(0, 160, Orientation.Horizontal);
+Debug.WriteLine($"Stress viewport: {diagnostics.AttachedViewportSource}; items {diagnostics.ItemCount}; window {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}; cache {diagnostics.ActiveCacheLength}.");
 
+repeater.Layout = new StackLayout
+{
+    Orientation = Orientation.Horizontal,
+    Spacing = 10
+};
+repeater.HorizontalCacheLength = 360;
+repeater.VerticalCacheLength = 80;
+repeater.EstimatedItemExtent = 180;
+repeater.AttachViewport(scrollViewer, Orientation.Horizontal);
+repeater.ApplyViewport(720, 540, Orientation.Horizontal);
+diagnostics = repeater.GetDiagnostics();
+Debug.WriteLine($"Horizontal QA: {diagnostics.AttachedViewportSource}/{diagnostics.AttachedViewportOrientation}; window {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}; cache H{diagnostics.HorizontalCacheLength}/V{diagnostics.VerticalCacheLength}.");
+
+repeater.AttachViewport(scroller, Orientation.Horizontal);
 repeater.RealizeRange(0, 5);
 repeater.ResetRealizationWindow();
 """,
