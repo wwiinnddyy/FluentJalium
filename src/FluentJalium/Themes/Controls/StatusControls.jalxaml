@@ -157,6 +157,46 @@
         </Setter>
     </Style>
 
+    <Style TargetType="fluent:FWSnackbarOverlayHost">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MaxVisibleSnackbars" Value="3" />
+        <Setter Property="Placement" Value="Bottom" />
+        <Setter Property="Spacing" Value="8" />
+        <Setter Property="IsTransitionEnabled" Value="True" />
+        <Setter Property="TransitionProfile" Value="Entrance" />
+        <Setter Property="SnackbarTransitionDuration" Value="0:0:0.32" />
+        <Setter Property="TransitionOffset" Value="16" />
+        <Setter Property="OverlayPlacement" Value="Bottom" />
+        <Setter Property="IsOverlayAutoOpenEnabled" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Bottom" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWSnackbarOverlayHost">
+                <Grid>
+                    <Popup Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsOverlayOpen}"
+                           StaysOpen="True"
+                           Placement="{TemplateBinding OverlayPlacement}"
+                           PlacementTarget="{TemplateBinding OverlayTarget}">
+                        <Border Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ItemsControl Name="PART_ItemsControl"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Vertical" Spacing="8" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
     <Style TargetType="fluent:FWInfoBadge">
         <Setter Property="Padding" Value="4,0,4,0" />
         <Setter Property="MinWidth" Value="6" />

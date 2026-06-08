@@ -9,6 +9,7 @@ using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
+using PopupPlacementMode = Jalium.UI.Controls.Primitives.PlacementMode;
 
 namespace FluentJalium.Tests;
 
@@ -92,6 +93,7 @@ public sealed class FluentNotificationStatusTests
             AssertBasedOnStyle<FWToastNotificationHost, ToastNotificationHost>(app.Resources);
             AssertOwnedStyle<FWSnackbar>(app.Resources);
             AssertOwnedStyle<FWSnackbarHost>(app.Resources);
+            AssertOwnedStyle<FWSnackbarOverlayHost>(app.Resources);
             AssertBasedOnStyle<FWStatusBar, StatusBar>(app.Resources);
             AssertBasedOnStyle<FWStatusBarItem, StatusBarItem>(app.Resources);
         }
@@ -132,6 +134,14 @@ public sealed class FluentNotificationStatusTests
         AssertSetter(snackbarHostStyle, FWSnackbarHost.TransitionOffsetProperty, 16.0);
         AssertSetter(snackbarHostStyle, Control.HorizontalContentAlignmentProperty, "Stretch");
         AssertSetter(snackbarHostStyle, Control.VerticalContentAlignmentProperty, "Bottom");
+        var snackbarOverlayHostStyle = AssertStyle<FWSnackbarOverlayHost>(dictionary);
+        Assert.Null(snackbarOverlayHostStyle.BasedOn);
+        AssertSetter(snackbarOverlayHostStyle, FWSnackbarHost.MaxVisibleSnackbarsProperty, 3);
+        AssertSetter(snackbarOverlayHostStyle, FWSnackbarHost.PlacementProperty, "Bottom");
+        AssertSetter(snackbarOverlayHostStyle, FWSnackbarHost.SpacingProperty, 8.0);
+        AssertSetter(snackbarOverlayHostStyle, FWSnackbarOverlayHost.OverlayPlacementProperty, "Bottom");
+        AssertSetter(snackbarOverlayHostStyle, FWSnackbarOverlayHost.IsOverlayAutoOpenEnabledProperty);
+        AssertSetter(snackbarOverlayHostStyle, Control.TemplateProperty);
         AssertContainsStyle<StatusBar>(dictionary);
         AssertContainsStyle<StatusBarItem>(dictionary);
 
@@ -547,6 +557,79 @@ public sealed class FluentNotificationStatusTests
         host.CloseCurrent();
 
         Assert.Equal(3, transitions.Count);
+        Assert.Empty(host.Snackbars);
+    }
+
+    [Fact]
+    public void FWSnackbarOverlayHost_ShouldAutoOpenAndCloseWithQueueState()
+    {
+        var host = new FWSnackbarOverlayHost
+        {
+            MaxVisibleSnackbars = 1,
+            OverlayPlacement = PopupPlacementMode.Top
+        };
+        var overlayOpened = 0;
+        var overlayClosed = 0;
+        host.OverlayOpened += (_, _) => overlayOpened++;
+        host.OverlayClosed += (_, _) => overlayClosed++;
+        var first = new FWSnackbar { Title = "First", IsAutoDismissEnabled = false };
+        var second = new FWSnackbar { Title = "Second", IsAutoDismissEnabled = false };
+
+        Assert.False(host.IsOverlayOpen);
+        Assert.True(host.IsOverlayAutoOpenEnabled);
+        Assert.Equal(PopupPlacementMode.Top, host.OverlayPlacement);
+
+        host.Enqueue(first);
+
+        Assert.True(host.IsOverlayOpen);
+        Assert.Equal(1, overlayOpened);
+        Assert.Equal(0, overlayClosed);
+        Assert.Same(first, host.CurrentSnackbar);
+
+        host.Enqueue(second);
+
+        Assert.True(host.IsOverlayOpen);
+        Assert.Equal(1, host.PendingCount);
+
+        first.Close();
+
+        Assert.True(host.IsOverlayOpen);
+        Assert.Same(second, host.CurrentSnackbar);
+        Assert.Equal(0, host.PendingCount);
+
+        Assert.True(host.CloseCurrent());
+
+        Assert.False(host.IsOverlayOpen);
+        Assert.Equal(1, overlayClosed);
+        Assert.Empty(host.Snackbars);
+    }
+
+    [Fact]
+    public void FWSnackbarOverlayHost_ShouldSupportManualOverlayStateAndServiceRouting()
+    {
+        var host = new FWSnackbarOverlayHost
+        {
+            IsOverlayAutoOpenEnabled = false
+        };
+        var service = new FWSnackbarService();
+        service.SetHost(host);
+
+        var snackbar = service.Show(ToastSeverity.Information, "Saved", duration: TimeSpan.FromSeconds(8));
+
+        Assert.Same(host, service.Host);
+        Assert.True(snackbar.IsOpen);
+        Assert.False(host.IsOverlayOpen);
+        Assert.True(host.OpenOverlay());
+        Assert.True(host.IsOverlayOpen);
+        Assert.False(host.OpenOverlay());
+        Assert.True(host.CloseOverlay());
+        Assert.False(host.IsOverlayOpen);
+        Assert.False(host.CloseOverlay());
+        Assert.Throws<ArgumentException>(() => host.OverlayPlacement = (PopupPlacementMode)999);
+
+        service.Clear();
+
+        Assert.False(host.IsOverlayOpen);
         Assert.Empty(host.Snackbars);
     }
 

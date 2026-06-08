@@ -599,10 +599,13 @@ var scroller = new FWScroller
 };
 """,
         ["status.snackbar"] = """
-var host = new FWSnackbarHost
+var host = new FWSnackbarOverlayHost
 {
     Width = 470,
-    MaxVisibleSnackbars = 2,
+    OverlayTarget = rootElement,
+    OverlayPlacement = PlacementMode.Bottom,
+    IsOverlayAutoOpenEnabled = true,
+    MaxVisibleSnackbars = 3,
     Placement = FWSnackbarPlacement.Bottom,
     Spacing = 8,
     TransitionProfile = FWContentTransitionProfile.Entrance,
@@ -635,6 +638,7 @@ snackbar.Closing += (_, args) =>
 
 var closeTask = service.EnqueueForResultAsync(snackbar);
 var diagnostics = host.GetDiagnostics();
+var isOverlayOpen = host.IsOverlayOpen;
 snackbar.PauseAutoDismiss();
 snackbar.ResumeAutoDismiss();
 service.CloseCurrent();

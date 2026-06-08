@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using PopupPlacementMode = Jalium.UI.Controls.Primitives.PlacementMode;
 
 namespace FluentJalium.Controls;
 
@@ -1100,6 +1101,122 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
     private static bool IsValidTransitionOffset(object? value)
     {
         return value is double offset && offset >= 0 && !double.IsNaN(offset) && !double.IsInfinity(offset);
+    }
+}
+
+/// <summary>
+/// Snackbar host that presents queued snackbars through an overlay popup while reusing host queue semantics.
+/// </summary>
+public class FWSnackbarOverlayHost : FWSnackbarHost
+{
+    private static readonly DependencyPropertyKey IsOverlayOpenPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsOverlayOpen), typeof(bool), typeof(FWSnackbarOverlayHost),
+            new PropertyMetadata(false));
+
+    public static readonly DependencyProperty IsOverlayOpenProperty = IsOverlayOpenPropertyKey.DependencyProperty;
+
+    public static readonly DependencyProperty OverlayTargetProperty =
+        DependencyProperty.Register(nameof(OverlayTarget), typeof(UIElement), typeof(FWSnackbarOverlayHost),
+            new PropertyMetadata(null));
+
+    public static readonly DependencyProperty OverlayPlacementProperty =
+        DependencyProperty.Register(nameof(OverlayPlacement), typeof(PopupPlacementMode), typeof(FWSnackbarOverlayHost),
+            new PropertyMetadata(PopupPlacementMode.Bottom), IsValidOverlayPlacement);
+
+    public static readonly DependencyProperty IsOverlayAutoOpenEnabledProperty =
+        DependencyProperty.Register(nameof(IsOverlayAutoOpenEnabled), typeof(bool), typeof(FWSnackbarOverlayHost),
+            new PropertyMetadata(true, OnOverlayAutoOpenChanged));
+
+    public FWSnackbarOverlayHost()
+    {
+        QueueChanged += OnOverlayQueueChanged;
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsOverlayOpen => (bool)GetValue(IsOverlayOpenProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public UIElement? OverlayTarget
+    {
+        get => (UIElement?)GetValue(OverlayTargetProperty);
+        set => SetValue(OverlayTargetProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public PopupPlacementMode OverlayPlacement
+    {
+        get => (PopupPlacementMode)GetValue(OverlayPlacementProperty)!;
+        set => SetValue(OverlayPlacementProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsOverlayAutoOpenEnabled
+    {
+        get => (bool)GetValue(IsOverlayAutoOpenEnabledProperty)!;
+        set => SetValue(IsOverlayAutoOpenEnabledProperty, value);
+    }
+
+    public event EventHandler? OverlayOpened;
+
+    public event EventHandler? OverlayClosed;
+
+    public bool OpenOverlay()
+    {
+        if (IsOverlayOpen)
+        {
+            return false;
+        }
+
+        SetValue(IsOverlayOpenPropertyKey.DependencyProperty, true);
+        OverlayOpened?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    public bool CloseOverlay()
+    {
+        if (!IsOverlayOpen)
+        {
+            return false;
+        }
+
+        SetValue(IsOverlayOpenPropertyKey.DependencyProperty, false);
+        OverlayClosed?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    private void OnOverlayQueueChanged(object? sender, FWSnackbarHostQueueChangedEventArgs e)
+    {
+        UpdateOverlayState(e.Diagnostics);
+    }
+
+    private void UpdateOverlayState(FWSnackbarHostDiagnostics diagnostics)
+    {
+        if (!IsOverlayAutoOpenEnabled)
+        {
+            return;
+        }
+
+        if (diagnostics.VisibleCount > 0 || diagnostics.PendingCount > 0)
+        {
+            OpenOverlay();
+        }
+        else
+        {
+            CloseOverlay();
+        }
+    }
+
+    private static void OnOverlayAutoOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbarOverlayHost host && e.NewValue is true)
+        {
+            host.UpdateOverlayState(host.GetDiagnostics());
+        }
+    }
+
+    private static bool IsValidOverlayPlacement(object? value)
+    {
+        return value is PopupPlacementMode placement && Enum.IsDefined(placement);
     }
 }
 
