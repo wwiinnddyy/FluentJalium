@@ -34,6 +34,18 @@ using ShapePointCollection = Jalium.UI.Controls.Shapes.PointCollection;
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryShapeControlsQaSnapshot(
+    int ShapeCount,
+    int EnabledCount,
+    bool HasAccentStroke,
+    bool HasFilledShapes,
+    double RectangleRadiusX,
+    double RectangleRadiusY,
+    int PolylinePointCount,
+    int PolygonPointCount,
+    bool HasPathData,
+    string PathMode);
+
 internal sealed class GalleryVisualsPage
 {
     public UIElement CreateContent()
@@ -641,6 +653,15 @@ internal sealed class GalleryVisualsPage
             Stretch = Stretch.Uniform
         };
 
+        void UpdateShapeOutput(string action)
+        {
+            output.Text = FormatShapeControlsVisualQa(
+                action,
+                CreateShapeControlsQaSnapshot(rectangle, ellipse, line, polyline, polygon, path));
+        }
+
+        UpdateShapeOutput("Shape controls QA");
+
         return new FWStackPanel
         {
             Orientation = Orientation.Vertical,
@@ -669,7 +690,7 @@ internal sealed class GalleryVisualsPage
                         ApplyShapeBrushes(rectangle, ellipse, polygon, path, ThemeBrush("SelectionBackgroundWeak"), ThemeBrush("AccentBrush"));
                         line.Stroke = ThemeBrush("AccentBrush");
                         polyline.Stroke = ThemeBrush("AccentBrush");
-                        output.Text = "Shapes: accent fill and stroke restored.";
+                        UpdateShapeOutput("Shape accent restored");
                     }),
                     CreateVisualActionButton(FluentIconRegular.DrawShape24, "Morph", () =>
                     {
@@ -686,17 +707,71 @@ internal sealed class GalleryVisualsPage
                         path.Data = path.Data.StartsWith("M 4,36", StringComparison.Ordinal)
                             ? "M 6,44 L 22,10 L 42,38 L 62,10 L 82,44 Z"
                             : "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20";
-                        output.Text = "Shapes: geometry, radius, and path data morphed.";
+                        UpdateShapeOutput("Shape geometry morphed");
                     }),
                     CreateVisualActionButton(FluentIconRegular.Prohibited24, "Disable", () =>
                     {
                         var isEnabled = !rectangle.IsEnabled;
                         SetShapeEnabled(isEnabled, rectangle, ellipse, line, polyline, polygon, path);
-                        output.Text = $"Shapes enabled: {FormatOnOff(isEnabled)}.";
+                        UpdateShapeOutput("Shape enabled state changed");
                     })),
                 CreateVisualStatus(output)
             }
         };
+    }
+
+    internal static GalleryShapeControlsQaSnapshot CreateShapeControlsQaSnapshot(
+        FWRectangle rectangle,
+        FWEllipse ellipse,
+        FWLine line,
+        FWPolyline polyline,
+        FWPolygon polygon,
+        FWPath path)
+    {
+        ArgumentNullException.ThrowIfNull(rectangle);
+        ArgumentNullException.ThrowIfNull(ellipse);
+        ArgumentNullException.ThrowIfNull(line);
+        ArgumentNullException.ThrowIfNull(polyline);
+        ArgumentNullException.ThrowIfNull(polygon);
+        ArgumentNullException.ThrowIfNull(path);
+
+        var enabledCount = 0;
+        FrameworkElement[] shapes = [rectangle, ellipse, line, polyline, polygon, path];
+        foreach (var shape in shapes)
+        {
+            if (shape.IsEnabled)
+            {
+                enabledCount++;
+            }
+        }
+
+        var pathData = path.Data ?? string.Empty;
+        return new GalleryShapeControlsQaSnapshot(
+            shapes.Length,
+            enabledCount,
+            rectangle.Stroke != null
+                && ellipse.Stroke != null
+                && line.Stroke != null
+                && polyline.Stroke != null
+                && polygon.Stroke != null
+                && path.Stroke != null,
+            rectangle.Fill != null
+                && ellipse.Fill != null
+                && polygon.Fill != null
+                && path.Fill != null,
+            rectangle.RadiusX,
+            rectangle.RadiusY,
+            polyline.Points?.Count ?? 0,
+            polygon.Points?.Count ?? 0,
+            !string.IsNullOrWhiteSpace(pathData),
+            pathData.StartsWith("M 4,36", StringComparison.Ordinal) ? "curve" : "polygon");
+    }
+
+    internal static string FormatShapeControlsVisualQa(string action, GalleryShapeControlsQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Shapes: {snapshot.ShapeCount}. Enabled: {snapshot.EnabledCount}/{snapshot.ShapeCount}. Accent stroke: {FormatOnOff(snapshot.HasAccentStroke)}. Filled: {FormatOnOff(snapshot.HasFilledShapes)}. Rectangle radius: {snapshot.RectangleRadiusX:0}/{snapshot.RectangleRadiusY:0}. Polyline points: {snapshot.PolylinePointCount}. Polygon points: {snapshot.PolygonPointCount}. Path data: {FormatOnOff(snapshot.HasPathData)} ({snapshot.PathMode}).";
     }
 
     private static UIElement CreateImageSample()

@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -346,6 +347,103 @@ public sealed class FluentVisualControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(stack, surface.Child);
+    }
+
+    [Fact]
+    public void GalleryVisualsPage_ShouldFormatShapeControlsVisualQaSnapshot()
+    {
+        var shapeStroke = new SolidColorBrush(Colors.DeepSkyBlue);
+        var shapeFill = new SolidColorBrush(Color.FromArgb(0x33, 0x00, 0x78, 0xD4));
+        var rectangle = new FWRectangle
+        {
+            RadiusX = 8,
+            RadiusY = 8,
+            Fill = shapeFill,
+            Stroke = shapeStroke
+        };
+        var ellipse = new FWEllipse
+        {
+            Fill = shapeFill,
+            Stroke = shapeStroke
+        };
+        var line = new FWLine
+        {
+            Stroke = shapeStroke
+        };
+        var polyline = new FWPolyline
+        {
+            Points = ShapePointCollection.Parse("0,40 18,14 38,34 58,8 82,28"),
+            Stroke = shapeStroke
+        };
+        var polygon = new FWPolygon
+        {
+            Points = ShapePointCollection.Parse("8,44 28,8 52,22 74,44"),
+            Fill = shapeFill,
+            Stroke = shapeStroke
+        };
+        var path = new FWPath
+        {
+            Data = "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20",
+            Fill = shapeFill,
+            Stroke = shapeStroke
+        };
+
+        var snapshot = GalleryVisualsPage.CreateShapeControlsQaSnapshot(
+            rectangle,
+            ellipse,
+            line,
+            polyline,
+            polygon,
+            path);
+        var text = GalleryVisualsPage.FormatShapeControlsVisualQa("Shape controls QA", snapshot);
+
+        Assert.Equal(6, snapshot.ShapeCount);
+        Assert.Equal(6, snapshot.EnabledCount);
+        Assert.True(snapshot.HasAccentStroke);
+        Assert.True(snapshot.HasFilledShapes);
+        Assert.Equal(8, snapshot.RectangleRadiusX);
+        Assert.Equal(8, snapshot.RectangleRadiusY);
+        Assert.Equal(5, snapshot.PolylinePointCount);
+        Assert.Equal(4, snapshot.PolygonPointCount);
+        Assert.True(snapshot.HasPathData);
+        Assert.Equal("curve", snapshot.PathMode);
+
+        Assert.Contains("Shape controls QA", text, StringComparison.Ordinal);
+        Assert.Contains("Shapes: 6", text, StringComparison.Ordinal);
+        Assert.Contains("Enabled: 6/6", text, StringComparison.Ordinal);
+        Assert.Contains("Accent stroke: on", text, StringComparison.Ordinal);
+        Assert.Contains("Filled: on", text, StringComparison.Ordinal);
+        Assert.Contains("Rectangle radius: 8/8", text, StringComparison.Ordinal);
+        Assert.Contains("Polyline points: 5", text, StringComparison.Ordinal);
+        Assert.Contains("Polygon points: 4", text, StringComparison.Ordinal);
+        Assert.Contains("Path data: on (curve)", text, StringComparison.Ordinal);
+
+        rectangle.IsEnabled = false;
+        ellipse.IsEnabled = false;
+        line.IsEnabled = false;
+        polyline.IsEnabled = false;
+        polygon.IsEnabled = false;
+        path.IsEnabled = false;
+        rectangle.RadiusX = 22;
+        rectangle.RadiusY = 22;
+        path.Data = "M 6,44 L 22,10 L 42,38 L 62,10 L 82,44 Z";
+
+        var disabledSnapshot = GalleryVisualsPage.CreateShapeControlsQaSnapshot(
+            rectangle,
+            ellipse,
+            line,
+            polyline,
+            polygon,
+            path);
+        var disabledText = GalleryVisualsPage.FormatShapeControlsVisualQa("Shape enabled state changed", disabledSnapshot);
+
+        Assert.Equal(0, disabledSnapshot.EnabledCount);
+        Assert.Equal(22, disabledSnapshot.RectangleRadiusX);
+        Assert.Equal(22, disabledSnapshot.RectangleRadiusY);
+        Assert.Equal("polygon", disabledSnapshot.PathMode);
+        Assert.Contains("Enabled: 0/6", disabledText, StringComparison.Ordinal);
+        Assert.Contains("Rectangle radius: 22/22", disabledText, StringComparison.Ordinal);
+        Assert.Contains("Path data: on (polygon)", disabledText, StringComparison.Ordinal);
     }
 
     private static byte[] CreateSamplePixels(int width, int height)
