@@ -24,7 +24,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 ### Gallery visibility gaps
 
 - Workflow depth: Gallery now covers the first-wave control/state matrix broadly; future visibility work should focus on longer end-to-end app patterns and diagnostics rather than raw page presence.
-- Metadata parity: first-wave Gallery pages now carry catalog metadata and registered sample-code keys across buttons, switches, range, input/media, menus, selectors/properties, data inspectors, and motion/transitions; remaining Gallery work should focus on richer app-pattern walkthroughs and visual QA rather than basic metadata.
+- Metadata parity: first-wave Gallery pages now carry catalog metadata, registered sample-code keys, and factory coverage guards across control families; remaining Gallery work should focus on richer app-pattern walkthroughs and visual QA rather than basic metadata.
 
 ### Semantic-depth gaps
 
@@ -42,6 +42,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 1. TaskDialog visual QA package: validate real app-window focus restore/trap behavior and modal layering after the automation and template focus traversal base.
 2. ItemsRepeater visual QA package: validate ScrollViewer/FWScroller viewport attachment in real Gallery shells and tune large-list stress scenarios without breaking the current `Panel` API.
 3. Settings visual QA package: default row typography/action alignment and richer SettingsExpander item-host template contracts now have theme/Gallery coverage; remaining work is real-window visual QA.
+4. Collection navigation evaluation: current Jalium controls do not expose native `SemanticZoom` or `FlipView` bases, so `FWSemanticZoom`, `FWFlipView`, and `FWItemsView` should be prototyped against existing collection primitives before public API.
 
 ## Recently completed batches
 
@@ -53,6 +54,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Text input coverage: `FWAutoSuggestBox` has direct Gallery coverage, catalog metadata, registry-backed sample code, `QuerySubmitted`, `SuggestionChosen`, and text-change reason APIs while preserving `FWAutoCompleteBox` as the Jalium base.
 - Disclosure coverage: `FWTeachingTip` has a default popup presenter style, targeted tests, catalog metadata, and registry-backed sample code for placement/action/close states.
 - Materials coverage: `FWFluentWindowSurface` and derived material surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, and `FWFocusGlassSurface` are visible in Gallery with catalog metadata and copyable recipes.
+- Window material diagnostics coverage: Gallery now surfaces `FWFluentWindowSurface` profile switching, requested `WindowBackdropType`, actual host `Window.SystemBackdrop`, surface role/material kind, and copyable QA code for matching requested versus applied window material state.
 - Collection state coverage: `FWListView`, `FWGridView`, `FWListBox`, and `FWDataGrid` now show empty, loading, grouped, compact, comfortable, and spacious states in Gallery with updated catalog search metadata and registry-backed sample code.
 - Settings semantics coverage: `FWSettingsCard` now exposes read-only `CanExecute`, restores command-disabled state when commands are removed, supports `ClickMode.Hover`, and has keyboard/command tests; `FWSettingsExpander` now has direct content rows, `ItemCount`, `ItemsChanged`, and add/remove/clear helpers with Gallery and registry coverage.
 - Settings interaction coverage: `FWSettingsCard` now exposes `FWSettingsCardDiagnostics`, `IsPointerPressed`, `IsKeyboardPressed`, and `IsInteractionPressed`; the default style consumes pressed, focus, and disabled states, and Gallery/registry examples surface invokable/can-execute/pressed diagnostics so settings rows provide WinUI-style interaction feedback without stale pressed visuals.
@@ -76,6 +78,8 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Navigation selector/tab diagnostics coverage: `FWSelectorBar` now exposes `FWSelectorBarDiagnostics` for selected item, selected text, item count, orientation, density, indicator placement, and resolved layout metrics; `FWTabView` now exposes `FWTabViewDiagnostics` for selected header/content, tab count, tab width mode, close overlay mode, placement, add/reorder state, and resolved layout metrics, with Gallery and registry examples surfacing both snapshots.
 - Forms pattern coverage: Gallery now has a dedicated Forms scenario page that combines `FWLabel`, `FWTextBox`, `FWAutoSuggestBox`, `FWRadioButtons`, `FWInfoBar`, `FWSettingsCard`, `FWToggleSwitch`, `FWButton`, and `FWCheckBox` into validation, submit/reset, settings-row, and density workflows without introducing a premature public `FWForm` abstraction.
 - Gallery metadata parity coverage: `buttons`, `switches`, `range`, `inputandmedia`, `menus`, `selectorsandproperties`, `datainspectors`, and `motionandtransitions` now expose `SourcePath`, `BaseClasses`, `ApiNamespace`, `RelatedControls`, and `SampleCodeKey` entries with registry snippets for command surfaces, boolean states, slider/progress, color/ink/media, flyout/command bar, selector/property grid, data inspector, and motion workflows.
+- Gallery registry guard coverage: tests now require every non-footer catalog `SampleCodeKey` to be explicitly registered and to resolve to authored sample code instead of fallback-generated snippets.
+- Gallery factory guard coverage: `GalleryCatalogService` exposes registered page ids for tests, and catalog tests assert every `GalleryCatalog` page has a matching factory before runtime shell navigation can hit a missing page factory.
 - Snackbar lifetime coverage: `FWSnackbar` now exposes cancelable `Closing`, `RequestClose`, pointer/focus/manual auto-dismiss pause state, `WaitForCloseAsync`, and host/service `ShowForResultAsync` / `EnqueueForResultAsync` APIs; Gallery shows pause/resume, close cancellation, service queues, and result-task completion.
 - Snackbar host placement coverage: `FWSnackbarHost.Placement` now drives top/bottom content alignment, `Spacing` controls the generated snackbar stack panel, and Gallery exposes placement/alignment/spacing diagnostics with registry and catalog metadata updated.
 - Snackbar transition diagnostics coverage: `FWSnackbarHost` now exposes `TransitionProfile`, `SnackbarTransitionDuration`, `TransitionOffset`, `TransitionRequested`, `QueueChanged`, and `GetDiagnostics()` so Gallery and app hosts can observe queue layout and wire Fluent motion without taking over host lifetime semantics.
