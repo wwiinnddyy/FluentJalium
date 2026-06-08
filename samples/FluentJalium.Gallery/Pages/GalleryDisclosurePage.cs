@@ -35,6 +35,16 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryDisclosurePage
 {
+    internal readonly record struct TeachingTipVisualQaSnapshot(
+        bool IsOpen,
+        bool HasTarget,
+        bool HasHeroContent,
+        TeachingTipPlacementMode PreferredPlacement,
+        TeachingTipTailVisibility TailVisibility,
+        bool IsLightDismissEnabled,
+        object? ActionButtonContent,
+        object? CloseButtonContent);
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Disclosure and Dialogs");
@@ -320,7 +330,7 @@ internal sealed class GalleryDisclosurePage
 
         void UpdateTeachingTipStatus(string action)
         {
-            output.Text = $"{action}. Open: {FormatOnOff(teachingTip.IsOpen)}, placement: {teachingTip.PreferredPlacement}, tail: {teachingTip.TailVisibility}, action: {teachingTip.ActionButtonContent}, close: {teachingTip.CloseButtonContent}.";
+            output.Text = FormatTeachingTipVisualQa(action, CreateTeachingTipVisualQaSnapshot(teachingTip));
         }
 
         target.Click += (_, _) =>
@@ -397,6 +407,28 @@ internal sealed class GalleryDisclosurePage
                 CreateDisclosureStatus(output)
             }
         };
+    }
+
+    internal static TeachingTipVisualQaSnapshot CreateTeachingTipVisualQaSnapshot(FWTeachingTip teachingTip)
+    {
+        ArgumentNullException.ThrowIfNull(teachingTip);
+
+        return new TeachingTipVisualQaSnapshot(
+            teachingTip.IsOpen,
+            teachingTip.Target != null,
+            teachingTip.HeroContent != null,
+            teachingTip.PreferredPlacement,
+            teachingTip.TailVisibility,
+            teachingTip.IsLightDismissEnabled,
+            teachingTip.ActionButtonContent,
+            teachingTip.CloseButtonContent);
+    }
+
+    internal static string FormatTeachingTipVisualQa(string action, TeachingTipVisualQaSnapshot snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
+        return $"{action}. TeachingTip QA: open {FormatOnOff(snapshot.IsOpen)}, target {FormatOnOff(snapshot.HasTarget)}, hero {FormatOnOff(snapshot.HasHeroContent)}, placement {snapshot.PreferredPlacement}, tail {snapshot.TailVisibility}, light dismiss {FormatOnOff(snapshot.IsLightDismissEnabled)}, action {snapshot.ActionButtonContent}, close {snapshot.CloseButtonContent}.";
     }
 
     private static UIElement CreateContentDialogSample()

@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Automation;
 using Jalium.UI.Controls;
@@ -311,6 +312,44 @@ public sealed class FluentDisclosureControlsTests
         Assert.Equal(TeachingTipCloseReason.CloseButton, closingArgs.Reason);
         Assert.True(closingArgs.Cancel);
         Assert.Equal(TeachingTipCloseReason.Programmatic, closedArgs.Reason);
+    }
+
+    [Fact]
+    public void GalleryTeachingTipVisualQa_ShouldSummarizeTargetHeroPlacementAndCommands()
+    {
+        var tip = new FWTeachingTip
+        {
+            Target = new FWButton { Content = "Density options" },
+            HeroContent = new FWBorder { Width = 120, Height = 48 },
+            ActionButtonContent = "Apply",
+            CloseButtonContent = "Later",
+            PreferredPlacement = TeachingTipPlacementMode.Right,
+            TailVisibility = TeachingTipTailVisibility.Auto,
+            IsLightDismissEnabled = true,
+            IsOpen = true
+        };
+
+        var snapshot = GalleryDisclosurePage.CreateTeachingTipVisualQaSnapshot(tip);
+        var text = GalleryDisclosurePage.FormatTeachingTipVisualQa(
+            "TeachingTip placement changed",
+            snapshot);
+
+        Assert.True(snapshot.IsOpen);
+        Assert.True(snapshot.HasTarget);
+        Assert.True(snapshot.HasHeroContent);
+        Assert.Equal(TeachingTipPlacementMode.Right, snapshot.PreferredPlacement);
+        Assert.Equal(TeachingTipTailVisibility.Auto, snapshot.TailVisibility);
+        Assert.True(snapshot.IsLightDismissEnabled);
+        Assert.Equal("Apply", snapshot.ActionButtonContent);
+        Assert.Equal("Later", snapshot.CloseButtonContent);
+        Assert.Contains("TeachingTip QA: open on", text);
+        Assert.Contains("target on", text);
+        Assert.Contains("hero on", text);
+        Assert.Contains("placement Right", text);
+        Assert.Contains("tail Auto", text);
+        Assert.Contains("light dismiss on", text);
+        Assert.Contains("action Apply", text);
+        Assert.Contains("close Later", text);
     }
 
     [Fact]
