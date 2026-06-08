@@ -314,6 +314,33 @@ public sealed class FluentTextInputControlsTests
     }
 
     [Fact]
+    public void FWAutoSuggestBox_ShouldNormalizeNullQueryAndFallbackSuggestionText()
+    {
+        var autoSuggestBox = new FWAutoSuggestBox
+        {
+            Text = "Calendar",
+            TextMemberPath = "MissingName",
+            IsDropDownOpen = true
+        };
+        var fallbackSuggestion = new AutoSuggestFallbackRow("Fallback suggestion");
+        FWAutoSuggestBoxSuggestionChosenEventArgs? chosenArgs = null;
+        autoSuggestBox.SuggestionChosen += (_, args) => chosenArgs = args;
+
+        autoSuggestBox.SetQueryText(null, FWAutoSuggestBoxTextChangeReason.UserInput);
+
+        Assert.Equal(string.Empty, autoSuggestBox.Text);
+        Assert.Equal(FWAutoSuggestBoxTextChangeReason.UserInput, autoSuggestBox.LastTextChangeReason);
+
+        Assert.True(autoSuggestBox.RequestSuggestionChosen(fallbackSuggestion));
+
+        Assert.Same(fallbackSuggestion, autoSuggestBox.SelectedItem);
+        Assert.Same(fallbackSuggestion, chosenArgs?.SelectedItem);
+        Assert.Equal("Fallback suggestion", autoSuggestBox.Text);
+        Assert.False(autoSuggestBox.IsDropDownOpen);
+        Assert.Equal(FWAutoSuggestBoxTextChangeReason.SuggestionChosen, autoSuggestBox.LastTextChangeReason);
+    }
+
+    [Fact]
     public void FWTextInputControls_ShouldExposeMaterialInputPanelState()
     {
         var textBox = new FWTextBox
@@ -444,6 +471,11 @@ public sealed class FluentTextInputControlsTests
     }
 
     private sealed record AutoSuggestRow(string Name);
+
+    private sealed record AutoSuggestFallbackRow(string Label)
+    {
+        public override string ToString() => Label;
+    }
 
     private static Style AssertStyle<TControl>(ResourceDictionary dictionary)
         where TControl : FrameworkElement
