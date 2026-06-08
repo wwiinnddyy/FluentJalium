@@ -319,10 +319,15 @@ internal sealed class GalleryStatusPage
 
         void UpdateOutput(string action)
         {
-            var currentTitle = host.CurrentSnackbar?.Title?.ToString() ?? "none";
-            var isPaused = host.CurrentSnackbar?.IsAutoDismissPaused ?? false;
+            var currentSnackbar = host.CurrentSnackbar;
+            var currentTitle = currentSnackbar?.Title?.ToString() ?? "none";
+            var isPaused = currentSnackbar?.IsAutoDismissPaused ?? false;
+            var presenter = currentSnackbar?.GetPresenterDiagnostics();
+            var presenterState = presenter?.PresenterState.ToString() ?? "Idle";
+            var presenterOpacity = presenter?.PresenterOpacity ?? 1.0;
+            var presenterOffset = presenter?.PresenterOffset ?? 0.0;
             var diagnostics = host.GetDiagnostics();
-            output.Text = $"{action}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
+            output.Text = $"{action}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Presenter: {presenterState}, opacity {presenterOpacity:0.00}, offset {presenterOffset:0.0}. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
         }
 
         host.TransitionRequested += (_, args) =>

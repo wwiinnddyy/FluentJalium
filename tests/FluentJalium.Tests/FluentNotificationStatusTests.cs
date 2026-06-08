@@ -561,6 +561,153 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public void FWSnackbar_ShouldExposePresenterMotionDiagnostics()
+    {
+        var snackbar = new FWSnackbar { Title = "Motion", IsAutoDismissEnabled = false };
+        var initialDiagnostics = snackbar.GetPresenterDiagnostics();
+
+        Assert.Equal(FWSnackbarPresenterState.Idle, snackbar.PresenterState);
+        Assert.Equal(FWSnackbarPresenterState.Idle, initialDiagnostics.PresenterState);
+        Assert.False(initialDiagnostics.HasPresenter);
+        Assert.Equal(1.0, initialDiagnostics.PresenterOpacity);
+        Assert.Equal(0.0, initialDiagnostics.PresenterOffset);
+        Assert.Equal(TimeSpan.Zero, initialDiagnostics.TransitionDuration);
+        Assert.Equal(FWSnackbarPlacement.Bottom, initialDiagnostics.Placement);
+        Assert.Null(initialDiagnostics.LastTransitionKind);
+
+        var host = new FWSnackbarHost
+        {
+            Placement = FWSnackbarPlacement.Top,
+            SnackbarTransitionDuration = TimeSpan.FromMilliseconds(220),
+            TransitionOffset = 24
+        };
+        FWSnackbarTransitionRequestedEventArgs? transition = null;
+        host.TransitionRequested += (_, args) => transition = args;
+
+        host.Enqueue(snackbar);
+
+        var showDiagnostics = snackbar.GetPresenterDiagnostics();
+        Assert.NotNull(transition);
+        Assert.Equal(FWSnackbarTransitionKind.Show, transition!.Kind);
+        Assert.Equal(FWSnackbarPresenterState.Entering, showDiagnostics.PresenterState);
+        Assert.Equal(FWSnackbarPresenterState.Entering, transition.PresenterDiagnostics.PresenterState);
+        Assert.False(showDiagnostics.HasPresenter);
+        Assert.Equal(0.0, showDiagnostics.PresenterOpacity);
+        Assert.Equal(-24.0, showDiagnostics.PresenterOffset);
+        Assert.Equal(TimeSpan.FromMilliseconds(220), showDiagnostics.TransitionDuration);
+        Assert.Equal(FWSnackbarPlacement.Top, showDiagnostics.Placement);
+        Assert.Equal(FWSnackbarTransitionKind.Show, showDiagnostics.LastTransitionKind);
+
+        host.IsTransitionEnabled = false;
+        host.Clear();
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public void FWSnackbar_TemplateShouldAttachPendingPresenterMotion()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var snackbar = new FWSnackbar
+            {
+                Title = "Templated",
+                IsAutoDismissEnabled = false,
+                Width = 360,
+                Style = AssertStyle<FWSnackbar>(app.Resources)
+            };
+            var host = new FWSnackbarHost
+            {
+                Placement = FWSnackbarPlacement.Top,
+                SnackbarTransitionDuration = TimeSpan.FromSeconds(5),
+                TransitionOffset = 18
+            };
+
+            host.Enqueue(snackbar);
+            Assert.False(snackbar.GetPresenterDiagnostics().HasPresenter);
+            Assert.Equal(FWSnackbarPresenterState.Entering, snackbar.PresenterState);
+
+            snackbar.ApplyTemplate();
+            snackbar.Measure(new Size(360, 120));
+            snackbar.Arrange(new Rect(0, 0, 360, 120));
+
+            var diagnostics = snackbar.GetPresenterDiagnostics();
+            Assert.True(diagnostics.HasPresenter);
+            Assert.Equal(FWSnackbarTransitionKind.Show, diagnostics.LastTransitionKind);
+            Assert.Equal(TimeSpan.FromSeconds(5), diagnostics.TransitionDuration);
+            Assert.Equal(FWSnackbarPlacement.Top, diagnostics.Placement);
+            Assert.Contains(diagnostics.PresenterState, new[] { FWSnackbarPresenterState.Entering, FWSnackbarPresenterState.Visible });
+            Assert.InRange(diagnostics.PresenterOpacity, 0.0, 1.0);
+            Assert.InRange(diagnostics.PresenterOffset, -18.0, 0.0);
+
+            host.IsTransitionEnabled = false;
+            host.Clear();
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public async Task FWSnackbarHost_ShouldDeferRemovalDuringPresenterCloseMotion()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var host = new FWSnackbarHost
+            {
+                IsTransitionEnabled = false,
+                MaxVisibleSnackbars = 1,
+                Placement = FWSnackbarPlacement.Bottom,
+                SnackbarTransitionDuration = TimeSpan.FromSeconds(5),
+                TransitionOffset = 22
+            };
+            var snackbar = new FWSnackbar
+            {
+                Title = "Close motion",
+                IsAutoDismissEnabled = false,
+                Style = AssertStyle<FWSnackbar>(app.Resources)
+            };
+            var resultTask = host.EnqueueForResultAsync(snackbar);
+            snackbar.ApplyTemplate();
+            snackbar.Measure(new Size(360, 120));
+            snackbar.Arrange(new Rect(0, 0, 360, 120));
+
+            host.IsTransitionEnabled = true;
+            Assert.True(host.CloseCurrent());
+
+            var diagnostics = snackbar.GetPresenterDiagnostics();
+            Assert.False(snackbar.IsOpen);
+            Assert.Equal(FWSnackbarPresenterState.Exiting, diagnostics.PresenterState);
+            Assert.True(diagnostics.HasPresenter);
+            Assert.InRange(diagnostics.PresenterOpacity, 0.0, 1.0);
+            Assert.InRange(diagnostics.PresenterOffset, 0.0, 22.0);
+            Assert.Equal(FWSnackbarTransitionKind.Close, diagnostics.LastTransitionKind);
+            Assert.Contains(snackbar, host.Snackbars);
+            Assert.False(resultTask.IsCompleted);
+
+            CompleteSnackbarPresenterTransition(snackbar, FWSnackbarPresenterState.Exiting);
+
+            Assert.Empty(host.Snackbars);
+            Assert.Equal(FWSnackbarCloseReason.Programmatic, await resultTask);
+        }
+        finally
+        {
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public void FWSnackbarOverlayHost_ShouldAutoOpenAndCloseWithQueueState()
     {
         var host = new FWSnackbarOverlayHost
@@ -1046,6 +1193,13 @@ public sealed class FluentNotificationStatusTests
         }
 
         return null;
+    }
+
+    private static void CompleteSnackbarPresenterTransition(FWSnackbar snackbar, FWSnackbarPresenterState completedState)
+    {
+        typeof(FWSnackbar)
+            .GetMethod("CompletePresenterTransition", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .Invoke(snackbar, [completedState]);
     }
 
     private static void ResetApplicationState()

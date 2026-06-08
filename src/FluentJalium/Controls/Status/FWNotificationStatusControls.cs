@@ -1,6 +1,9 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
+using Jalium.UI.Media;
+using Jalium.UI.Threading;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -122,6 +125,17 @@ public enum FWSnackbarTransitionKind
 }
 
 /// <summary>
+/// Describes the visual presenter phase currently applied to a <see cref="FWSnackbar"/>.
+/// </summary>
+public enum FWSnackbarPresenterState
+{
+    Idle,
+    Entering,
+    Visible,
+    Exiting
+}
+
+/// <summary>
 /// Describes why a snackbar host queue changed.
 /// </summary>
 public enum FWSnackbarHostQueueChangeReason
@@ -167,6 +181,7 @@ public sealed class FWSnackbarTransitionRequestedEventArgs : EventArgs
         Snackbar = snackbar;
         Kind = kind;
         Diagnostics = diagnostics;
+        PresenterDiagnostics = snackbar.GetPresenterDiagnostics();
     }
 
     public FWSnackbar Snackbar { get; }
@@ -174,6 +189,8 @@ public sealed class FWSnackbarTransitionRequestedEventArgs : EventArgs
     public FWSnackbarTransitionKind Kind { get; }
 
     public FWSnackbarHostDiagnostics Diagnostics { get; }
+
+    public FWSnackbarPresenterDiagnostics PresenterDiagnostics { get; }
 }
 
 /// <summary>
@@ -199,17 +216,44 @@ public sealed class FWSnackbarHostQueueChangedEventArgs : EventArgs
 }
 
 /// <summary>
+/// Snapshot of snackbar presenter motion state.
+/// </summary>
+public readonly record struct FWSnackbarPresenterDiagnostics(
+    FWSnackbarPresenterState PresenterState,
+    bool HasPresenter,
+    double PresenterOpacity,
+    double PresenterOffset,
+    TimeSpan TransitionDuration,
+    FWSnackbarPlacement Placement,
+    FWSnackbarTransitionKind? LastTransitionKind);
+
+/// <summary>
 /// FluentJalium Snackbar control for transient in-app messages and lightweight undo actions.
 /// </summary>
 public class FWSnackbar : ContentControl, IFluentJaliumControl
 {
     private Button? _actionButton;
     private Button? _closeButton;
+    private FrameworkElement? _presenterRoot;
+    private TranslateTransform? _presenterTransform;
     private CancellationTokenSource? _autoDismissCancellation;
     private TaskCompletionSource<FWSnackbarCloseReason>? _closedTask;
+    private DispatcherTimer? _presenterTransitionTimer;
+    private readonly Stopwatch _presenterTransitionStopwatch = new();
     private bool _manualAutoDismissPause;
     private bool _pointerAutoDismissPause;
     private bool _focusAutoDismissPause;
+    private bool _isCompletingPresenterClose;
+    private bool _completeCloseWhenPresenterTransitionCompletes;
+    private FWSnackbarTransitionKind? _pendingPresenterTransitionKind;
+    private FWSnackbarPlacement _pendingPresenterTransitionPlacement;
+    private TimeSpan _pendingPresenterTransitionDuration;
+    private FWSnackbarTransitionKind? _lastTransitionKind;
+    private double _presenterStartOpacity = 1.0;
+    private double _presenterTargetOpacity = 1.0;
+    private double _presenterStartOffset;
+    private double _presenterTargetOffset;
+    private double _pendingPresenterTransitionOffset;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register(nameof(Title), typeof(object), typeof(FWSnackbar),
@@ -270,6 +314,36 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
             new PropertyMetadata(false));
 
     public static readonly DependencyProperty IsAutoDismissPausedProperty = IsAutoDismissPausedPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey PresenterStatePropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(PresenterState), typeof(FWSnackbarPresenterState), typeof(FWSnackbar),
+            new PropertyMetadata(FWSnackbarPresenterState.Idle, OnPresenterStateChanged));
+
+    public static readonly DependencyProperty PresenterStateProperty = PresenterStatePropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey PresenterOpacityPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(PresenterOpacity), typeof(double), typeof(FWSnackbar),
+            new PropertyMetadata(1.0, OnPresenterVisualStateChanged));
+
+    public static readonly DependencyProperty PresenterOpacityProperty = PresenterOpacityPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey PresenterOffsetPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(PresenterOffset), typeof(double), typeof(FWSnackbar),
+            new PropertyMetadata(0.0, OnPresenterVisualStateChanged));
+
+    public static readonly DependencyProperty PresenterOffsetProperty = PresenterOffsetPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey PresenterTransitionDurationPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(PresenterTransitionDuration), typeof(TimeSpan), typeof(FWSnackbar),
+            new PropertyMetadata(TimeSpan.Zero));
+
+    public static readonly DependencyProperty PresenterTransitionDurationProperty = PresenterTransitionDurationPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey PresenterPlacementPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(PresenterPlacement), typeof(FWSnackbarPlacement), typeof(FWSnackbar),
+            new PropertyMetadata(FWSnackbarPlacement.Bottom, OnPresenterVisualStateChanged));
+
+    public static readonly DependencyProperty PresenterPlacementProperty = PresenterPlacementPropertyKey.DependencyProperty;
 
     public FWSnackbar()
     {
@@ -375,6 +449,21 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     {
         get => (bool)GetValue(IsAutoDismissPausedProperty)!;
     }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWSnackbarPresenterState PresenterState => (FWSnackbarPresenterState)GetValue(PresenterStateProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
+    public double PresenterOpacity => (double)GetValue(PresenterOpacityProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
+    public double PresenterOffset => (double)GetValue(PresenterOffsetProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public TimeSpan PresenterTransitionDuration => (TimeSpan)GetValue(PresenterTransitionDurationProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
+    public FWSnackbarPlacement PresenterPlacement => (FWSnackbarPlacement)GetValue(PresenterPlacementProperty)!;
 
     public event EventHandler<FWSnackbarActionEventArgs>? ActionClick;
 
@@ -486,8 +575,15 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
             _closeButton.Click -= OnCloseButtonClick;
         }
 
+        _presenterRoot = GetTemplateChild("PART_PresenterRoot") as FrameworkElement;
         _actionButton = GetTemplateChild("PART_ActionButton") as Button;
         _closeButton = GetTemplateChild("PART_CloseButton") as Button;
+
+        EnsurePresenterTransform();
+        if (!TryStartPendingPresenterTransition())
+        {
+            UpdatePresenterVisualState();
+        }
 
         if (_actionButton != null)
         {
@@ -500,6 +596,130 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
 
         UpdateTemplateState();
+    }
+
+    public FWSnackbarPresenterDiagnostics GetPresenterDiagnostics()
+    {
+        return new FWSnackbarPresenterDiagnostics(
+            PresenterState,
+            _presenterRoot is not null,
+            PresenterOpacity,
+            PresenterOffset,
+            PresenterTransitionDuration,
+            PresenterPlacement,
+            _lastTransitionKind);
+    }
+
+    internal void BeginPresenterTransition(
+        FWSnackbarTransitionKind kind,
+        FWSnackbarPlacement placement,
+        double transitionOffset,
+        TimeSpan transitionDuration)
+    {
+        _lastTransitionKind = kind;
+        SetValue(PresenterTransitionDurationPropertyKey.DependencyProperty, transitionDuration);
+        SetValue(PresenterPlacementPropertyKey.DependencyProperty, placement);
+
+        if (kind == FWSnackbarTransitionKind.Show)
+        {
+            CancelPresenterCloseTransition();
+        }
+
+        if (_presenterRoot is null)
+        {
+            if (kind == FWSnackbarTransitionKind.Show)
+            {
+                if (transitionDuration > TimeSpan.Zero && transitionOffset > 0.0)
+                {
+                    QueuePresenterTransition(kind, placement, transitionOffset, transitionDuration);
+                    var signedOffset = ResolveSignedPresenterOffset(placement, transitionOffset);
+                    SetPresenterVisual(FWSnackbarPresenterState.Entering, opacity: 0.0, offset: signedOffset);
+                }
+                else
+                {
+                    ClearPendingPresenterTransition();
+                    SetPresenterVisual(FWSnackbarPresenterState.Visible, opacity: 1.0, offset: 0.0);
+                }
+            }
+            else
+            {
+                ClearPendingPresenterTransition();
+                SetPresenterVisual(FWSnackbarPresenterState.Idle, opacity: 1.0, offset: 0.0);
+            }
+
+            return;
+        }
+
+        ClearPendingPresenterTransition();
+        StartResolvedPresenterTransition(kind, placement, transitionOffset, transitionDuration);
+    }
+
+    private void StartResolvedPresenterTransition(
+        FWSnackbarTransitionKind kind,
+        FWSnackbarPlacement placement,
+        double transitionOffset,
+        TimeSpan transitionDuration)
+    {
+        if (transitionDuration <= TimeSpan.Zero || transitionOffset <= 0.0)
+        {
+            if (kind == FWSnackbarTransitionKind.Show)
+            {
+                SetPresenterVisual(FWSnackbarPresenterState.Visible, opacity: 1.0, offset: 0.0);
+            }
+            else
+            {
+                CompletePresenterClose();
+            }
+
+            return;
+        }
+
+        var signedOffset = ResolveSignedPresenterOffset(placement, transitionOffset);
+        if (kind == FWSnackbarTransitionKind.Show)
+        {
+            SetPresenterVisual(FWSnackbarPresenterState.Entering, opacity: 0.0, offset: signedOffset);
+            StartPresenterTransition(FWSnackbarPresenterState.Visible, 1.0, 0.0, transitionDuration, completeCloseWhenFinished: false);
+        }
+        else
+        {
+            SetValue(PresenterStatePropertyKey.DependencyProperty, FWSnackbarPresenterState.Exiting);
+            StartPresenterTransition(FWSnackbarPresenterState.Exiting, 0.0, signedOffset, transitionDuration, completeCloseWhenFinished: true);
+        }
+    }
+
+    private void QueuePresenterTransition(
+        FWSnackbarTransitionKind kind,
+        FWSnackbarPlacement placement,
+        double transitionOffset,
+        TimeSpan transitionDuration)
+    {
+        _pendingPresenterTransitionKind = kind;
+        _pendingPresenterTransitionPlacement = placement;
+        _pendingPresenterTransitionOffset = transitionOffset;
+        _pendingPresenterTransitionDuration = transitionDuration;
+    }
+
+    private bool TryStartPendingPresenterTransition()
+    {
+        if (_presenterRoot is null || _pendingPresenterTransitionKind is not { } kind)
+        {
+            return false;
+        }
+
+        var placement = _pendingPresenterTransitionPlacement;
+        var transitionOffset = _pendingPresenterTransitionOffset;
+        var transitionDuration = _pendingPresenterTransitionDuration;
+        ClearPendingPresenterTransition();
+        StartResolvedPresenterTransition(kind, placement, transitionOffset, transitionDuration);
+        return true;
+    }
+
+    private void ClearPendingPresenterTransition()
+    {
+        _pendingPresenterTransitionKind = null;
+        _pendingPresenterTransitionPlacement = FWSnackbarPlacement.Bottom;
+        _pendingPresenterTransitionOffset = 0.0;
+        _pendingPresenterTransitionDuration = TimeSpan.Zero;
     }
 
     private void OnActionButtonClick(object sender, RoutedEventArgs e)
@@ -644,14 +864,162 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     private void CompleteClose()
     {
+        if (!_isCompletingPresenterClose && PresenterState == FWSnackbarPresenterState.Exiting)
+        {
+            return;
+        }
+
         _autoDismissCancellation?.Cancel();
         _autoDismissCancellation?.Dispose();
         _autoDismissCancellation = null;
         _pointerAutoDismissPause = false;
         _focusAutoDismissPause = false;
         UpdateAutoDismissPauseState();
+        ClearPendingPresenterTransition();
+        CancelPresenterCloseTransition();
+        StopPresenterTransitionTimer();
+        if (!_isCompletingPresenterClose)
+        {
+            SetPresenterVisual(FWSnackbarPresenterState.Idle, opacity: 1.0, offset: 0.0);
+        }
+
         Closed?.Invoke(this, EventArgs.Empty);
         CompleteCloseTask(LastCloseReason);
+    }
+
+    private void StartPresenterTransition(
+        FWSnackbarPresenterState completedState,
+        double targetOpacity,
+        double targetOffset,
+        TimeSpan transitionDuration,
+        bool completeCloseWhenFinished)
+    {
+        CancelPresenterCloseTransition();
+        StopPresenterTransitionTimer();
+
+        _presenterStartOpacity = PresenterOpacity;
+        _presenterStartOffset = PresenterOffset;
+        _presenterTargetOpacity = Math.Clamp(targetOpacity, 0.0, 1.0);
+        _presenterTargetOffset = targetOffset;
+        _completeCloseWhenPresenterTransitionCompletes = completeCloseWhenFinished;
+
+        if (transitionDuration <= TimeSpan.Zero)
+        {
+            CompletePresenterTransition(completedState);
+            return;
+        }
+
+        SetValue(PresenterTransitionDurationPropertyKey.DependencyProperty, transitionDuration);
+        _presenterTransitionStopwatch.Restart();
+        _presenterTransitionTimer = new DispatcherTimer
+        {
+            Interval = CompositionTarget.FrameInterval
+        };
+        _presenterTransitionTimer.Tick += (_, _) => OnPresenterTransitionTick(completedState);
+        _presenterTransitionTimer.Start();
+    }
+
+    private void OnPresenterTransitionTick(FWSnackbarPresenterState completedState)
+    {
+        var durationMs = Math.Max(1.0, PresenterTransitionDuration.TotalMilliseconds);
+        var elapsed = _presenterTransitionStopwatch.Elapsed.TotalMilliseconds;
+        var t = Math.Clamp(elapsed / durationMs, 0.0, 1.0);
+        var eased = completedState == FWSnackbarPresenterState.Visible ? EaseOutCubic(t) : EaseInCubic(t);
+
+        SetValue(PresenterOpacityPropertyKey.DependencyProperty, Lerp(_presenterStartOpacity, _presenterTargetOpacity, eased));
+        SetValue(PresenterOffsetPropertyKey.DependencyProperty, Lerp(_presenterStartOffset, _presenterTargetOffset, eased));
+        UpdatePresenterVisualState();
+
+        if (t >= 1.0)
+        {
+            CompletePresenterTransition(completedState);
+        }
+    }
+
+    private void CompletePresenterTransition(FWSnackbarPresenterState completedState)
+    {
+        StopPresenterTransitionTimer();
+        SetPresenterVisual(completedState, _presenterTargetOpacity, _presenterTargetOffset);
+
+        if (_completeCloseWhenPresenterTransitionCompletes)
+        {
+            _completeCloseWhenPresenterTransitionCompletes = false;
+            CompletePresenterClose();
+        }
+    }
+
+    private void StopPresenterTransitionTimer()
+    {
+        if (_presenterTransitionTimer is not null)
+        {
+            _presenterTransitionTimer.Stop();
+            _presenterTransitionTimer = null;
+        }
+
+        _presenterTransitionStopwatch.Stop();
+    }
+
+    private void CompletePresenterClose()
+    {
+        if (!IsOpen && !_isCompletingPresenterClose)
+        {
+            _isCompletingPresenterClose = true;
+            try
+            {
+                CompleteClose();
+            }
+            finally
+            {
+                _isCompletingPresenterClose = false;
+            }
+        }
+    }
+
+    private void CancelPresenterCloseTransition()
+    {
+        _completeCloseWhenPresenterTransitionCompletes = false;
+    }
+
+    private void SetPresenterVisual(FWSnackbarPresenterState state, double opacity, double offset)
+    {
+        SetValue(PresenterStatePropertyKey.DependencyProperty, state);
+        SetValue(PresenterOpacityPropertyKey.DependencyProperty, Math.Clamp(opacity, 0.0, 1.0));
+        SetValue(PresenterOffsetPropertyKey.DependencyProperty, offset);
+        UpdatePresenterVisualState();
+    }
+
+    private void EnsurePresenterTransform()
+    {
+        if (_presenterRoot is null)
+        {
+            return;
+        }
+
+        _presenterTransform = _presenterRoot.RenderTransform as TranslateTransform;
+        if (_presenterTransform is null)
+        {
+            _presenterTransform = new TranslateTransform();
+            _presenterRoot.RenderTransform = _presenterTransform;
+        }
+    }
+
+    private void UpdatePresenterVisualState()
+    {
+        if (_presenterRoot is null)
+        {
+            return;
+        }
+
+        EnsurePresenterTransform();
+        _presenterRoot.Opacity = PresenterOpacity;
+
+        if (_presenterTransform is not null)
+        {
+            _presenterTransform.X = 0.0;
+            _presenterTransform.Y = PresenterOffset;
+        }
+
+        _presenterRoot.InvalidateVisual();
     }
 
     private static void OnActionCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -725,6 +1093,23 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
     }
 
+    private static void OnPresenterStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbar snackbar)
+        {
+            snackbar.InvalidateVisual();
+        }
+    }
+
+    private static void OnPresenterVisualStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSnackbar snackbar)
+        {
+            snackbar.UpdatePresenterVisualState();
+            snackbar.InvalidateVisual();
+        }
+    }
+
     private static bool IsValidSeverity(object? value)
     {
         return value is ToastSeverity severity && Enum.IsDefined(severity);
@@ -733,6 +1118,26 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     private static bool IsValidDuration(object? value)
     {
         return value is TimeSpan duration && duration >= TimeSpan.Zero;
+    }
+
+    private static double Lerp(double start, double end, double progress)
+    {
+        return start + (end - start) * progress;
+    }
+
+    private static double ResolveSignedPresenterOffset(FWSnackbarPlacement placement, double transitionOffset)
+    {
+        return placement == FWSnackbarPlacement.Top ? -transitionOffset : transitionOffset;
+    }
+
+    private static double EaseOutCubic(double progress)
+    {
+        return 1.0 - Math.Pow(1.0 - progress, 3.0);
+    }
+
+    private static double EaseInCubic(double progress)
+    {
+        return progress * progress * progress;
     }
 }
 
@@ -1017,6 +1422,7 @@ public class FWSnackbarHost : Control, IFluentJaliumControl
             return;
         }
 
+        snackbar.BeginPresenterTransition(kind, Placement, TransitionOffset, SnackbarTransitionDuration);
         TransitionRequested?.Invoke(this, new FWSnackbarTransitionRequestedEventArgs(snackbar, kind, GetDiagnostics()));
     }
 
