@@ -11,6 +11,7 @@ public class FWItemsRepeaterTests
     {
         // Arrange & Act
         var repeater = new FWItemsRepeater();
+        var diagnostics = repeater.GetDiagnostics();
 
         // Assert
         Assert.NotNull(repeater);
@@ -20,6 +21,16 @@ public class FWItemsRepeaterTests
         Assert.Equal(0.0, repeater.HorizontalCacheLength);
         Assert.Equal(0.0, repeater.VerticalCacheLength);
         Assert.Null(repeater.Animator);
+        Assert.Equal(FWItemsRepeaterRealizationMode.All, repeater.RealizationMode);
+        Assert.Equal(0, repeater.ItemCount);
+        Assert.Equal(0, repeater.RealizedElementCount);
+        Assert.Equal(0, repeater.RecycledElementCount);
+        Assert.Equal(-1, repeater.FirstRealizedIndex);
+        Assert.Equal(-1, repeater.LastRealizedIndex);
+        Assert.Equal(0, repeater.RequestedFirstRealizedIndex);
+        Assert.Equal(0, repeater.RequestedRealizedItemCount);
+        Assert.False(diagnostics.HasRealizedElements);
+        Assert.False(diagnostics.HasRecycledElements);
     }
 
     [Fact]
@@ -99,6 +110,181 @@ public class FWItemsRepeaterTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(repeater);
+    }
+
+    [Fact]
+    public void ItemsSource_WithTemplate_ShouldRealizeAllItemsByDefault()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = new[] { "Alpha", "Beta", "Gamma" },
+            HorizontalCacheLength = 120,
+            VerticalCacheLength = 240
+        };
+
+        // Act
+        var element = repeater.TryGetElement(1);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.NotNull(element);
+        Assert.Equal(FWItemsRepeaterRealizationMode.All, diagnostics.RealizationMode);
+        Assert.Equal(3, diagnostics.ItemCount);
+        Assert.Equal(3, diagnostics.RealizedElementCount);
+        Assert.Equal(0, diagnostics.RecycledElementCount);
+        Assert.Equal(0, diagnostics.FirstRealizedIndex);
+        Assert.Equal(2, diagnostics.LastRealizedIndex);
+        Assert.Equal(0, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(3, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(120, diagnostics.HorizontalCacheLength);
+        Assert.Equal(240, diagnostics.VerticalCacheLength);
+        Assert.Equal(3, diagnostics.LastCreatedElementCount);
+        Assert.Equal(0, diagnostics.LastReusedElementCount);
+        Assert.True(diagnostics.HasRealizedElements);
+        Assert.False(diagnostics.HasRecycledElements);
+        Assert.Equal(1, repeater.GetElementIndex(element!));
+    }
+
+    [Fact]
+    public void RealizeRange_ShouldOnlyRealizeRequestedItemWindow()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = new[] { "A", "B", "C", "D", "E", "F" }
+        };
+
+        // Act
+        repeater.RealizeRange(2, 3);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(6, diagnostics.ItemCount);
+        Assert.Equal(3, diagnostics.RealizedElementCount);
+        Assert.Equal(3, diagnostics.RecycledElementCount);
+        Assert.Equal(2, diagnostics.FirstRealizedIndex);
+        Assert.Equal(4, diagnostics.LastRealizedIndex);
+        Assert.Equal(2, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(3, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(0, diagnostics.LastCreatedElementCount);
+        Assert.Equal(3, diagnostics.LastReusedElementCount);
+        Assert.Null(repeater.TryGetElement(1));
+        Assert.NotNull(repeater.TryGetElement(2));
+        Assert.NotNull(repeater.TryGetElement(4));
+        Assert.Null(repeater.TryGetElement(5));
+    }
+
+    [Fact]
+    public void RealizeRange_WhenRangeMoves_ShouldReuseElements()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = new[] { "A", "B", "C", "D", "E", "F" }
+        };
+        repeater.RealizeRange(2, 3);
+        var firstWindowElement = repeater.TryGetElement(2);
+
+        // Act
+        repeater.RealizeRange(3, 2);
+        var movedDiagnostics = repeater.GetDiagnostics();
+        repeater.ResetRealizationWindow();
+        var resetDiagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.NotNull(firstWindowElement);
+        Assert.Equal(FWItemsRepeaterRealizationMode.Range, movedDiagnostics.RealizationMode);
+        Assert.Equal(2, movedDiagnostics.RealizedElementCount);
+        Assert.Equal(4, movedDiagnostics.RecycledElementCount);
+        Assert.Equal(3, movedDiagnostics.FirstRealizedIndex);
+        Assert.Equal(4, movedDiagnostics.LastRealizedIndex);
+        Assert.Equal(0, movedDiagnostics.LastCreatedElementCount);
+        Assert.Equal(2, movedDiagnostics.LastReusedElementCount);
+        Assert.Equal(FWItemsRepeaterRealizationMode.All, resetDiagnostics.RealizationMode);
+        Assert.Equal(6, resetDiagnostics.RealizedElementCount);
+        Assert.Equal(0, resetDiagnostics.RecycledElementCount);
+        Assert.Equal(0, resetDiagnostics.FirstRealizedIndex);
+        Assert.Equal(5, resetDiagnostics.LastRealizedIndex);
+        Assert.Equal(0, resetDiagnostics.LastCreatedElementCount);
+        Assert.Equal(6, resetDiagnostics.LastReusedElementCount);
+    }
+
+    [Fact]
+    public void RealizeRange_WhenOutsideItems_ShouldRealizeNothing()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = new[] { "A", "B", "C" }
+        };
+
+        // Act
+        repeater.RealizeRange(99, 5);
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(3, diagnostics.ItemCount);
+        Assert.Equal(0, diagnostics.RealizedElementCount);
+        Assert.Equal(3, diagnostics.RecycledElementCount);
+        Assert.Equal(-1, diagnostics.FirstRealizedIndex);
+        Assert.Equal(-1, diagnostics.LastRealizedIndex);
+        Assert.Equal(99, diagnostics.RequestedFirstRealizedIndex);
+        Assert.Equal(5, diagnostics.RequestedRealizedItemCount);
+        Assert.Equal(0, diagnostics.LastCreatedElementCount);
+        Assert.Equal(0, diagnostics.LastReusedElementCount);
+        Assert.False(diagnostics.HasRealizedElements);
+        Assert.True(diagnostics.HasRecycledElements);
+    }
+
+    [Fact]
+    public void RealizeRange_WithNegativeArguments_ShouldThrow()
+    {
+        // Arrange
+        var repeater = new FWItemsRepeater();
+
+        // Act & Assert
+        Assert.Throws<ArgumentOutOfRangeException>(() => repeater.RealizeRange(-1, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => repeater.RealizeRange(0, -1));
+    }
+
+    [Fact]
+    public void CollectionChanges_ShouldRefreshDiagnosticsAndReuseElements()
+    {
+        // Arrange
+        var items = new System.Collections.ObjectModel.ObservableCollection<string> { "A", "B", "C" };
+        var repeater = new FWItemsRepeater
+        {
+            ItemTemplate = CreateTextTemplate(),
+            ItemsSource = items
+        };
+        repeater.RealizeRange(0, 2);
+
+        // Act
+        items.Add("D");
+        var diagnostics = repeater.GetDiagnostics();
+
+        // Assert
+        Assert.Equal(FWItemsRepeaterRealizationMode.Range, diagnostics.RealizationMode);
+        Assert.Equal(4, diagnostics.ItemCount);
+        Assert.Equal(2, diagnostics.RealizedElementCount);
+        Assert.Equal(1, diagnostics.RecycledElementCount);
+        Assert.Equal(0, diagnostics.LastCreatedElementCount);
+        Assert.Equal(2, diagnostics.LastReusedElementCount);
+    }
+
+    private static DataTemplate CreateTextTemplate()
+    {
+        var template = new DataTemplate();
+        template.SetVisualTree(() => new TextBlock());
+        template.Seal();
+        return template;
     }
 }
 

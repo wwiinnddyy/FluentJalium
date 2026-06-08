@@ -6,11 +6,62 @@ using System.Collections.Specialized;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// Describes how <see cref="FWItemsRepeater"/> chooses the item indices that are currently realized.
+/// </summary>
+public enum FWItemsRepeaterRealizationMode
+{
+    /// <summary>
+    /// All items from the current source are realized.
+    /// </summary>
+    All,
+
+    /// <summary>
+    /// Only the explicitly requested item range is realized.
+    /// </summary>
+    Range
+}
+
+/// <summary>
+/// Snapshot of realized item and recycle-pool state for <see cref="FWItemsRepeater"/>.
+/// </summary>
+public readonly record struct FWItemsRepeaterDiagnostics(
+    FWItemsRepeaterRealizationMode RealizationMode,
+    int ItemCount,
+    int RealizedElementCount,
+    int RecycledElementCount,
+    int FirstRealizedIndex,
+    int LastRealizedIndex,
+    int RequestedFirstRealizedIndex,
+    int RequestedRealizedItemCount,
+    double HorizontalCacheLength,
+    double VerticalCacheLength,
+    int LastCreatedElementCount,
+    int LastReusedElementCount)
+{
+    /// <summary>
+    /// Gets a value indicating whether the repeater has any realized elements.
+    /// </summary>
+    public bool HasRealizedElements => RealizedElementCount > 0;
+
+    /// <summary>
+    /// Gets a value indicating whether the repeater currently has reusable elements in its recycle pool.
+    /// </summary>
+    public bool HasRecycledElements => RecycledElementCount > 0;
+}
+
+/// <summary>
 /// FluentJalium ItemsRepeater control for flexible, virtualizing list layouts.
 /// </summary>
 public class FWItemsRepeater : Panel, IFluentJaliumControl
 {
-    private IList? _realizedElements;
+    private readonly List<object?> _items = new();
+    private readonly Dictionary<int, FrameworkElement> _realizedElements = new();
+    private readonly Stack<FrameworkElement> _recyclePool = new();
+    private int _realizationStartIndex;
+    private int _realizationItemCount = int.MaxValue;
+    private int _lastCreatedElementCount;
+    private int _lastReusedElementCount;
+    private bool _hasRealizationRange;
 
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FWItemsRepeater),
@@ -41,7 +92,6 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     /// </summary>
     public FWItemsRepeater()
     {
-        _realizedElements = new List<FrameworkElement>();
     }
 
     /// <summary>
@@ -104,24 +154,110 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
         set => SetValue(AnimatorProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWItemsRepeaterRealizationMode RealizationMode =>
+        _hasRealizationRange ? FWItemsRepeaterRealizationMode.Range : FWItemsRepeaterRealizationMode.All;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int ItemCount => _items.Count;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int RealizedElementCount => _realizedElements.Count;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int RecycledElementCount => _recyclePool.Count;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int FirstRealizedIndex => GetFirstRealizedIndex();
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int LastRealizedIndex => GetLastRealizedIndex();
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int RequestedFirstRealizedIndex => _hasRealizationRange ? _realizationStartIndex : 0;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public int RequestedRealizedItemCount => _hasRealizationRange ? _realizationItemCount : _items.Count;
+
     /// <summary>
-    /// Gets the element at the specified index.
+    /// Gets the realized element at the specified item index.
     /// </summary>
     public FrameworkElement? TryGetElement(int index)
     {
-        if (_realizedElements != null && index >= 0 && index < _realizedElements.Count)
-        {
-            return _realizedElements[index] as FrameworkElement;
-        }
-        return null;
+        return _realizedElements.TryGetValue(index, out var element) ? element : null;
     }
 
     /// <summary>
-    /// Gets the index of the element for the specified item.
+    /// Gets the item index represented by the specified realized element.
     /// </summary>
     public int GetElementIndex(FrameworkElement element)
     {
-        return _realizedElements?.IndexOf(element) ?? -1;
+        foreach (var pair in _realizedElements)
+        {
+            if (ReferenceEquals(pair.Value, element))
+            {
+                return pair.Key;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Realizes only the requested item index window while recycling existing elements.
+    /// </summary>
+    public void RealizeRange(int startIndex, int itemCount)
+    {
+        if (startIndex < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index cannot be negative.");
+        }
+
+        if (itemCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(itemCount), "Item count cannot be negative.");
+        }
+
+        _hasRealizationRange = true;
+        _realizationStartIndex = startIndex;
+        _realizationItemCount = itemCount;
+        RefreshItems();
+    }
+
+    /// <summary>
+    /// Returns to realizing the full item set.
+    /// </summary>
+    public void ResetRealizationWindow()
+    {
+        if (!_hasRealizationRange)
+        {
+            return;
+        }
+
+        _hasRealizationRange = false;
+        _realizationStartIndex = 0;
+        _realizationItemCount = int.MaxValue;
+        RefreshItems();
+    }
+
+    /// <summary>
+    /// Gets a snapshot of realization, recycle-pool, and cache diagnostics.
+    /// </summary>
+    public FWItemsRepeaterDiagnostics GetDiagnostics()
+    {
+        return new FWItemsRepeaterDiagnostics(
+            RealizationMode,
+            ItemCount,
+            RealizedElementCount,
+            RecycledElementCount,
+            FirstRealizedIndex,
+            LastRealizedIndex,
+            RequestedFirstRealizedIndex,
+            RequestedRealizedItemCount,
+            HorizontalCacheLength,
+            VerticalCacheLength,
+            _lastCreatedElementCount,
+            _lastReusedElementCount);
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -195,7 +331,7 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     {
         if (d is FWItemsRepeater repeater)
         {
-            repeater.RefreshItems();
+            repeater.RefreshItems(reuseExistingElements: false);
         }
     }
 
@@ -214,24 +350,153 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
 
     private void RefreshItems()
     {
-        Children.Clear();
-        _realizedElements?.Clear();
+        RefreshItems(reuseExistingElements: true);
+    }
 
-        if (ItemsSource == null || ItemTemplate == null)
-            return;
-
-        foreach (var item in ItemsSource)
+    private void RefreshItems(bool reuseExistingElements)
+    {
+        SnapshotItems();
+        if (reuseExistingElements)
         {
-            var element = ItemTemplate.LoadContent() as FrameworkElement;
-            if (element != null)
+            RecycleRealizedElements();
+        }
+        else
+        {
+            DiscardRealizedElements();
+            _recyclePool.Clear();
+        }
+
+        _lastCreatedElementCount = 0;
+        _lastReusedElementCount = 0;
+
+        if (_items.Count == 0 || ItemTemplate == null)
+        {
+            InvalidateMeasure();
+            InvalidateVisual();
+            return;
+        }
+
+        var (startIndex, endIndex) = GetRealizationRange();
+        for (var index = startIndex; index < endIndex; index++)
+        {
+            var element = GetOrCreateElement();
+            if (element == null)
             {
-                element.DataContext = item;
-                Children.Add(element);
-                _realizedElements?.Add(element);
+                continue;
             }
+
+            element.DataContext = _items[index];
+            Children.Add(element);
+            _realizedElements[index] = element;
+            Animator?.OnElementShown(element);
         }
 
         InvalidateMeasure();
+        InvalidateVisual();
+    }
+
+    private void SnapshotItems()
+    {
+        _items.Clear();
+        if (ItemsSource == null)
+        {
+            return;
+        }
+
+        foreach (var item in ItemsSource)
+        {
+            _items.Add(item);
+        }
+    }
+
+    private (int StartIndex, int EndIndex) GetRealizationRange()
+    {
+        if (!_hasRealizationRange)
+        {
+            return (0, _items.Count);
+        }
+
+        var startIndex = Math.Min(_realizationStartIndex, _items.Count);
+        var realizedCount = Math.Min(_realizationItemCount, _items.Count - startIndex);
+        return (startIndex, startIndex + realizedCount);
+    }
+
+    private FrameworkElement? GetOrCreateElement()
+    {
+        if (_recyclePool.Count > 0)
+        {
+            _lastReusedElementCount++;
+            return _recyclePool.Pop();
+        }
+
+        var element = ItemTemplate?.LoadContent() as FrameworkElement;
+        if (element != null)
+        {
+            _lastCreatedElementCount++;
+        }
+
+        return element;
+    }
+
+    private void RecycleRealizedElements()
+    {
+        foreach (var element in _realizedElements.Values)
+        {
+            Animator?.OnElementHidden(element);
+            _recyclePool.Push(element);
+        }
+
+        Children.Clear();
+        _realizedElements.Clear();
+    }
+
+    private void DiscardRealizedElements()
+    {
+        foreach (var element in _realizedElements.Values)
+        {
+            Animator?.OnElementHidden(element);
+        }
+
+        Children.Clear();
+        _realizedElements.Clear();
+    }
+
+    private int GetFirstRealizedIndex()
+    {
+        if (_realizedElements.Count == 0)
+        {
+            return -1;
+        }
+
+        var first = int.MaxValue;
+        foreach (var index in _realizedElements.Keys)
+        {
+            if (index < first)
+            {
+                first = index;
+            }
+        }
+
+        return first;
+    }
+
+    private int GetLastRealizedIndex()
+    {
+        if (_realizedElements.Count == 0)
+        {
+            return -1;
+        }
+
+        var last = int.MinValue;
+        foreach (var index in _realizedElements.Keys)
+        {
+            if (index > last)
+            {
+                last = index;
+            }
+        }
+
+        return last;
     }
 }
 

@@ -16,6 +16,7 @@ namespace FluentJalium.Gallery.Pages;
 public class AdvancedCollectionsPage : Page
 {
     private FWItemsRepeater? _repeater;
+    private TextBlock? _repeaterDiagnosticsText;
     private ObservableCollection<SampleItem> _items;
 
     public AdvancedCollectionsPage()
@@ -100,10 +101,15 @@ public class AdvancedCollectionsPage : Page
 
     private UIElement CreateLayoutControls()
     {
-        var panel = new StackPanel
+        var stack = new StackPanel
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16
+            Spacing = 10
+        };
+
+        var panel = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8
         };
 
         var stackLayoutButton = new Button
@@ -134,12 +140,46 @@ public class AdvancedCollectionsPage : Page
         };
         removeItemButton.Click += (s, e) => RemoveItem();
 
+        var firstWindowButton = new Button
+        {
+            Content = "Window 0-5",
+            MinWidth = 100
+        };
+        firstWindowButton.Click += (s, e) => RealizeWindow(0, 5);
+
+        var laterWindowButton = new Button
+        {
+            Content = "Window 8-5",
+            MinWidth = 100
+        };
+        laterWindowButton.Click += (s, e) => RealizeWindow(8, 5);
+
+        var allItemsButton = new Button
+        {
+            Content = "All",
+            MinWidth = 80
+        };
+        allItemsButton.Click += (s, e) => ResetRealizationWindow();
+
+        _repeaterDiagnosticsText = new TextBlock
+        {
+            FontSize = 13,
+            Opacity = 0.72,
+            TextWrapping = TextWrapping.Wrap
+        };
+
         panel.Children.Add(stackLayoutButton);
         panel.Children.Add(gridLayoutButton);
         panel.Children.Add(addItemButton);
         panel.Children.Add(removeItemButton);
+        panel.Children.Add(firstWindowButton);
+        panel.Children.Add(laterWindowButton);
+        panel.Children.Add(allItemsButton);
 
-        return panel;
+        stack.Children.Add(panel);
+        stack.Children.Add(_repeaterDiagnosticsText);
+
+        return stack;
     }
 
     private UIElement CreateItemsRepeaterDemo()
@@ -174,6 +214,7 @@ public class AdvancedCollectionsPage : Page
 
         scrollViewer.Content = _repeater;
         border.Child = scrollViewer;
+        UpdateRepeaterDiagnostics();
 
         return border;
     }
@@ -230,6 +271,7 @@ public class AdvancedCollectionsPage : Page
                 Orientation = Orientation.Vertical,
                 Spacing = 8
             };
+            UpdateRepeaterDiagnostics();
         }
     }
 
@@ -245,6 +287,7 @@ public class AdvancedCollectionsPage : Page
                 MinColumnSpacing = 8,
                 MinRowSpacing = 8
             };
+            UpdateRepeaterDiagnostics();
         }
     }
 
@@ -255,6 +298,7 @@ public class AdvancedCollectionsPage : Page
             Title = $"Item {_items.Count + 1}",
             Description = $"Description for item {_items.Count + 1}"
         });
+        UpdateRepeaterDiagnostics();
     }
 
     private void RemoveItem()
@@ -262,7 +306,35 @@ public class AdvancedCollectionsPage : Page
         if (_items.Count > 0)
         {
             _items.RemoveAt(_items.Count - 1);
+            UpdateRepeaterDiagnostics();
         }
+    }
+
+    private void RealizeWindow(int startIndex, int itemCount)
+    {
+        _repeater?.RealizeRange(startIndex, itemCount);
+        UpdateRepeaterDiagnostics();
+    }
+
+    private void ResetRealizationWindow()
+    {
+        _repeater?.ResetRealizationWindow();
+        UpdateRepeaterDiagnostics();
+    }
+
+    private void UpdateRepeaterDiagnostics()
+    {
+        if (_repeater == null || _repeaterDiagnosticsText == null)
+        {
+            return;
+        }
+
+        var diagnostics = _repeater.GetDiagnostics();
+        var range = diagnostics.HasRealizedElements
+            ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
+            : "none";
+        _repeaterDiagnosticsText.Text =
+            $"Mode: {diagnostics.RealizationMode} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Range: {range} | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
     }
 
     private ObservableCollection<SampleItem> GenerateSampleItems()

@@ -301,6 +301,10 @@ var repeater = new FWItemsRepeater
     HorizontalCacheLength = 200,
     VerticalCacheLength = 200
 };
+
+repeater.RealizeRange(0, 5);
+var diagnostics = repeater.GetDiagnostics();
+repeater.ResetRealizationWindow();
 """,
         ["collections.gridview"] = """
 var emptyList = new FWListView
