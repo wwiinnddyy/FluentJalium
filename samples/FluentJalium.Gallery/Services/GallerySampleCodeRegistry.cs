@@ -1108,7 +1108,17 @@ FWAnnotatedScrollBarDiagnostics annotationDiagnostics = annotatedScrollBar.GetDi
 Debug.WriteLine($"AnnotatedScrollBar labels: {annotationDiagnostics.RegisteredLabelCount}/{annotationDiagnostics.SourceLabelCount}; value: {annotationDiagnostics.Value}; range: {annotationDiagnostics.Minimum}-{annotationDiagnostics.Maximum}.");
 """,
         ["status.snackbar"] = """
-var host = new FWSnackbarOverlayHost
+var rootHost = new FWSnackbarHost
+{
+    Width = 470,
+    MaxVisibleSnackbars = 2,
+    Placement = FWSnackbarPlacement.Bottom,
+    Spacing = 8,
+    TransitionProfile = FWContentTransitionProfile.Entrance,
+    TransitionOffset = 16
+};
+
+var overlayHost = new FWSnackbarOverlayHost
 {
     Width = 470,
     OverlayTarget = rootElement,
@@ -1120,10 +1130,15 @@ var host = new FWSnackbarOverlayHost
     TransitionProfile = FWContentTransitionProfile.Entrance,
     TransitionOffset = 16
 };
+
 var service = new FWSnackbarService();
-service.SetHost(host);
-host.TransitionRequested += (_, args) => LogTransition(args.Kind, args.Diagnostics);
-host.QueueChanged += (_, args) => LogQueueDiagnostics(args.Reason, host.GetDiagnostics());
+service.SetHost(rootHost);
+rootHost.TransitionRequested += (_, args) => LogTransition(args.Kind, args.Diagnostics);
+rootHost.QueueChanged += (_, args) => LogQueueDiagnostics(args.Reason, args.Diagnostics);
+overlayHost.TransitionRequested += (_, args) => LogTransition(args.Kind, args.Diagnostics);
+overlayHost.QueueChanged += (_, args) => LogQueueDiagnostics(args.Reason, args.Diagnostics);
+overlayHost.OverlayOpened += (_, _) => LogOverlayState(overlayHost.IsOverlayOpen);
+overlayHost.OverlayClosed += (_, _) => LogOverlayState(overlayHost.IsOverlayOpen);
 
 var snackbar = new FWSnackbar
 {
@@ -1145,11 +1160,18 @@ snackbar.Closing += (_, args) =>
     args.Cancel = ShouldKeepSnackbarOpen(args.Reason);
 };
 
+service.SetHost(overlayHost);
+overlayHost.Placement = FWSnackbarPlacement.Top;
+overlayHost.OverlayPlacement = PlacementMode.Top;
+overlayHost.Placement = FWSnackbarPlacement.Bottom;
+overlayHost.OverlayPlacement = PlacementMode.Bottom;
+
 var closeTask = service.EnqueueForResultAsync(snackbar);
-var diagnostics = host.GetDiagnostics();
-var isOverlayOpen = host.IsOverlayOpen;
+var diagnostics = overlayHost.GetDiagnostics();
+var isOverlayOpen = overlayHost.IsOverlayOpen;
 snackbar.PauseAutoDismiss();
 snackbar.ResumeAutoDismiss();
+snackbar.RequestClose(FWSnackbarCloseReason.CloseButton);
 service.CloseCurrent();
 var closeReason = await closeTask;
 """

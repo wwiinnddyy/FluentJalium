@@ -2,6 +2,7 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
@@ -21,6 +22,7 @@ using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToastNotificationHost = FluentJalium.Controls.FWToastNotificationHost;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWSnackbarHost = FluentJalium.Controls.FWSnackbarHost;
+using FWSnackbarOverlayHost = FluentJalium.Controls.FWSnackbarOverlayHost;
 using FWSnackbarPlacement = FluentJalium.Controls.FWSnackbarPlacement;
 using FWSnackbarService = FluentJalium.Controls.FWSnackbarService;
 using FWSnackbarTransitionKind = FluentJalium.Controls.FWSnackbarTransitionKind;
@@ -290,7 +292,32 @@ internal sealed class GalleryStatusPage
 
     private static UIElement CreateSnackbarStatusSample()
     {
-        var output = CreateStatusOutput("Host queue ready: current Draft archived. Visible 1/2, queued 1, closed 0, actions 0, paused off.");
+        var output = CreateStatusOutput("Root host ready: current Draft archived. Visible 1/2, queued 1, closed 0, actions 0, overlay closed, paused off.");
+        var overlayTarget = new FWBorder
+        {
+            Width = 470,
+            Height = 56,
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(FluentIconRegular.DesktopPulse24, 18, ThemeBrush("TextSecondary")),
+                    new FWTextBlock
+                    {
+                        Text = "Overlay target/root window surface",
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
+            }
+        };
         var host = new FWSnackbarHost
         {
             Width = 470,
@@ -300,9 +327,23 @@ internal sealed class GalleryStatusPage
             TransitionProfile = FWContentTransitionProfile.Entrance,
             TransitionOffset = 16
         };
+        var overlayHost = new FWSnackbarOverlayHost
+        {
+            Width = 470,
+            OverlayTarget = overlayTarget,
+            OverlayPlacement = PlacementMode.Bottom,
+            IsOverlayAutoOpenEnabled = true,
+            MaxVisibleSnackbars = 3,
+            Placement = FWSnackbarPlacement.Bottom,
+            Spacing = 8,
+            TransitionProfile = FWContentTransitionProfile.Entrance,
+            TransitionOffset = 16
+        };
         var service = new FWSnackbarService();
         service.SetHost(host);
 
+        FWSnackbarHost activeHost = host;
+        var routeLabel = "Root";
         var autoDismissEnabled = false;
         var closedEvents = 0;
         var transitionRequests = 0;
@@ -311,6 +352,7 @@ internal sealed class GalleryStatusPage
         var lastCloseReason = FWSnackbarCloseReason.None;
         var actionRequests = 0;
         var lastCommandParameter = "none";
+        var overlayEvents = 0;
         var actionCommand = new GallerySnackbarCommand(parameter =>
         {
             actionRequests++;
@@ -319,27 +361,44 @@ internal sealed class GalleryStatusPage
 
         void UpdateOutput(string action)
         {
-            var currentSnackbar = host.CurrentSnackbar;
+            var currentSnackbar = activeHost.CurrentSnackbar;
             var currentTitle = currentSnackbar?.Title?.ToString() ?? "none";
             var isPaused = currentSnackbar?.IsAutoDismissPaused ?? false;
             var presenter = currentSnackbar?.GetPresenterDiagnostics();
             var presenterState = presenter?.PresenterState.ToString() ?? "Idle";
             var presenterOpacity = presenter?.PresenterOpacity ?? 1.0;
             var presenterOffset = presenter?.PresenterOffset ?? 0.0;
-            var diagnostics = host.GetDiagnostics();
-            output.Text = $"{action}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Presenter: {presenterState}, opacity {presenterOpacity:0.00}, offset {presenterOffset:0.0}. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
+            var diagnostics = activeHost.GetDiagnostics();
+            var overlayState = overlayHost.IsOverlayOpen ? "open" : "closed";
+            output.Text = $"{action}. Route: {routeLabel}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Overlay: {overlayState}/{overlayHost.OverlayPlacement}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Presenter: {presenterState}, opacity {presenterOpacity:0.00}, offset {presenterOffset:0.0}. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Overlay events: {overlayEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
         }
 
-        host.TransitionRequested += (_, args) =>
+        void WireDiagnostics(FWSnackbarHost diagnosticsHost, string label)
         {
-            transitionRequests++;
-            lastTransition = args.Kind;
-            UpdateOutput($"Transition requested for {args.Snackbar.Title}");
+            diagnosticsHost.TransitionRequested += (_, args) =>
+            {
+                transitionRequests++;
+                lastTransition = args.Kind;
+                UpdateOutput($"{label} transition requested for {args.Snackbar.Title}");
+            };
+            diagnosticsHost.QueueChanged += (_, _) =>
+            {
+                queueEvents++;
+                UpdateOutput($"{label} queue diagnostics updated");
+            };
+        }
+
+        WireDiagnostics(host, "Root host");
+        WireDiagnostics(overlayHost, "Overlay host");
+        overlayHost.OverlayOpened += (_, _) =>
+        {
+            overlayEvents++;
+            UpdateOutput("Overlay opened");
         };
-        host.QueueChanged += (_, _) =>
+        overlayHost.OverlayClosed += (_, _) =>
         {
-            queueEvents++;
-            UpdateOutput("Snackbar host queue diagnostics updated");
+            overlayEvents++;
+            UpdateOutput("Overlay closed");
         };
 
         FWSnackbar CreateQueuedSnackbar(ToastSeverity severity, string title, string message, string actionContent, string actionParameter)
@@ -409,12 +468,36 @@ internal sealed class GalleryStatusPage
         void ToggleAutoDismiss()
         {
             autoDismissEnabled = !autoDismissEnabled;
-            foreach (var snackbar in host.Snackbars)
+            foreach (var snackbar in activeHost.Snackbars)
             {
                 snackbar.IsAutoDismissEnabled = autoDismissEnabled;
             }
 
             UpdateOutput($"Auto-dismiss {(autoDismissEnabled ? "enabled" : "disabled")}");
+        }
+
+        void RouteToHost(FWSnackbarHost nextHost, string nextRoute)
+        {
+            activeHost = nextHost;
+            routeLabel = nextRoute;
+            service.SetHost(nextHost);
+            UpdateOutput($"Snackbar service routed to {nextRoute.ToLowerInvariant()} host");
+        }
+
+        void ApplyPlacement(FWSnackbarPlacement placement)
+        {
+            host.Placement = placement;
+            overlayHost.Placement = placement;
+            overlayHost.OverlayPlacement = placement == FWSnackbarPlacement.Top
+                ? PlacementMode.Top
+                : PlacementMode.Bottom;
+            UpdateOutput($"Snackbar hosts placement set to {placement.ToString().ToLowerInvariant()}");
+        }
+
+        void SetTransitionProfile(FWSnackbarHost targetHost, FWContentTransitionProfile profile, double offset)
+        {
+            targetHost.TransitionProfile = profile;
+            targetHost.TransitionOffset = offset;
         }
 
         EnqueueSnackbar(ToastSeverity.Information, "Draft archived", "The current gallery draft moved to the archive.", "Undo", "draft-archive");
@@ -427,6 +510,7 @@ internal sealed class GalleryStatusPage
             Spacing = 10,
             Children =
             {
+                overlayTarget,
                 new FWBorder
                 {
                     Width = 470,
@@ -438,6 +522,23 @@ internal sealed class GalleryStatusPage
                     Padding = new Thickness(10),
                     Child = host
                 },
+                overlayHost,
+                CreateStatusButtonRow(
+                    CreateStatusActionButton(FluentIconRegular.DesktopPulse24, "Root host", () => RouteToHost(host, "Root")),
+                    CreateStatusActionButton(FluentIconRegular.Open24, "Overlay host", () => RouteToHost(overlayHost, "Overlay")),
+                    CreateStatusActionButton(FluentIconRegular.OpenOff24, "Overlay", () =>
+                    {
+                        if (overlayHost.IsOverlayOpen)
+                        {
+                            overlayHost.CloseOverlay();
+                        }
+                        else
+                        {
+                            overlayHost.OpenOverlay();
+                        }
+
+                        UpdateOutput("Overlay state toggled manually");
+                    })),
                 CreateStatusButtonRow(
                     CreateStatusActionButton(FluentIconRegular.Info24, "Info", () => EnqueueSnackbar(
                         ToastSeverity.Information,
@@ -461,12 +562,12 @@ internal sealed class GalleryStatusPage
                 CreateStatusButtonRow(
                     CreateStatusActionButton(FluentIconRegular.ArrowUndo24, "Action", () =>
                     {
-                        var handled = host.CurrentSnackbar?.RequestAction();
+                        var handled = activeHost.CurrentSnackbar?.RequestAction();
                         UpdateOutput($"Current action requested. Handled: {handled?.ToString() ?? "none"}");
                     }),
                     CreateStatusActionButton(FluentIconRegular.Dismiss24, "Close", () =>
                     {
-                        var closed = service.CloseCurrent();
+                        var closed = activeHost.CurrentSnackbar?.RequestClose(FWSnackbarCloseReason.CloseButton) ?? false;
                         if (!closed)
                         {
                             UpdateOutput("Close requested with no current snackbar");
@@ -475,12 +576,12 @@ internal sealed class GalleryStatusPage
                     CreateStatusActionButton(FluentIconRegular.Clock24, "Auto", ToggleAutoDismiss),
                     CreateStatusActionButton(FluentIconRegular.ClockPause24, "Pause", () =>
                     {
-                        host.CurrentSnackbar?.PauseAutoDismiss();
+                        activeHost.CurrentSnackbar?.PauseAutoDismiss();
                         UpdateOutput("Current snackbar auto-dismiss paused");
                     }),
                     CreateStatusActionButton(FluentIconRegular.Play24, "Resume", () =>
                     {
-                        host.CurrentSnackbar?.ResumeAutoDismiss();
+                        activeHost.CurrentSnackbar?.ResumeAutoDismiss();
                         UpdateOutput("Current snackbar auto-dismiss resumed");
                     }),
                     CreateStatusActionButton(FluentIconRegular.DismissCircle24, "Clear", () =>
@@ -492,30 +593,30 @@ internal sealed class GalleryStatusPage
                 CreateStatusButtonRow(
                     CreateStatusActionButton(FluentIconRegular.ArrowUp24, "Top", () =>
                     {
-                        host.Placement = FWSnackbarPlacement.Top;
-                        UpdateOutput("Snackbar host placement set to top");
+                        ApplyPlacement(FWSnackbarPlacement.Top);
                     }),
                     CreateStatusActionButton(FluentIconRegular.ArrowDown24, "Bottom", () =>
                     {
-                        host.Placement = FWSnackbarPlacement.Bottom;
-                        UpdateOutput("Snackbar host placement set to bottom");
+                        ApplyPlacement(FWSnackbarPlacement.Bottom);
                     }),
                     CreateStatusActionButton(FluentIconRegular.TextLineSpacing24, "Spacing", () =>
                     {
-                        host.Spacing = Math.Abs(host.Spacing - 8) < 0.1 ? 14 : 8;
+                        var spacing = Math.Abs(activeHost.Spacing - 8) < 0.1 ? 14 : 8;
+                        host.Spacing = spacing;
+                        overlayHost.Spacing = spacing;
                         UpdateOutput("Snackbar host spacing changed");
                     }),
                     CreateStatusActionButton(FluentIconRegular.SlideTransition24, "Motion", () =>
                     {
-                        if (host.TransitionProfile == FWContentTransitionProfile.Entrance)
+                        if (activeHost.TransitionProfile == FWContentTransitionProfile.Entrance)
                         {
-                            host.TransitionProfile = FWContentTransitionProfile.Suppress;
-                            host.TransitionOffset = 0;
+                            SetTransitionProfile(host, FWContentTransitionProfile.Suppress, 0);
+                            SetTransitionProfile(overlayHost, FWContentTransitionProfile.Suppress, 0);
                         }
                         else
                         {
-                            host.TransitionProfile = FWContentTransitionProfile.Entrance;
-                            host.TransitionOffset = 16;
+                            SetTransitionProfile(host, FWContentTransitionProfile.Entrance, 16);
+                            SetTransitionProfile(overlayHost, FWContentTransitionProfile.Entrance, 16);
                         }
 
                         UpdateOutput("Snackbar host transition profile changed");

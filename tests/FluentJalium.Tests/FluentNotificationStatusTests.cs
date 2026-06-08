@@ -3,8 +3,10 @@ using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Services;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Input;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
@@ -403,6 +405,36 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public async Task FWSnackbar_ShouldPauseAutoDismissOnFocusAndResumeOnLostFocus()
+    {
+        var snackbar = new FWSnackbar
+        {
+            Title = "Focused",
+            Duration = TimeSpan.FromMilliseconds(30),
+            IsAutoDismissEnabled = true
+        };
+
+        var resultTask = snackbar.ShowForResultAsync();
+        snackbar.RaiseEvent(new KeyboardFocusChangedEventArgs(UIElement.GotKeyboardFocusEvent, null, snackbar));
+
+        Assert.True(snackbar.IsAutoDismissPaused);
+
+        await Task.Delay(TimeSpan.FromMilliseconds(100));
+
+        Assert.True(snackbar.IsOpen);
+        Assert.False(resultTask.IsCompleted);
+
+        snackbar.RaiseEvent(new KeyboardFocusChangedEventArgs(UIElement.LostKeyboardFocusEvent, snackbar, null));
+
+        var completed = await Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2)));
+
+        Assert.Same(resultTask, completed);
+        Assert.False(snackbar.IsAutoDismissPaused);
+        Assert.Equal(FWSnackbarCloseReason.Timeout, await resultTask);
+        Assert.False(snackbar.IsOpen);
+    }
+
+    [Fact]
     public void FWSnackbarHost_ShouldQueueAndPromoteSnackbarItems()
     {
         var host = new FWSnackbarHost
@@ -786,6 +818,86 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public void FWSnackbarOverlayHost_ShouldReportRootOverlayDiagnosticsAndServiceRouteChanges()
+    {
+        var rootHost = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1,
+            Placement = FWSnackbarPlacement.Bottom,
+            TransitionOffset = 16
+        };
+        var overlayTarget = new FWBorder();
+        var overlayHost = new FWSnackbarOverlayHost
+        {
+            OverlayTarget = overlayTarget,
+            OverlayPlacement = PopupPlacementMode.Top,
+            MaxVisibleSnackbars = 2,
+            Placement = FWSnackbarPlacement.Top,
+            Spacing = 12,
+            TransitionOffset = 20
+        };
+        var service = new FWSnackbarService();
+        var hostChanges = 0;
+        service.HostChanged += (_, _) => hostChanges++;
+        service.SetHost(rootHost);
+        service.SetHost(overlayHost);
+
+        var transitions = new List<FWSnackbarTransitionRequestedEventArgs>();
+        var queueChanges = new List<FWSnackbarHostQueueChangedEventArgs>();
+        overlayHost.TransitionRequested += (_, args) => transitions.Add(args);
+        overlayHost.QueueChanged += (_, args) => queueChanges.Add(args);
+
+        var first = service.Show(ToastSeverity.Warning, "Overlay first", "Uses root overlay host.", "Review");
+        var second = service.Enqueue(new FWSnackbar
+        {
+            Title = "Overlay second",
+            IsAutoDismissEnabled = false
+        });
+        var diagnostics = overlayHost.GetDiagnostics();
+
+        Assert.Equal(2, hostChanges);
+        Assert.Same(overlayHost, service.Host);
+        Assert.Same(overlayTarget, overlayHost.OverlayTarget);
+        Assert.True(overlayHost.IsOverlayOpen);
+        Assert.Equal(PopupPlacementMode.Top, overlayHost.OverlayPlacement);
+        Assert.Same(first, overlayHost.CurrentSnackbar);
+        Assert.True(first.IsOpen);
+        Assert.True(second.IsOpen);
+        Assert.Equal(2, diagnostics.VisibleCount);
+        Assert.Equal(0, diagnostics.PendingCount);
+        Assert.Equal(2, diagnostics.MaxVisibleSnackbars);
+        Assert.Equal(FWSnackbarPlacement.Top, diagnostics.Placement);
+        Assert.Equal(VerticalAlignment.Top, diagnostics.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, diagnostics.HorizontalAlignment);
+        Assert.Equal(12, diagnostics.Spacing);
+        Assert.Equal(20, diagnostics.TransitionOffset);
+        Assert.True(diagnostics.HasCurrentSnackbar);
+        Assert.False(diagnostics.HasPendingSnackbars);
+        Assert.Equal(new[] { FWSnackbarTransitionKind.Show, FWSnackbarTransitionKind.Show }, transitions.Select(item => item.Kind).ToArray());
+        Assert.Equal(new[] { FWSnackbarHostQueueChangeReason.Shown, FWSnackbarHostQueueChangeReason.Shown }, queueChanges.Select(item => item.Reason).ToArray());
+        Assert.All(transitions, transition =>
+        {
+            Assert.Equal(FWSnackbarPlacement.Top, transition.Diagnostics.Placement);
+            Assert.Equal(20, transition.Diagnostics.TransitionOffset);
+            Assert.Equal(FWSnackbarPresenterState.Entering, transition.PresenterDiagnostics.PresenterState);
+        });
+
+        overlayHost.Placement = FWSnackbarPlacement.Bottom;
+        overlayHost.OverlayPlacement = PopupPlacementMode.Bottom;
+        diagnostics = overlayHost.GetDiagnostics();
+
+        Assert.Equal(FWSnackbarPlacement.Bottom, diagnostics.Placement);
+        Assert.Equal(VerticalAlignment.Bottom, diagnostics.VerticalAlignment);
+        Assert.Equal(PopupPlacementMode.Bottom, overlayHost.OverlayPlacement);
+        Assert.Equal(FWSnackbarHostQueueChangeReason.LayoutChanged, queueChanges[^1].Reason);
+
+        service.Clear();
+
+        Assert.False(overlayHost.IsOverlayOpen);
+        Assert.Empty(overlayHost.Snackbars);
+    }
+
+    [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void FWSnackbarHost_TemplateShouldApplyPlacementAlignmentToItemsControl()
     {
@@ -947,6 +1059,31 @@ public sealed class FluentNotificationStatusTests
 
         Assert.Equal(FWSnackbarCloseReason.Programmatic, await resultTask);
         Assert.Empty(host.Snackbars);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeSnackbarRootOverlayHostQaSample()
+    {
+        Assert.True(GallerySampleCodeRegistry.TryGetRegisteredSampleCode("status.snackbar", out var sampleCode));
+
+        Assert.Contains("new FWSnackbarHost", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("new FWSnackbarOverlayHost", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("OverlayTarget = rootElement", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("service.SetHost(rootHost)", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("service.SetHost(overlayHost)", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("FWSnackbarPlacement.Top", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("FWSnackbarPlacement.Bottom", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("PlacementMode.Top", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("PlacementMode.Bottom", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("TransitionRequested", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("QueueChanged", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("GetDiagnostics()", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("FWSnackbarCloseReason.CloseButton", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("ShouldKeepSnackbarOpen(args.Reason)", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("IsAutoDismissPausedOnPointerOverEnabled = true", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("IsAutoDismissPausedOnFocusEnabled = true", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("PauseAutoDismiss()", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("ResumeAutoDismiss()", sampleCode, StringComparison.Ordinal);
     }
 
     [Fact]
