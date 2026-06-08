@@ -56,6 +56,41 @@ radioButtons.Items.Add("Gallery shell");
 radioButtons.Items.Add("Control playground");
 radioButtons.SelectedIndex = 1;
 """,
+        ["range.slider.progress"] = """
+var slider = new FWSlider
+{
+    Width = 320,
+    Density = FWRangeDensity.Comfortable,
+    Minimum = 0,
+    Maximum = 100,
+    Value = 64,
+    TickFrequency = 10,
+    IsSnapToTickEnabled = true
+};
+
+var rangeSlider = new FWRangeSlider
+{
+    Width = 320,
+    Minimum = 0,
+    Maximum = 100,
+    RangeStart = 24,
+    RangeEnd = 76,
+    MinimumRange = 8
+};
+
+var progress = new FWProgressBar
+{
+    Minimum = 0,
+    Maximum = 100,
+    Value = slider.Value
+};
+
+var ring = new FWProgressRing
+{
+    IsIndeterminate = true,
+    RingSize = FWProgressRingSize.Large
+};
+""",
         ["datetime.calendarpicker.calendarview"] = """
 var reviewDate = new FWCalendarDatePicker
 {
@@ -75,6 +110,35 @@ var calendarView = new FWCalendarView
     SelectedDate = reviewDate.SelectedDate,
     FirstDayOfWeek = DayOfWeek.Monday,
     IsTodayHighlighted = true
+};
+""",
+        ["inputmedia.color.ink.media"] = """
+var picker = new FWColorPicker
+{
+    Color = Color.FromRgb(0x00, 0x78, 0xD4),
+    IsAlphaEnabled = true,
+    IsColorPreviewVisible = true,
+    IsHexInputVisible = true
+};
+
+var inkCanvas = new FWInkCanvas
+{
+    Width = 330,
+    Height = 180,
+    EditingMode = InkCanvasEditingMode.Ink,
+    DefaultStrokeTaperMode = StrokeTaperMode.TaperedEnd
+};
+
+var presenter = new FWInkPresenter
+{
+    Strokes = inkCanvas.Strokes
+};
+
+var media = new FWMediaElement
+{
+    LoadedBehavior = MediaState.Manual,
+    Stretch = Stretch.Uniform,
+    ScrubbingEnabled = true
 };
 """,
         ["layout.settingscard"] = """
@@ -292,6 +356,32 @@ var player = new FWAnimatedVisualPlayer
     IsLooping = true,
     FallbackContent = icon
 };
+""",
+        ["menus.flyout.commandbar"] = """
+var menuBar = new FWMenuBar();
+menuBar.Items.Add(new FWMenuBarItem
+{
+    Title = "File",
+    Items =
+    {
+        new FWMenuFlyoutItem { Text = "New", Icon = IconGlyph(FluentIconRegular.DocumentAdd24) },
+        new FWMenuFlyoutItem { Text = "Save", Icon = IconGlyph(FluentIconRegular.Save24) },
+        new FWMenuFlyoutSeparator(),
+        new FWMenuFlyoutItem { Text = "Exit" }
+    }
+});
+
+var flyout = new FWMenuFlyout();
+flyout.Items.Add(new FWMenuFlyoutItem { Text = "Copy" });
+flyout.Items.Add(new FWMenuFlyoutSubItem
+{
+    Text = "Export",
+    Items = { new FWMenuFlyoutItem { Text = "PDF document" } }
+});
+
+var commandFlyout = new FWCommandBarFlyout { AlwaysExpanded = true };
+commandFlyout.PrimaryCommands.Add(new FWAppBarButton { Label = "Copy", Icon = IconGlyph(FluentIconRegular.Copy24) });
+commandFlyout.SecondaryCommands.Add(new FWAppBarButton { Label = "Rename", Icon = IconGlyph(FluentIconRegular.Rename24) });
 """,
         ["disclosure.taskdialog"] = """
 var deleteCommand = new RelayCommand(parameter => DeleteTemporaryCache(parameter));

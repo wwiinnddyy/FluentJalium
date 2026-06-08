@@ -24,6 +24,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 ### Gallery visibility gaps
 
 - Workflow depth: Gallery now covers the first-wave control/state matrix broadly; future visibility work should focus on longer end-to-end app patterns and diagnostics rather than raw page presence.
+- Metadata parity: `range`, `menus`, and `inputandmedia` now carry catalog metadata and registered sample-code keys; remaining page-level parity work should continue with `buttons`, `switches`, `selectorsandproperties`, `datainspectors`, and `motionandtransitions`.
 
 ### Semantic-depth gaps
 
@@ -55,6 +56,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Snackbar result/service coverage: `FWSnackbar` now exposes `FWSnackbarCloseReason`, `LastCloseReason`, and `ShowForResultAsync`; `FWSnackbarHost.Clear` marks visible and pending items as host-cleared; `FWSnackbarService` routes service-style show/enqueue/close/clear calls into a configured host with Gallery, registry, and tests updated.
 - TaskDialog command/focus coverage: `FWTaskDialog` now exposes button command DPs and command parameters, records `CommandExecuted` on button request events, respects command `CanExecute`, routes Escape through the configured cancel button, focuses the default template button when opened, and hides/disables empty or unavailable buttons.
 - TaskDialog modal host coverage: `FWTaskDialogHost` now hosts a single dialog in an overlay template, routes light dismiss and host Escape through the dialog cancel button, exposes focus restore/trap knobs, restores an explicit focus target on close, and keeps `FWTaskDialog.ShowAsync` result semantics intact.
+- Gallery metadata parity coverage: `range`, `menus`, and `inputandmedia` now expose `SourcePath`, `BaseClasses`, `ApiNamespace`, `RelatedControls`, and `SampleCodeKey` entries with registry snippets for slider/progress, flyout/command bar, and color/ink/media workflows.
 - Snackbar lifetime coverage: `FWSnackbar` now exposes cancelable `Closing`, `RequestClose`, pointer/focus/manual auto-dismiss pause state, `WaitForCloseAsync`, and host/service `ShowForResultAsync` / `EnqueueForResultAsync` APIs; Gallery shows pause/resume, close cancellation, service queues, and result-task completion.
 - Snackbar host placement coverage: `FWSnackbarHost.Placement` now drives top/bottom content alignment, `Spacing` controls the generated snackbar stack panel, and Gallery exposes placement/alignment/spacing diagnostics with registry and catalog metadata updated.
 - Snackbar transition diagnostics coverage: `FWSnackbarHost` now exposes `TransitionProfile`, `SnackbarTransitionDuration`, `TransitionOffset`, `TransitionRequested`, `QueueChanged`, and `GetDiagnostics()` so Gallery and app hosts can observe queue layout and wire Fluent motion without taking over host lifetime semantics.
