@@ -28,7 +28,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 ### Semantic-depth gaps
 
-- `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, and command-state restoration now exist; remaining work is mostly focus/pressed visuals, automation patterns, and action alignment polish.
+- `FWSettingsCard`: Click/Command, keyboard invocation, hover click mode, command-state restoration, focus/pressed visuals, and interaction diagnostics now exist; remaining work is mostly automation patterns and action alignment polish.
 - `FWSettingsExpander`: item-host APIs now expose direct content rows, item count, collection change events, and add/remove/clear helpers; remaining work is richer item container styling and default data-row templates.
 - `FWSnackbar`: host queueing, auto-dismiss, action command support, close reasons, result-style async flow, pause-on-hover/focus lifetime, closing cancellation, host/service async result APIs, top/bottom host placement with spacing, overlay/root host presentation, transition timing hooks, and queue diagnostics now exist; remaining work is real animated presenter choreography, visual QA, and root-window integration refinements.
 - `FWTaskDialog`: awaitable result flow, button command DPs, `CommandExecuted` request metadata, default/cancel requests, Escape-to-cancel, default focus, empty/disabled button states, focus target helpers, and `FWTaskDialogHost` modal overlay with light dismiss, focus restore/trap hooks, keyboard diagnostics, and host reentry guards now exist; remaining work is deeper automation peer coverage and real visual-tree focus traversal.
@@ -39,7 +39,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 
 1. TaskDialog automation package: deepen automation peer coverage and real visual-tree focus traversal on top of the modal host/default/cancel/diagnostics base.
 2. Snackbar motion package: use the overlay/root host pattern plus transition diagnostics to drive real presenter choreography and visual QA.
-3. Settings visual/automation polish: add focus/pressed states, action alignment refinements, and automation/invoke patterns after the command and item-host semantics stabilize.
+3. Settings automation polish: add action alignment refinements and automation/invoke patterns after the command, item-host, and interaction-state semantics stabilize.
 
 ## Recently completed batches
 
@@ -53,6 +53,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 - Materials coverage: `FWFluentWindowSurface` and derived material surfaces such as `FWLayerSurface`, `FWMicaSurface`, `FWAcrylicSurface`, `FWCardSurface`, `FWFlyoutSurface`, and `FWFocusGlassSurface` are visible in Gallery with catalog metadata and copyable recipes.
 - Collection state coverage: `FWListView`, `FWGridView`, `FWListBox`, and `FWDataGrid` now show empty, loading, grouped, compact, comfortable, and spacious states in Gallery with updated catalog search metadata and registry-backed sample code.
 - Settings semantics coverage: `FWSettingsCard` now exposes read-only `CanExecute`, restores command-disabled state when commands are removed, supports `ClickMode.Hover`, and has keyboard/command tests; `FWSettingsExpander` now has direct content rows, `ItemCount`, `ItemsChanged`, and add/remove/clear helpers with Gallery and registry coverage.
+- Settings interaction coverage: `FWSettingsCard` now exposes `FWSettingsCardDiagnostics`, `IsPointerPressed`, `IsKeyboardPressed`, and `IsInteractionPressed`; the default style consumes pressed, focus, and disabled states so settings rows provide WinUI-style interaction feedback without stale pressed visuals.
 - Snackbar result/service coverage: `FWSnackbar` now exposes `FWSnackbarCloseReason`, `LastCloseReason`, and `ShowForResultAsync`; `FWSnackbarHost.Clear` marks visible and pending items as host-cleared; `FWSnackbarService` routes service-style show/enqueue/close/clear calls into a configured host with Gallery, registry, and tests updated.
 - TaskDialog command/focus coverage: `FWTaskDialog` now exposes button command DPs and command parameters, records `CommandExecuted` on button request events, respects command `CanExecute`, routes Escape through the configured cancel button, focuses the default template button when opened, and hides/disables empty or unavailable buttons.
 - TaskDialog modal host coverage: `FWTaskDialogHost` now hosts a single dialog in an overlay template, routes light dismiss and host Escape through the dialog cancel button, exposes focus restore/trap knobs, restores an explicit focus target on close, and keeps `FWTaskDialog.ShowAsync` result semantics intact.

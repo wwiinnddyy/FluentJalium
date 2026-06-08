@@ -375,6 +375,76 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void FWSettingsCard_ShouldExposeInteractionDiagnosticsAndPressedState()
+    {
+        var command = new RecordingCommand();
+        var card = new FWSettingsCard
+        {
+            Header = "Window material",
+            IsClickEnabled = true,
+            Command = command,
+            CommandParameter = "material"
+        };
+
+        var initialDiagnostics = card.GetDiagnostics();
+
+        Assert.True(initialDiagnostics.IsClickEnabled);
+        Assert.True(initialDiagnostics.IsEnabled);
+        Assert.True(initialDiagnostics.CanExecute);
+        Assert.True(initialDiagnostics.IsInvokable);
+        Assert.True(initialDiagnostics.HasCommand);
+        Assert.Equal(ClickMode.Release, initialDiagnostics.ClickMode);
+        Assert.False(initialDiagnostics.IsPointerPressed);
+        Assert.False(initialDiagnostics.IsKeyboardPressed);
+        Assert.False(initialDiagnostics.IsInteractionPressed);
+
+        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+
+        Assert.True(card.IsKeyboardPressed);
+        Assert.False(card.IsPointerPressed);
+        Assert.True(card.IsInteractionPressed);
+        Assert.True(card.GetDiagnostics().IsInteractionPressed);
+
+        command.CanExecuteResult = false;
+        command.RaiseCanExecuteChanged();
+
+        Assert.False(card.CanExecute);
+        Assert.False(card.IsEnabled);
+        Assert.False(card.IsKeyboardPressed);
+        Assert.False(card.IsPointerPressed);
+        Assert.False(card.IsInteractionPressed);
+        Assert.False(card.GetDiagnostics().IsInvokable);
+
+        command.CanExecuteResult = true;
+        command.RaiseCanExecuteChanged();
+        card.RaiseEvent(new Jalium.UI.Input.MouseButtonEventArgs(
+            UIElement.MouseDownEvent,
+            new Point(4, 4),
+            Jalium.UI.Input.MouseButton.Left,
+            Jalium.UI.Input.MouseButtonState.Pressed,
+            clickCount: 1,
+            leftButton: Jalium.UI.Input.MouseButtonState.Pressed,
+            middleButton: Jalium.UI.Input.MouseButtonState.Released,
+            rightButton: Jalium.UI.Input.MouseButtonState.Released,
+            xButton1: Jalium.UI.Input.MouseButtonState.Released,
+            xButton2: Jalium.UI.Input.MouseButtonState.Released,
+            modifiers: Jalium.UI.Input.ModifierKeys.None,
+            timestamp: 0));
+
+        Assert.True(card.IsPointerPressed);
+        Assert.False(card.IsKeyboardPressed);
+        Assert.True(card.IsInteractionPressed);
+
+        card.IsClickEnabled = false;
+
+        Assert.False(card.Focusable);
+        Assert.False(card.IsPointerPressed);
+        Assert.False(card.IsKeyboardPressed);
+        Assert.False(card.IsInteractionPressed);
+        Assert.False(card.GetDiagnostics().IsInvokable);
+    }
+
+    [Fact]
     public void ContentTransitionRecipe_ShouldExposeFluentMotionProfiles()
     {
         var defaultRecipe = FWContentTransitionRecipe.Create(FWContentTransitionProfile.Default);
@@ -574,6 +644,9 @@ public sealed class FluentContentLayoutControlsTests
         AssertSetter(settingsCardStyle, FWSettingsCard.IsClickEnabledProperty);
         AssertSetter(settingsCardStyle, FWSettingsCard.ClickModeProperty);
         AssertSetter(settingsCardStyle, UIElement.FocusableProperty);
+        AssertTriggerSetter(settingsCardStyle, FWSettingsCard.IsInteractionPressedProperty, true, Control.BackgroundProperty, "ControlBackgroundPressed");
+        AssertTriggerSetter(settingsCardStyle, UIElement.IsKeyboardFocusedProperty, true, Control.BorderBrushProperty, "ControlBorderFocused");
+        AssertTriggerSetter(settingsCardStyle, UIElement.IsEnabledProperty, false, Control.BackgroundProperty, "ControlBackgroundDisabled");
 
         ResetApplicationState();
     }
@@ -616,6 +689,42 @@ public sealed class FluentContentLayoutControlsTests
     private static void AssertSetter(Style style, DependencyProperty property)
     {
         Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private static void AssertTriggerSetter(
+        Style style,
+        DependencyProperty triggerProperty,
+        object triggerValue,
+        DependencyProperty setterProperty,
+        object expectedSetterValue)
+    {
+        var trigger = Assert.Single(
+            style.Triggers.OfType<Trigger>(),
+            candidate => candidate.Property == triggerProperty && TriggerValueEquals(candidate.Value, triggerValue));
+        var setter = Assert.Single(trigger.Setters, candidate => candidate.Property == setterProperty);
+
+        if (setter.Value is IDynamicResourceReference dynamicReference)
+        {
+            Assert.Equal(expectedSetterValue, dynamicReference.ResourceKey);
+            return;
+        }
+
+        Assert.Equal(expectedSetterValue, setter.Value);
+    }
+
+    private static bool TriggerValueEquals(object? actual, object expected)
+    {
+        if (Equals(actual, expected))
+        {
+            return true;
+        }
+
+        if (actual is null)
+        {
+            return false;
+        }
+
+        return string.Equals(actual.ToString(), expected.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
     private sealed class RecordingCommand : ICommand

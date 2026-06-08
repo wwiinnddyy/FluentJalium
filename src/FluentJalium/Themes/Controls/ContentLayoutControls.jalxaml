@@ -290,7 +290,14 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Background" Value="{ThemeResource ControlBackgroundPointerOver}" />
             </Trigger>
+            <Trigger Property="IsInteractionPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundPressed}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderFocused}" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource ControlBackgroundDisabled}" />
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
             </Trigger>

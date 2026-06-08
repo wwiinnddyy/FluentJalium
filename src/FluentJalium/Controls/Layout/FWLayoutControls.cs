@@ -949,12 +949,24 @@ public class FWRelativePanel : Panel, IFluentJaliumControl
 }
 
 /// <summary>
+/// Lightweight state snapshot for <see cref="FWSettingsCard"/> interaction diagnostics.
+/// </summary>
+public readonly record struct FWSettingsCardDiagnostics(
+    bool IsClickEnabled,
+    bool IsEnabled,
+    bool CanExecute,
+    bool IsInvokable,
+    bool IsPointerPressed,
+    bool IsKeyboardPressed,
+    bool IsInteractionPressed,
+    bool HasCommand,
+    ClickMode ClickMode);
+
+/// <summary>
 /// FluentJalium SettingsCard control for compact settings rows.
 /// </summary>
 public class FWSettingsCard : ContentControl, IFluentJaliumControl
 {
-    private bool _isPointerPressed;
-    private bool _isKeyboardPressed;
     private bool _hasCommandCanExecuteOverride;
     private bool _isEnabledBeforeCommandCanExecute = true;
 
@@ -1007,6 +1019,24 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     public static readonly DependencyProperty ClickModeProperty =
         DependencyProperty.Register(nameof(ClickMode), typeof(ClickMode), typeof(FWSettingsCard),
             new PropertyMetadata(ClickMode.Release));
+
+    private static readonly DependencyPropertyKey IsPointerPressedPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsPointerPressed), typeof(bool), typeof(FWSettingsCard),
+            new PropertyMetadata(false, OnInteractionStateChanged));
+
+    public static readonly DependencyProperty IsPointerPressedProperty = IsPointerPressedPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey IsKeyboardPressedPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsKeyboardPressed), typeof(bool), typeof(FWSettingsCard),
+            new PropertyMetadata(false, OnInteractionStateChanged));
+
+    public static readonly DependencyProperty IsKeyboardPressedProperty = IsKeyboardPressedPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey IsInteractionPressedPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsInteractionPressed), typeof(bool), typeof(FWSettingsCard),
+            new PropertyMetadata(false, OnInteractionPressedChanged));
+
+    public static readonly DependencyProperty IsInteractionPressedProperty = IsInteractionPressedPropertyKey.DependencyProperty;
 
     public static readonly RoutedEvent ClickEvent =
         EventManager.RegisterRoutedEvent(nameof(Click), RoutingStrategy.Bubble,
@@ -1107,6 +1137,15 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         set => SetValue(ClickModeProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsPointerPressed => (bool)GetValue(IsPointerPressedProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsKeyboardPressed => (bool)GetValue(IsKeyboardPressedProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsInteractionPressed => (bool)GetValue(IsInteractionPressedProperty)!;
+
     public event RoutedEventHandler Click
     {
         add => AddHandler(ClickEvent, value);
@@ -1130,6 +1169,20 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         return Invoke();
     }
 
+    public FWSettingsCardDiagnostics GetDiagnostics()
+    {
+        return new FWSettingsCardDiagnostics(
+            IsClickEnabled,
+            IsEnabled,
+            CanExecute,
+            CanInvoke(),
+            IsPointerPressed,
+            IsKeyboardPressed,
+            IsInteractionPressed,
+            Command != null,
+            ClickMode);
+    }
+
     private static void OnSettingsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSettingsCard card)
@@ -1144,6 +1197,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         if (d is FWSettingsCard card)
         {
             card.Focusable = card.IsClickEnabled;
+            card.CoerceInteractionState();
             card.InvalidateVisual();
         }
     }
@@ -1176,6 +1230,23 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         }
     }
 
+    private static void OnInteractionStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsCard card)
+        {
+            card.UpdateInteractionPressed();
+            card.InvalidateVisual();
+        }
+    }
+
+    private static void OnInteractionPressedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWSettingsCard card)
+        {
+            card.InvalidateVisual();
+        }
+    }
+
     private void OnCanExecuteChanged(object? sender, EventArgs e)
     {
         UpdateCanExecute();
@@ -1196,6 +1267,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             }
 
             IsEnabled = false;
+            CoerceInteractionState();
             return;
         }
 
@@ -1204,6 +1276,8 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             IsEnabled = _isEnabledBeforeCommandCanExecute;
             _hasCommandCanExecuteOverride = false;
         }
+
+        CoerceInteractionState();
     }
 
     private bool CanInvoke()
@@ -1215,6 +1289,44 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 
         var command = Command;
         return command == null || CanExecuteCommand(command);
+    }
+
+    private void SetPointerPressed(bool value)
+    {
+        if (IsPointerPressed != value)
+        {
+            SetValue(IsPointerPressedPropertyKey.DependencyProperty, value);
+        }
+    }
+
+    private void SetKeyboardPressed(bool value)
+    {
+        if (IsKeyboardPressed != value)
+        {
+            SetValue(IsKeyboardPressedPropertyKey.DependencyProperty, value);
+        }
+    }
+
+    private void UpdateInteractionPressed()
+    {
+        var value = IsEnabled && IsClickEnabled && CanExecute && (IsPointerPressed || IsKeyboardPressed);
+        if (IsInteractionPressed != value)
+        {
+            SetValue(IsInteractionPressedPropertyKey.DependencyProperty, value);
+        }
+    }
+
+    private void CoerceInteractionState()
+    {
+        if (!IsEnabled || !IsClickEnabled || !CanExecute)
+        {
+            SetPointerPressed(false);
+            SetKeyboardPressed(false);
+            ReleaseMouseCapture();
+            return;
+        }
+
+        UpdateInteractionPressed();
     }
 
     private bool CanExecuteCommand(ICommand command)
@@ -1258,7 +1370,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             return;
         }
 
-        _isPointerPressed = true;
+        SetPointerPressed(true);
         CaptureMouse();
         Focus();
 
@@ -1277,8 +1389,8 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
             return;
         }
 
-        var wasPressed = _isPointerPressed;
-        _isPointerPressed = false;
+        var wasPressed = IsPointerPressed;
+        SetPointerPressed(false);
         ReleaseMouseCapture();
 
         if (wasPressed && IsMouseOver && ClickMode == ClickMode.Release)
@@ -1290,12 +1402,12 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 
     private void OnMouseLeaveHandler(object sender, MouseEventArgs e)
     {
-        if (!_isPointerPressed)
+        if (!IsPointerPressed)
         {
             return;
         }
 
-        _isPointerPressed = false;
+        SetPointerPressed(false);
         ReleaseMouseCapture();
     }
 
@@ -1316,7 +1428,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 
         if (e.Key == Key.Space)
         {
-            _isKeyboardPressed = true;
+            SetKeyboardPressed(true);
             if (ClickMode == ClickMode.Press)
             {
                 Invoke();
@@ -1333,18 +1445,34 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
 
     private void OnKeyUpHandler(object sender, KeyEventArgs e)
     {
-        if (e.Key != Key.Space || !_isKeyboardPressed)
+        if (e.Key != Key.Space || !IsKeyboardPressed)
         {
             return;
         }
 
-        _isKeyboardPressed = false;
+        SetKeyboardPressed(false);
         if (ClickMode == ClickMode.Release)
         {
             Invoke();
         }
 
         e.Handled = true;
+    }
+
+    protected override void OnLostMouseCapture()
+    {
+        base.OnLostMouseCapture();
+        SetPointerPressed(false);
+    }
+
+    protected override void OnIsKeyboardFocusedChanged(bool isFocused)
+    {
+        base.OnIsKeyboardFocusedChanged(isFocused);
+
+        if (!isFocused)
+        {
+            SetKeyboardPressed(false);
+        }
     }
 }
 
