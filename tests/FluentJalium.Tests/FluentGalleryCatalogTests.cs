@@ -307,6 +307,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("Window backdrop QA", sampleCode);
         Assert.Contains("GalleryWindowSurfaceDiagnostics.Create", sampleCode);
         Assert.Contains("FormatWindowSurfaceDiagnostics", sampleCode);
+        Assert.Contains("GalleryWindowSurfaceEnvironment.Create", sampleCode);
+        Assert.Contains("FluentThemeVariant.HighContrast", sampleCode);
+        Assert.Contains("ResolveWindowSurfaceActualBackdrop", sampleCode);
+        Assert.Contains("High contrast fallback", sampleCode);
+        Assert.Contains("Inactive window material", sampleCode);
+        Assert.Contains("Unsupported host fallback", sampleCode);
     }
 
     [Fact]

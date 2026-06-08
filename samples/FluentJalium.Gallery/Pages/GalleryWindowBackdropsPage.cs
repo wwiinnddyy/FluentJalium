@@ -1,6 +1,7 @@
 using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using FluentJalium.Controls;
+using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -19,6 +20,37 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryWindowSurfaceEnvironment(
+    FluentThemeVariant Theme,
+    bool IsWindowActive,
+    bool IsHostBackdropSupported)
+{
+    public static GalleryWindowSurfaceEnvironment Current =>
+        new(FluentThemeManager.CurrentTheme, IsWindowActive: true, IsHostBackdropSupported: true);
+
+    public bool IsHighContrast => Theme == FluentThemeVariant.HighContrast;
+
+    public bool UsesSolidFallback => IsHighContrast || !IsHostBackdropSupported;
+
+    public string ThemeState => IsHighContrast ? "high contrast" : Theme.ToString().ToLowerInvariant();
+
+    public string ActivationState => IsWindowActive ? "active" : "inactive";
+
+    public string HostState => IsHostBackdropSupported ? "host supported" : "host unsupported";
+
+    public string FallbackState => UsesSolidFallback
+        ? "solid fallback"
+        : IsWindowActive ? "system material" : "inactive material";
+
+    public static GalleryWindowSurfaceEnvironment Create(
+        FluentThemeVariant theme,
+        bool isWindowActive = true,
+        bool isHostBackdropSupported = true)
+    {
+        return new GalleryWindowSurfaceEnvironment(theme, isWindowActive, isHostBackdropSupported);
+    }
+}
+
 internal sealed record GalleryWindowSurfaceDiagnostics(
     FWFluentWindowMaterialProfile Profile,
     string Role,
@@ -29,9 +61,12 @@ internal sealed record GalleryWindowSurfaceDiagnostics(
     FWFluentMaterialKind SurfaceMaterialKind,
     BorderShape SurfaceShape,
     bool AutoApplyWindowBackdrop,
-    bool WasApplied)
+    bool WasApplied,
+    GalleryWindowSurfaceEnvironment Environment)
 {
     public bool IsMatched => ActualSystemBackdrop == RequestedSystemBackdrop;
+
+    public bool UsesSolidFallback => Environment.UsesSolidFallback;
 
     public string MatchState => IsMatched ? "matched" : "pending";
 
@@ -39,10 +74,16 @@ internal sealed record GalleryWindowSurfaceDiagnostics(
 
     public string AutoApplyText => AutoApplyWindowBackdrop ? "On" : "Off";
 
+    public string EnvironmentState =>
+        $"{Environment.ThemeState}, {Environment.ActivationState}, {Environment.HostState}";
+
+    public string FallbackState => Environment.FallbackState;
+
     public static GalleryWindowSurfaceDiagnostics Create(
         FWFluentWindowSurface surface,
         WindowBackdropType actualSystemBackdrop,
-        bool wasApplied)
+        bool wasApplied,
+        GalleryWindowSurfaceEnvironment? environment = null)
     {
         ArgumentNullException.ThrowIfNull(surface);
 
@@ -57,7 +98,8 @@ internal sealed record GalleryWindowSurfaceDiagnostics(
             surface.MaterialKind,
             surface.Shape,
             surface.AutoApplyWindowBackdrop,
-            wasApplied);
+            wasApplied,
+            environment ?? GalleryWindowSurfaceEnvironment.Current);
     }
 }
 
@@ -92,7 +134,7 @@ internal sealed class GalleryWindowBackdropsPage
         examples.Children.Add(CreateWindowBackdropExampleCard(
             FluentIconRegular.DataUsage24,
             "Window surface diagnostics",
-            "FWFluentWindowSurface exposes the requested profile, surface role, and actual host Window.SystemBackdrop for shell QA.",
+            "FWFluentWindowSurface exposes requested, actual, high contrast, inactive, and unsupported-host states for shell QA.",
             CreateWindowSurfaceDiagnostics()));
         examples.Children.Add(CreateWindowBackdropExampleCard(
             FluentIconRegular.AppGeneric24,
@@ -130,6 +172,7 @@ internal sealed class GalleryWindowBackdropsPage
 
     private UIElement CreateWindowSurfaceDiagnostics()
     {
+        var environment = GalleryWindowSurfaceEnvironment.Current;
         var surface = new FWFluentWindowSurface
         {
             Width = 490,
@@ -137,9 +180,38 @@ internal sealed class GalleryWindowBackdropsPage
             AutoApplyWindowBackdrop = false
         };
         surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.MicaShell);
-        surface.Child = CreateWindowSurfacePreviewContent(surface, _window.SystemBackdrop, wasApplied: false);
+        surface.Child = CreateWindowSurfacePreviewContent(
+            surface,
+            ResolveWindowSurfaceActualBackdrop(_window.SystemBackdrop, environment),
+            wasApplied: false,
+            environment);
 
-        var status = CreateBackdropOutputText(CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: false));
+        var status = CreateBackdropOutputText(CreateWindowSurfaceDiagnosticsText(
+            surface,
+            ResolveWindowSurfaceActualBackdrop(_window.SystemBackdrop, environment),
+            wasApplied: false,
+            environment));
+
+        void RefreshSurface(FWFluentWindowMaterialProfile profile, bool applyWindowBackdrop)
+        {
+            surface.ApplyWindowMaterialProfile(profile);
+            if (applyWindowBackdrop)
+            {
+                surface.ApplyWindowBackdrop(_window);
+            }
+
+            var actualBackdrop = ResolveWindowSurfaceActualBackdrop(_window.SystemBackdrop, environment);
+            surface.Child = CreateWindowSurfacePreviewContent(surface, actualBackdrop, applyWindowBackdrop, environment);
+            status.Text = CreateWindowSurfaceDiagnosticsText(surface, actualBackdrop, applyWindowBackdrop, environment);
+        }
+
+        void SetEnvironment(GalleryWindowSurfaceEnvironment nextEnvironment)
+        {
+            environment = nextEnvironment;
+            var actualBackdrop = ResolveWindowSurfaceActualBackdrop(_window.SystemBackdrop, environment);
+            surface.Child = CreateWindowSurfacePreviewContent(surface, actualBackdrop, wasApplied: false, environment);
+            status.Text = CreateWindowSurfaceDiagnosticsText(surface, actualBackdrop, wasApplied: false, environment);
+        }
 
         return new FWStackPanel
         {
@@ -149,11 +221,16 @@ internal sealed class GalleryWindowBackdropsPage
             {
                 surface,
                 CreateBackdropButtonRow(
-                    CreateWindowProfileActionButton(FluentIconRegular.DismissCircle24, "Solid", FWFluentWindowMaterialProfile.Solid, surface, status),
-                    CreateWindowProfileActionButton(FluentIconRegular.WindowBrush24, "Mica", FWFluentWindowMaterialProfile.MicaShell, surface, status),
-                    CreateWindowProfileActionButton(FluentIconRegular.LayerDiagonal24, "Tabbed", FWFluentWindowMaterialProfile.TabbedMicaAlt, surface, status),
-                    CreateWindowProfileActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", FWFluentWindowMaterialProfile.TransientAcrylic, surface, status),
-                    CreateWindowProfileActionButton(FluentIconRegular.Glasses24, "Focus", FWFluentWindowMaterialProfile.FocusGlassShell, surface, status)),
+                    CreateBackdropActionButton(FluentIconRegular.DismissCircle24, "Solid", () => RefreshSurface(FWFluentWindowMaterialProfile.Solid, applyWindowBackdrop: true)),
+                    CreateBackdropActionButton(FluentIconRegular.WindowBrush24, "Mica", () => RefreshSurface(FWFluentWindowMaterialProfile.MicaShell, applyWindowBackdrop: true)),
+                    CreateBackdropActionButton(FluentIconRegular.LayerDiagonal24, "Tabbed", () => RefreshSurface(FWFluentWindowMaterialProfile.TabbedMicaAlt, applyWindowBackdrop: true)),
+                    CreateBackdropActionButton(FluentIconRegular.TransparencySquare24, "Acrylic", () => RefreshSurface(FWFluentWindowMaterialProfile.TransientAcrylic, applyWindowBackdrop: true)),
+                    CreateBackdropActionButton(FluentIconRegular.Glasses24, "Focus", () => RefreshSurface(FWFluentWindowMaterialProfile.FocusGlassShell, applyWindowBackdrop: true))),
+                CreateBackdropButtonRow(
+                    CreateBackdropActionButton(FluentIconRegular.Accessibility24, "High contrast", () => SetEnvironment(GalleryWindowSurfaceEnvironment.Create(FluentThemeVariant.HighContrast))),
+                    CreateBackdropActionButton(FluentIconRegular.Window24, "Inactive", () => SetEnvironment(GalleryWindowSurfaceEnvironment.Create(FluentThemeManager.CurrentTheme, isWindowActive: false))),
+                    CreateBackdropActionButton(FluentIconRegular.PlugDisconnected24, "Unsupported", () => SetEnvironment(GalleryWindowSurfaceEnvironment.Create(FluentThemeManager.CurrentTheme, isHostBackdropSupported: false))),
+                    CreateBackdropActionButton(FluentIconRegular.CheckmarkCircle24, "Supported", () => SetEnvironment(GalleryWindowSurfaceEnvironment.Current))),
                 CreateBackdropStatus(status)
             }
         };
@@ -214,9 +291,10 @@ internal sealed class GalleryWindowBackdropsPage
     private static FWBorder CreateWindowSurfacePreviewContent(
         FWFluentWindowSurface surface,
         WindowBackdropType actualSystemBackdrop,
-        bool wasApplied)
+        bool wasApplied,
+        GalleryWindowSurfaceEnvironment? environment = null)
     {
-        var diagnostics = GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied);
+        var diagnostics = GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied, environment);
 
         return new FWBorder
         {
@@ -260,7 +338,11 @@ internal sealed class GalleryWindowBackdropsPage
                             CreateSystemBackdropBadge($"Surface {diagnostics.SurfaceRole}"),
                             CreateSystemBackdropBadge($"Material {diagnostics.SurfaceMaterialKind}"),
                             CreateSystemBackdropBadge(diagnostics.MatchState),
-                            CreateSystemBackdropBadge(diagnostics.ApplyState)
+                            CreateSystemBackdropBadge(diagnostics.ApplyState),
+                            CreateSystemBackdropBadge(diagnostics.Environment.ThemeState),
+                            CreateSystemBackdropBadge(diagnostics.Environment.ActivationState),
+                            CreateSystemBackdropBadge(diagnostics.Environment.HostState),
+                            CreateSystemBackdropBadge(diagnostics.FallbackState)
                         }
                     },
                     new FWTextBlock
@@ -317,8 +399,10 @@ internal sealed class GalleryWindowBackdropsPage
     {
         surface.ApplyWindowMaterialProfile(profile);
         surface.ApplyWindowBackdrop(_window);
-        surface.Child = CreateWindowSurfacePreviewContent(surface, _window.SystemBackdrop, wasApplied: true);
-        status.Text = CreateWindowSurfaceDiagnosticsText(surface, _window.SystemBackdrop, wasApplied: true);
+        var environment = GalleryWindowSurfaceEnvironment.Current;
+        var actualBackdrop = ResolveWindowSurfaceActualBackdrop(_window.SystemBackdrop, environment);
+        surface.Child = CreateWindowSurfacePreviewContent(surface, actualBackdrop, wasApplied: true, environment);
+        status.Text = CreateWindowSurfaceDiagnosticsText(surface, actualBackdrop, wasApplied: true, environment);
     }
 
     private static string CreateWindowBackdropStatusText(WindowBackdropType systemBackdrop)
@@ -337,16 +421,26 @@ internal sealed class GalleryWindowBackdropsPage
     internal static string CreateWindowSurfaceDiagnosticsText(
         FWFluentWindowSurface surface,
         WindowBackdropType actualSystemBackdrop,
-        bool wasApplied)
+        bool wasApplied,
+        GalleryWindowSurfaceEnvironment? environment = null)
     {
-        return FormatWindowSurfaceDiagnostics(GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied));
+        return FormatWindowSurfaceDiagnostics(GalleryWindowSurfaceDiagnostics.Create(surface, actualSystemBackdrop, wasApplied, environment));
+    }
+
+    internal static WindowBackdropType ResolveWindowSurfaceActualBackdrop(
+        WindowBackdropType windowSystemBackdrop,
+        GalleryWindowSurfaceEnvironment environment)
+    {
+        return environment.UsesSolidFallback
+            ? WindowBackdropType.None
+            : windowSystemBackdrop;
     }
 
     internal static string FormatWindowSurfaceDiagnostics(GalleryWindowSurfaceDiagnostics diagnostics)
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
 
-        return $"Profile: {diagnostics.Role}; requested: {diagnostics.RequestedSystemBackdrop}/{diagnostics.RequestedBackdropKind}; actual: {diagnostics.ActualSystemBackdrop}; surface: {diagnostics.SurfaceRole}/{diagnostics.SurfaceMaterialKind}/{diagnostics.SurfaceShape}; auto apply: {diagnostics.AutoApplyText}; window: {diagnostics.MatchState}, {diagnostics.ApplyState}.";
+        return $"Profile: {diagnostics.Role}; requested: {diagnostics.RequestedSystemBackdrop}/{diagnostics.RequestedBackdropKind}; actual: {diagnostics.ActualSystemBackdrop}; surface: {diagnostics.SurfaceRole}/{diagnostics.SurfaceMaterialKind}/{diagnostics.SurfaceShape}; auto apply: {diagnostics.AutoApplyText}; environment: {diagnostics.EnvironmentState}; fallback: {diagnostics.FallbackState}; window: {diagnostics.MatchState}, {diagnostics.ApplyState}.";
     }
 
     private static FWBorder CreateRecipeTile(FluentIconRegular icon, FWFluentWindowBackdropKind backdropKind)

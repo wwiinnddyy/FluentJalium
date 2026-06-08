@@ -845,6 +845,28 @@ var diagnostics = GalleryWindowSurfaceDiagnostics.Create(
     actualBackdrop,
     wasApplied: true);
 Debug.WriteLine(GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(diagnostics));
+
+var highContrastEnvironment = GalleryWindowSurfaceEnvironment.Create(
+    FluentThemeVariant.HighContrast);
+var highContrastActualBackdrop = GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(
+    actualBackdrop,
+    highContrastEnvironment);
+var highContrastDiagnostics = GalleryWindowSurfaceDiagnostics.Create(
+    windowSurface,
+    highContrastActualBackdrop,
+    wasApplied: true,
+    highContrastEnvironment);
+
+var inactiveEnvironment = GalleryWindowSurfaceEnvironment.Create(
+    FluentThemeManager.CurrentTheme,
+    isWindowActive: false);
+var unsupportedHostEnvironment = GalleryWindowSurfaceEnvironment.Create(
+    FluentThemeManager.CurrentTheme,
+    isHostBackdropSupported: false);
+
+Debug.WriteLine($"High contrast fallback: {highContrastDiagnostics.FallbackState}; {highContrastDiagnostics.EnvironmentState}.");
+Debug.WriteLine($"Inactive window material: {inactiveEnvironment.FallbackState}; host: {inactiveEnvironment.HostState}.");
+Debug.WriteLine($"Unsupported host fallback: {unsupportedHostEnvironment.FallbackState}; supported: {unsupportedHostEnvironment.IsHostBackdropSupported}.");
 """,
         ["materials.derivedsurfaces"] = """
 var card = new FWCardSurface

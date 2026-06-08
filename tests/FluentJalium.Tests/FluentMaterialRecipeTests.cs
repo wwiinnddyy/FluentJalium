@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -404,6 +405,8 @@ public sealed class FluentMaterialRecipeTests
         Assert.Contains("actual: Mica", pendingText);
         Assert.Contains("surface: FocusGlass/LiquidGlass/SuperEllipse", pendingText);
         Assert.Contains("auto apply: Off", pendingText);
+        Assert.Contains("environment: dark, active, host supported", pendingText);
+        Assert.Contains("fallback: system material", pendingText);
         Assert.Contains("window: pending, not applied", pendingText);
 
         surface.AutoApplyWindowBackdrop = true;
@@ -415,7 +418,60 @@ public sealed class FluentMaterialRecipeTests
         Assert.Equal("matched", matched.MatchState);
         Assert.Equal("applied", matched.ApplyState);
         Assert.Contains("auto apply: On", matchedText);
+        Assert.Contains("fallback: system material", matchedText);
         Assert.Contains("window: matched, applied", matchedText);
+    }
+
+    [Fact]
+    public void WindowSurfaceGalleryDiagnostics_ShouldReportHighContrastInactiveAndUnsupportedFallbacks()
+    {
+        var surface = new FWFluentWindowSurface();
+        surface.ApplyWindowMaterialProfile(FWFluentWindowMaterialProfile.MicaShell);
+
+        var highContrastEnvironment = GalleryWindowSurfaceEnvironment.Create(FluentThemeVariant.HighContrast);
+        var highContrastActual = GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(
+            WindowBackdropType.Mica,
+            highContrastEnvironment);
+        var highContrast = GalleryWindowSurfaceDiagnostics.Create(
+            surface,
+            highContrastActual,
+            wasApplied: true,
+            highContrastEnvironment);
+        var highContrastText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(highContrast);
+
+        var inactiveEnvironment = GalleryWindowSurfaceEnvironment.Create(FluentThemeVariant.Dark, isWindowActive: false);
+        var inactive = GalleryWindowSurfaceDiagnostics.Create(
+            surface,
+            GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(WindowBackdropType.Mica, inactiveEnvironment),
+            wasApplied: true,
+            inactiveEnvironment);
+
+        var unsupportedEnvironment = GalleryWindowSurfaceEnvironment.Create(FluentThemeVariant.Light, isHostBackdropSupported: false);
+        var unsupported = GalleryWindowSurfaceDiagnostics.Create(
+            surface,
+            GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(WindowBackdropType.Mica, unsupportedEnvironment),
+            wasApplied: false,
+            unsupportedEnvironment);
+        var unsupportedText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(unsupported);
+
+        Assert.Equal(WindowBackdropType.None, highContrastActual);
+        Assert.True(highContrast.UsesSolidFallback);
+        Assert.Equal("high contrast", highContrast.Environment.ThemeState);
+        Assert.Equal("solid fallback", highContrast.FallbackState);
+        Assert.Contains("environment: high contrast, active, host supported", highContrastText);
+        Assert.Contains("fallback: solid fallback", highContrastText);
+
+        Assert.False(inactive.UsesSolidFallback);
+        Assert.Equal(WindowBackdropType.Mica, inactive.ActualSystemBackdrop);
+        Assert.Equal("inactive", inactive.Environment.ActivationState);
+        Assert.Equal("inactive material", inactive.FallbackState);
+
+        Assert.True(unsupported.UsesSolidFallback);
+        Assert.False(unsupported.Environment.IsHostBackdropSupported);
+        Assert.Equal(WindowBackdropType.None, unsupported.ActualSystemBackdrop);
+        Assert.Equal("host unsupported", unsupported.Environment.HostState);
+        Assert.Contains("environment: light, active, host unsupported", unsupportedText);
+        Assert.Contains("window: pending, not applied", unsupportedText);
     }
 
     [Fact]
