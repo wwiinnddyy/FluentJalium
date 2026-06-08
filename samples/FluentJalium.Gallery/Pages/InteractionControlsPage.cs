@@ -15,6 +15,7 @@ namespace FluentJalium.Gallery.Pages;
 public class InteractionControlsPage : Page
 {
     private TextBlock? _refreshStatusText;
+    private TextBlock? _refreshDiagnosticsText;
     private int _refreshCount = 0;
 
     public InteractionControlsPage()
@@ -120,6 +121,28 @@ public class InteractionControlsPage : Page
         };
         contentStack.Children.Add(_refreshStatusText);
 
+        _refreshDiagnosticsText = new TextBlock
+        {
+            Text = FormatRefreshContainerDiagnostics("Initial", refreshContainer.GetDiagnostics()),
+            FontSize = 12,
+            TextWrapping = TextWrapping.Wrap,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Opacity = 0.75
+        };
+        contentStack.Children.Add(_refreshDiagnosticsText);
+
+        var refreshButton = new FWButton
+        {
+            Content = "Request refresh",
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+        refreshButton.Click += (_, _) =>
+        {
+            refreshContainer.RequestRefresh();
+            UpdateRefreshDiagnostics("Requested", refreshContainer);
+        };
+        contentStack.Children.Add(refreshButton);
+
         // Add sample content
         for (int i = 1; i <= 10; i++)
         {
@@ -144,6 +167,10 @@ public class InteractionControlsPage : Page
     private void OnRefreshRequested(object? sender, RefreshRequestedEventArgs e)
     {
         var deferral = e.GetDeferral();
+        if (sender is FWRefreshContainer requestedContainer)
+        {
+            UpdateRefreshDiagnostics("Refresh requested", requestedContainer);
+        }
 
         Task.Run(async () =>
         {
@@ -158,9 +185,28 @@ public class InteractionControlsPage : Page
                     _refreshStatusText.Text = $"Refreshed {_refreshCount} times";
                 }
                 deferral.Complete();
+                if (sender is FWRefreshContainer completedContainer)
+                {
+                    UpdateRefreshDiagnostics("Completed", completedContainer);
+                }
             });
         });
     }
+
+    private void UpdateRefreshDiagnostics(string reason, FWRefreshContainer refreshContainer)
+    {
+        if (_refreshDiagnosticsText != null)
+        {
+            _refreshDiagnosticsText.Text = FormatRefreshContainerDiagnostics(reason, refreshContainer.GetDiagnostics());
+        }
+    }
+
+    private static string FormatRefreshContainerDiagnostics(string reason, FWRefreshContainerDiagnostics diagnostics)
+    {
+        return $"{reason}: refreshing {FormatOnOff(diagnostics.IsRefreshing)}; pulling {FormatOnOff(diagnostics.IsPulling)}; progress {diagnostics.PullProgress:P0}; distance {diagnostics.PullDistance:0}/{diagnostics.PullThreshold:0}; visualizer {diagnostics.VisualizerState}; template {FormatOnOff(diagnostics.HasScrollViewer)}.";
+    }
+
+    private static string FormatOnOff(bool value) => value ? "on" : "off";
 
     private UIElement CreateScrollerSection()
     {

@@ -7,6 +7,23 @@ using Jalium.UI.Media;
 namespace FluentJalium.Controls;
 
 /// <summary>
+/// Snapshot of the pull-to-refresh state hosted by <see cref="FWRefreshContainer"/>.
+/// </summary>
+public readonly record struct FWRefreshContainerDiagnostics(
+    RefreshPullDirection PullDirection,
+    bool IsRefreshing,
+    bool IsPulling,
+    double PullDistance,
+    double PullThreshold,
+    double MaxPullDistance,
+    double PullProgress,
+    bool HasScrollViewer,
+    bool HasRefreshVisualizerBorder,
+    bool HasRefreshIndicator,
+    bool HasCustomVisualizer,
+    RefreshVisualizerState VisualizerState);
+
+/// <summary>
 /// FluentJalium RefreshContainer control for pull-to-refresh functionality.
 /// </summary>
 public class FWRefreshContainer : ContentControl, IFluentJaliumControl
@@ -96,6 +113,26 @@ public class FWRefreshContainer : ContentControl, IFluentJaliumControl
         {
             StartRefresh();
         }
+    }
+
+    /// <summary>
+    /// Gets a snapshot of the current pull-to-refresh state.
+    /// </summary>
+    public FWRefreshContainerDiagnostics GetDiagnostics()
+    {
+        return new FWRefreshContainerDiagnostics(
+            PullDirection,
+            _isRefreshing,
+            _isPulling,
+            _pullDistance,
+            PullThreshold,
+            MaxPullDistance,
+            Math.Clamp(_pullDistance / PullThreshold, 0, 1),
+            _scrollViewer != null,
+            _refreshVisualizerBorder != null,
+            _refreshIndicator != null,
+            Visualizer != null,
+            Visualizer?.State ?? RefreshVisualizerState.Idle);
     }
 
     private void OnMouseDown(object sender, MouseButtonEventArgs e)

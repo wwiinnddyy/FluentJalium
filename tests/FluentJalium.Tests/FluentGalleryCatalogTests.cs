@@ -31,6 +31,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWScrollViewer" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWSwipeControl" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWGridSplitter" && control.Page.UniqueId == "interaction");
+        Assert.Contains(controls, control => control.Name == "FWRefreshContainerDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWScrollerViewportDiagnostics" && control.Page.UniqueId == "advancedinteraction");
     }
 
@@ -85,6 +86,13 @@ public sealed class FluentGalleryCatalogTests
 
         var swipeControl = Assert.Single(controls, control => control.Name == "FWSwipeControl");
         Assert.Equal("/Interaction/FWScrollViewer/FWSwipeControl", swipeControl.SourcePath);
+
+        var refreshDiagnostics = Assert.Single(controls, control => control.Name == "FWRefreshContainerDiagnostics");
+        Assert.True(refreshDiagnostics.IsUpdated);
+        Assert.Equal(GalleryPageStatus.Preview, refreshDiagnostics.Status);
+        Assert.Equal("advancedinteraction.scroller", refreshDiagnostics.SampleCodeKey);
+        Assert.Contains("ContentControl", refreshDiagnostics.BaseClasses);
+        Assert.Equal("/Interaction/FWScroller/FWRefreshContainerDiagnostics", refreshDiagnostics.SourcePath);
     }
 
     [Fact]
@@ -159,6 +167,11 @@ public sealed class FluentGalleryCatalogTests
             page => page.UniqueId == "advancedinteraction");
 
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWRefreshContainer", sampleCode);
+        Assert.Contains("RefreshRequested", sampleCode);
+        Assert.Contains("RequestRefresh", sampleCode);
+        Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("PullProgress", sampleCode);
         Assert.Contains("new FWScroller", sampleCode);
         Assert.Contains("AttachScrollViewer", sampleCode);
         Assert.Contains("GetViewportDiagnostics", sampleCode);

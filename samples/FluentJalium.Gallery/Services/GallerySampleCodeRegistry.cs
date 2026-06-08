@@ -863,6 +863,29 @@ var teachingTip = new FWTeachingTip
 teachingTip.IsOpen = true;
 """,
         ["advancedinteraction.scroller"] = """
+var refreshContainer = new FWRefreshContainer
+{
+    PullDirection = RefreshPullDirection.TopToBottom,
+    Content = new FWStackPanel
+    {
+        Spacing = 8,
+        Children =
+        {
+            new FWTextBlock { Text = "Pull down to refresh" },
+            new FWTextBlock { Text = "Scrollable content" }
+        }
+    }
+};
+refreshContainer.RefreshRequested += (_, args) =>
+{
+    var deferral = args.GetDeferral();
+    RefreshFeedAsync().ContinueWith(_ => deferral.Complete());
+};
+refreshContainer.RequestRefresh();
+
+var refreshDiagnostics = refreshContainer.GetDiagnostics();
+Debug.WriteLine($"RefreshContainer: refreshing {refreshDiagnostics.IsRefreshing}; progress {refreshDiagnostics.PullProgress:P0}; visualizer {refreshDiagnostics.VisualizerState}.");
+
 var scroller = new FWScroller
 {
     VerticalScrollMode = ScrollMode.Enabled,

@@ -17,6 +17,15 @@ public class FWRefreshContainerTests
         Assert.NotNull(container);
         Assert.Equal(RefreshPullDirection.TopToBottom, container.PullDirection);
         Assert.Null(container.Visualizer);
+        Assert.Equal(RefreshPullDirection.TopToBottom, container.GetDiagnostics().PullDirection);
+        Assert.False(container.GetDiagnostics().IsRefreshing);
+        Assert.False(container.GetDiagnostics().IsPulling);
+        Assert.Equal(0, container.GetDiagnostics().PullDistance);
+        Assert.Equal(100, container.GetDiagnostics().PullThreshold);
+        Assert.Equal(150, container.GetDiagnostics().MaxPullDistance);
+        Assert.Equal(0, container.GetDiagnostics().PullProgress);
+        Assert.False(container.GetDiagnostics().HasCustomVisualizer);
+        Assert.Equal(RefreshVisualizerState.Idle, container.GetDiagnostics().VisualizerState);
     }
 
     [Theory]
@@ -48,6 +57,52 @@ public class FWRefreshContainerTests
     }
 
     [Fact]
+    public void RequestRefresh_WithDeferral_ShouldExposeRefreshingDiagnosticsUntilCompleted()
+    {
+        // Arrange
+        var container = new FWRefreshContainer();
+        RefreshRequestedDeferral? deferral = null;
+        container.RefreshRequested += (_, args) =>
+        {
+            deferral = args.GetDeferral();
+        };
+
+        // Act
+        container.RequestRefresh();
+        var refreshingDiagnostics = container.GetDiagnostics();
+        deferral?.Complete();
+        var completedDiagnostics = container.GetDiagnostics();
+
+        // Assert
+        Assert.NotNull(deferral);
+        Assert.True(refreshingDiagnostics.IsRefreshing);
+        Assert.Equal(RefreshVisualizerState.Idle, refreshingDiagnostics.VisualizerState);
+        Assert.False(completedDiagnostics.IsRefreshing);
+        Assert.Equal(0, completedDiagnostics.PullDistance);
+    }
+
+    [Fact]
+    public void GetDiagnostics_WithVisualizer_ShouldExposeVisualizerState()
+    {
+        // Arrange
+        var visualizer = new TestRefreshVisualizer
+        {
+            State = RefreshVisualizerState.Pending
+        };
+        var container = new FWRefreshContainer
+        {
+            Visualizer = visualizer
+        };
+
+        // Act
+        var diagnostics = container.GetDiagnostics();
+
+        // Assert
+        Assert.True(diagnostics.HasCustomVisualizer);
+        Assert.Equal(RefreshVisualizerState.Pending, diagnostics.VisualizerState);
+    }
+
+    [Fact]
     public void ImplementsIFluentJaliumControl()
     {
         // Arrange
@@ -55,6 +110,13 @@ public class FWRefreshContainerTests
 
         // Assert
         Assert.IsAssignableFrom<IFluentJaliumControl>(container);
+    }
+
+    private sealed class TestRefreshVisualizer : RefreshVisualizer
+    {
+        public override void UpdateProgress(double progress)
+        {
+        }
     }
 }
 
