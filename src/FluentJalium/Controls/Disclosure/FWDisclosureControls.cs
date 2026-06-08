@@ -963,11 +963,16 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
     public bool FocusDefaultButton()
     {
-        return FocusButtonCandidate(
+        if (FocusButtonCandidate(
             DefaultButton,
             FWTaskDialogButton.Primary,
             FWTaskDialogButton.Secondary,
-            FWTaskDialogButton.Close);
+            FWTaskDialogButton.Close))
+        {
+            return true;
+        }
+
+        return FocusFirstFocusableElement();
     }
 
     public bool FocusFirstAvailableButton()
@@ -986,6 +991,36 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
             FWTaskDialogButton.Primary);
     }
 
+    public bool FocusFirstFocusableElement()
+    {
+        if (!IsOpen)
+        {
+            return false;
+        }
+
+        if (FocusVisualTreeElement(reverse: false))
+        {
+            return true;
+        }
+
+        return FocusDialogFallback();
+    }
+
+    public bool FocusLastFocusableElement()
+    {
+        if (!IsOpen)
+        {
+            return false;
+        }
+
+        if (FocusVisualTreeElement(reverse: true))
+        {
+            return true;
+        }
+
+        return FocusDialogFallback();
+    }
+
     private bool FocusButtonCandidate(params FWTaskDialogButton[] candidates)
     {
         if (!IsOpen)
@@ -997,14 +1032,80 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         {
             if (ButtonFor(candidate) is { } button)
             {
-                if (button.Focus())
+                if (TryFocusElement(button))
                 {
-                    _lastFocusTarget = candidate;
                     return true;
                 }
             }
         }
 
+        return FocusDialogFallback();
+    }
+
+    private bool FocusVisualTreeElement(bool reverse)
+    {
+        var focusableElements = new List<UIElement>();
+        CollectFocusableElements(this, focusableElements);
+        if (reverse)
+        {
+            for (var index = focusableElements.Count - 1; index >= 0; index--)
+            {
+                if (TryFocusElement(focusableElements[index]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        foreach (var element in focusableElements)
+        {
+            if (TryFocusElement(element))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void CollectFocusableElements(Visual root, List<UIElement> focusableElements)
+    {
+        for (var index = 0; index < root.VisualChildrenCount; index++)
+        {
+            if (root.GetVisualChild(index) is not { } child)
+            {
+                continue;
+            }
+
+            if (child is UIElement element && IsVisualTreeFocusCandidate(element))
+            {
+                focusableElements.Add(element);
+            }
+
+            CollectFocusableElements(child, focusableElements);
+        }
+    }
+
+    private bool TryFocusElement(UIElement element)
+    {
+        if (!IsVisualTreeFocusCandidate(element))
+        {
+            return false;
+        }
+
+        if (!element.Focus())
+        {
+            return false;
+        }
+
+        _lastFocusTarget = ButtonForElement(element);
+        return true;
+    }
+
+    private bool FocusDialogFallback()
+    {
         var focused = Focus();
         if (focused)
         {
@@ -1012,6 +1113,43 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         }
 
         return focused;
+    }
+
+    private bool IsVisualTreeFocusCandidate(UIElement element)
+    {
+        if (ReferenceEquals(element, this) ||
+            !element.Focusable ||
+            !element.IsEnabled ||
+            element.Visibility != Visibility.Visible)
+        {
+            return false;
+        }
+
+        return element is not TextBlock &&
+               element is not AccessText &&
+               element is not ContentPresenter &&
+               element is not Panel &&
+               element is not Border;
+    }
+
+    private FWTaskDialogButton ButtonForElement(UIElement element)
+    {
+        if (ReferenceEquals(element, _primaryButton))
+        {
+            return FWTaskDialogButton.Primary;
+        }
+
+        if (ReferenceEquals(element, _secondaryButton))
+        {
+            return FWTaskDialogButton.Secondary;
+        }
+
+        if (ReferenceEquals(element, _closeButton))
+        {
+            return FWTaskDialogButton.Close;
+        }
+
+        return FWTaskDialogButton.None;
     }
 
     private Button? ButtonFor(FWTaskDialogButton button)
@@ -1306,11 +1444,11 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
                 : FWTaskDialogHostKeyboardRequest.TabForward;
             if (e.IsShiftDown)
             {
-                _ = CurrentDialog?.FocusLastAvailableButton();
+                _ = CurrentDialog?.FocusLastFocusableElement();
             }
             else
             {
-                _ = CurrentDialog?.FocusFirstAvailableButton();
+                _ = CurrentDialog?.FocusFirstFocusableElement();
             }
 
             e.Handled = true;

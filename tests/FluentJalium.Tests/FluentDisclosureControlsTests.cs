@@ -716,6 +716,92 @@ public sealed class FluentDisclosureControlsTests
     }
 
     [Fact]
+    [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
+    public async Task FWTaskDialogHost_ShouldTrapTabAcrossVisualTreeFocusableContent()
+    {
+        ResetApplicationState();
+        ThemeLoader.Initialize();
+        var previousProvider = FocusService.Provider;
+        var focusProvider = new RecordingFocusProvider();
+        FocusService.Provider = focusProvider;
+        var app = new Application();
+
+        try
+        {
+            FluentThemeManager.Apply(app);
+            var contentTextBox = new FWTextBox
+            {
+                Text = "Optional reason",
+                Focusable = true
+            };
+            var dialog = new FWTaskDialog
+            {
+                Title = "Delete temporary layout cache?",
+                Subtitle = "A focused input sits before the command buttons.",
+                Content = contentTextBox,
+                PrimaryButtonText = "Delete",
+                SecondaryButtonText = "Archive",
+                CloseButtonText = "Cancel",
+                DefaultButton = FWTaskDialogButton.Primary,
+                CancelButton = FWTaskDialogButton.Close,
+                Style = AssertStyle<FWTaskDialog>(app.Resources)
+            };
+            var host = new FWTaskDialogHost
+            {
+                IsFocusTrapEnabled = true
+            };
+
+            var showTask = host.ShowAsync(dialog);
+            dialog.ApplyTemplate();
+            dialog.Measure(new Size(480, 320));
+            dialog.Arrange(new Rect(0, 0, 480, 320));
+
+            Assert.Equal(FWTaskDialogButton.Primary, dialog.LastFocusTarget);
+
+            var tabArgs = new KeyEventArgs(
+                UIElement.KeyDownEvent,
+                Key.Tab,
+                ModifierKeys.None,
+                isDown: true,
+                isRepeat: false,
+                timestamp: 0);
+
+            host.RaiseEvent(tabArgs);
+
+            Assert.True(tabArgs.Handled);
+            Assert.Equal(FWTaskDialogHostKeyboardRequest.TabForward, host.LastKeyboardRequest);
+            Assert.Same(contentTextBox, focusProvider.FocusedElement);
+            Assert.Equal(FWTaskDialogButton.None, dialog.LastFocusTarget);
+
+            var shiftTabArgs = new KeyEventArgs(
+                UIElement.KeyDownEvent,
+                Key.Tab,
+                ModifierKeys.Shift,
+                isDown: true,
+                isRepeat: false,
+                timestamp: 0);
+
+            host.RaiseEvent(shiftTabArgs);
+
+            Assert.True(shiftTabArgs.Handled);
+            Assert.Equal(FWTaskDialogHostKeyboardRequest.TabBackward, host.LastKeyboardRequest);
+            Assert.Equal(FWTaskDialogButton.Close, dialog.LastFocusTarget);
+            var focusedCloseButton = Assert.IsAssignableFrom<DependencyObject>(focusProvider.FocusedElement);
+            Assert.Equal("CloseButton", AutomationProperties.GetAutomationId(focusedCloseButton));
+
+            Assert.True(dialog.RequestCloseButtonClick());
+            var result = await showTask;
+
+            Assert.Equal(FWTaskDialogResult.Close, result);
+        }
+        finally
+        {
+            FocusService.Provider = previousProvider;
+            ResetApplicationState();
+        }
+    }
+
+    [Fact]
     public async Task FWTaskDialogHost_ShouldExposeFocusDiagnosticsAndReuseCurrentDialogTask()
     {
         var host = new FWTaskDialogHost
@@ -1094,6 +1180,27 @@ public sealed class FluentDisclosureControlsTests
         }
 
         public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private sealed class RecordingFocusProvider : IFocusProvider
+    {
+        public IInputElement? FocusedElement { get; private set; }
+
+        public IInputElement? Focus(IInputElement? element)
+        {
+            FocusedElement = element;
+            return element;
+        }
+
+        public void ClearFocus()
+        {
+            FocusedElement = null;
+        }
+
+        public bool MoveFocus(UIElement element, FocusNavigationDirection direction)
+        {
+            return false;
+        }
     }
 
     private static void ResetApplicationState()
