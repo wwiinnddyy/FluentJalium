@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -473,6 +474,70 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(today.AddMonths(1), displayChanges[0].AddedDate);
         Assert.Null(displayChanges[1].RemovedDate);
         Assert.Null(displayChanges[1].AddedDate);
+    }
+
+    [Fact]
+    public void GalleryDateTimePage_ShouldFormatCalendarPickerAndCalendarViewQaSnapshots()
+    {
+        var today = DateTime.Today;
+        var calendarDatePicker = new FWCalendarDatePicker
+        {
+            Header = "Review date",
+            Density = FWDateTimePickerDensity.Compact,
+            DisplayDateStart = today,
+            DisplayDateEnd = today.AddDays(90),
+            SelectedDate = today.AddDays(7),
+            SelectedDateFormat = DatePickerFormat.Long,
+            IsDropDownOpen = true
+        };
+        var calendarView = new FWCalendarView
+        {
+            DisplayDate = today,
+            DisplayDateStart = today.AddDays(-5),
+            DisplayDateEnd = today.AddDays(45),
+            SelectedDate = today.AddDays(2),
+            FirstDayOfWeek = DayOfWeek.Monday,
+            IsTodayHighlighted = true,
+            SelectionMode = CalendarSelectionMode.SingleDate
+        };
+        calendarView.BlackoutDates.Add(today.AddDays(4).Date);
+
+        var pickerSnapshot = GalleryDateTimePage.CreateCalendarDatePickerQaSnapshot(calendarDatePicker);
+        var pickerText = GalleryDateTimePage.FormatCalendarDatePickerQa("CalendarDatePicker QA", pickerSnapshot);
+        var calendarViewSnapshot = GalleryDateTimePage.CreateCalendarViewQaSnapshot(calendarView);
+        var calendarViewText = GalleryDateTimePage.FormatCalendarViewQa("CalendarView QA", calendarViewSnapshot);
+
+        Assert.Equal("Review date", pickerSnapshot.Header);
+        Assert.Equal(today.AddDays(7), pickerSnapshot.SelectedDate);
+        Assert.Equal(today, pickerSnapshot.DisplayDateStart);
+        Assert.Equal(today.AddDays(90), pickerSnapshot.DisplayDateEnd);
+        Assert.Equal(DatePickerFormat.Long, pickerSnapshot.SelectedDateFormat);
+        Assert.Equal(FWDateTimePickerDensity.Compact, pickerSnapshot.Density);
+        Assert.True(pickerSnapshot.IsDropDownOpen);
+        Assert.Contains("CalendarDatePicker QA", pickerText, StringComparison.Ordinal);
+        Assert.Contains("Header: Review date", pickerText, StringComparison.Ordinal);
+        Assert.Contains($"Selected: {today.AddDays(7):D}", pickerText, StringComparison.Ordinal);
+        Assert.Contains($"Range: {today:D} to {today.AddDays(90):D}", pickerText, StringComparison.Ordinal);
+        Assert.Contains("Format: Long", pickerText, StringComparison.Ordinal);
+        Assert.Contains("Density: compact", pickerText, StringComparison.Ordinal);
+        Assert.Contains("Drop-down: open", pickerText, StringComparison.Ordinal);
+
+        Assert.Equal(today, calendarViewSnapshot.DisplayDate);
+        Assert.Equal(today.AddDays(2), calendarViewSnapshot.SelectedDate);
+        Assert.Equal(today.AddDays(-5), calendarViewSnapshot.DisplayDateStart);
+        Assert.Equal(today.AddDays(45), calendarViewSnapshot.DisplayDateEnd);
+        Assert.Equal(DayOfWeek.Monday, calendarViewSnapshot.FirstDayOfWeek);
+        Assert.True(calendarViewSnapshot.IsTodayHighlighted);
+        Assert.Equal(CalendarSelectionMode.SingleDate, calendarViewSnapshot.SelectionMode);
+        Assert.Equal(1, calendarViewSnapshot.BlackoutDateCount);
+        Assert.Contains("CalendarView QA", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains($"Display: {today:MMMM yyyy}", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains($"Selected: {today.AddDays(2):D}", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains($"Range: {today.AddDays(-5):D} to {today.AddDays(45):D}", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains("First day: Monday", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains("Today ring: on", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains("Selection: SingleDate", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains("Blackouts: 1", calendarViewText, StringComparison.Ordinal);
     }
 
     [Fact]

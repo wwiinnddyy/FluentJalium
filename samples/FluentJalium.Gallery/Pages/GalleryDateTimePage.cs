@@ -19,6 +19,25 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryCalendarDatePickerQaSnapshot(
+    string Header,
+    DateTime? SelectedDate,
+    DateTime? DisplayDateStart,
+    DateTime? DisplayDateEnd,
+    DatePickerFormat SelectedDateFormat,
+    FWDateTimePickerDensity Density,
+    bool IsDropDownOpen);
+
+internal readonly record struct GalleryCalendarViewQaSnapshot(
+    DateTime DisplayDate,
+    DateTime? SelectedDate,
+    DateTime? DisplayDateStart,
+    DateTime? DisplayDateEnd,
+    DayOfWeek FirstDayOfWeek,
+    bool IsTodayHighlighted,
+    CalendarSelectionMode SelectionMode,
+    int BlackoutDateCount);
+
 internal sealed class GalleryDateTimePage
 {
     public UIElement CreateContent()
@@ -139,10 +158,7 @@ internal sealed class GalleryDateTimePage
 
         void UpdateOutput(string? prefix = null)
         {
-            var state = $"Selected: {FormatDateTimeDate(datePicker.SelectedDate)}. " +
-                $"Range: {FormatDateTimeDate(datePicker.DisplayDateStart)} to {FormatDateTimeDate(datePicker.DisplayDateEnd)}. " +
-                $"Format: {datePicker.SelectedDateFormat}. Drop-down: {(datePicker.IsDropDownOpen ? "open" : "closed")}";
-            output.Text = prefix is null ? state : $"{prefix}. {state}";
+            output.Text = FormatCalendarDatePickerQa(prefix ?? "CalendarDatePicker QA", datePicker);
         }
 
         datePicker.SelectedDateChanged += (_, _) => UpdateOutput();
@@ -316,15 +332,13 @@ internal sealed class GalleryDateTimePage
         };
         calendarView.BlackoutDates.Add(today.AddDays(2).Date);
 
-        void UpdateOutput()
+        void UpdateOutput(string action = "CalendarView QA")
         {
-            output.Text = $"DisplayDate: {calendarView.DisplayDate:MMMM yyyy}. " +
-                $"SelectedDate: {FormatDateTimeDate(calendarView.SelectedDate)}. " +
-                $"FirstDayOfWeek: {calendarView.FirstDayOfWeek}. IsTodayHighlighted: {calendarView.IsTodayHighlighted}";
+            output.Text = FormatCalendarViewQa(action, calendarView);
         }
 
-        calendarView.SelectedDateChanged += (_, _) => UpdateOutput();
-        calendarView.DisplayDateChanged += (_, _) => UpdateOutput();
+        calendarView.SelectedDateChanged += (_, _) => UpdateOutput("Selection changed");
+        calendarView.DisplayDateChanged += (_, _) => UpdateOutput("Display changed");
         UpdateOutput();
 
         return new FWStackPanel
@@ -339,32 +353,32 @@ internal sealed class GalleryDateTimePage
                     {
                         calendarView.DisplayDate = today;
                         calendarView.SelectedDate = today;
-                        UpdateOutput();
+                        UpdateOutput("Today selected");
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.CalendarArrowRight24, "Next month", () =>
                     {
                         calendarView.DisplayDate = calendarView.DisplayDate.AddMonths(1);
-                        UpdateOutput();
+                        UpdateOutput("Next month");
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.CalendarArrowRight24, "+10 days", () =>
                     {
                         calendarView.SelectedDate = today.AddDays(10);
-                        UpdateOutput();
+                        UpdateOutput("Date advanced");
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.CalendarWeekStart24, "Monday", () =>
                     {
                         calendarView.FirstDayOfWeek = DayOfWeek.Monday;
-                        UpdateOutput();
+                        UpdateOutput("Week starts Monday");
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.CalendarWeekStart24, "Sunday", () =>
                     {
                         calendarView.FirstDayOfWeek = DayOfWeek.Sunday;
-                        UpdateOutput();
+                        UpdateOutput("Week starts Sunday");
                     }),
                     CreateDateTimeActionButton(FluentIconRegular.CalendarCheckmark24, "Today ring", () =>
                     {
                         calendarView.IsTodayHighlighted = !calendarView.IsTodayHighlighted;
-                        UpdateOutput();
+                        UpdateOutput("Today ring toggled");
                     })),
                 CreateDateTimeStatus(output)
             }
@@ -652,6 +666,59 @@ internal sealed class GalleryDateTimePage
         return date?.ToString("D") ?? "none";
     }
 
+    internal static GalleryCalendarDatePickerQaSnapshot CreateCalendarDatePickerQaSnapshot(FWCalendarDatePicker datePicker)
+    {
+        ArgumentNullException.ThrowIfNull(datePicker);
+
+        return new GalleryCalendarDatePickerQaSnapshot(
+            datePicker.Header?.ToString() ?? string.Empty,
+            datePicker.SelectedDate,
+            datePicker.DisplayDateStart,
+            datePicker.DisplayDateEnd,
+            datePicker.SelectedDateFormat,
+            datePicker.Density,
+            datePicker.IsDropDownOpen);
+    }
+
+    internal static string FormatCalendarDatePickerQa(string action, FWCalendarDatePicker datePicker)
+    {
+        return FormatCalendarDatePickerQa(action, CreateCalendarDatePickerQaSnapshot(datePicker));
+    }
+
+    internal static string FormatCalendarDatePickerQa(string action, GalleryCalendarDatePickerQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Header: {snapshot.Header}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. Format: {snapshot.SelectedDateFormat}. Density: {FormatDensity(snapshot.Density)}. Drop-down: {FormatOpenClosed(snapshot.IsDropDownOpen)}.";
+    }
+
+    internal static GalleryCalendarViewQaSnapshot CreateCalendarViewQaSnapshot(FWCalendarView calendarView)
+    {
+        ArgumentNullException.ThrowIfNull(calendarView);
+
+        return new GalleryCalendarViewQaSnapshot(
+            calendarView.DisplayDate,
+            calendarView.SelectedDate,
+            calendarView.DisplayDateStart,
+            calendarView.DisplayDateEnd,
+            calendarView.FirstDayOfWeek,
+            calendarView.IsTodayHighlighted,
+            calendarView.SelectionMode,
+            calendarView.BlackoutDates.Count);
+    }
+
+    internal static string FormatCalendarViewQa(string action, FWCalendarView calendarView)
+    {
+        return FormatCalendarViewQa(action, CreateCalendarViewQaSnapshot(calendarView));
+    }
+
+    internal static string FormatCalendarViewQa(string action, GalleryCalendarViewQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Display: {snapshot.DisplayDate:MMMM yyyy}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. First day: {snapshot.FirstDayOfWeek}. Today ring: {FormatOnOff(snapshot.IsTodayHighlighted)}. Selection: {snapshot.SelectionMode}. Blackouts: {snapshot.BlackoutDateCount}.";
+    }
+
     private static string FormatDateTimeTime(TimeSpan? time, string clockIdentifier)
     {
         if (!time.HasValue)
@@ -691,6 +758,16 @@ internal sealed class GalleryDateTimePage
             FWDateTimePickerDensity.Spacious => "spacious",
             _ => "comfortable"
         };
+    }
+
+    private static string FormatOpenClosed(bool value)
+    {
+        return value ? "open" : "closed";
+    }
+
+    private static string FormatOnOff(bool value)
+    {
+        return value ? "on" : "off";
     }
 
     private static FWStackPanel CreateSection(string title)
