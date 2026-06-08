@@ -20,6 +20,9 @@ using FWParallaxView = FluentJalium.Controls.FWParallaxView;
 using FWRelativePanel = FluentJalium.Controls.FWRelativePanel;
 using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
 using FWSettingsCardAutomationDiagnostics = FluentJalium.Controls.FWSettingsCardAutomationDiagnostics;
+using FWSplitView = FluentJalium.Controls.FWSplitView;
+using FWSplitViewDisplayMode = FluentJalium.Controls.FWSplitViewDisplayMode;
+using FWSplitViewPanePlacement = FluentJalium.Controls.FWSplitViewPanePlacement;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTwoPaneView = FluentJalium.Controls.FWTwoPaneView;
@@ -56,6 +59,11 @@ internal sealed class GalleryContentLayoutPage
             "Stack, wrap, and grid layout",
             "StackPanel spacing, WrapPanel chips, Grid spacing, rows, columns, and spanning cells.",
             CreatePanelLayoutSample()));
+        examples.Children.Add(CreateLayoutExampleCard(
+            FluentIconRegular.PanelLeftContract24,
+            "SplitView pane layout",
+            "SplitView pane placement, compact length, overlay modes, and open/close state.",
+            CreateSplitViewLayoutSample()));
         examples.Children.Add(CreateLayoutExampleCard(
             FluentIconRegular.DualScreenTablet24,
             "Adaptive settings layout",
@@ -358,6 +366,71 @@ internal sealed class GalleryContentLayoutPage
                             ? ClickMode.Release
                             : ClickMode.Hover;
                         output.Text = $"SettingsCard ClickMode: {modeCard.ClickMode}. Automation: {FormatSettingsCardAutomation(modeCard.GetAutomationDiagnostics())}.";
+                    })),
+                CreateLayoutStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateSplitViewLayoutSample()
+    {
+        var output = CreateLayoutOutput("SplitView: CompactInline closed, left pane length 56.");
+        var splitView = new FWSplitView
+        {
+            Width = 520,
+            Height = 230,
+            DisplayMode = FWSplitViewDisplayMode.CompactInline,
+            PanePlacement = FWSplitViewPanePlacement.Left,
+            OpenPaneLength = 208,
+            CompactPaneLength = 56,
+            IsPaneOpen = false,
+            IsLightDismissEnabled = true,
+            Background = ThemeBrush("SurfaceBackground"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            PaneBackground = ThemeBrush("LayerFillColorDefaultBrush"),
+            ContentBackground = ThemeBrush("ControlBackground"),
+            Pane = CreateSplitViewPaneContent(),
+            Content = CreateSplitViewMainContent()
+        };
+
+        void UpdateState(string action)
+        {
+            output.Text = $"{action}. Mode: {splitView.DisplayMode}; placement: {splitView.PanePlacement}; open: {FormatOnOff(splitView.IsPaneOpen)}; pane length: {splitView.ActualPaneLength:0}.";
+        }
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 540,
+            Children =
+            {
+                splitView,
+                CreateLayoutButtonRow(
+                    CreateLayoutActionButton(FluentIconRegular.PanelLeftContract24, "Toggle", () =>
+                    {
+                        splitView.TogglePane();
+                        UpdateState("SplitView toggled");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.LayoutColumnTwo24, "Inline", () =>
+                    {
+                        splitView.DisplayMode = FWSplitViewDisplayMode.CompactInline;
+                        splitView.ClosePane();
+                        UpdateState("CompactInline requested");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.Layer24, "Overlay", () =>
+                    {
+                        splitView.DisplayMode = FWSplitViewDisplayMode.CompactOverlay;
+                        splitView.OpenPane();
+                        UpdateState("CompactOverlay requested");
+                    }),
+                    CreateLayoutActionButton(FluentIconRegular.ChevronRight24, "Side", () =>
+                    {
+                        splitView.PanePlacement = splitView.PanePlacement == FWSplitViewPanePlacement.Left
+                            ? FWSplitViewPanePlacement.Right
+                            : FWSplitViewPanePlacement.Left;
+                        UpdateState("Pane placement toggled");
                     })),
                 CreateLayoutStatus(output)
             }
@@ -785,6 +858,7 @@ internal sealed class GalleryContentLayoutPage
             "Text and access text" => "<FWTextBlock Text=\"Selectable body copy\" IsTextSelectionEnabled=\"True\" />\n<FWAccessText Text=\"_Open command\" />",
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
+            "SplitView pane layout" => "<FWSplitView DisplayMode=\"CompactInline\"\n             PanePlacement=\"Left\"\n             IsPaneOpen=\"False\"\n             OpenPaneLength=\"208\"\n             CompactPaneLength=\"56\">\n  <FWSplitView.Pane>\n    <FWStackPanel Spacing=\"8\" />\n  </FWSplitView.Pane>\n  <FWBorder Padding=\"14\">\n    <FWTextBlock Text=\"Primary content\" />\n  </FWBorder>\n</FWSplitView>\n<!-- ActualPaneLength reflects compact, open, and overlay states. -->",
             "Adaptive settings layout" => "<FWTwoPaneView x:Name=\"AdaptiveView\" Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>\n<!-- AdaptiveView.ActualMode / AdaptiveView.VisiblePane expose the resolved state. -->",
             "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView x:Name=\"Depth\" Progress=\"0.5\" HorizontalShift=\"18\" VerticalShift=\"28\" />\n<!-- Depth.CurrentOffset exposes the resolved parallax offset. -->",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
@@ -883,6 +957,83 @@ internal sealed class GalleryContentLayoutPage
                 Text = text,
                 Foreground = ThemeBrush("TextPrimary"),
                 FontSize = 12
+            }
+        };
+    }
+
+    private static FWStackPanel CreateSplitViewPaneContent()
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                CreateSplitViewPaneItem(FluentIconRegular.LayoutColumnTwo24, "Overview"),
+                CreateSplitViewPaneItem(FluentIconRegular.DataUsage24, "Reports"),
+                CreateSplitViewPaneItem(FluentIconRegular.CloudSync24, "Sync")
+            }
+        };
+    }
+
+    private static FWBorder CreateSplitViewMainContent()
+    {
+        return new FWBorder
+        {
+            Padding = new Thickness(14),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWStackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Children =
+                        {
+                            CreateIcon(FluentIconRegular.Layer24, 18, ThemeBrush("TextPrimary")),
+                            new FWTextBlock
+                            {
+                                Text = "Primary content",
+                                Foreground = ThemeBrush("TextPrimary"),
+                                FontSize = 15,
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "The pane can stay compact inline, open beside content, or overlay the same content region.",
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    CreateSampleGrid()
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateSplitViewPaneItem(FluentIconRegular icon, string text)
+    {
+        return new FWBorder
+        {
+            Padding = new Thickness(12, 8, 12, 8),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(icon, 18, ThemeBrush("TextPrimary")),
+                    new FWTextBlock
+                    {
+                        Text = text,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }
+                }
             }
         };
     }

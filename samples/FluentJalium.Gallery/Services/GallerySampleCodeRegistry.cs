@@ -243,6 +243,32 @@ connected.PrepareToAnimate("card", sourceElement, options);
 connected.TryStart("card", destinationElement);
 """,
         ["layout.settingscard"] = """
+var splitView = new FWSplitView
+{
+    DisplayMode = FWSplitViewDisplayMode.CompactInline,
+    PanePlacement = FWSplitViewPanePlacement.Left,
+    IsPaneOpen = false,
+    OpenPaneLength = 208,
+    CompactPaneLength = 56,
+    Pane = new FWStackPanel
+    {
+        Spacing = 8,
+        Children =
+        {
+            new FWButton { Content = "Overview" },
+            new FWButton { Content = "Reports" }
+        }
+    },
+    Content = new FWBorder
+    {
+        Padding = new Thickness(14),
+        Child = new FWTextBlock { Text = "Primary content" }
+    }
+};
+
+splitView.TogglePane();
+var paneLength = splitView.ActualPaneLength;
+
 var card = new FWSettingsCard
 {
     Header = "Display mode",
@@ -495,6 +521,21 @@ var player = new FWAnimatedVisualPlayer
 };
 """,
         ["menus.flyout.commandbar"] = """
+var contentFlyout = new FWFlyout
+{
+    Placement = FlyoutPlacementMode.Right,
+    Density = FWMenuDensity.Spacious,
+    Content = new FWStackPanel
+    {
+        Spacing = 8,
+        Children =
+        {
+            new FWTextBlock { Text = "Preview settings" },
+            new FWButton { Content = "Apply" }
+        }
+    }
+};
+
 var menuBar = new FWMenuBar();
 menuBar.Items.Add(new FWMenuBarItem
 {

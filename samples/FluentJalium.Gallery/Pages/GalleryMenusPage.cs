@@ -11,8 +11,10 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWCommandBarFlyout = FluentJalium.Controls.FWCommandBarFlyout;
 using FWContextMenu = FluentJalium.Controls.FWContextMenu;
 using FWDropDownButton = FluentJalium.Controls.FWDropDownButton;
+using FWFlyout = FluentJalium.Controls.FWFlyout;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWMenuDensity = FluentJalium.Controls.FWMenuDensity;
 using FWMenu = FluentJalium.Controls.FWMenu;
 using FWMenuBar = FluentJalium.Controls.FWMenuBar;
 using FWMenuBarItem = FluentJalium.Controls.FWMenuBarItem;
@@ -54,6 +56,11 @@ internal sealed class GalleryMenusPage
             "FWContextMenu",
             "Context menu placement, open and close events, command shortcuts, disabled items, and checkable state.",
             CreateContextMenuSample()));
+        examples.Children.Add(CreateMenuExampleCard(
+            FluentIconRegular.AppFolder24,
+            "FWFlyout and FWFlyoutPresenter",
+            "General purpose content flyout with density, placement, presenter chrome, and open or close state.",
+            CreateFlyoutSample()));
         examples.Children.Add(CreateMenuExampleCard(
             FluentIconRegular.ChevronDown24,
             "FWMenuFlyout",
@@ -283,6 +290,90 @@ internal sealed class GalleryMenusPage
                     {
                         contextMenu.Placement = PlacementMode.Bottom;
                         output.Text = $"ContextMenu placement: {contextMenu.Placement}";
+                    })),
+                CreateMenuStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateFlyoutSample()
+    {
+        var output = CreateMenuOutput("Flyout: closed");
+        var flyout = new FWFlyout
+        {
+            Placement = FlyoutPlacementMode.Right,
+            Density = FWMenuDensity.Spacious,
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 8,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = "Preview settings",
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "FWFlyout hosts arbitrary content while FWFlyoutPresenter supplies the Fluent surface.",
+                        FontSize = 12,
+                        TextWrapping = TextWrapping.Wrap,
+                        Foreground = ThemeBrush("TextSecondary")
+                    },
+                    new FWWrapPanel
+                    {
+                        HorizontalSpacing = 8,
+                        VerticalSpacing = 8,
+                        Children =
+                        {
+                            new FWButton { Content = "Apply", MinWidth = 88 },
+                            new FWButton { Content = "Reset", MinWidth = 88 }
+                        }
+                    }
+                }
+            }
+        };
+        var button = new FWButton
+        {
+            Content = CreateMenuButtonContent(FluentIconRegular.AppFolder24, "Open content flyout"),
+            MinWidth = 190
+        };
+        flyout.Opened += (_, _) => output.Text = $"Flyout: open at {flyout.Placement}, density {flyout.Density}";
+        flyout.Closed += (_, _) => output.Text = "Flyout: closed";
+        button.Click += (_, _) =>
+        {
+            flyout.ShowAt(button);
+            output.Text = $"Flyout: open at {flyout.Placement}";
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                button,
+                CreateMenuButtonRow(
+                    CreateMenuActionButton(FluentIconRegular.Open24, "Open", () =>
+                    {
+                        flyout.ShowAt(button);
+                        output.Text = $"Flyout: open at {flyout.Placement}";
+                    }),
+                    CreateMenuActionButton(FluentIconRegular.ArrowRight24, "Right", () =>
+                    {
+                        flyout.Placement = FlyoutPlacementMode.Right;
+                        output.Text = $"Flyout placement: {flyout.Placement}";
+                    }),
+                    CreateMenuActionButton(FluentIconRegular.ChevronDown24, "Bottom", () =>
+                    {
+                        flyout.Placement = FlyoutPlacementMode.Bottom;
+                        output.Text = $"Flyout placement: {flyout.Placement}";
+                    }),
+                    CreateMenuActionButton(FluentIconRegular.DismissCircle24, "Hide", () =>
+                    {
+                        flyout.Hide();
+                        output.Text = "Flyout: hidden";
                     })),
                 CreateMenuStatus(output)
             }
@@ -689,6 +780,7 @@ internal sealed class GalleryMenusPage
             "FWMenuBar" => "<FWMenuBar>\n    <FWMenuBarItem Title=\"File\" />\n    <FWMenuBarItem Title=\"Edit\" />\n</FWMenuBar>",
             "FWMenu and FWMenuItem" => "<FWMenu>\n    <FWMenuItem Header=\"Project\">\n        <FWMenuItem Header=\"Build\" InputGestureText=\"Ctrl+B\" />\n    </FWMenuItem>\n</FWMenu>",
             "FWContextMenu" => "<FWBorder>\n    <FWBorder.ContextMenu>\n        <FWContextMenu Placement=\"Bottom\" />\n    </FWBorder.ContextMenu>\n</FWBorder>",
+            "FWFlyout and FWFlyoutPresenter" => "<FWButton Content=\"Open content flyout\">\n    <FWButton.Flyout>\n        <FWFlyout Placement=\"Right\" Density=\"Spacious\">\n            <FWTextBlock Text=\"Flyout content\" />\n        </FWFlyout>\n    </FWButton.Flyout>\n</FWButton>",
             "FWMenuFlyout" => "<FWDropDownButton Content=\"Actions\">\n    <FWDropDownButton.Flyout>\n        <FWMenuFlyout />\n    </FWDropDownButton.Flyout>\n</FWDropDownButton>",
             "FWMenuFlyoutSubItem" => "<FWMenuFlyoutSubItem Text=\"Export\">\n    <FWMenuFlyoutItem Text=\"PDF document\" />\n</FWMenuFlyoutSubItem>",
             "FWCommandBarFlyout" => "<FWCommandBarFlyout AlwaysExpanded=\"True\">\n    <FWAppBarButton Label=\"Copy\" />\n</FWCommandBarFlyout>",
