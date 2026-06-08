@@ -444,11 +444,6 @@
         <Setter Property="Density" Value="Comfortable" />
         <Setter Property="Orientation" Value="Horizontal" />
         <Setter Property="SelectionIndicatorPlacement" Value="Auto" />
-        <Setter Property="ItemsPanel">
-            <ItemsPanelTemplate>
-                <StackPanel Orientation="Horizontal" Spacing="4" />
-            </ItemsPanelTemplate>
-        </Setter>
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWSelectorBar">
                 <Border Background="{TemplateBinding Background}"

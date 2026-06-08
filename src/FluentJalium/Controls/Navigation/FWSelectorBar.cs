@@ -83,6 +83,20 @@ public class FWSelectorBar : Selector, IFluentJaliumControl
         }
     }
 
+    protected override Panel CreateItemsPanel()
+    {
+        if (ItemsPanel != null)
+        {
+            return base.CreateItemsPanel();
+        }
+
+        return new StackPanel
+        {
+            Orientation = Orientation,
+            Spacing = 4
+        };
+    }
+
     private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWSelectorBar selectorBar && e.NewValue is FWNavigationDensity density)
@@ -112,8 +126,18 @@ public class FWSelectorBar : Selector, IFluentJaliumControl
     {
         if (d is FWSelectorBar selectorBar)
         {
+            selectorBar.UpdateItemsPanelOrientation();
             selectorBar.InvalidateMeasure();
             selectorBar.InvalidateVisual();
+        }
+    }
+
+    private void UpdateItemsPanelOrientation()
+    {
+        if (ItemsPanel == null && ItemsHost is StackPanel panel)
+        {
+            panel.Orientation = Orientation;
+            panel.InvalidateMeasure();
         }
     }
 

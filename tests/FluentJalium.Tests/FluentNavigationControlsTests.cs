@@ -562,6 +562,27 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWSelectorBar_ShouldCreateDefaultItemsPanelFromOrientation()
+    {
+        var selectorBar = new TestSelectorBar
+        {
+            Orientation = Orientation.Vertical
+        };
+
+        var verticalPanel = Assert.IsType<StackPanel>(selectorBar.CreateDefaultItemsPanel());
+
+        Assert.Equal(Orientation.Vertical, verticalPanel.Orientation);
+        Assert.Equal(4, verticalPanel.Spacing);
+
+        selectorBar.Orientation = Orientation.Horizontal;
+
+        var horizontalPanel = Assert.IsType<StackPanel>(selectorBar.CreateDefaultItemsPanel());
+
+        Assert.Equal(Orientation.Horizontal, horizontalPanel.Orientation);
+        Assert.Equal(4, horizontalPanel.Spacing);
+    }
+
+    [Fact]
     public void FWNavigationView_ShouldExposePaneHeaderFooterModesAndSelectionEvents()
     {
         var navigationView = new FWNavigationView
@@ -764,6 +785,11 @@ public sealed class FluentNavigationControlsTests
 
     private sealed class NavigationDetailsPage : Page
     {
+    }
+
+    private sealed class TestSelectorBar : FWSelectorBar
+    {
+        public Panel CreateDefaultItemsPanel() => CreateItemsPanel();
     }
 
     private static ResourceDictionary LoadGenericThemeDictionary()
