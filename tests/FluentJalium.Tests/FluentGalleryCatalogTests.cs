@@ -118,4 +118,58 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWGridSplitter", sampleCode);
         Assert.Contains("KeyboardIncrement = 12", sampleCode);
     }
+
+    [Fact]
+    public void GalleryDesignPages_ShouldExposeMetadataAndSampleKeys()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+
+        var themeArchitecture = Assert.Single(pages, page => page.UniqueId == "themearchitecture");
+        Assert.True(themeArchitecture.IsUpdated);
+        Assert.Equal("/Design/ThemeArchitecture", themeArchitecture.SourcePath);
+        Assert.Equal("FluentJalium.Controls.Themes", themeArchitecture.ApiNamespace);
+        Assert.Equal("design.themearchitecture", themeArchitecture.SampleCodeKey);
+        Assert.Contains("ResourceDictionary", themeArchitecture.BaseClasses!);
+
+        var colors = Assert.Single(pages, page => page.UniqueId == "colors");
+        Assert.Equal("/Design/Colors", colors.SourcePath);
+        Assert.Equal("design.colors", colors.SampleCodeKey);
+        Assert.Contains("FluentColors", colors.RelatedControls);
+
+        var typography = Assert.Single(pages, page => page.UniqueId == "typography");
+        Assert.Equal("/Design/Typography", typography.SourcePath);
+        Assert.Equal("design.typography", typography.SampleCodeKey);
+        Assert.Contains("FontFamily", typography.BaseClasses!);
+
+        var geometry = Assert.Single(pages, page => page.UniqueId == "geometry");
+        Assert.Equal("/Design/Geometry", geometry.SourcePath);
+        Assert.Equal("design.geometry", geometry.SampleCodeKey);
+        Assert.Contains("CornerRadius", geometry.BaseClasses!);
+
+        var motion = Assert.Single(pages, page => page.UniqueId == "motiontokens");
+        Assert.Equal("/Design/MotionTokens", motion.SourcePath);
+        Assert.Equal("design.motiontokens", motion.SampleCodeKey);
+        Assert.Contains("TransitionMode", motion.RelatedControls);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeDesignTokenSamples()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+
+        AssertDesignSample(pages, "themearchitecture", "FluentThemeManager.Apply", "FluentControlsResourceName");
+        AssertDesignSample(pages, "colors", "AccentFillColorDefaultBrush", "SelectionBackgroundWeak");
+        AssertDesignSample(pages, "typography", "CurrentDisplayFontFamily", "ControlContentThemeFontSize");
+        AssertDesignSample(pages, "geometry", "CardCornerRadius", "FluentOverlayBorderThickness");
+        AssertDesignSample(pages, "motiontokens", "FWConnectedAnimationService", "FluentMotionDurationNormal");
+    }
+
+    private static void AssertDesignSample(GalleryPageInfo[] pages, string uniqueId, string firstExpected, string secondExpected)
+    {
+        var page = Assert.Single(pages, page => page.UniqueId == uniqueId);
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains(firstExpected, sampleCode);
+        Assert.Contains(secondExpected, sampleCode);
+    }
 }

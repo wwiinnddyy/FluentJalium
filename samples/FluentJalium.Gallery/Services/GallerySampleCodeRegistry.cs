@@ -11,6 +11,96 @@ internal static class GallerySampleCodeRegistry
         ["catalog.filter.updated"] = CreateCatalogFilterSample("Updated"),
         ["catalog.filter.preview"] = CreateCatalogFilterSample("Preview"),
         ["catalog.filter.diagnostic"] = CreateCatalogFilterSample("Diagnostic"),
+        ["design.themearchitecture"] = """
+FluentThemeManager.Apply(app);
+
+var genericDictionary = FluentThemeManager.GenericThemeResourceName;
+var tokenDictionary = FluentThemeManager.FluentResourcesResourceName;
+var controlDictionary = FluentThemeManager.FluentControlsResourceName;
+
+// Theme mode restyles Jalium base controls; FW controls expose the public FluentJalium surface.
+var surface = new FWStackPanel
+{
+    Children =
+    {
+        new FWTextBlock { Text = genericDictionary },
+        new FWTextBlock { Text = tokenDictionary },
+        new FWTextBlock { Text = controlDictionary }
+    }
+};
+""",
+        ["design.colors"] = """
+var accentPreview = new FWBorder
+{
+    Width = 160,
+    Height = 72,
+    Background = ThemeBrush("AccentFillColorDefaultBrush"),
+    BorderBrush = ThemeBrush("AccentControlElevationBorderBrush"),
+    BorderThickness = new Thickness(1),
+    CornerRadius = new CornerRadius(6)
+};
+
+var textPreview = new FWTextBlock
+{
+    Text = "Text and semantic color resources",
+    Foreground = ThemeBrush("TextFillColorPrimaryBrush")
+};
+
+var selectionBrush = ThemeBrush("SelectionBackgroundWeak");
+var hyperlinkBrush = ThemeBrush("HyperlinkForeground");
+""",
+        ["design.typography"] = """
+var title = new FWTextBlock
+{
+    Text = "FluentJalium typography",
+    FontFamily = FluentThemeManager.CurrentDisplayFontFamily,
+    FontSize = ResourceDouble("FluentTitleFontSize", 20)
+};
+
+var body = new FWTextBlock
+{
+    Text = "Body text uses the current theme family and control content size.",
+    FontFamily = FluentThemeManager.CurrentBodyFontFamily,
+    FontSize = ResourceDouble("ControlContentThemeFontSize", 14)
+};
+
+var code = new FWTextBlock
+{
+    Text = "FWButton | FWTextBox | FWNavigationView",
+    FontFamily = FluentThemeManager.CurrentMonoFontFamily,
+    FontSize = ResourceDouble("FluentCaptionFontSize", 12)
+};
+""",
+        ["design.geometry"] = """
+var card = new FWBorder
+{
+    Width = 320,
+    Padding = new Thickness(14),
+    Background = ThemeBrush("LayerFillColorDefaultBrush"),
+    BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+    BorderThickness = ResourceThickness("FluentControlBorderThickness", 1),
+    CornerRadius = ResourceCornerRadius("CardCornerRadius", 6)
+};
+
+var flyoutPresenter = new FWBorder
+{
+    CornerRadius = ResourceCornerRadius("OverlayCornerRadius", 8),
+    BorderThickness = ResourceThickness("FluentOverlayBorderThickness", 1)
+};
+""",
+        ["design.motiontokens"] = """
+var transitionHost = new FWTransitioningContentControl
+{
+    TransitionProfile = FWContentTransitionProfile.Entrance,
+    TransitionDuration = ResourceDuration("FluentMotionDurationNormal"),
+    TransitionMode = TransitionMode.SlideUp
+};
+
+var connectedAnimation = new FWConnectedAnimationService();
+var options = FWConnectedAnimationOptions.CreateProfile(FWConnectedAnimationProfile.Navigation);
+connectedAnimation.PrepareToAnimate("hero", sourceElement, options);
+connectedAnimation.TryStart("hero", destinationElement);
+""",
         ["buttons.commandbar"] = """
 var primaryButton = new FWButton { Content = "Save" };
 var splitButton = new FWSplitButton
