@@ -133,7 +133,8 @@ public sealed class FluentContentLayoutControlsTests
             VerticalShift = 48,
             StartOffset = 0.25,
             EndOffset = 0.75,
-            IsHorizontalShiftEnabled = true
+            IsHorizontalShiftEnabled = true,
+            Progress = 0.5
         };
         var settingsCard = new FWSettingsCard
         {
@@ -206,13 +207,16 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Same(relativePanel, twoPaneView.Pane1);
         Assert.Same(transitionHost, twoPaneView.Pane2);
         Assert.Equal(FWTwoPaneViewMode.Tall, twoPaneView.Mode);
+        Assert.Equal(FWTwoPaneViewMode.Tall, twoPaneView.ActualMode);
         Assert.Equal(FWTwoPaneViewPriority.Pane2, twoPaneView.PanePriority);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Both, twoPaneView.VisiblePane);
         Assert.Same(transitionHost, twoPaneView.ActivePane);
         Assert.Equal(720, twoPaneView.MinWideModeWidth);
         Assert.Equal(560, twoPaneView.MinTallModeHeight);
         Assert.Same(twoPaneView, parallaxView.Content);
         Assert.Same(grid, parallaxView.Source);
         Assert.Equal(new Point(6, 24), parallaxView.GetParallaxOffset(0.5));
+        Assert.Equal(new Point(6, 24), parallaxView.CurrentOffset);
         Assert.Equal("Use adaptive panes", settingsCard.Header);
         Assert.True(settingsCard.IsClickEnabled);
         Assert.IsType<FWToggleSwitch>(settingsCard.Content);
@@ -255,6 +259,120 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(splitView, surface.Child);
+    }
+
+    [Fact]
+    public void FWTwoPaneView_ShouldExposeActualModeVisiblePaneAndDiagnostics()
+    {
+        var pane1 = new FWTextBlock { Text = "Master" };
+        var pane2 = new FWTextBlock { Text = "Detail" };
+        var twoPaneView = new FWTwoPaneView
+        {
+            Pane1 = pane1,
+            Pane2 = pane2,
+            Mode = FWTwoPaneViewMode.Wide,
+            PanePriority = FWTwoPaneViewPriority.Pane1,
+            MinWideModeWidth = 720,
+            MinTallModeHeight = 560
+        };
+
+        Assert.Equal(FWTwoPaneViewMode.Wide, twoPaneView.ActualMode);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Both, twoPaneView.VisiblePane);
+        Assert.Same(pane1, twoPaneView.ActivePane);
+
+        twoPaneView.PanePriority = FWTwoPaneViewPriority.Pane2;
+
+        Assert.Equal(FWTwoPaneViewVisiblePane.Both, twoPaneView.VisiblePane);
+        Assert.Same(pane2, twoPaneView.ActivePane);
+
+        twoPaneView.Mode = FWTwoPaneViewMode.SinglePane;
+
+        var pane2Diagnostics = twoPaneView.GetDiagnostics();
+
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, twoPaneView.ActualMode);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Pane2, twoPaneView.VisiblePane);
+        Assert.Same(pane2, twoPaneView.ActivePane);
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, pane2Diagnostics.RequestedMode);
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, pane2Diagnostics.ActualMode);
+        Assert.Equal(FWTwoPaneViewPriority.Pane2, pane2Diagnostics.PanePriority);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Pane2, pane2Diagnostics.VisiblePane);
+        Assert.False(pane2Diagnostics.ShowsPane1);
+        Assert.True(pane2Diagnostics.ShowsPane2);
+        Assert.Same(pane2, pane2Diagnostics.ActivePane);
+        Assert.Equal(720, pane2Diagnostics.MinWideModeWidth);
+        Assert.Equal(560, pane2Diagnostics.MinTallModeHeight);
+
+        twoPaneView.PanePriority = FWTwoPaneViewPriority.Pane1;
+
+        var pane1Diagnostics = twoPaneView.GetDiagnostics();
+
+        Assert.Equal(FWTwoPaneViewVisiblePane.Pane1, twoPaneView.VisiblePane);
+        Assert.Same(pane1, twoPaneView.ActivePane);
+        Assert.True(pane1Diagnostics.ShowsPane1);
+        Assert.False(pane1Diagnostics.ShowsPane2);
+
+        twoPaneView.Mode = FWTwoPaneViewMode.Wide;
+        twoPaneView.Measure(new Size(600, 480));
+
+        var narrowDiagnostics = twoPaneView.GetDiagnostics();
+
+        Assert.Equal(FWTwoPaneViewMode.Wide, narrowDiagnostics.RequestedMode);
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, narrowDiagnostics.ActualMode);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Pane1, narrowDiagnostics.VisiblePane);
+
+        twoPaneView.Measure(new Size(800, 480));
+
+        Assert.Equal(FWTwoPaneViewMode.Wide, twoPaneView.ActualMode);
+        Assert.Equal(FWTwoPaneViewVisiblePane.Both, twoPaneView.VisiblePane);
+
+        twoPaneView.Mode = FWTwoPaneViewMode.Tall;
+        twoPaneView.Measure(new Size(800, 480));
+
+        Assert.Equal(FWTwoPaneViewMode.SinglePane, twoPaneView.ActualMode);
+    }
+
+    [Fact]
+    public void FWParallaxView_ShouldExposeProgressCurrentOffsetAndDiagnostics()
+    {
+        var source = new FWGrid();
+        var parallaxView = new FWParallaxView
+        {
+            Source = source,
+            HorizontalShift = 20,
+            VerticalShift = 40,
+            StartOffset = 0.25,
+            EndOffset = 0.75,
+            IsHorizontalShiftEnabled = true,
+            IsVerticalShiftEnabled = true
+        };
+
+        Assert.Equal(0, parallaxView.Progress);
+        Assert.Equal(new Point(5, 10), parallaxView.CurrentOffset);
+
+        parallaxView.Progress = 0.5;
+
+        Assert.Equal(0.5, parallaxView.Progress);
+        Assert.Equal(new Point(10, 20), parallaxView.CurrentOffset);
+        Assert.Equal(new Point(10, 20), parallaxView.GetParallaxOffset(0.5));
+
+        parallaxView.Progress = 2;
+
+        Assert.Equal(1, parallaxView.Progress);
+        Assert.Equal(new Point(15, 30), parallaxView.CurrentOffset);
+
+        parallaxView.IsHorizontalShiftEnabled = false;
+
+        var diagnostics = parallaxView.GetDiagnostics();
+
+        Assert.True(diagnostics.HasSource);
+        Assert.Equal(1, diagnostics.Progress);
+        Assert.Equal(new Point(0, 30), diagnostics.CurrentOffset);
+        Assert.Equal(20, diagnostics.HorizontalShift);
+        Assert.Equal(40, diagnostics.VerticalShift);
+        Assert.Equal(0.25, diagnostics.StartOffset);
+        Assert.Equal(0.75, diagnostics.EndOffset);
+        Assert.False(diagnostics.IsHorizontalShiftEnabled);
+        Assert.True(diagnostics.IsVerticalShiftEnabled);
     }
 
     [Fact]
@@ -632,11 +750,14 @@ public sealed class FluentContentLayoutControlsTests
         AssertSetter(twoPaneViewStyle, FWTwoPaneView.PanePriorityProperty);
         AssertSetter(twoPaneViewStyle, FWTwoPaneView.MinWideModeWidthProperty);
         AssertSetter(twoPaneViewStyle, FWTwoPaneView.MinTallModeHeightProperty);
+        AssertTriggerSetter(twoPaneViewStyle, FWTwoPaneView.VisiblePaneProperty, FWTwoPaneViewVisiblePane.Pane1, UIElement.VisibilityProperty, Visibility.Collapsed);
+        AssertTriggerSetter(twoPaneViewStyle, FWTwoPaneView.VisiblePaneProperty, FWTwoPaneViewVisiblePane.Pane2, UIElement.VisibilityProperty, Visibility.Collapsed);
 
         var parallaxViewStyle = AssertStyle<FWParallaxView>(dictionary);
         Assert.Equal(typeof(ContentControl), parallaxViewStyle.BasedOn?.TargetType);
         AssertSetter(parallaxViewStyle, FWParallaxView.VerticalShiftProperty);
         AssertSetter(parallaxViewStyle, FWParallaxView.IsVerticalShiftEnabledProperty);
+        AssertSetter(parallaxViewStyle, FWParallaxView.ProgressProperty);
 
         var settingsCardStyle = AssertStyle<FWSettingsCard>(dictionary);
         Assert.Equal(typeof(ContentControl), settingsCardStyle.BasedOn?.TargetType);
@@ -709,7 +830,9 @@ public sealed class FluentContentLayoutControlsTests
             return;
         }
 
-        Assert.Equal(expectedSetterValue, setter.Value);
+        Assert.True(
+            TriggerValueEquals(setter.Value, expectedSetterValue),
+            $"Expected trigger setter value {expectedSetterValue}, got {setter.Value}.");
     }
 
     private static bool TriggerValueEquals(object? actual, object expected)

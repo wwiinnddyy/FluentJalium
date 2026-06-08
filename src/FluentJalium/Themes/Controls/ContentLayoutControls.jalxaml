@@ -184,11 +184,13 @@
                         <ContentPresenter Name="PART_Pane1Host"
                                           Grid.Column="0"
                                           Grid.Row="0"
+                                          Grid.ColumnSpan="1"
                                           Content="{TemplateBinding Pane1}"
                                           ContentTemplate="{TemplateBinding Pane1Template}" />
                         <ContentPresenter Name="PART_Pane2Host"
                                           Grid.Column="1"
                                           Grid.Row="0"
+                                          Grid.ColumnSpan="1"
                                           Content="{TemplateBinding Pane2}"
                                           ContentTemplate="{TemplateBinding Pane2Template}" />
                     </Grid>
@@ -200,8 +202,17 @@
                 <Setter TargetName="PART_Pane2Host" Property="Grid.Column" Value="0" />
                 <Setter TargetName="PART_Pane2Host" Property="Grid.Row" Value="1" />
             </Trigger>
-            <Trigger Property="Mode" Value="SinglePane">
+            <Trigger Property="VisiblePane" Value="Pane1">
+                <Setter TargetName="PART_Pane1Host" Property="Grid.Column" Value="0" />
+                <Setter TargetName="PART_Pane1Host" Property="Grid.Row" Value="0" />
+                <Setter TargetName="PART_Pane1Host" Property="Grid.ColumnSpan" Value="2" />
                 <Setter TargetName="PART_Pane2Host" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="VisiblePane" Value="Pane2">
+                <Setter TargetName="PART_Pane1Host" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="PART_Pane2Host" Property="Grid.Column" Value="0" />
+                <Setter TargetName="PART_Pane2Host" Property="Grid.Row" Value="0" />
+                <Setter TargetName="PART_Pane2Host" Property="Grid.ColumnSpan" Value="2" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
@@ -218,6 +229,7 @@
         <Setter Property="EndOffset" Value="1" />
         <Setter Property="IsVerticalShiftEnabled" Value="True" />
         <Setter Property="IsHorizontalShiftEnabled" Value="False" />
+        <Setter Property="Progress" Value="0" />
         <Setter Property="Template">
             <ControlTemplate TargetType="fluent:FWParallaxView">
                 <Border Background="{TemplateBinding Background}"
@@ -226,7 +238,8 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         Padding="{TemplateBinding Padding}"
                         ClipToBounds="True">
-                    <ContentPresenter Content="{TemplateBinding Content}"
+                    <ContentPresenter Name="PART_ContentHost"
+                                      Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />

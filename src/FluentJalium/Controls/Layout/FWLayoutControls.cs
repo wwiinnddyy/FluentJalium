@@ -2,6 +2,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Input;
+using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -219,10 +220,36 @@ public enum FWTwoPaneViewPriority
 }
 
 /// <summary>
+/// Describes which pane is currently visible in a <see cref="FWTwoPaneView"/>.
+/// </summary>
+public enum FWTwoPaneViewVisiblePane
+{
+    Pane1,
+    Pane2,
+    Both
+}
+
+/// <summary>
+/// Resolved FluentJalium TwoPaneView state useful for Gallery diagnostics and adaptive shells.
+/// </summary>
+public readonly record struct FWTwoPaneViewDiagnostics(
+    FWTwoPaneViewMode RequestedMode,
+    FWTwoPaneViewMode ActualMode,
+    FWTwoPaneViewPriority PanePriority,
+    FWTwoPaneViewVisiblePane VisiblePane,
+    bool ShowsPane1,
+    bool ShowsPane2,
+    object? ActivePane,
+    double MinWideModeWidth,
+    double MinTallModeHeight);
+
+/// <summary>
 /// FluentJalium TwoPaneView control for foldable and adaptive master-detail layouts.
 /// </summary>
 public class FWTwoPaneView : Control, IFluentJaliumControl
 {
+    private Size _lastAvailableSize = new(double.PositiveInfinity, double.PositiveInfinity);
+
     public static readonly DependencyProperty Pane1Property =
         DependencyProperty.Register(nameof(Pane1), typeof(object), typeof(FWTwoPaneView),
             new PropertyMetadata(null, OnLayoutStateChanged));
@@ -254,6 +281,23 @@ public class FWTwoPaneView : Control, IFluentJaliumControl
     public static readonly DependencyProperty MinTallModeHeightProperty =
         DependencyProperty.Register(nameof(MinTallModeHeight), typeof(double), typeof(FWTwoPaneView),
             new PropertyMetadata(641.0, OnLayoutStateChanged), IsValidNonNegativeDouble);
+
+    private static readonly DependencyPropertyKey ActualModePropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(ActualMode), typeof(FWTwoPaneViewMode), typeof(FWTwoPaneView),
+            new PropertyMetadata(FWTwoPaneViewMode.Wide));
+
+    public static readonly DependencyProperty ActualModeProperty = ActualModePropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey VisiblePanePropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(VisiblePane), typeof(FWTwoPaneViewVisiblePane), typeof(FWTwoPaneView),
+            new PropertyMetadata(FWTwoPaneViewVisiblePane.Both));
+
+    public static readonly DependencyProperty VisiblePaneProperty = VisiblePanePropertyKey.DependencyProperty;
+
+    public FWTwoPaneView()
+    {
+        UpdateActualPaneState(_lastAvailableSize);
+    }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
     public object? Pane1
@@ -311,15 +355,67 @@ public class FWTwoPaneView : Control, IFluentJaliumControl
         set => SetValue(MinTallModeHeightProperty, value);
     }
 
-    public object? ActivePane => PanePriority == FWTwoPaneViewPriority.Pane2 ? Pane2 : Pane1;
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWTwoPaneViewMode ActualMode => (FWTwoPaneViewMode)GetValue(ActualModeProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWTwoPaneViewVisiblePane VisiblePane => (FWTwoPaneViewVisiblePane)GetValue(VisiblePaneProperty)!;
+
+    public object? ActivePane => VisiblePane == FWTwoPaneViewVisiblePane.Pane2 || PanePriority == FWTwoPaneViewPriority.Pane2 ? Pane2 : Pane1;
+
+    public FWTwoPaneViewDiagnostics GetDiagnostics()
+    {
+        return new FWTwoPaneViewDiagnostics(
+            Mode,
+            ActualMode,
+            PanePriority,
+            VisiblePane,
+            VisiblePane is FWTwoPaneViewVisiblePane.Pane1 or FWTwoPaneViewVisiblePane.Both,
+            VisiblePane is FWTwoPaneViewVisiblePane.Pane2 or FWTwoPaneViewVisiblePane.Both,
+            ActivePane,
+            MinWideModeWidth,
+            MinTallModeHeight);
+    }
 
     private static void OnLayoutStateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWTwoPaneView twoPaneView)
         {
+            twoPaneView.UpdateActualPaneState(twoPaneView._lastAvailableSize);
             twoPaneView.InvalidateMeasure();
             twoPaneView.InvalidateVisual();
         }
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        _lastAvailableSize = availableSize;
+        UpdateActualPaneState(availableSize);
+
+        return base.MeasureOverride(availableSize);
+    }
+
+    private void UpdateActualPaneState(Size availableSize)
+    {
+        var actualMode = ResolveActualMode(availableSize);
+        var visiblePane = actualMode == FWTwoPaneViewMode.SinglePane
+            ? PanePriority == FWTwoPaneViewPriority.Pane2
+                ? FWTwoPaneViewVisiblePane.Pane2
+                : FWTwoPaneViewVisiblePane.Pane1
+            : FWTwoPaneViewVisiblePane.Both;
+
+        SetValue(ActualModePropertyKey.DependencyProperty, actualMode);
+        SetValue(VisiblePanePropertyKey.DependencyProperty, visiblePane);
+    }
+
+    private FWTwoPaneViewMode ResolveActualMode(Size availableSize)
+    {
+        return Mode switch
+        {
+            FWTwoPaneViewMode.Wide when double.IsFinite(availableSize.Width) && availableSize.Width < MinWideModeWidth => FWTwoPaneViewMode.SinglePane,
+            FWTwoPaneViewMode.Tall when double.IsFinite(availableSize.Height) && availableSize.Height < MinTallModeHeight => FWTwoPaneViewMode.SinglePane,
+            _ => Mode
+        };
     }
 
     private static bool IsValidMode(object? value)
@@ -371,9 +467,23 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
         DependencyProperty.Register(nameof(IsHorizontalShiftEnabled), typeof(bool), typeof(FWParallaxView),
             new PropertyMetadata(false, OnParallaxPropertyChanged));
 
+    public static readonly DependencyProperty ProgressProperty =
+        DependencyProperty.Register(nameof(Progress), typeof(double), typeof(FWParallaxView),
+            new PropertyMetadata(0.0, OnParallaxPropertyChanged), IsValidProgress);
+
+    private static readonly DependencyPropertyKey CurrentOffsetPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(CurrentOffset), typeof(Point), typeof(FWParallaxView),
+            new PropertyMetadata(new Point(0, 0)));
+
+    public static readonly DependencyProperty CurrentOffsetProperty = CurrentOffsetPropertyKey.DependencyProperty;
+
+    private ContentPresenter? _contentHost;
+    private TranslateTransform? _contentTransform;
+
     public FWParallaxView()
     {
         UseTemplateContentManagement();
+        UpdateCurrentOffset();
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
@@ -425,6 +535,25 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
         set => SetValue(IsHorizontalShiftEnabledProperty, value);
     }
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public double Progress
+    {
+        get => (double)GetValue(ProgressProperty)!;
+        set => SetValue(ProgressProperty, Math.Clamp(value, 0.0, 1.0));
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public Point CurrentOffset => (Point)GetValue(CurrentOffsetProperty)!;
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        _contentHost = GetTemplateChild("PART_ContentHost") as ContentPresenter;
+        EnsureContentTransform();
+        UpdateContentTransform(CurrentOffset);
+    }
+
     public Point GetParallaxOffset(double progress)
     {
         var normalized = Math.Clamp(progress, 0.0, 1.0);
@@ -435,12 +564,60 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
             IsVerticalShiftEnabled ? VerticalShift * position : 0.0);
     }
 
+    public FWParallaxViewDiagnostics GetDiagnostics()
+    {
+        return new FWParallaxViewDiagnostics(
+            Source is not null,
+            Progress,
+            CurrentOffset,
+            HorizontalShift,
+            VerticalShift,
+            StartOffset,
+            EndOffset,
+            IsHorizontalShiftEnabled,
+            IsVerticalShiftEnabled);
+    }
+
     private static void OnParallaxPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is FWParallaxView parallaxView)
         {
+            parallaxView.UpdateCurrentOffset();
             parallaxView.InvalidateMeasure();
             parallaxView.InvalidateVisual();
+        }
+    }
+
+    private void UpdateCurrentOffset()
+    {
+        var offset = GetParallaxOffset(Progress);
+        SetValue(CurrentOffsetPropertyKey.DependencyProperty, offset);
+        UpdateContentTransform(offset);
+    }
+
+    private void EnsureContentTransform()
+    {
+        if (_contentHost is null)
+        {
+            return;
+        }
+
+        _contentTransform = _contentHost.RenderTransform as TranslateTransform;
+        if (_contentTransform is null)
+        {
+            _contentTransform = new TranslateTransform();
+            _contentHost.RenderTransform = _contentTransform;
+        }
+    }
+
+    private void UpdateContentTransform(Point offset)
+    {
+        EnsureContentTransform();
+
+        if (_contentTransform is not null)
+        {
+            _contentTransform.X = offset.X;
+            _contentTransform.Y = offset.Y;
         }
     }
 
@@ -448,7 +625,26 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
     {
         return value is double number && double.IsFinite(number);
     }
+
+    private static bool IsValidProgress(object? value)
+    {
+        return value is double number && double.IsFinite(number) && number >= 0.0 && number <= 1.0;
+    }
 }
+
+/// <summary>
+/// Resolved FluentJalium ParallaxView state useful for Gallery diagnostics and visual QA.
+/// </summary>
+public readonly record struct FWParallaxViewDiagnostics(
+    bool HasSource,
+    double Progress,
+    Point CurrentOffset,
+    double HorizontalShift,
+    double VerticalShift,
+    double StartOffset,
+    double EndOffset,
+    bool IsHorizontalShiftEnabled,
+    bool IsVerticalShiftEnabled);
 
 /// <summary>
 /// FluentJalium RelativePanel control for arranging children relative to the panel or to sibling elements.

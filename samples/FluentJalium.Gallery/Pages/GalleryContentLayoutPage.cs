@@ -58,12 +58,12 @@ internal sealed class GalleryContentLayoutPage
         examples.Children.Add(CreateLayoutExampleCard(
             FluentIconRegular.DualScreenTablet24,
             "Adaptive settings layout",
-            "TwoPaneView and SettingsCard compose adaptive master-detail settings surfaces.",
+            "TwoPaneView ActualMode, VisiblePane, diagnostics, and SettingsCard command state.",
             CreateAdaptiveSettingsLayoutSample()));
         examples.Children.Add(CreateLayoutExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
             "Canvas, relative, and parallax layout",
-            "Canvas placement, RelativePanel compatibility, and ParallaxView offset recipes for rich layout surfaces.",
+            "Canvas placement, RelativePanel compatibility, and ParallaxView Progress/CurrentOffset diagnostics.",
             CreatePositioningParallaxSample()));
         examples.Children.Add(CreateLayoutExampleCard(
             FluentIconRegular.SlideTransition24,
@@ -244,7 +244,7 @@ internal sealed class GalleryContentLayoutPage
 
     private static UIElement CreateAdaptiveSettingsLayoutSample()
     {
-        var output = CreateLayoutOutput("TwoPaneView: Wide, priority Pane1. SettingsCard command enabled.");
+        var output = CreateLayoutOutput("TwoPaneView diagnostics ready.");
         var configureCommand = new GalleryLayoutCommand(parameter =>
         {
             output.Text = $"SettingsCard command executed: {parameter}.";
@@ -275,6 +275,8 @@ internal sealed class GalleryContentLayoutPage
             Height = 230,
             Mode = FWTwoPaneViewMode.Wide,
             PanePriority = FWTwoPaneViewPriority.Pane1,
+            MinWideModeWidth = 480,
+            MinTallModeHeight = 200,
             Background = ThemeBrush("SurfaceBackground"),
             BorderBrush = ThemeBrush("ControlBorder"),
             BorderThickness = new Thickness(1),
@@ -295,7 +297,8 @@ internal sealed class GalleryContentLayoutPage
 
         void UpdateState(string action)
         {
-            output.Text = $"{action}. Mode: {twoPaneView.Mode}, priority: {twoPaneView.PanePriority}.";
+            var diagnostics = twoPaneView.GetDiagnostics();
+            output.Text = $"{action}. Requested: {diagnostics.RequestedMode}; actual: {diagnostics.ActualMode}; visible: {diagnostics.VisiblePane}; priority: {diagnostics.PanePriority}.";
         }
 
         return new FWStackPanel
@@ -310,17 +313,17 @@ internal sealed class GalleryContentLayoutPage
                     CreateLayoutActionButton(FluentIconRegular.LayoutColumnTwo24, "Wide", () =>
                     {
                         twoPaneView.Mode = FWTwoPaneViewMode.Wide;
-                        UpdateState("TwoPaneView arranged side by side");
+                        UpdateState("TwoPaneView requested Wide");
                     }),
                     CreateLayoutActionButton(FluentIconRegular.LayoutRowTwo24, "Tall", () =>
                     {
                         twoPaneView.Mode = FWTwoPaneViewMode.Tall;
-                        UpdateState("TwoPaneView arranged vertically");
+                        UpdateState("TwoPaneView requested Tall");
                     }),
                     CreateLayoutActionButton(FluentIconRegular.PanelLeftContract24, "Single", () =>
                     {
                         twoPaneView.Mode = FWTwoPaneViewMode.SinglePane;
-                        UpdateState("TwoPaneView collapsed to one pane");
+                        UpdateState("TwoPaneView requested SinglePane");
                     }),
                     CreateLayoutActionButton(FluentIconRegular.ChevronRight24, "Priority", () =>
                     {
@@ -330,6 +333,7 @@ internal sealed class GalleryContentLayoutPage
                         UpdateState("Pane priority toggled");
                     })),
                 CreateLayoutButtonRow(
+                    CreateLayoutActionButton(FluentIconRegular.DataUsage24, "Diagnostics", () => UpdateState("TwoPaneView diagnostics refreshed")),
                     CreateLayoutActionButton(FluentIconRegular.CursorClick24, "Invoke card", () =>
                     {
                         if (!modeCard.PerformClick())
@@ -413,9 +417,9 @@ internal sealed class GalleryContentLayoutPage
 
         void SetProgress(double progress)
         {
-            var offset = parallaxView.GetParallaxOffset(progress);
-            parallaxView.Margin = new Thickness(offset.X, offset.Y, 0, 0);
-            output.Text = $"Parallax progress: {progress:0.00}, offset {offset.X:0},{offset.Y:0}.";
+            parallaxView.Progress = progress;
+            var diagnostics = parallaxView.GetDiagnostics();
+            output.Text = $"Parallax progress: {diagnostics.Progress:0.00}, current offset {diagnostics.CurrentOffset.X:0},{diagnostics.CurrentOffset.Y:0}.";
         }
 
         return new FWStackPanel
@@ -769,8 +773,8 @@ internal sealed class GalleryContentLayoutPage
             "Text and access text" => "<FWTextBlock Text=\"Selectable body copy\" IsTextSelectionEnabled=\"True\" />\n<FWAccessText Text=\"_Open command\" />",
             "Border and content hosts" => "<FWBorder Padding=\"14\" CornerRadius=\"6\">\n  <FWContentControl Content=\"Hosted content\" />\n</FWBorder>",
             "Stack, wrap, and grid layout" => "<FWStackPanel Spacing=\"10\" />\n<FWWrapPanel HorizontalSpacing=\"8\" />\n<FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />",
-            "Adaptive settings layout" => "<FWTwoPaneView Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>",
-            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView HorizontalShift=\"18\" VerticalShift=\"28\" />",
+            "Adaptive settings layout" => "<FWTwoPaneView x:Name=\"AdaptiveView\" Mode=\"Wide\">\n  <FWSettingsCard Header=\"Display mode\"\n                  Description=\"Adaptive settings row\"\n                  IsClickEnabled=\"True\"\n                  Command=\"{Binding ConfigureCommand}\"\n                  CommandParameter=\"display-mode\" />\n</FWTwoPaneView>\n<!-- AdaptiveView.ActualMode / AdaptiveView.VisiblePane expose the resolved state. -->",
+            "Canvas, relative, and parallax layout" => "<FWCanvas />\n<FWRelativePanel>\n  <FWBorder x:Name=\"Anchor\" />\n  <FWBorder fluent:FWRelativePanel.RightOf=\"{Binding ElementName=Anchor}\" />\n</FWRelativePanel>\n<FWParallaxView x:Name=\"Depth\" Progress=\"0.5\" HorizontalShift=\"18\" VerticalShift=\"28\" />\n<!-- Depth.CurrentOffset exposes the resolved parallax offset. -->",
             "Transitioning content" => "<FWTransitioningContentControl TransitionMode=\"SlideLeft\" />",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWGrid ColumnSpacing=\"8\" RowSpacing=\"8\" />\n</FWFluentMaterialSurface>"
         };
