@@ -149,6 +149,9 @@ public sealed class FluentNavigationControlsTests
         AssertSetter(tabViewStyle, FWTabView.DensityProperty);
         AssertSetter(tabViewStyle, FWTabView.TabWidthModeProperty);
         AssertSetter(tabViewStyle, FWTabView.CloseButtonOverlayModeProperty);
+        AssertTargetTriggerSetter(tabViewStyle, FWTabView.TabStripPlacementProperty, Jalium.UI.Controls.Dock.Bottom, "PART_TabStrip", Grid.RowProperty, 1);
+        AssertTargetTriggerSetter(tabViewStyle, FWTabView.TabStripPlacementProperty, Jalium.UI.Controls.Dock.Bottom, "PART_SelectedContentPresenter", Grid.RowProperty, 0);
+        AssertTargetTriggerSetter(tabViewStyle, FWTabView.TabStripPlacementProperty, Jalium.UI.Controls.Dock.Bottom, "PART_SelectedContentPresenter", FrameworkElement.MarginProperty, new Thickness(0, 0, 0, 8));
 
         var fwTabViewItemStyle = AssertStyle<FWTabViewItem>(dictionary);
         Assert.Equal(typeof(TabItem), fwTabViewItemStyle.BasedOn?.TargetType);
@@ -823,6 +826,47 @@ public sealed class FluentNavigationControlsTests
     private static void AssertSetter(Style style, DependencyProperty property)
     {
         Assert.Contains(style.Setters, setter => setter.Property == property);
+    }
+
+    private static void AssertTargetTriggerSetter(
+        Style style,
+        DependencyProperty triggerProperty,
+        object triggerValue,
+        string targetName,
+        DependencyProperty setterProperty,
+        object expectedSetterValue)
+    {
+        var trigger = Assert.Single(
+            style.Triggers.OfType<Trigger>(),
+            candidate => candidate.Property == triggerProperty && TriggerValueEquals(candidate.Value, triggerValue));
+        var setter = Assert.Single(
+            trigger.Setters,
+            candidate => candidate.TargetName == targetName && SetterTargetsProperty(candidate, setterProperty));
+
+        Assert.True(
+            TriggerValueEquals(setter.Value, expectedSetterValue),
+            $"Expected trigger setter value {expectedSetterValue}, got {setter.Value}.");
+    }
+
+    private static bool SetterTargetsProperty(Setter setter, DependencyProperty property)
+    {
+        return setter.Property == property ||
+            string.Equals(setter.PropertyName, $"{property.OwnerType.Name}.{property.Name}", StringComparison.Ordinal);
+    }
+
+    private static bool TriggerValueEquals(object? actual, object expected)
+    {
+        if (Equals(actual, expected))
+        {
+            return true;
+        }
+
+        if (actual is null)
+        {
+            return false;
+        }
+
+        return string.Equals(actual.ToString(), expected.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
     private static void InvokeNavigationItem(NavigationView navigationView, NavigationViewItem item)

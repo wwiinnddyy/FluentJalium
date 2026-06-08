@@ -423,6 +423,11 @@
             <Trigger Property="IsAddTabButtonVisible" Value="False">
                 <Setter TargetName="PART_AddTabButton" Property="Visibility" Value="Collapsed" />
             </Trigger>
+            <Trigger Property="TabStripPlacement" Value="Bottom">
+                <Setter TargetName="PART_TabStrip" Property="Grid.Row" Value="1" />
+                <Setter TargetName="PART_SelectedContentPresenter" Property="Grid.Row" Value="0" />
+                <Setter TargetName="PART_SelectedContentPresenter" Property="Margin" Value="0,0,0,8" />
+            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{ThemeResource TextDisabled}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
