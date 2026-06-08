@@ -60,6 +60,19 @@ internal readonly record struct GalleryNavigationShellQaSnapshot(
     int PageCount,
     string SearchText);
 
+internal readonly record struct GalleryTitleBarVisualQaSnapshot(
+    string Title,
+    bool IsShowIcon,
+    bool IsShowTitle,
+    bool IsMaximized,
+    bool ShowMinimizeButton,
+    bool ShowMaximizeButton,
+    bool ShowCloseButton,
+    bool HasLeftWindowCommands,
+    bool HasRightWindowCommands,
+    double Width,
+    double Height);
+
 internal sealed class GalleryNavigationPage
 {
     public UIElement CreateContent()
@@ -477,6 +490,31 @@ internal sealed class GalleryNavigationPage
         ArgumentNullException.ThrowIfNull(action);
 
         return $"{action}. Route: {snapshot.CurrentRouteKey}. Page: {snapshot.CurrentPageType}. Provider: {FormatOnOff(snapshot.HasPageTypeProvider)}. Back: {FormatOnOff(snapshot.CanGoBack)} ({snapshot.BackStackDepth}). Forward: {FormatOnOff(snapshot.CanGoForward)} ({snapshot.ForwardStackDepth}). Breadcrumb: {snapshot.BreadcrumbPath}. Selector: {snapshot.SelectorText} ({FormatIndex(snapshot.SelectorIndex, snapshot.SelectorItemCount)}). Tab: {snapshot.TabHeader} ({FormatIndex(snapshot.TabIndex, snapshot.TabItemCount)}), close {snapshot.CloseButtonOverlayMode}. Pips: {snapshot.SelectedPageNumber}/{snapshot.PageCount}. Search: {snapshot.SearchText}.";
+    }
+
+    internal static GalleryTitleBarVisualQaSnapshot CreateTitleBarVisualQaSnapshot(FWTitleBar titleBar)
+    {
+        ArgumentNullException.ThrowIfNull(titleBar);
+
+        return new GalleryTitleBarVisualQaSnapshot(
+            titleBar.Title ?? string.Empty,
+            titleBar.IsShowIcon,
+            titleBar.IsShowTitle,
+            titleBar.IsMaximized,
+            titleBar.ShowMinimizeButton,
+            titleBar.ShowMaximizeButton,
+            titleBar.ShowCloseButton,
+            titleBar.LeftWindowCommands != null,
+            titleBar.RightWindowCommands != null,
+            titleBar.Width,
+            titleBar.Height);
+    }
+
+    internal static string FormatTitleBarVisualQa(string action, GalleryTitleBarVisualQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. TitleBar QA: title {snapshot.Title}. Icon {FormatOnOff(snapshot.IsShowIcon)}. Title text {FormatOnOff(snapshot.IsShowTitle)}. Maximized {FormatOnOff(snapshot.IsMaximized)}. Buttons min/max/close {FormatOnOff(snapshot.ShowMinimizeButton)}/{FormatOnOff(snapshot.ShowMaximizeButton)}/{FormatOnOff(snapshot.ShowCloseButton)}. Commands left/right {FormatOnOff(snapshot.HasLeftWindowCommands)}/{FormatOnOff(snapshot.HasRightWindowCommands)}. Size {snapshot.Width:0}x{snapshot.Height:0}.";
     }
 
     [RequiresUnreferencedCode("Gallery sample navigates to local Page types by typeof literals.")]
@@ -1186,15 +1224,12 @@ internal sealed class GalleryNavigationPage
             Width = 32,
             Height = 28
         };
-        syncButton.Click += (_, _) => output.Text = "TitleBar command: Sync clicked.";
-
         var pinButton = new FWButton
         {
             Content = CreateIcon(FluentIconRegular.Pin24, 16, ThemeBrush("TextPrimary")),
             Width = 32,
             Height = 28
         };
-        pinButton.Click += (_, _) => output.Text = "TitleBar command: Pin clicked.";
 
         var titleBar = new FWTitleBar
         {
@@ -1229,13 +1264,22 @@ internal sealed class GalleryNavigationPage
                 }
             }
         };
-        titleBar.MinimizeClicked += (_, _) => output.Text = "TitleBar window button: Minimize clicked (demo only).";
+
+        void UpdateTitleBarOutput(string action)
+        {
+            output.Text = FormatTitleBarVisualQa(action, CreateTitleBarVisualQaSnapshot(titleBar));
+        }
+
+        syncButton.Click += (_, _) => UpdateTitleBarOutput("TitleBar sync command clicked");
+        pinButton.Click += (_, _) => UpdateTitleBarOutput("TitleBar pin command clicked");
+        titleBar.MinimizeClicked += (_, _) => UpdateTitleBarOutput("TitleBar minimize command clicked");
         titleBar.MaximizeRestoreClicked += (_, _) =>
         {
             titleBar.IsMaximized = !titleBar.IsMaximized;
-            output.Text = $"TitleBar window button: {(titleBar.IsMaximized ? "Maximize" : "Restore")} clicked (demo only).";
+            UpdateTitleBarOutput("TitleBar maximize/restore command clicked");
         };
-        titleBar.CloseClicked += (_, _) => output.Text = "TitleBar window button: Close clicked (demo only).";
+        titleBar.CloseClicked += (_, _) => UpdateTitleBarOutput("TitleBar close command clicked");
+        UpdateTitleBarOutput("TitleBar preview ready");
 
         return new FWStackPanel
         {
@@ -1248,22 +1292,22 @@ internal sealed class GalleryNavigationPage
                     CreateNavigationActionButton(FluentIconRegular.Window24, "Max state", () =>
                     {
                         titleBar.IsMaximized = !titleBar.IsMaximized;
-                        output.Text = $"TitleBar preview maximized: {titleBar.IsMaximized}";
+                        UpdateTitleBarOutput("TitleBar max state toggled");
                     }),
                     CreateNavigationActionButton(FluentIconRegular.Subtract24, "Minimize", () =>
                     {
                         titleBar.ShowMinimizeButton = !titleBar.ShowMinimizeButton;
-                        output.Text = $"ShowMinimizeButton: {titleBar.ShowMinimizeButton}";
+                        UpdateTitleBarOutput("TitleBar minimize visibility toggled");
                     }),
                     CreateNavigationActionButton(FluentIconRegular.Square24, "Maximize", () =>
                     {
                         titleBar.ShowMaximizeButton = !titleBar.ShowMaximizeButton;
-                        output.Text = $"ShowMaximizeButton: {titleBar.ShowMaximizeButton}";
+                        UpdateTitleBarOutput("TitleBar maximize visibility toggled");
                     }),
                     CreateNavigationActionButton(FluentIconRegular.Dismiss24, "Close", () =>
                     {
                         titleBar.ShowCloseButton = !titleBar.ShowCloseButton;
-                        output.Text = $"ShowCloseButton: {titleBar.ShowCloseButton}";
+                        UpdateTitleBarOutput("TitleBar close visibility toggled");
                     })),
                 CreateNavigationStatus(output)
             }

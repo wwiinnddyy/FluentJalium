@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 
@@ -75,6 +76,50 @@ public sealed class FluentShellControlsTests
         Assert.Equal(48, button.DesiredSize.Width);
         Assert.Equal(34, button.DesiredSize.Height);
         Assert.False(button.Focusable);
+    }
+
+    [Fact]
+    public void GalleryNavigationPage_ShouldFormatTitleBarVisualQaSnapshot()
+    {
+        var leftCommands = new FWStackPanel();
+        var rightCommands = new FWStackPanel();
+        var titleBar = new FWTitleBar
+        {
+            Width = 500,
+            Height = 36,
+            Title = "FluentJalium Gallery",
+            IsShowIcon = false,
+            IsShowTitle = true,
+            IsMaximized = true,
+            ShowMinimizeButton = true,
+            ShowMaximizeButton = false,
+            ShowCloseButton = true,
+            LeftWindowCommands = leftCommands,
+            RightWindowCommands = rightCommands
+        };
+
+        var snapshot = GalleryNavigationPage.CreateTitleBarVisualQaSnapshot(titleBar);
+        var text = GalleryNavigationPage.FormatTitleBarVisualQa("TitleBar preview ready", snapshot);
+
+        Assert.Equal("FluentJalium Gallery", snapshot.Title);
+        Assert.False(snapshot.IsShowIcon);
+        Assert.True(snapshot.IsShowTitle);
+        Assert.True(snapshot.IsMaximized);
+        Assert.True(snapshot.ShowMinimizeButton);
+        Assert.False(snapshot.ShowMaximizeButton);
+        Assert.True(snapshot.ShowCloseButton);
+        Assert.True(snapshot.HasLeftWindowCommands);
+        Assert.True(snapshot.HasRightWindowCommands);
+        Assert.Equal(500, snapshot.Width);
+        Assert.Equal(36, snapshot.Height);
+        Assert.Contains("TitleBar preview ready. TitleBar QA", text);
+        Assert.Contains("title FluentJalium Gallery", text);
+        Assert.Contains("Icon off", text);
+        Assert.Contains("Title text on", text);
+        Assert.Contains("Maximized on", text);
+        Assert.Contains("Buttons min/max/close on/off/on", text);
+        Assert.Contains("Commands left/right on/on", text);
+        Assert.Contains("Size 500x36", text);
     }
 
     private static void InvokeTitleBarCommand(TitleBar titleBar, string methodName)
