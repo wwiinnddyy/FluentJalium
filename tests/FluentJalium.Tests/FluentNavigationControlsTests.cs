@@ -621,6 +621,22 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWTabView_ShouldUsePlainSelectedItemAsSelectedContent()
+    {
+        var document = new DocumentTab("Build output");
+        var diagnostics = new DocumentTab("Diagnostics");
+        var tabView = new FWTabView();
+
+        tabView.Items.Add(document);
+        tabView.Items.Add(diagnostics);
+
+        tabView.SelectedItem = diagnostics;
+
+        Assert.Same(diagnostics, tabView.SelectedItem);
+        Assert.Same(diagnostics, tabView.SelectedContent);
+    }
+
+    [Fact]
     public void FWSelectorBar_ShouldExposeSelectionAndDensityState()
     {
         var overview = new FWSelectorBarItem
@@ -657,6 +673,29 @@ public sealed class FluentNavigationControlsTests
         Assert.False(overview.IsSelected);
         Assert.True(activity.IsSelected);
         Assert.Equal(2, selectionChanged);
+    }
+
+    [Fact]
+    public void FWSelectorBar_ShouldRejectNullSelectionAndIgnorePlainItemsForContainerSelection()
+    {
+        var overview = new FWSelectorBarItem
+        {
+            Text = "Overview"
+        };
+        var plainItem = "Plain item";
+        var selectorBar = new FWSelectorBar();
+        selectorBar.Items.Add(overview);
+        selectorBar.Items.Add(plainItem);
+
+        Assert.Throws<ArgumentNullException>(() => selectorBar.SelectItem(null!));
+
+        selectorBar.SelectedItem = overview;
+        Assert.True(overview.IsSelected);
+
+        selectorBar.SelectedItem = plainItem;
+
+        Assert.Same(plainItem, selectorBar.SelectedItem);
+        Assert.False(overview.IsSelected);
     }
 
     [Fact]
@@ -884,6 +923,8 @@ public sealed class FluentNavigationControlsTests
     private sealed class NavigationDetailsPage : Page
     {
     }
+
+    private sealed record DocumentTab(string Title);
 
     private sealed class TestSelectorBar : FWSelectorBar
     {
