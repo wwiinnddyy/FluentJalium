@@ -337,12 +337,7 @@ var scrollViewer = new FWScrollViewer
     Content = repeater
 };
 
-scrollViewer.ScrollChanged += (_, _) =>
-{
-    repeater.ApplyViewport(scrollViewer.VerticalOffset, scrollViewer.ViewportHeight);
-};
-
-repeater.ApplyViewport(0, 160);
+repeater.AttachViewport(scrollViewer);
 var diagnostics = repeater.GetDiagnostics();
 Debug.WriteLine($"Viewport source: {diagnostics.RealizationSource}; window: {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}.");
 repeater.ApplyViewport(0, 160, Orientation.Horizontal);
@@ -612,25 +607,28 @@ var result = await showTask;
 Debug.WriteLine($"TaskDialog completed with {result}.");
 """,
         ["disclosure.settings.teachingtip"] = """
+public sealed record SettingsRow(
+    string Header,
+    string Description,
+    object HeaderIcon,
+    string Value,
+    object ActionIcon,
+    ICommand? Command = null,
+    object? CommandParameter = null,
+    bool IsClickEnabled = false);
+
 var expander = new FWSettingsExpander
 {
     Header = "Appearance",
     Description = "Theme and material options",
-    IsExpanded = true
+    IsExpanded = true,
+    ItemsSource = new[]
+    {
+        new SettingsRow("App theme", "Use system setting", ThemeIcon, "System", ChevronIcon, IsClickEnabled: true),
+        new SettingsRow("Window material", "Preview shell backdrop", MaterialIcon, "Preview", CursorIcon, PreviewMaterialCommand, "material", true),
+        new SettingsRow("Control density", "Comfortable touch targets", DensityIcon, "Comfort", ChevronIcon, IsClickEnabled: true)
+    }
 };
-
-expander.AddSetting(new FWSettingsCard
-{
-    Header = "App theme",
-    Description = "Use system setting"
-});
-expander.AddSetting(new FWSettingsCard
-{
-    Header = "Window material",
-    Description = "Preview shell backdrop",
-    IsClickEnabled = true,
-    Command = PreviewMaterialCommand
-});
 
 var itemCount = expander.ItemCount;
 

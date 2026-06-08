@@ -63,7 +63,8 @@ public readonly record struct FWItemsRepeaterDiagnostics(
     double HorizontalCacheLength,
     double VerticalCacheLength,
     int LastCreatedElementCount,
-    int LastReusedElementCount)
+    int LastReusedElementCount,
+    bool IsViewportAttached)
 {
     /// <summary>
     /// Gets a value indicating whether the repeater has any realized elements.
@@ -91,6 +92,8 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     private bool _hasRealizationRange;
     private FWItemsRepeaterRealizationSource _realizationSource = FWItemsRepeaterRealizationSource.All;
     private Orientation _viewportOrientation = Orientation.Vertical;
+    private ScrollViewer? _attachedViewportScrollViewer;
+    private Orientation _attachedViewportOrientation = Orientation.Vertical;
 
     public static readonly DependencyProperty ItemsSourceProperty =
         DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(FWItemsRepeater),
@@ -256,6 +259,9 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
     public int RequestedRealizedItemCount => _hasRealizationRange ? _realizationItemCount : _items.Count;
 
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsViewportAttached => _attachedViewportScrollViewer != null;
+
     /// <summary>
     /// Gets the realized element at the specified item index.
     /// </summary>
@@ -348,6 +354,43 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     }
 
     /// <summary>
+    /// Attaches the realization window to a <see cref="ScrollViewer"/> so scroll changes automatically refresh realized items.
+    /// </summary>
+    public void AttachViewport(ScrollViewer scrollViewer, Orientation orientation = Orientation.Vertical)
+    {
+        ArgumentNullException.ThrowIfNull(scrollViewer);
+
+        if (ReferenceEquals(_attachedViewportScrollViewer, scrollViewer) &&
+            _attachedViewportOrientation == orientation)
+        {
+            ApplyViewport(scrollViewer, orientation);
+            return;
+        }
+
+        DetachViewport();
+
+        _attachedViewportScrollViewer = scrollViewer;
+        _attachedViewportOrientation = orientation;
+        scrollViewer.ScrollChanged += OnAttachedViewportScrollChanged;
+        ApplyViewport(scrollViewer, orientation);
+    }
+
+    /// <summary>
+    /// Detaches any <see cref="ScrollViewer"/> previously attached through <see cref="AttachViewport"/>.
+    /// </summary>
+    public void DetachViewport()
+    {
+        if (_attachedViewportScrollViewer == null)
+        {
+            return;
+        }
+
+        _attachedViewportScrollViewer.ScrollChanged -= OnAttachedViewportScrollChanged;
+        _attachedViewportScrollViewer = null;
+        _attachedViewportOrientation = Orientation.Vertical;
+    }
+
+    /// <summary>
     /// Returns to realizing the full item set.
     /// </summary>
     public void ResetRealizationWindow()
@@ -387,7 +430,8 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
             HorizontalCacheLength,
             VerticalCacheLength,
             _lastCreatedElementCount,
-            _lastReusedElementCount);
+            _lastReusedElementCount,
+            IsViewportAttached);
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -484,6 +528,17 @@ public class FWItemsRepeater : Panel, IFluentJaliumControl
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         RefreshItems();
+    }
+
+    private void OnAttachedViewportScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (!ReferenceEquals(sender, _attachedViewportScrollViewer) ||
+            _attachedViewportScrollViewer == null)
+        {
+            return;
+        }
+
+        ApplyViewport(_attachedViewportScrollViewer, _attachedViewportOrientation);
     }
 
     private void RefreshItems()
