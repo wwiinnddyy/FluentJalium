@@ -24,11 +24,43 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWSnackbarHost = FluentJalium.Controls.FWSnackbarHost;
 using FWSnackbarOverlayHost = FluentJalium.Controls.FWSnackbarOverlayHost;
 using FWSnackbarPlacement = FluentJalium.Controls.FWSnackbarPlacement;
+using FWSnackbarPresenterState = FluentJalium.Controls.FWSnackbarPresenterState;
 using FWSnackbarService = FluentJalium.Controls.FWSnackbarService;
 using FWSnackbarTransitionKind = FluentJalium.Controls.FWSnackbarTransitionKind;
 using System.Windows.Input;
 
 namespace FluentJalium.Gallery.Pages;
+
+internal readonly record struct GallerySnackbarVisualQaSnapshot(
+    string Route,
+    string CurrentTitle,
+    int VisibleCount,
+    int MaxVisibleSnackbars,
+    int PendingCount,
+    FWSnackbarPlacement Placement,
+    VerticalAlignment VerticalAlignment,
+    HorizontalAlignment HorizontalAlignment,
+    bool IsOverlayOpen,
+    PlacementMode OverlayPlacement,
+    bool HasOverlayTarget,
+    double Spacing,
+    bool IsTransitionEnabled,
+    FWContentTransitionProfile TransitionProfile,
+    TimeSpan TransitionDuration,
+    double TransitionOffset,
+    FWSnackbarPresenterState PresenterState,
+    double PresenterOpacity,
+    double PresenterOffset,
+    int TransitionRequests,
+    FWSnackbarTransitionKind LastTransition,
+    int QueueEvents,
+    int OverlayEvents,
+    int ClosedEvents,
+    FWSnackbarCloseReason LastCloseReason,
+    int ActionRequests,
+    string LastCommandParameter,
+    bool IsAutoDismissEnabled,
+    bool IsAutoDismissPaused);
 
 internal sealed class GalleryStatusPage
 {
@@ -361,16 +393,21 @@ internal sealed class GalleryStatusPage
 
         void UpdateOutput(string action)
         {
-            var currentSnackbar = activeHost.CurrentSnackbar;
-            var currentTitle = currentSnackbar?.Title?.ToString() ?? "none";
-            var isPaused = currentSnackbar?.IsAutoDismissPaused ?? false;
-            var presenter = currentSnackbar?.GetPresenterDiagnostics();
-            var presenterState = presenter?.PresenterState.ToString() ?? "Idle";
-            var presenterOpacity = presenter?.PresenterOpacity ?? 1.0;
-            var presenterOffset = presenter?.PresenterOffset ?? 0.0;
-            var diagnostics = activeHost.GetDiagnostics();
-            var overlayState = overlayHost.IsOverlayOpen ? "open" : "closed";
-            output.Text = $"{action}. Route: {routeLabel}. Current: {currentTitle}. Visible: {diagnostics.VisibleCount}/{diagnostics.MaxVisibleSnackbars}. Queued: {diagnostics.PendingCount}. Placement: {diagnostics.Placement}/{diagnostics.VerticalAlignment}. Overlay: {overlayState}/{overlayHost.OverlayPlacement}. Spacing: {diagnostics.Spacing}. Motion: {diagnostics.TransitionProfile}/{diagnostics.SnackbarTransitionDuration.TotalMilliseconds:0}ms/{diagnostics.TransitionOffset}px. Presenter: {presenterState}, opacity {presenterOpacity:0.00}, offset {presenterOffset:0.0}. Transitions: {transitionRequests} ({lastTransition}). Queue events: {queueEvents}. Overlay events: {overlayEvents}. Closed: {closedEvents}. Last close: {lastCloseReason}. Actions: {actionRequests}. Last parameter: {lastCommandParameter}. Auto-dismiss: {(autoDismissEnabled ? "On" : "Off")}. Paused: {(isPaused ? "On" : "Off")}.";
+            var snapshot = CreateSnackbarVisualQaSnapshot(
+                routeLabel,
+                activeHost,
+                overlayHost,
+                autoDismissEnabled,
+                transitionRequests,
+                lastTransition,
+                queueEvents,
+                overlayEvents,
+                closedEvents,
+                lastCloseReason,
+                actionRequests,
+                lastCommandParameter);
+
+            output.Text = FormatSnackbarVisualQa(action, snapshot);
         }
 
         void WireDiagnostics(FWSnackbarHost diagnosticsHost, string label)
@@ -624,6 +661,68 @@ internal sealed class GalleryStatusPage
                 CreateStatus(output)
             }
         };
+    }
+
+    internal static GallerySnackbarVisualQaSnapshot CreateSnackbarVisualQaSnapshot(
+        string route,
+        FWSnackbarHost activeHost,
+        FWSnackbarOverlayHost overlayHost,
+        bool autoDismissEnabled,
+        int transitionRequests,
+        FWSnackbarTransitionKind lastTransition,
+        int queueEvents,
+        int overlayEvents,
+        int closedEvents,
+        FWSnackbarCloseReason lastCloseReason,
+        int actionRequests,
+        string lastCommandParameter)
+    {
+        ArgumentNullException.ThrowIfNull(route);
+        ArgumentNullException.ThrowIfNull(activeHost);
+        ArgumentNullException.ThrowIfNull(overlayHost);
+
+        var currentSnackbar = activeHost.CurrentSnackbar;
+        var presenter = currentSnackbar?.GetPresenterDiagnostics();
+        var diagnostics = activeHost.GetDiagnostics();
+
+        return new GallerySnackbarVisualQaSnapshot(
+            route,
+            currentSnackbar?.Title?.ToString() ?? "none",
+            diagnostics.VisibleCount,
+            diagnostics.MaxVisibleSnackbars,
+            diagnostics.PendingCount,
+            diagnostics.Placement,
+            diagnostics.VerticalAlignment,
+            diagnostics.HorizontalAlignment,
+            overlayHost.IsOverlayOpen,
+            overlayHost.OverlayPlacement,
+            overlayHost.OverlayTarget != null,
+            diagnostics.Spacing,
+            diagnostics.IsTransitionEnabled,
+            diagnostics.TransitionProfile,
+            diagnostics.SnackbarTransitionDuration,
+            diagnostics.TransitionOffset,
+            presenter?.PresenterState ?? FWSnackbarPresenterState.Idle,
+            presenter?.PresenterOpacity ?? 1.0,
+            presenter?.PresenterOffset ?? 0.0,
+            transitionRequests,
+            lastTransition,
+            queueEvents,
+            overlayEvents,
+            closedEvents,
+            lastCloseReason,
+            actionRequests,
+            string.IsNullOrWhiteSpace(lastCommandParameter) ? "none" : lastCommandParameter,
+            autoDismissEnabled,
+            currentSnackbar?.IsAutoDismissPaused ?? false);
+    }
+
+    internal static string FormatSnackbarVisualQa(string action, GallerySnackbarVisualQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        var overlayState = snapshot.IsOverlayOpen ? "open" : "closed";
+        return $"{action}. Route: {snapshot.Route}. Current: {snapshot.CurrentTitle}. Visible: {snapshot.VisibleCount}/{snapshot.MaxVisibleSnackbars}. Queued: {snapshot.PendingCount}. Placement: {snapshot.Placement}/{snapshot.VerticalAlignment}. Alignment: {snapshot.HorizontalAlignment}. Overlay: {overlayState}/{snapshot.OverlayPlacement}. Overlay target: {FormatOnOff(snapshot.HasOverlayTarget)}. Spacing: {snapshot.Spacing}. Motion: {snapshot.TransitionProfile}/{snapshot.TransitionDuration.TotalMilliseconds:0}ms/{snapshot.TransitionOffset}px. Transitions enabled: {FormatOnOff(snapshot.IsTransitionEnabled)}. Presenter: {snapshot.PresenterState}, opacity {snapshot.PresenterOpacity:0.00}, offset {snapshot.PresenterOffset:0.0}. Transitions: {snapshot.TransitionRequests} ({snapshot.LastTransition}). Queue events: {snapshot.QueueEvents}. Overlay events: {snapshot.OverlayEvents}. Closed: {snapshot.ClosedEvents}. Last close: {snapshot.LastCloseReason}. Actions: {snapshot.ActionRequests}. Last parameter: {snapshot.LastCommandParameter}. Auto-dismiss: {FormatOnOff(snapshot.IsAutoDismissEnabled)}. Paused: {FormatOnOff(snapshot.IsAutoDismissPaused)}.";
     }
 
     private static UIElement CreateStatusBarStatusSample()
@@ -954,6 +1053,8 @@ internal sealed class GalleryStatusPage
             _ => "<FWInfoBar IsOpen=\"True\" />"
         };
     }
+
+    private static string FormatOnOff(bool value) => value ? "On" : "Off";
 
     private static FWWrapPanel CreateStatusButtonRow(params FWButton[] buttons)
     {

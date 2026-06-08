@@ -1248,6 +1248,20 @@ var closeTask = service.EnqueueForResultAsync(snackbar);
 var diagnostics = overlayHost.GetDiagnostics();
 var isOverlayOpen = overlayHost.IsOverlayOpen;
 snackbar.PauseAutoDismiss();
+var visualQa = GalleryStatusPage.CreateSnackbarVisualQaSnapshot(
+    "Overlay",
+    overlayHost,
+    overlayHost,
+    autoDismissEnabled: true,
+    transitionRequests: 1,
+    lastTransition: FWSnackbarTransitionKind.Show,
+    queueEvents: 1,
+    overlayEvents: isOverlayOpen ? 1 : 0,
+    closedEvents: 0,
+    lastCloseReason: FWSnackbarCloseReason.None,
+    actionRequests: 0,
+    lastCommandParameter: "preview-refresh");
+Debug.WriteLine(GalleryStatusPage.FormatSnackbarVisualQa("Snackbar root-window QA", visualQa));
 snackbar.ResumeAutoDismiss();
 snackbar.RequestClose(FWSnackbarCloseReason.CloseButton);
 service.CloseCurrent();

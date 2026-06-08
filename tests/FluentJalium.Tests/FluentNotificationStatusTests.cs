@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using FluentJalium.Gallery.Services;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -898,6 +899,102 @@ public sealed class FluentNotificationStatusTests
     }
 
     [Fact]
+    public void GalleryStatusPage_ShouldFormatSnackbarRootWindowVisualQaSnapshot()
+    {
+        var rootHost = new FWSnackbarHost
+        {
+            MaxVisibleSnackbars = 1,
+            Placement = FWSnackbarPlacement.Bottom
+        };
+        var overlayTarget = new FWBorder();
+        var overlayHost = new FWSnackbarOverlayHost
+        {
+            OverlayTarget = overlayTarget,
+            OverlayPlacement = PopupPlacementMode.Top,
+            MaxVisibleSnackbars = 2,
+            Placement = FWSnackbarPlacement.Top,
+            Spacing = 12,
+            TransitionProfile = FWContentTransitionProfile.Entrance,
+            SnackbarTransitionDuration = TimeSpan.FromMilliseconds(220),
+            TransitionOffset = 20
+        };
+        var service = new FWSnackbarService();
+        service.SetHost(rootHost);
+        service.SetHost(overlayHost);
+
+        var snackbar = service.Show(ToastSeverity.Warning, "Overlay first", "Uses root overlay host.", "Review");
+        snackbar.PauseAutoDismiss();
+
+        var snapshot = GalleryStatusPage.CreateSnackbarVisualQaSnapshot(
+            "Overlay",
+            overlayHost,
+            overlayHost,
+            autoDismissEnabled: true,
+            transitionRequests: 1,
+            lastTransition: FWSnackbarTransitionKind.Show,
+            queueEvents: 1,
+            overlayEvents: 1,
+            closedEvents: 0,
+            lastCloseReason: FWSnackbarCloseReason.None,
+            actionRequests: 2,
+            lastCommandParameter: "review-queue");
+        var text = GalleryStatusPage.FormatSnackbarVisualQa("Snackbar root-window QA", snapshot);
+
+        Assert.Equal("Overlay", snapshot.Route);
+        Assert.Equal("Overlay first", snapshot.CurrentTitle);
+        Assert.Equal(1, snapshot.VisibleCount);
+        Assert.Equal(2, snapshot.MaxVisibleSnackbars);
+        Assert.Equal(0, snapshot.PendingCount);
+        Assert.Equal(FWSnackbarPlacement.Top, snapshot.Placement);
+        Assert.Equal(VerticalAlignment.Top, snapshot.VerticalAlignment);
+        Assert.Equal(HorizontalAlignment.Stretch, snapshot.HorizontalAlignment);
+        Assert.True(snapshot.IsOverlayOpen);
+        Assert.Equal(PopupPlacementMode.Top, snapshot.OverlayPlacement);
+        Assert.True(snapshot.HasOverlayTarget);
+        Assert.Equal(12, snapshot.Spacing);
+        Assert.True(snapshot.IsTransitionEnabled);
+        Assert.Equal(FWContentTransitionProfile.Entrance, snapshot.TransitionProfile);
+        Assert.Equal(TimeSpan.FromMilliseconds(220), snapshot.TransitionDuration);
+        Assert.Equal(20, snapshot.TransitionOffset);
+        Assert.Equal(FWSnackbarPresenterState.Entering, snapshot.PresenterState);
+        Assert.Equal(0.0, snapshot.PresenterOpacity);
+        Assert.Equal(-20.0, snapshot.PresenterOffset);
+        Assert.Equal(1, snapshot.TransitionRequests);
+        Assert.Equal(FWSnackbarTransitionKind.Show, snapshot.LastTransition);
+        Assert.Equal(1, snapshot.QueueEvents);
+        Assert.Equal(1, snapshot.OverlayEvents);
+        Assert.Equal(0, snapshot.ClosedEvents);
+        Assert.Equal(FWSnackbarCloseReason.None, snapshot.LastCloseReason);
+        Assert.Equal(2, snapshot.ActionRequests);
+        Assert.Equal("review-queue", snapshot.LastCommandParameter);
+        Assert.True(snapshot.IsAutoDismissEnabled);
+        Assert.True(snapshot.IsAutoDismissPaused);
+
+        Assert.Contains("Snackbar root-window QA", text, StringComparison.Ordinal);
+        Assert.Contains("Route: Overlay", text, StringComparison.Ordinal);
+        Assert.Contains("Current: Overlay first", text, StringComparison.Ordinal);
+        Assert.Contains("Visible: 1/2", text, StringComparison.Ordinal);
+        Assert.Contains("Queued: 0", text, StringComparison.Ordinal);
+        Assert.Contains("Placement: Top/Top", text, StringComparison.Ordinal);
+        Assert.Contains("Alignment: Stretch", text, StringComparison.Ordinal);
+        Assert.Contains("Overlay: open/Top", text, StringComparison.Ordinal);
+        Assert.Contains("Overlay target: On", text, StringComparison.Ordinal);
+        Assert.Contains("Spacing: 12", text, StringComparison.Ordinal);
+        Assert.Contains("Motion: Entrance/220ms/20px", text, StringComparison.Ordinal);
+        Assert.Contains("Transitions enabled: On", text, StringComparison.Ordinal);
+        Assert.Contains("Presenter: Entering, opacity 0.00, offset -20.0", text, StringComparison.Ordinal);
+        Assert.Contains("Transitions: 1 (Show)", text, StringComparison.Ordinal);
+        Assert.Contains("Queue events: 1", text, StringComparison.Ordinal);
+        Assert.Contains("Overlay events: 1", text, StringComparison.Ordinal);
+        Assert.Contains("Actions: 2", text, StringComparison.Ordinal);
+        Assert.Contains("Last parameter: review-queue", text, StringComparison.Ordinal);
+        Assert.Contains("Auto-dismiss: On", text, StringComparison.Ordinal);
+        Assert.Contains("Paused: On", text, StringComparison.Ordinal);
+
+        service.Clear();
+    }
+
+    [Fact]
     [RequiresUnreferencedCode("Exercises runtime theme dictionary loading.")]
     public void FWSnackbarHost_TemplateShouldApplyPlacementAlignmentToItemsControl()
     {
@@ -1078,6 +1175,9 @@ public sealed class FluentNotificationStatusTests
         Assert.Contains("TransitionRequested", sampleCode, StringComparison.Ordinal);
         Assert.Contains("QueueChanged", sampleCode, StringComparison.Ordinal);
         Assert.Contains("GetDiagnostics()", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("CreateSnackbarVisualQaSnapshot", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("FormatSnackbarVisualQa", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("Snackbar root-window QA", sampleCode, StringComparison.Ordinal);
         Assert.Contains("FWSnackbarCloseReason.CloseButton", sampleCode, StringComparison.Ordinal);
         Assert.Contains("ShouldKeepSnackbarOpen(args.Reason)", sampleCode, StringComparison.Ordinal);
         Assert.Contains("IsAutoDismissPausedOnPointerOverEnabled = true", sampleCode, StringComparison.Ordinal);
