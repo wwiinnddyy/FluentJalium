@@ -208,6 +208,11 @@ public class FWTabView : Selector, IFluentJaliumControl
     {
         ArgumentNullException.ThrowIfNull(tab);
 
+        if (!tab.IsClosable)
+        {
+            return false;
+        }
+
         var index = GetIndexOf(tab);
         if (index < 0 || ItemsSource != null)
         {

@@ -500,6 +500,29 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWTabView_ShouldNotCloseNonClosableTabs()
+    {
+        var locked = new FWTabViewItem
+        {
+            Header = "Pinned",
+            Content = "Pinned content",
+            IsClosable = false
+        };
+        var tabView = new FWTabView();
+        var closeRequested = 0;
+        tabView.TabCloseRequested += (_, _) => closeRequested++;
+        tabView.Items.Add(locked);
+        tabView.SelectedItem = locked;
+
+        Assert.False(tabView.RequestCloseTab(locked));
+
+        Assert.Single(tabView.Items);
+        Assert.Same(locked, tabView.SelectedItem);
+        Assert.Equal("Pinned content", tabView.SelectedContent);
+        Assert.Equal(0, closeRequested);
+    }
+
+    [Fact]
     public void FWSelectorBar_ShouldExposeSelectionAndDensityState()
     {
         var overview = new FWSelectorBarItem
