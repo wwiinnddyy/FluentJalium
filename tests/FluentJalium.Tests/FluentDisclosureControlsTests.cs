@@ -9,6 +9,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Documents;
+using Jalium.UI.Input;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
@@ -81,6 +82,7 @@ public sealed class FluentDisclosureControlsTests
             AssertBasedOnStyle<FWContentDialog, ContentDialog>(app.Resources);
             AssertOwnedStyle<FWTeachingTip>(app.Resources);
             AssertOwnedStyle<FWTaskDialog>(app.Resources);
+            AssertOwnedStyle<FWTaskDialogHost>(app.Resources);
             AssertBasedOnStyle<FWGroupBox, GroupBox>(app.Resources);
         }
         finally
@@ -163,6 +165,17 @@ public sealed class FluentDisclosureControlsTests
         AssertSetter(taskDialogStyle, FWTaskDialog.DefaultButtonProperty);
         AssertSetter(taskDialogStyle, FWTaskDialog.CancelButtonProperty);
         AssertSetter(taskDialogStyle, Control.PaddingProperty);
+
+        var taskDialogHostStyle = AssertStyle<FWTaskDialogHost>(dictionary);
+        Assert.Null(taskDialogHostStyle.BasedOn);
+        AssertSetter(taskDialogHostStyle, Control.BackgroundProperty);
+        AssertSetter(taskDialogHostStyle, Control.PaddingProperty);
+        AssertSetter(taskDialogHostStyle, FWTaskDialogHost.IsLightDismissEnabledProperty);
+        AssertSetter(taskDialogHostStyle, FWTaskDialogHost.IsFocusTrapEnabledProperty);
+        AssertSetter(taskDialogHostStyle, FWTaskDialogHost.RestoreFocusOnCloseProperty);
+        AssertSetter(taskDialogHostStyle, Control.HorizontalContentAlignmentProperty);
+        AssertSetter(taskDialogHostStyle, Control.VerticalContentAlignmentProperty);
+        AssertSetter(taskDialogHostStyle, Control.TemplateProperty);
 
         ResetApplicationState();
     }
@@ -472,6 +485,133 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(secondaryClick.CommandExecuted);
         Assert.Equal(1, secondaryCommand.ExecuteCount);
         Assert.Equal("archive-draft", secondaryCommand.LastParameter);
+    }
+
+    [Fact]
+    public async Task FWTaskDialogHost_ShouldShowDialogWithOverlayStateAndReturnResult()
+    {
+        var host = new FWTaskDialogHost();
+        var restoreTarget = new FWButton { Content = "Restore" };
+        var dialog = new FWTaskDialog
+        {
+            Title = "Reset defaults?",
+            PrimaryButtonText = "Reset",
+            CloseButtonText = "Cancel",
+            Focusable = true
+        };
+        host.FocusRestoreTarget = restoreTarget;
+
+        var showTask = host.ShowAsync(dialog);
+
+        Assert.True(host.IsOpen);
+        Assert.Same(dialog, host.CurrentDialog);
+        Assert.Same(dialog, host.Content);
+        Assert.True(dialog.IsOpen);
+
+        Assert.True(dialog.RequestPrimaryButtonClick());
+
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Primary, result);
+        Assert.False(host.IsOpen);
+        Assert.Null(host.CurrentDialog);
+        Assert.Null(host.Content);
+        Assert.False(dialog.IsOpen);
+    }
+
+    [Fact]
+    public async Task FWTaskDialogHost_ShouldRouteLightDismissThroughCancelButton()
+    {
+        var host = new FWTaskDialogHost();
+        var closeCommand = new RecordingCommand();
+        var dialog = new FWTaskDialog
+        {
+            Title = "Archive draft?",
+            PrimaryButtonText = "Publish",
+            CloseButtonText = "Cancel",
+            CancelButton = FWTaskDialogButton.Close,
+            CloseButtonCommand = closeCommand,
+            CloseButtonCommandParameter = "light-dismiss"
+        };
+        var cancelClose = true;
+        var closeRequests = 0;
+        dialog.CloseButtonClick += (_, args) =>
+        {
+            closeRequests++;
+            args.Cancel = cancelClose;
+        };
+
+        var showTask = host.ShowAsync(dialog);
+
+        Assert.False(host.RequestLightDismiss());
+        Assert.True(host.IsOpen);
+        Assert.True(dialog.IsOpen);
+        Assert.False(showTask.IsCompleted);
+        Assert.Equal(1, closeRequests);
+        Assert.Equal(1, closeCommand.ExecuteCount);
+        Assert.Equal("light-dismiss", closeCommand.LastParameter);
+
+        cancelClose = false;
+
+        Assert.True(host.RequestLightDismiss());
+
+        var result = await showTask;
+
+        Assert.Equal(FWTaskDialogResult.Close, result);
+        Assert.False(host.IsOpen);
+        Assert.Null(host.CurrentDialog);
+        Assert.Equal(2, closeRequests);
+        Assert.Equal(2, closeCommand.ExecuteCount);
+    }
+
+    [Fact]
+    public async Task FWTaskDialogHost_ShouldTrapKeyboardRequestsWithinCurrentDialog()
+    {
+        var host = new FWTaskDialogHost();
+        var secondaryCommand = new RecordingCommand();
+        var dialog = new FWTaskDialog
+        {
+            Title = "Review draft?",
+            PrimaryButtonText = "Publish",
+            SecondaryButtonText = "Archive",
+            CloseButtonText = "Cancel",
+            DefaultButton = FWTaskDialogButton.Primary,
+            CancelButton = FWTaskDialogButton.Secondary,
+            SecondaryButtonCommand = secondaryCommand,
+            SecondaryButtonCommandParameter = "archive"
+        };
+        var showTask = host.ShowAsync(dialog);
+        var tabArgs = new KeyEventArgs(
+            UIElement.KeyDownEvent,
+            Key.Tab,
+            ModifierKeys.None,
+            isDown: true,
+            isRepeat: false,
+            timestamp: 0);
+
+        host.RaiseEvent(tabArgs);
+
+        Assert.True(tabArgs.Handled);
+        Assert.True(host.IsOpen);
+        Assert.Same(dialog, host.CurrentDialog);
+
+        var escapeArgs = new KeyEventArgs(
+            UIElement.KeyDownEvent,
+            Key.Escape,
+            ModifierKeys.None,
+            isDown: true,
+            isRepeat: false,
+            timestamp: 0);
+
+        host.RaiseEvent(escapeArgs);
+
+        var result = await showTask;
+
+        Assert.True(escapeArgs.Handled);
+        Assert.Equal(FWTaskDialogResult.Secondary, result);
+        Assert.Equal(1, secondaryCommand.ExecuteCount);
+        Assert.Equal("archive", secondaryCommand.LastParameter);
+        Assert.False(host.IsOpen);
     }
 
     [Fact]

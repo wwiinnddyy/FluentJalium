@@ -263,7 +263,7 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
 
     public static readonly DependencyProperty DefaultButtonProperty =
         DependencyProperty.Register(nameof(DefaultButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
-            new PropertyMetadata(FWTaskDialogButton.Primary), IsValidButton);
+            new PropertyMetadata(FWTaskDialogButton.Primary, OnDefaultButtonChanged), IsValidButton);
 
     public static readonly DependencyProperty CancelButtonProperty =
         DependencyProperty.Register(nameof(CancelButton), typeof(FWTaskDialogButton), typeof(FWTaskDialog),
@@ -683,6 +683,14 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         }
     }
 
+    private static void OnDefaultButtonChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FWTaskDialog dialog)
+        {
+            dialog.FocusDefaultButton();
+        }
+    }
+
     private static void ApplyDensity(FWTaskDialog dialog, FWDisclosureDensity density)
     {
         var (padding, minWidth, maxWidth) = FWContentDialog.GetDialogMetrics(density);
@@ -782,14 +790,29 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         button.IsEnabled = CanExecuteButtonCommand(taskDialogButton);
     }
 
-    private void FocusDefaultButton()
+    public bool FocusDefaultButton()
     {
         if (!IsOpen)
         {
-            return;
+            return false;
         }
 
-        var button = DefaultButton switch
+        var button = ButtonFor(DefaultButton)
+            ?? ButtonFor(FWTaskDialogButton.Primary)
+            ?? ButtonFor(FWTaskDialogButton.Secondary)
+            ?? ButtonFor(FWTaskDialogButton.Close);
+
+        if (button != null)
+        {
+            return button.Focus();
+        }
+
+        return Focus();
+    }
+
+    private Button? ButtonFor(FWTaskDialogButton button)
+    {
+        var candidate = button switch
         {
             FWTaskDialogButton.Primary => _primaryButton,
             FWTaskDialogButton.Secondary => _secondaryButton,
@@ -797,10 +820,12 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
             _ => null
         };
 
-        if (button != null && button.Visibility == Visibility.Visible && button.IsEnabled)
+        if (candidate != null && candidate.Visibility == Visibility.Visible && candidate.IsEnabled)
         {
-            button.Focus();
+            return candidate;
         }
+
+        return null;
     }
 
     private static FWTaskDialogResult ToResult(FWTaskDialogButton button)
@@ -830,6 +855,196 @@ public class FWTaskDialog : ContentControl, IFluentJaliumControl
         _showCancellationRegistration.Dispose();
         _showTask?.TrySetResult(result);
         _showTask = null;
+    }
+}
+
+/// <summary>
+/// Hosts <see cref="FWTaskDialog"/> instances as modal overlay content while preserving dialog result semantics.
+/// </summary>
+public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
+{
+    private static readonly DependencyPropertyKey CurrentDialogPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(CurrentDialog), typeof(FWTaskDialog), typeof(FWTaskDialogHost),
+            new PropertyMetadata(null));
+
+    public static readonly DependencyProperty CurrentDialogProperty = CurrentDialogPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey IsOpenPropertyKey =
+        DependencyProperty.RegisterReadOnly(nameof(IsOpen), typeof(bool), typeof(FWTaskDialogHost),
+            new PropertyMetadata(false));
+
+    public static readonly DependencyProperty IsOpenProperty = IsOpenPropertyKey.DependencyProperty;
+
+    public static readonly DependencyProperty IsLightDismissEnabledProperty =
+        DependencyProperty.Register(nameof(IsLightDismissEnabled), typeof(bool), typeof(FWTaskDialogHost),
+            new PropertyMetadata(true));
+
+    public static readonly DependencyProperty IsFocusTrapEnabledProperty =
+        DependencyProperty.Register(nameof(IsFocusTrapEnabled), typeof(bool), typeof(FWTaskDialogHost),
+            new PropertyMetadata(true));
+
+    public static readonly DependencyProperty RestoreFocusOnCloseProperty =
+        DependencyProperty.Register(nameof(RestoreFocusOnClose), typeof(bool), typeof(FWTaskDialogHost),
+            new PropertyMetadata(true));
+
+    public static readonly DependencyProperty FocusRestoreTargetProperty =
+        DependencyProperty.Register(nameof(FocusRestoreTarget), typeof(UIElement), typeof(FWTaskDialogHost),
+            new PropertyMetadata(null));
+
+    private Task<FWTaskDialogResult>? _currentShowTask;
+
+    public FWTaskDialogHost()
+    {
+        Focusable = true;
+        AddHandler(KeyDownEvent, new KeyEventHandler(OnKeyDownHandler));
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public FWTaskDialog? CurrentDialog => (FWTaskDialog?)GetValue(CurrentDialogProperty);
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsOpen => (bool)GetValue(IsOpenProperty)!;
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsLightDismissEnabled
+    {
+        get => (bool)GetValue(IsLightDismissEnabledProperty)!;
+        set => SetValue(IsLightDismissEnabledProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool IsFocusTrapEnabled
+    {
+        get => (bool)GetValue(IsFocusTrapEnabledProperty)!;
+        set => SetValue(IsFocusTrapEnabledProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public bool RestoreFocusOnClose
+    {
+        get => (bool)GetValue(RestoreFocusOnCloseProperty)!;
+        set => SetValue(RestoreFocusOnCloseProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.Behavior)]
+    public UIElement? FocusRestoreTarget
+    {
+        get => (UIElement?)GetValue(FocusRestoreTargetProperty);
+        set => SetValue(FocusRestoreTargetProperty, value);
+    }
+
+    public Task<FWTaskDialogResult> ShowAsync(FWTaskDialog dialog, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(dialog);
+
+        if (IsOpen && CurrentDialog != null)
+        {
+            if (ReferenceEquals(CurrentDialog, dialog) && _currentShowTask != null)
+            {
+                return _currentShowTask;
+            }
+
+            throw new InvalidOperationException("FWTaskDialogHost can show one dialog at a time.");
+        }
+
+        AttachDialog(dialog);
+        var dialogTask = dialog.ShowAsync(cancellationToken);
+        _currentShowTask = TrackDialogAsync(dialog, dialogTask);
+        return _currentShowTask;
+    }
+
+    public bool Close(FWTaskDialogResult result = FWTaskDialogResult.Close)
+    {
+        return CurrentDialog?.Close(result) ?? false;
+    }
+
+    public bool RequestLightDismiss()
+    {
+        if (!IsLightDismissEnabled)
+        {
+            return false;
+        }
+
+        return RequestCancel();
+    }
+
+    public bool RequestCancel()
+    {
+        return CurrentDialog?.RequestCancelButtonClick() ?? false;
+    }
+
+    private async Task<FWTaskDialogResult> TrackDialogAsync(FWTaskDialog dialog, Task<FWTaskDialogResult> dialogTask)
+    {
+        try
+        {
+            return await dialogTask;
+        }
+        finally
+        {
+            if (ReferenceEquals(CurrentDialog, dialog))
+            {
+                DetachDialog(dialog);
+            }
+        }
+    }
+
+    private void AttachDialog(FWTaskDialog dialog)
+    {
+        dialog.Closed += OnCurrentDialogClosed;
+        SetValue(CurrentDialogPropertyKey.DependencyProperty, dialog);
+        SetValue(IsOpenPropertyKey.DependencyProperty, true);
+        Content = dialog;
+        Focus();
+    }
+
+    private void DetachDialog(FWTaskDialog dialog)
+    {
+        dialog.Closed -= OnCurrentDialogClosed;
+        if (ReferenceEquals(CurrentDialog, dialog))
+        {
+            SetValue(CurrentDialogPropertyKey.DependencyProperty, null);
+            SetValue(IsOpenPropertyKey.DependencyProperty, false);
+            Content = null;
+            _currentShowTask = null;
+            RestoreFocus();
+        }
+    }
+
+    private void RestoreFocus()
+    {
+        if (RestoreFocusOnClose)
+        {
+            _ = FocusRestoreTarget?.Focus();
+        }
+    }
+
+    private void OnCurrentDialogClosed(object? sender, FWTaskDialogClosedEventArgs e)
+    {
+        if (sender is FWTaskDialog dialog)
+        {
+            DetachDialog(dialog);
+        }
+    }
+
+    private void OnKeyDownHandler(object sender, KeyEventArgs e)
+    {
+        if (!IsOpen)
+        {
+            return;
+        }
+
+        if (e.Key == Key.Escape)
+        {
+            _ = RequestCancel();
+            e.Handled = true;
+            return;
+        }
+
+        if (IsFocusTrapEnabled && e.Key == Key.Tab)
+        {
+            _ = CurrentDialog?.FocusDefaultButton();
+            e.Handled = true;
+        }
     }
 }
 

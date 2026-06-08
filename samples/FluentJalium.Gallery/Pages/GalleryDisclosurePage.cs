@@ -18,6 +18,7 @@ using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTaskDialog = FluentJalium.Controls.FWTaskDialog;
 using FWTaskDialogButton = FluentJalium.Controls.FWTaskDialogButton;
 using FWTaskDialogButtonClickEventArgs = FluentJalium.Controls.FWTaskDialogButtonClickEventArgs;
+using FWTaskDialogHost = FluentJalium.Controls.FWTaskDialogHost;
 using FWTeachingTip = FluentJalium.Controls.FWTeachingTip;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
@@ -445,7 +446,7 @@ internal sealed class GalleryDisclosurePage
 
     private static UIElement CreateTaskDialogSample()
     {
-        var output = CreateDisclosureOutput("TaskDialog: ready for ShowAsync flow. Default: Primary, primary command: on, cancel guard: off.");
+        var output = CreateDisclosureOutput("TaskDialogHost: modal host ready. Default: Primary, primary command: on, cancel guard: off.");
         var cancelCloseRequests = false;
         var commandExecutions = 0;
         var lastRequest = "No button requests yet.";
@@ -468,7 +469,7 @@ internal sealed class GalleryDisclosurePage
         var taskDialog = new FWTaskDialog
         {
             Title = "Delete temporary layout cache?",
-            Subtitle = "FWTaskDialog keeps awaitable command semantics without requiring a modal host.",
+            Subtitle = "FWTaskDialogHost provides overlay, light dismiss, and focus restore around the awaitable command flow.",
             Icon = CreateIcon(FluentIconRegular.Warning24, 22, ThemeBrush("TextPrimary")),
             PrimaryButtonText = "Delete",
             SecondaryButtonText = "Archive",
@@ -489,6 +490,14 @@ internal sealed class GalleryDisclosurePage
                 TextWrapping = TextWrapping.Wrap
             }
         };
+        var taskDialogHost = new FWTaskDialogHost
+        {
+            Width = 470,
+            Height = 260,
+            FocusRestoreTarget = output,
+            IsLightDismissEnabled = true,
+            IsFocusTrapEnabled = true
+        };
         taskDialog.PrimaryButtonClick += (_, args) => UpdateRequestEvent("Primary", args);
         taskDialog.SecondaryButtonClick += (_, args) => UpdateRequestEvent("Secondary", args);
         taskDialog.CloseButtonClick += (_, args) =>
@@ -507,7 +516,7 @@ internal sealed class GalleryDisclosurePage
             var requestText = requestCompleted.HasValue
                 ? $", request: {(requestCompleted.Value ? "completed" : "canceled")}"
                 : string.Empty;
-            output.Text = $"{action}. Open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. {lastRequest} {lastCommand}";
+            output.Text = $"{action}. Host open: {FormatOnOff(taskDialogHost.IsOpen)}, dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, focus trap: {FormatOnOff(taskDialogHost.IsFocusTrapEnabled)}, light dismiss: {FormatOnOff(taskDialogHost.IsLightDismissEnabled)}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. {lastRequest} {lastCommand}";
         }
 
         bool RequestDefaultButton()
@@ -532,17 +541,11 @@ internal sealed class GalleryDisclosurePage
 
         async Task RunShowAsyncFlowAsync()
         {
-            output.Text = $"TaskDialog ShowAsync flow started. Default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}.";
+            output.Text = $"TaskDialogHost ShowAsync flow started. Default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}.";
 
             try
             {
-                var result = await TryShowTaskDialogAsync(taskDialog);
-                if (result is null)
-                {
-                    UpdateAfterRequest("ShowAsync API not available yet; opened request flow");
-                    return;
-                }
-
+                var result = await taskDialogHost.ShowAsync(taskDialog);
                 output.Text = $"TaskDialog ShowAsync completed. Final result: {result}. Open: {FormatOnOff(taskDialog.IsOpen)}, default: {taskDialog.DefaultButton}, cancel guard: {FormatOnOff(cancelCloseRequests)}.";
             }
             catch (Exception ex)
@@ -551,19 +554,22 @@ internal sealed class GalleryDisclosurePage
             }
         }
 
+        _ = taskDialogHost.ShowAsync(taskDialog);
+        UpdateAfterRequest("TaskDialogHost opened");
+
         return new FWStackPanel
         {
             Orientation = Orientation.Vertical,
             Spacing = 10,
             Children =
             {
-                taskDialog,
+                taskDialogHost,
                 CreateDisclosureButtonRow(
                     CreateDisclosureActionButton(FluentIconRegular.Play24, "ShowAsync", () => _ = RunShowAsyncFlowAsync()),
                     CreateDisclosureActionButton(FluentIconRegular.Open24, "Open", () =>
                     {
-                        taskDialog.Open();
-                        UpdateAfterRequest("TaskDialog opened");
+                        _ = taskDialogHost.ShowAsync(taskDialog);
+                        UpdateAfterRequest("TaskDialogHost opened");
                     }),
                     CreateDisclosureActionButton(FluentIconRegular.Send24, "Default request", () =>
                     {
@@ -584,6 +590,11 @@ internal sealed class GalleryDisclosurePage
                     {
                         var completed = RequestCancelButton();
                         UpdateAfterRequest("Cancel command requested", completed);
+                    }),
+                    CreateDisclosureActionButton(FluentIconRegular.ShieldDismiss24, "Light dismiss", () =>
+                    {
+                        var completed = taskDialogHost.RequestLightDismiss();
+                        UpdateAfterRequest("Light dismiss requested", completed);
                     }),
                     CreateDisclosureActionButton(FluentIconRegular.CheckmarkCircle24, "Default", () =>
                     {
@@ -622,40 +633,6 @@ internal sealed class GalleryDisclosurePage
 
         var result = method.Invoke(taskDialog, null);
         return result is not bool completed || completed;
-    }
-
-    private static async Task<object?> TryShowTaskDialogAsync(FWTaskDialog taskDialog)
-    {
-        var method = taskDialog.GetType().GetMethod("ShowAsync", Type.EmptyTypes);
-        if (method is null)
-        {
-            taskDialog.Open();
-            return null;
-        }
-
-        var result = method.Invoke(taskDialog, null);
-        if (result is Task task)
-        {
-            await task;
-            return ReadTaskDialogTaskResult(task) ?? taskDialog.Result;
-        }
-
-        if (result is not null)
-        {
-            var asTask = result.GetType().GetMethod("AsTask", Type.EmptyTypes);
-            if (asTask?.Invoke(result, null) is Task valueTask)
-            {
-                await valueTask;
-                return ReadTaskDialogTaskResult(valueTask) ?? taskDialog.Result;
-            }
-        }
-
-        return result ?? taskDialog.Result;
-    }
-
-    private static object? ReadTaskDialogTaskResult(Task task)
-    {
-        return task.GetType().GetProperty("Result")?.GetValue(task);
     }
 
     private static string GetTaskDialogExceptionMessage(Exception ex)

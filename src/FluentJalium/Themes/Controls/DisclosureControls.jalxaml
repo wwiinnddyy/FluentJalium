@@ -493,6 +493,35 @@
         </Style.Triggers>
     </Style>
 
+    <Style TargetType="fluent:FWTaskDialogHost">
+        <Setter Property="Background" Value="{ThemeResource ContentDialogOverlayBackground}" />
+        <Setter Property="Padding" Value="24" />
+        <Setter Property="IsLightDismissEnabled" Value="True" />
+        <Setter Property="IsFocusTrapEnabled" Value="True" />
+        <Setter Property="RestoreFocusOnClose" Value="True" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate TargetType="fluent:FWTaskDialogHost">
+                <Grid Name="PART_Root">
+                    <Border Name="PART_Overlay"
+                            Background="{TemplateBinding Background}" />
+                    <ContentPresenter Name="PART_DialogPresenter"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Margin="{TemplateBinding Padding}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsOpen" Value="False">
+                <Setter TargetName="PART_Root" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style TargetType="fluent:FWTaskDialog">
         <Setter Property="Background" Value="{ThemeResource ContentDialogBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />

@@ -297,11 +297,17 @@ var player = new FWAnimatedVisualPlayer
 var deleteCommand = new RelayCommand(parameter => DeleteTemporaryCache(parameter));
 var archiveCommand = new RelayCommand(parameter => ArchiveTemporaryCache(parameter));
 var cancelCommand = new RelayCommand(parameter => Debug.WriteLine(parameter));
+var host = new FWTaskDialogHost
+{
+    IsLightDismissEnabled = true,
+    IsFocusTrapEnabled = true,
+    RestoreFocusOnClose = true
+};
 
 var taskDialog = new FWTaskDialog
 {
     Title = "Delete temporary layout cache?",
-    Subtitle = "FWTaskDialog keeps awaitable command semantics.",
+    Subtitle = "FWTaskDialogHost wraps command semantics in a modal overlay.",
     PrimaryButtonText = "Delete",
     SecondaryButtonText = "Archive",
     CloseButtonText = "Cancel",
@@ -325,6 +331,9 @@ taskDialog.PrimaryButtonClick += (_, args) =>
 {
     Debug.WriteLine($"Primary requested. Command executed: {args.CommandExecuted}");
 };
+
+var result = await host.ShowAsync(taskDialog);
+Debug.WriteLine($"TaskDialog completed with {result}.");
 """,
         ["disclosure.settings.teachingtip"] = """
 var expander = new FWSettingsExpander
