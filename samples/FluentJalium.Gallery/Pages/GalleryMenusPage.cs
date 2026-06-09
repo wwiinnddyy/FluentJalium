@@ -32,6 +32,14 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryMenusPage
 {
+    internal readonly record struct FlyoutQaSnapshot(
+        bool IsOpen,
+        FlyoutPlacementMode Placement,
+        FWMenuDensity Density,
+        bool HasContent,
+        bool HasContentTemplate,
+        bool HasExplicitPresenterStyle);
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Menus and Flyouts");
@@ -908,8 +916,27 @@ internal sealed class GalleryMenusPage
     {
         ArgumentNullException.ThrowIfNull(flyout);
 
-        var contentState = flyout.Content == null ? "empty" : "content";
-        return $"{label}: {(flyout.IsOpen ? "open" : "closed")}; placement {flyout.Placement}; density {flyout.Density}; presenter {contentState}.";
+        return FormatFlyoutQa(label, CreateFlyoutQaSnapshot(flyout));
+    }
+
+    internal static FlyoutQaSnapshot CreateFlyoutQaSnapshot(FWFlyout flyout)
+    {
+        ArgumentNullException.ThrowIfNull(flyout);
+
+        return new FlyoutQaSnapshot(
+            flyout.IsOpen,
+            flyout.Placement,
+            flyout.Density,
+            flyout.Content != null,
+            flyout.ContentTemplate != null,
+            flyout.FlyoutPresenterStyle != null);
+    }
+
+    internal static string FormatFlyoutQa(string label, FlyoutQaSnapshot snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(label);
+
+        return $"{label}: {(snapshot.IsOpen ? "open" : "closed")}; placement {snapshot.Placement}; density {snapshot.Density}; content {FormatOnOff(snapshot.HasContent)}; template {FormatOnOff(snapshot.HasContentTemplate)}; explicit presenter style {FormatOnOff(snapshot.HasExplicitPresenterStyle)}.";
     }
 
     internal static string FormatMenuFlyoutQa(string label, FWMenuFlyout flyout)

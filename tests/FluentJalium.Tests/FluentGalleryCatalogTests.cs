@@ -283,6 +283,23 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeFlyoutPresenterQaSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "menus");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWFlyout", sampleCode);
+        Assert.Contains("CreateFlyoutQaSnapshot", sampleCode);
+        Assert.Contains("FormatFlyoutQa", sampleCode);
+        Assert.Contains("Flyout QA", sampleCode);
+        Assert.Contains("new FWMenuBar", sampleCode);
+        Assert.Contains("new FWMenuFlyout", sampleCode);
+        Assert.Contains("new FWCommandBarFlyout", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeAdvancedCollectionNavigationRecipes()
     {
         var page = Assert.Single(

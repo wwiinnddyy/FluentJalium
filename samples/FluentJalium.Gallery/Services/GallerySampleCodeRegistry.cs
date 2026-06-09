@@ -1020,6 +1020,8 @@ var contentFlyout = new FWFlyout
         }
     }
 };
+var flyoutQa = GalleryMenusPage.CreateFlyoutQaSnapshot(contentFlyout);
+Debug.WriteLine(GalleryMenusPage.FormatFlyoutQa("Flyout QA", flyoutQa));
 
 var menuBar = new FWMenuBar();
 menuBar.Items.Add(new FWMenuBarItem

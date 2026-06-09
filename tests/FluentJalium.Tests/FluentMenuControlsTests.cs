@@ -296,6 +296,37 @@ public sealed class FluentMenuControlsTests
     }
 
     [Fact]
+    public void GalleryMenusPage_ShouldFormatFlyoutQaSnapshot()
+    {
+        var style = new Style(typeof(FWFlyoutPresenter));
+        var template = new DataTemplate();
+        var flyout = new FWFlyout
+        {
+            Content = "Settings",
+            ContentTemplate = template,
+            Placement = FlyoutPlacementMode.Bottom,
+            Density = FWMenuDensity.Spacious,
+            FlyoutPresenterStyle = style
+        };
+
+        var snapshot = GalleryMenusPage.CreateFlyoutQaSnapshot(flyout);
+        var text = GalleryMenusPage.FormatFlyoutQa("Flyout QA", snapshot);
+
+        Assert.False(snapshot.IsOpen);
+        Assert.Equal(FlyoutPlacementMode.Bottom, snapshot.Placement);
+        Assert.Equal(FWMenuDensity.Spacious, snapshot.Density);
+        Assert.True(snapshot.HasContent);
+        Assert.True(snapshot.HasContentTemplate);
+        Assert.True(snapshot.HasExplicitPresenterStyle);
+        Assert.Contains("Flyout QA: closed", text);
+        Assert.Contains("placement Bottom", text);
+        Assert.Contains("density Spacious", text);
+        Assert.Contains("content on", text);
+        Assert.Contains("template on", text);
+        Assert.Contains("explicit presenter style on", text);
+    }
+
+    [Fact]
     public void FWFlyout_ShouldResolvePresenterStyleFromApplicationResources()
     {
         ResetApplicationState();
@@ -668,7 +699,9 @@ public sealed class FluentMenuControlsTests
         Assert.Contains("Flyout QA: closed", flyoutText);
         Assert.Contains("placement Right", flyoutText);
         Assert.Contains("density Spacious", flyoutText);
-        Assert.Contains("presenter content", flyoutText);
+        Assert.Contains("content on", flyoutText);
+        Assert.Contains("template off", flyoutText);
+        Assert.Contains("explicit presenter style off", flyoutText);
 
         Assert.Contains("MenuFlyout QA: closed", menuFlyoutText);
         Assert.Contains("placement Bottom", menuFlyoutText);
