@@ -232,6 +232,18 @@ public sealed class FluentContentLayoutControlsTests
         splitView.OpenPane();
         Assert.True(splitView.IsPaneOpen);
         Assert.Equal(300, splitView.ActualPaneLength);
+        var splitViewDiagnostics = splitView.GetDiagnostics();
+        Assert.Equal(FWSplitViewDisplayMode.CompactInline, splitViewDiagnostics.DisplayMode);
+        Assert.Equal(FWSplitViewPanePlacement.Right, splitViewDiagnostics.PanePlacement);
+        Assert.True(splitViewDiagnostics.IsPaneOpen);
+        Assert.False(splitViewDiagnostics.IsOverlayMode);
+        Assert.False(splitViewDiagnostics.IsLightDismissEnabled);
+        Assert.Equal(300, splitViewDiagnostics.OpenPaneLength);
+        Assert.Equal(56, splitViewDiagnostics.CompactPaneLength);
+        Assert.Equal(300, splitViewDiagnostics.ActualPaneLength);
+        Assert.True(splitViewDiagnostics.HasPane);
+        Assert.False(splitViewDiagnostics.HasPaneTemplate);
+        Assert.True(splitViewDiagnostics.HasContent);
         splitView.TogglePane();
         Assert.False(splitView.IsPaneOpen);
         Assert.Equal(56, splitView.ActualPaneLength);
@@ -398,6 +410,51 @@ public sealed class FluentContentLayoutControlsTests
     }
 
     [Fact]
+    public void GalleryContentLayoutPage_ShouldFormatSplitViewDiagnostics()
+    {
+        var splitView = new FWSplitView
+        {
+            DisplayMode = FWSplitViewDisplayMode.CompactOverlay,
+            PanePlacement = FWSplitViewPanePlacement.Right,
+            OpenPaneLength = 300,
+            CompactPaneLength = 52,
+            IsPaneOpen = true,
+            IsLightDismissEnabled = true,
+            Pane = new FWTextBlock { Text = "Pane" },
+            PaneTemplate = new DataTemplate(),
+            Content = new FWTextBlock { Text = "Content" }
+        };
+
+        var diagnostics = splitView.GetDiagnostics();
+        var text = GalleryContentLayoutPage.FormatSplitViewDiagnostics(
+            "SplitView diagnostics updated",
+            diagnostics);
+
+        Assert.Equal(FWSplitViewDisplayMode.CompactOverlay, diagnostics.DisplayMode);
+        Assert.Equal(FWSplitViewPanePlacement.Right, diagnostics.PanePlacement);
+        Assert.True(diagnostics.IsPaneOpen);
+        Assert.True(diagnostics.IsOverlayMode);
+        Assert.True(diagnostics.IsLightDismissEnabled);
+        Assert.Equal(300, diagnostics.OpenPaneLength);
+        Assert.Equal(52, diagnostics.CompactPaneLength);
+        Assert.Equal(300, diagnostics.ActualPaneLength);
+        Assert.True(diagnostics.HasPane);
+        Assert.True(diagnostics.HasPaneTemplate);
+        Assert.True(diagnostics.HasContent);
+        Assert.Contains("SplitView diagnostics updated", text);
+        Assert.Contains("mode CompactOverlay", text);
+        Assert.Contains("placement Right", text);
+        Assert.Contains("open on", text);
+        Assert.Contains("overlay on", text);
+        Assert.Contains("light dismiss on", text);
+        Assert.Contains("pane length 300/300", text);
+        Assert.Contains("compact 52", text);
+        Assert.Contains("pane on", text);
+        Assert.Contains("template on", text);
+        Assert.Contains("content on", text);
+    }
+
+    [Fact]
     public void FWSplitView_ShouldRaisePaneOpenedAndPaneClosedOnlyWhenStateChanges()
     {
         var splitView = new FWSplitView
@@ -479,6 +536,12 @@ public sealed class FluentContentLayoutControlsTests
         Assert.True(splitView.RequestLightDismiss());
         Assert.False(splitView.IsPaneOpen);
         Assert.Equal(1, closed);
+        var dismissedDiagnostics = splitView.GetDiagnostics();
+        Assert.Equal(FWSplitViewDisplayMode.Overlay, dismissedDiagnostics.DisplayMode);
+        Assert.True(dismissedDiagnostics.IsOverlayMode);
+        Assert.True(dismissedDiagnostics.IsLightDismissEnabled);
+        Assert.False(dismissedDiagnostics.IsPaneOpen);
+        Assert.Equal(0, dismissedDiagnostics.ActualPaneLength);
 
         Assert.False(splitView.RequestLightDismiss());
         Assert.False(splitView.IsPaneOpen);

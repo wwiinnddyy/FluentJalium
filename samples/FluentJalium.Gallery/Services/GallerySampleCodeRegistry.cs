@@ -465,6 +465,10 @@ var splitView = new FWSplitView
 
 splitView.TogglePane();
 var paneLength = splitView.ActualPaneLength;
+FWSplitViewDiagnostics splitViewDiagnostics = splitView.GetDiagnostics();
+Debug.WriteLine(GalleryContentLayoutPage.FormatSplitViewDiagnostics(
+    "SplitView toggled",
+    splitViewDiagnostics));
 
 var card = new FWSettingsCard
 {

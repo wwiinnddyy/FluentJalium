@@ -28,6 +28,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWSnackbar" && control.Page.UniqueId == "status");
         Assert.Contains(controls, control => control.Name == "FWSnackbarPresenterDiagnostics" && control.Page.UniqueId == "status");
         Assert.Contains(controls, control => control.Name == "FWSplitView" && control.Page.UniqueId == "contentandlayout");
+        Assert.Contains(controls, control => control.Name == "FWSplitViewDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWTwoPaneView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWTwoPaneViewDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWParallaxView" && control.Page.UniqueId == "contentandlayout");
@@ -136,6 +137,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal("layout.splitview.settingscard", splitView.SampleCodeKey);
         Assert.Contains("ContentControl", splitView.BaseClasses);
         Assert.Equal("/Layout/FWSplitView", splitView.SourcePath);
+
+        var splitViewDiagnostics = Assert.Single(controls, control => control.Name == "FWSplitViewDiagnostics");
+        Assert.True(splitViewDiagnostics.IsUpdated);
+        Assert.Equal("layout.splitview.settingscard", splitViewDiagnostics.SampleCodeKey);
+        Assert.Contains("ContentControl", splitViewDiagnostics.BaseClasses);
+        Assert.Equal("/Layout/FWSplitView/FWSplitViewDiagnostics", splitViewDiagnostics.SourcePath);
 
         var twoPaneDiagnostics = Assert.Single(controls, control => control.Name == "FWTwoPaneViewDiagnostics");
         Assert.True(twoPaneDiagnostics.IsUpdated);
@@ -328,6 +335,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWSplitView", sampleCode);
         Assert.Contains("FWSplitViewDisplayMode.CompactInline", sampleCode);
         Assert.Contains("ActualPaneLength", sampleCode);
+        Assert.Contains("FWSplitViewDiagnostics", sampleCode);
+        Assert.Contains("FormatSplitViewDiagnostics", sampleCode);
         Assert.Contains("new FWSettingsCard", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
         Assert.Contains("IsInvokable", sampleCode);

@@ -24,6 +24,7 @@ using FWSettingsCardDiagnostics = FluentJalium.Controls.FWSettingsCardDiagnostic
 using FWScroller = FluentJalium.Controls.FWScroller;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWSplitView = FluentJalium.Controls.FWSplitView;
+using FWSplitViewDiagnostics = FluentJalium.Controls.FWSplitViewDiagnostics;
 using FWSplitViewDisplayMode = FluentJalium.Controls.FWSplitViewDisplayMode;
 using FWSplitViewPanePlacement = FluentJalium.Controls.FWSplitViewPanePlacement;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
@@ -477,7 +478,7 @@ internal sealed class GalleryContentLayoutPage
 
         void UpdateState(string action)
         {
-            output.Text = $"{action}. Mode: {splitView.DisplayMode}; placement: {splitView.PanePlacement}; open: {FormatOnOff(splitView.IsPaneOpen)}; pane length: {splitView.ActualPaneLength:0}.";
+            output.Text = FormatSplitViewDiagnostics(action, splitView.GetDiagnostics());
         }
 
         return new FWStackPanel
@@ -526,6 +527,13 @@ internal sealed class GalleryContentLayoutPage
     private static string FormatSettingsCardAutomation(FWSettingsCardAutomationDiagnostics diagnostics)
     {
         return $"{diagnostics.ControlType}/{diagnostics.Name}; invoke: {FormatOnOff(diagnostics.IsInvokePatternAvailable)}; help: {diagnostics.HelpText}";
+    }
+
+    internal static string FormatSplitViewDiagnostics(string action, FWSplitViewDiagnostics diagnostics)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
+        return $"{action}. SplitView diagnostics: mode {diagnostics.DisplayMode}, placement {diagnostics.PanePlacement}, open {FormatOnOff(diagnostics.IsPaneOpen)}, overlay {FormatOnOff(diagnostics.IsOverlayMode)}, light dismiss {FormatOnOff(diagnostics.IsLightDismissEnabled)}, pane length {diagnostics.ActualPaneLength:0}/{diagnostics.OpenPaneLength:0}, compact {diagnostics.CompactPaneLength:0}, pane {FormatOnOff(diagnostics.HasPane)}, template {FormatOnOff(diagnostics.HasPaneTemplate)}, content {FormatOnOff(diagnostics.HasContent)}.";
     }
 
     private static string FormatOnOff(bool value) => value ? "on" : "off";

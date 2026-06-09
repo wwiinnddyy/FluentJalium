@@ -25,6 +25,22 @@ public enum FWSplitViewPanePlacement
 }
 
 /// <summary>
+/// Snapshot of pane, layout, and dismiss state for <see cref="FWSplitView"/>.
+/// </summary>
+public readonly record struct FWSplitViewDiagnostics(
+    FWSplitViewDisplayMode DisplayMode,
+    FWSplitViewPanePlacement PanePlacement,
+    bool IsPaneOpen,
+    bool IsOverlayMode,
+    bool IsLightDismissEnabled,
+    double OpenPaneLength,
+    double CompactPaneLength,
+    double ActualPaneLength,
+    bool HasPane,
+    bool HasPaneTemplate,
+    bool HasContent);
+
+/// <summary>
 /// FluentJalium SplitView control for shell panes and master-detail layouts.
 /// </summary>
 public class FWSplitView : ContentControl, IFluentJaliumControl
@@ -179,6 +195,22 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
 
         ClosePane();
         return true;
+    }
+
+    public FWSplitViewDiagnostics GetDiagnostics()
+    {
+        return new FWSplitViewDiagnostics(
+            DisplayMode,
+            PanePlacement,
+            IsPaneOpen,
+            IsOverlayMode,
+            IsLightDismissEnabled,
+            OpenPaneLength,
+            CompactPaneLength,
+            ActualPaneLength,
+            Pane != null,
+            PaneTemplate != null,
+            Content != null);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
