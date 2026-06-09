@@ -917,6 +917,14 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("Settings visual QA", document);
         Assert.Contains("Navigation app-shell recipes", document);
         Assert.Contains("Forms pattern Gallery page", document);
+        Assert.Contains("Visuals and chart sample depth", document);
+        Assert.Contains("derived surface recipes", document);
+        Assert.Contains("FWBackdrop", document);
+        Assert.Contains("CreateLegendTooltipQaSnapshot", document);
+        Assert.Contains("FormatShapeControlsVisualQa", document);
+        Assert.Contains("GalleryCatalogFilterSnapshot", document);
+        Assert.Contains("validation summaries", document);
+        Assert.Contains("Rendered Gallery QA pass", document);
         Assert.Contains("FWSemanticZoom", document);
         Assert.Contains("FWFlipView", document);
         Assert.Contains("IFluentJaliumControl", document);
