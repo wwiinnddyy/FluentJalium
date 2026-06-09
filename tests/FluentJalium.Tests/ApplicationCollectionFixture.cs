@@ -1,4 +1,7 @@
 using Jalium.UI.Markup;
+using Xunit;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace FluentJalium.Tests;
 

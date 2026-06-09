@@ -518,21 +518,46 @@ var diffViewer = new FWDiffViewer
 {
     OriginalText = previousDocument,
     ModifiedText = currentDocument,
-    ShowMinimap = true
+    ViewMode = DiffViewMode.Unified,
+    ShowMinimap = true,
+    IsReadOnly = true
 };
 
 var hexEditor = new FWHexEditor
 {
     Data = Encoding.UTF8.GetBytes("FluentJalium"),
-    BytesPerRow = 16,
+    BytesPerRow = 8,
+    ShowDataInterpretation = true,
+    SelectionLength = 2,
     IsReadOnly = true
 };
 
 var jsonViewer = new FWJsonTreeViewer
 {
     JsonText = "{ \"control\": \"FWJsonTreeViewer\", \"state\": \"ready\" }",
-    ExpandDepth = 2
+    ExpandDepth = 2,
+    MaxRenderDepth = 8,
+    ShowTypeIndicators = true,
+    ShowItemCount = true,
+    IsEditable = false
 };
+
+var workbenchSurface = new FWFluentMaterialSurface
+{
+    MaterialKind = FWFluentMaterialKind.LiquidGlass,
+    Child = new FWStackPanel
+    {
+        Children = { diffViewer, hexEditor, jsonViewer }
+    }
+};
+
+var workbenchSnapshot = GalleryDataInspectorsPage.CreateDataInspectorWorkbenchSnapshot(
+    diffViewer,
+    hexEditor,
+    jsonViewer,
+    workbenchSurface);
+Debug.WriteLine(GalleryDataInspectorsPage.FormatDataInspectorWorkbenchQa("Data Inspectors workbench QA", workbenchSnapshot));
+Debug.Assert(workbenchSnapshot.IsReady);
 """,
         ["motion.transitions"] = """
 var transitionHost = new FWTransitioningContentControl

@@ -581,6 +581,30 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeDataInspectorsWorkbenchQaSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "datainspectors");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWDiffViewer", sampleCode);
+        Assert.Contains("new FWHexEditor", sampleCode);
+        Assert.Contains("new FWJsonTreeViewer", sampleCode);
+        Assert.Contains("new FWFluentMaterialSurface", sampleCode);
+        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
+        Assert.Contains("CreateDataInspectorWorkbenchSnapshot", sampleCode);
+        Assert.Contains("FormatDataInspectorWorkbenchQa", sampleCode);
+        Assert.Contains("Data Inspectors workbench QA", sampleCode);
+        Assert.Contains("workbenchSnapshot.IsReady", sampleCode);
+        Assert.Contains("ShowMinimap = true", sampleCode);
+        Assert.Contains("IsReadOnly = true", sampleCode);
+        Assert.Contains("ShowDataInterpretation = true", sampleCode);
+        Assert.Contains("ExpandDepth = 2", sampleCode);
+        Assert.Contains("MaxRenderDepth = 8", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeFormsPatternSample()
     {
         var page = Assert.Single(

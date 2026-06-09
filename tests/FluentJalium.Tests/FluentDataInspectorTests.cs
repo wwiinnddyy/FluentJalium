@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Markup;
@@ -371,6 +372,77 @@ public sealed class FluentDataInspectorTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(diffViewer, surface.Child);
+    }
+
+    [Fact]
+    public void GalleryDataInspectorsPage_ShouldFormatWorkbenchQaSnapshot()
+    {
+        var diffViewer = new FWDiffViewer
+        {
+            OriginalText = "theme: dark\naccent: blue",
+            ModifiedText = "theme: dark\naccent: teal\nstatus: ready",
+            ViewMode = DiffViewMode.Unified,
+            ShowMinimap = true,
+            IsReadOnly = true
+        };
+        var hexEditor = new FWHexEditor
+        {
+            Data = [0x46, 0x57, 0x20, 0x51, 0x41],
+            BytesPerRow = 8,
+            ShowDataInterpretation = true,
+            SelectionLength = 2,
+            IsReadOnly = true
+        };
+        var jsonViewer = new FWJsonTreeViewer
+        {
+            JsonText = "{ \"theme\": \"Fluent\", \"ready\": true }",
+            ExpandDepth = 2,
+            MaxRenderDepth = 8,
+            ShowTypeIndicators = true,
+            ShowItemCount = true,
+            IsEditable = false
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            Child = diffViewer
+        };
+
+        var snapshot = GalleryDataInspectorsPage.CreateDataInspectorWorkbenchSnapshot(
+            diffViewer,
+            hexEditor,
+            jsonViewer,
+            surface);
+        var text = GalleryDataInspectorsPage.FormatDataInspectorWorkbenchQa("Data Inspectors workbench QA", snapshot);
+
+        Assert.True(snapshot.IsReady);
+        Assert.True(snapshot.HasDiffContent);
+        Assert.Equal(DiffViewMode.Unified, snapshot.DiffViewMode);
+        Assert.True(snapshot.DiffChangeCount > 0);
+        Assert.True(snapshot.IsDiffMinimapVisible);
+        Assert.True(snapshot.IsDiffReadOnly);
+        Assert.True(snapshot.HasHexContent);
+        Assert.Equal(5, snapshot.HexByteCount);
+        Assert.Equal(8, snapshot.HexBytesPerRow);
+        Assert.True(snapshot.IsHexReadOnly);
+        Assert.True(snapshot.IsHexDataInterpretationVisible);
+        Assert.Equal(2, snapshot.HexSelectionLength);
+        Assert.True(snapshot.HasJsonContent);
+        Assert.Equal(2, snapshot.JsonExpandDepth);
+        Assert.Equal(8, snapshot.JsonMaxRenderDepth);
+        Assert.False(snapshot.IsJsonEditable);
+        Assert.True(snapshot.IsJsonTypeIndicatorsVisible);
+        Assert.True(snapshot.IsJsonItemCountVisible);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, snapshot.MaterialKind);
+        Assert.Contains("Data Inspectors workbench QA", text);
+        Assert.Contains("diff on Unified", text);
+        Assert.Contains("minimap on", text);
+        Assert.Contains("hex on bytes 5", text);
+        Assert.Contains("interpretation on", text);
+        Assert.Contains("json on", text);
+        Assert.Contains("expand depth 2/8", text);
+        Assert.Contains("material LiquidGlass", text);
+        Assert.Contains("ready on", text);
     }
 
     private static ResourceDictionary LoadGenericThemeDictionary()

@@ -17,6 +17,29 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryDataInspectorsPage
 {
+    internal readonly record struct GalleryDataInspectorWorkbenchSnapshot(
+        bool HasDiffContent,
+        DiffViewMode DiffViewMode,
+        int DiffChangeCount,
+        bool IsDiffMinimapVisible,
+        bool IsDiffReadOnly,
+        bool HasHexContent,
+        int HexByteCount,
+        int HexBytesPerRow,
+        bool IsHexReadOnly,
+        bool IsHexDataInterpretationVisible,
+        long HexSelectionLength,
+        bool HasJsonContent,
+        int JsonExpandDepth,
+        int JsonMaxRenderDepth,
+        bool IsJsonEditable,
+        bool IsJsonTypeIndicatorsVisible,
+        bool IsJsonItemCountVisible,
+        FWFluentMaterialKind MaterialKind)
+    {
+        public bool IsReady => HasDiffContent && HasHexContent && HasJsonContent;
+    }
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Data Inspectors");
@@ -191,17 +214,36 @@ internal sealed class GalleryDataInspectorsPage
 
     private static UIElement CreateMaterialInspectionWorkbench()
     {
-        var output = CreateOutput("Workbench: Diff focus. LiquidGlass active.");
         var diffViewer = CreateSampleDiffViewer(width: 420, height: 190);
         diffViewer.ViewMode = DiffViewMode.Unified;
         diffViewer.GutterWidth = 48;
         diffViewer.ContextLines = 1;
+        diffViewer.IsReadOnly = true;
 
         var hexEditor = CreateSampleHexEditor(width: 420, height: 160);
         hexEditor.BytesPerRow = 8;
         hexEditor.ShowDataInterpretation = true;
+        hexEditor.IsReadOnly = true;
 
-        return new FWFluentMaterialSurface
+        var jsonViewer = CreateSampleJsonTreeViewer(width: 420, height: 160);
+        jsonViewer.SearchText = "theme";
+        jsonViewer.MaxRenderDepth = 8;
+        jsonViewer.IsEditable = false;
+
+        var output = CreateOutput("Workbench QA pending.");
+        var workbenchPanel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                CreateMaterialHeader(),
+                diffViewer,
+                hexEditor,
+                jsonViewer
+            }
+        };
+        var surface = new FWFluentMaterialSurface
         {
             Width = 520,
             MaterialKind = FWFluentMaterialKind.LiquidGlass,
@@ -218,34 +260,71 @@ internal sealed class GalleryDataInspectorsPage
             Shape = BorderShape.SuperEllipse,
             SuperEllipseN = 4,
             Padding = new Thickness(16),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 12,
-                Children =
-                {
-                    CreateMaterialHeader(),
-                    diffViewer,
-                    hexEditor,
-                    CreateButtonRow(
-                        CreateIconActionButton(FluentIconRegular.DocumentSearch24, "Diff focus", () =>
-                        {
-                            diffViewer.ShowMinimap = !diffViewer.ShowMinimap;
-                            output.Text = $"Workbench: Diff minimap {FormatOnOff(diffViewer.ShowMinimap)}.";
-                        }),
-                        CreateIconActionButton(FluentIconRegular.DataHistogram24, "Hex group", () =>
-                        {
-                            hexEditor.BytesPerRow = hexEditor.BytesPerRow == 8 ? 16 : 8;
-                            output.Text = $"Workbench: Hex bytes per row {hexEditor.BytesPerRow}.";
-                        }),
-                        CreateIconActionButton(FluentIconRegular.Search24, "Find FW", () =>
-                        {
-                            output.Text = $"Workbench: Found FW at offset {hexEditor.FindBytes([0x46, 0x57])}.";
-                        })),
-                    CreateStatus(output)
-                }
-            }
+            Child = workbenchPanel
         };
+
+        void UpdateWorkbenchOutput(string action)
+        {
+            var snapshot = CreateDataInspectorWorkbenchSnapshot(diffViewer, hexEditor, jsonViewer, surface);
+            output.Text = FormatDataInspectorWorkbenchQa(action, snapshot);
+        }
+
+        workbenchPanel.Children.Add(CreateButtonRow(
+            CreateIconActionButton(FluentIconRegular.DocumentSearch24, "Diff focus", () =>
+            {
+                diffViewer.ShowMinimap = !diffViewer.ShowMinimap;
+                UpdateWorkbenchOutput("Diff focus");
+            }),
+            CreateIconActionButton(FluentIconRegular.DataHistogram24, "Hex group", () =>
+            {
+                hexEditor.BytesPerRow = hexEditor.BytesPerRow == 8 ? 16 : 8;
+                UpdateWorkbenchOutput("Hex group");
+            }),
+            CreateIconActionButton(FluentIconRegular.Braces24, "JSON depth", () =>
+            {
+                jsonViewer.ExpandDepth = jsonViewer.ExpandDepth == 2 ? 4 : 2;
+                UpdateWorkbenchOutput("JSON depth");
+            }),
+            CreateIconActionButton(FluentIconRegular.Search24, "Find FW", () =>
+            {
+                var offset = hexEditor.FindBytes([0x46, 0x57]);
+                UpdateWorkbenchOutput($"Find FW {offset}");
+            })));
+        workbenchPanel.Children.Add(CreateStatus(output));
+        UpdateWorkbenchOutput("Data Inspectors workbench QA");
+        return surface;
+    }
+
+    internal static GalleryDataInspectorWorkbenchSnapshot CreateDataInspectorWorkbenchSnapshot(
+        FWDiffViewer diffViewer,
+        FWHexEditor hexEditor,
+        FWJsonTreeViewer jsonViewer,
+        FWFluentMaterialSurface? materialSurface = null)
+    {
+        return new GalleryDataInspectorWorkbenchSnapshot(
+            HasDiffContent: !string.IsNullOrWhiteSpace(diffViewer.OriginalText) || !string.IsNullOrWhiteSpace(diffViewer.ModifiedText),
+            DiffViewMode: diffViewer.ViewMode,
+            DiffChangeCount: diffViewer.GetChangeCount(),
+            IsDiffMinimapVisible: diffViewer.ShowMinimap,
+            IsDiffReadOnly: diffViewer.IsReadOnly,
+            HasHexContent: hexEditor.Data?.Length > 0,
+            HexByteCount: hexEditor.Data?.Length ?? 0,
+            HexBytesPerRow: hexEditor.BytesPerRow,
+            IsHexReadOnly: hexEditor.IsReadOnly,
+            IsHexDataInterpretationVisible: hexEditor.ShowDataInterpretation,
+            HexSelectionLength: hexEditor.SelectionLength,
+            HasJsonContent: !string.IsNullOrWhiteSpace(jsonViewer.JsonText) && jsonViewer.RootNode != null,
+            JsonExpandDepth: jsonViewer.ExpandDepth,
+            JsonMaxRenderDepth: jsonViewer.MaxRenderDepth,
+            IsJsonEditable: jsonViewer.IsEditable,
+            IsJsonTypeIndicatorsVisible: jsonViewer.ShowTypeIndicators,
+            IsJsonItemCountVisible: jsonViewer.ShowItemCount,
+            MaterialKind: materialSurface?.MaterialKind ?? FWFluentMaterialKind.None);
+    }
+
+    internal static string FormatDataInspectorWorkbenchQa(string action, GalleryDataInspectorWorkbenchSnapshot snapshot)
+    {
+        return $"{action}: diff {FormatOnOff(snapshot.HasDiffContent)} {snapshot.DiffViewMode} changes {snapshot.DiffChangeCount}, minimap {FormatOnOff(snapshot.IsDiffMinimapVisible)}, read-only {FormatOnOff(snapshot.IsDiffReadOnly)}; hex {FormatOnOff(snapshot.HasHexContent)} bytes {snapshot.HexByteCount}, row {snapshot.HexBytesPerRow}, read-only {FormatOnOff(snapshot.IsHexReadOnly)}, interpretation {FormatOnOff(snapshot.IsHexDataInterpretationVisible)}, selection {snapshot.HexSelectionLength}; json {FormatOnOff(snapshot.HasJsonContent)}, expand depth {snapshot.JsonExpandDepth}/{snapshot.JsonMaxRenderDepth}, editable {FormatOnOff(snapshot.IsJsonEditable)}, types {FormatOnOff(snapshot.IsJsonTypeIndicatorsVisible)}, item count {FormatOnOff(snapshot.IsJsonItemCountVisible)}; material {snapshot.MaterialKind}; ready {FormatOnOff(snapshot.IsReady)}.";
     }
 
     private static FWDiffViewer CreateSampleDiffViewer(double width, double height)
