@@ -352,6 +352,11 @@ var calendarView = new FWCalendarView
     FirstDayOfWeek = DayOfWeek.Monday,
     IsTodayHighlighted = true
 };
+
+var pickerQa = GalleryDateTimePage.CreateCalendarDatePickerQaSnapshot(reviewDate);
+var calendarViewQa = GalleryDateTimePage.CreateCalendarViewQaSnapshot(calendarView);
+Debug.WriteLine(GalleryDateTimePage.FormatCalendarDatePickerQa("CalendarDatePicker QA", pickerQa));
+Debug.WriteLine(GalleryDateTimePage.FormatCalendarViewQa("CalendarView QA", calendarViewQa));
 """,
         ["inputmedia.color.ink.media"] = """
 var picker = new FWColorPicker

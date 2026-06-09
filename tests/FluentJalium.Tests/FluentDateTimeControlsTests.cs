@@ -507,6 +507,7 @@ public sealed class FluentDateTimeControlsTests
         var calendarViewSnapshot = GalleryDateTimePage.CreateCalendarViewQaSnapshot(calendarView);
         var calendarViewText = GalleryDateTimePage.FormatCalendarViewQa("CalendarView QA", calendarViewSnapshot);
 
+        Assert.Equal(nameof(DatePicker), pickerSnapshot.CompatibilityBase);
         Assert.Equal("Review date", pickerSnapshot.Header);
         Assert.Equal(today.AddDays(7), pickerSnapshot.SelectedDate);
         Assert.Equal(today, pickerSnapshot.DisplayDateStart);
@@ -515,6 +516,7 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(FWDateTimePickerDensity.Compact, pickerSnapshot.Density);
         Assert.True(pickerSnapshot.IsDropDownOpen);
         Assert.Contains("CalendarDatePicker QA", pickerText, StringComparison.Ordinal);
+        Assert.Contains("Compatibility: DatePicker", pickerText, StringComparison.Ordinal);
         Assert.Contains("Header: Review date", pickerText, StringComparison.Ordinal);
         Assert.Contains($"Selected: {today.AddDays(7):D}", pickerText, StringComparison.Ordinal);
         Assert.Contains($"Range: {today:D} to {today.AddDays(90):D}", pickerText, StringComparison.Ordinal);
@@ -522,6 +524,7 @@ public sealed class FluentDateTimeControlsTests
         Assert.Contains("Density: compact", pickerText, StringComparison.Ordinal);
         Assert.Contains("Drop-down: open", pickerText, StringComparison.Ordinal);
 
+        Assert.Equal(nameof(Calendar), calendarViewSnapshot.CompatibilityBase);
         Assert.Equal(today, calendarViewSnapshot.DisplayDate);
         Assert.Equal(today.AddDays(2), calendarViewSnapshot.SelectedDate);
         Assert.Equal(today.AddDays(-5), calendarViewSnapshot.DisplayDateStart);
@@ -531,6 +534,7 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(CalendarSelectionMode.SingleDate, calendarViewSnapshot.SelectionMode);
         Assert.Equal(1, calendarViewSnapshot.BlackoutDateCount);
         Assert.Contains("CalendarView QA", calendarViewText, StringComparison.Ordinal);
+        Assert.Contains("Compatibility: Calendar", calendarViewText, StringComparison.Ordinal);
         Assert.Contains($"Display: {today:MMMM yyyy}", calendarViewText, StringComparison.Ordinal);
         Assert.Contains($"Selected: {today.AddDays(2):D}", calendarViewText, StringComparison.Ordinal);
         Assert.Contains($"Range: {today.AddDays(-5):D} to {today.AddDays(45):D}", calendarViewText, StringComparison.Ordinal);

@@ -20,6 +20,7 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 namespace FluentJalium.Gallery.Pages;
 
 internal readonly record struct GalleryCalendarDatePickerQaSnapshot(
+    string CompatibilityBase,
     string Header,
     DateTime? SelectedDate,
     DateTime? DisplayDateStart,
@@ -29,6 +30,7 @@ internal readonly record struct GalleryCalendarDatePickerQaSnapshot(
     bool IsDropDownOpen);
 
 internal readonly record struct GalleryCalendarViewQaSnapshot(
+    string CompatibilityBase,
     DateTime DisplayDate,
     DateTime? SelectedDate,
     DateTime? DisplayDateStart,
@@ -671,6 +673,7 @@ internal sealed class GalleryDateTimePage
         ArgumentNullException.ThrowIfNull(datePicker);
 
         return new GalleryCalendarDatePickerQaSnapshot(
+            nameof(DatePicker),
             datePicker.Header?.ToString() ?? string.Empty,
             datePicker.SelectedDate,
             datePicker.DisplayDateStart,
@@ -689,7 +692,7 @@ internal sealed class GalleryDateTimePage
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        return $"{action}. Header: {snapshot.Header}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. Format: {snapshot.SelectedDateFormat}. Density: {FormatDensity(snapshot.Density)}. Drop-down: {FormatOpenClosed(snapshot.IsDropDownOpen)}.";
+        return $"{action}. Compatibility: {snapshot.CompatibilityBase}. Header: {snapshot.Header}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. Format: {snapshot.SelectedDateFormat}. Density: {FormatDensity(snapshot.Density)}. Drop-down: {FormatOpenClosed(snapshot.IsDropDownOpen)}.";
     }
 
     internal static GalleryCalendarViewQaSnapshot CreateCalendarViewQaSnapshot(FWCalendarView calendarView)
@@ -697,6 +700,7 @@ internal sealed class GalleryDateTimePage
         ArgumentNullException.ThrowIfNull(calendarView);
 
         return new GalleryCalendarViewQaSnapshot(
+            nameof(Calendar),
             calendarView.DisplayDate,
             calendarView.SelectedDate,
             calendarView.DisplayDateStart,
@@ -716,7 +720,7 @@ internal sealed class GalleryDateTimePage
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        return $"{action}. Display: {snapshot.DisplayDate:MMMM yyyy}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. First day: {snapshot.FirstDayOfWeek}. Today ring: {FormatOnOff(snapshot.IsTodayHighlighted)}. Selection: {snapshot.SelectionMode}. Blackouts: {snapshot.BlackoutDateCount}.";
+        return $"{action}. Compatibility: {snapshot.CompatibilityBase}. Display: {snapshot.DisplayDate:MMMM yyyy}. Selected: {FormatDateTimeDate(snapshot.SelectedDate)}. Range: {FormatDateTimeDate(snapshot.DisplayDateStart)} to {FormatDateTimeDate(snapshot.DisplayDateEnd)}. First day: {snapshot.FirstDayOfWeek}. Today ring: {FormatOnOff(snapshot.IsTodayHighlighted)}. Selection: {snapshot.SelectionMode}. Blackouts: {snapshot.BlackoutDateCount}.";
     }
 
     private static string FormatDateTimeTime(TimeSpan? time, string clockIdentifier)

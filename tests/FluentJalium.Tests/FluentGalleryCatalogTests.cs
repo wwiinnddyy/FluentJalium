@@ -300,6 +300,24 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeDateTimeCompatibilityQaSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "dateandtime");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWCalendarDatePicker", sampleCode);
+        Assert.Contains("new FWCalendarView", sampleCode);
+        Assert.Contains("CreateCalendarDatePickerQaSnapshot", sampleCode);
+        Assert.Contains("CreateCalendarViewQaSnapshot", sampleCode);
+        Assert.Contains("FormatCalendarDatePickerQa", sampleCode);
+        Assert.Contains("FormatCalendarViewQa", sampleCode);
+        Assert.Contains("CalendarDatePicker QA", sampleCode);
+        Assert.Contains("CalendarView QA", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeAdvancedCollectionNavigationRecipes()
     {
         var page = Assert.Single(
