@@ -1299,7 +1299,7 @@ var restoreTarget = new FWButton
     Focusable = true
 };
 
-(bool ModalLayer, bool Focus, bool Keyboard, bool Automation, bool LightDismiss, bool CommandPath, FWTaskDialogButton DefaultButton, FWTaskDialogButton CancelButton, int HostLayer, int AppLayer) CreateTaskDialogRealWindowQaSnapshot(
+(bool ModalLayer, bool Focus, bool Keyboard, bool Automation, bool LightDismiss, bool CommandPath, bool RestoreTiming, bool ClipGuard, bool RootWindowSmoke, FWTaskDialogButton DefaultButton, FWTaskDialogButton CancelButton, int HostLayer, int AppLayer) CreateTaskDialogRealWindowQaSnapshot(
     FWTaskDialogHostDiagnostics hostDiagnostics,
     FWTaskDialogAutomationDiagnostics automationDiagnostics,
     int hostLayer,
@@ -1309,22 +1309,33 @@ var restoreTarget = new FWButton
     bool primaryCommandCanExecute,
     bool cancelCloseGuardEnabled)
 {
+    var modalLayer = hostDiagnostics.IsOpen && hostDiagnostics.HasCurrentDialog && hostLayer > appLayer;
+    var focus = hostDiagnostics.RestoreFocusOnClose && hostDiagnostics.HasFocusRestoreTarget && automationDiagnostics.LastFocusTarget != FWTaskDialogButton.None;
+    var keyboard = hostDiagnostics.IsFocusTrapEnabled && hostDiagnostics.LastKeyboardRequest != FWTaskDialogHostKeyboardRequest.None && hostDiagnostics.LastKeyboardRequestHandled;
+    var automation = automationDiagnostics.PrimaryButton.IsVisible && automationDiagnostics.CloseButton.IsCancel;
+    var commandPath = automationDiagnostics.PrimaryButton.IsEnabled && primaryCommandCanExecute;
+    var restoreTiming = focus && automationDiagnostics.CloseButton.IsCancel;
+    var clipGuard = modalLayer && automationDiagnostics.PrimaryButton.IsVisible && !string.IsNullOrWhiteSpace(automationDiagnostics.CloseButton.AutomationId);
+    var rootWindowSmoke = modalLayer && focus && keyboard && automation && hostDiagnostics.IsLightDismissEnabled && commandPath && restoreTiming && clipGuard;
     return (
-        hostDiagnostics.IsOpen && hostDiagnostics.HasCurrentDialog && hostLayer > appLayer,
-        hostDiagnostics.RestoreFocusOnClose && hostDiagnostics.HasFocusRestoreTarget && automationDiagnostics.LastFocusTarget != FWTaskDialogButton.None,
-        hostDiagnostics.IsFocusTrapEnabled && hostDiagnostics.LastKeyboardRequest != FWTaskDialogHostKeyboardRequest.None && hostDiagnostics.LastKeyboardRequestHandled,
-        automationDiagnostics.PrimaryButton.IsVisible && automationDiagnostics.CloseButton.IsCancel,
+        modalLayer,
+        focus,
+        keyboard,
+        automation,
         hostDiagnostics.IsLightDismissEnabled,
-        automationDiagnostics.PrimaryButton.IsEnabled && primaryCommandCanExecute,
+        commandPath,
+        restoreTiming,
+        clipGuard,
+        rootWindowSmoke,
         defaultButton,
         cancelButton,
         hostLayer,
         appLayer);
 }
 
-string FormatTaskDialogRealWindowQa(string action, (bool ModalLayer, bool Focus, bool Keyboard, bool Automation, bool LightDismiss, bool CommandPath, FWTaskDialogButton DefaultButton, FWTaskDialogButton CancelButton, int HostLayer, int AppLayer) snapshot)
+string FormatTaskDialogRealWindowQa(string action, (bool ModalLayer, bool Focus, bool Keyboard, bool Automation, bool LightDismiss, bool CommandPath, bool RestoreTiming, bool ClipGuard, bool RootWindowSmoke, FWTaskDialogButton DefaultButton, FWTaskDialogButton CancelButton, int HostLayer, int AppLayer) snapshot)
 {
-    return $"{action}. TaskDialog real-window QA: modal layer {snapshot.ModalLayer}; focus {snapshot.Focus}; keyboard {snapshot.Keyboard}; automation {snapshot.Automation}; light dismiss {snapshot.LightDismiss}; command path {snapshot.CommandPath}; default {snapshot.DefaultButton}; cancel {snapshot.CancelButton}; host/app z {snapshot.HostLayer}/{snapshot.AppLayer}.";
+    return $"{action}. TaskDialog real-window QA: modal layer {snapshot.ModalLayer}; focus {snapshot.Focus}; keyboard {snapshot.Keyboard}; automation {snapshot.Automation}; light dismiss {snapshot.LightDismiss}; command path {snapshot.CommandPath}; restore timing {snapshot.RestoreTiming}; clip guard {snapshot.ClipGuard}; root-window smoke {snapshot.RootWindowSmoke}; default {snapshot.DefaultButton}; cancel {snapshot.CancelButton}; host/app z {snapshot.HostLayer}/{snapshot.AppLayer}.";
 }
 
 var host = new FWTaskDialogHost
@@ -1392,6 +1403,7 @@ var qaSnapshot = CreateTaskDialogRealWindowQaSnapshot(
     primaryCommandCanExecute: deleteCommand.CanExecute(null),
     cancelCloseGuardEnabled: false);
 Debug.WriteLine(FormatTaskDialogRealWindowQa("Real-window QA snapshot", qaSnapshot));
+Debug.WriteLine($"TaskDialog root-window smoke: restore timing {qaSnapshot.RestoreTiming}; clip guard {qaSnapshot.ClipGuard}; ready {qaSnapshot.RootWindowSmoke}.");
 
 var result = await showTask;
 Debug.WriteLine($"TaskDialog completed with {result}.");

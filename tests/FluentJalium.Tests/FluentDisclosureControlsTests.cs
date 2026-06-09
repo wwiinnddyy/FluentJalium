@@ -417,6 +417,9 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(snapshot.HasAutomationCoverage);
         Assert.True(snapshot.IsCommandPathReady);
         Assert.True(snapshot.IsFluentModalReady);
+        Assert.True(snapshot.HasCloseRestoreTimingEvidence);
+        Assert.True(snapshot.HasRootWindowClippingGuard);
+        Assert.True(snapshot.IsRootWindowSmokeReady);
         Assert.False(snapshot.CancelCloseGuardEnabled);
         Assert.Equal(FWTaskDialogButton.Primary, snapshot.DefaultButton);
         Assert.Equal(FWTaskDialogButton.Close, snapshot.CancelButton);
@@ -430,6 +433,8 @@ public sealed class FluentDisclosureControlsTests
         Assert.Contains("light dismiss on", text);
         Assert.Contains("command path on", text);
         Assert.Contains("cancel guard off", text);
+        Assert.Contains("restore timing on", text);
+        Assert.Contains("clip guard on", text);
         Assert.Contains("default Primary", text);
         Assert.Contains("cancel Close", text);
         Assert.Contains("host/app z 10/0", text);
@@ -437,7 +442,8 @@ public sealed class FluentDisclosureControlsTests
         Assert.Contains("last focus Primary", text);
         Assert.Contains("primary id PrimaryButton", text);
         Assert.Contains("close id CloseButton", text);
-        Assert.Contains("ready on", text);
+        Assert.Contains("modal ready on", text);
+        Assert.Contains("root-window smoke on", text);
     }
 
     [Fact]
@@ -1029,6 +1035,9 @@ public sealed class FluentDisclosureControlsTests
             Assert.True(snapshot.HasKeyboardCoverage);
             Assert.True(snapshot.HasAutomationCoverage);
             Assert.True(snapshot.IsFluentModalReady);
+            Assert.True(snapshot.HasCloseRestoreTimingEvidence);
+            Assert.True(snapshot.HasRootWindowClippingGuard);
+            Assert.True(snapshot.IsRootWindowSmokeReady);
 
             var escapeArgs = new KeyEventArgs(
                 UIElement.KeyDownEvent,

@@ -462,8 +462,14 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("FocusRestoreTarget", sampleCode);
         Assert.Contains("Panel.SetZIndex", sampleCode);
         Assert.Contains("TaskDialog real-window QA", sampleCode);
+        Assert.Contains("TaskDialog root-window smoke", sampleCode);
         Assert.Contains("CreateTaskDialogRealWindowQaSnapshot", sampleCode);
         Assert.Contains("FormatTaskDialogRealWindowQa", sampleCode);
+        Assert.Contains("RestoreTiming", sampleCode);
+        Assert.Contains("ClipGuard", sampleCode);
+        Assert.Contains("RootWindowSmoke", sampleCode);
+        Assert.Contains("restore timing", sampleCode);
+        Assert.Contains("clip guard", sampleCode);
         Assert.Contains("new KeyEventArgs", sampleCode);
         Assert.Contains("Key.Tab", sampleCode);
         Assert.Contains("ModifierKeys.Shift", sampleCode);

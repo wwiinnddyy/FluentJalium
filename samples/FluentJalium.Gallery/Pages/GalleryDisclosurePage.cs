@@ -89,12 +89,27 @@ internal sealed class GalleryDisclosurePage
 
         public bool IsCommandPathReady => PrimaryButtonEnabled && PrimaryCommandCanExecute;
 
+        public bool HasCloseRestoreTimingEvidence => RestoreFocusOnClose &&
+            HasFocusRestoreTarget &&
+            LastFocusTarget != FWTaskDialogButton.None &&
+            CloseButtonIsCancel;
+
+        public bool HasRootWindowClippingGuard => IsOpen &&
+            HasCurrentDialog &&
+            HostLayer > AppLayer &&
+            PrimaryButtonVisible &&
+            !string.IsNullOrWhiteSpace(CloseButtonAutomationId);
+
         public bool IsFluentModalReady => IsModalLayerAboveApp &&
             IsLightDismissEnabled &&
             HasKeyboardCoverage &&
             HasFocusCoverage &&
             HasAutomationCoverage &&
             IsCommandPathReady;
+
+        public bool IsRootWindowSmokeReady => IsFluentModalReady &&
+            HasCloseRestoreTimingEvidence &&
+            HasRootWindowClippingGuard;
     }
 
     public UIElement CreateContent()
@@ -536,7 +551,7 @@ internal sealed class GalleryDisclosurePage
         var output = CreateDisclosureOutput("TaskDialogHost: modal host ready. Default: Primary, primary command: on, cancel guard: off.");
         var hostStatus = CreateDisclosureOutput("Host: waiting for diagnostics.");
         var focusStatus = CreateDisclosureOutput("Focus QA: restore target not focused yet.");
-        var qaStatus = CreateDisclosureOutput("Real-window QA: waiting for modal layer, focus, keyboard, and automation coverage.");
+        var qaStatus = CreateDisclosureOutput("Root-window smoke QA: waiting for modal layer, focus, keyboard, automation, restore timing, and clipping guard coverage.");
         var automationStatus = CreateDisclosureOutput("Automation: waiting for button metadata.");
         var keyboardStatus = CreateDisclosureOutput("Keyboard: no host key requests yet.");
         var cancelCloseRequests = false;
@@ -861,7 +876,7 @@ internal sealed class GalleryDisclosurePage
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(action);
 
-        return $"{action}. TaskDialog real-window QA: modal layer {FormatOnOff(snapshot.IsModalLayerAboveApp)}, focus {FormatOnOff(snapshot.HasFocusCoverage)}, keyboard {FormatOnOff(snapshot.HasKeyboardCoverage)}, automation {FormatOnOff(snapshot.HasAutomationCoverage)}, light dismiss {FormatOnOff(snapshot.IsLightDismissEnabled)}, command path {FormatOnOff(snapshot.IsCommandPathReady)}, cancel guard {FormatOnOff(snapshot.CancelCloseGuardEnabled)}, default {snapshot.DefaultButton}, cancel {snapshot.CancelButton}, host/app z {snapshot.HostLayer}/{snapshot.AppLayer}, last key {snapshot.LastKeyboardRequest}/{FormatOnOff(snapshot.LastKeyboardRequestHandled)}, last focus {snapshot.LastFocusTarget}, primary id {snapshot.PrimaryButtonAutomationId}, close id {snapshot.CloseButtonAutomationId}, ready {FormatOnOff(snapshot.IsFluentModalReady)}.";
+        return $"{action}. TaskDialog real-window QA: modal layer {FormatOnOff(snapshot.IsModalLayerAboveApp)}, focus {FormatOnOff(snapshot.HasFocusCoverage)}, keyboard {FormatOnOff(snapshot.HasKeyboardCoverage)}, automation {FormatOnOff(snapshot.HasAutomationCoverage)}, light dismiss {FormatOnOff(snapshot.IsLightDismissEnabled)}, command path {FormatOnOff(snapshot.IsCommandPathReady)}, cancel guard {FormatOnOff(snapshot.CancelCloseGuardEnabled)}, restore timing {FormatOnOff(snapshot.HasCloseRestoreTimingEvidence)}, clip guard {FormatOnOff(snapshot.HasRootWindowClippingGuard)}, default {snapshot.DefaultButton}, cancel {snapshot.CancelButton}, host/app z {snapshot.HostLayer}/{snapshot.AppLayer}, last key {snapshot.LastKeyboardRequest}/{FormatOnOff(snapshot.LastKeyboardRequestHandled)}, last focus {snapshot.LastFocusTarget}, primary id {snapshot.PrimaryButtonAutomationId}, close id {snapshot.CloseButtonAutomationId}, modal ready {FormatOnOff(snapshot.IsFluentModalReady)}, root-window smoke {FormatOnOff(snapshot.IsRootWindowSmokeReady)}.";
     }
 
     private static string FormatTaskDialogAutomation(FWTaskDialogAutomationDiagnostics diagnostics)
