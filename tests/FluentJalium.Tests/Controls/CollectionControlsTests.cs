@@ -1042,10 +1042,27 @@ public class CollectionControlsTests
         Assert.Contains("0 public-ready", summary);
         Assert.Contains("3/3 candidates have Gallery recipe evidence", evidenceSummary);
         Assert.Contains("9 missing public API evidence items remain", evidenceSummary);
+        Assert.Contains("10 missing automation, gesture/animation, or two-view contract evidence items remain", evidenceSummary);
 
-        AssertEvaluation(evaluations, "FWItemsView", "multi-select selection model");
-        AssertEvaluation(evaluations, "FWFlipView", "touch swipe gesture host");
-        AssertEvaluation(evaluations, "FWSemanticZoom", "two-view synchronized source API");
+        var itemsView = AssertEvaluation(evaluations, "FWItemsView", "multi-select selection model");
+        var flipView = AssertEvaluation(evaluations, "FWFlipView", "touch swipe gesture host");
+        var semanticZoom = AssertEvaluation(evaluations, "FWSemanticZoom", "two-view synchronized source API");
+
+        AssertCandidateContractEvidence(
+            itemsView,
+            expectedAutomationEvidence: "selection automation peer exposes item position, selected state, and invoke pattern",
+            expectedGestureAnimationEvidence: "range selection and multi-select pointer gesture contract",
+            expectedTwoViewSynchronizationEvidence: null);
+        AssertCandidateContractEvidence(
+            flipView,
+            expectedAutomationEvidence: "page automation peer exposes selected page and item navigation patterns",
+            expectedGestureAnimationEvidence: "touch swipe gesture trace",
+            expectedTwoViewSynchronizationEvidence: null);
+        AssertCandidateContractEvidence(
+            semanticZoom,
+            expectedAutomationEvidence: "group automation focus contract",
+            expectedGestureAnimationEvidence: "zoom transition animation snapshot",
+            expectedTwoViewSynchronizationEvidence: "overview/detail source synchronization trace");
     }
 
     private static DataTemplate CreateTextTemplate()
@@ -1084,7 +1101,7 @@ public class CollectionControlsTests
         };
     }
 
-    private static void AssertEvaluation(
+    private static AdvancedCollectionsPage.CollectionNavigationEvaluation AssertEvaluation(
         IReadOnlyList<AdvancedCollectionsPage.CollectionNavigationEvaluation> evaluations,
         string candidateControl,
         string expectedRisk)
@@ -1109,6 +1126,40 @@ public class CollectionControlsTests
         Assert.Contains("Gallery recipe evidence on", evidenceText);
         Assert.Contains("missing public API evidence", evidenceText);
         Assert.Contains(evaluation.MissingPublicApiEvidence[0], evidenceText);
+
+        return evaluation;
+    }
+
+    private static void AssertCandidateContractEvidence(
+        AdvancedCollectionsPage.CollectionNavigationEvaluation evaluation,
+        string expectedAutomationEvidence,
+        string expectedGestureAnimationEvidence,
+        string? expectedTwoViewSynchronizationEvidence)
+    {
+        var evidenceText = AdvancedCollectionsPage.FormatCollectionNavigationEvidence(evaluation);
+
+        Assert.True(evaluation.HasMissingAutomationContractEvidence);
+        Assert.True(evaluation.HasMissingGestureAnimationContractEvidence);
+        Assert.Contains(expectedAutomationEvidence, evaluation.MissingAutomationContractEvidence);
+        Assert.Contains(expectedGestureAnimationEvidence, evaluation.MissingGestureAnimationContractEvidence);
+        Assert.Contains(expectedAutomationEvidence, evidenceText);
+        Assert.Contains(expectedGestureAnimationEvidence, evidenceText);
+
+        if (expectedTwoViewSynchronizationEvidence is null)
+        {
+            Assert.False(evaluation.HasMissingTwoViewSynchronizationContractEvidence);
+            Assert.Empty(evaluation.MissingTwoViewSynchronizationContractEvidence);
+            Assert.Contains("missing two-view synchronization contract evidence none", evidenceText);
+        }
+        else
+        {
+            Assert.True(evaluation.HasMissingTwoViewSynchronizationContractEvidence);
+            Assert.Contains(expectedTwoViewSynchronizationEvidence, evaluation.MissingTwoViewSynchronizationContractEvidence);
+            Assert.Contains(expectedTwoViewSynchronizationEvidence, evidenceText);
+        }
+
+        Assert.False(evaluation.IsPublicApiReady);
+        Assert.Equal("Keep as Gallery recipe before public API", evaluation.RecommendedSurface);
     }
 
     private static ScrollViewer CreateScrollViewer(

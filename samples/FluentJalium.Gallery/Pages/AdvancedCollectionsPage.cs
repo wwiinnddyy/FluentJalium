@@ -147,6 +147,9 @@ public class AdvancedCollectionsPage : Page
         bool HasVirtualizationBehavior,
         string[] RecipeEvidence,
         string[] MissingPublicApiEvidence,
+        string[] MissingAutomationContractEvidence,
+        string[] MissingGestureAnimationContractEvidence,
+        string[] MissingTwoViewSynchronizationContractEvidence,
         string[] ProvenSemantics,
         string[] RemainingRisks)
     {
@@ -158,11 +161,27 @@ public class AdvancedCollectionsPage : Page
 
         public bool HasRecipeEvidence => RecipeEvidence.Length > 0 && ProvenSemanticCount == 4;
 
-        public bool HasMissingPublicApiEvidence => MissingPublicApiEvidence.Length > 0;
+        public bool HasMissingPublicApiEvidence =>
+            MissingPublicApiEvidence.Length > 0
+            || HasMissingAutomationContractEvidence
+            || HasMissingGestureAnimationContractEvidence
+            || HasMissingTwoViewSynchronizationContractEvidence;
+
+        public bool HasMissingAutomationContractEvidence => MissingAutomationContractEvidence.Length > 0;
+
+        public bool HasMissingGestureAnimationContractEvidence => MissingGestureAnimationContractEvidence.Length > 0;
+
+        public bool HasMissingTwoViewSynchronizationContractEvidence => MissingTwoViewSynchronizationContractEvidence.Length > 0;
+
+        public int MissingContractEvidenceCount =>
+            MissingAutomationContractEvidence.Length
+            + MissingGestureAnimationContractEvidence.Length
+            + MissingTwoViewSynchronizationContractEvidence.Length;
 
         public bool IsPublicApiReady =>
             RemainingRisks.Length == 0
             && MissingPublicApiEvidence.Length == 0
+            && MissingContractEvidenceCount == 0
             && ProvenSemanticCount == 4;
     }
 
@@ -1260,6 +1279,9 @@ public class AdvancedCollectionsPage : Page
                 HasVirtualizationBehavior: true,
                 ["command recipe updates selected index", "invoke command records InvokedIndex", "FWItemsRepeater diagnostics prove viewport range and recycling"],
                 ["owned selection model evidence", "item container automation metadata", "multi-select gesture parity"],
+                ["selection automation peer exposes item position, selected state, and invoke pattern"],
+                ["range selection and multi-select pointer gesture contract"],
+                [],
                 ["Previous/Next/Home/End movement", "selected item and invoke tracking", "viewport-derived realization", "repeater-backed item recycling"],
                 ["dedicated item container contract", "multi-select selection model", "automation peer contract"]),
             new CollectionNavigationEvaluation(
@@ -1272,6 +1294,9 @@ public class AdvancedCollectionsPage : Page
                 HasVirtualizationBehavior: true,
                 ["FWPipsPager synchronizes page state", "horizontal viewport realization", "single-page command invocation"],
                 ["pointer and touch swipe gesture trace", "page transition animation snapshot", "looping and edge behavior contract"],
+                ["page automation peer exposes selected page and item navigation patterns"],
+                ["touch swipe gesture trace", "page transition animation snapshot", "looping and edge gesture contract"],
+                [],
                 ["pips pager synchronization", "page selection and invocation", "horizontal viewport windows", "single-page realization"],
                 ["touch swipe gesture host", "page transition animation contract", "looping and edge behavior"]),
             new CollectionNavigationEvaluation(
@@ -1284,6 +1309,9 @@ public class AdvancedCollectionsPage : Page
                 HasVirtualizationBehavior: true,
                 ["group movement updates selected group", "overview/details toggle state", "group-aware viewport window"],
                 ["two-view source synchronization trace", "zoom transition animation snapshot", "group automation focus contract"],
+                ["group automation focus contract"],
+                ["zoom transition animation snapshot"],
+                ["overview/detail source synchronization trace", "selected group handoff contract"],
                 ["group previous/next movement", "overview/details toggle", "first item selection per group", "group-aware viewport windows"],
                 ["two-view synchronized source API", "zoom transition choreography", "group automation and focus contract"])
         };
@@ -1303,8 +1331,9 @@ public class AdvancedCollectionsPage : Page
         var items = evaluations.ToArray();
         var recipeEvidence = items.Count(evaluation => evaluation.HasRecipeEvidence);
         var missingPublicApiEvidence = items.Sum(evaluation => evaluation.MissingPublicApiEvidence.Length);
+        var missingContractEvidence = items.Sum(evaluation => evaluation.MissingContractEvidenceCount);
 
-        return $"Collection navigation evidence: {recipeEvidence}/{items.Length} candidates have Gallery recipe evidence; {missingPublicApiEvidence} missing public API evidence items remain. Keep FWItemsView, FWFlipView, and FWSemanticZoom recipe-first until those evidence gaps close.";
+        return $"Collection navigation evidence: {recipeEvidence}/{items.Length} candidates have Gallery recipe evidence; {missingPublicApiEvidence} missing public API evidence items remain; {missingContractEvidence} missing automation, gesture/animation, or two-view contract evidence items remain. Keep FWItemsView, FWFlipView, and FWSemanticZoom recipe-first until those evidence gaps close.";
     }
 
     internal static string FormatCollectionNavigationEvaluation(CollectionNavigationEvaluation evaluation)
@@ -1324,8 +1353,17 @@ public class AdvancedCollectionsPage : Page
         var missingEvidence = evaluation.MissingPublicApiEvidence.Length == 0
             ? "none"
             : string.Join(", ", evaluation.MissingPublicApiEvidence);
+        var missingAutomation = evaluation.MissingAutomationContractEvidence.Length == 0
+            ? "none"
+            : string.Join(", ", evaluation.MissingAutomationContractEvidence);
+        var missingGestureAnimation = evaluation.MissingGestureAnimationContractEvidence.Length == 0
+            ? "none"
+            : string.Join(", ", evaluation.MissingGestureAnimationContractEvidence);
+        var missingTwoViewSynchronization = evaluation.MissingTwoViewSynchronizationContractEvidence.Length == 0
+            ? "none"
+            : string.Join(", ", evaluation.MissingTwoViewSynchronizationContractEvidence);
 
-        return $"{evaluation.CandidateControl} evidence: Gallery recipe evidence {FormatOnOff(evaluation.HasRecipeEvidence)} ({recipeEvidence}); missing public API evidence {missingEvidence}.";
+        return $"{evaluation.CandidateControl} evidence: Gallery recipe evidence {FormatOnOff(evaluation.HasRecipeEvidence)} ({recipeEvidence}); missing public API evidence {missingEvidence}; missing automation contract evidence {missingAutomation}; missing gesture/animation contract evidence {missingGestureAnimation}; missing two-view synchronization contract evidence {missingTwoViewSynchronization}.";
     }
 
     private static string FormatOnOff(bool value) => value ? "on" : "off";
