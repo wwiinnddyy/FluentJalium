@@ -695,6 +695,16 @@ Debug.WriteLine(AdvancedCollectionsPage.CreateCollectionRecipeDiagnosticsText(it
 Debug.WriteLine($"ItemsView recipe selected {itemsViewRecipe.SelectedIndex}, invoked {itemsViewRecipe.InvokedIndex}.");
 Debug.WriteLine($"FlipView recipe page {flipViewRecipe.PageIndex + 1}/{flipViewRecipe.ItemCount}.");
 Debug.WriteLine($"SemanticZoom recipe group {semanticZoomRecipe.GroupIndex}, zoomed out {semanticZoomRecipe.IsZoomedOut}.");
+
+var evaluations = AdvancedCollectionsPage.CreateCollectionNavigationEvaluations();
+var candidateControls = evaluations.Select(evaluation => evaluation.CandidateControl).ToArray();
+Debug.WriteLine("FWItemsView / FWFlipView / FWSemanticZoom remain recipe-first candidates until public API contracts are proven.");
+Debug.WriteLine($"Collection navigation candidates: {string.Join(", ", candidateControls)}.");
+Debug.WriteLine(AdvancedCollectionsPage.CreateCollectionNavigationEvaluationSummary(evaluations));
+foreach (var evaluation in evaluations)
+{
+    Debug.WriteLine(AdvancedCollectionsPage.FormatCollectionNavigationEvaluation(evaluation));
+}
 """,
         ["collections.gridview"] = """
 var emptyList = new FWListView

@@ -111,6 +111,26 @@ public class AdvancedCollectionsPage : Page
         public bool HasInvocation => InvokedIndex >= 0;
     }
 
+    internal readonly record struct CollectionNavigationEvaluation(
+        CollectionRecipeKind Kind,
+        string CandidateControl,
+        string RecommendedSurface,
+        bool HasKeyboardNavigation,
+        bool HasSelectionSemantics,
+        bool HasViewportBehavior,
+        bool HasVirtualizationBehavior,
+        string[] ProvenSemantics,
+        string[] RemainingRisks)
+    {
+        public int ProvenSemanticCount =>
+            Convert.ToInt32(HasKeyboardNavigation)
+            + Convert.ToInt32(HasSelectionSemantics)
+            + Convert.ToInt32(HasViewportBehavior)
+            + Convert.ToInt32(HasVirtualizationBehavior);
+
+        public bool IsPublicApiReady => RemainingRisks.Length == 0 && ProvenSemanticCount == 4;
+    }
+
     public AdvancedCollectionsPage()
     {
         Title = "Advanced Collections";
@@ -208,7 +228,8 @@ public class AdvancedCollectionsPage : Page
             {
                 CreateItemsViewRecipe(),
                 CreateFlipViewRecipe(),
-                CreateSemanticZoomRecipe()
+                CreateSemanticZoomRecipe(),
+                CreateCollectionNavigationEvaluationPanel()
             }
         };
     }
@@ -326,6 +347,67 @@ public class AdvancedCollectionsPage : Page
             "SemanticZoom-like grouping recipe",
             "Keeps grouped overview/detail navigation as a Gallery recipe while Jalium lacks a native SemanticZoom base.",
             content);
+    }
+
+    private UIElement CreateCollectionNavigationEvaluationPanel()
+    {
+        var evaluations = CreateCollectionNavigationEvaluations();
+        var content = new StackPanel
+        {
+            Spacing = 10
+        };
+
+        content.Children.Add(new TextBlock
+        {
+            Text = CreateCollectionNavigationEvaluationSummary(evaluations),
+            FontSize = 13,
+            Opacity = 0.75,
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        foreach (var evaluation in evaluations)
+        {
+            content.Children.Add(CreateCollectionNavigationEvaluationRow(evaluation));
+        }
+
+        return CreateRecipeSurface(
+            "Collection navigation API evaluation",
+            "Keeps ItemsView, FlipView, and SemanticZoom candidates honest: Gallery recipes can prove behavior before FluentJalium publishes a stable FW control API.",
+            content);
+    }
+
+    private static UIElement CreateCollectionNavigationEvaluationRow(CollectionNavigationEvaluation evaluation)
+    {
+        var stack = new StackPanel
+        {
+            Spacing = 6
+        };
+
+        stack.Children.Add(new TextBlock
+        {
+            Text = evaluation.CandidateControl,
+            FontSize = 15,
+            FontWeight = FontWeights.SemiBold,
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        stack.Children.Add(new TextBlock
+        {
+            Text = FormatCollectionNavigationEvaluation(evaluation),
+            FontSize = 12,
+            Opacity = 0.75,
+            TextWrapping = TextWrapping.Wrap
+        });
+
+        return new FWBorder
+        {
+            Background = new SolidColorBrush(Color.FromRgb(0xF8, 0xFA, 0xFF)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xCF, 0xDA, 0xEE)),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = stack
+        };
     }
 
     private UIElement CreateRecipeSurface(string title, string description, UIElement content)
@@ -1057,6 +1139,65 @@ public class AdvancedCollectionsPage : Page
 
         return NormalizeCollectionRecipeState(state);
     }
+
+    internal static IReadOnlyList<CollectionNavigationEvaluation> CreateCollectionNavigationEvaluations()
+    {
+        return new[]
+        {
+            new CollectionNavigationEvaluation(
+                CollectionRecipeKind.ItemsViewSelection,
+                "FWItemsView",
+                "Keep as Gallery recipe before public API",
+                HasKeyboardNavigation: true,
+                HasSelectionSemantics: true,
+                HasViewportBehavior: true,
+                HasVirtualizationBehavior: true,
+                ["Previous/Next/Home/End movement", "selected item and invoke tracking", "viewport-derived realization", "repeater-backed item recycling"],
+                ["dedicated item container contract", "multi-select selection model", "automation peer contract"]),
+            new CollectionNavigationEvaluation(
+                CollectionRecipeKind.FlipViewPaging,
+                "FWFlipView",
+                "Keep as Gallery recipe before public API",
+                HasKeyboardNavigation: true,
+                HasSelectionSemantics: true,
+                HasViewportBehavior: true,
+                HasVirtualizationBehavior: true,
+                ["pips pager synchronization", "page selection and invocation", "horizontal viewport windows", "single-page realization"],
+                ["touch swipe gesture host", "page transition animation contract", "looping and edge behavior"]),
+            new CollectionNavigationEvaluation(
+                CollectionRecipeKind.SemanticZoomGrouping,
+                "FWSemanticZoom",
+                "Keep as Gallery recipe before public API",
+                HasKeyboardNavigation: true,
+                HasSelectionSemantics: true,
+                HasViewportBehavior: true,
+                HasVirtualizationBehavior: true,
+                ["group previous/next movement", "overview/details toggle", "first item selection per group", "group-aware viewport windows"],
+                ["two-view synchronized source API", "zoom transition choreography", "group automation and focus contract"])
+        };
+    }
+
+    internal static string CreateCollectionNavigationEvaluationSummary(IEnumerable<CollectionNavigationEvaluation> evaluations)
+    {
+        var items = evaluations.ToArray();
+        var publicReady = items.Count(evaluation => evaluation.IsPublicApiReady);
+        var recipeFirst = items.Length - publicReady;
+
+        return $"Collection navigation evaluation: {items.Length} candidates, {recipeFirst} recipe-first, {publicReady} public-ready. Publish only after the remaining API, automation, gesture, and animation risks are closed.";
+    }
+
+    internal static string FormatCollectionNavigationEvaluation(CollectionNavigationEvaluation evaluation)
+    {
+        var proven = string.Join(", ", evaluation.ProvenSemantics);
+        var risks = evaluation.RemainingRisks.Length == 0
+            ? "none"
+            : string.Join(", ", evaluation.RemainingRisks);
+        var readiness = evaluation.IsPublicApiReady ? "public API ready" : "recipe/prototype";
+
+        return $"{evaluation.CandidateControl}: {readiness}; surface: {evaluation.RecommendedSurface}; semantics keyboard {FormatOnOff(evaluation.HasKeyboardNavigation)}, selection {FormatOnOff(evaluation.HasSelectionSemantics)}, viewport {FormatOnOff(evaluation.HasViewportBehavior)}, virtualization {FormatOnOff(evaluation.HasVirtualizationBehavior)}; proven {proven}; remaining {risks}.";
+    }
+
+    private static string FormatOnOff(bool value) => value ? "on" : "off";
 
     internal static IReadOnlyList<string> CreateCollectionRecipeGroups()
     {

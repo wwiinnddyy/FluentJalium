@@ -983,6 +983,24 @@ public class CollectionControlsTests
         Assert.Contains("Invoked: 1", diagnosticsText);
     }
 
+    [Fact]
+    public void GalleryCollectionNavigationEvaluation_ShouldKeepCandidatesAsRecipesUntilContractsAreProven()
+    {
+        // Act
+        var evaluations = AdvancedCollectionsPage.CreateCollectionNavigationEvaluations();
+        var summary = AdvancedCollectionsPage.CreateCollectionNavigationEvaluationSummary(evaluations);
+
+        // Assert
+        Assert.Equal(3, evaluations.Count);
+        Assert.Contains("3 candidates", summary);
+        Assert.Contains("3 recipe-first", summary);
+        Assert.Contains("0 public-ready", summary);
+
+        AssertEvaluation(evaluations, "FWItemsView", "multi-select selection model");
+        AssertEvaluation(evaluations, "FWFlipView", "touch swipe gesture host");
+        AssertEvaluation(evaluations, "FWSemanticZoom", "two-view synchronized source API");
+    }
+
     private static DataTemplate CreateTextTemplate()
     {
         var template = new DataTemplate();
@@ -1017,6 +1035,24 @@ public class CollectionControlsTests
             HorizontalCacheLength = state.Kind == AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging ? 96 : 0,
             VerticalCacheLength = state.Kind == AdvancedCollectionsPage.CollectionRecipeKind.FlipViewPaging ? 0 : 96
         };
+    }
+
+    private static void AssertEvaluation(
+        IReadOnlyList<AdvancedCollectionsPage.CollectionNavigationEvaluation> evaluations,
+        string candidateControl,
+        string expectedRisk)
+    {
+        var evaluation = Assert.Single(evaluations, evaluation => evaluation.CandidateControl == candidateControl);
+        var text = AdvancedCollectionsPage.FormatCollectionNavigationEvaluation(evaluation);
+
+        Assert.False(evaluation.IsPublicApiReady);
+        Assert.Equal(4, evaluation.ProvenSemanticCount);
+        Assert.Equal("Keep as Gallery recipe before public API", evaluation.RecommendedSurface);
+        Assert.Contains(expectedRisk, evaluation.RemainingRisks);
+        Assert.Contains(candidateControl, text);
+        Assert.Contains("recipe/prototype", text);
+        Assert.Contains("semantics keyboard on, selection on, viewport on, virtualization on", text);
+        Assert.Contains(expectedRisk, text);
     }
 
     private static ScrollViewer CreateScrollViewer(
