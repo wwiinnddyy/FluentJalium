@@ -11,6 +11,17 @@ internal static class GallerySampleCodeRegistry
         ["catalog.filter.updated"] = CreateCatalogFilterSample("Updated"),
         ["catalog.filter.preview"] = CreateCatalogFilterSample("Preview"),
         ["catalog.filter.diagnostic"] = CreateCatalogFilterSample("Diagnostic"),
+        ["diagnostics.visualqa.coverage"] = """
+var families = GalleryVisualQaCoverageCatalog.CreateFamilies();
+var snapshot = GalleryVisualQaCoveragePage.CreateSnapshot();
+Debug.WriteLine(GalleryVisualQaCoverageCatalog.FormatSnapshot(snapshot));
+
+foreach (var family in families)
+{
+    Debug.WriteLine(GalleryVisualQaCoveragePage.FormatFamilyCoverage(family));
+    Debug.Assert(GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(family.SampleCodeKey));
+}
+""",
         ["design.themearchitecture"] = """
 FluentThemeManager.Apply(app);
 

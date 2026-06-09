@@ -536,6 +536,51 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryVisualQaCoveragePage_ShouldExposeDiagnosticFooterMetadataAndSampleCode()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var page = Assert.Single(pages, page => page.UniqueId == "visualqacoverage");
+
+        Assert.Equal("Visual QA Coverage", page.Title);
+        Assert.Equal(GalleryNavigationGroup.Diagnostics, page.Group);
+        Assert.True(page.IsFooter);
+        Assert.True(page.IsUpdated);
+        Assert.Equal(GalleryPageStatus.Diagnostic, page.Status);
+        Assert.Equal("/GalleryDiagnostics/VisualQaCoverage", page.SourcePath);
+        Assert.Equal("FluentJalium.Gallery.Models", page.ApiNamespace);
+        Assert.Equal("diagnostics.visualqa.coverage", page.SampleCodeKey);
+        Assert.Contains("GalleryVisualQaCoverageCatalog", page.RelatedControls);
+        Assert.Contains("GalleryVisualQaCoverageSnapshot", page.BaseClasses!);
+        Assert.True(page.MatchesSearch("visual qa evidence"));
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("GalleryVisualQaCoverageCatalog.CreateFamilies", sampleCode);
+        Assert.Contains("GalleryVisualQaCoveragePage.CreateSnapshot", sampleCode);
+        Assert.Contains("FormatFamilyCoverage", sampleCode);
+        Assert.Contains("ContainsRegisteredSampleCodeKey", sampleCode);
+        Assert.DoesNotContain("Generated from", sampleCode);
+    }
+
+    [Fact]
+    public void GalleryVisualQaCoveragePage_ShouldCreateSnapshotContentAndFormatFamilies()
+    {
+        var page = new GalleryVisualQaCoveragePage();
+        var snapshot = GalleryVisualQaCoveragePage.CreateSnapshot();
+        var family = Assert.Single(
+            GalleryVisualQaCoverageCatalog.CreateFamilies(),
+            family => family.FamilyId == "materials");
+        var text = GalleryVisualQaCoveragePage.FormatFamilyCoverage(family);
+        var content = page.CreateContent();
+
+        Assert.True(snapshot.CoversPage("windowbackdrops"));
+        Assert.True(snapshot.HasSample("materials.windowbackdrop"));
+        Assert.Contains("Materials and window backdrops", text);
+        Assert.Contains("high contrast", text);
+        Assert.Contains("materials.windowbackdrop", text);
+        Assert.IsAssignableFrom<UIElement>(content);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeDesignTokenSamples()
     {
         var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
