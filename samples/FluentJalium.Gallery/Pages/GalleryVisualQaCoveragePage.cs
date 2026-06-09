@@ -44,7 +44,7 @@ internal sealed class GalleryVisualQaCoveragePage
     {
         ArgumentNullException.ThrowIfNull(family);
 
-        return $"{family.Title}: page {family.PageId}, sample {family.SampleCodeKey}, controls {string.Join(", ", family.Controls)}, states {string.Join(", ", family.CoveredStates)}, evidence {string.Join("; ", family.Evidence)}.";
+        return $"{family.Title}: readiness {family.Readiness}, evidence level {family.EvidenceLevel}, next action {family.NextAction}, page {family.PageId}, sample {family.SampleCodeKey}, controls {string.Join(", ", family.Controls)}, states {string.Join(", ", family.CoveredStates)}, evidence {string.Join("; ", family.Evidence)}.";
     }
 
     private static FWBorder CreateSummary(GalleryVisualQaCoverageSnapshot snapshot)
@@ -79,7 +79,9 @@ internal sealed class GalleryVisualQaCoveragePage
                             CreatePill($"{snapshot.FamilyCount} families"),
                             CreatePill($"{snapshot.ControlCount} controls"),
                             CreatePill($"{snapshot.StateCount} state tokens"),
-                            CreatePill($"{snapshot.DiagnosticFamilyCount} diagnostic families")
+                            CreatePill($"{snapshot.DiagnosticFamilyCount} diagnostic families"),
+                            CreatePill($"{snapshot.ReadinessFamilyCount} readiness-scored"),
+                            CreatePill($"{snapshot.NeedsRenderedQaCount} need rendered QA")
                         }
                     }
                 }
@@ -106,6 +108,8 @@ internal sealed class GalleryVisualQaCoveragePage
                 {
                     CreateHeaderRow(FluentIconRegular.AppFolder24, family.Title),
                     CreateMetaText($"{family.PageId} / {family.SampleCodeKey}"),
+                    CreateWrap("Readiness", [family.Readiness, family.EvidenceLevel, family.RequiresRenderedQa ? "Rendered QA required" : "Rendered QA complete"]),
+                    CreateMetaText($"Next: {family.NextAction}"),
                     CreateWrap("Controls", family.Controls),
                     CreateWrap("States", family.CoveredStates),
                     CreateWrap("Evidence", family.Evidence)

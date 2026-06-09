@@ -757,6 +757,10 @@ public sealed class FluentGalleryCatalogTests
             Assert.All(family.Controls, control => Assert.StartsWith("FW", control, StringComparison.Ordinal));
             Assert.True(family.CoveredStates.Length >= 6, $"{family.FamilyId} has too few covered states.");
             Assert.NotEmpty(family.Evidence);
+            Assert.True(family.HasReadinessEvidence, $"{family.FamilyId} must declare readiness evidence.");
+            Assert.False(string.IsNullOrWhiteSpace(family.Readiness));
+            Assert.False(string.IsNullOrWhiteSpace(family.EvidenceLevel));
+            Assert.False(string.IsNullOrWhiteSpace(family.NextAction));
             Assert.Contains(family.Title, family.Summary);
         }
     }
@@ -772,6 +776,9 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(snapshot.ControlCount >= 50);
         Assert.True(snapshot.StateCount >= 15);
         Assert.True(snapshot.DiagnosticFamilyCount >= 8);
+        Assert.Equal(families.Count, snapshot.ReadinessFamilyCount);
+        Assert.True(snapshot.NeedsRenderedQaCount >= 10);
+        Assert.Equal(0, snapshot.RenderedQaFamilyCount);
         Assert.True(snapshot.CoversPage("windowbackdrops"));
         Assert.True(snapshot.CoversPage("advancedcollections"));
         Assert.True(snapshot.HasSample("materials.windowbackdrop"));
@@ -788,7 +795,13 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(families, family => family.Covers("dark"));
         Assert.Contains(families, family => family.Covers("high contrast"));
         Assert.Contains(families, family => family.Covers("diagnostics"));
+        Assert.Contains(families, family => family is { FamilyId: "charts", Readiness: "Rendered QA needed", EvidenceLevel: "SampleCode", RequiresRenderedQa: true });
+        Assert.Contains(families, family => family is { FamilyId: "visuals", Readiness: "Rendered QA needed", EvidenceLevel: "SampleCode", RequiresRenderedQa: true });
+        Assert.Contains(families, family => family is { FamilyId: "disclosure", EvidenceLevel: "RealWindowSmoke", RequiresRenderedQa: true });
+        Assert.Contains(families, family => family is { FamilyId: "materials", EvidenceLevel: "RuntimeDiagnostics", RequiresRenderedQa: true });
         Assert.Contains("Visual QA coverage", summary);
+        Assert.Contains("readiness-scored", summary);
+        Assert.Contains("need rendered QA", summary);
     }
 
     [Fact]
@@ -813,6 +826,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("GalleryVisualQaCoverageCatalog.CreateFamilies", sampleCode);
         Assert.Contains("GalleryVisualQaCoveragePage.CreateSnapshot", sampleCode);
         Assert.Contains("FormatFamilyCoverage", sampleCode);
+        Assert.Contains("HasReadinessEvidence", sampleCode);
+        Assert.Contains("RequiresRenderedQa", sampleCode);
         Assert.Contains("ContainsRegisteredSampleCodeKey", sampleCode);
         Assert.DoesNotContain("Generated from", sampleCode);
     }
@@ -831,6 +846,11 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(snapshot.CoversPage("windowbackdrops"));
         Assert.True(snapshot.HasSample("materials.windowbackdrop"));
         Assert.Contains("Materials and window backdrops", text);
+        Assert.Contains("Runtime diagnostic-ready", text);
+        Assert.Contains("RuntimeDiagnostics", text);
+        Assert.Contains("next action", text);
+        Assert.Contains("high contrast", text);
+        Assert.Contains("fallback brushes", text);
         Assert.Contains("high contrast", text);
         Assert.Contains("materials.windowbackdrop", text);
         Assert.IsAssignableFrom<UIElement>(content);

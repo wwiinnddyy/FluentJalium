@@ -19,6 +19,8 @@ Debug.WriteLine(GalleryVisualQaCoverageCatalog.FormatSnapshot(snapshot));
 foreach (var family in families)
 {
     Debug.WriteLine(GalleryVisualQaCoveragePage.FormatFamilyCoverage(family));
+    Debug.Assert(family.HasReadinessEvidence);
+    Debug.Assert(!family.RequiresRenderedQa || !string.IsNullOrWhiteSpace(family.NextAction));
     Debug.Assert(GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(family.SampleCodeKey));
 }
 """,
