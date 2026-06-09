@@ -1045,6 +1045,10 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("GalleryCatalogFilterSnapshot", document);
         Assert.Contains("validation summaries", document);
         Assert.Contains("Rendered Gallery QA pass", document);
+        Assert.Contains("phone/license-key formatting", document);
+        Assert.Contains("FormatPhoneRecipe", document);
+        Assert.Contains("FWMaskedTextBox", document);
+        Assert.Contains("missing automation, gesture/animation, or two-view contract evidence", document);
         Assert.Contains("FWSemanticZoom", document);
         Assert.Contains("FWFlipView", document);
         Assert.Contains("IFluentJaliumControl", document);
