@@ -870,14 +870,16 @@ Debug.WriteLine($"SelectorBar selected: {selectorDiagnostics.SelectedText}; inde
 var tabView = new FWTabView
 {
     TabWidthMode = FWTabViewWidthMode.SizeToContent,
-    CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always
+    CloseButtonOverlayMode = FWTabViewCloseButtonOverlayMode.Always,
+    CanReorderTabs = true
 };
 tabView.Items.Add(new FWTabViewItem { Header = "Overview", Content = "Overview content", IsClosable = false });
 tabView.Items.Add(new FWTabViewItem { Header = "Details", Content = "Details content" });
 tabView.SelectedIndex = 0;
+var movedTab = tabView.TryMoveTab(0, 1);
 
 var tabDiagnostics = tabView.GetDiagnostics();
-Debug.WriteLine($"TabView selected: {tabDiagnostics.SelectedHeader}; tabs: {tabDiagnostics.ItemCount}; close: {tabDiagnostics.CloseButtonOverlayMode}.");
+Debug.WriteLine($"TabView selected: {tabDiagnostics.SelectedHeader}; tabs: {tabDiagnostics.ItemCount}; close: {tabDiagnostics.CloseButtonOverlayMode}; reorder: {tabDiagnostics.CanReorderTabs}; moved: {movedTab}.");
 
 var shellQa = GalleryNavigationPage.CreateNavigationShellQaSnapshot(
     navigationService,

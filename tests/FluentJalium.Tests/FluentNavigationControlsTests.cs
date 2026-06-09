@@ -764,6 +764,55 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWTabView_TryMoveTab_ShouldRespectReorderFlagAndKeepSelection()
+    {
+        var overview = new FWTabViewItem
+        {
+            Header = "Overview",
+            Content = "Overview content"
+        };
+        var details = new FWTabViewItem
+        {
+            Header = "Details",
+            Content = "Details content"
+        };
+        var metrics = new FWTabViewItem
+        {
+            Header = "Metrics",
+            Content = "Metrics content"
+        };
+        var tabView = new FWTabView
+        {
+            CanReorderTabs = true
+        };
+        tabView.Items.Add(overview);
+        tabView.Items.Add(details);
+        tabView.Items.Add(metrics);
+        tabView.SelectedItem = details;
+
+        Assert.True(tabView.TryMoveTab(1, 0));
+
+        Assert.Same(details, tabView.Items[0]);
+        Assert.Same(overview, tabView.Items[1]);
+        Assert.Same(metrics, tabView.Items[2]);
+        Assert.Same(details, tabView.SelectedItem);
+        Assert.Equal(0, tabView.SelectedIndex);
+        Assert.Equal("Details content", tabView.SelectedContent);
+        Assert.True(details.IsSelected);
+        Assert.False(overview.IsSelected);
+
+        Assert.False(tabView.TryMoveTab(-1, 0));
+        Assert.False(tabView.TryMoveTab(0, 99));
+
+        tabView.CanReorderTabs = false;
+
+        Assert.False(tabView.TryMoveTab(0, 1));
+        Assert.Same(details, tabView.Items[0]);
+        Assert.Equal(0, tabView.GetDiagnostics().SelectedIndex);
+        Assert.True(tabView.GetDiagnostics().HasSelection);
+    }
+
+    [Fact]
     public void FWTabViewItem_ShouldExposeCloseButtonHitTesting()
     {
         var item = new FWTabViewItem

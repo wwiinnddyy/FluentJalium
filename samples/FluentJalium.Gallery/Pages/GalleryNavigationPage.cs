@@ -1196,6 +1196,13 @@ internal sealed class GalleryNavigationPage
                             }
                         }
                     }),
+                    CreateNavigationActionButton(FluentIconRegular.ArrowSort24, "Move", () =>
+                    {
+                        var oldIndex = tabView.SelectedIndex;
+                        var newIndex = oldIndex < tabView.Items.Count - 1 ? oldIndex + 1 : 0;
+                        var moved = tabView.TryMoveTab(oldIndex, newIndex);
+                        UpdateStatus(moved ? $"Moved tab {oldIndex}->{newIndex}" : "Move unavailable");
+                    }),
                     CreateNavigationActionButton(FluentIconRegular.TableResizeColumn24, "Width", () =>
                     {
                         tabView.TabWidthMode = tabView.TabWidthMode switch

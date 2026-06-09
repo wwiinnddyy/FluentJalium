@@ -245,6 +245,38 @@ public class FWTabView : Selector, IFluentJaliumControl
         return true;
     }
 
+    public bool TryMoveTab(int oldIndex, int newIndex)
+    {
+        var itemCount = GetItemCount();
+        if (!CanReorderTabs ||
+            ItemsSource != null ||
+            oldIndex < 0 ||
+            newIndex < 0 ||
+            oldIndex >= itemCount ||
+            newIndex >= itemCount)
+        {
+            return false;
+        }
+
+        if (oldIndex == newIndex)
+        {
+            return true;
+        }
+
+        var selectedItem = SelectedItem;
+        var tab = Items[oldIndex];
+        Items.RemoveAt(oldIndex);
+        Items.Insert(newIndex, tab);
+        SelectedItem = selectedItem;
+        if (selectedItem != null)
+        {
+            SelectedIndex = GetIndexOf(selectedItem);
+        }
+        UpdateContainerSelection();
+        InvalidateVisual();
+        return true;
+    }
+
     public FWTabViewDiagnostics GetDiagnostics()
     {
         return new FWTabViewDiagnostics(
