@@ -861,9 +861,11 @@ var selectorBar = new FWSelectorBar
 selectorBar.Items.Add(new FWSelectorBarItem { Text = "Overview" });
 selectorBar.Items.Add(new FWSelectorBarItem { Text = "Activity" });
 selectorBar.SelectedIndex = 0;
+var didSelectActivity = selectorBar.TrySelectIndex(1);
+var ignoredOutOfRange = selectorBar.TrySelectIndex(99);
 
 var selectorDiagnostics = selectorBar.GetDiagnostics();
-Debug.WriteLine($"SelectorBar selected: {selectorDiagnostics.SelectedText}; index: {selectorDiagnostics.SelectedIndex}/{selectorDiagnostics.ItemCount}.");
+Debug.WriteLine($"SelectorBar selected: {selectorDiagnostics.SelectedText}; index: {selectorDiagnostics.SelectedIndex}/{selectorDiagnostics.ItemCount}; selected activity: {didSelectActivity}; ignored out-of-range: {!ignoredOutOfRange}.");
 
 var tabView = new FWTabView
 {

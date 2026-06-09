@@ -1092,6 +1092,14 @@ internal sealed class GalleryNavigationPage
                     CreateNavigationActionButton(FluentIconRegular.Home24, "Overview", () => selectorBar.SelectItem(overviewItem)),
                     CreateNavigationActionButton(FluentIconRegular.Clock24, "Activity", () => selectorBar.SelectItem(activityItem)),
                     CreateNavigationActionButton(FluentIconRegular.Settings24, "Settings", () => selectorBar.SelectItem(settingsItem)),
+                    CreateNavigationActionButton(FluentIconRegular.ArrowRight24, "Next", () =>
+                    {
+                        var nextIndex = selectorBar.SelectedIndex < 0
+                            ? 0
+                            : (selectorBar.SelectedIndex + 1) % selectorBar.Items.Count;
+                        var selected = selectorBar.TrySelectIndex(nextIndex);
+                        UpdateStatus(selected ? "Next view selected" : "Next view unavailable");
+                    }),
                     CreateNavigationActionButton(FluentIconRegular.PanelLeft24, "Vertical", () =>
                     {
                         selectorBar.Orientation = selectorBar.Orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;

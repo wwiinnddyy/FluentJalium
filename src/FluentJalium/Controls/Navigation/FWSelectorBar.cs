@@ -65,6 +65,17 @@ public class FWSelectorBar : Selector, IFluentJaliumControl
         SelectedItem = item;
     }
 
+    public bool TrySelectIndex(int index)
+    {
+        if (index < 0 || index >= Items.Count)
+        {
+            return false;
+        }
+
+        SelectedIndex = index;
+        return true;
+    }
+
     public FWSelectorBarDiagnostics GetDiagnostics()
     {
         return new FWSelectorBarDiagnostics(

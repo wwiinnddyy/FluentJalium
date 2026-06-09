@@ -263,6 +263,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
         Assert.Contains("new FWSelectorBar", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("TrySelectIndex", sampleCode);
         Assert.Contains("SelectedText", sampleCode);
         Assert.Contains("SelectedHeader", sampleCode);
         Assert.Contains("ItemCount", sampleCode);

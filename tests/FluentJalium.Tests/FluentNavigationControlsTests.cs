@@ -938,6 +938,38 @@ public sealed class FluentNavigationControlsTests
     }
 
     [Fact]
+    public void FWSelectorBar_TrySelectIndex_ShouldSelectValidIndexAndIgnoreInvalidIndex()
+    {
+        var overview = new FWSelectorBarItem { Text = "Overview" };
+        var activity = new FWSelectorBarItem { Text = "Activity" };
+        var settings = new FWSelectorBarItem { Text = "Settings" };
+        var selectorBar = new FWSelectorBar();
+        var selectionChanged = 0;
+        selectorBar.SelectionChanged += (_, _) => selectionChanged++;
+        selectorBar.Items.Add(overview);
+        selectorBar.Items.Add(activity);
+        selectorBar.Items.Add(settings);
+
+        var selectedActivity = selectorBar.TrySelectIndex(1);
+        var ignoredNegative = selectorBar.TrySelectIndex(-1);
+        var ignoredOutOfRange = selectorBar.TrySelectIndex(99);
+        var diagnostics = selectorBar.GetDiagnostics();
+
+        Assert.True(selectedActivity);
+        Assert.False(ignoredNegative);
+        Assert.False(ignoredOutOfRange);
+        Assert.Equal(1, selectorBar.SelectedIndex);
+        Assert.Same(activity, selectorBar.SelectedItem);
+        Assert.False(overview.IsSelected);
+        Assert.True(activity.IsSelected);
+        Assert.False(settings.IsSelected);
+        Assert.Equal(1, selectionChanged);
+        Assert.Equal(1, diagnostics.SelectedIndex);
+        Assert.Equal("Activity", diagnostics.SelectedText);
+        Assert.True(diagnostics.HasSelection);
+    }
+
+    [Fact]
     public void FWSelectorBar_ShouldRejectNullSelectionAndIgnorePlainItemsForContainerSelection()
     {
         var overview = new FWSelectorBarItem
