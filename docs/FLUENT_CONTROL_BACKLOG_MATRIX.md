@@ -47,6 +47,7 @@ This matrix turns the Fluent control gap audit into an executable backlog. WinUI
 | P0 | Keep All/New/Updated/Preview/Diagnostic filters complete | WinUI Gallery-style discovery is now part of the product surface. | Every `GalleryCatalog` entry has factory, related controls, docs links, source path, registered sample key when applicable, group counts, source/sample/API counts, and complete navigation metadata in `GalleryCatalogFilterSnapshot`. |
 | P1 | Add scenario pages, not only control cards | Fluent Design System is about usable app patterns: navigation, settings, forms, status, data, and material layering. | Scenario pages combine 3-6 `FW*` controls and expose useful diagnostics without becoming marketing pages. |
 | P1 | Code/sample split | FluentAvalonia and WinUI Gallery both make samples inspectable; FluentJalium should keep registry code accurate. | `GallerySampleCodeRegistry` has assertions for every catalog `SampleCodeKey`, includes copyable family samples for charts, visuals, disclosure, and materials, and does not drift into fallback-generated samples. |
+| P1 | Control gap matrix | The remaining work is now mostly public-vs-recipe-vs-evaluate decisions, not raw type creation. | `Control Gap Matrix` footer diagnostics tracks first-wave public controls, rendered-QA gates, recipe-only candidates, Evaluate candidates, reference inputs, blockers, and sample-code keys. |
 | P1 | Visual QA checklist per control family | Many remaining gaps are visual/state confidence, not missing types. | Visual QA coverage Gallery entry/metadata keeps each family guarded by state, evidence, and sample key; each family has normal, hover, pressed, selected, disabled, focus, light/dark/high contrast, and density coverage where meaningful. |
 | P2 | Reference/source links | Users should jump from Gallery to docs/source quickly. | `GalleryControlInfo` exposes current source path, namespace, base classes, related controls, and docs links for all control families. |
 
@@ -56,7 +57,8 @@ This matrix turns the Fluent control gap audit into an executable backlog. WinUI
 2. Navigation app-shell walkthrough: demonstrates WPF UI/UI.WPF.Modern-inspired shell ergonomics with FluentJalium-native route diagnostics.
 3. Forms pattern Gallery page visual QA pass: validate dense, disabled, focus, validation summary, dirty/reset/save lifecycle, and async submit states after the baseline/data-form recipe page.
 4. Collection navigation evaluation: use the `AdvancedCollectionsPage` Gallery recipe evidence matrix to keep `FWSemanticZoom`, `FWFlipView`, and `FWItemsView` as prototypes until owned selection-model evidence, gesture/animation traces, two-view sync traces, and automation metadata are public-API ready.
-5. Rendered Gallery QA pass: use the richer catalog/filter/sample evidence to inspect charts, visuals, disclosure, and materials pages in a running Gallery before broadening more public API.
+5. Control Gap Matrix hardening: keep the diagnostics footer entry current as controls move between public FW surface, rendered-QA gate, Gallery recipe, and Evaluate states.
+6. Rendered Gallery QA pass: use the richer catalog/filter/sample evidence to inspect charts, visuals, disclosure, and materials pages in a running Gallery before broadening more public API.
 
 ## Guardrails
 

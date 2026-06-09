@@ -951,6 +951,109 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryControlGapCatalog_ShouldTrackPublicRecipeAndEvaluateCandidates()
+    {
+        var entries = GalleryControlGapCatalog.CreateEntries();
+        var snapshot = GalleryControlGapCatalog.CreateSnapshot();
+        var summary = GalleryControlGapCatalog.FormatSnapshot(snapshot);
+
+        Assert.True(entries.Count >= 18);
+        Assert.True(snapshot.PublicControlCount >= 10);
+        Assert.True(snapshot.RecipeOnlyCount >= 3);
+        Assert.True(snapshot.EvaluateCount >= 3);
+        Assert.True(snapshot.RenderedQaRequiredCount >= 4);
+        Assert.True(snapshot.P0Count >= 7);
+        Assert.True(snapshot.P1Count >= 5);
+        Assert.True(snapshot.P2Count >= 1);
+        Assert.True(snapshot.CoversArea("advancedcollections"));
+        Assert.True(snapshot.CoversArea("inputandmedia"));
+        Assert.True(snapshot.CoversReference("WinUI / WinUI Gallery"));
+        Assert.True(snapshot.CoversReference("WPF UI"));
+        Assert.True(snapshot.CoversReference("FluentAvalonia / Community Toolkit"));
+        Assert.True(snapshot.HasSample("advancedcollections.itemsrepeater"));
+        Assert.True(snapshot.HasSample("disclosure.taskdialog"));
+
+        Assert.Contains(entries, entry => entry is
+        {
+            CandidateControl: "FWFlyout / FWFlyoutPresenter",
+            Stage: GalleryControlGapStage.PublicFwControl,
+            Priority: "P0"
+        });
+        Assert.Contains(entries, entry => entry is
+        {
+            CandidateControl: "FWAutoSuggestBox",
+            Stage: GalleryControlGapStage.PublicFwControl,
+            SampleCodeKey: "textinput.autosuggestbox"
+        });
+        Assert.Contains(entries, entry => entry is
+        {
+            CandidateControl: "FWSettingsCard / FWSettingsExpander",
+            Stage: GalleryControlGapStage.RenderedQaRequired
+        });
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWItemsView" && entry.IsRecipeOnly);
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWFlipView" && entry.IsRecipeOnly);
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWSemanticZoom" && entry.IsRecipeOnly);
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWMaskedTextBox / FWForm" && entry.IsEvaluateOnly);
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWContactCard" && entry.IsEvaluateOnly);
+        Assert.Contains(entries, entry => entry.CandidateControl == "FWInkToolbar" && entry.IsEvaluateOnly);
+        Assert.All(entries, entry => Assert.True(entry.HasDecisionEvidence));
+        Assert.All(entries.Where(entry => entry.RequiresPublicApi), entry => Assert.NotEmpty(entry.RequiredBeforePublicApi));
+        Assert.Contains("Control gap matrix", summary);
+        Assert.Contains("public FW controls", summary);
+        Assert.Contains("recipe-only candidates", summary);
+        Assert.Contains("rendered-QA gates", summary);
+    }
+
+    [Fact]
+    public void GalleryControlGapPage_ShouldExposeDiagnosticFooterMetadataAndSampleCode()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var page = Assert.Single(pages, page => page.UniqueId == "controlgapmatrix");
+
+        Assert.Equal("Control Gap Matrix", page.Title);
+        Assert.Equal(GalleryNavigationGroup.Diagnostics, page.Group);
+        Assert.True(page.IsFooter);
+        Assert.True(page.IsUpdated);
+        Assert.Equal(GalleryPageStatus.Diagnostic, page.Status);
+        Assert.Equal("/GalleryDiagnostics/ControlGapMatrix", page.SourcePath);
+        Assert.Equal("FluentJalium.Gallery.Models", page.ApiNamespace);
+        Assert.Equal("diagnostics.controlgap.matrix", page.SampleCodeKey);
+        Assert.Contains("GalleryControlGapCatalog", page.RelatedControls);
+        Assert.Contains("GalleryControlGapSnapshot", page.BaseClasses!);
+        Assert.True(page.MatchesSearch("control gap evaluate"));
+        Assert.True(page.MatchesSearch("FluentAvalonia Community Toolkit"));
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("GalleryControlGapCatalog.CreateEntries", sampleCode);
+        Assert.Contains("GalleryControlGapPage.CreateSnapshot", sampleCode);
+        Assert.Contains("FormatGapEntry", sampleCode);
+        Assert.Contains("HasDecisionEvidence", sampleCode);
+        Assert.Contains("RequiredBeforePublicApi", sampleCode);
+        Assert.Contains("WinUI / WinUI Gallery", sampleCode);
+        Assert.DoesNotContain("Generated from", sampleCode);
+    }
+
+    [Fact]
+    public void GalleryControlGapPage_ShouldCreateSnapshotContentAndFormatEntries()
+    {
+        var page = new GalleryControlGapPage();
+        var snapshot = GalleryControlGapPage.CreateSnapshot();
+        var entry = Assert.Single(
+            GalleryControlGapCatalog.CreateEntries(),
+            entry => entry.CandidateControl == "FWInkToolbar");
+        var text = GalleryControlGapPage.FormatGapEntry(entry);
+        var content = page.CreateContent();
+
+        Assert.True(snapshot.CoversArea("inputandmedia"));
+        Assert.True(snapshot.HasSample("inputmedia.color.ink.media"));
+        Assert.Contains("FWInkToolbar", text);
+        Assert.Contains("Evaluate", text);
+        Assert.Contains("FWToolBar plus FWInkCanvas recipe", text);
+        Assert.Contains("Dedicated toolbar command model", text);
+        Assert.IsAssignableFrom<UIElement>(content);
+    }
+
+    [Fact]
     public void GalleryVisualQaCoveragePage_ShouldCreateSnapshotContentAndFormatFamilies()
     {
         var page = new GalleryVisualQaCoveragePage();

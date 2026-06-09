@@ -73,6 +73,7 @@ internal sealed class GalleryCatalogService
             [PageId("Status")] = () => CreatePageStack(new GalleryStatusPage().CreateContent()),
             [PageId("Design")] = () => CreatePageStack(new GalleryDesignPage().CreateContent()),
             [PageId("Settings")] = () => CreatePageStack(new GallerySettingsPage(applyTheme, applyAccent).CreateContent()),
+            [PageId("Control Gap Matrix")] = () => CreatePageStack(new GalleryControlGapPage().CreateContent()),
             [PageId("Visual QA Coverage")] = () => CreatePageStack(new GalleryVisualQaCoveragePage().CreateContent()),
             [PageId("State Matrix")] = () => CreatePageStack(new GalleryStateMatrixPage().CreateContent())
         };

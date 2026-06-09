@@ -24,7 +24,7 @@ This audit compares the current FluentJalium `FW*` surface with WinUI, WPF UI, U
 ### Gallery visibility gaps
 
 - Workflow depth: Gallery now covers the first-wave control/state matrix broadly; future visibility work should focus on longer end-to-end app patterns and diagnostics rather than raw page presence.
-- Metadata parity: first-wave Gallery pages now carry catalog metadata, registered sample-code keys, and factory coverage guards across control families; Visual QA coverage Gallery entry/metadata is now the diagnostic direction for per-family state/evidence/sample-key guards, while remaining Gallery work should focus on richer app-pattern walkthroughs and deeper visual QA rather than basic metadata.
+- Metadata parity: first-wave Gallery pages now carry catalog metadata, registered sample-code keys, and factory coverage guards across control families. Control Gap Matrix now tracks public FW surfaces, rendered-QA gates, recipe-only candidates, Evaluate candidates, reference inputs, blockers, and sample-code keys; Visual QA coverage remains the diagnostic direction for per-family state/evidence/sample-key guards.
 
 ### Semantic-depth gaps
 

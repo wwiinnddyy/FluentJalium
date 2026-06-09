@@ -24,6 +24,23 @@ foreach (var family in families)
     Debug.Assert(GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(family.SampleCodeKey));
 }
 """,
+        ["diagnostics.controlgap.matrix"] = """
+var entries = GalleryControlGapCatalog.CreateEntries();
+var snapshot = GalleryControlGapPage.CreateSnapshot();
+Debug.WriteLine(GalleryControlGapCatalog.FormatSnapshot(snapshot));
+
+foreach (var entry in entries)
+{
+    Debug.WriteLine(GalleryControlGapPage.FormatGapEntry(entry));
+    Debug.Assert(entry.HasDecisionEvidence);
+    Debug.Assert(GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(entry.SampleCodeKey));
+    Debug.Assert(entry.IsPublicFwControl || entry.RequiredBeforePublicApi.Length > 0 || entry.RequiresRenderedQa);
+}
+
+Debug.Assert(snapshot.CoversReference("WinUI / WinUI Gallery"));
+Debug.Assert(snapshot.CoversReference("FluentAvalonia / Community Toolkit"));
+Debug.Assert(snapshot.HasSample("advancedcollections.itemsrepeater"));
+""",
         ["design.themearchitecture"] = """
 FluentThemeManager.Apply(app);
 
