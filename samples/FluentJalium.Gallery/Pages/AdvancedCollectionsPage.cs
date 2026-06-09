@@ -71,6 +71,32 @@ public class AdvancedCollectionsPage : Page
         double HorizontalCacheLength,
         double VerticalCacheLength);
 
+    internal readonly record struct ItemsRepeaterVisualQaSnapshot(
+        string ProfileName,
+        string LastAction,
+        string ViewportSource,
+        string RealizedRange,
+        string RequestedRange,
+        string CacheSummary,
+        bool IsVirtualized,
+        bool HasViewportWindow,
+        bool HasStableRange,
+        bool HasCacheCoverage,
+        bool MatchesProfileAxis,
+        bool MatchesProfileScale,
+        bool HasAttachedViewport,
+        bool HasRecyclerEvidence)
+    {
+        public bool IsVisualQaReady =>
+            IsVirtualized
+            && HasViewportWindow
+            && HasStableRange
+            && HasCacheCoverage
+            && MatchesProfileAxis
+            && MatchesProfileScale
+            && HasAttachedViewport;
+    }
+
     internal enum CollectionRecipeKind
     {
         ItemsViewSelection,
@@ -922,7 +948,9 @@ public class AdvancedCollectionsPage : Page
             _repeaterScenarioText.Text = CreateItemsRepeaterScenarioText(_currentProfile, diagnostics, _lastQaAction);
         }
 
-        _repeaterDiagnosticsText.Text = CreateItemsRepeaterDiagnosticsText(diagnostics);
+        var visualQaSnapshot = CreateItemsRepeaterVisualQaSnapshot(_currentProfile, diagnostics, _lastQaAction);
+        _repeaterDiagnosticsText.Text =
+            $"{CreateItemsRepeaterDiagnosticsText(diagnostics)}{Environment.NewLine}{FormatItemsRepeaterVisualQa(visualQaSnapshot)}";
     }
 
     private void SeedViewportFromCurrentProfile()
@@ -1114,6 +1142,61 @@ public class AdvancedCollectionsPage : Page
 
         return
             $"Mode: {diagnostics.RealizationMode}/{diagnostics.RealizationSource} ({viewportState}) | QA: {virtualizationState} | Axis: {diagnostics.ViewportOrientation} | Items: {diagnostics.ItemCount} | Realized: {diagnostics.RealizedElementCount} | Requested: {requested} | Range: {range} | Viewport: {diagnostics.ViewportStart:0}-{diagnostics.ViewportStart + diagnostics.ViewportLength:0} @ {diagnostics.EstimatedItemExtent:0}px | Reused: {diagnostics.LastReusedElementCount} | Pool: {diagnostics.RecycledElementCount} | Cache: active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}";
+    }
+
+    internal static ItemsRepeaterVisualQaSnapshot CreateItemsRepeaterVisualQaSnapshot(
+        ItemsRepeaterGalleryProfile profile,
+        FWItemsRepeaterDiagnostics diagnostics,
+        string lastAction)
+    {
+        var realizedRange = diagnostics.HasRealizedElements
+            ? $"{diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}"
+            : "none";
+        var requestedRange = diagnostics.RequestedRealizedItemCount > 0
+            ? $"{diagnostics.RequestedFirstRealizedIndex}-{diagnostics.RequestedFirstRealizedIndex + diagnostics.RequestedRealizedItemCount - 1}"
+            : "none";
+        var viewportSource = diagnostics.IsViewportAttached
+            ? $"{diagnostics.AttachedViewportSource}/{diagnostics.AttachedViewportOrientation}"
+            : "detached";
+        var expectedActiveCache = diagnostics.ViewportOrientation == Orientation.Horizontal
+            ? diagnostics.HorizontalCacheLength
+            : diagnostics.VerticalCacheLength;
+        var hasStableRange =
+            diagnostics.HasRealizedElements
+            && diagnostics.FirstRealizedIndex >= 0
+            && diagnostics.LastRealizedIndex >= diagnostics.FirstRealizedIndex
+            && diagnostics.LastRealizedIndex < diagnostics.ItemCount;
+        var hasAttachedViewport =
+            diagnostics.IsViewportAttached
+            && diagnostics.AttachedViewportSource != FWItemsRepeaterViewportSource.None
+            && diagnostics.AttachedViewportOrientation == profile.Orientation;
+
+        return new ItemsRepeaterVisualQaSnapshot(
+            profile.Name,
+            lastAction,
+            viewportSource,
+            realizedRange,
+            requestedRange,
+            $"active {diagnostics.ActiveCacheLength:0}, H{diagnostics.HorizontalCacheLength:0}/V{diagnostics.VerticalCacheLength:0}",
+            diagnostics.ItemCount > 0
+                && diagnostics.RealizedElementCount > 0
+                && diagnostics.RealizedElementCount < diagnostics.ItemCount,
+            diagnostics.RealizationSource == FWItemsRepeaterRealizationSource.Viewport
+                && diagnostics.RequestedRealizedItemCount > 0
+                && diagnostics.ViewportLength > 0,
+            hasStableRange,
+            Math.Abs(diagnostics.ActiveCacheLength - expectedActiveCache) < 0.1
+                && diagnostics.EstimatedItemExtent > 0,
+            diagnostics.ViewportOrientation == profile.Orientation,
+            diagnostics.ItemCount == profile.ItemCount,
+            hasAttachedViewport,
+            diagnostics.LastReusedElementCount > 0 || diagnostics.RecycledElementCount > 0);
+    }
+
+    internal static string FormatItemsRepeaterVisualQa(ItemsRepeaterVisualQaSnapshot snapshot)
+    {
+        return
+            $"ItemsRepeater visual QA: ready {FormatOnOff(snapshot.IsVisualQaReady)} | profile {snapshot.ProfileName} | virtualized {FormatOnOff(snapshot.IsVirtualized)} | viewport {FormatOnOff(snapshot.HasViewportWindow)} | range {FormatOnOff(snapshot.HasStableRange)} ({snapshot.RealizedRange}) | requested {snapshot.RequestedRange} | cache {FormatOnOff(snapshot.HasCacheCoverage)} ({snapshot.CacheSummary}) | axis {FormatOnOff(snapshot.MatchesProfileAxis)} | scale {FormatOnOff(snapshot.MatchesProfileScale)} | attached {FormatOnOff(snapshot.HasAttachedViewport)} | recycler {(snapshot.HasRecyclerEvidence ? "seen" : "pending")} | source {snapshot.ViewportSource} | action {snapshot.LastAction}";
     }
 
     internal static CollectionRecipeState CreateCollectionRecipeState(CollectionRecipeKind kind)

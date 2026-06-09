@@ -284,6 +284,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("AttachViewport", sampleCode);
         Assert.Contains("FWItemsRepeaterDiagnostics", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
+        Assert.Contains("CreateItemsRepeaterVisualQaSnapshot", sampleCode);
+        Assert.Contains("FormatItemsRepeaterVisualQa", sampleCode);
         Assert.Contains("ItemsViewSelection", sampleCode);
         Assert.Contains("FlipViewPaging", sampleCode);
         Assert.Contains("SemanticZoomGrouping", sampleCode);

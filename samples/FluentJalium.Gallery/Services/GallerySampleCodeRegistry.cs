@@ -649,8 +649,18 @@ scroller.AttachScrollViewer(scrollViewer);
 repeater.AttachViewport(scroller);
 repeater.ApplyViewport(2560, 480);
 FWItemsRepeaterDiagnostics diagnostics = repeater.GetDiagnostics();
+var largeListProfile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+    AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.LargeListStress);
+var largeListQa = AdvancedCollectionsPage.CreateItemsRepeaterVisualQaSnapshot(
+    largeListProfile,
+    diagnostics,
+    "Applied large-list stress");
 Debug.WriteLine($"Stress viewport: {diagnostics.AttachedViewportSource}; items {diagnostics.ItemCount}; window {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}; cache {diagnostics.ActiveCacheLength}.");
+Debug.WriteLine(AdvancedCollectionsPage.FormatItemsRepeaterVisualQa(largeListQa));
 
+var horizontalProfile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+    AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.HorizontalVirtualization);
+repeater.ItemsSource = AdvancedCollectionsPage.CreateItemsRepeaterSampleItems(horizontalProfile);
 repeater.Layout = new StackLayout
 {
     Orientation = Orientation.Horizontal,
@@ -662,7 +672,12 @@ repeater.EstimatedItemExtent = 180;
 repeater.AttachViewport(scrollViewer, Orientation.Horizontal);
 repeater.ApplyViewport(720, 540, Orientation.Horizontal);
 diagnostics = repeater.GetDiagnostics();
+var horizontalQa = AdvancedCollectionsPage.CreateItemsRepeaterVisualQaSnapshot(
+    horizontalProfile,
+    diagnostics,
+    "Applied horizontal virtualization");
 Debug.WriteLine($"Horizontal QA: {diagnostics.AttachedViewportSource}/{diagnostics.AttachedViewportOrientation}; window {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}; cache H{diagnostics.HorizontalCacheLength}/V{diagnostics.VerticalCacheLength}.");
+Debug.WriteLine(AdvancedCollectionsPage.FormatItemsRepeaterVisualQa(horizontalQa));
 
 repeater.AttachViewport(scroller, Orientation.Horizontal);
 repeater.RealizeRange(0, 5);

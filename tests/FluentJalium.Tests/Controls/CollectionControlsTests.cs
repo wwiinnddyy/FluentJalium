@@ -816,6 +816,50 @@ public class CollectionControlsTests
     }
 
     [Fact]
+    public void GalleryItemsRepeaterVisualQa_ShouldSummarizeViewportCacheRangeAndAttachment()
+    {
+        // Arrange
+        var profile = AdvancedCollectionsPage.CreateItemsRepeaterQaProfile(
+            AdvancedCollectionsPage.ItemsRepeaterGalleryScenario.LargeListStress);
+        var scrollViewer = CreateScrollViewer(viewportHeight: 480, contentHeight: 9600);
+        var scroller = new FWScroller();
+        scroller.AttachScrollViewer(scrollViewer);
+        var repeater = CreateRepeaterFromGalleryProfile(profile);
+
+        // Act
+        repeater.AttachViewport(scroller, profile.Orientation);
+        scroller.ScrollTo(0, profile.ViewportStart);
+        var diagnostics = repeater.GetDiagnostics();
+        var snapshot = AdvancedCollectionsPage.CreateItemsRepeaterVisualQaSnapshot(
+            profile,
+            diagnostics,
+            "Applied large-list stress");
+        var text = AdvancedCollectionsPage.FormatItemsRepeaterVisualQa(snapshot);
+
+        // Assert
+        Assert.True(snapshot.IsVisualQaReady);
+        Assert.True(snapshot.IsVirtualized);
+        Assert.True(snapshot.HasViewportWindow);
+        Assert.True(snapshot.HasStableRange);
+        Assert.True(snapshot.HasCacheCoverage);
+        Assert.True(snapshot.MatchesProfileAxis);
+        Assert.True(snapshot.MatchesProfileScale);
+        Assert.True(snapshot.HasAttachedViewport);
+        Assert.Equal("Scroller/Vertical", snapshot.ViewportSource);
+        Assert.Contains("ItemsRepeater visual QA", text);
+        Assert.Contains("ready on", text);
+        Assert.Contains("virtualized on", text);
+        Assert.Contains("viewport on", text);
+        Assert.Contains("range on", text);
+        Assert.Contains("cache on", text);
+        Assert.Contains("axis on", text);
+        Assert.Contains("scale on", text);
+        Assert.Contains("attached on", text);
+        Assert.Contains("source Scroller/Vertical", text);
+        Assert.Contains("action Applied large-list stress", text);
+    }
+
+    [Fact]
     public void GalleryHorizontalProfile_ShouldUseHorizontalCacheAndLayout()
     {
         // Arrange
