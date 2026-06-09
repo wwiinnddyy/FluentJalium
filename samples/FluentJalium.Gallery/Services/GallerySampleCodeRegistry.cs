@@ -1070,6 +1070,31 @@ Debug.WriteLine($"Inactive window material: {inactiveEnvironment.FallbackState};
 Debug.WriteLine($"Unsupported host fallback: {unsupportedHostEnvironment.FallbackState}; supported: {unsupportedHostEnvironment.IsHostBackdropSupported}.");
 """,
         ["materials.derivedsurfaces"] = """
+var layer = new FWLayerSurface
+{
+    Child = new FWTextBlock { Text = "Layer content" }
+};
+
+var mica = new FWMicaSurface
+{
+    Child = new FWTextBlock { Text = "Long-lived shell region" }
+};
+
+var micaAlt = new FWMicaAltSurface
+{
+    Child = new FWTextBlock { Text = "Tabbed pane region" }
+};
+
+var acrylic = new FWAcrylicSurface
+{
+    Child = new FWButton { Content = "Transient command" }
+};
+
+var frostedGlass = new FWFrostedGlassSurface
+{
+    Child = new FWTextBlock { Text = "Soft preview media" }
+};
+
 var card = new FWCardSurface
 {
     Child = new FWTextBlock { Text = "Stable card content" }
@@ -1091,22 +1116,50 @@ var windowSurface = new FWFluentWindowSurface
     WindowMaterialProfile = FWFluentWindowMaterialProfile.MicaShell,
     WindowBackdropKind = FWFluentWindowBackdropKind.Mica
 };
+
+var acrylicRecipe = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.Acrylic);
+acrylic.UseMaterialRecipe(acrylicRecipe);
+
+var focusRecipe = FWFluentMaterialRecipe.Create(FWFluentMaterialKind.LiquidGlass);
+focusGlass.UseMaterialRecipe(focusRecipe);
+
+Debug.WriteLine($"Derived surface recipes: layer {layer.MaterialKind}, mica {mica.MaterialKind}, acrylic blur {acrylicRecipe.BlurRadius}, focus {focusGlass.MaterialKind}.");
 """,
         ["materialprimitives.backdrop"] = """
+var micaBackdrop = new FWBackdrop
+{
+    Type = FWBackdropType.Mica,
+    TintColor = Color.FromRgb(0xF3, 0xF3, 0xF3),
+    TintOpacity = 0.8,
+    LuminosityOpacity = 0.85,
+    FallbackColor = Color.FromRgb(0xF8, 0xF8, 0xF8)
+};
+
+var forcedFallback = new FWBackdrop
+{
+    Type = FWBackdropType.Acrylic,
+    AlwaysUseFallback = true,
+    FallbackColor = Color.FromRgb(0x20, 0x20, 0x20)
+};
+
+var solidFallback = new FWBackdrop
+{
+    Type = FWBackdropType.None,
+    FallbackColor = Color.FromRgb(0xFA, 0xFA, 0xFA)
+};
+
 var surface = new FWBorder
 {
     Width = 320,
     Height = 180,
     CornerRadius = new CornerRadius(8),
     ClipToBounds = true,
-    Child = new FWBackdrop
-    {
-        Type = FWBackdropType.Mica,
-        TintColor = Color.FromRgb(0xF3, 0xF3, 0xF3),
-        TintOpacity = 0.8,
-        LuminosityOpacity = 0.85
-    }
+    Child = micaBackdrop
 };
+
+Debug.WriteLine($"Backdrop primitive QA: type {micaBackdrop.Type}, tint {micaBackdrop.TintOpacity}, fallback {micaBackdrop.FallbackColor}.");
+Debug.WriteLine($"Forced fallback QA: always {forcedFallback.AlwaysUseFallback}, type {forcedFallback.Type}, color {forcedFallback.FallbackColor}.");
+Debug.WriteLine($"Solid fallback QA: type {solidFallback.Type}, color {solidFallback.FallbackColor}.");
 """,
         ["animatedcontrols.motion"] = """
 var icon = new FWAnimatedIcon

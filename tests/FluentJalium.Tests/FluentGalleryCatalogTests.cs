@@ -541,6 +541,49 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeDerivedSurfaceFamilySample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "materialsand effects".Replace(" ", string.Empty));
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWLayerSurface", sampleCode);
+        Assert.Contains("new FWMicaSurface", sampleCode);
+        Assert.Contains("new FWMicaAltSurface", sampleCode);
+        Assert.Contains("new FWAcrylicSurface", sampleCode);
+        Assert.Contains("new FWFrostedGlassSurface", sampleCode);
+        Assert.Contains("new FWCardSurface", sampleCode);
+        Assert.Contains("new FWFlyoutSurface", sampleCode);
+        Assert.Contains("new FWFocusGlassSurface", sampleCode);
+        Assert.Contains("new FWFluentWindowSurface", sampleCode);
+        Assert.Contains("FWFluentMaterialRecipe.Create", sampleCode);
+        Assert.Contains("FWFluentMaterialKind.Acrylic", sampleCode);
+        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
+        Assert.Contains("UseMaterialRecipe", sampleCode);
+        Assert.Contains("Derived surface recipes", sampleCode);
+    }
+
+    [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeBackdropPrimitiveFallbackSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "materialprimitives");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWBackdrop", sampleCode);
+        Assert.Contains("FWBackdropType.Mica", sampleCode);
+        Assert.Contains("FWBackdropType.Acrylic", sampleCode);
+        Assert.Contains("FWBackdropType.None", sampleCode);
+        Assert.Contains("FallbackColor", sampleCode);
+        Assert.Contains("AlwaysUseFallback = true", sampleCode);
+        Assert.Contains("Backdrop primitive QA", sampleCode);
+        Assert.Contains("Forced fallback QA", sampleCode);
+        Assert.Contains("Solid fallback QA", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeAdvancedInteractionScrollerDiagnosticsSample()
     {
         var page = Assert.Single(
