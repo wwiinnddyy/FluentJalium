@@ -547,33 +547,113 @@ FWParallaxViewDiagnostics parallaxDiagnostics = parallaxView.GetDiagnostics();
 Debug.WriteLine($"Parallax diagnostics: source {parallaxDiagnostics.SourceKind}; progress {parallaxDiagnostics.Progress:P0}; offset {parallaxDiagnostics.CurrentOffset}.");
 """,
         ["visuals.icons.richtext.personpicture.markdown.qrcode.shapes"] = """
+var person = new FWPersonPicture
+{
+    DisplayName = "Rhea Holloway",
+    Initials = "RH",
+    BadgeNumber = 2,
+    Width = 64,
+    Height = 64
+};
+
+var markdown = new FWMarkdown
+{
+    Width = 320,
+    Text = "### Fluent visuals\nUse [Markdown](https://jalium.dev/fluent), QR, avatar, and icon primitives together.",
+    OpenLinksExternally = false
+};
+
+markdown.LinkClicked += (_, args) =>
+{
+    args.Handled = true;
+    Debug.WriteLine($"Markdown link handled: {args.Uri}");
+};
+
+var qrCode = new FWQRCode
+{
+    Text = "https://jalium.dev/fluent",
+    Width = 128,
+    Height = 128,
+    QuietZoneModules = 3,
+    ErrorCorrectionLevel = QRCodeErrorCorrectionLevel.Q,
+    ModuleShape = QRModuleShape.RoundedSquare,
+    EyeShape = QREyeShape.Rounded
+};
+
+var accentStroke = ThemeBrush("AccentFillColorDefaultBrush");
+var translucentFill = ThemeBrush("AccentFillColorSelectedTextBackgroundBrush");
+var rectangle = new FWRectangle
+{
+    Width = 84,
+    Height = 52,
+    RadiusX = 8,
+    RadiusY = 8,
+    Fill = translucentFill,
+    Stroke = accentStroke,
+    StrokeThickness = 1.5
+};
+var ellipse = new FWEllipse
+{
+    Width = 58,
+    Height = 58,
+    Fill = translucentFill,
+    Stroke = accentStroke,
+    StrokeThickness = 1.5
+};
+var line = new FWLine
+{
+    X1 = 4,
+    Y1 = 42,
+    X2 = 84,
+    Y2 = 10,
+    Stroke = accentStroke,
+    StrokeThickness = 3
+};
+var polyline = new FWPolyline
+{
+    Points = ShapePointCollection.Parse("0,40 18,14 38,34 58,8 82,28"),
+    Stroke = accentStroke,
+    StrokeThickness = 3
+};
+var polygon = new FWPolygon
+{
+    Points = ShapePointCollection.Parse("8,44 28,8 52,22 74,44"),
+    Fill = translucentFill,
+    Stroke = accentStroke,
+    StrokeThickness = 1.5
+};
+var path = new FWPath
+{
+    Data = "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20",
+    Fill = translucentFill,
+    Stroke = accentStroke,
+    StrokeThickness = 1.5
+};
+
+var shapeQa = GalleryVisualsPage.CreateShapeControlsQaSnapshot(
+    rectangle,
+    ellipse,
+    line,
+    polyline,
+    polygon,
+    path);
+Debug.WriteLine(GalleryVisualsPage.FormatShapeControlsVisualQa("Shape controls QA", shapeQa));
+
 var visuals = new FWStackPanel
 {
     Orientation = Orientation.Vertical,
     Spacing = 12,
     Children =
     {
-        new FWPersonPicture
-        {
-            DisplayName = "Rhea Holloway",
-            Initials = "RH",
-            BadgeNumber = 2,
-            Width = 64,
-            Height = 64
-        },
-        new FWMarkdown
-        {
-            Width = 320,
-            Text = "### Fluent visuals\nUse Markdown, QR, avatar, and icon primitives together."
-        },
-        new FWQRCode
-        {
-            Text = "https://jalium.dev/fluent",
-            Width = 128,
-            Height = 128,
-            QuietZoneModules = 3,
-            ErrorCorrectionLevel = QRCodeErrorCorrectionLevel.Q
-        }
+        person,
+        markdown,
+        qrCode,
+        rectangle,
+        ellipse,
+        line,
+        polyline,
+        polygon,
+        path
     }
 };
 """,

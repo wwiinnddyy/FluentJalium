@@ -370,6 +370,35 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeVisualsDeepSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "visuals");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWPersonPicture", sampleCode);
+        Assert.Contains("new FWMarkdown", sampleCode);
+        Assert.Contains("LinkClicked", sampleCode);
+        Assert.Contains("args.Handled = true", sampleCode);
+        Assert.Contains("new FWQRCode", sampleCode);
+        Assert.Contains("QRCodeErrorCorrectionLevel.Q", sampleCode);
+        Assert.Contains("QRModuleShape.RoundedSquare", sampleCode);
+        Assert.Contains("QREyeShape.Rounded", sampleCode);
+        Assert.Contains("QuietZoneModules = 3", sampleCode);
+        Assert.Contains("new FWRectangle", sampleCode);
+        Assert.Contains("new FWEllipse", sampleCode);
+        Assert.Contains("new FWLine", sampleCode);
+        Assert.Contains("new FWPolyline", sampleCode);
+        Assert.Contains("new FWPolygon", sampleCode);
+        Assert.Contains("new FWPath", sampleCode);
+        Assert.Contains("ShapePointCollection.Parse", sampleCode);
+        Assert.Contains("CreateShapeControlsQaSnapshot", sampleCode);
+        Assert.Contains("FormatShapeControlsVisualQa", sampleCode);
+        Assert.Contains("Shape controls QA", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeSplitViewAndSettingsCardLayoutSample()
     {
         var page = Assert.Single(
