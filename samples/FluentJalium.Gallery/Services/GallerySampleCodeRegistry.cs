@@ -271,6 +271,67 @@ var progress = new FWProgressBar
     Visibility = Visibility.Collapsed
 };
 
+var dataTitle = new FWTextBox
+{
+    PlaceholderText = "Task title",
+    Text = "Gallery release checklist"
+};
+var dataHours = new FWNumberBox
+{
+    Minimum = 0,
+    Maximum = 24,
+    Value = 6,
+    PlaceholderText = "Hours"
+};
+var dataOwner = new FWAutoSuggestBox
+{
+    ItemsSource = new[] { "Design Systems", "Platform Engineering", "Gallery Operations" },
+    FilterMode = AutoCompleteFilterMode.Contains,
+    MinimumPrefixLength = 1,
+    Text = "Gallery Operations"
+};
+var validationSummary = new FWInfoBar
+{
+    Title = "Validation summary",
+    IsOpen = true
+};
+var isDirty = false;
+var isSaving = false;
+
+ValidationIssue[] issues = CreateDataFormValidationIssues(
+    dataTitle.Text,
+    dataHours.Value,
+    dataOwner.Text,
+    requiresReview: true);
+validationSummary.Message = FormatDataFormValidationSummary(
+    "Data form validation recipe",
+    issues,
+    isDirty,
+    isSaving);
+
+void ResetDataFormDraft()
+{
+    dataTitle.Text = "Gallery release checklist";
+    dataHours.Value = 6;
+    dataOwner.SetQueryText("Gallery Operations", FWAutoSuggestBoxTextChangeReason.ProgrammaticChange);
+    isDirty = false;
+}
+
+async Task SaveDataFormDraftAsync()
+{
+    issues = CreateDataFormValidationIssues(dataTitle.Text, dataHours.Value, dataOwner.Text, requiresReview: true);
+    validationSummary.Message = FormatDataFormValidationSummary("SaveDataFormDraftAsync", issues, isDirty, isSaving);
+    if (issues.Length > 0)
+    {
+        return;
+    }
+
+    isSaving = true;
+    await Task.Delay(120);
+    isDirty = false;
+    isSaving = false;
+}
+
 var submitCard = new FWSettingsCard
 {
     Header = "Submit action",

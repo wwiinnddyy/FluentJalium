@@ -502,12 +502,80 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("new FWSettingsCard", sampleCode);
         Assert.Contains("new FWProgressBar", sampleCode);
         Assert.Contains("new FWButton", sampleCode);
+        Assert.Contains("new FWNumberBox", sampleCode);
+        Assert.Contains("ValidationIssue", sampleCode);
+        Assert.Contains("validation summary", sampleCode, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("isDirty", sampleCode);
+        Assert.Contains("ResetDataFormDraft", sampleCode);
+        Assert.Contains("SaveDataFormDraftAsync", sampleCode);
+        Assert.Contains("CreateDataFormValidationIssues", sampleCode);
+        Assert.Contains("FormatDataFormValidationSummary", sampleCode);
         Assert.Contains("RunSubmitAsync", sampleCode);
         Assert.Contains("Disable reviewer fields", sampleCode);
         Assert.Contains("Focus QA", sampleCode);
         Assert.Contains("Forms visual QA", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
         Assert.Contains("forms.submit", sampleCode);
+        Assert.DoesNotContain("new FWForm", sampleCode);
+    }
+
+    [Fact]
+    public void GalleryFormsPage_ShouldCreateDataFormValidationSnapshots()
+    {
+        var invalidIssues = GalleryFormsPage.CreateDataFormValidationIssues(
+            title: "",
+            hours: 0,
+            owner: "",
+            requiresReview: true);
+
+        Assert.Contains(invalidIssues, issue => issue.Field == "Title" && issue.Severity == InfoBarSeverity.Error);
+        Assert.Contains(invalidIssues, issue => issue.Field == "Hours" && issue.Severity == InfoBarSeverity.Error);
+        Assert.Contains(invalidIssues, issue => issue.Field == "Owner" && issue.Severity == InfoBarSeverity.Error);
+
+        var invalidSnapshot = GalleryFormsPage.CreateDataFormRecipeSnapshot(
+            "Validate",
+            invalidIssues,
+            isDirty: true,
+            isSaving: false);
+
+        Assert.True(invalidSnapshot.IsDirty);
+        Assert.False(invalidSnapshot.IsSaving);
+        Assert.Equal(3, invalidSnapshot.IssueCount);
+        Assert.Equal(InfoBarSeverity.Error, invalidSnapshot.Severity);
+        Assert.Contains("Draft is dirty", invalidSnapshot.Summary);
+        Assert.Contains("Title is required", invalidSnapshot.Summary);
+
+        var warningIssues = GalleryFormsPage.CreateDataFormValidationIssues(
+            title: "Long QA run",
+            hours: 13,
+            owner: "Gallery Operations",
+            requiresReview: true);
+
+        var warningSnapshot = GalleryFormsPage.CreateDataFormRecipeSnapshot(
+            "Validate",
+            warningIssues,
+            isDirty: true,
+            isSaving: false);
+
+        Assert.Single(warningIssues);
+        Assert.Equal(InfoBarSeverity.Warning, warningSnapshot.Severity);
+        Assert.Contains("split before save", warningSnapshot.Summary);
+
+        var validIssues = GalleryFormsPage.CreateDataFormValidationIssues(
+            title: "Release checklist",
+            hours: 6,
+            owner: "",
+            requiresReview: false);
+
+        var savingSnapshot = GalleryFormsPage.CreateDataFormRecipeSnapshot(
+            "SaveDataFormDraftAsync",
+            validIssues,
+            isDirty: true,
+            isSaving: true);
+
+        Assert.Empty(validIssues);
+        Assert.Equal(InfoBarSeverity.Informational, savingSnapshot.Severity);
+        Assert.Contains("ready to save", savingSnapshot.Summary);
     }
 
     [Fact]

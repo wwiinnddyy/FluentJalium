@@ -11,6 +11,8 @@ using FWButton = FluentJalium.Controls.FWButton;
 using FWCheckBox = FluentJalium.Controls.FWCheckBox;
 using FWInfoBar = FluentJalium.Controls.FWInfoBar;
 using FWLabel = FluentJalium.Controls.FWLabel;
+using FWNumberBox = FluentJalium.Controls.FWNumberBox;
+using FWNumberBoxDensity = FluentJalium.Controls.FWNumberBoxDensity;
 using FWProgressBar = FluentJalium.Controls.FWProgressBar;
 using FWRangeDensity = FluentJalium.Controls.FWRangeDensity;
 using FWRadioButtons = FluentJalium.Controls.FWRadioButtons;
@@ -29,6 +31,16 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GalleryFormsPage
 {
+    internal readonly record struct ValidationIssue(string Field, string Message, InfoBarSeverity Severity);
+
+    internal readonly record struct DataFormRecipeSnapshot(
+        string Action,
+        bool IsDirty,
+        bool IsSaving,
+        int IssueCount,
+        InfoBarSeverity Severity,
+        string Summary);
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Forms");
@@ -51,6 +63,13 @@ internal sealed class GalleryFormsPage
             "SettingsCard rows coordinate switches, optional fields, compact density, command diagnostics, and a form summary InfoBar.",
             CreateSubmissionSettingsSample(),
             CreateSampleCode("Submission settings"),
+            width: 680));
+        examples.Children.Add(CreateFormsExampleCard(
+            FluentIconRegular.DocumentBulletList24,
+            "Data form validation recipe",
+            "Recipe-first data entry pattern with validation summary, dirty state, reset, and save lifecycle built from existing FW controls.",
+            CreateDataFormValidationRecipeSample(),
+            CreateSampleCode("Data form validation recipe"),
             width: 680));
 
         panel.Children.Add(examples);
@@ -175,6 +194,198 @@ internal sealed class GalleryFormsPage
                         accountType.SelectedIndex = 0;
                         ApplyValidation("Reset");
                     })),
+                CreateFormsStatus(output)
+            }
+        };
+    }
+
+    private static UIElement CreateDataFormValidationRecipeSample()
+    {
+        var initialTitle = "Gallery release checklist";
+        var initialHours = 6.0;
+        var initialOwner = "Gallery Operations";
+        var initialRequiresReview = true;
+        var isDirty = false;
+        var isSaving = false;
+
+        var output = CreateFormsOutput("Data form recipe ready. No changes have been made.");
+        var dirtyStatus = CreateFormsOutput("Dirty state: clean. Reset disabled until a field changes.");
+        var lifecycleStatus = CreateFormsOutput("Save lifecycle: idle. Validation summary is ready.");
+        var title = new FWTextBox
+        {
+            Text = initialTitle,
+            Width = 260,
+            PlaceholderText = "Task title",
+            Density = FWTextInputDensity.Comfortable
+        };
+        var hours = new FWNumberBox
+        {
+            Width = 180,
+            Minimum = 0,
+            Maximum = 24,
+            SmallChange = 0.5,
+            LargeChange = 2,
+            Value = initialHours,
+            PlaceholderText = "Hours",
+            Density = FWNumberBoxDensity.Comfortable,
+            SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline
+        };
+        var owner = new FWAutoSuggestBox
+        {
+            Text = initialOwner,
+            Width = 260,
+            ItemsSource = TeamSuggestions,
+            PlaceholderText = "Owner team",
+            FilterMode = AutoCompleteFilterMode.Contains,
+            MinimumPrefixLength = 1,
+            Density = FWTextInputDensity.Comfortable
+        };
+        var requiresReview = new FWToggleSwitch
+        {
+            IsOn = initialRequiresReview,
+            OnContent = "Review",
+            OffContent = "Draft",
+            Density = FWSwitchDensity.Comfortable
+        };
+        var validationSummary = new FWInfoBar
+        {
+            Title = "Validation summary",
+            Message = "No issues. Ready to save.",
+            Severity = InfoBarSeverity.Success,
+            IsOpen = true,
+            IsClosable = false,
+            Width = 566
+        };
+        var resetCard = new FWSettingsCard
+        {
+            Header = "Reset data form draft",
+            Description = "Restore the draft values and clear the dirty state.",
+            HeaderIcon = CreateIcon(FluentIconRegular.DismissCircle24, 20, ThemeBrush("TextPrimary")),
+            Content = new FWTextBlock
+            {
+                Text = "Clean",
+                Foreground = ThemeBrush("TextSecondary")
+            },
+            IsClickEnabled = true,
+            CommandParameter = "forms.data.reset",
+            ClickMode = ClickMode.Release
+        };
+        var saveCard = new FWSettingsCard
+        {
+            Header = "Save data form draft",
+            Description = "Validate required fields, show the summary, and simulate an async save.",
+            HeaderIcon = CreateIcon(FluentIconRegular.Save24, 20, ThemeBrush("TextPrimary")),
+            Content = new FWTextBlock
+            {
+                Text = "Idle",
+                Foreground = ThemeBrush("TextSecondary")
+            },
+            IsClickEnabled = true,
+            CommandParameter = "forms.data.save",
+            ClickMode = ClickMode.Release
+        };
+
+        DataFormRecipeSnapshot RefreshRecipe(string action)
+        {
+            var issues = CreateDataFormValidationIssues(title.Text, hours.Value, owner.Text, requiresReview.IsOn);
+            var snapshot = CreateDataFormRecipeSnapshot(action, issues, isDirty, isSaving);
+            validationSummary.Severity = snapshot.Severity;
+            validationSummary.Title = snapshot.IssueCount == 0 ? "Validation summary" : "Review validation summary";
+            validationSummary.Message = snapshot.Summary;
+            resetCard.IsEnabled = isDirty && !isSaving;
+            saveCard.IsEnabled = !isSaving && issues.Length == 0;
+            resetCard.Content = new FWTextBlock
+            {
+                Text = isDirty ? "Dirty" : "Clean",
+                Foreground = ThemeBrush("TextSecondary")
+            };
+            saveCard.Content = new FWTextBlock
+            {
+                Text = isSaving ? "Saving" : issues.Length == 0 ? "Ready" : "Blocked",
+                Foreground = ThemeBrush("TextSecondary")
+            };
+            dirtyStatus.Text = $"Dirty state: {(isDirty ? "dirty" : "clean")}. Reset enabled {FormatOnOff(resetCard.IsEnabled)}.";
+            lifecycleStatus.Text = $"Save lifecycle: {(isSaving ? "saving" : "idle")}. Issues {snapshot.IssueCount}; severity {snapshot.Severity}.";
+            output.Text = $"{action}: {snapshot.Summary}";
+            return snapshot;
+        }
+
+        void MarkDirty(string reason)
+        {
+            isDirty = true;
+            RefreshRecipe(reason);
+        }
+
+        void ResetDataFormDraft()
+        {
+            title.Text = initialTitle;
+            hours.Value = initialHours;
+            owner.SetQueryText(initialOwner, FWAutoSuggestBoxTextChangeReason.ProgrammaticChange);
+            requiresReview.IsOn = initialRequiresReview;
+            isDirty = false;
+            isSaving = false;
+            RefreshRecipe("ResetDataFormDraft");
+        }
+
+        async Task SaveDataFormDraftAsync()
+        {
+            var snapshot = RefreshRecipe("SaveDataFormDraftAsync validation");
+            if (snapshot.IssueCount > 0)
+            {
+                return;
+            }
+
+            isSaving = true;
+            RefreshRecipe("SaveDataFormDraftAsync started");
+            await Task.Delay(120);
+            isDirty = false;
+            isSaving = false;
+            RefreshRecipe("SaveDataFormDraftAsync completed");
+        }
+
+        resetCard.Command = new GalleryFormsCommand(_ => ResetDataFormDraft());
+        saveCard.Command = new GalleryFormsCommand(_ => _ = SaveDataFormDraftAsync());
+        title.TextChanged += (_, _) => MarkDirty("Title changed");
+        hours.ValueChanged += (_, _) => MarkDirty("Hours changed");
+        owner.TextChanged += (_, _) => MarkDirty("Owner changed");
+        owner.QuerySubmitted += (_, _) => MarkDirty("Owner submitted");
+        requiresReview.Toggled += (_, _) => MarkDirty("Review mode changed");
+        RefreshRecipe("Data form validation recipe initialized");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 16,
+                    VerticalSpacing = 12,
+                    Children =
+                    {
+                        CreateField("Title", title, 'L'),
+                        CreateField("Hours", hours, 'H'),
+                        CreateField("Owner", owner, 'O'),
+                        CreateSettingsRow(FluentIconRegular.CheckmarkCircle24, "Review mode", "Require a non-empty owner before save.", requiresReview)
+                    }
+                },
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 12,
+                    VerticalSpacing = 12,
+                    Children =
+                    {
+                        new FWBorder { Width = 274, Child = resetCard },
+                        new FWBorder { Width = 274, Child = saveCard }
+                    }
+                },
+                validationSummary,
+                CreateFormsButtonRow(
+                    CreateFormsActionButton(FluentIconRegular.CheckmarkCircle24, "Validate", () => RefreshRecipe("Validate data form")),
+                    CreateFormsActionButton(FluentIconRegular.DismissCircle24, "Reset", ResetDataFormDraft),
+                    CreateFormsActionButton(FluentIconRegular.Save24, "Save", () => _ = SaveDataFormDraftAsync())),
+                CreateFormsQaPanel(dirtyStatus, lifecycleStatus),
                 CreateFormsStatus(output)
             }
         };
@@ -456,6 +667,73 @@ internal sealed class GalleryFormsPage
         return issues.ToArray();
     }
 
+    internal static ValidationIssue[] CreateDataFormValidationIssues(string? title, double hours, string? owner, bool requiresReview)
+    {
+        var issues = new List<ValidationIssue>();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            issues.Add(new ValidationIssue("Title", "Title is required.", InfoBarSeverity.Error));
+        }
+
+        if (hours <= 0)
+        {
+            issues.Add(new ValidationIssue("Hours", "Hours must be greater than zero.", InfoBarSeverity.Error));
+        }
+        else if (hours > 12)
+        {
+            issues.Add(new ValidationIssue("Hours", "Hours above 12 should be split before save.", InfoBarSeverity.Warning));
+        }
+
+        if (requiresReview && string.IsNullOrWhiteSpace(owner))
+        {
+            issues.Add(new ValidationIssue("Owner", "Owner is required when review mode is on.", InfoBarSeverity.Error));
+        }
+
+        return issues.ToArray();
+    }
+
+    internal static DataFormRecipeSnapshot CreateDataFormRecipeSnapshot(
+        string action,
+        IReadOnlyList<ValidationIssue> issues,
+        bool isDirty,
+        bool isSaving)
+    {
+        var severity = ResolveDataFormSeverity(issues, isSaving);
+        var summary = FormatDataFormValidationSummary(action, issues, isDirty, isSaving);
+        return new DataFormRecipeSnapshot(action, isDirty, isSaving, issues.Count, severity, summary);
+    }
+
+    internal static string FormatDataFormValidationSummary(
+        string action,
+        IReadOnlyList<ValidationIssue> issues,
+        bool isDirty,
+        bool isSaving)
+    {
+        var lifecycle = isSaving ? "saving" : isDirty ? "dirty" : "clean";
+        if (issues.Count == 0)
+        {
+            return $"{action}: no issues. Draft is {lifecycle} and ready to save.";
+        }
+
+        var issueText = string.Join(" ", issues.Select(issue => $"{issue.Field}: {issue.Message}"));
+        return $"{action}: {issues.Count} validation issue(s). Draft is {lifecycle}. {issueText}";
+    }
+
+    private static InfoBarSeverity ResolveDataFormSeverity(IReadOnlyList<ValidationIssue> issues, bool isSaving)
+    {
+        if (issues.Any(issue => issue.Severity == InfoBarSeverity.Error))
+        {
+            return InfoBarSeverity.Error;
+        }
+
+        if (issues.Any(issue => issue.Severity == InfoBarSeverity.Warning))
+        {
+            return InfoBarSeverity.Warning;
+        }
+
+        return isSaving ? InfoBarSeverity.Informational : InfoBarSeverity.Success;
+    }
+
     private static FWBorder CreateFormsExampleCard(FluentIconRegular icon, string title, string description, UIElement content, string code, double width)
     {
         return GallerySampleCard.Create(icon, title, description, content, code: code, width: width);
@@ -484,6 +762,24 @@ var submitCard = new FWSettingsCard
 };
 
 var diagnostics = submitCard.GetDiagnostics();
+""",
+            "Data form validation recipe" => """
+var title = new FWTextBox { PlaceholderText = "Task title", Text = "Gallery release checklist" };
+var hours = new FWNumberBox { Minimum = 0, Maximum = 24, Value = 6, PlaceholderText = "Hours" };
+var owner = new FWAutoSuggestBox
+{
+    ItemsSource = TeamSuggestions,
+    FilterMode = AutoCompleteFilterMode.Contains,
+    MinimumPrefixLength = 1,
+    Text = "Gallery Operations"
+};
+var validationSummary = new FWInfoBar { Title = "Validation summary", IsOpen = true };
+var isDirty = false;
+var isSaving = false;
+
+ValidationIssue[] issues = CreateDataFormValidationIssues(title.Text, hours.Value, owner.Text, requiresReview: true);
+validationSummary.Message = FormatDataFormValidationSummary("Validate", issues, isDirty, isSaving);
+await SaveDataFormDraftAsync();
 """,
             _ => "var form = new FWStackPanel();"
         };
