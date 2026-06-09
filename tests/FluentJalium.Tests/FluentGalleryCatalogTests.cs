@@ -356,10 +356,17 @@ public sealed class FluentGalleryCatalogTests
 
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
         Assert.Contains("new FWLineChart", sampleCode);
+        Assert.Contains("new FWBarChart", sampleCode);
+        Assert.Contains("new FWPieChart", sampleCode);
+        Assert.Contains("new FWChartLegend", sampleCode);
+        Assert.Contains("new FWChartTooltip", sampleCode);
         Assert.Contains("CreateLineSeries", sampleCode);
         Assert.Contains("CreateChartVisualQaSnapshot", sampleCode);
         Assert.Contains("FormatChartVisualQa", sampleCode);
         Assert.Contains("Chart visual QA", sampleCode);
+        Assert.Contains("CreateLegendTooltipQaSnapshot", sampleCode);
+        Assert.Contains("FormatLegendTooltipVisualQa", sampleCode);
+        Assert.Contains("Legend tooltip QA", sampleCode);
     }
 
     [Fact]

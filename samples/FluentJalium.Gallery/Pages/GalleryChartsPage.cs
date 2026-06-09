@@ -42,6 +42,16 @@ internal readonly record struct GalleryChartVisualQaSnapshot(
     bool IsZoomEnabled,
     bool IsPanEnabled);
 
+internal readonly record struct GalleryLegendTooltipQaSnapshot(
+    int LegendItemCount,
+    Orientation LegendOrientation,
+    string SeriesTitle,
+    string XValue,
+    string YValue,
+    bool HasTooltipBackground,
+    bool HasTooltipBorder,
+    bool HasTooltipForeground);
+
 internal sealed class GalleryChartsPage
 {
     public UIElement CreateContent()
@@ -221,6 +231,34 @@ internal sealed class GalleryChartsPage
         ArgumentNullException.ThrowIfNull(action);
 
         return $"{action}. Chart: {snapshot.Chart}. Title: {snapshot.Title}. Size: {snapshot.Width:0}x{snapshot.Height:0}. Series: {snapshot.SeriesCount}. Points: {snapshot.DataPointCount}. Palette: {FormatOnOff(snapshot.HasPalette)}. Legend: {snapshot.LegendPosition}. Tooltip: {FormatOnOff(snapshot.IsTooltipEnabled)}. Animation: {FormatOnOff(snapshot.IsAnimationEnabled)}. Axes: {FormatOnOff(snapshot.HasAxes)}. Grid: {FormatOnOff(snapshot.IsGridVisible)}. Zoom: {FormatOnOff(snapshot.IsZoomEnabled)}. Pan: {FormatOnOff(snapshot.IsPanEnabled)}.";
+    }
+
+    internal static GalleryLegendTooltipQaSnapshot CreateLegendTooltipQaSnapshot(ChartLegend legend, ChartTooltip tooltip)
+    {
+        ArgumentNullException.ThrowIfNull(legend);
+        ArgumentNullException.ThrowIfNull(tooltip);
+
+        return new GalleryLegendTooltipQaSnapshot(
+            CountEnumerable(legend.Items),
+            legend.Orientation,
+            tooltip.SeriesTitle ?? string.Empty,
+            tooltip.XValue ?? string.Empty,
+            tooltip.YValue ?? string.Empty,
+            tooltip.Background != null,
+            tooltip.BorderBrush != null,
+            tooltip.Foreground != null);
+    }
+
+    internal static string FormatLegendTooltipVisualQa(string action, ChartLegend legend, ChartTooltip tooltip)
+    {
+        return FormatLegendTooltipVisualQa(action, CreateLegendTooltipQaSnapshot(legend, tooltip));
+    }
+
+    internal static string FormatLegendTooltipVisualQa(string action, GalleryLegendTooltipQaSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+
+        return $"{action}. Legend items: {snapshot.LegendItemCount}. Legend orientation: {snapshot.LegendOrientation}. Tooltip series: {snapshot.SeriesTitle}. X: {snapshot.XValue}. Y: {snapshot.YValue}. Tooltip background: {FormatOnOff(snapshot.HasTooltipBackground)}. Tooltip border: {FormatOnOff(snapshot.HasTooltipBorder)}. Tooltip foreground: {FormatOnOff(snapshot.HasTooltipForeground)}.";
     }
 
     private static int CountChartSeries(ChartBase chart)
@@ -824,7 +862,6 @@ internal sealed class GalleryChartsPage
 
     private static UIElement CreateLegendAndTooltipSample()
     {
-        var output = CreateOutput("Legend items: 4. Tooltip binds SeriesTitle, XValue, YValue, and SeriesBrush.");
         var legend = new FWChartLegend
         {
             Width = 470,
@@ -851,6 +888,7 @@ internal sealed class GalleryChartsPage
             Foreground = ThemeBrush("ChartTooltipForeground", Color.FromRgb(245, 245, 245)),
             BorderBrush = ThemeBrush("ChartTooltipBorderBrush", Color.FromArgb(190, 255, 255, 255))
         };
+        var output = CreateOutput(FormatLegendTooltipVisualQa("Legend and tooltip QA", legend, tooltip));
 
         return new FWStackPanel
         {
@@ -873,14 +911,14 @@ internal sealed class GalleryChartsPage
                     {
                         legend.Orientation = legend.Orientation == Orientation.Horizontal ? Orientation.Vertical : Orientation.Horizontal;
                         legend.Height = legend.Orientation == Orientation.Horizontal ? 36 : 116;
-                        output.Text = $"Legend orientation: {legend.Orientation}. Tooltip series: {tooltip.SeriesTitle}.";
+                        output.Text = FormatLegendTooltipVisualQa("Legend toggled", legend, tooltip);
                     }),
                     CreateIconActionButton(FluentIconRegular.InfoSparkle24, "Tooltip", () =>
                     {
                         tooltip.SeriesTitle = tooltip.SeriesTitle == "Current" ? "Risk" : "Current";
                         tooltip.YValue = tooltip.SeriesTitle == "Current" ? "78" : "24";
                         tooltip.SeriesBrush = tooltip.SeriesTitle == "Current" ? PaletteBrush(0) : PaletteBrush(3);
-                        output.Text = $"Legend orientation: {legend.Orientation}. Tooltip series: {tooltip.SeriesTitle}.";
+                        output.Text = FormatLegendTooltipVisualQa("Tooltip toggled", legend, tooltip);
                     })),
                 CreateStatus(output)
             }

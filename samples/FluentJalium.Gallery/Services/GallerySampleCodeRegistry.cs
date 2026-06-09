@@ -795,6 +795,44 @@ chart.Series.Add(CreateLineSeries(
 
 var chartQa = GalleryChartsPage.CreateChartVisualQaSnapshot(chart);
 Debug.WriteLine(GalleryChartsPage.FormatChartVisualQa("Chart visual QA", chartQa));
+
+var barChart = new FWBarChart
+{
+    Title = "Weekly throughput",
+    Width = 320,
+    Height = 180
+};
+
+var pieChart = new FWPieChart
+{
+    Title = "Risk split",
+    Width = 240,
+    Height = 180
+};
+
+var legend = new FWChartLegend
+{
+    Orientation = Orientation.Horizontal,
+    Items = new[]
+    {
+        new ChartLegendItem { Label = "Current", Brush = PaletteBrush(0) },
+        new ChartLegendItem { Label = "Baseline", Brush = PaletteBrush(1) },
+        new ChartLegendItem { Label = "Risk", Brush = PaletteBrush(3) }
+    }
+};
+
+var tooltip = new FWChartTooltip
+{
+    SeriesTitle = "Current",
+    XValue = "Fri",
+    YValue = "78",
+    Background = ThemeBrush("ChartTooltipBackground"),
+    BorderBrush = ThemeBrush("ChartTooltipBorderBrush"),
+    Foreground = ThemeBrush("ChartTooltipForeground")
+};
+
+var legendTooltipQa = GalleryChartsPage.CreateLegendTooltipQaSnapshot(legend, tooltip);
+Debug.WriteLine(GalleryChartsPage.FormatLegendTooltipVisualQa("Legend tooltip QA", legendTooltipQa));
 """,
         ["navigation.breadcrumb.pips.selector.tabview.titlebar"] = """
 var navigationView = new FWNavigationView

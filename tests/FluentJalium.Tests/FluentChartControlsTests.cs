@@ -168,6 +168,52 @@ public sealed class FluentChartControlsTests
         Assert.Contains("Pan: on", text, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void GalleryChartsPage_ShouldFormatLegendTooltipVisualQaSnapshot()
+    {
+        var legend = new FWChartLegend
+        {
+            Orientation = Orientation.Vertical,
+            Items = new[]
+            {
+                new ChartLegendItem { Label = "Current", Brush = new SolidColorBrush(Color.FromRgb(0x41, 0x7E, 0xE0)) },
+                new ChartLegendItem { Label = "Baseline", Brush = new SolidColorBrush(Color.FromRgb(0x00, 0xBC, 0xD4)) },
+                new ChartLegendItem { Label = "Risk", Brush = new SolidColorBrush(Color.FromRgb(0xE8, 0x11, 0x23)) }
+            }
+        };
+        var tooltip = new FWChartTooltip
+        {
+            SeriesTitle = "Current",
+            XValue = "Fri",
+            YValue = "78",
+            Background = new SolidColorBrush(Color.FromRgb(0x20, 0x20, 0x20)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)),
+            Foreground = new SolidColorBrush(Color.FromRgb(0xF5, 0xF5, 0xF5))
+        };
+
+        var snapshot = GalleryChartsPage.CreateLegendTooltipQaSnapshot(legend, tooltip);
+        var text = GalleryChartsPage.FormatLegendTooltipVisualQa("Legend tooltip QA", snapshot);
+
+        Assert.Equal(3, snapshot.LegendItemCount);
+        Assert.Equal(Orientation.Vertical, snapshot.LegendOrientation);
+        Assert.Equal("Current", snapshot.SeriesTitle);
+        Assert.Equal("Fri", snapshot.XValue);
+        Assert.Equal("78", snapshot.YValue);
+        Assert.True(snapshot.HasTooltipBackground);
+        Assert.True(snapshot.HasTooltipBorder);
+        Assert.True(snapshot.HasTooltipForeground);
+
+        Assert.Contains("Legend tooltip QA", text, StringComparison.Ordinal);
+        Assert.Contains("Legend items: 3", text, StringComparison.Ordinal);
+        Assert.Contains("Legend orientation: Vertical", text, StringComparison.Ordinal);
+        Assert.Contains("Tooltip series: Current", text, StringComparison.Ordinal);
+        Assert.Contains("X: Fri", text, StringComparison.Ordinal);
+        Assert.Contains("Y: 78", text, StringComparison.Ordinal);
+        Assert.Contains("Tooltip background: on", text, StringComparison.Ordinal);
+        Assert.Contains("Tooltip border: on", text, StringComparison.Ordinal);
+        Assert.Contains("Tooltip foreground: on", text, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData(FluentThemeVariant.Dark)]
     [InlineData(FluentThemeVariant.Light)]
