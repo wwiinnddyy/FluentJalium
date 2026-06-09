@@ -22,6 +22,7 @@ using FWTaskDialogButton = FluentJalium.Controls.FWTaskDialogButton;
 using FWTaskDialogButtonClickEventArgs = FluentJalium.Controls.FWTaskDialogButtonClickEventArgs;
 using FWTaskDialogHost = FluentJalium.Controls.FWTaskDialogHost;
 using FWTaskDialogHostDiagnostics = FluentJalium.Controls.FWTaskDialogHostDiagnostics;
+using FWTaskDialogHostKeyboardRequest = FluentJalium.Controls.FWTaskDialogHostKeyboardRequest;
 using FWTeachingTip = FluentJalium.Controls.FWTeachingTip;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
@@ -44,6 +45,57 @@ internal sealed class GalleryDisclosurePage
         bool IsLightDismissEnabled,
         object? ActionButtonContent,
         object? CloseButtonContent);
+
+    internal readonly record struct TaskDialogRealWindowQaSnapshot(
+        bool IsOpen,
+        bool HasCurrentDialog,
+        bool IsLightDismissEnabled,
+        bool IsFocusTrapEnabled,
+        bool RestoreFocusOnClose,
+        bool HasFocusRestoreTarget,
+        FWTaskDialogHostKeyboardRequest LastKeyboardRequest,
+        bool LastKeyboardRequestHandled,
+        int HostLayer,
+        int AppLayer,
+        FWTaskDialogButton DefaultButton,
+        FWTaskDialogButton CancelButton,
+        FWTaskDialogButton LastFocusTarget,
+        string AutomationName,
+        string PrimaryButtonAutomationId,
+        string CloseButtonAutomationId,
+        string CloseButtonName,
+        bool PrimaryButtonVisible,
+        bool PrimaryButtonEnabled,
+        bool CloseButtonIsCancel,
+        bool PrimaryCommandCanExecute,
+        bool CancelCloseGuardEnabled)
+    {
+        public bool IsModalLayerAboveApp => IsOpen && HasCurrentDialog && HostLayer > AppLayer;
+
+        public bool HasKeyboardCoverage => IsFocusTrapEnabled &&
+            LastKeyboardRequest != FWTaskDialogHostKeyboardRequest.None &&
+            LastKeyboardRequestHandled;
+
+        public bool HasFocusCoverage => RestoreFocusOnClose &&
+            HasFocusRestoreTarget &&
+            LastFocusTarget != FWTaskDialogButton.None;
+
+        public bool HasAutomationCoverage => !string.IsNullOrWhiteSpace(AutomationName) &&
+            !string.IsNullOrWhiteSpace(PrimaryButtonAutomationId) &&
+            !string.IsNullOrWhiteSpace(CloseButtonAutomationId) &&
+            !string.IsNullOrWhiteSpace(CloseButtonName) &&
+            PrimaryButtonVisible &&
+            CloseButtonIsCancel;
+
+        public bool IsCommandPathReady => PrimaryButtonEnabled && PrimaryCommandCanExecute;
+
+        public bool IsFluentModalReady => IsModalLayerAboveApp &&
+            IsLightDismissEnabled &&
+            HasKeyboardCoverage &&
+            HasFocusCoverage &&
+            HasAutomationCoverage &&
+            IsCommandPathReady;
+    }
 
     public UIElement CreateContent()
     {
@@ -484,6 +536,7 @@ internal sealed class GalleryDisclosurePage
         var output = CreateDisclosureOutput("TaskDialogHost: modal host ready. Default: Primary, primary command: on, cancel guard: off.");
         var hostStatus = CreateDisclosureOutput("Host: waiting for diagnostics.");
         var focusStatus = CreateDisclosureOutput("Focus QA: restore target not focused yet.");
+        var qaStatus = CreateDisclosureOutput("Real-window QA: waiting for modal layer, focus, keyboard, and automation coverage.");
         var automationStatus = CreateDisclosureOutput("Automation: waiting for button metadata.");
         var keyboardStatus = CreateDisclosureOutput("Keyboard: no host key requests yet.");
         var cancelCloseRequests = false;
@@ -599,10 +652,20 @@ internal sealed class GalleryDisclosurePage
         {
             var automation = taskDialog.GetAutomationDiagnostics();
             var hostDiagnostics = taskDialogHost.GetDiagnostics();
+            var qaSnapshot = CreateTaskDialogRealWindowQaSnapshot(
+                hostDiagnostics,
+                automation,
+                Panel.GetZIndex(taskDialogHost),
+                Panel.GetZIndex(appSurface),
+                taskDialog.DefaultButton,
+                taskDialog.CancelButton,
+                deleteCommand.CanExecuteResult,
+                cancelCloseRequests);
             var requestText = requestCompleted.HasValue
                 ? $", request: {(requestCompleted.Value ? "completed" : "canceled")}"
                 : string.Empty;
-            output.Text = $"{action}. Dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. Host diagnostics: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}. Automation: {FormatTaskDialogAutomation(automation)}. {lastRequest} {lastCommand}";
+            output.Text = $"{action}. Dialog open: {FormatOnOff(taskDialog.IsOpen)}, result: {taskDialog.Result}, default: {taskDialog.DefaultButton}, primary command: {FormatOnOff(deleteCommand.CanExecuteResult)}, cancel guard: {FormatOnOff(cancelCloseRequests)}{requestText}. {FormatTaskDialogRealWindowQa(action, qaSnapshot)} Host diagnostics: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}. Automation: {FormatTaskDialogAutomation(automation)}. {lastRequest} {lastCommand}";
+            qaStatus.Text = FormatTaskDialogRealWindowQa("Real-window QA snapshot", qaSnapshot);
             hostStatus.Text = $"Host QA: {FormatTaskDialogHostDiagnostics(hostDiagnostics)}; layer {Panel.GetZIndex(taskDialogHost)} over app {Panel.GetZIndex(appSurface)}.";
             focusStatus.Text = $"Focus QA: restore focus {FormatOnOff(hostDiagnostics.RestoreFocusOnClose)}, restore target {FormatOnOff(hostDiagnostics.HasFocusRestoreTarget)}, last dialog focus {automation.LastFocusTarget}. {lastFocus}";
             automationStatus.Text = $"Automation QA: {FormatTaskDialogAutomation(automation)}; close {automation.CloseButton.AutomationId}/{automation.CloseButton.Name}/{automation.CloseButton.HelpText}.";
@@ -754,9 +817,51 @@ internal sealed class GalleryDisclosurePage
                         UpdateAfterRequest("Restore focus toggled");
                     })),
                 CreateDisclosureStatus(output),
-                CreateTaskDialogDiagnosticsPanel(hostStatus, focusStatus, keyboardStatus, automationStatus)
+                CreateTaskDialogDiagnosticsPanel(qaStatus, hostStatus, focusStatus, keyboardStatus, automationStatus)
             }
         };
+    }
+
+    internal static TaskDialogRealWindowQaSnapshot CreateTaskDialogRealWindowQaSnapshot(
+        FWTaskDialogHostDiagnostics hostDiagnostics,
+        FWTaskDialogAutomationDiagnostics automationDiagnostics,
+        int hostLayer,
+        int appLayer,
+        FWTaskDialogButton defaultButton,
+        FWTaskDialogButton cancelButton,
+        bool primaryCommandCanExecute,
+        bool cancelCloseGuardEnabled)
+    {
+        return new TaskDialogRealWindowQaSnapshot(
+            hostDiagnostics.IsOpen,
+            hostDiagnostics.HasCurrentDialog,
+            hostDiagnostics.IsLightDismissEnabled,
+            hostDiagnostics.IsFocusTrapEnabled,
+            hostDiagnostics.RestoreFocusOnClose,
+            hostDiagnostics.HasFocusRestoreTarget,
+            hostDiagnostics.LastKeyboardRequest,
+            hostDiagnostics.LastKeyboardRequestHandled,
+            hostLayer,
+            appLayer,
+            defaultButton,
+            cancelButton,
+            automationDiagnostics.LastFocusTarget,
+            automationDiagnostics.Name,
+            automationDiagnostics.PrimaryButton.AutomationId,
+            automationDiagnostics.CloseButton.AutomationId,
+            automationDiagnostics.CloseButton.Name,
+            automationDiagnostics.PrimaryButton.IsVisible,
+            automationDiagnostics.PrimaryButton.IsEnabled,
+            automationDiagnostics.CloseButton.IsCancel,
+            primaryCommandCanExecute,
+            cancelCloseGuardEnabled);
+    }
+
+    internal static string FormatTaskDialogRealWindowQa(string action, TaskDialogRealWindowQaSnapshot snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
+        return $"{action}. TaskDialog real-window QA: modal layer {FormatOnOff(snapshot.IsModalLayerAboveApp)}, focus {FormatOnOff(snapshot.HasFocusCoverage)}, keyboard {FormatOnOff(snapshot.HasKeyboardCoverage)}, automation {FormatOnOff(snapshot.HasAutomationCoverage)}, light dismiss {FormatOnOff(snapshot.IsLightDismissEnabled)}, command path {FormatOnOff(snapshot.IsCommandPathReady)}, cancel guard {FormatOnOff(snapshot.CancelCloseGuardEnabled)}, default {snapshot.DefaultButton}, cancel {snapshot.CancelButton}, host/app z {snapshot.HostLayer}/{snapshot.AppLayer}, last key {snapshot.LastKeyboardRequest}/{FormatOnOff(snapshot.LastKeyboardRequestHandled)}, last focus {snapshot.LastFocusTarget}, primary id {snapshot.PrimaryButtonAutomationId}, close id {snapshot.CloseButtonAutomationId}, ready {FormatOnOff(snapshot.IsFluentModalReady)}.";
     }
 
     private static string FormatTaskDialogAutomation(FWTaskDialogAutomationDiagnostics diagnostics)

@@ -353,6 +353,94 @@ public sealed class FluentDisclosureControlsTests
     }
 
     [Fact]
+    public void GalleryTaskDialogRealWindowQa_ShouldSummarizeModalFocusKeyboardAndAutomationCoverage()
+    {
+        var hostDiagnostics = new FWTaskDialogHostDiagnostics(
+            IsOpen: true,
+            HasCurrentDialog: true,
+            IsLightDismissEnabled: true,
+            IsFocusTrapEnabled: true,
+            RestoreFocusOnClose: true,
+            HasFocusRestoreTarget: true,
+            LastKeyboardRequest: FWTaskDialogHostKeyboardRequest.TabForward,
+            LastKeyboardRequestHandled: true);
+        var automationDiagnostics = new FWTaskDialogAutomationDiagnostics(
+            ClassName: nameof(FWTaskDialog),
+            ControlType: AutomationControlType.Window,
+            Name: "Delete temporary layout cache?",
+            HelpText: "Task dialog help",
+            LastFocusTarget: FWTaskDialogButton.Primary,
+            PrimaryButton: new FWTaskDialogButtonAutomationMetadata(
+                FWTaskDialogButton.Primary,
+                "PrimaryButton",
+                "Delete",
+                "Default action",
+                IsVisible: true,
+                IsEnabled: true,
+                IsDefault: true,
+                IsCancel: false),
+            SecondaryButton: new FWTaskDialogButtonAutomationMetadata(
+                FWTaskDialogButton.Secondary,
+                "SecondaryButton",
+                "Archive",
+                "Secondary action",
+                IsVisible: true,
+                IsEnabled: true,
+                IsDefault: false,
+                IsCancel: false),
+            CloseButton: new FWTaskDialogButtonAutomationMetadata(
+                FWTaskDialogButton.Close,
+                "CloseButton",
+                "Cancel",
+                "Cancel action",
+                IsVisible: true,
+                IsEnabled: true,
+                IsDefault: false,
+                IsCancel: true));
+
+        var snapshot = GalleryDisclosurePage.CreateTaskDialogRealWindowQaSnapshot(
+            hostDiagnostics,
+            automationDiagnostics,
+            hostLayer: 10,
+            appLayer: 0,
+            defaultButton: FWTaskDialogButton.Primary,
+            cancelButton: FWTaskDialogButton.Close,
+            primaryCommandCanExecute: true,
+            cancelCloseGuardEnabled: false);
+        var text = GalleryDisclosurePage.FormatTaskDialogRealWindowQa(
+            "Real-window QA snapshot",
+            snapshot);
+
+        Assert.True(snapshot.IsModalLayerAboveApp);
+        Assert.True(snapshot.HasKeyboardCoverage);
+        Assert.True(snapshot.HasFocusCoverage);
+        Assert.True(snapshot.HasAutomationCoverage);
+        Assert.True(snapshot.IsCommandPathReady);
+        Assert.True(snapshot.IsFluentModalReady);
+        Assert.False(snapshot.CancelCloseGuardEnabled);
+        Assert.Equal(FWTaskDialogButton.Primary, snapshot.DefaultButton);
+        Assert.Equal(FWTaskDialogButton.Close, snapshot.CancelButton);
+        Assert.Equal(FWTaskDialogHostKeyboardRequest.TabForward, snapshot.LastKeyboardRequest);
+        Assert.Equal("PrimaryButton", snapshot.PrimaryButtonAutomationId);
+        Assert.Equal("CloseButton", snapshot.CloseButtonAutomationId);
+        Assert.Contains("TaskDialog real-window QA: modal layer on", text);
+        Assert.Contains("focus on", text);
+        Assert.Contains("keyboard on", text);
+        Assert.Contains("automation on", text);
+        Assert.Contains("light dismiss on", text);
+        Assert.Contains("command path on", text);
+        Assert.Contains("cancel guard off", text);
+        Assert.Contains("default Primary", text);
+        Assert.Contains("cancel Close", text);
+        Assert.Contains("host/app z 10/0", text);
+        Assert.Contains("last key TabForward/on", text);
+        Assert.Contains("last focus Primary", text);
+        Assert.Contains("primary id PrimaryButton", text);
+        Assert.Contains("close id CloseButton", text);
+        Assert.Contains("ready on", text);
+    }
+
+    [Fact]
     public async Task FWTaskDialog_ShouldExposeAwaitableResultAndDefaultCancelRequests()
     {
         var dialog = new FWTaskDialog
@@ -912,6 +1000,35 @@ public sealed class FluentDisclosureControlsTests
             var focusedDefaultButton = Assert.IsAssignableFrom<DependencyObject>(focusProvider.FocusedElement);
             Assert.Equal("PrimaryButton", AutomationProperties.GetAutomationId(focusedDefaultButton));
             Assert.Equal(FWTaskDialogButton.Primary, dialog.LastFocusTarget);
+
+            var tabArgs = new KeyEventArgs(
+                UIElement.KeyDownEvent,
+                Key.Tab,
+                ModifierKeys.None,
+                isDown: true,
+                isRepeat: false,
+                timestamp: 0);
+
+            host.RaiseEvent(tabArgs);
+
+            Assert.True(tabArgs.Handled);
+            Assert.Equal(FWTaskDialogHostKeyboardRequest.TabForward, host.LastKeyboardRequest);
+
+            var snapshot = GalleryDisclosurePage.CreateTaskDialogRealWindowQaSnapshot(
+                host.GetDiagnostics(),
+                dialog.GetAutomationDiagnostics(),
+                Panel.GetZIndex(host),
+                Panel.GetZIndex(appContent),
+                dialog.DefaultButton,
+                dialog.CancelButton,
+                primaryCommandCanExecute: true,
+                cancelCloseGuardEnabled: false);
+
+            Assert.True(snapshot.IsModalLayerAboveApp);
+            Assert.True(snapshot.HasFocusCoverage);
+            Assert.True(snapshot.HasKeyboardCoverage);
+            Assert.True(snapshot.HasAutomationCoverage);
+            Assert.True(snapshot.IsFluentModalReady);
 
             var escapeArgs = new KeyEventArgs(
                 UIElement.KeyDownEvent,
