@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Gallery.Pages;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -233,5 +234,86 @@ public sealed class FluentInteractionControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(stack, surface.Child);
+    }
+
+    [Fact]
+    public void GalleryAdvancedInteractionDiagnostics_ShouldFormatCancelledRefreshDeferral()
+    {
+        var text = InteractionControlsPage.FormatRefreshContainerDiagnostics(
+            "Cancelled",
+            new FWRefreshContainerDiagnostics(
+                RefreshPullDirection.TopToBottom,
+                IsRefreshing: false,
+                IsPulling: false,
+                PullDistance: 0,
+                PullThreshold: 100,
+                MaxPullDistance: 150,
+                PullProgress: 0,
+                HasScrollViewer: true,
+                HasRefreshVisualizerBorder: true,
+                HasRefreshIndicator: true,
+                HasCustomVisualizer: false,
+                RefreshVisualizerState.Idle));
+
+        Assert.Contains("Cancelled", text);
+        Assert.Contains("refreshing off", text);
+        Assert.Contains("deferral cancelled", text);
+    }
+
+    [Fact]
+    public void GalleryAdvancedInteractionDiagnostics_ShouldFormatSnapPointState()
+    {
+        var scroller = new FWScroller
+        {
+            HorizontalSnapPointsType = SnapPointsType.None,
+            VerticalSnapPointsType = SnapPointsType.MandatorySingle
+        };
+        var text = InteractionControlsPage.FormatScrollerDiagnostics(
+            "Snap requested",
+            scroller,
+            new FWScrollerViewportDiagnostics(
+                HasScrollViewer: true,
+                HorizontalOffset: 0,
+                VerticalOffset: 180,
+                ViewportWidth: 320,
+                ViewportHeight: 180,
+                ExtentWidth: 320,
+                ExtentHeight: 900,
+                ZoomFactor: 1));
+
+        Assert.Contains("snap H/V None/MandatorySingle", text);
+        Assert.Contains("snap state active H/V off/on", text);
+    }
+
+    [Fact]
+    public void GalleryAdvancedInteractionDiagnostics_ShouldFormatAnnotationHoverDetailPresenter()
+    {
+        var args = new DetailLabelRequestedEventArgs(FWAnnotatedScrollBar.DetailLabelRequestedEvent, new FWAnnotatedScrollBar())
+        {
+            ScrollOffset = 400,
+            Content = "Info",
+            LabelType = ScrollBarLabelType.Info
+        };
+        var text = InteractionControlsPage.FormatAnnotatedScrollBarDetail(
+            args,
+            new FWAnnotatedScrollBarDiagnostics(
+                HasDetailsCanvas: true,
+                SourceLabelCount: 3,
+                RegisteredLabelCount: 3,
+                HasLabels: true,
+                Orientation: Orientation.Vertical,
+                Minimum: 0,
+                Maximum: 500,
+                Value: 400,
+                ViewportSize: 40,
+                TrackLength: 300,
+                LastRequestedScrollOffset: 400,
+                LastRequestedContent: "Info",
+                LastRequestedLabelType: ScrollBarLabelType.Info));
+
+        Assert.Contains("Info: Info at 400", text);
+        Assert.Contains("Detail request hover Info", text);
+        Assert.Contains("detail presenter on", text);
+        Assert.Contains("hover Info", text);
     }
 }

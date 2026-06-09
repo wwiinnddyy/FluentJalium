@@ -1,0 +1,181 @@
+namespace FluentJalium.Gallery.Models;
+
+internal sealed record GalleryVisualQaCoverageFamily(
+    string FamilyId,
+    string Title,
+    string PageId,
+    string SampleCodeKey,
+    string[] Controls,
+    string[] CoveredStates,
+    string[] Evidence)
+{
+    public bool Covers(string state)
+    {
+        return CoveredStates.Any(covered => string.Equals(covered, state, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public string Summary =>
+        $"{Title}: {Controls.Length} controls, {CoveredStates.Length} states, sample {SampleCodeKey}.";
+}
+
+internal sealed record GalleryVisualQaCoverageSnapshot(
+    int FamilyCount,
+    int ControlCount,
+    int StateCount,
+    int DiagnosticFamilyCount,
+    string[] PageIds,
+    string[] SampleCodeKeys)
+{
+    public bool CoversPage(string pageId)
+    {
+        return PageIds.Contains(pageId, StringComparer.Ordinal);
+    }
+
+    public bool HasSample(string sampleCodeKey)
+    {
+        return SampleCodeKeys.Contains(sampleCodeKey, StringComparer.Ordinal);
+    }
+}
+
+internal static class GalleryVisualQaCoverageCatalog
+{
+    public static IReadOnlyList<GalleryVisualQaCoverageFamily> CreateFamilies()
+    {
+        return Families;
+    }
+
+    public static GalleryVisualQaCoverageSnapshot CreateSnapshot()
+    {
+        return new GalleryVisualQaCoverageSnapshot(
+            Families.Length,
+            Families.Sum(family => family.Controls.Length),
+            Families.SelectMany(family => family.CoveredStates).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
+            Families.Count(family => family.Covers("diagnostics")),
+            Families.Select(family => family.PageId).Distinct(StringComparer.Ordinal).OrderBy(pageId => pageId, StringComparer.Ordinal).ToArray(),
+            Families.Select(family => family.SampleCodeKey).Distinct(StringComparer.Ordinal).OrderBy(sampleCodeKey => sampleCodeKey, StringComparer.Ordinal).ToArray());
+    }
+
+    public static string FormatSnapshot(GalleryVisualQaCoverageSnapshot snapshot)
+    {
+        return $"Visual QA coverage: {snapshot.FamilyCount} families, {snapshot.ControlCount} controls, {snapshot.StateCount} state tokens, {snapshot.DiagnosticFamilyCount} diagnostic families.";
+    }
+
+    private static readonly GalleryVisualQaCoverageFamily[] Families =
+    [
+        Family(
+            "commands",
+            "Command surfaces",
+            "buttons",
+            "buttons.commandbar",
+            ["FWButton", "FWSplitButton", "FWCommandBar", "FWToolBar"],
+            ["normal", "hover", "pressed", "disabled", "focus", "density", "material"],
+            ["State Matrix command rows", "CommandBar Gallery sample", "Toolbar sample code"]),
+        Family(
+            "forms",
+            "Forms and validation",
+            "forms",
+            "patterns.forms",
+            ["FWLabel", "FWTextBox", "FWAutoSuggestBox", "FWRadioButtons", "FWInfoBar", "FWSettingsCard"],
+            ["normal", "disabled", "focus", "density", "validation", "async", "diagnostics"],
+            ["Forms visual QA panel", "Submit progress sample", "Catalog metadata tests"]),
+        Family(
+            "collections",
+            "Collections and virtualization",
+            "advancedcollections",
+            "advancedcollections.itemsrepeater",
+            ["FWItemsRepeater", "FWItemsRepeaterDiagnostics", "FWGridView", "FWListView"],
+            ["normal", "selected", "focus", "density", "large list", "horizontal", "diagnostics"],
+            ["ItemsRepeater QA profiles", "Collection navigation recipes", "Viewport diagnostics"]),
+        Family(
+            "navigation",
+            "Navigation shell",
+            "navigation",
+            "navigation.breadcrumb.pips.selector.tabview.titlebar",
+            ["FWNavigationService", "FWBreadcrumbBar", "FWPipsPager", "FWSelectorBar", "FWTabView", "FWTitleBar"],
+            ["normal", "selected", "disabled", "focus", "density", "diagnostics", "material"],
+            ["App shell QA snapshot", "SelectorBar diagnostics", "TabView diagnostics"]),
+        Family(
+            "disclosure",
+            "Disclosure and modal flows",
+            "disclosure",
+            "disclosure.taskdialog",
+            ["FWTaskDialog", "FWTaskDialogHost", "FWTeachingTip", "FWSettingsExpander", "FWContentDialog"],
+            ["normal", "disabled", "focus", "light dismiss", "keyboard", "automation", "diagnostics"],
+            ["TaskDialog real-window QA", "TeachingTip visual QA", "SettingsExpander item host sample"]),
+        Family(
+            "layout",
+            "Adaptive layout and settings",
+            "contentandlayout",
+            "layout.splitview.settingscard",
+            ["FWSplitView", "FWTwoPaneView", "FWParallaxView", "FWSettingsCard"],
+            ["normal", "hover", "pressed", "disabled", "focus", "density", "diagnostics"],
+            ["Settings visual QA snapshot", "TwoPaneView diagnostics", "Parallax diagnostics"]),
+        Family(
+            "materials",
+            "Materials and window backdrops",
+            "windowbackdrops",
+            "materials.windowbackdrop",
+            ["FWFluentWindowSurface", "FWFluentWindowSurfaceDiagnostics", "FWFluentMaterialSurface"],
+            ["normal", "light", "dark", "high contrast", "inactive", "unsupported host", "diagnostics"],
+            ["Window surface diagnostics", "High contrast fallback", "Unsupported host fallback"]),
+        Family(
+            "interaction",
+            "Advanced interaction",
+            "advancedinteraction",
+            "advancedinteraction.scroller",
+            ["FWRefreshContainer", "FWScroller", "FWAnnotatedScrollBar"],
+            ["normal", "focus", "refresh deferral", "snap points", "annotation detail", "diagnostics"],
+            ["Refresh diagnostics", "Scroller viewport diagnostics", "AnnotatedScrollBar detail formatter"]),
+        Family(
+            "status",
+            "Status and notification",
+            "status",
+            "status.snackbar",
+            ["FWInfoBar", "FWSnackbar", "FWSnackbarPresenterDiagnostics", "FWSnackbarHost"],
+            ["normal", "hover", "focus", "disabled", "queue", "overlay", "diagnostics"],
+            ["Snackbar visual QA snapshot", "Presenter diagnostics", "Overlay host QA"]),
+        Family(
+            "visuals",
+            "Visual primitives",
+            "visuals",
+            "visuals.icons.richtext.personpicture.markdown.qrcode.shapes",
+            ["FWPersonPicture", "FWMarkdown", "FWQRCode", "FWRectangle", "FWEllipse", "FWPath"],
+            ["normal", "disabled", "focus", "light", "dark", "high contrast", "diagnostics"],
+            ["Shape controls QA snapshot", "Visuals Gallery sample", "Icon fallback coverage"]),
+        Family(
+            "datetime",
+            "Date and time",
+            "dateandtime",
+            "datetime.calendarpicker.calendarview",
+            ["FWDatePicker", "FWCalendarDatePicker", "FWCalendarView", "FWTimePicker"],
+            ["normal", "selected", "disabled", "focus", "bounds", "density", "diagnostics"],
+            ["CalendarDatePicker QA", "CalendarView QA", "Date/time sample code"]),
+        Family(
+            "charts",
+            "Charts and data visualization",
+            "charts",
+            "charts.family",
+            ["FWLineChart", "FWBarChart", "FWPieChart", "FWHeatmap", "FWChartLegend"],
+            ["normal", "selected", "disabled", "focus", "viewport", "density", "diagnostics"],
+            ["Chart visual QA snapshot", "Chart legend/tooltip samples", "Palette state tests"])
+    ];
+
+    private static GalleryVisualQaCoverageFamily Family(
+        string familyId,
+        string title,
+        string pageId,
+        string sampleCodeKey,
+        string[] controls,
+        string[] coveredStates,
+        string[] evidence)
+    {
+        return new GalleryVisualQaCoverageFamily(
+            familyId,
+            title,
+            pageId,
+            sampleCodeKey,
+            controls,
+            coveredStates,
+            evidence);
+    }
+}

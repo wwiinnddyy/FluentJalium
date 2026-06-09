@@ -42,6 +42,18 @@ internal readonly record struct GalleryWindowSurfaceEnvironment(
         ? "solid fallback"
         : IsWindowActive ? "system material" : "inactive material";
 
+    public string FallbackReason => (IsHighContrast, IsWindowActive, IsHostBackdropSupported) switch
+    {
+        (true, false, false) => "high contrast + inactive window + unsupported host",
+        (true, true, false) => "high contrast + unsupported host",
+        (true, false, true) => "high contrast + inactive window",
+        (true, true, true) => "high contrast",
+        (false, false, false) => "inactive window + unsupported host",
+        (false, true, false) => "unsupported host",
+        (false, false, true) => "inactive window",
+        _ => "none"
+    };
+
     public static GalleryWindowSurfaceEnvironment Create(
         FluentThemeVariant theme,
         bool isWindowActive = true,
@@ -89,6 +101,12 @@ internal sealed record GalleryWindowSurfaceDiagnostics(
         $"{Environment.ThemeState}, {Environment.ActivationState}, {Environment.HostState}";
 
     public string FallbackState => Environment.FallbackState;
+
+    public string RequestedActualState => IsMatched ? "requested matches actual" : "requested differs from actual";
+
+    public string ResolutionState => UsesSolidFallback
+        ? $"solid fallback ({Environment.FallbackReason}, {RequestedActualState})"
+        : $"{Environment.ActivationState} material, {RequestedActualState}";
 
     public static GalleryWindowSurfaceDiagnostics Create(
         FWFluentWindowSurface surface,
@@ -343,7 +361,8 @@ internal sealed class GalleryWindowBackdropsPage
                             CreateSystemBackdropBadge(diagnostics.Environment.ThemeState),
                             CreateSystemBackdropBadge(diagnostics.Environment.ActivationState),
                             CreateSystemBackdropBadge(diagnostics.Environment.HostState),
-                            CreateSystemBackdropBadge(diagnostics.FallbackState)
+                            CreateSystemBackdropBadge(diagnostics.FallbackState),
+                            CreateSystemBackdropBadge(diagnostics.ResolutionState)
                         }
                     },
                     new FWTextBlock
@@ -441,7 +460,7 @@ internal sealed class GalleryWindowBackdropsPage
     {
         ArgumentNullException.ThrowIfNull(diagnostics);
 
-        return $"Profile: {diagnostics.Role}; requested: {diagnostics.RequestedSystemBackdrop}/{diagnostics.RequestedBackdropKind}; actual: {diagnostics.ActualSystemBackdrop}; surface: {diagnostics.SurfaceRole}/{diagnostics.SurfaceMaterialKind}/{diagnostics.SurfaceShape}; auto apply: {diagnostics.AutoApplyText}; environment: {diagnostics.EnvironmentState}; fallback: {diagnostics.FallbackState}; window: {diagnostics.MatchState}, {diagnostics.ApplyState}.";
+        return $"Profile: {diagnostics.Role}; requested: {diagnostics.RequestedSystemBackdrop}/{diagnostics.RequestedBackdropKind}; actual: {diagnostics.ActualSystemBackdrop}; surface: {diagnostics.SurfaceRole}/{diagnostics.SurfaceMaterialKind}/{diagnostics.SurfaceShape}; auto apply: {diagnostics.AutoApplyText}; environment: {diagnostics.EnvironmentState}; fallback: {diagnostics.FallbackState}; resolution: {diagnostics.ResolutionState}; window: {diagnostics.MatchState}, {diagnostics.ApplyState}.";
     }
 
     private static FWBorder CreateRecipeTile(FluentIconRegular icon, FWFluentWindowBackdropKind backdropKind)

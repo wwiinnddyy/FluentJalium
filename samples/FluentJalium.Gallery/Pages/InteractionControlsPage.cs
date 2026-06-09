@@ -241,8 +241,25 @@ public class InteractionControlsPage : Page
 
     internal static string FormatRefreshContainerDiagnostics(string reason, FWRefreshContainerDiagnostics diagnostics)
     {
-        var deferralState = diagnostics.IsRefreshing ? "pending" : "idle";
+        var deferralState = FormatRefreshDeferralState(reason, diagnostics);
         return $"{reason}: refreshing {FormatOnOff(diagnostics.IsRefreshing)}; pulling {FormatOnOff(diagnostics.IsPulling)}; deferral {deferralState}; progress {diagnostics.PullProgress:P0}; distance {diagnostics.PullDistance:0}/{diagnostics.PullThreshold:0}/{diagnostics.MaxPullDistance:0}; direction {diagnostics.PullDirection}; visualizer {diagnostics.VisualizerState}; template {FormatOnOff(diagnostics.HasScrollViewer)}; custom visualizer {FormatOnOff(diagnostics.HasCustomVisualizer)}.";
+    }
+
+    private static string FormatRefreshDeferralState(string reason, FWRefreshContainerDiagnostics diagnostics)
+    {
+        if (diagnostics.IsRefreshing)
+        {
+            return "pending";
+        }
+
+        if (reason.Contains("ignored", StringComparison.OrdinalIgnoreCase))
+        {
+            return "ignored";
+        }
+
+        return reason.Contains("cancel", StringComparison.OrdinalIgnoreCase)
+            ? "cancelled"
+            : "idle";
     }
 
     private static string FormatOnOff(bool value) => value ? "on" : "off";
@@ -500,19 +517,26 @@ public class InteractionControlsPage : Page
             ? $"{diagnostics.ExtentWidth:0}x{diagnostics.ExtentHeight:0}"
             : "template pending";
 
-        return $"{reason}: offset {diagnostics.HorizontalOffset:0},{diagnostics.VerticalOffset:0}; viewport {viewport}; extent {extent}; zoom {diagnostics.ZoomFactor:0.##}; snap H/V {scroller.HorizontalSnapPointsType}/{scroller.VerticalSnapPointsType}; anchored H/V {FormatOnOff(scroller.IsAnchoredAtHorizontalExtent)}/{FormatOnOff(scroller.IsAnchoredAtVerticalExtent)}.";
+        var hasHorizontalSnap = HasSnapPoints(scroller.HorizontalSnapPointsType);
+        var hasVerticalSnap = HasSnapPoints(scroller.VerticalSnapPointsType);
+        var snapState = hasHorizontalSnap || hasVerticalSnap ? "active" : "inactive";
+
+        return $"{reason}: offset {diagnostics.HorizontalOffset:0},{diagnostics.VerticalOffset:0}; viewport {viewport}; extent {extent}; zoom {diagnostics.ZoomFactor:0.##}; snap H/V {scroller.HorizontalSnapPointsType}/{scroller.VerticalSnapPointsType}; snap state {snapState} H/V {FormatOnOff(hasHorizontalSnap)}/{FormatOnOff(hasVerticalSnap)}; anchored H/V {FormatOnOff(scroller.IsAnchoredAtHorizontalExtent)}/{FormatOnOff(scroller.IsAnchoredAtVerticalExtent)}.";
     }
+
+    private static bool HasSnapPoints(SnapPointsType snapPointsType) => snapPointsType != SnapPointsType.None;
 
     internal static string FormatAnnotatedScrollBarDiagnostics(string reason, FWAnnotatedScrollBarDiagnostics diagnostics)
     {
-        return $"{reason}: labels {diagnostics.RegisteredLabelCount}/{diagnostics.SourceLabelCount}; value {diagnostics.Value:0}/{diagnostics.Maximum:0}; viewport {diagnostics.ViewportSize:0}; orientation {diagnostics.Orientation}; canvas {FormatOnOff(diagnostics.HasDetailsCanvas)}; last {diagnostics.LastRequestedLabelType?.ToString() ?? "none"} at {diagnostics.LastRequestedScrollOffset:0}.";
+        var lastLabelType = diagnostics.LastRequestedLabelType?.ToString() ?? "none";
+        return $"{reason}: labels {diagnostics.RegisteredLabelCount}/{diagnostics.SourceLabelCount}; value {diagnostics.Value:0}/{diagnostics.Maximum:0}; viewport {diagnostics.ViewportSize:0}; orientation {diagnostics.Orientation}; canvas {FormatOnOff(diagnostics.HasDetailsCanvas)}; detail presenter {FormatOnOff(diagnostics.HasDetailsCanvas)}; hover {lastLabelType}; last {lastLabelType} at {diagnostics.LastRequestedScrollOffset:0}.";
     }
 
     internal static string FormatAnnotatedScrollBarDetail(
         DetailLabelRequestedEventArgs args,
         FWAnnotatedScrollBarDiagnostics diagnostics)
     {
-        return $"{args.LabelType}: {args.Content} at {args.ScrollOffset:0}. {FormatAnnotatedScrollBarDiagnostics("Detail requested", diagnostics)}";
+        return $"{args.LabelType}: {args.Content} at {args.ScrollOffset:0}. Detail request hover {args.LabelType}; {FormatAnnotatedScrollBarDiagnostics("Detail requested", diagnostics)}";
     }
 
     private static FWButton CreateAnnotationJumpButton(

@@ -444,6 +444,7 @@ public sealed class FluentMaterialRecipeTests
         Assert.Contains("auto apply: Off", pendingText);
         Assert.Contains("environment: dark, active, host supported", pendingText);
         Assert.Contains("fallback: system material", pendingText);
+        Assert.Contains("resolution: active material, requested differs from actual", pendingText);
         Assert.Contains("window: pending, not applied", pendingText);
 
         surface.AutoApplyWindowBackdrop = true;
@@ -456,6 +457,7 @@ public sealed class FluentMaterialRecipeTests
         Assert.Equal("applied", matched.ApplyState);
         Assert.Contains("auto apply: On", matchedText);
         Assert.Contains("fallback: system material", matchedText);
+        Assert.Contains("resolution: active material, requested matches actual", matchedText);
         Assert.Contains("window: matched, applied", matchedText);
     }
 
@@ -482,6 +484,7 @@ public sealed class FluentMaterialRecipeTests
             GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(WindowBackdropType.Mica, inactiveEnvironment),
             wasApplied: true,
             inactiveEnvironment);
+        var inactiveText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(inactive);
 
         var unsupportedEnvironment = GalleryWindowSurfaceEnvironment.Create(FluentThemeVariant.Light, isHostBackdropSupported: false);
         var unsupported = GalleryWindowSurfaceDiagnostics.Create(
@@ -491,24 +494,52 @@ public sealed class FluentMaterialRecipeTests
             unsupportedEnvironment);
         var unsupportedText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(unsupported);
 
+        var inactiveUnsupportedEnvironment = GalleryWindowSurfaceEnvironment.Create(
+            FluentThemeVariant.Dark,
+            isWindowActive: false,
+            isHostBackdropSupported: false);
+        var inactiveUnsupported = GalleryWindowSurfaceDiagnostics.Create(
+            surface,
+            GalleryWindowBackdropsPage.ResolveWindowSurfaceActualBackdrop(WindowBackdropType.Mica, inactiveUnsupportedEnvironment),
+            wasApplied: false,
+            inactiveUnsupportedEnvironment);
+        var inactiveUnsupportedText = GalleryWindowBackdropsPage.FormatWindowSurfaceDiagnostics(inactiveUnsupported);
+
         Assert.Equal(WindowBackdropType.None, highContrastActual);
         Assert.True(highContrast.UsesSolidFallback);
         Assert.Equal("high contrast", highContrast.Environment.ThemeState);
+        Assert.Equal("high contrast", highContrast.Environment.FallbackReason);
         Assert.Equal("solid fallback", highContrast.FallbackState);
+        Assert.Equal("solid fallback (high contrast, requested differs from actual)", highContrast.ResolutionState);
         Assert.Contains("environment: high contrast, active, host supported", highContrastText);
         Assert.Contains("fallback: solid fallback", highContrastText);
+        Assert.Contains("resolution: solid fallback (high contrast, requested differs from actual)", highContrastText);
 
         Assert.False(inactive.UsesSolidFallback);
         Assert.Equal(WindowBackdropType.Mica, inactive.ActualSystemBackdrop);
         Assert.Equal("inactive", inactive.Environment.ActivationState);
+        Assert.Equal("inactive window", inactive.Environment.FallbackReason);
         Assert.Equal("inactive material", inactive.FallbackState);
+        Assert.Equal("inactive material, requested matches actual", inactive.ResolutionState);
+        Assert.Contains("environment: dark, inactive, host supported", inactiveText);
+        Assert.Contains("resolution: inactive material, requested matches actual", inactiveText);
 
         Assert.True(unsupported.UsesSolidFallback);
         Assert.False(unsupported.Environment.IsHostBackdropSupported);
         Assert.Equal(WindowBackdropType.None, unsupported.ActualSystemBackdrop);
         Assert.Equal("host unsupported", unsupported.Environment.HostState);
+        Assert.Equal("unsupported host", unsupported.Environment.FallbackReason);
+        Assert.Equal("solid fallback (unsupported host, requested differs from actual)", unsupported.ResolutionState);
         Assert.Contains("environment: light, active, host unsupported", unsupportedText);
+        Assert.Contains("resolution: solid fallback (unsupported host, requested differs from actual)", unsupportedText);
         Assert.Contains("window: pending, not applied", unsupportedText);
+
+        Assert.True(inactiveUnsupported.UsesSolidFallback);
+        Assert.Equal(WindowBackdropType.None, inactiveUnsupported.ActualSystemBackdrop);
+        Assert.Equal("inactive window + unsupported host", inactiveUnsupported.Environment.FallbackReason);
+        Assert.Equal("solid fallback (inactive window + unsupported host, requested differs from actual)", inactiveUnsupported.ResolutionState);
+        Assert.Contains("environment: dark, inactive, host unsupported", inactiveUnsupportedText);
+        Assert.Contains("resolution: solid fallback (inactive window + unsupported host, requested differs from actual)", inactiveUnsupportedText);
     }
 
     [Fact]

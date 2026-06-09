@@ -484,6 +484,58 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryVisualQaCoverageCatalog_ShouldMapFamiliesToCatalogPagesAndRegisteredSamples()
+    {
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var pageIds = pages.Select(page => page.UniqueId).ToHashSet(StringComparer.Ordinal);
+        var families = GalleryVisualQaCoverageCatalog.CreateFamilies();
+
+        Assert.True(families.Count >= 10);
+
+        foreach (var family in families)
+        {
+            Assert.True(pageIds.Contains(family.PageId), $"{family.FamilyId} references missing page '{family.PageId}'.");
+            Assert.True(
+                GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(family.SampleCodeKey),
+                $"{family.FamilyId} references unregistered sample key '{family.SampleCodeKey}'.");
+            Assert.All(family.Controls, control => Assert.StartsWith("FW", control, StringComparison.Ordinal));
+            Assert.True(family.CoveredStates.Length >= 6, $"{family.FamilyId} has too few covered states.");
+            Assert.NotEmpty(family.Evidence);
+            Assert.Contains(family.Title, family.Summary);
+        }
+    }
+
+    [Fact]
+    public void GalleryVisualQaCoverageCatalog_ShouldCoverCoreFluentStateTokens()
+    {
+        var families = GalleryVisualQaCoverageCatalog.CreateFamilies();
+        var snapshot = GalleryVisualQaCoverageCatalog.CreateSnapshot();
+        var summary = GalleryVisualQaCoverageCatalog.FormatSnapshot(snapshot);
+
+        Assert.Equal(families.Count, snapshot.FamilyCount);
+        Assert.True(snapshot.ControlCount >= 50);
+        Assert.True(snapshot.StateCount >= 15);
+        Assert.True(snapshot.DiagnosticFamilyCount >= 8);
+        Assert.True(snapshot.CoversPage("windowbackdrops"));
+        Assert.True(snapshot.CoversPage("advancedcollections"));
+        Assert.True(snapshot.HasSample("materials.windowbackdrop"));
+        Assert.True(snapshot.HasSample("advancedinteraction.scroller"));
+
+        Assert.Contains(families, family => family.Covers("normal"));
+        Assert.Contains(families, family => family.Covers("hover"));
+        Assert.Contains(families, family => family.Covers("pressed"));
+        Assert.Contains(families, family => family.Covers("selected"));
+        Assert.Contains(families, family => family.Covers("disabled"));
+        Assert.Contains(families, family => family.Covers("focus"));
+        Assert.Contains(families, family => family.Covers("density"));
+        Assert.Contains(families, family => family.Covers("light"));
+        Assert.Contains(families, family => family.Covers("dark"));
+        Assert.Contains(families, family => family.Covers("high contrast"));
+        Assert.Contains(families, family => family.Covers("diagnostics"));
+        Assert.Contains("Visual QA coverage", summary);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeDesignTokenSamples()
     {
         var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());

@@ -1,4 +1,5 @@
 using FluentJalium.Gallery.Controls;
+using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
 using Jalium.UI;
@@ -41,6 +42,12 @@ internal sealed class GalleryDesignPage
             "Each control page uses the same Example, States, Properties, and Code / Notes rhythm so batches stay comparable.",
             CreateSampleCardSample(),
             code: "GallerySampleCard.Create(\n    icon,\n    title,\n    description,\n    sample,\n    states,\n    properties,\n    code);"));
+        examples.Children.Add(GallerySampleCard.Create(
+            FluentIconRegular.DataUsage24,
+            "Visual QA coverage",
+            "Control families now declare their Gallery QA evidence: covered states, diagnostics, and sample-code keys.",
+            CreateVisualQaCoverageSample(),
+            code: "var families = GalleryVisualQaCoverageCatalog.CreateFamilies();\nvar snapshot = GalleryVisualQaCoverageCatalog.CreateSnapshot();\nGalleryVisualQaCoverageCatalog.FormatSnapshot(snapshot);"));
         examples.Children.Add(GallerySampleCard.Create(
             FluentIconRegular.WindowBrush24,
             "Materials as first-class pages",
@@ -210,6 +217,68 @@ internal sealed class GalleryDesignPage
                 CreateSectionPreview("States", "Normal, pointer over, pressed, selected, disabled"),
                 CreateSectionPreview("Properties", "Primary FW type and important knobs"),
                 CreateSectionPreview("Code / Notes", "Jalium syntax and implementation notes")
+            }
+        };
+    }
+
+    private static UIElement CreateVisualQaCoverageSample()
+    {
+        var snapshot = GalleryVisualQaCoverageCatalog.CreateSnapshot();
+        var stack = new FWStackPanel
+        {
+            Width = 540,
+            Orientation = Orientation.Vertical,
+            Spacing = 8
+        };
+
+        stack.Children.Add(CreateMetric(
+            FluentIconRegular.DataUsage24,
+            "Coverage snapshot",
+            GalleryVisualQaCoverageCatalog.FormatSnapshot(snapshot)));
+
+        foreach (var family in GalleryVisualQaCoverageCatalog.CreateFamilies().Take(4))
+        {
+            stack.Children.Add(CreateVisualQaCoverageRow(family));
+        }
+
+        return stack;
+    }
+
+    private static FWBorder CreateVisualQaCoverageRow(GalleryVisualQaCoverageFamily family)
+    {
+        return new FWBorder
+        {
+            Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
+            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 3,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = family.Title,
+                        FontSize = 13,
+                        Foreground = GalleryThemeResources.Brush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = $"{family.PageId} / {family.SampleCodeKey}",
+                        FontSize = 12,
+                        Foreground = GalleryThemeResources.Brush("TextSecondary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = string.Join(", ", family.CoveredStates.Take(6)),
+                        FontSize = 12,
+                        Foreground = GalleryThemeResources.Brush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
             }
         };
     }
