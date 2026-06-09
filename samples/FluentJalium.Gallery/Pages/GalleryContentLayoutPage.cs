@@ -47,7 +47,35 @@ internal sealed class GalleryContentLayoutPage
         FWSettingsCardDiagnostics SyncCard,
         FWSettingsCardAutomationDiagnostics SyncAutomation,
         FWSettingsCardDiagnostics DisabledCard,
-        FWSettingsCardAutomationDiagnostics DisabledAutomation);
+        FWSettingsCardAutomationDiagnostics DisabledAutomation)
+    {
+        public bool HasAdaptiveLayoutEvidence => Layout.ActivePane != null;
+
+        public bool HasPrimaryCommandEvidence => PrimaryCard.IsInvokable &&
+            PrimaryCard.HasCommand &&
+            PrimaryCard.CanExecute &&
+            PrimaryAutomation.IsInvokePatternAvailable &&
+            PrimaryAutomation.IsKeyboardFocusable;
+
+        public bool HasHoverStateEvidence => SyncCard.IsClickEnabled &&
+            SyncCard.ClickMode == ClickMode.Hover &&
+            SyncCard.IsInvokable;
+
+        public bool HasDisabledRowEvidence => !DisabledCard.IsEnabled &&
+            !DisabledCard.IsInvokable &&
+            !DisabledAutomation.IsKeyboardFocusable;
+
+        public bool HasAutomationEvidence =>
+            !string.IsNullOrWhiteSpace(PrimaryAutomation.Name) &&
+            !string.IsNullOrWhiteSpace(PrimaryAutomation.HelpText) &&
+            !string.IsNullOrWhiteSpace(DisabledAutomation.Name);
+
+        public bool IsSettingsVisualQaReady => HasAdaptiveLayoutEvidence &&
+            HasPrimaryCommandEvidence &&
+            HasHoverStateEvidence &&
+            HasDisabledRowEvidence &&
+            HasAutomationEvidence;
+    }
 
     public UIElement CreateContent()
     {
@@ -451,7 +479,7 @@ internal sealed class GalleryContentLayoutPage
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(action);
 
-        return $"{action}. Settings visual QA: requested {snapshot.Layout.RequestedMode}, actual {snapshot.Layout.ActualMode}, visible {snapshot.Layout.VisiblePane}, priority {snapshot.Layout.PanePriority}. Primary {FormatSettingsCardDiagnostics(snapshot.PrimaryCard)}; automation {FormatSettingsCardAutomation(snapshot.PrimaryAutomation)}. Sync {FormatSettingsCardDiagnostics(snapshot.SyncCard)}. Disabled {FormatSettingsCardDiagnostics(snapshot.DisabledCard)}.";
+        return $"{action}. Settings visual QA: requested {snapshot.Layout.RequestedMode}, actual {snapshot.Layout.ActualMode}, visible {snapshot.Layout.VisiblePane}, priority {snapshot.Layout.PanePriority}. Primary {FormatSettingsCardDiagnostics(snapshot.PrimaryCard)}; automation {FormatSettingsCardAutomation(snapshot.PrimaryAutomation)}. Sync {FormatSettingsCardDiagnostics(snapshot.SyncCard)}. Disabled {FormatSettingsCardDiagnostics(snapshot.DisabledCard)}. Evidence adaptive {FormatOnOff(snapshot.HasAdaptiveLayoutEvidence)}, primary command {FormatOnOff(snapshot.HasPrimaryCommandEvidence)}, hover {FormatOnOff(snapshot.HasHoverStateEvidence)}, disabled row {FormatOnOff(snapshot.HasDisabledRowEvidence)}, automation {FormatOnOff(snapshot.HasAutomationEvidence)}, ready {FormatOnOff(snapshot.IsSettingsVisualQaReady)}.";
     }
 
     private static UIElement CreateSplitViewLayoutSample()

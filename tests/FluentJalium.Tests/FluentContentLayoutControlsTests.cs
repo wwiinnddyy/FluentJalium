@@ -395,10 +395,16 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Equal(ClickMode.Release, snapshot.PrimaryCard.ClickMode);
         Assert.Equal("Display mode", snapshot.PrimaryAutomation.Name);
         Assert.True(snapshot.PrimaryAutomation.IsInvokePatternAvailable);
+        Assert.True(snapshot.HasAdaptiveLayoutEvidence);
+        Assert.True(snapshot.HasPrimaryCommandEvidence);
         Assert.Equal(ClickMode.Hover, snapshot.SyncCard.ClickMode);
         Assert.True(snapshot.SyncCard.IsInvokable);
+        Assert.True(snapshot.HasHoverStateEvidence);
         Assert.False(snapshot.DisabledCard.IsEnabled);
         Assert.False(snapshot.DisabledCard.IsInvokable);
+        Assert.True(snapshot.HasDisabledRowEvidence);
+        Assert.True(snapshot.HasAutomationEvidence);
+        Assert.True(snapshot.IsSettingsVisualQaReady);
         Assert.Contains("Settings visual QA initialized", text);
         Assert.Contains("requested SinglePane", text);
         Assert.Contains("visible Pane2", text);
@@ -407,6 +413,12 @@ public sealed class FluentContentLayoutControlsTests
         Assert.Contains("Sync invokable on", text);
         Assert.Contains("mode Hover", text);
         Assert.Contains("Disabled invokable off", text);
+        Assert.Contains("Evidence adaptive on", text);
+        Assert.Contains("primary command on", text);
+        Assert.Contains("hover on", text);
+        Assert.Contains("disabled row on", text);
+        Assert.Contains("automation on", text);
+        Assert.Contains("ready on", text);
     }
 
     [Fact]

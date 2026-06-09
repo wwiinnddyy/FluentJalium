@@ -428,6 +428,14 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("IsInteractionPressed", sampleCode);
         Assert.Contains("GetAutomationDiagnostics", sampleCode);
         Assert.Contains("Settings visual QA", sampleCode);
+        Assert.Contains("CreateSettingsVisualQaSnapshot", sampleCode);
+        Assert.Contains("FormatSettingsVisualQa", sampleCode);
+        Assert.Contains("IsSettingsVisualQaReady", sampleCode);
+        Assert.Contains("HasAdaptiveLayoutEvidence", sampleCode);
+        Assert.Contains("HasPrimaryCommandEvidence", sampleCode);
+        Assert.Contains("HasHoverStateEvidence", sampleCode);
+        Assert.Contains("HasDisabledRowEvidence", sampleCode);
+        Assert.Contains("HasAutomationEvidence", sampleCode);
         Assert.Contains("ClickMode.Hover", sampleCode);
         Assert.Contains("disabledCard", sampleCode);
         Assert.Contains("IsEnabled = false", sampleCode);

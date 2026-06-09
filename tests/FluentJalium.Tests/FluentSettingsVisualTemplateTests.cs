@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
@@ -80,6 +81,75 @@ public sealed class FluentSettingsVisualTemplateTests
         AssertSetter(settingsExpanderStyle, FWSettingsExpander.ItemTemplateProperty);
 
         ResetApplicationState();
+    }
+
+    [Fact]
+    public void GallerySettingsPage_ShouldFormatSettingsVisualQaSnapshot()
+    {
+        var primary = new FWSettingsCard
+        {
+            Header = "App theme",
+            Description = "Follow system setting.",
+            HeaderIcon = new FWTextBlock { Text = "I" },
+            ActionIcon = new FWTextBlock { Text = ">" },
+            Content = new FWToggleSwitch { IsOn = true },
+            IsClickEnabled = true
+        };
+        var action = new FWSettingsCard
+        {
+            Header = "Launch behavior",
+            Description = "Open startup options.",
+            HeaderIcon = new FWTextBlock { Text = "I" },
+            ActionIcon = new FWTextBlock { Text = ">" },
+            Content = new FWButton { Content = "Configure" },
+            IsClickEnabled = true
+        };
+        var disabled = new FWSettingsCard
+        {
+            Header = "Enterprise policy",
+            Description = "Disabled row keeps alignment visible.",
+            HeaderIcon = new FWTextBlock { Text = "I" },
+            ActionIcon = new FWTextBlock { Text = "!" },
+            Content = new FWTextBlock { Text = "Managed" },
+            IsClickEnabled = true,
+            IsEnabled = false
+        };
+        var expander = new FWSettingsExpander
+        {
+            Header = "Advanced settings",
+            IsExpanded = true
+        };
+        expander.AddSetting(new FWSettingsCard { Header = "Accent color" });
+        expander.AddSetting(new FWSettingsCard { Header = "Language" });
+        expander.AddSetting(new FWSettingsCard { Header = "Diagnostics" });
+
+        var snapshot = GallerySettingsPage.CreateSettingsVisualQaSnapshot(
+            new[] { primary, action, disabled },
+            expander);
+        var text = GallerySettingsPage.FormatSettingsVisualQa("Settings QA", snapshot);
+
+        Assert.Equal(3, snapshot.CardCount);
+        Assert.Equal(3, snapshot.ClickableCount);
+        Assert.Equal(1, snapshot.DisabledCount);
+        Assert.Equal(3, snapshot.ExpanderItemCount);
+        Assert.Equal(1, snapshot.ExpandedCount);
+        Assert.True(snapshot.HasIconColumn);
+        Assert.True(snapshot.HasActionColumn);
+        Assert.True(snapshot.HasItemHostRows);
+        Assert.True(snapshot.HasAutomationName);
+        Assert.True(snapshot.HasAutomationHelpText);
+        Assert.True(snapshot.CanInvokeClickableRow);
+        Assert.Equal(6, snapshot.DenseRowCount);
+        Assert.True(snapshot.IsSettingsVisualQaReady);
+        Assert.Contains("Settings QA", text);
+        Assert.Contains("Cards: 3", text);
+        Assert.Contains("Clickable: 3", text);
+        Assert.Contains("Disabled: 1", text);
+        Assert.Contains("Expander items: 3", text);
+        Assert.Contains("Icon/action: on/on", text);
+        Assert.Contains("Automation: on/on", text);
+        Assert.Contains("Dense rows: 6", text);
+        Assert.Contains("Ready: on", text);
     }
 
     private static ResourceDictionary LoadThemeDictionary(string source)

@@ -5,10 +5,13 @@ using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWComboBox = FluentJalium.Controls.FWComboBox;
+using FWSettingsCard = FluentJalium.Controls.FWSettingsCard;
+using FWSettingsExpander = FluentJalium.Controls.FWSettingsExpander;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
@@ -18,6 +21,33 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GallerySettingsPage
 {
+    internal readonly record struct GallerySettingsVisualQaSnapshot(
+        int CardCount,
+        int ClickableCount,
+        int DisabledCount,
+        int ExpanderItemCount,
+        int ExpandedCount,
+        bool HasIconColumn,
+        bool HasActionColumn,
+        bool HasItemHostRows,
+        bool HasAutomationName,
+        bool HasAutomationHelpText,
+        bool CanInvokeClickableRow,
+        int DenseRowCount)
+    {
+        public bool IsSettingsVisualQaReady => DenseRowCount >= 6 &&
+            ClickableCount > 0 &&
+            DisabledCount > 0 &&
+            ExpanderItemCount > 0 &&
+            ExpandedCount > 0 &&
+            HasIconColumn &&
+            HasActionColumn &&
+            HasItemHostRows &&
+            HasAutomationName &&
+            HasAutomationHelpText &&
+            CanInvokeClickableRow;
+    }
+
     private readonly Action<FluentThemeVariant> _applyTheme;
     private readonly Action<Color> _applyAccent;
     private readonly LocalizationService _localization;
@@ -75,6 +105,16 @@ internal sealed class GallerySettingsPage
             Strings.Settings_DiagnosticsDescription,
             CreateDiagnosticsSample(),
             "GalleryCatalog.CreatePageInfos()\n    .Where(page => page.IsFooter || page.Status != GalleryPageStatus.Stable);"));
+        examples.Children.Add(CreateSettingsCard(
+            FluentIconRegular.TextBoxSettings24,
+            "Settings visual QA",
+            "Dense settings rows with icons, actions, disabled state, clickable row, automation text, and SettingsExpander item-host rows.",
+            CreateSettingsControlsVisualQaSample(),
+            """
+var cards = new[] { appThemeCard, launchCard, disabledPolicyCard };
+var snapshot = GallerySettingsPage.CreateSettingsVisualQaSnapshot(cards, advancedExpander);
+Debug.WriteLine(GallerySettingsPage.FormatSettingsVisualQa("Settings QA", snapshot));
+"""));
 
         panel.Children.Add(examples);
         return panel;
@@ -254,6 +294,164 @@ internal sealed class GallerySettingsPage
         };
     }
 
+    private static UIElement CreateSettingsControlsVisualQaSample()
+    {
+        var output = CreateOutput("Settings visual QA: waiting for dense settings evidence.");
+        var appThemeCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.DarkTheme24,
+            "App theme",
+            "Follow system setting and keep long descriptions wrapped.",
+            new FWToggleSwitch { IsOn = true, OnContent = "System", OffContent = "Manual" },
+            actionIcon: FluentIconRegular.ChevronRight24,
+            isClickEnabled: true);
+        var launchCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.Rocket24,
+            "Launch behavior",
+            "Open advanced startup options.",
+            new FWButton { Content = "Configure" },
+            actionIcon: FluentIconRegular.Open24,
+            isClickEnabled: true);
+        var syncCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.CloudSync24,
+            "Sync settings",
+            "Use hover click mode for a compact settings action.",
+            new FWToggleSwitch { IsOn = true, OnContent = "On", OffContent = "Off" },
+            actionIcon: FluentIconRegular.AccessibilityCheckmark24,
+            isClickEnabled: true,
+            clickMode: ClickMode.Hover);
+        var densityCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.TextDensity24,
+            "Control density",
+            "Comfortable rows preserve icon and action alignment.",
+            new FWComboBox
+            {
+                MinWidth = 120,
+                SelectedIndex = 0,
+                Items = { "Comfortable", "Compact" }
+            },
+            actionIcon: FluentIconRegular.ChevronRight24);
+        var disabledPolicyCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.ShieldDismiss24,
+            "Enterprise policy",
+            "Disabled rows keep text, icon, and action affordances aligned.",
+            new FWTextBlock { Text = "Managed", Foreground = ThemeBrush("TextSecondary") },
+            actionIcon: FluentIconRegular.AlertOff24,
+            isClickEnabled: true,
+            isEnabled: false);
+        var previewCard = CreateVisualQaSettingsCard(
+            FluentIconRegular.WindowWrench24,
+            "Preview channel",
+            "Shows a long metadata row inside the dense settings page.",
+            new FWButton { Content = "Preview" },
+            actionIcon: FluentIconRegular.ChevronRight24);
+        var expander = new FWSettingsExpander
+        {
+            Header = "Advanced settings",
+            Description = "SettingsExpander item-host rows use SettingsCard defaults.",
+            HeaderIcon = CreateIcon(FluentIconRegular.Settings24, 20, ThemeBrush("TextPrimary")),
+            IsExpanded = true
+        };
+        expander.AddSetting(CreateVisualQaSettingsCard(
+            FluentIconRegular.Color24,
+            "Accent color",
+            "Preserve action alignment when rows are hosted by an expander.",
+            new FWTextBlock { Text = "Blue", Foreground = ThemeBrush("TextSecondary") },
+            actionIcon: FluentIconRegular.ChevronRight24,
+            isClickEnabled: true));
+        expander.AddSetting(CreateVisualQaSettingsCard(
+            FluentIconRegular.LocalLanguage24,
+            "Language",
+            "Hosted row with secondary text.",
+            new FWTextBlock { Text = "System", Foreground = ThemeBrush("TextSecondary") },
+            actionIcon: FluentIconRegular.ChevronRight24));
+        expander.AddSetting(CreateVisualQaSettingsCard(
+            FluentIconRegular.DataUsage24,
+            "Diagnostics",
+            "Hosted row for Gallery metadata.",
+            new FWButton { Content = "View" },
+            actionIcon: FluentIconRegular.Open24,
+            isClickEnabled: true));
+
+        var cards = new[]
+        {
+            appThemeCard,
+            launchCard,
+            syncCard,
+            densityCard,
+            disabledPolicyCard,
+            previewCard
+        };
+
+        void RefreshQa(string action)
+        {
+            output.Text = FormatSettingsVisualQa(action, CreateSettingsVisualQaSnapshot(cards, expander));
+        }
+
+        appThemeCard.Click += (_, _) => RefreshQa("App theme row invoked");
+        launchCard.Click += (_, _) => RefreshQa("Launch row invoked");
+        syncCard.Click += (_, _) => RefreshQa("Sync row invoked");
+        expander.Expanded += (_, _) => RefreshQa("SettingsExpander expanded");
+        expander.Collapsed += (_, _) => RefreshQa("SettingsExpander collapsed");
+        RefreshQa("Settings QA initialized");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Width = 560,
+            Children =
+            {
+                appThemeCard,
+                launchCard,
+                syncCard,
+                densityCard,
+                disabledPolicyCard,
+                previewCard,
+                expander,
+                CreateButtonRow(
+                    CreateActionButton(FluentIconRegular.DataUsage24, "Refresh QA", () => RefreshQa("Settings QA refreshed")),
+                    CreateActionButton(FluentIconRegular.PanelLeftContract24, "Toggle expander", () => expander.IsExpanded = !expander.IsExpanded),
+                    CreateActionButton(FluentIconRegular.ShieldDismiss24, "Policy", () =>
+                    {
+                        disabledPolicyCard.IsEnabled = !disabledPolicyCard.IsEnabled;
+                        RefreshQa("Policy row state toggled");
+                    })),
+                CreateStatus(output)
+            }
+        };
+    }
+
+    internal static GallerySettingsVisualQaSnapshot CreateSettingsVisualQaSnapshot(
+        IReadOnlyList<FWSettingsCard> cards,
+        FWSettingsExpander expander)
+    {
+        ArgumentNullException.ThrowIfNull(cards);
+        ArgumentNullException.ThrowIfNull(expander);
+
+        var diagnostics = cards.Select(card => card.GetDiagnostics()).ToArray();
+        var automation = cards.Select(card => card.GetAutomationDiagnostics()).ToArray();
+        return new GallerySettingsVisualQaSnapshot(
+            cards.Count,
+            diagnostics.Count(item => item.IsClickEnabled),
+            diagnostics.Count(item => !item.IsEnabled),
+            expander.ItemCount,
+            expander.IsExpanded ? 1 : 0,
+            cards.Any(card => card.HeaderIcon != null),
+            cards.Any(card => card.ActionIcon != null),
+            expander.ItemCount > 0,
+            automation.Any(item => !string.IsNullOrWhiteSpace(item.Name)),
+            automation.Any(item => !string.IsNullOrWhiteSpace(item.HelpText)),
+            diagnostics.Any(item => item.IsInvokable),
+            cards.Count + expander.ItemCount);
+    }
+
+    internal static string FormatSettingsVisualQa(string action, GallerySettingsVisualQaSnapshot snapshot)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
+        return $"{action}. Settings QA. Cards: {snapshot.CardCount}. Clickable: {snapshot.ClickableCount}. Disabled: {snapshot.DisabledCount}. Expander items: {snapshot.ExpanderItemCount}. Expanded: {snapshot.ExpandedCount}. Icon/action: {FormatOnOff(snapshot.HasIconColumn)}/{FormatOnOff(snapshot.HasActionColumn)}. Item host: {FormatOnOff(snapshot.HasItemHostRows)}. Automation: {FormatOnOff(snapshot.HasAutomationName)}/{FormatOnOff(snapshot.HasAutomationHelpText)}. Invoke: {FormatOnOff(snapshot.CanInvokeClickableRow)}. Dense rows: {snapshot.DenseRowCount}. Ready: {FormatOnOff(snapshot.IsSettingsVisualQaReady)}.";
+    }
+
     private FWButton CreateAccentButton(string label, Color color, TextBlock output)
     {
         var button = new FWButton
@@ -287,6 +485,29 @@ internal sealed class GallerySettingsPage
             output.Text = string.Format(Strings.Status_Accent, $"{color.R:X2}{color.G:X2}{color.B:X2}");
         };
         return button;
+    }
+
+    private static FWSettingsCard CreateVisualQaSettingsCard(
+        FluentIconRegular icon,
+        string header,
+        string description,
+        UIElement content,
+        FluentIconRegular? actionIcon = null,
+        bool isClickEnabled = false,
+        bool isEnabled = true,
+        ClickMode clickMode = ClickMode.Release)
+    {
+        return new FWSettingsCard
+        {
+            Header = header,
+            Description = description,
+            HeaderIcon = CreateIcon(icon, 20, ThemeBrush("TextSecondary")),
+            ActionIcon = actionIcon.HasValue ? CreateIcon(actionIcon.Value, 16, ThemeBrush("TextSecondary")) : null,
+            Content = content,
+            IsClickEnabled = isClickEnabled,
+            IsEnabled = isEnabled,
+            ClickMode = clickMode
+        };
     }
 
     private static FWBorder CreateDiagnosticRow(FluentIconRegular icon, string title, string description)
@@ -449,5 +670,10 @@ internal sealed class GallerySettingsPage
         }
 
         return new SolidColorBrush(Colors.Transparent);
+    }
+
+    private static string FormatOnOff(bool value)
+    {
+        return value ? "on" : "off";
     }
 }

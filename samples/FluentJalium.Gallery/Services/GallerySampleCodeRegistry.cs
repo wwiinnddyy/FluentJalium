@@ -578,6 +578,13 @@ var twoPaneView = new FWTwoPaneView
 };
 FWTwoPaneViewDiagnostics twoPaneDiagnostics = twoPaneView.GetDiagnostics();
 Debug.WriteLine($"TwoPaneView diagnostics: requested {twoPaneDiagnostics.RequestedMode}; actual {twoPaneDiagnostics.ActualMode}; visible {twoPaneDiagnostics.VisiblePane}.");
+var settingsVisualQa = GalleryContentLayoutPage.CreateSettingsVisualQaSnapshot(
+    twoPaneView,
+    card,
+    hoverCard,
+    disabledCard);
+Debug.WriteLine(GalleryContentLayoutPage.FormatSettingsVisualQa("Settings visual QA snapshot", settingsVisualQa));
+Debug.WriteLine($"Settings visual QA ready: {settingsVisualQa.IsSettingsVisualQaReady}; adaptive {settingsVisualQa.HasAdaptiveLayoutEvidence}; command {settingsVisualQa.HasPrimaryCommandEvidence}; hover {settingsVisualQa.HasHoverStateEvidence}; disabled {settingsVisualQa.HasDisabledRowEvidence}; automation {settingsVisualQa.HasAutomationEvidence}.");
 
 card.PerformClick();
 
