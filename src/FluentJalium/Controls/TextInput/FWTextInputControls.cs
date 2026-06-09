@@ -229,9 +229,16 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
         EventManager.RegisterRoutedEvent(nameof(SuggestionChosen), RoutingStrategy.Bubble,
             typeof(EventHandler<FWAutoSuggestBoxSuggestionChosenEventArgs>), typeof(FWAutoSuggestBox));
 
+    public static readonly RoutedEvent AutoSuggestTextChangedEvent =
+        EventManager.RegisterRoutedEvent(nameof(AutoSuggestTextChanged), RoutingStrategy.Bubble,
+            typeof(EventHandler<FWAutoSuggestBoxTextChangedEventArgs>), typeof(FWAutoSuggestBox));
+
+    private FWAutoSuggestBoxTextChangeReason? _pendingTextChangeReason;
+
     public FWAutoSuggestBox()
     {
         ApplyDensity(this, Density);
+        TextChanged += OnAutoCompleteTextChanged;
         SelectionChanged += OnAutoCompleteSelectionChanged;
     }
 
@@ -245,6 +252,12 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
     {
         add => AddHandler(SuggestionChosenEvent, value);
         remove => RemoveHandler(SuggestionChosenEvent, value);
+    }
+
+    public event EventHandler<FWAutoSuggestBoxTextChangedEventArgs> AutoSuggestTextChanged
+    {
+        add => AddHandler(AutoSuggestTextChangedEvent, value);
+        remove => RemoveHandler(AutoSuggestTextChangedEvent, value);
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
@@ -264,7 +277,18 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
     public void SetQueryText(string? text, FWAutoSuggestBoxTextChangeReason reason = FWAutoSuggestBoxTextChangeReason.ProgrammaticChange)
     {
         LastTextChangeReason = reason;
-        Text = text ?? string.Empty;
+        _pendingTextChangeReason = reason;
+        try
+        {
+            Text = text ?? string.Empty;
+        }
+        finally
+        {
+            if (_pendingTextChangeReason == reason)
+            {
+                _pendingTextChangeReason = null;
+            }
+        }
     }
 
     public bool RequestSuggestionChosen(object? suggestion)
@@ -274,13 +298,11 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
             return false;
         }
 
-        LastTextChangeReason = FWAutoSuggestBoxTextChangeReason.SuggestionChosen;
         SelectedItem = suggestion;
-        Text = ResolveSuggestionText(suggestion);
+        SetQueryText(ResolveSuggestionText(suggestion), FWAutoSuggestBoxTextChangeReason.SuggestionChosen);
         IsDropDownOpen = false;
 
-        var args = new FWAutoSuggestBoxSuggestionChosenEventArgs(SuggestionChosenEvent, this, suggestion);
-        RaiseEvent(args);
+        RaiseSuggestionChosen(suggestion);
         return true;
     }
 
@@ -302,9 +324,27 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
 
         base.OnKeyDown(e);
 
-        if (submitQuery && e.Handled)
+        if (submitQuery)
         {
             RequestQuerySubmitted(SelectedItem);
+        }
+    }
+
+    protected override void InsertText(string textToInsert)
+    {
+        var previousReason = _pendingTextChangeReason;
+        _pendingTextChangeReason = FWAutoSuggestBoxTextChangeReason.UserInput;
+
+        try
+        {
+            base.InsertText(textToInsert);
+        }
+        finally
+        {
+            if (_pendingTextChangeReason == FWAutoSuggestBoxTextChangeReason.UserInput)
+            {
+                _pendingTextChangeReason = previousReason;
+            }
         }
     }
 
@@ -332,7 +372,24 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
             return;
         }
 
-        LastTextChangeReason = FWAutoSuggestBoxTextChangeReason.SuggestionChosen;
+        RaiseAutoSuggestTextChanged(FWAutoSuggestBoxTextChangeReason.SuggestionChosen);
+        RaiseSuggestionChosen(selectedItem);
+    }
+
+    private void OnAutoCompleteTextChanged(object? sender, RoutedEventArgs e)
+    {
+        RaiseAutoSuggestTextChanged(_pendingTextChangeReason ?? FWAutoSuggestBoxTextChangeReason.ProgrammaticChange);
+        _pendingTextChangeReason = null;
+    }
+
+    private void RaiseAutoSuggestTextChanged(FWAutoSuggestBoxTextChangeReason reason)
+    {
+        LastTextChangeReason = reason;
+        RaiseEvent(new FWAutoSuggestBoxTextChangedEventArgs(AutoSuggestTextChangedEvent, this, Text, reason));
+    }
+
+    private void RaiseSuggestionChosen(object selectedItem)
+    {
         RaiseEvent(new FWAutoSuggestBoxSuggestionChosenEventArgs(SuggestionChosenEvent, this, selectedItem));
     }
 
@@ -370,6 +427,23 @@ public sealed class FWAutoSuggestBoxQuerySubmittedEventArgs : RoutedEventArgs
 
     public string QueryText { get; }
     public object? ChosenSuggestion { get; }
+}
+
+public sealed class FWAutoSuggestBoxTextChangedEventArgs : RoutedEventArgs
+{
+    public FWAutoSuggestBoxTextChangedEventArgs(
+        RoutedEvent routedEvent,
+        object source,
+        string text,
+        FWAutoSuggestBoxTextChangeReason reason)
+        : base(routedEvent, source)
+    {
+        Text = text;
+        Reason = reason;
+    }
+
+    public string Text { get; }
+    public FWAutoSuggestBoxTextChangeReason Reason { get; }
 }
 
 public sealed class FWAutoSuggestBoxSuggestionChosenEventArgs : RoutedEventArgs

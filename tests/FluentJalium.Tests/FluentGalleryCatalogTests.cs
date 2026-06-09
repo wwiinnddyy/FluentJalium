@@ -228,6 +228,25 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryTextInputPage_ShouldExposeAutoSuggestReasonMetadataAndSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "textinput");
+
+        Assert.Equal("textinput.autosuggestbox", page.SampleCodeKey);
+        Assert.Contains("AutoSuggestTextChanged", page.Tags);
+        Assert.Contains("TextChangeReason", page.Tags);
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWAutoSuggestBox", sampleCode);
+        Assert.Contains("AutoSuggestTextChanged", sampleCode);
+        Assert.Contains("args.Reason", sampleCode);
+        Assert.Contains("QuerySubmitted", sampleCode);
+        Assert.Contains("ChosenSuggestion", sampleCode);
+        Assert.Contains("FWAutoSuggestBoxTextChangeReason.UserInput", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeNavigationSelectorDiagnosticsSample()
     {
         var page = Assert.Single(

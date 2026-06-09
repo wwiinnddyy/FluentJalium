@@ -173,6 +173,11 @@ autoSuggestBox.TextChanged += (_, _) =>
     var matchCount = autoSuggestBox.FilteredItems.Count;
 };
 
+autoSuggestBox.AutoSuggestTextChanged += (_, args) =>
+{
+    Debug.WriteLine($"Text changed: {args.Text}; reason: {args.Reason}");
+};
+
 autoSuggestBox.SuggestionChosen += (_, args) =>
 {
     var selected = args.SelectedItem;
@@ -182,6 +187,9 @@ autoSuggestBox.QuerySubmitted += (_, args) =>
 {
     var query = args.QueryText;
     var chosen = args.ChosenSuggestion;
+    Debug.WriteLine(chosen == null
+        ? $"Submitted text query: {query}"
+        : $"Submitted chosen suggestion: {chosen}");
 };
 
 autoSuggestBox.SetQueryText("Calendar", FWAutoSuggestBoxTextChangeReason.UserInput);

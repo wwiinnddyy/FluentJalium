@@ -52,7 +52,7 @@ internal sealed class GalleryTextInputPage
         examples.Children.Add(CreateTextInputExampleCard(
             FluentIconRegular.SearchSparkle24,
             "FWAutoSuggestBox",
-            "WinUI-style suggest naming with filtering, drop-down state, density, and live suggestion counts.",
+            "WinUI-style suggest naming with text-change reasons, suggestion choice, query submit, and live counts.",
             CreateAutoSuggestInputSample()));
         examples.Children.Add(CreateTextInputExampleCard(
             FluentIconRegular.DocumentText24,
@@ -276,6 +276,7 @@ internal sealed class GalleryTextInputPage
         }
 
         autoSuggestBox.TextChanged += (_, _) => UpdateOutput("Suggest");
+        autoSuggestBox.AutoSuggestTextChanged += (_, args) => output.Text = $"AutoSuggest text changed: {args.Text}, reason: {args.Reason}, matches: {autoSuggestBox.FilteredItems.Count}.";
         autoSuggestBox.SuggestionChosen += (_, args) => output.Text = $"Suggestion chosen: {args.SelectedItem}. Text: {autoSuggestBox.Text}, reason: {autoSuggestBox.LastTextChangeReason}.";
         autoSuggestBox.QuerySubmitted += (_, args) => output.Text = $"Query submitted: {args.QueryText}, chosen: {args.ChosenSuggestion?.ToString() ?? "none"}.";
         autoSuggestBox.DropDownOpened += (_, _) => UpdateOutput("Drop-down open");
