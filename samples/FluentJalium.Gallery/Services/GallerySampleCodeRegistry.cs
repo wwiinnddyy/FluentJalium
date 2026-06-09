@@ -480,6 +480,16 @@ var interaction = card.GetDiagnostics();
 Debug.WriteLine($"SettingsCard interaction: invokable {interaction.IsInvokable}; pressed {interaction.IsInteractionPressed}; click mode {interaction.ClickMode}.");
 Debug.WriteLine($"Settings visual QA: primary {card.GetDiagnostics().IsInvokable}; hover {hoverCard.GetDiagnostics().ClickMode}; disabled {disabledCard.GetDiagnostics().IsEnabled}.");
 
+var twoPaneView = new FWTwoPaneView
+{
+    Mode = FWTwoPaneViewMode.Wide,
+    PanePriority = FWTwoPaneViewPriority.Pane1,
+    Pane1 = new FWTextBlock { Text = "Navigation pane" },
+    Pane2 = new FWTextBlock { Text = "Settings pane" }
+};
+FWTwoPaneViewDiagnostics twoPaneDiagnostics = twoPaneView.GetDiagnostics();
+Debug.WriteLine($"TwoPaneView diagnostics: requested {twoPaneDiagnostics.RequestedMode}; actual {twoPaneDiagnostics.ActualMode}; visible {twoPaneDiagnostics.VisiblePane}.");
+
 card.PerformClick();
 
 var scrollViewer = new FWScrollViewer
@@ -505,6 +515,8 @@ var parallaxView = new FWParallaxView
     IsHorizontalShiftEnabled = true
 };
 parallaxView.RefreshProgressFromSource();
+FWParallaxViewDiagnostics parallaxDiagnostics = parallaxView.GetDiagnostics();
+Debug.WriteLine($"Parallax diagnostics: source {parallaxDiagnostics.SourceKind}; progress {parallaxDiagnostics.Progress:P0}; offset {parallaxDiagnostics.CurrentOffset}.");
 """,
         ["visuals.icons.richtext.personpicture.markdown.qrcode.shapes"] = """
 var visuals = new FWStackPanel
@@ -617,7 +629,7 @@ scroller.AttachScrollViewer(scrollViewer);
 
 repeater.AttachViewport(scroller);
 repeater.ApplyViewport(2560, 480);
-var diagnostics = repeater.GetDiagnostics();
+FWItemsRepeaterDiagnostics diagnostics = repeater.GetDiagnostics();
 Debug.WriteLine($"Stress viewport: {diagnostics.AttachedViewportSource}; items {diagnostics.ItemCount}; window {diagnostics.FirstRealizedIndex}-{diagnostics.LastRealizedIndex}; cache {diagnostics.ActiveCacheLength}.");
 
 repeater.Layout = new StackLayout
@@ -849,6 +861,10 @@ var isMatched = actualBackdrop == FWFluentWindowMaterialProfileRecipe
     .Create(windowSurface.WindowMaterialProfile)
     .SystemBackdrop;
 Debug.WriteLine($"Window backdrop QA: actual {actualBackdrop}; matched {isMatched}; auto apply {windowSurface.AutoApplyWindowBackdrop}.");
+
+FWFluentWindowSurfaceDiagnostics surfaceDiagnostics =
+    windowSurface.GetWindowSurfaceDiagnostics(actualBackdrop, wasApplied: true);
+Debug.WriteLine($"Window surface diagnostics: {surfaceDiagnostics.Role}; match {surfaceDiagnostics.MatchState}; applied {surfaceDiagnostics.ApplyState}.");
 
 var diagnostics = GalleryWindowSurfaceDiagnostics.Create(
     windowSurface,
@@ -1255,6 +1271,8 @@ overlayHost.Placement = FWSnackbarPlacement.Bottom;
 overlayHost.OverlayPlacement = PlacementMode.Bottom;
 
 var closeTask = service.EnqueueForResultAsync(snackbar);
+FWSnackbarPresenterDiagnostics presenterDiagnostics = snackbar.GetPresenterDiagnostics();
+Debug.WriteLine($"Snackbar presenter: {presenterDiagnostics.PresenterState}; has presenter {presenterDiagnostics.HasPresenter}; opacity {presenterDiagnostics.PresenterOpacity}; offset {presenterDiagnostics.PresenterOffset}.");
 var diagnostics = overlayHost.GetDiagnostics();
 var isOverlayOpen = overlayHost.IsOverlayOpen;
 snackbar.PauseAutoDismiss();

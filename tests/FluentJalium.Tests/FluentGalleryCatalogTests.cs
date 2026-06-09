@@ -26,9 +26,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWSettingsExpander" && control.Page.UniqueId == "disclosure");
         Assert.Contains(controls, control => control.Name == "FWTaskDialog" && control.Page.UniqueId == "disclosure");
         Assert.Contains(controls, control => control.Name == "FWSnackbar" && control.Page.UniqueId == "status");
+        Assert.Contains(controls, control => control.Name == "FWSnackbarPresenterDiagnostics" && control.Page.UniqueId == "status");
         Assert.Contains(controls, control => control.Name == "FWSplitView" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWTwoPaneView" && control.Page.UniqueId == "contentandlayout");
+        Assert.Contains(controls, control => control.Name == "FWTwoPaneViewDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWParallaxView" && control.Page.UniqueId == "contentandlayout");
+        Assert.Contains(controls, control => control.Name == "FWParallaxViewDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWSettingsCardDiagnostics" && control.Page.UniqueId == "contentandlayout");
         Assert.Contains(controls, control => control.Name == "FWRadioButtons" && control.Page.UniqueId == "selection");
         Assert.Contains(controls, control => control.Name == "FWComboBoxItem" && control.Page.UniqueId == "selection");
@@ -39,6 +42,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWRefreshContainerDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWScrollerViewportDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWAnnotatedScrollBarDiagnostics" && control.Page.UniqueId == "advancedinteraction");
+        Assert.Contains(controls, control => control.Name == "FWItemsRepeaterDiagnostics" && control.Page.UniqueId == "advancedcollections");
+        Assert.Contains(controls, control => control.Name == "FWFluentWindowSurfaceDiagnostics" && control.Page.UniqueId == "windowbackdrops");
     }
 
     [Fact]
@@ -74,6 +79,10 @@ public sealed class FluentGalleryCatalogTests
         AssertCatalogControl(controls, "FWToggleMenuFlyoutItem", "menus");
         AssertCatalogControl(controls, "FWMenuFlyoutSeparator", "menus");
 
+        AssertCatalogControl(controls, "FWTwoPaneViewDiagnostics", "contentandlayout");
+        AssertCatalogControl(controls, "FWParallaxViewDiagnostics", "contentandlayout");
+        AssertCatalogControl(controls, "FWFluentWindowSurfaceDiagnostics", "windowbackdrops");
+        AssertCatalogControl(controls, "FWSnackbarPresenterDiagnostics", "status");
         AssertCatalogControl(controls, "FWSnackbarHostDiagnostics", "status");
         AssertCatalogControl(controls, "FWToastNotificationItem", "status");
         AssertCatalogControl(controls, "FWStatusBarItem", "status");
@@ -96,6 +105,13 @@ public sealed class FluentGalleryCatalogTests
         var itemsRepeater = Assert.Single(controls, control => control.Name == "FWItemsRepeater");
         Assert.True(itemsRepeater.IsNew);
         Assert.Equal(GalleryPageStatus.Preview, itemsRepeater.Status);
+
+        var itemsRepeaterDiagnostics = Assert.Single(controls, control => control.Name == "FWItemsRepeaterDiagnostics");
+        Assert.True(itemsRepeaterDiagnostics.IsNew);
+        Assert.Equal(GalleryPageStatus.Preview, itemsRepeaterDiagnostics.Status);
+        Assert.Equal("advancedcollections.itemsrepeater", itemsRepeaterDiagnostics.SampleCodeKey);
+        Assert.Contains("Panel", itemsRepeaterDiagnostics.BaseClasses);
+        Assert.Equal("/Collections/FWItemsRepeater/FWItemsRepeaterDiagnostics", itemsRepeaterDiagnostics.SourcePath);
 
         var selectorBarDiagnostics = Assert.Single(controls, control => control.Name == "FWSelectorBarDiagnostics");
         Assert.True(selectorBarDiagnostics.IsUpdated);
@@ -120,6 +136,30 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal("layout.splitview.settingscard", splitView.SampleCodeKey);
         Assert.Contains("ContentControl", splitView.BaseClasses);
         Assert.Equal("/Layout/FWSplitView", splitView.SourcePath);
+
+        var twoPaneDiagnostics = Assert.Single(controls, control => control.Name == "FWTwoPaneViewDiagnostics");
+        Assert.True(twoPaneDiagnostics.IsUpdated);
+        Assert.Equal("layout.splitview.settingscard", twoPaneDiagnostics.SampleCodeKey);
+        Assert.Contains("ContentControl", twoPaneDiagnostics.BaseClasses);
+        Assert.Equal("/Layout/FWSplitView/FWTwoPaneViewDiagnostics", twoPaneDiagnostics.SourcePath);
+
+        var parallaxDiagnostics = Assert.Single(controls, control => control.Name == "FWParallaxViewDiagnostics");
+        Assert.True(parallaxDiagnostics.IsUpdated);
+        Assert.Equal("layout.splitview.settingscard", parallaxDiagnostics.SampleCodeKey);
+        Assert.Contains("ContentControl", parallaxDiagnostics.BaseClasses);
+        Assert.Equal("/Layout/FWSplitView/FWParallaxViewDiagnostics", parallaxDiagnostics.SourcePath);
+
+        var windowSurfaceDiagnostics = Assert.Single(controls, control => control.Name == "FWFluentWindowSurfaceDiagnostics");
+        Assert.True(windowSurfaceDiagnostics.IsUpdated);
+        Assert.Equal("materials.windowbackdrop", windowSurfaceDiagnostics.SampleCodeKey);
+        Assert.Contains("Border", windowSurfaceDiagnostics.BaseClasses);
+        Assert.Equal("/Materials/FWFluentWindowSurface/FWFluentWindowSurfaceDiagnostics", windowSurfaceDiagnostics.SourcePath);
+
+        var snackbarPresenterDiagnostics = Assert.Single(controls, control => control.Name == "FWSnackbarPresenterDiagnostics");
+        Assert.True(snackbarPresenterDiagnostics.IsUpdated);
+        Assert.Equal("status.snackbar", snackbarPresenterDiagnostics.SampleCodeKey);
+        Assert.Contains("ContentControl", snackbarPresenterDiagnostics.BaseClasses);
+        Assert.Equal("/Status/FWSnackbar/FWSnackbarPresenterDiagnostics", snackbarPresenterDiagnostics.SourcePath);
 
         var scrollViewer = Assert.Single(controls, control => control.Name == "FWScrollViewer");
         Assert.True(scrollViewer.IsUpdated);
@@ -223,6 +263,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
         Assert.Contains("new FWItemsRepeater", sampleCode);
         Assert.Contains("AttachViewport", sampleCode);
+        Assert.Contains("FWItemsRepeaterDiagnostics", sampleCode);
         Assert.Contains("GetDiagnostics", sampleCode);
         Assert.Contains("ItemsViewSelection", sampleCode);
         Assert.Contains("FlipViewPaging", sampleCode);
@@ -269,16 +310,15 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("ClickMode.Hover", sampleCode);
         Assert.Contains("disabledCard", sampleCode);
         Assert.Contains("IsEnabled = false", sampleCode);
+        Assert.Contains("new FWTwoPaneView", sampleCode);
+        Assert.Contains("FWTwoPaneViewDiagnostics", sampleCode);
+        Assert.Contains("FWParallaxViewDiagnostics", sampleCode);
     }
 
     [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeSettingsExpanderItemHostTemplateSample()
+    public void GallerySampleCodeRegistry_ShouldKeepSettingsExpanderItemHostTemplateSampleRegistered()
     {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "disclosure");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleCodeRegistry.TryGetRegisteredSampleCode("disclosure.settings.teachingtip", out var sampleCode));
         Assert.Contains("new FWSettingsExpander", sampleCode);
         Assert.Contains("ItemsSource = new[]", sampleCode);
         Assert.Contains("new SettingsRow", sampleCode);
@@ -288,7 +328,12 @@ public sealed class FluentGalleryCatalogTests
     [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeTaskDialogRealWindowQaSample()
     {
-        Assert.True(GallerySampleCodeRegistry.TryGetRegisteredSampleCode("disclosure.taskdialog", out var sampleCode));
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "disclosure");
+
+        Assert.Equal("disclosure.taskdialog", page.SampleCodeKey);
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
 
         Assert.Contains("new FWTaskDialogHost", sampleCode);
         Assert.Contains("FocusRestoreTarget", sampleCode);
@@ -363,6 +408,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("window.SystemBackdrop", sampleCode);
         Assert.Contains("isMatched", sampleCode);
         Assert.Contains("Window backdrop QA", sampleCode);
+        Assert.Contains("FWFluentWindowSurfaceDiagnostics", sampleCode);
+        Assert.Contains("GetWindowSurfaceDiagnostics", sampleCode);
         Assert.Contains("GalleryWindowSurfaceDiagnostics.Create", sampleCode);
         Assert.Contains("FormatWindowSurfaceDiagnostics", sampleCode);
         Assert.Contains("GalleryWindowSurfaceEnvironment.Create", sampleCode);
@@ -505,6 +552,11 @@ public sealed class FluentGalleryCatalogTests
         Assert.All(diagnostic.Matches, control => Assert.True(IsDiagnosticCatalogControl(control)));
         Assert.True(diagnostic.ContainsControl("FWRefreshContainerDiagnostics"));
         Assert.True(diagnostic.ContainsControl("FWAnnotatedScrollBarDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWItemsRepeaterDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWTwoPaneViewDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWParallaxViewDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWFluentWindowSurfaceDiagnostics"));
+        Assert.True(diagnostic.ContainsControl("FWSnackbarPresenterDiagnostics"));
     }
 
     [Fact]

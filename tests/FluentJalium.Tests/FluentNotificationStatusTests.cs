@@ -1174,6 +1174,8 @@ public sealed class FluentNotificationStatusTests
         Assert.Contains("PlacementMode.Bottom", sampleCode, StringComparison.Ordinal);
         Assert.Contains("TransitionRequested", sampleCode, StringComparison.Ordinal);
         Assert.Contains("QueueChanged", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("FWSnackbarPresenterDiagnostics", sampleCode, StringComparison.Ordinal);
+        Assert.Contains("GetPresenterDiagnostics", sampleCode, StringComparison.Ordinal);
         Assert.Contains("GetDiagnostics()", sampleCode, StringComparison.Ordinal);
         Assert.Contains("CreateSnackbarVisualQaSnapshot", sampleCode, StringComparison.Ordinal);
         Assert.Contains("FormatSnackbarVisualQa", sampleCode, StringComparison.Ordinal);
