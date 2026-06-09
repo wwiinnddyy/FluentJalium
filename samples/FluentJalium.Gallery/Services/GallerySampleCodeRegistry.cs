@@ -1443,6 +1443,12 @@ var filterPage = new GalleryCatalogFilterPage(
 var snapshot = filterPage.CreateSnapshot();
 var content = filterPage.CreateContent();
 Debug.WriteLine($"{{filter}}: {snapshot.ControlCount} controls across {snapshot.PageCount} pages.");
+Debug.WriteLine($"{snapshot.GroupCounts.Length} groups, {snapshot.WithSourcePathCount} sources, {snapshot.WithSampleCodeKeyCount} samples, {snapshot.WithApiNamespaceCount} api namespaces.");
+
+foreach (var group in snapshot.GroupCounts)
+{
+    Debug.WriteLine($"{group.Group}: {group.ControlCount} controls across {group.PageCount} pages.");
+}
 """;
     }
 

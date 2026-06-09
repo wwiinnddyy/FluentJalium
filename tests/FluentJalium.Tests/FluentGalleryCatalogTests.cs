@@ -706,6 +706,22 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal(controls.Count(control => control.Status == GalleryPageStatus.Preview), all.PreviewCount);
         Assert.Equal(controls.Count(IsDiagnosticCatalogControl), all.DiagnosticCount);
         Assert.Equal(controls.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count(), all.PageCount);
+        Assert.Equal(controls.Count(control => !string.IsNullOrWhiteSpace(control.SourcePath)), all.WithSourcePathCount);
+        Assert.Equal(controls.Count(control => !string.IsNullOrWhiteSpace(control.SampleCodeKey)), all.WithSampleCodeKeyCount);
+        Assert.Equal(controls.Count(control => !string.IsNullOrWhiteSpace(control.ApiNamespace)), all.WithApiNamespaceCount);
+        Assert.Equal(
+            controls
+                .GroupBy(control => control.Group, StringComparer.Ordinal)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group => new GalleryCatalogFilterGroupSnapshot(
+                    group.Key,
+                    group.Count(),
+                    group.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count()))
+                .ToArray(),
+            all.GroupCounts);
+        Assert.True(all.HasCompleteNavigationMetadata);
+        Assert.True(all.ContainsPage("navigation"));
+        Assert.True(all.ContainsSampleCodeKey("navigation.breadcrumb.pips.selector.tabview.titlebar"));
 
         Assert.NotEmpty(newest.Matches);
         Assert.All(newest.Matches, control => Assert.True(control.IsNew));
@@ -720,6 +736,9 @@ public sealed class FluentGalleryCatalogTests
         Assert.All(preview.Matches, control => Assert.Equal(GalleryPageStatus.Preview, control.Status));
         Assert.True(preview.ContainsControl("FWItemsRepeater"));
         Assert.True(preview.ContainsControl("FWAnimatedIcon"));
+        Assert.True(preview.ContainsPage("advancedcollections"));
+        Assert.True(preview.ContainsSampleCodeKey("advancedcollections.itemsrepeater"));
+        Assert.True(preview.HasCompleteNavigationMetadata);
 
         Assert.NotEmpty(diagnostic.Matches);
         Assert.All(diagnostic.Matches, control => Assert.True(IsDiagnosticCatalogControl(control)));
@@ -745,6 +764,10 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal(snapshot.ControlCount, snapshot.PreviewCount);
         Assert.True(snapshot.PageCount > 0);
         Assert.True(snapshot.ContainsControl("FWItemsRepeater"));
+        Assert.True(snapshot.ContainsPage("advancedcollections"));
+        Assert.True(snapshot.ContainsSampleCodeKey("advancedcollections.itemsrepeater"));
+        Assert.NotEmpty(snapshot.GroupCounts);
+        Assert.True(snapshot.HasCompleteNavigationMetadata);
         Assert.IsAssignableFrom<UIElement>(content);
     }
 
@@ -764,6 +787,10 @@ public sealed class FluentGalleryCatalogTests
             Assert.Contains("CreateSnapshot()", sampleCode);
             Assert.Contains("snapshot.ControlCount", sampleCode);
             Assert.Contains("snapshot.PageCount", sampleCode);
+            Assert.Contains("snapshot.GroupCounts", sampleCode);
+            Assert.Contains("snapshot.WithSourcePathCount", sampleCode);
+            Assert.Contains("snapshot.WithSampleCodeKeyCount", sampleCode);
+            Assert.Contains("snapshot.WithApiNamespaceCount", sampleCode);
             Assert.DoesNotContain("Generated from", sampleCode);
         }
     }

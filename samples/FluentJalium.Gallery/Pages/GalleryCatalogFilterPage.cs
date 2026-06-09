@@ -80,10 +80,14 @@ internal sealed class GalleryCatalogFilterPage
                 {
                     CreateSummaryPill(FluentIconRegular.ControlButton24, $"{snapshot.ControlCount} controls"),
                     CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{snapshot.PageCount} pages"),
+                    CreateSummaryPill(FluentIconRegular.Tag24, $"{snapshot.GroupCounts.Length} groups"),
                     CreateSummaryPill(FluentIconRegular.New24, $"{snapshot.NewCount} new"),
                     CreateSummaryPill(FluentIconRegular.ArrowClockwise24, $"{snapshot.UpdatedCount} updated"),
                     CreateSummaryPill(FluentIconRegular.Sparkle24, $"{snapshot.PreviewCount} preview"),
-                    CreateSummaryPill(FluentIconRegular.DataUsage24, $"{snapshot.DiagnosticCount} diagnostic")
+                    CreateSummaryPill(FluentIconRegular.DataUsage24, $"{snapshot.DiagnosticCount} diagnostic"),
+                    CreateSummaryPill(FluentIconRegular.FolderOpen24, $"{snapshot.WithSourcePathCount} sources"),
+                    CreateSummaryPill(FluentIconRegular.ClipboardCode24, $"{snapshot.WithSampleCodeKeyCount} samples"),
+                    CreateSummaryPill(FluentIconRegular.Braces24, $"{snapshot.WithApiNamespaceCount} api")
                 }
             }
         };

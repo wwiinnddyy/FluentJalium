@@ -1,5 +1,10 @@
 namespace FluentJalium.Gallery.Models;
 
+internal sealed record GalleryCatalogFilterGroupSnapshot(
+    string Group,
+    int ControlCount,
+    int PageCount);
+
 internal sealed record GalleryCatalogFilterSnapshot(
     GalleryCatalogFilter Filter,
     GalleryControlInfo[] Matches,
@@ -7,9 +12,18 @@ internal sealed record GalleryCatalogFilterSnapshot(
     int NewCount,
     int UpdatedCount,
     int PreviewCount,
-    int DiagnosticCount)
+    int DiagnosticCount,
+    GalleryCatalogFilterGroupSnapshot[] GroupCounts,
+    int WithSourcePathCount,
+    int WithSampleCodeKeyCount,
+    int WithApiNamespaceCount)
 {
     public int ControlCount => Matches.Length;
+
+    public bool HasCompleteNavigationMetadata =>
+        WithSourcePathCount == ControlCount
+        && WithSampleCodeKeyCount == ControlCount
+        && WithApiNamespaceCount == ControlCount;
 
     public static GalleryCatalogFilterSnapshot Create(GalleryCatalogFilter filter, IEnumerable<GalleryPageInfo> pages)
     {
@@ -36,12 +50,33 @@ internal sealed record GalleryCatalogFilterSnapshot(
             matches.Count(control => control.IsNew),
             matches.Count(control => control.IsUpdated),
             matches.Count(control => control.Status == GalleryPageStatus.Preview),
-            matches.Count(IsDiagnosticControl));
+            matches.Count(IsDiagnosticControl),
+            matches
+                .GroupBy(control => control.Group, StringComparer.Ordinal)
+                .OrderBy(group => group.Key, StringComparer.Ordinal)
+                .Select(group => new GalleryCatalogFilterGroupSnapshot(
+                    group.Key,
+                    group.Count(),
+                    group.Select(control => control.Page.UniqueId).Distinct(StringComparer.Ordinal).Count()))
+                .ToArray(),
+            matches.Count(control => !string.IsNullOrWhiteSpace(control.SourcePath)),
+            matches.Count(control => !string.IsNullOrWhiteSpace(control.SampleCodeKey)),
+            matches.Count(control => !string.IsNullOrWhiteSpace(control.ApiNamespace)));
     }
 
     public bool ContainsControl(string controlName)
     {
         return Matches.Any(control => string.Equals(control.Name, controlName, StringComparison.Ordinal));
+    }
+
+    public bool ContainsPage(string pageId)
+    {
+        return Matches.Any(control => string.Equals(control.Page.UniqueId, pageId, StringComparison.Ordinal));
+    }
+
+    public bool ContainsSampleCodeKey(string sampleCodeKey)
+    {
+        return Matches.Any(control => string.Equals(control.SampleCodeKey, sampleCodeKey, StringComparison.Ordinal));
     }
 
     private static bool MatchesFilter(GalleryCatalogFilter filter, GalleryControlInfo control)
