@@ -20,6 +20,32 @@ namespace FluentJalium.Gallery.Pages;
 
 internal sealed class GallerySelectorsPropertiesPage
 {
+    internal readonly record struct GallerySelectorsPropertiesQaSnapshot(
+        bool HasSelectedTreeItem,
+        int TreeItemCount,
+        int SelectedTreeItemCount,
+        int CheckedTreeItemCount,
+        bool IsTreeSearchEnabled,
+        bool HasTreeSearchText,
+        bool IsTreeDropDownOpen,
+        TreeSelectorCheckCascadeMode TreeCascadeMode,
+        bool HasSelectedObject,
+        PropertyGridSortMode PropertySortMode,
+        string PropertyDensity,
+        bool IsPropertySearchVisible,
+        bool HasPropertySearchText,
+        bool IsPropertyDescriptionVisible,
+        bool IsPropertyToolbarVisible,
+        bool IsPropertyReadOnly,
+        double NameColumnWidth,
+        FWFluentMaterialKind MaterialKind)
+    {
+        public bool HasSelectionEvidence => HasSelectedTreeItem || SelectedTreeItemCount > 0;
+        public bool HasCascadeEvidence => CheckedTreeItemCount > 0 && TreeCascadeMode == TreeSelectorCheckCascadeMode.Cascade;
+        public bool HasPropertyGridEvidence => HasSelectedObject && IsPropertySearchVisible && IsPropertyDescriptionVisible;
+        public bool IsReady => HasSelectionEvidence && HasCascadeEvidence && HasPropertyGridEvidence;
+    }
+
     public UIElement CreateContent()
     {
         var panel = CreateSection("Selectors and Properties");
@@ -255,11 +281,13 @@ internal sealed class GallerySelectorsPropertiesPage
     {
         var sample = new GalleryPropertySample();
         var selectorOutput = CreateOutput("Selected: Theme resources");
-        var propertyOutput = CreateOutput("PropertyGrid: Categorized, density compact, description on");
+        var propertyOutput = CreateOutput("Properties QA pending.");
         var selector = new FWTreeSelector
         {
             Width = 420,
             SelectionMode = SelectionMode.Single,
+            ShowCheckBoxes = true,
+            CheckCascadeMode = TreeSelectorCheckCascadeMode.Cascade,
             PlaceholderText = "Choose a property source",
             IsSearchEnabled = true,
             SearchText = "theme",
@@ -268,12 +296,29 @@ internal sealed class GallerySelectorsPropertiesPage
         PopulateGalleryTreeSelector(selector);
         selector.SelectedItem = "Theme resources";
         selector.SelectionChanged += (_, _) => selectorOutput.Text = $"Selected: {selector.SelectedItem ?? "none"}";
+        if (selector.Items[0] is FWTreeSelectorItem root)
+        {
+            root.IsChecked = true;
+        }
 
         var propertyGrid = CreateSamplePropertyGrid(sample, width: 420, height: 230);
         propertyGrid.Density = FWPropertyGridDensity.Compact;
         propertyGrid.ShowToolBar = false;
+        propertyGrid.SearchText = "layout";
 
-        return new FWFluentMaterialSurface
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 12,
+            Children =
+            {
+                CreateMaterialHeader(),
+                selector,
+                CreateStatus(selectorOutput),
+                propertyGrid
+            }
+        };
+        var surface = new FWFluentMaterialSurface
         {
             Width = 520,
             MaterialKind = FWFluentMaterialKind.LiquidGlass,
@@ -290,43 +335,73 @@ internal sealed class GallerySelectorsPropertiesPage
             Shape = BorderShape.SuperEllipse,
             SuperEllipseN = 4,
             Padding = new Thickness(16),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 12,
-                Children =
-                {
-                    CreateMaterialHeader(),
-                    selector,
-                    CreateStatus(selectorOutput),
-                    propertyGrid,
-                    CreateButtonRow(
-                        CreateIconActionButton(FluentIconRegular.GroupList24, "Categorized", () =>
-                        {
-                            propertyGrid.SortMode = PropertyGridSortMode.Categorized;
-                            propertyOutput.Text = $"PropertyGrid: Categorized, density {FormatDensity(propertyGrid.Density)}, description on";
-                        }),
-                        CreateIconActionButton(FluentIconRegular.TextSortAscending24, "Alphabetical", () =>
-                        {
-                            propertyGrid.SortMode = PropertyGridSortMode.Alphabetical;
-                            propertyOutput.Text = $"PropertyGrid: Alphabetical, density {FormatDensity(propertyGrid.Density)}, description on";
-                        }),
-                        CreateIconActionButton(FluentIconRegular.TextDensity24, "Density", () =>
-                        {
-                            propertyGrid.Density = propertyGrid.Density == FWPropertyGridDensity.Compact
-                                ? FWPropertyGridDensity.Comfortable
-                                : FWPropertyGridDensity.Compact;
-                            propertyOutput.Text = $"PropertyGrid density: {FormatDensity(propertyGrid.Density)}";
-                        }),
-                        CreateIconActionButton(FluentIconRegular.EditLock24, "Read-only", () =>
-                        {
-                            propertyGrid.IsReadOnly = !propertyGrid.IsReadOnly;
-                            propertyOutput.Text = $"PropertyGrid read-only: {propertyGrid.IsReadOnly}, density {FormatDensity(propertyGrid.Density)}";
-                        })),
-                    CreateStatus(propertyOutput)
-                }
-            }
+            Child = panel
         };
+
+        void UpdatePropertyOutput(string action)
+        {
+            propertyOutput.Text = FormatSelectorsPropertiesQa(
+                action,
+                CreateSelectorsPropertiesQaSnapshot(selector, propertyGrid, surface));
+        }
+
+        panel.Children.Add(CreateButtonRow(
+            CreateIconActionButton(FluentIconRegular.GroupList24, "Categorized", () =>
+            {
+                propertyGrid.SortMode = PropertyGridSortMode.Categorized;
+                UpdatePropertyOutput("Categorized");
+            }),
+            CreateIconActionButton(FluentIconRegular.TextSortAscending24, "Alphabetical", () =>
+            {
+                propertyGrid.SortMode = PropertyGridSortMode.Alphabetical;
+                UpdatePropertyOutput("Alphabetical");
+            }),
+            CreateIconActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+            {
+                propertyGrid.Density = propertyGrid.Density == FWPropertyGridDensity.Compact
+                    ? FWPropertyGridDensity.Comfortable
+                    : FWPropertyGridDensity.Compact;
+                UpdatePropertyOutput("Density");
+            }),
+            CreateIconActionButton(FluentIconRegular.EditLock24, "Read-only", () =>
+            {
+                propertyGrid.IsReadOnly = !propertyGrid.IsReadOnly;
+                UpdatePropertyOutput("Read-only");
+            })));
+        panel.Children.Add(CreateStatus(propertyOutput));
+        UpdatePropertyOutput("Selectors and properties QA");
+        return surface;
+    }
+
+    internal static GallerySelectorsPropertiesQaSnapshot CreateSelectorsPropertiesQaSnapshot(
+        FWTreeSelector selector,
+        FWPropertyGrid propertyGrid,
+        FWFluentMaterialSurface? materialSurface = null)
+    {
+        return new GallerySelectorsPropertiesQaSnapshot(
+            HasSelectedTreeItem: selector.SelectedItem != null,
+            TreeItemCount: CountTreeItems(selector.Items),
+            SelectedTreeItemCount: selector.SelectedItems.Count,
+            CheckedTreeItemCount: selector.CheckedItems.Count,
+            IsTreeSearchEnabled: selector.IsSearchEnabled,
+            HasTreeSearchText: !string.IsNullOrWhiteSpace(selector.SearchText),
+            IsTreeDropDownOpen: selector.IsDropDownOpen,
+            TreeCascadeMode: selector.CheckCascadeMode,
+            HasSelectedObject: propertyGrid.SelectedObject != null,
+            PropertySortMode: propertyGrid.SortMode,
+            PropertyDensity: FormatDensity(propertyGrid.Density),
+            IsPropertySearchVisible: propertyGrid.ShowSearchBox,
+            HasPropertySearchText: !string.IsNullOrWhiteSpace(propertyGrid.SearchText),
+            IsPropertyDescriptionVisible: propertyGrid.ShowDescription,
+            IsPropertyToolbarVisible: propertyGrid.ShowToolBar,
+            IsPropertyReadOnly: propertyGrid.IsReadOnly,
+            NameColumnWidth: propertyGrid.NameColumnWidth,
+            MaterialKind: materialSurface?.MaterialKind ?? FWFluentMaterialKind.None);
+    }
+
+    internal static string FormatSelectorsPropertiesQa(string action, GallerySelectorsPropertiesQaSnapshot snapshot)
+    {
+        return $"{action}: tree selected {FormatOnOff(snapshot.HasSelectionEvidence)}, items {snapshot.TreeItemCount}, selected {snapshot.SelectedTreeItemCount}, checked {snapshot.CheckedTreeItemCount}, search {FormatOnOff(snapshot.IsTreeSearchEnabled)}/{FormatOnOff(snapshot.HasTreeSearchText)}, dropdown {FormatOpenState(snapshot.IsTreeDropDownOpen)}, cascade {snapshot.TreeCascadeMode}; property object {FormatOnOff(snapshot.HasSelectedObject)}, sort {snapshot.PropertySortMode}, density {snapshot.PropertyDensity}, search {FormatOnOff(snapshot.IsPropertySearchVisible)}/{FormatOnOff(snapshot.HasPropertySearchText)}, description {FormatOnOff(snapshot.IsPropertyDescriptionVisible)}, toolbar {FormatOnOff(snapshot.IsPropertyToolbarVisible)}, read-only {FormatOnOff(snapshot.IsPropertyReadOnly)}, name width {snapshot.NameColumnWidth:0}, material {snapshot.MaterialKind}, ready {FormatOnOff(snapshot.IsReady)}.";
     }
 
     private static FWPropertyGrid CreateSamplePropertyGrid(GalleryPropertySample sample, double width = 470, double height = 310)
@@ -514,6 +589,8 @@ internal sealed class GallerySelectorsPropertiesPage
 
     private static string FormatOpenState(bool isOpen) => isOpen ? "open" : "closed";
 
+    private static string FormatOnOff(bool value) => value ? "on" : "off";
+
     private static string FormatSearchText(string? searchText) => string.IsNullOrWhiteSpace(searchText) ? "empty" : searchText;
 
     private static string FormatDensity(FWPropertyGridDensity density)
@@ -550,6 +627,22 @@ internal sealed class GallerySelectorsPropertiesPage
         }
 
         return string.Join(", ", names);
+    }
+
+    private static int CountTreeItems(System.Collections.IEnumerable items)
+    {
+        var count = 0;
+
+        foreach (var item in items)
+        {
+            count++;
+            if (item is TreeSelectorItem treeSelectorItem)
+            {
+                count += CountTreeItems(treeSelectorItem.Items);
+            }
+        }
+
+        return count;
     }
 
     private static FWStackPanel CreateSection(string title)

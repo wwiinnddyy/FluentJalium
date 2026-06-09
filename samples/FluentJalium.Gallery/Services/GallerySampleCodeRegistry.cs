@@ -496,11 +496,24 @@ var selector = new FWTreeSelector
 {
     PlaceholderText = "Control families",
     SelectionMode = SelectionMode.Multiple,
+    ShowCheckBoxes = true,
+    CheckCascadeMode = TreeSelectorCheckCascadeMode.Cascade,
     IsSearchEnabled = true,
     SearchText = "data"
 };
-selector.Items.Add(new FWTreeSelectorItem { Header = "Inputs", IsChecked = true });
-selector.Items.Add(new FWTreeSelectorItem { Header = "Navigation" });
+selector.Items.Add(new FWTreeSelectorItem
+{
+    Header = "Inputs",
+    IsExpanded = true,
+    IsChecked = true,
+    Items =
+    {
+        new FWTreeSelectorItem { Header = "Text input" },
+        new FWTreeSelectorItem { Header = "Selection" }
+    }
+});
+selector.Items.Add(new FWTreeSelectorItem { Header = "Navigation", IsChecked = true });
+selector.SelectedItem = "Inputs";
 
 var propertyGrid = new FWPropertyGrid
 {
@@ -510,8 +523,27 @@ var propertyGrid = new FWPropertyGrid
         Category = "Collections",
         IsPreview = false
     },
-    SearchText = "density"
+    SortMode = PropertyGridSortMode.Categorized,
+    ShowSearchBox = true,
+    ShowDescription = true,
+    ShowToolBar = false,
+    SearchText = "density",
+    Density = FWPropertyGridDensity.Compact,
+    IsReadOnly = true
 };
+
+var propertySurface = new FWFluentMaterialSurface
+{
+    MaterialKind = FWFluentMaterialKind.LiquidGlass,
+    Child = propertyGrid
+};
+
+var propertySnapshot = GallerySelectorsPropertiesPage.CreateSelectorsPropertiesQaSnapshot(
+    selector,
+    propertyGrid,
+    propertySurface);
+Debug.WriteLine(GallerySelectorsPropertiesPage.FormatSelectorsPropertiesQa("Selectors and properties QA", propertySnapshot));
+Debug.Assert(propertySnapshot.IsReady);
 """,
         ["datainspectors.viewers"] = """
 var diffViewer = new FWDiffViewer

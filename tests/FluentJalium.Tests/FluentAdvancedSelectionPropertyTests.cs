@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -330,6 +331,78 @@ public sealed class FluentAdvancedSelectionPropertyTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(grid, surface.Child);
+    }
+
+    [Fact]
+    public void GallerySelectorsPropertiesPage_ShouldFormatPropertyGridQaSnapshot()
+    {
+        var selector = new FWTreeSelector
+        {
+            SelectionMode = SelectionMode.Multiple,
+            ShowCheckBoxes = true,
+            CheckCascadeMode = TreeSelectorCheckCascadeMode.Cascade,
+            IsSearchEnabled = true,
+            SearchText = "theme",
+            IsDropDownOpen = true
+        };
+        var root = new FWTreeSelectorItem { Header = "FluentJalium", IsExpanded = true };
+        var theme = new FWTreeSelectorItem { Header = "Theme resources" };
+        root.Items.Add(theme);
+        selector.Items.Add(root);
+        root.IsChecked = true;
+        selector.SelectedItem = "Theme resources";
+
+        var grid = new FWPropertyGrid
+        {
+            SelectedObject = new PropertyGridSample(),
+            SortMode = PropertyGridSortMode.Categorized,
+            ShowSearchBox = true,
+            ShowDescription = true,
+            ShowToolBar = false,
+            SearchText = "layout",
+            Density = FWPropertyGridDensity.Compact,
+            IsReadOnly = true
+        };
+        var surface = new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            Child = grid
+        };
+
+        var snapshot = GallerySelectorsPropertiesPage.CreateSelectorsPropertiesQaSnapshot(selector, grid, surface);
+        var text = GallerySelectorsPropertiesPage.FormatSelectorsPropertiesQa("Selectors and properties QA", snapshot);
+
+        Assert.True(snapshot.IsReady);
+        Assert.True(snapshot.HasSelectionEvidence);
+        Assert.True(snapshot.HasCascadeEvidence);
+        Assert.True(snapshot.HasPropertyGridEvidence);
+        Assert.Equal(2, snapshot.TreeItemCount);
+        Assert.Equal(0, snapshot.SelectedTreeItemCount);
+        Assert.Equal(2, snapshot.CheckedTreeItemCount);
+        Assert.True(snapshot.IsTreeSearchEnabled);
+        Assert.True(snapshot.HasTreeSearchText);
+        Assert.True(snapshot.IsTreeDropDownOpen);
+        Assert.Equal(TreeSelectorCheckCascadeMode.Cascade, snapshot.TreeCascadeMode);
+        Assert.True(snapshot.HasSelectedObject);
+        Assert.Equal(PropertyGridSortMode.Categorized, snapshot.PropertySortMode);
+        Assert.Equal("compact", snapshot.PropertyDensity);
+        Assert.True(snapshot.IsPropertySearchVisible);
+        Assert.True(snapshot.HasPropertySearchText);
+        Assert.True(snapshot.IsPropertyDescriptionVisible);
+        Assert.False(snapshot.IsPropertyToolbarVisible);
+        Assert.True(snapshot.IsPropertyReadOnly);
+        Assert.Equal(128, snapshot.NameColumnWidth);
+        Assert.Equal(FWFluentMaterialKind.LiquidGlass, snapshot.MaterialKind);
+        Assert.Contains("Selectors and properties QA", text);
+        Assert.Contains("tree selected on", text);
+        Assert.Contains("checked 2", text);
+        Assert.Contains("cascade Cascade", text);
+        Assert.Contains("property object on", text);
+        Assert.Contains("density compact", text);
+        Assert.Contains("toolbar off", text);
+        Assert.Contains("read-only on", text);
+        Assert.Contains("material LiquidGlass", text);
+        Assert.Contains("ready on", text);
     }
 
     private sealed class TestTreeSelector : FWTreeSelector

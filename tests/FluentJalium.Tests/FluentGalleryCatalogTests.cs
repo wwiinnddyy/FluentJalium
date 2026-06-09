@@ -605,6 +605,30 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GallerySampleCodeRegistry_ShouldExposeSelectorsPropertiesQaSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "selectorsandproperties");
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWTreeSelector", sampleCode);
+        Assert.Contains("new FWTreeSelectorItem", sampleCode);
+        Assert.Contains("new FWPropertyGrid", sampleCode);
+        Assert.Contains("TreeSelectorCheckCascadeMode.Cascade", sampleCode);
+        Assert.Contains("new FWFluentMaterialSurface", sampleCode);
+        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
+        Assert.Contains("CreateSelectorsPropertiesQaSnapshot", sampleCode);
+        Assert.Contains("FormatSelectorsPropertiesQa", sampleCode);
+        Assert.Contains("Selectors and properties QA", sampleCode);
+        Assert.Contains("propertySnapshot.IsReady", sampleCode);
+        Assert.Contains("ShowDescription = true", sampleCode);
+        Assert.Contains("ShowToolBar = false", sampleCode);
+        Assert.Contains("Density = FWPropertyGridDensity.Compact", sampleCode);
+        Assert.Contains("IsReadOnly = true", sampleCode);
+    }
+
+    [Fact]
     public void GallerySampleCodeRegistry_ShouldExposeFormsPatternSample()
     {
         var page = Assert.Single(
