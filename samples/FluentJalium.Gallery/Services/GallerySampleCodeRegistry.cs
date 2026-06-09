@@ -1333,6 +1333,8 @@ var teachingTip = new FWTeachingTip
 };
 
 teachingTip.IsOpen = true;
+var teachingTipQa = GalleryDisclosurePage.CreateTeachingTipVisualQaSnapshot(teachingTip);
+Debug.WriteLine(GalleryDisclosurePage.FormatTeachingTipVisualQa("TeachingTip visual QA", teachingTipQa));
 """,
         ["advancedinteraction.scroller"] = """
 var refreshContainer = new FWRefreshContainer

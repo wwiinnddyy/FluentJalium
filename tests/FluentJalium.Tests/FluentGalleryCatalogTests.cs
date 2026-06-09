@@ -433,6 +433,14 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("ItemsSource = new[]", sampleCode);
         Assert.Contains("new SettingsRow", sampleCode);
         Assert.Contains("PreviewMaterialCommand", sampleCode);
+        Assert.Contains("new FWTeachingTip", sampleCode);
+        Assert.Contains("Target = target", sampleCode);
+        Assert.Contains("HeroContent = new FWBorder", sampleCode);
+        Assert.Contains("TeachingTipPlacementMode.Bottom", sampleCode);
+        Assert.Contains("TeachingTipTailVisibility.Visible", sampleCode);
+        Assert.Contains("CreateTeachingTipVisualQaSnapshot", sampleCode);
+        Assert.Contains("FormatTeachingTipVisualQa", sampleCode);
+        Assert.Contains("TeachingTip visual QA", sampleCode);
     }
 
     [Fact]
