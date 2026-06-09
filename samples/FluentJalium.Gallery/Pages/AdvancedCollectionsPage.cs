@@ -145,6 +145,8 @@ public class AdvancedCollectionsPage : Page
         bool HasSelectionSemantics,
         bool HasViewportBehavior,
         bool HasVirtualizationBehavior,
+        string[] RecipeEvidence,
+        string[] MissingPublicApiEvidence,
         string[] ProvenSemantics,
         string[] RemainingRisks)
     {
@@ -154,7 +156,14 @@ public class AdvancedCollectionsPage : Page
             + Convert.ToInt32(HasViewportBehavior)
             + Convert.ToInt32(HasVirtualizationBehavior);
 
-        public bool IsPublicApiReady => RemainingRisks.Length == 0 && ProvenSemanticCount == 4;
+        public bool HasRecipeEvidence => RecipeEvidence.Length > 0 && ProvenSemanticCount == 4;
+
+        public bool HasMissingPublicApiEvidence => MissingPublicApiEvidence.Length > 0;
+
+        public bool IsPublicApiReady =>
+            RemainingRisks.Length == 0
+            && MissingPublicApiEvidence.Length == 0
+            && ProvenSemanticCount == 4;
     }
 
     public AdvancedCollectionsPage()
@@ -390,6 +399,13 @@ public class AdvancedCollectionsPage : Page
             Opacity = 0.75,
             TextWrapping = TextWrapping.Wrap
         });
+        content.Children.Add(new TextBlock
+        {
+            Text = CreateCollectionNavigationEvidenceSummary(evaluations),
+            FontSize = 12,
+            Opacity = 0.72,
+            TextWrapping = TextWrapping.Wrap
+        });
 
         foreach (var evaluation in evaluations)
         {
@@ -420,6 +436,13 @@ public class AdvancedCollectionsPage : Page
         stack.Children.Add(new TextBlock
         {
             Text = FormatCollectionNavigationEvaluation(evaluation),
+            FontSize = 12,
+            Opacity = 0.75,
+            TextWrapping = TextWrapping.Wrap
+        });
+        stack.Children.Add(new TextBlock
+        {
+            Text = FormatCollectionNavigationEvidence(evaluation),
             FontSize = 12,
             Opacity = 0.75,
             TextWrapping = TextWrapping.Wrap
@@ -1235,6 +1258,8 @@ public class AdvancedCollectionsPage : Page
                 HasSelectionSemantics: true,
                 HasViewportBehavior: true,
                 HasVirtualizationBehavior: true,
+                ["command recipe updates selected index", "invoke command records InvokedIndex", "FWItemsRepeater diagnostics prove viewport range and recycling"],
+                ["owned selection model evidence", "item container automation metadata", "multi-select gesture parity"],
                 ["Previous/Next/Home/End movement", "selected item and invoke tracking", "viewport-derived realization", "repeater-backed item recycling"],
                 ["dedicated item container contract", "multi-select selection model", "automation peer contract"]),
             new CollectionNavigationEvaluation(
@@ -1245,6 +1270,8 @@ public class AdvancedCollectionsPage : Page
                 HasSelectionSemantics: true,
                 HasViewportBehavior: true,
                 HasVirtualizationBehavior: true,
+                ["FWPipsPager synchronizes page state", "horizontal viewport realization", "single-page command invocation"],
+                ["pointer and touch swipe gesture trace", "page transition animation snapshot", "looping and edge behavior contract"],
                 ["pips pager synchronization", "page selection and invocation", "horizontal viewport windows", "single-page realization"],
                 ["touch swipe gesture host", "page transition animation contract", "looping and edge behavior"]),
             new CollectionNavigationEvaluation(
@@ -1255,6 +1282,8 @@ public class AdvancedCollectionsPage : Page
                 HasSelectionSemantics: true,
                 HasViewportBehavior: true,
                 HasVirtualizationBehavior: true,
+                ["group movement updates selected group", "overview/details toggle state", "group-aware viewport window"],
+                ["two-view source synchronization trace", "zoom transition animation snapshot", "group automation focus contract"],
                 ["group previous/next movement", "overview/details toggle", "first item selection per group", "group-aware viewport windows"],
                 ["two-view synchronized source API", "zoom transition choreography", "group automation and focus contract"])
         };
@@ -1269,6 +1298,15 @@ public class AdvancedCollectionsPage : Page
         return $"Collection navigation evaluation: {items.Length} candidates, {recipeFirst} recipe-first, {publicReady} public-ready. Publish only after the remaining API, automation, gesture, and animation risks are closed.";
     }
 
+    internal static string CreateCollectionNavigationEvidenceSummary(IEnumerable<CollectionNavigationEvaluation> evaluations)
+    {
+        var items = evaluations.ToArray();
+        var recipeEvidence = items.Count(evaluation => evaluation.HasRecipeEvidence);
+        var missingPublicApiEvidence = items.Sum(evaluation => evaluation.MissingPublicApiEvidence.Length);
+
+        return $"Collection navigation evidence: {recipeEvidence}/{items.Length} candidates have Gallery recipe evidence; {missingPublicApiEvidence} missing public API evidence items remain. Keep FWItemsView, FWFlipView, and FWSemanticZoom recipe-first until those evidence gaps close.";
+    }
+
     internal static string FormatCollectionNavigationEvaluation(CollectionNavigationEvaluation evaluation)
     {
         var proven = string.Join(", ", evaluation.ProvenSemantics);
@@ -1278,6 +1316,16 @@ public class AdvancedCollectionsPage : Page
         var readiness = evaluation.IsPublicApiReady ? "public API ready" : "recipe/prototype";
 
         return $"{evaluation.CandidateControl}: {readiness}; surface: {evaluation.RecommendedSurface}; semantics keyboard {FormatOnOff(evaluation.HasKeyboardNavigation)}, selection {FormatOnOff(evaluation.HasSelectionSemantics)}, viewport {FormatOnOff(evaluation.HasViewportBehavior)}, virtualization {FormatOnOff(evaluation.HasVirtualizationBehavior)}; proven {proven}; remaining {risks}.";
+    }
+
+    internal static string FormatCollectionNavigationEvidence(CollectionNavigationEvaluation evaluation)
+    {
+        var recipeEvidence = string.Join(", ", evaluation.RecipeEvidence);
+        var missingEvidence = evaluation.MissingPublicApiEvidence.Length == 0
+            ? "none"
+            : string.Join(", ", evaluation.MissingPublicApiEvidence);
+
+        return $"{evaluation.CandidateControl} evidence: Gallery recipe evidence {FormatOnOff(evaluation.HasRecipeEvidence)} ({recipeEvidence}); missing public API evidence {missingEvidence}.";
     }
 
     private static string FormatOnOff(bool value) => value ? "on" : "off";

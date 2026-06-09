@@ -1033,12 +1033,15 @@ public class CollectionControlsTests
         // Act
         var evaluations = AdvancedCollectionsPage.CreateCollectionNavigationEvaluations();
         var summary = AdvancedCollectionsPage.CreateCollectionNavigationEvaluationSummary(evaluations);
+        var evidenceSummary = AdvancedCollectionsPage.CreateCollectionNavigationEvidenceSummary(evaluations);
 
         // Assert
         Assert.Equal(3, evaluations.Count);
         Assert.Contains("3 candidates", summary);
         Assert.Contains("3 recipe-first", summary);
         Assert.Contains("0 public-ready", summary);
+        Assert.Contains("3/3 candidates have Gallery recipe evidence", evidenceSummary);
+        Assert.Contains("9 missing public API evidence items remain", evidenceSummary);
 
         AssertEvaluation(evaluations, "FWItemsView", "multi-select selection model");
         AssertEvaluation(evaluations, "FWFlipView", "touch swipe gesture host");
@@ -1088,15 +1091,24 @@ public class CollectionControlsTests
     {
         var evaluation = Assert.Single(evaluations, evaluation => evaluation.CandidateControl == candidateControl);
         var text = AdvancedCollectionsPage.FormatCollectionNavigationEvaluation(evaluation);
+        var evidenceText = AdvancedCollectionsPage.FormatCollectionNavigationEvidence(evaluation);
 
         Assert.False(evaluation.IsPublicApiReady);
+        Assert.True(evaluation.HasRecipeEvidence);
+        Assert.True(evaluation.HasMissingPublicApiEvidence);
         Assert.Equal(4, evaluation.ProvenSemanticCount);
         Assert.Equal("Keep as Gallery recipe before public API", evaluation.RecommendedSurface);
+        Assert.NotEmpty(evaluation.RecipeEvidence);
+        Assert.NotEmpty(evaluation.MissingPublicApiEvidence);
         Assert.Contains(expectedRisk, evaluation.RemainingRisks);
         Assert.Contains(candidateControl, text);
         Assert.Contains("recipe/prototype", text);
         Assert.Contains("semantics keyboard on, selection on, viewport on, virtualization on", text);
         Assert.Contains(expectedRisk, text);
+        Assert.Contains(candidateControl, evidenceText);
+        Assert.Contains("Gallery recipe evidence on", evidenceText);
+        Assert.Contains("missing public API evidence", evidenceText);
+        Assert.Contains(evaluation.MissingPublicApiEvidence[0], evidenceText);
     }
 
     private static ScrollViewer CreateScrollViewer(

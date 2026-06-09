@@ -874,9 +874,13 @@ var candidateControls = evaluations.Select(evaluation => evaluation.CandidateCon
 Debug.WriteLine("FWItemsView / FWFlipView / FWSemanticZoom remain recipe-first candidates until public API contracts are proven.");
 Debug.WriteLine($"Collection navigation candidates: {string.Join(", ", candidateControls)}.");
 Debug.WriteLine(AdvancedCollectionsPage.CreateCollectionNavigationEvaluationSummary(evaluations));
+Debug.WriteLine(AdvancedCollectionsPage.CreateCollectionNavigationEvidenceSummary(evaluations));
 foreach (var evaluation in evaluations)
 {
     Debug.WriteLine(AdvancedCollectionsPage.FormatCollectionNavigationEvaluation(evaluation));
+    Debug.WriteLine(AdvancedCollectionsPage.FormatCollectionNavigationEvidence(evaluation));
+    Debug.WriteLine($"Recipe evidence: {string.Join(", ", evaluation.RecipeEvidence)}.");
+    Debug.WriteLine($"Missing public API evidence: {string.Join(", ", evaluation.MissingPublicApiEvidence)}.");
 }
 """,
         ["collections.gridview"] = """

@@ -341,7 +341,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("InvokedIndex", sampleCode);
         Assert.Contains("CreateCollectionNavigationEvaluations", sampleCode);
         Assert.Contains("CreateCollectionNavigationEvaluationSummary", sampleCode);
+        Assert.Contains("CreateCollectionNavigationEvidenceSummary", sampleCode);
         Assert.Contains("FormatCollectionNavigationEvaluation", sampleCode);
+        Assert.Contains("FormatCollectionNavigationEvidence", sampleCode);
+        Assert.Contains("Recipe evidence", sampleCode);
+        Assert.Contains("Missing public API evidence", sampleCode);
+        Assert.Contains("MissingPublicApiEvidence", sampleCode);
         Assert.Contains("FWItemsView", sampleCode);
         Assert.Contains("FWFlipView", sampleCode);
         Assert.Contains("FWSemanticZoom", sampleCode);
