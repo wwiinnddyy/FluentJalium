@@ -1077,6 +1077,7 @@ var shellQa = GalleryNavigationPage.CreateNavigationShellQaSnapshot(
     pager,
     search);
 Debug.WriteLine(GalleryNavigationPage.FormatNavigationShellQa("App shell QA", shellQa));
+Debug.WriteLine($"App shell ready: {shellQa.IsAppShellReady}; route provider {shellQa.HasRouteProviderCoverage}; footer settings {shellQa.HasFooterSettingsCoverage}; search route {shellQa.HasSearchRouteCoverage}; documents {shellQa.HasDocumentWorkspaceCoverage}; pager {shellQa.HasPageNavigationCoverage}.");
 """,
         ["materials.windowbackdrop"] = """
 var windowSurface = new FWFluentWindowSurface

@@ -467,6 +467,12 @@ public sealed class FluentNavigationControlsTests
         Assert.Equal(3, snapshot.SelectedPageNumber);
         Assert.Equal(3, snapshot.PageCount);
         Assert.Equal("Settings", snapshot.SearchText);
+        Assert.True(snapshot.HasRouteProviderCoverage);
+        Assert.True(snapshot.HasFooterSettingsCoverage);
+        Assert.True(snapshot.HasSearchRouteCoverage);
+        Assert.True(snapshot.HasDocumentWorkspaceCoverage);
+        Assert.True(snapshot.HasPageNavigationCoverage);
+        Assert.True(snapshot.IsAppShellReady);
         Assert.Contains("App shell QA. Route: settings.", text);
         Assert.Contains("Page: NavigationProviderPage.", text);
         Assert.Contains("Provider: on.", text);
@@ -476,6 +482,12 @@ public sealed class FluentNavigationControlsTests
         Assert.Contains("Tab: Settings (2/2), close OnPointerOver.", text);
         Assert.Contains("Pips: 3/3.", text);
         Assert.Contains("Search: Settings.", text);
+        Assert.Contains("Route provider on.", text);
+        Assert.Contains("Footer settings on.", text);
+        Assert.Contains("Search route on.", text);
+        Assert.Contains("Documents on.", text);
+        Assert.Contains("Pager on.", text);
+        Assert.Contains("App shell ready on.", text);
     }
 
     [Fact]

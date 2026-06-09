@@ -58,7 +58,34 @@ internal readonly record struct GalleryNavigationShellQaSnapshot(
     FWTabViewCloseButtonOverlayMode CloseButtonOverlayMode,
     int SelectedPageNumber,
     int PageCount,
-    string SearchText);
+    string SearchText)
+{
+    public bool HasRouteProviderCoverage => HasPageTypeProvider &&
+        !string.Equals(CurrentRouteKey, "none", StringComparison.Ordinal) &&
+        !string.Equals(CurrentPageType, "none", StringComparison.Ordinal);
+
+    public bool HasFooterSettingsCoverage =>
+        string.Equals(CurrentRouteKey, "settings", StringComparison.OrdinalIgnoreCase) &&
+        BreadcrumbPath.Contains("Settings", StringComparison.OrdinalIgnoreCase);
+
+    public bool HasSearchRouteCoverage =>
+        !string.Equals(SearchText, "none", StringComparison.Ordinal) &&
+        string.Equals(SearchText, SelectorText, StringComparison.OrdinalIgnoreCase);
+
+    public bool HasDocumentWorkspaceCoverage => TabItemCount > 1 &&
+        TabIndex >= 0 &&
+        CloseButtonOverlayMode != FWTabViewCloseButtonOverlayMode.Never;
+
+    public bool HasPageNavigationCoverage => PageCount > 1 &&
+        SelectedPageNumber > 0 &&
+        SelectedPageNumber <= PageCount;
+
+    public bool IsAppShellReady => HasRouteProviderCoverage &&
+        HasFooterSettingsCoverage &&
+        HasSearchRouteCoverage &&
+        HasDocumentWorkspaceCoverage &&
+        HasPageNavigationCoverage;
+}
 
 internal readonly record struct GalleryTitleBarVisualQaSnapshot(
     string Title,
@@ -489,7 +516,7 @@ internal sealed class GalleryNavigationPage
     {
         ArgumentNullException.ThrowIfNull(action);
 
-        return $"{action}. Route: {snapshot.CurrentRouteKey}. Page: {snapshot.CurrentPageType}. Provider: {FormatOnOff(snapshot.HasPageTypeProvider)}. Back: {FormatOnOff(snapshot.CanGoBack)} ({snapshot.BackStackDepth}). Forward: {FormatOnOff(snapshot.CanGoForward)} ({snapshot.ForwardStackDepth}). Breadcrumb: {snapshot.BreadcrumbPath}. Selector: {snapshot.SelectorText} ({FormatIndex(snapshot.SelectorIndex, snapshot.SelectorItemCount)}). Tab: {snapshot.TabHeader} ({FormatIndex(snapshot.TabIndex, snapshot.TabItemCount)}), close {snapshot.CloseButtonOverlayMode}. Pips: {snapshot.SelectedPageNumber}/{snapshot.PageCount}. Search: {snapshot.SearchText}.";
+        return $"{action}. Route: {snapshot.CurrentRouteKey}. Page: {snapshot.CurrentPageType}. Provider: {FormatOnOff(snapshot.HasPageTypeProvider)}. Back: {FormatOnOff(snapshot.CanGoBack)} ({snapshot.BackStackDepth}). Forward: {FormatOnOff(snapshot.CanGoForward)} ({snapshot.ForwardStackDepth}). Breadcrumb: {snapshot.BreadcrumbPath}. Selector: {snapshot.SelectorText} ({FormatIndex(snapshot.SelectorIndex, snapshot.SelectorItemCount)}). Tab: {snapshot.TabHeader} ({FormatIndex(snapshot.TabIndex, snapshot.TabItemCount)}), close {snapshot.CloseButtonOverlayMode}. Pips: {snapshot.SelectedPageNumber}/{snapshot.PageCount}. Search: {snapshot.SearchText}. Route provider {FormatOnOff(snapshot.HasRouteProviderCoverage)}. Footer settings {FormatOnOff(snapshot.HasFooterSettingsCoverage)}. Search route {FormatOnOff(snapshot.HasSearchRouteCoverage)}. Documents {FormatOnOff(snapshot.HasDocumentWorkspaceCoverage)}. Pager {FormatOnOff(snapshot.HasPageNavigationCoverage)}. App shell ready {FormatOnOff(snapshot.IsAppShellReady)}.";
     }
 
     internal static GalleryTitleBarVisualQaSnapshot CreateTitleBarVisualQaSnapshot(FWTitleBar titleBar)

@@ -280,6 +280,12 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("FormatNavigationShellQa", sampleCode);
         Assert.Contains("App shell QA", sampleCode);
         Assert.Contains("HasPageTypeProvider", sampleCode);
+        Assert.Contains("IsAppShellReady", sampleCode);
+        Assert.Contains("HasRouteProviderCoverage", sampleCode);
+        Assert.Contains("HasFooterSettingsCoverage", sampleCode);
+        Assert.Contains("HasSearchRouteCoverage", sampleCode);
+        Assert.Contains("HasDocumentWorkspaceCoverage", sampleCode);
+        Assert.Contains("HasPageNavigationCoverage", sampleCode);
     }
 
     [Fact]
