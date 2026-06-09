@@ -197,6 +197,35 @@ autoSuggestBox.QuerySubmitted += (_, args) =>
 autoSuggestBox.SetQueryText("Calendar", FWAutoSuggestBoxTextChangeReason.UserInput);
 autoSuggestBox.RequestSuggestionChosen(autoSuggestBox.FilteredItems.FirstOrDefault());
 autoSuggestBox.RequestQuerySubmitted();
+
+// Formatting recipe: keep phone/license-key masks as Gallery recipes until a public FWMaskedTextBox API is proven.
+var phone = new FWTextBox
+{
+    Text = GalleryTextInputPage.FormatPhoneRecipe("4255550123"),
+    PlaceholderText = "(425) 555-0123",
+    Density = FWTextInputDensity.Comfortable
+};
+var licenseKey = new FWTextBox
+{
+    Text = GalleryTextInputPage.FormatLicenseKeyRecipe("flntjlum2026"),
+    PlaceholderText = "FLNT-JLUM-2026",
+    CharacterCasing = CharacterCasing.Upper,
+    Density = FWTextInputDensity.Comfortable
+};
+
+phone.TextChanged += (_, _) =>
+{
+    phone.Text = GalleryTextInputPage.FormatPhoneRecipe(phone.Text);
+};
+licenseKey.TextChanged += (_, _) =>
+{
+    licenseKey.Text = GalleryTextInputPage.FormatLicenseKeyRecipe(licenseKey.Text);
+};
+
+var formattingSnapshot = GalleryTextInputPage.CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text);
+Debug.WriteLine(GalleryTextInputPage.FormatFormattingRecipeQa("Formatting recipe QA", formattingSnapshot));
+Debug.Assert(formattingSnapshot.IsRecipeOnly);
+Debug.Assert(formattingSnapshot.IsReady);
 """,
         ["selection.radiobuttons"] = """
 var radioButtons = new FWRadioButtons

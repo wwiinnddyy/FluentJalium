@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Pages;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -535,6 +536,29 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(panel, surface.Child);
+    }
+
+    [Fact]
+    public void GalleryTextInputPage_ShouldFormatMaskedInputRecipesWithoutPublicMaskedTextBox()
+    {
+        var partialPhone = GalleryTextInputPage.FormatPhoneRecipe("42555");
+        var fullPhone = GalleryTextInputPage.FormatPhoneRecipe("425.555.0123 ext 88");
+        var license = GalleryTextInputPage.FormatLicenseKeyRecipe("flnt-jlum-2026-extra");
+        var snapshot = GalleryTextInputPage.CreateFormattingRecipeSnapshot(fullPhone, license);
+        var text = GalleryTextInputPage.FormatFormattingRecipeQa("Formatting recipe QA", snapshot);
+
+        Assert.Equal("(425) 55", partialPhone);
+        Assert.Equal("(425) 555-0123", fullPhone);
+        Assert.Equal("FLNT-JLUM-2026", license);
+        Assert.Equal("(425) 555-0123", snapshot.FormattedPhone);
+        Assert.Equal("FLNT-JLUM-2026", snapshot.FormattedLicenseKey);
+        Assert.True(snapshot.IsPhoneComplete);
+        Assert.True(snapshot.IsLicenseKeyComplete);
+        Assert.True(snapshot.IsRecipeOnly);
+        Assert.True(snapshot.IsReady);
+        Assert.Contains("Formatting recipe QA", text);
+        Assert.Contains("recipe-only on", text);
+        Assert.DoesNotContain("FWMaskedTextBox", text);
     }
 
     private static ResourceDictionary LoadGenericThemeDictionary()

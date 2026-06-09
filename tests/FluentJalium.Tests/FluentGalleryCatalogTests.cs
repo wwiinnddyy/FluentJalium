@@ -251,6 +251,13 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("QuerySubmitted", sampleCode);
         Assert.Contains("ChosenSuggestion", sampleCode);
         Assert.Contains("FWAutoSuggestBoxTextChangeReason.UserInput", sampleCode);
+        Assert.Contains("Formatting recipe", sampleCode);
+        Assert.Contains("FormatPhoneRecipe", sampleCode);
+        Assert.Contains("FormatLicenseKeyRecipe", sampleCode);
+        Assert.Contains("CreateFormattingRecipeSnapshot", sampleCode);
+        Assert.Contains("FormatFormattingRecipeQa", sampleCode);
+        Assert.Contains("IsRecipeOnly", sampleCode);
+        Assert.DoesNotContain("new FWMaskedTextBox", sampleCode);
     }
 
     [Fact]

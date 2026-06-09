@@ -23,6 +23,18 @@ using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
 
+internal readonly record struct GalleryTextInputFormatRecipeSnapshot(
+    string RawPhone,
+    string FormattedPhone,
+    string RawLicenseKey,
+    string FormattedLicenseKey,
+    bool IsPhoneComplete,
+    bool IsLicenseKeyComplete,
+    bool IsRecipeOnly)
+{
+    public bool IsReady => IsPhoneComplete && IsLicenseKeyComplete && IsRecipeOnly;
+}
+
 internal sealed class GalleryTextInputPage
 {
     public UIElement CreateContent()
@@ -54,6 +66,11 @@ internal sealed class GalleryTextInputPage
             "FWAutoSuggestBox",
             "WinUI-style suggest naming with text-change reasons, suggestion choice, query submit, and live counts.",
             CreateAutoSuggestInputSample()));
+        examples.Children.Add(CreateTextInputExampleCard(
+            FluentIconRegular.TextBoxSettings24,
+            "Formatting recipe",
+            "Phone and license-key formatting stays as a Gallery recipe until a repeated masked-input API proves itself.",
+            CreateFormattingRecipeSample()));
         examples.Children.Add(CreateTextInputExampleCard(
             FluentIconRegular.DocumentText24,
             "FWRichTextBox",
@@ -333,6 +350,88 @@ internal sealed class GalleryTextInputPage
         };
     }
 
+    private static UIElement CreateFormattingRecipeSample()
+    {
+        var output = CreateTextInputOutput("Formatting recipe: phone and license key ready.");
+        var phone = new FWTextBox
+        {
+            Width = 220,
+            PlaceholderText = "(425) 555-0123",
+            Text = FormatPhoneRecipe("4255550123"),
+            Density = FWTextInputDensity.Comfortable
+        };
+        var licenseKey = new FWTextBox
+        {
+            Width = 260,
+            PlaceholderText = "FLNT-JLUM-2026",
+            Text = FormatLicenseKeyRecipe("flntjlum2026"),
+            CharacterCasing = CharacterCasing.Upper,
+            Density = FWTextInputDensity.Comfortable
+        };
+        var route = new FWAutoSuggestBox
+        {
+            Width = 260,
+            ItemsSource = SearchItems,
+            Text = "TextBox",
+            PlaceholderText = "Format target",
+            FilterMode = AutoCompleteFilterMode.Contains,
+            MinimumPrefixLength = 1,
+            Density = FWTextInputDensity.Compact
+        };
+
+        void ApplyFormatting(string action)
+        {
+            phone.Text = FormatPhoneRecipe(phone.Text);
+            licenseKey.Text = FormatLicenseKeyRecipe(licenseKey.Text);
+            var snapshot = CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text);
+            output.Text = FormatFormattingRecipeQa(action, snapshot);
+        }
+
+        phone.TextChanged += (_, _) => output.Text = FormatFormattingRecipeQa("Phone edited", CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text));
+        licenseKey.TextChanged += (_, _) => output.Text = FormatFormattingRecipeQa("License edited", CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text));
+        route.QuerySubmitted += (_, args) => output.Text = $"Format target submitted: {args.QueryText}.";
+        ApplyFormatting("Formatting recipe QA");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Children =
+            {
+                new FWWrapPanel
+                {
+                    HorizontalSpacing = 12,
+                    VerticalSpacing = 10,
+                    Children =
+                    {
+                        phone,
+                        licenseKey,
+                        route
+                    }
+                },
+                CreateTextInputButtonRow(
+                    CreateTextInputActionButton(FluentIconRegular.Phone24, "Phone", () =>
+                    {
+                        phone.Text = "2065550188";
+                        ApplyFormatting("Phone formatted");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.Key24, "Key", () =>
+                    {
+                        licenseKey.Text = "fwmasked26";
+                        ApplyFormatting("License formatted");
+                    }),
+                    CreateTextInputActionButton(FluentIconRegular.CheckmarkCircle24, "Validate", () => ApplyFormatting("Validation")),
+                    CreateTextInputActionButton(FluentIconRegular.DismissCircle24, "Clear", () =>
+                    {
+                        phone.Text = string.Empty;
+                        licenseKey.Text = string.Empty;
+                        output.Text = "Formatting recipe cleared";
+                    })),
+                CreateTextInputStatus(output)
+            }
+        };
+    }
+
     private static UIElement CreateRichTextInputSample()
     {
         var output = CreateTextInputOutput("RichTextBox: ready");
@@ -504,6 +603,7 @@ internal sealed class GalleryTextInputPage
             "FWPasswordBox and FWNumberBox" => "<FWPasswordBox RevealMode=\"Visible\" PlaceholderText=\"Password\" />\n<FWNumberBox Minimum=\"0\" Maximum=\"100\" Value=\"42\" SpinButtonPlacementMode=\"Inline\" />",
             "FWAutoCompleteBox" => "<FWAutoCompleteBox ItemsSource=\"{Binding SearchItems}\" FilterMode=\"Contains\" MinimumPrefixLength=\"1\" />",
             "FWAutoSuggestBox" => "<FWAutoSuggestBox ItemsSource=\"{Binding SearchItems}\"\n                  Text=\"Auto\"\n                  FilterMode=\"Contains\"\n                  MinimumPrefixLength=\"1\"\n                  Density=\"Comfortable\" />",
+            "Formatting recipe" => "phone.Text = FormatPhoneRecipe(phone.Text);\nlicenseKey.Text = FormatLicenseKeyRecipe(licenseKey.Text);\nvar snapshot = CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text);",
             "FWRichTextBox" => "<FWRichTextBox AcceptsTab=\"True\" IsSpellCheckEnabled=\"True\" />",
             "Material input panel" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWAutoSuggestBox PlaceholderText=\"Search FluentJalium\" />\n</FWFluentMaterialSurface>",
             _ => "<FWTextBox />"
@@ -652,6 +752,51 @@ internal sealed class GalleryTextInputPage
         return decimalPlaces >= 0
             ? value.ToString($"F{decimalPlaces}", CultureInfo.CurrentCulture)
             : value.ToString("G", CultureInfo.CurrentCulture);
+    }
+
+    internal static string FormatPhoneRecipe(string? text)
+    {
+        var digits = new string((text ?? string.Empty).Where(char.IsDigit).Take(10).ToArray());
+
+        return digits.Length switch
+        {
+            >= 10 => $"({digits[..3]}) {digits[3..6]}-{digits[6..10]}",
+            >= 7 => $"({digits[..3]}) {digits[3..6]}-{digits[6..]}",
+            >= 4 => $"({digits[..3]}) {digits[3..]}",
+            > 0 => digits,
+            _ => string.Empty
+        };
+    }
+
+    internal static string FormatLicenseKeyRecipe(string? text)
+    {
+        var characters = new string((text ?? string.Empty)
+            .Where(char.IsLetterOrDigit)
+            .Select(char.ToUpperInvariant)
+            .Take(12)
+            .ToArray());
+
+        return string.Join("-", characters.Chunk(4).Select(chunk => new string(chunk)));
+    }
+
+    internal static GalleryTextInputFormatRecipeSnapshot CreateFormattingRecipeSnapshot(string? phoneText, string? licenseKeyText)
+    {
+        var formattedPhone = FormatPhoneRecipe(phoneText);
+        var formattedLicenseKey = FormatLicenseKeyRecipe(licenseKeyText);
+
+        return new GalleryTextInputFormatRecipeSnapshot(
+            phoneText ?? string.Empty,
+            formattedPhone,
+            licenseKeyText ?? string.Empty,
+            formattedLicenseKey,
+            new string(formattedPhone.Where(char.IsDigit).ToArray()).Length == 10,
+            formattedLicenseKey.Replace("-", string.Empty, StringComparison.Ordinal).Length == 12,
+            IsRecipeOnly: true);
+    }
+
+    internal static string FormatFormattingRecipeQa(string action, GalleryTextInputFormatRecipeSnapshot snapshot)
+    {
+        return $"{action}: phone {snapshot.FormattedPhone}; license {snapshot.FormattedLicenseKey}; complete phone {FormatOnOff(snapshot.IsPhoneComplete)}; complete key {FormatOnOff(snapshot.IsLicenseKeyComplete)}; recipe-only {FormatOnOff(snapshot.IsRecipeOnly)}.";
     }
 
     private static FWStackPanel CreateSection(string title)
