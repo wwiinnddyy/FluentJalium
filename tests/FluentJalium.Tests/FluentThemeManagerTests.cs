@@ -145,6 +145,7 @@ public sealed class FluentThemeManagerTests
             AssertOwnedStyle<FWInkCanvas>(app.Resources);
             AssertBasedOnStyle<FWInkPresenter, InkPresenter>(app.Resources);
             AssertOwnedStyle<FWMediaElement>(app.Resources);
+            AssertBasedOnStyle<FWWebView, WebView>(app.Resources);
             AssertBasedOnStyle<FWImage, Image>(app.Resources);
             AssertBasedOnStyle<FWBitmapIcon, Image>(app.Resources);
             AssertBasedOnStyle<FWImageIcon, Image>(app.Resources);
@@ -398,6 +399,8 @@ public sealed class FluentThemeManagerTests
         AssertContainsStyle<InkPresenter>(dictionary);
         AssertContainsStyle<MediaElement>(dictionary);
         AssertContainsStyle<FWMediaElement>(dictionary);
+        AssertContainsStyle<WebView>(dictionary);
+        AssertContainsStyle<FWWebView>(dictionary);
         AssertContainsStyle<Image>(dictionary);
         AssertContainsStyle<Markdown>(dictionary);
         AssertContainsStyle<QRCode>(dictionary);
@@ -1022,6 +1025,7 @@ public sealed class FluentThemeManagerTests
             AssertOwnedStyle<FWInkCanvas>(app.Resources);
             AssertBasedOnStyle<FWInkPresenter, InkPresenter>(app.Resources);
             AssertOwnedStyle<FWMediaElement>(app.Resources);
+            AssertBasedOnStyle<FWWebView, WebView>(app.Resources);
             Assert.IsType<SolidColorBrush>(app.Resources["ColorPickerBackground"]);
             Assert.IsType<SolidColorBrush>(app.Resources["InkCanvasBorderBrush"]);
             Assert.IsType<SolidColorBrush>(app.Resources["MediaElementForeground"]);
@@ -1308,6 +1312,7 @@ public sealed class FluentThemeManagerTests
         AssertFluentControl<FWInkCanvas, InkCanvas>();
         AssertFluentControl<FWInkPresenter, InkPresenter>();
         AssertFluentControl<FWMediaElement, MediaElement>();
+        AssertFluentControl<FWWebView, WebView>();
     }
 
     [Fact]

@@ -205,3 +205,40 @@ public class FWMediaElement : MediaElement, IFluentJaliumControl
         }
     }
 }
+
+/// <summary>
+/// FluentJalium WebView control.
+/// </summary>
+public class FWWebView : WebView, IFluentJaliumControl
+{
+    /// <summary>
+    /// Creates diagnostics for Gallery and tests without forcing WebView2 initialization.
+    /// </summary>
+    public FWWebViewDiagnostics GetDiagnostics()
+    {
+        return new FWWebViewDiagnostics(
+            Source,
+            DocumentTitle,
+            CanGoBack,
+            CanGoForward,
+            IsWebViewInitialized,
+            IsNavigating,
+            ZoomFactor,
+            DefaultBackgroundColor,
+            InitializationError);
+    }
+}
+
+/// <summary>
+/// Snapshot of <see cref="FWWebView"/> state that is safe to query before WebView2 initializes.
+/// </summary>
+public readonly record struct FWWebViewDiagnostics(
+    Uri? Source,
+    string DocumentTitle,
+    bool CanGoBack,
+    bool CanGoForward,
+    bool IsInitialized,
+    bool IsNavigating,
+    double ZoomFactor,
+    Color DefaultBackgroundColor,
+    string? InitializationError);

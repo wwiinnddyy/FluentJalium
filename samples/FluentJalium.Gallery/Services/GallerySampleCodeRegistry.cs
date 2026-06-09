@@ -478,6 +478,18 @@ var media = new FWMediaElement
     Stretch = Stretch.Uniform,
     ScrubbingEnabled = true
 };
+
+var webView = new FWWebView
+{
+    Width = 330,
+    Height = 180,
+    DefaultBackgroundColor = Colors.White,
+    ZoomFactor = 1.0
+};
+webView.NavigateToString(GalleryInputMediaPage.CreateWebViewSampleHtml("FluentJalium WebView"));
+
+FWWebViewDiagnostics webViewDiagnostics = webView.GetDiagnostics();
+Debug.WriteLine(GalleryInputMediaPage.FormatWebViewDiagnostics("WebView diagnostics", webViewDiagnostics));
 """,
         ["selectors.properties"] = """
 var selector = new FWTreeSelector

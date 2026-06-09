@@ -68,6 +68,14 @@ public sealed class FluentInputMediaControlsTests
             SpeedRatio = 1.25,
             Position = TimeSpan.FromSeconds(7)
         };
+        using var webView = new FWWebView
+        {
+            Width = 240,
+            Height = 140,
+            Source = new Uri("https://example.com/"),
+            DefaultBackgroundColor = Colors.White,
+            ZoomFactor = 1.25
+        };
         var stack = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
@@ -77,7 +85,8 @@ public sealed class FluentInputMediaControlsTests
                 picker,
                 canvas,
                 presenter,
-                media
+                media,
+                webView
             }
         };
         var surface = new FWFluentMaterialSurface
@@ -120,8 +129,15 @@ public sealed class FluentInputMediaControlsTests
         Assert.Equal(TimeSpan.Zero, media.Position);
         Assert.Equal(1, media.BorderThickness.Left);
         Assert.Equal(6, media.CornerRadius.TopLeft);
+        var webViewDiagnostics = webView.GetDiagnostics();
+        Assert.Equal(new Uri("https://example.com/"), webViewDiagnostics.Source);
+        Assert.False(webViewDiagnostics.IsInitialized);
+        Assert.False(webViewDiagnostics.IsNavigating);
+        Assert.Equal(1.25, webViewDiagnostics.ZoomFactor);
+        Assert.Equal(Colors.White, webViewDiagnostics.DefaultBackgroundColor);
+        Assert.Null(webViewDiagnostics.InitializationError);
         Assert.Equal(10, stack.Spacing);
-        Assert.Equal(4, stack.Children.Count);
+        Assert.Equal(5, stack.Children.Count);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);
@@ -130,6 +146,34 @@ public sealed class FluentInputMediaControlsTests
         Assert.Equal(BorderShape.SuperEllipse, surface.Shape);
         Assert.Equal(4, surface.SuperEllipseN);
         Assert.Same(stack, surface.Child);
+    }
+
+    [Fact]
+    public void FWWebView_ShouldExposeSafeDiagnosticsBeforeWebView2Initialization()
+    {
+        using var webView = new FWWebView
+        {
+            Width = 320,
+            Height = 180,
+            DefaultBackgroundColor = Color.FromRgb(0xF9, 0xF9, 0xF9),
+            ZoomFactor = 8
+        };
+
+        webView.Navigate("https://example.com/");
+        webView.NavigateToString("<html><title>Inline</title></html>");
+        var diagnostics = webView.GetDiagnostics();
+
+        Assert.IsAssignableFrom<WebView>(webView);
+        Assert.IsAssignableFrom<IFluentJaliumControl>(webView);
+        Assert.Equal(new Uri("https://example.com/"), diagnostics.Source);
+        Assert.Equal(string.Empty, diagnostics.DocumentTitle);
+        Assert.False(diagnostics.CanGoBack);
+        Assert.False(diagnostics.CanGoForward);
+        Assert.False(diagnostics.IsInitialized);
+        Assert.False(diagnostics.IsNavigating);
+        Assert.Equal(4.0, diagnostics.ZoomFactor);
+        Assert.Equal(Color.FromRgb(0xF9, 0xF9, 0xF9), diagnostics.DefaultBackgroundColor);
+        Assert.Null(diagnostics.InitializationError);
     }
 
     private static Stroke CreateStroke(Color color)

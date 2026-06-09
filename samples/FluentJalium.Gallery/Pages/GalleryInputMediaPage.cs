@@ -16,6 +16,7 @@ using FWLabel = FluentJalium.Controls.FWLabel;
 using FWMediaElement = FluentJalium.Controls.FWMediaElement;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWWebView = FluentJalium.Controls.FWWebView;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
@@ -51,6 +52,11 @@ internal sealed class GalleryInputMediaPage
             "FWMediaElement",
             "Manual playback surface with play, pause, stop, stretch, mute, and surface styling states.",
             CreateMediaElementSample()));
+        examples.Children.Add(CreateInputMediaExampleCard(
+            FluentIconRegular.Globe24,
+            "FWWebView",
+            "Thin WebView2-host wrapper with Source, HTML navigation, title, zoom, and safe pre-initialization diagnostics.",
+            CreateWebViewSample()));
         examples.Children.Add(CreateInputMediaExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
             "Material input and media workbench",
@@ -248,6 +254,52 @@ internal sealed class GalleryInputMediaPage
         };
     }
 
+    private static UIElement CreateWebViewSample()
+    {
+        var output = CreateInputMediaOutput("WebView: local HTML loaded as a safe Gallery sample.");
+        var webView = CreateWebView(width: 330, height: 180);
+
+        void UpdateDiagnostics(string action)
+        {
+            output.Text = FormatWebViewDiagnostics(action, webView.GetDiagnostics());
+        }
+
+        webView.SourceChanged += (_, _) => UpdateDiagnostics("Source changed");
+        webView.DocumentTitleChanged += (_, args) => output.Text = $"WebView title changed: {args.Title}.";
+        webView.CoreWebView2InitializationCompleted += (_, _) => UpdateDiagnostics("WebView2 initialized");
+        webView.NavigateToString(CreateWebViewSampleHtml("FluentJalium WebView"));
+        UpdateDiagnostics("WebView diagnostics");
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 390,
+            Children =
+            {
+                new FWLabel { Content = "FWWebView host" },
+                CreateWebViewPreview(webView, "WebView2 content"),
+                CreateInputMediaButtonRow(
+                    CreateInputMediaActionButton(FluentIconRegular.DocumentText24, "HTML", () =>
+                    {
+                        webView.NavigateToString(CreateWebViewSampleHtml("Inline Fluent HTML"));
+                        UpdateDiagnostics("NavigateToString");
+                    }),
+                    CreateInputMediaActionButton(FluentIconRegular.Globe24, "Source", () =>
+                    {
+                        webView.Navigate("https://example.com/");
+                        UpdateDiagnostics("Source navigation");
+                    }),
+                    CreateInputMediaActionButton(FluentIconRegular.ZoomIn24, "Zoom", () =>
+                    {
+                        webView.ZoomFactor = webView.ZoomFactor >= 1.25 ? 1.0 : 1.25;
+                        UpdateDiagnostics("Zoom");
+                    })),
+                CreateInputMediaStatus(output)
+            }
+        };
+    }
+
     private static UIElement CreateMaterialInputMediaWorkbenchSample()
     {
         var output = CreateInputMediaOutput("Workbench: LiquidGlass. Color, ink, presenter, and media ready.");
@@ -362,6 +414,51 @@ internal sealed class GalleryInputMediaPage
         };
     }
 
+    private static FWWebView CreateWebView(double width, double height)
+    {
+        return new FWWebView
+        {
+            Width = width,
+            Height = height,
+            DefaultBackgroundColor = Colors.White,
+            ZoomFactor = 1.0
+        };
+    }
+
+    internal static string CreateWebViewSampleHtml(string title)
+    {
+        return $$"""
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{title}}</title>
+  <style>
+    body { margin: 0; font-family: Segoe UI, sans-serif; background: #f9f9f9; color: #1f1f1f; }
+    main { padding: 18px; }
+    h1 { font-size: 18px; margin: 0 0 8px; }
+    p { font-size: 13px; margin: 0; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>{{title}}</h1>
+    <p>Inline HTML keeps the Gallery sample deterministic while exercising FWWebView navigation.</p>
+  </main>
+</body>
+</html>
+""";
+    }
+
+    internal static string FormatWebViewDiagnostics(string action, FluentJalium.Controls.FWWebViewDiagnostics diagnostics)
+    {
+        var source = diagnostics.Source?.ToString() ?? "inline html";
+        var title = string.IsNullOrWhiteSpace(diagnostics.DocumentTitle) ? "untitled" : diagnostics.DocumentTitle;
+        var error = string.IsNullOrWhiteSpace(diagnostics.InitializationError) ? "none" : diagnostics.InitializationError;
+
+        return $"{action}: source {source}; title {title}; initialized {FormatOnOff(diagnostics.IsInitialized)}; navigating {FormatOnOff(diagnostics.IsNavigating)}; back/forward {FormatOnOff(diagnostics.CanGoBack)}/{FormatOnOff(diagnostics.CanGoForward)}; zoom {diagnostics.ZoomFactor:0.##}; error {error}.";
+    }
+
     private static Grid CreateMediaPreview(FWMediaElement media, string title)
     {
         return new Grid
@@ -384,6 +481,42 @@ internal sealed class GalleryInputMediaPage
                         {
                             Text = title,
                             Foreground = ThemeBrush("MediaElementForeground")
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    private static FWBorder CreateWebViewPreview(FWWebView webView, string title)
+    {
+        return new FWBorder
+        {
+            Width = webView.Width,
+            Height = webView.Height,
+            Background = ThemeBrush("MediaElementBackground"),
+            BorderBrush = ThemeBrush("MediaElementBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Child = new Grid
+            {
+                Children =
+                {
+                    webView,
+                    new FWStackPanel
+                    {
+                        Orientation = Orientation.Vertical,
+                        Spacing = 6,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Children =
+                        {
+                            CreateIcon(FluentIconRegular.Globe24, 28, ThemeBrush("MediaElementForeground")),
+                            new FWTextBlock
+                            {
+                                Text = title,
+                                Foreground = ThemeBrush("MediaElementForeground")
+                            }
                         }
                     }
                 }
@@ -500,6 +633,7 @@ internal sealed class GalleryInputMediaPage
             "FWInkCanvas" => "<FWInkCanvas EditingMode=\"Ink\" DefaultStrokeTaperMode=\"TaperedEnd\" />",
             "FWInkPresenter" => "<FWInkPresenter Strokes=\"{Binding Strokes}\" />",
             "FWMediaElement" => "<FWMediaElement LoadedBehavior=\"Manual\" Stretch=\"Uniform\" ScrubbingEnabled=\"True\" />",
+            "FWWebView" => "var webView = new FWWebView();\nwebView.NavigateToString(GalleryInputMediaPage.CreateWebViewSampleHtml(\"FluentJalium\"));",
             "Material input and media workbench" => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n    <FWColorPicker IsCompact=\"True\" />\n    <FWInkCanvas />\n</FWFluentMaterialSurface>",
             _ => "<FWColorPicker />"
         };

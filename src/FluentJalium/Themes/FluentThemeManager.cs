@@ -252,6 +252,7 @@ public static class FluentThemeManager
         AliasStyle<FWGrid, Grid>(dictionary);
         AliasStyle<FWColorPicker, ColorPicker>(dictionary);
         AliasStyle<FWInkPresenter, InkPresenter>(dictionary);
+        AliasStyle<FWWebView, WebView>(dictionary);
         AliasStyle<FWImage, Image>(dictionary);
         AliasStyle<FWMarkdown, Markdown>(dictionary);
         AliasStyle<FWQRCode, QRCode>(dictionary);
@@ -295,7 +296,7 @@ public static class FluentThemeManager
         {
             if (dictionary.TryGetValue(typeof(TFluentControl), out var fluentStyleValue) && fluentStyleValue is Style fluentStyle)
             {
-                if (fluentStyle.BasedOn?.TargetType == typeof(TJaliumControl))
+                if (fluentStyle.BasedOn == null || fluentStyle.BasedOn.TargetType == typeof(TJaliumControl))
                 {
                     fluentStyle.BasedOn = style;
                 }

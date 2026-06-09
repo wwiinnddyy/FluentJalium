@@ -71,4 +71,16 @@
         <Setter Property="UnloadedBehavior" Value="Close" />
         <Setter Property="MinHeight" Value="180" />
     </Style>
+
+    <Style TargetType="WebView">
+        <Setter Property="MinHeight" Value="180" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="DefaultBackgroundColor" Value="#FFFFFFFF" />
+    </Style>
+
+    <Style TargetType="fluent:FWWebView" BasedOn="{StaticResource {x:Type WebView}}">
+        <Setter Property="MinHeight" Value="180" />
+        <Setter Property="Focusable" Value="True" />
+        <Setter Property="DefaultBackgroundColor" Value="#FFFFFFFF" />
+    </Style>
 </ResourceDictionary>

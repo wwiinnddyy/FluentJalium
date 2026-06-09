@@ -40,6 +40,8 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains(controls, control => control.Name == "FWScrollBar" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWSwipeControl" && control.Page.UniqueId == "interaction");
         Assert.Contains(controls, control => control.Name == "FWGridSplitter" && control.Page.UniqueId == "interaction");
+        Assert.Contains(controls, control => control.Name == "FWWebView" && control.Page.UniqueId == "inputandmedia");
+        Assert.Contains(controls, control => control.Name == "FWWebViewDiagnostics" && control.Page.UniqueId == "inputandmedia");
         Assert.Contains(controls, control => control.Name == "FWRefreshContainerDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWScrollerViewportDiagnostics" && control.Page.UniqueId == "advancedinteraction");
         Assert.Contains(controls, control => control.Name == "FWAnnotatedScrollBarDiagnostics" && control.Page.UniqueId == "advancedinteraction");
@@ -178,6 +180,19 @@ public sealed class FluentGalleryCatalogTests
         var swipeControl = Assert.Single(controls, control => control.Name == "FWSwipeControl");
         Assert.Equal("/Interaction/FWScrollViewer/FWSwipeControl", swipeControl.SourcePath);
 
+        var webView = Assert.Single(controls, control => control.Name == "FWWebView");
+        Assert.True(webView.IsUpdated);
+        Assert.Equal("inputmedia.color.ink.media", webView.SampleCodeKey);
+        Assert.Equal("FluentJalium.Controls", webView.ApiNamespace);
+        Assert.Contains("WebView", webView.BaseClasses);
+        Assert.Equal("/InputMedia/FWColorPicker/FWWebView", webView.SourcePath);
+
+        var webViewDiagnostics = Assert.Single(controls, control => control.Name == "FWWebViewDiagnostics");
+        Assert.True(webViewDiagnostics.IsUpdated);
+        Assert.Equal("inputmedia.color.ink.media", webViewDiagnostics.SampleCodeKey);
+        Assert.Contains("WebView", webViewDiagnostics.BaseClasses);
+        Assert.Equal("/InputMedia/FWColorPicker/FWWebViewDiagnostics", webViewDiagnostics.SourcePath);
+
         var refreshDiagnostics = Assert.Single(controls, control => control.Name == "FWRefreshContainerDiagnostics");
         Assert.True(refreshDiagnostics.IsUpdated);
         Assert.Equal(GalleryPageStatus.Preview, refreshDiagnostics.Status);
@@ -258,6 +273,54 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("FormatFormattingRecipeQa", sampleCode);
         Assert.Contains("IsRecipeOnly", sampleCode);
         Assert.DoesNotContain("new FWMaskedTextBox", sampleCode);
+    }
+
+    [Fact]
+    public void GalleryInputMediaPage_ShouldExposeWebViewMetadataAndSample()
+    {
+        var page = Assert.Single(
+            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
+            page => page.UniqueId == "inputandmedia");
+
+        Assert.Equal("inputmedia.color.ink.media", page.SampleCodeKey);
+        Assert.Equal("FluentJalium.Controls", page.ApiNamespace);
+        Assert.Contains("FWWebView", page.RelatedControls);
+        Assert.Contains("FWWebViewDiagnostics", page.RelatedControls);
+        Assert.Contains("WebView", page.BaseClasses!);
+        Assert.True(page.MatchesSearch("webview2 browser diagnostics"));
+
+        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.Contains("new FWColorPicker", sampleCode);
+        Assert.Contains("new FWInkCanvas", sampleCode);
+        Assert.Contains("new FWMediaElement", sampleCode);
+        Assert.Contains("new FWWebView", sampleCode);
+        Assert.Contains("NavigateToString", sampleCode);
+        Assert.Contains("GalleryInputMediaPage.CreateWebViewSampleHtml", sampleCode);
+        Assert.Contains("FWWebViewDiagnostics", sampleCode);
+        Assert.Contains("FormatWebViewDiagnostics", sampleCode);
+
+        var html = GalleryInputMediaPage.CreateWebViewSampleHtml("FluentJalium WebView");
+        Assert.Contains("<title>FluentJalium WebView</title>", html);
+        Assert.Contains("Inline HTML keeps the Gallery sample deterministic", html);
+
+        var diagnostics = new FluentJalium.Controls.FWWebViewDiagnostics(
+            new Uri("https://example.com/"),
+            "Example",
+            CanGoBack: false,
+            CanGoForward: true,
+            IsInitialized: false,
+            IsNavigating: false,
+            ZoomFactor: 1.25,
+            DefaultBackgroundColor: Jalium.UI.Media.Colors.White,
+            InitializationError: null);
+        var formatted = GalleryInputMediaPage.FormatWebViewDiagnostics("Sample", diagnostics);
+
+        Assert.Contains("Sample: source https://example.com/", formatted);
+        Assert.Contains("title Example", formatted);
+        Assert.Contains("initialized off", formatted);
+        Assert.Contains("back/forward off/on", formatted);
+        Assert.Contains("zoom 1.25", formatted);
+        Assert.Contains("error none", formatted);
     }
 
     [Fact]
