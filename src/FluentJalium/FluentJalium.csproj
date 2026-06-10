@@ -60,6 +60,10 @@
     <JalxamlPage Include="Themes\**\*.jalxaml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Fonts\*.ttf" />
+  </ItemGroup>
+
   <Import Project="$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets"
           Condition="'$(UseJaliumSourceReferences)' == 'true' and Exists('$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets')" />
 

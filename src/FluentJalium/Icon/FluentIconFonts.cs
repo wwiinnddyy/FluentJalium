@@ -6,17 +6,17 @@ namespace FluentJalium.Icon;
 public static class FluentIconFonts
 {
     /// <summary>
-    /// Jalium.UI built-in Segoe MDL2 icon font used for regular Fluent icon fallback glyphs.
+    /// FluentSystemIcons Regular font for FluentJalium icons.
     /// </summary>
-    public const string Regular = "Segoe Fluent Icons, Segoe MDL2 Assets";
+    public const string Regular = "resm:FluentJalium.Fonts.FluentSystemIcons-Regular.ttf?assembly=FluentJalium#FluentSystemIcons-Regular";
 
     /// <summary>
-    /// Jalium.UI built-in Segoe MDL2 icon font used for filled Fluent icon fallback glyphs.
+    /// FluentSystemIcons Filled font for FluentJalium icons.
     /// </summary>
-    public const string Filled = "Segoe Fluent Icons, Segoe MDL2 Assets";
+    public const string Filled = "resm:FluentJalium.Fonts.FluentSystemIcons-Filled.ttf?assembly=FluentJalium#FluentSystemIcons-Filled";
 
     /// <summary>
-    /// Jalium.UI built-in Segoe MDL2 icon font used for Segoe compatibility glyphs.
+    /// Segoe MDL2 Assets fallback for compatibility.
     /// </summary>
-    public const string Segoe = "Segoe Fluent Icons, Segoe MDL2 Assets";
+    public const string Segoe = "Segoe MDL2 Assets";
 }
