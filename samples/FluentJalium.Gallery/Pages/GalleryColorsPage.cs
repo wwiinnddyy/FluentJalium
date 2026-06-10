@@ -4,6 +4,8 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
+using FWButton = FluentJalium.Controls.FWButton;
+using FWButtonDensity = FluentJalium.Controls.FWButtonDensity;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
@@ -94,7 +96,10 @@ internal sealed class GalleryColorsPage
 
     private static FWBorder CreateSwatchTile(string title, string primaryKey, string secondaryKey)
     {
-        return new FWBorder
+        var primaryBrush = ThemeBrush(primaryKey);
+        var hexValue = primaryBrush is SolidColorBrush scb ? $"#{scb.Color.R:X2}{scb.Color.G:X2}{scb.Color.B:X2}" : primaryKey;
+
+        var tile = new FWButton
         {
             Width = 170,
             Background = ThemeBrush("ControlBackground"),
@@ -102,7 +107,8 @@ internal sealed class GalleryColorsPage
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
             Padding = new Thickness(10),
-            Child = new FWStackPanel
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            Content = new FWStackPanel
             {
                 Orientation = Orientation.Vertical,
                 Spacing = 8,
@@ -115,7 +121,7 @@ internal sealed class GalleryColorsPage
                         {
                             new FWBorder
                             {
-                                Background = ThemeBrush(primaryKey),
+                                Background = primaryBrush,
                                 BorderBrush = ThemeBrush("ControlBorder"),
                                 BorderThickness = new Thickness(1),
                                 CornerRadius = new CornerRadius(6)
@@ -142,14 +148,14 @@ internal sealed class GalleryColorsPage
                     },
                     new FWTextBlock
                     {
-                        Text = primaryKey,
+                        Text = hexValue,
                         FontSize = 11,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
+                        FontFamily = "Cascadia Code",
+                        Foreground = ThemeBrush("TextSecondary")
                     },
                     new FWTextBlock
                     {
-                        Text = secondaryKey,
+                        Text = primaryKey,
                         FontSize = 11,
                         Foreground = ThemeBrush("TextSecondary"),
                         TextWrapping = TextWrapping.Wrap
@@ -157,6 +163,12 @@ internal sealed class GalleryColorsPage
                 }
             }
         };
+        tile.Click += (_, _) =>
+        {
+            Clipboard.SetText(hexValue);
+            GalleryFeedback.Copied($"{title}: {hexValue}");
+        };
+        return new FWBorder { Child = tile };
     }
 
     private static FWBorder CreateColorExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
@@ -176,30 +188,7 @@ internal sealed class GalleryColorsPage
 
     private static FWStackPanel CreateSection(string title)
     {
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 14,
-            Children =
-            {
-                new FWStackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 10,
-                    Children =
-                    {
-                        CreateIcon(FluentIconRegular.Color24, 24, ThemeBrush("TextPrimary")),
-                        new FWTextBlock
-                        {
-                            Text = title,
-                            FontSize = 22,
-                            Foreground = ThemeBrush("TextPrimary"),
-                            VerticalAlignment = VerticalAlignment.Center
-                        }
-                    }
-                }
-            }
-        };
+        return GalleryPageSection.Create(title, FluentIconRegular.Color24);
     }
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)

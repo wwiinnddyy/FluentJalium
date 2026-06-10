@@ -6,6 +6,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
+using FWButtonDensity = FluentJalium.Controls.FWButtonDensity;
 using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
@@ -28,111 +29,207 @@ internal sealed class GalleryOverviewPage
 
     public UIElement CreateContent()
     {
-        var panel = CreateSection(Strings.Overview_Title);
-        var examples = new FWWrapPanel
+        var root = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 36
+        };
+
+        root.Children.Add(CreateHeroBanner());
+        root.Children.Add(CreateThemeAndAccentSection());
+        root.Children.Add(CreateTypographySection());
+        root.Children.Add(CreateMaterialSection());
+
+        return root;
+    }
+
+    private UIElement CreateHeroBanner()
+    {
+        var heroContent = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 16,
+            Margin = new Thickness(40, 48, 40, 48)
+        };
+
+        heroContent.Children.Add(new FWTextBlock
+        {
+            Text = Strings.Overview_Title,
+            FontSize = 40,
+            FontFamily = "Segoe UI Variable Display",
+            FontWeight = FontWeights.SemiBold,
+            Foreground = ThemeBrush("TextPrimary")
+        });
+
+        heroContent.Children.Add(new FWTextBlock
+        {
+            Text = "Explore the Fluent Design System for Jalium.UI — a comprehensive toolkit for building modern, accessible, and beautiful applications.",
+            FontSize = 16,
+            Foreground = ThemeBrush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 600
+        });
+
+        var buttonRow = new FWWrapPanel
+        {
+            HorizontalSpacing = 12,
+            VerticalSpacing = 8,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+
+        var browseBtn = new FWButton
+        {
+            Content = CreateButtonContent(FluentIconRegular.ControlButton24, "Browse Controls"),
+            MinWidth = 160
+        };
+        buttonRow.Children.Add(browseBtn);
+
+        var designBtn = new FWButton
+        {
+            Content = CreateButtonContent(FluentIconRegular.DesignIdeas24, "Design System"),
+            MinWidth = 160
+        };
+        buttonRow.Children.Add(designBtn);
+
+        heroContent.Children.Add(buttonRow);
+
+        return new FWFluentMaterialSurface
+        {
+            MaterialKind = FWFluentMaterialKind.LiquidGlass,
+            TintColor = Color.FromArgb(140, 0, 120, 212),
+            TintOpacity = 0.14,
+            BlurRadius = 18,
+            RefractionAmount = 40,
+            ChromaticAberration = 0.25,
+            FusionRadius = 20,
+            Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(12),
+            Shape = BorderShape.SuperEllipse,
+            SuperEllipseN = 4,
+            Child = heroContent
+        };
+    }
+
+    private UIElement CreateThemeAndAccentSection()
+    {
+        var panel = new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 16
+        };
+
+        panel.Children.Add(CreateSectionTitle(FluentIconRegular.DarkTheme24, Strings.Overview_ThemeVariants));
+
+        var cards = new FWWrapPanel
         {
             HorizontalSpacing = 16,
             VerticalSpacing = 16
         };
 
-        examples.Children.Add(CreateOverviewCard(
+        var themeOutput = CreateOutput(string.Format(Strings.Overview_Theme, CurrentThemeLabel()));
+        cards.Children.Add(CreateCard(
             FluentIconRegular.DarkTheme24,
             Strings.Overview_ThemeVariants,
             Strings.Overview_ThemeVariants_Desc,
-            CreateThemeVariantSample()));
-        examples.Children.Add(CreateOverviewCard(
+            new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    CreateButtonRow(
+                        CreateActionButton(FluentIconRegular.WeatherSunny24, Strings.Settings_ThemeLight, () =>
+                        {
+                            _applyTheme(FluentThemeVariant.Light);
+                            themeOutput.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeLight);
+                        }),
+                        CreateActionButton(FluentIconRegular.DarkTheme24, Strings.Settings_ThemeDark, () =>
+                        {
+                            _applyTheme(FluentThemeVariant.Dark);
+                            themeOutput.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeDark);
+                        }),
+                        CreateActionButton(FluentIconRegular.Accessibility24, Strings.Settings_ThemeHighContrast, () =>
+                        {
+                            _applyTheme(FluentThemeVariant.HighContrast);
+                            themeOutput.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeHighContrast);
+                        })),
+                    CreateStatusBar(themeOutput)
+                }
+            }));
+
+        var accentOutput = CreateOutput(string.Format(Strings.Overview_Accent, CurrentAccentHex()));
+        cards.Children.Add(CreateCard(
             FluentIconRegular.Color24,
             Strings.Overview_AccentPalette,
             Strings.Overview_AccentPalette_Desc,
-            CreateAccentPaletteSample()));
-        examples.Children.Add(CreateOverviewCard(
-            FluentIconRegular.TextFont24,
-            Strings.Overview_TypographyTokens,
-            Strings.Overview_TypographyTokens_Desc,
-            CreateTypographySample()));
-        examples.Children.Add(CreateOverviewCard(
-            FluentIconRegular.LayerDiagonalSparkle24,
-            Strings.Overview_MaterialPreview,
-            Strings.Overview_MaterialPreview_Desc,
-            CreateMaterialThemePreview()));
+            new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWWrapPanel
+                    {
+                        HorizontalSpacing = 10,
+                        VerticalSpacing = 10,
+                        Children =
+                        {
+                            CreateAccentSwatch(Strings.Color_Blue, Color.FromRgb(0x00, 0x78, 0xD4), accentOutput),
+                            CreateAccentSwatch(Strings.Color_Rose, Color.FromRgb(0xC2, 0x39, 0xB3), accentOutput),
+                            CreateAccentSwatch(Strings.Color_Orange, Color.FromRgb(0xD8, 0x3B, 0x01), accentOutput),
+                            CreateAccentSwatch(Strings.Color_Green, Color.FromRgb(0x10, 0x7C, 0x10), accentOutput)
+                        }
+                    },
+                    CreateStatusBar(accentOutput)
+                }
+            }));
 
-        panel.Children.Add(examples);
+        panel.Children.Add(cards);
         return panel;
     }
 
-    private UIElement CreateThemeVariantSample()
+    private UIElement CreateTypographySection()
     {
-        string currentThemeLabel = FluentThemeManager.CurrentTheme switch
-        {
-            FluentThemeVariant.Light => Strings.Settings_ThemeLight,
-            FluentThemeVariant.Dark => Strings.Settings_ThemeDark,
-            _ => Strings.Settings_ThemeHighContrast
-        };
-        var output = CreateOverviewOutput(string.Format(Strings.Overview_Theme, currentThemeLabel));
-
-        return new FWStackPanel
+        var panel = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                CreateOverviewButtonRow(
-                    CreateOverviewActionButton(FluentIconRegular.WeatherSunny24, Strings.Settings_ThemeLight, () =>
-                    {
-                        _applyTheme(FluentThemeVariant.Light);
-                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeLight);
-                    }),
-                    CreateOverviewActionButton(FluentIconRegular.DarkTheme24, Strings.Settings_ThemeDark, () =>
-                    {
-                        _applyTheme(FluentThemeVariant.Dark);
-                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeDark);
-                    }),
-                    CreateOverviewActionButton(FluentIconRegular.Accessibility24, Strings.Settings_ThemeHighContrast, () =>
-                    {
-                        _applyTheme(FluentThemeVariant.HighContrast);
-                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeHighContrast);
-                    })),
-                CreateOverviewStatus(output)
-            }
+            Spacing = 16
         };
-    }
 
-    private UIElement CreateAccentPaletteSample()
-    {
-        var output = CreateOverviewOutput(string.Format(Strings.Overview_Accent, $"{FluentThemeManager.CurrentAccentColor.R:X2}{FluentThemeManager.CurrentAccentColor.G:X2}{FluentThemeManager.CurrentAccentColor.B:X2}"));
+        panel.Children.Add(CreateSectionTitle(FluentIconRegular.TextFont24, Strings.Overview_TypographyTokens));
 
-        return new FWStackPanel
+        var typeRamp = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                CreateAccentSwatchRow(output),
-                CreateOverviewStatus(output)
-            }
+            Spacing = 8
         };
+
+        typeRamp.Children.Add(CreateTypeRampRow("Display", FluentThemeManager.CurrentDisplayFontFamily, 40, "Segoe UI Variable Display"));
+        typeRamp.Children.Add(CreateTypeRampRow("Title", FluentThemeManager.CurrentDisplayFontFamily, 28, "FluentTitleFontSize"));
+        typeRamp.Children.Add(CreateTypeRampRow("Subtitle", FluentThemeManager.CurrentBodyFontFamily, 20, "FluentSubtitleFontSize"));
+        typeRamp.Children.Add(CreateTypeRampRow("Body", FluentThemeManager.CurrentBodyFontFamily, 14, "FluentBodyFontSize"));
+        typeRamp.Children.Add(CreateTypeRampRow("Caption", FluentThemeManager.CurrentBodyFontFamily, 12, "FluentCaptionFontSize"));
+        typeRamp.Children.Add(CreateTypeRampRow("Mono", FluentThemeManager.CurrentMonoFontFamily, 13, "Cascadia Code"));
+
+        panel.Children.Add(typeRamp);
+        return panel;
     }
 
-    private static UIElement CreateTypographySample()
+    private UIElement CreateMaterialSection()
     {
-        return new FWStackPanel
+        var panel = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 10,
-            Children =
-            {
-                CreateTypographyPreview(Strings.Overview_Typography_Display, FluentThemeManager.CurrentDisplayFontFamily, 22, Strings.Overview_Typography_DisplaySample),
-                CreateTypographyPreview(Strings.Overview_Typography_Body, FluentThemeManager.CurrentBodyFontFamily, 14, Strings.Overview_Typography_BodySample),
-                CreateTypographyPreview(Strings.Overview_Typography_Mono, FluentThemeManager.CurrentMonoFontFamily, 13, "FWButton | FWTextBox | FWNavigationView")
-            }
+            Spacing = 16
         };
-    }
 
-    private UIElement CreateMaterialThemePreview()
-    {
-        var output = CreateOverviewOutput(Strings.Overview_Material_Active);
+        panel.Children.Add(CreateSectionTitle(FluentIconRegular.LayerDiagonalSparkle24, Strings.Overview_MaterialPreview));
 
-        return new FWFluentMaterialSurface
+        var output = CreateOutput(Strings.Overview_Material_Active);
+
+        panel.Children.Add(new FWFluentMaterialSurface
         {
             Width = double.NaN,
             MaxWidth = 800,
@@ -149,14 +246,20 @@ internal sealed class GalleryOverviewPage
             CornerRadius = new CornerRadius(8),
             Shape = BorderShape.SuperEllipse,
             SuperEllipseN = 4,
-            Padding = new Thickness(16),
+            Padding = new Thickness(24),
             Child = new FWStackPanel
             {
                 Orientation = Orientation.Vertical,
                 Spacing = 12,
                 Children =
                 {
-                    CreateMaterialHeader(),
+                    new FWTextBlock
+                    {
+                        Text = Strings.Overview_ResourceLayer,
+                        FontSize = 18,
+                        FontWeight = FontWeights.SemiBold,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
                     new FWTextBlock
                     {
                         Text = Strings.Overview_ResourceLayer_Desc,
@@ -169,12 +272,12 @@ internal sealed class GalleryOverviewPage
                         VerticalSpacing = 8,
                         Children =
                         {
-                            CreateOverviewActionButton(FluentIconRegular.Color24, Strings.Color_Blue, () =>
+                            CreateActionButton(FluentIconRegular.Color24, Strings.Color_Blue, () =>
                             {
                                 _applyAccent(Color.FromRgb(0x00, 0x78, 0xD4));
                                 output.Text = string.Format(Strings.Overview_MaterialAccent, Strings.Color_Blue);
                             }),
-                            CreateOverviewActionButton(FluentIconRegular.ColorFill24, Strings.Color_Rose, () =>
+                            CreateActionButton(FluentIconRegular.ColorFill24, Strings.Color_Rose, () =>
                             {
                                 _applyAccent(Color.FromRgb(0xC2, 0x39, 0xB3));
                                 output.Text = string.Format(Strings.Overview_MaterialAccent, Strings.Color_Rose);
@@ -186,26 +289,137 @@ internal sealed class GalleryOverviewPage
                             }
                         }
                     },
-                    CreateOverviewStatus(output)
+                    CreateStatusBar(output)
+                }
+            }
+        });
+
+        return panel;
+    }
+
+    private static UIElement CreateSectionTitle(FluentIconRegular icon, string title)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 10,
+            Children =
+            {
+                CreateIcon(icon, 22, ThemeBrush("TextPrimary")),
+                new FWTextBlock
+                {
+                    Text = title,
+                    FontSize = 20,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = ThemeBrush("TextPrimary"),
+                    VerticalAlignment = VerticalAlignment.Center
                 }
             }
         };
     }
 
-    private FWWrapPanel CreateAccentSwatchRow(TextBlock output)
+    private static FWBorder CreateCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return new FWWrapPanel
+        return new FWBorder
         {
-            HorizontalSpacing = 10,
-            VerticalSpacing = 10,
-            Children =
+            Width = double.NaN,
+            MaxWidth = 480,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Background = ThemeBrush("CardBackgroundFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(24),
+            Child = new FWStackPanel
             {
-                CreateAccentSwatch(Strings.Color_Blue, Color.FromRgb(0x00, 0x78, 0xD4), output),
-                CreateAccentSwatch(Strings.Color_Rose, Color.FromRgb(0xC2, 0x39, 0xB3), output),
-                CreateAccentSwatch(Strings.Color_Orange, Color.FromRgb(0xD8, 0x3B, 0x01), output),
-                CreateAccentSwatch(Strings.Color_Green, Color.FromRgb(0x10, 0x7C, 0x10), output)
+                Orientation = Orientation.Vertical,
+                Spacing = 10,
+                Children =
+                {
+                    new FWStackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Spacing = 8,
+                        Children =
+                        {
+                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
+                            new FWTextBlock
+                            {
+                                Text = title,
+                                FontSize = 16,
+                                FontWeight = FontWeights.SemiBold,
+                                Foreground = ThemeBrush("TextPrimary"),
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        }
+                    },
+                    new FWTextBlock
+                    {
+                        Text = description,
+                        FontSize = 13,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        TextWrapping = TextWrapping.Wrap
+                    },
+                    content
+                }
             }
         };
+    }
+
+    private static FWBorder CreateTypeRampRow(string label, string family, double fontSize, string token)
+    {
+        return new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(16, 12, 16, 12),
+            Child = new Grid
+            {
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition { Width = new GridLength(100) },
+                    new ColumnDefinition { Width = GridLength.Star },
+                    new ColumnDefinition { Width = GridLength.Auto }
+                },
+                Children =
+                {
+                    CreateGridChild(0, new FWStackPanel
+                    {
+                        Orientation = Orientation.Vertical,
+                        Spacing = 2,
+                        Children =
+                        {
+                            new FWTextBlock { Text = label, FontSize = 12, FontWeight = FontWeights.SemiBold, Foreground = ThemeBrush("TextPrimary") },
+                            new FWTextBlock { Text = $"{fontSize}px", FontSize = 11, Foreground = ThemeBrush("TextSecondary") }
+                        }
+                    }),
+                    CreateGridChild(1, new FWTextBlock
+                    {
+                        Text = "The quick brown fox jumps over the lazy dog",
+                        FontFamily = family,
+                        FontSize = fontSize,
+                        Foreground = ThemeBrush("TextPrimary"),
+                        VerticalAlignment = VerticalAlignment.Center
+                    }),
+                    CreateGridChild(2, new FWTextBlock
+                    {
+                        Text = token,
+                        FontSize = 11,
+                        Foreground = ThemeBrush("TextSecondary"),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(12, 0, 0, 0)
+                    })
+                }
+            }
+        };
+    }
+
+    private static UIElement CreateGridChild(int column, UIElement child)
+    {
+        Grid.SetColumn(child, column);
+        return child;
     }
 
     private FWButton CreateAccentSwatch(string label, Color color, TextBlock output)
@@ -243,146 +457,38 @@ internal sealed class GalleryOverviewPage
         return button;
     }
 
-    private static FWBorder CreateTypographyPreview(string label, string family, double fontSize, string sample)
+    private static FWWrapPanel CreateButtonRow(params FWButton[] buttons)
     {
-        return new FWBorder
-        {
-            Background = ThemeBrush("LayerFillColorDefaultBrush"),
-            BorderBrush = ThemeBrush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 4,
-                Children =
-                {
-                    new FWTextBlock
-                    {
-                        Text = $"{label}: {family}",
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary")
-                    },
-                    new FWTextBlock
-                    {
-                        Text = sample,
-                        FontFamily = family,
-                        FontSize = fontSize,
-                        Foreground = ThemeBrush("TextPrimary")
-                    }
-                }
-            }
-        };
-    }
-
-    private static FWStackPanel CreateMaterialHeader()
-    {
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                CreateIcon(FluentIconRegular.LayerDiagonalSparkle24, 18, ThemeBrush("TextPrimary")),
-                new FWTextBlock
-                {
-                    Text = Strings.Overview_ResourceLayer,
-                    FontSize = 15,
-                    Foreground = ThemeBrush("TextPrimary"),
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            }
-        };
-    }
-
-    private static FWBorder CreateOverviewCard(FluentIconRegular icon, string title, string description, UIElement content)
-    {
-        return new FWBorder
-        {
-            Width = double.NaN,
-            MaxWidth = 800,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            Background = ThemeBrush("CardBackgroundFillColorDefaultBrush"),
-            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(24),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 10,
-                Children =
-                {
-                    new FWStackPanel
-                    {
-                        Orientation = Orientation.Horizontal,
-                        Spacing = 8,
-                        Children =
-                        {
-                            CreateIcon(icon, 20, ThemeBrush("TextPrimary")),
-                            new FWTextBlock
-                            {
-                                Text = title,
-                                FontSize = 15,
-                                Foreground = ThemeBrush("TextPrimary"),
-                                VerticalAlignment = VerticalAlignment.Center
-                            }
-                        }
-                    },
-                    new FWTextBlock
-                    {
-                        Text = description,
-                        FontSize = 12,
-                        Foreground = ThemeBrush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    content
-                }
-            }
-        };
-    }
-
-    private static FWWrapPanel CreateOverviewButtonRow(params FWButton[] buttons)
-    {
-        var row = new FWWrapPanel
-        {
-            HorizontalSpacing = 8,
-            VerticalSpacing = 8
-        };
-
-        foreach (var button in buttons)
-        {
-            row.Children.Add(button);
-        }
-
+        var row = new FWWrapPanel { HorizontalSpacing = 8, VerticalSpacing = 8 };
+        foreach (var button in buttons) row.Children.Add(button);
         return row;
     }
 
-    private static FWButton CreateOverviewActionButton(FluentIconRegular icon, string text, Action action)
+    private static FWButton CreateActionButton(FluentIconRegular icon, string text, Action action)
     {
         var button = new FWButton
         {
-            Content = new FWStackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                Spacing = 6,
-                Children =
-                {
-                    CreateIcon(icon, 16, ThemeBrush("TextPrimary")),
-                    new FWTextBlock
-                    {
-                        Text = text,
-                        VerticalAlignment = VerticalAlignment.Center
-                    }
-                }
-            }
+            Content = CreateButtonContent(icon, text)
         };
         button.Click += (_, _) => action();
         return button;
     }
 
-    private static TextBlock CreateOverviewOutput(string text)
+    private static FWStackPanel CreateButtonContent(FluentIconRegular icon, string text)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            Children =
+            {
+                CreateIcon(icon, 16, ThemeBrush("TextPrimary")),
+                new FWTextBlock { Text = text, VerticalAlignment = VerticalAlignment.Center }
+            }
+        };
+    }
+
+    private static TextBlock CreateOutput(string text)
     {
         return new TextBlock
         {
@@ -393,7 +499,7 @@ internal sealed class GalleryOverviewPage
         };
     }
 
-    private static FWBorder CreateOverviewStatus(TextBlock status)
+    private static FWBorder CreateStatusBar(TextBlock status)
     {
         return new FWBorder
         {
@@ -401,47 +507,34 @@ internal sealed class GalleryOverviewPage
             BorderBrush = ThemeBrush("ControlBorder"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(16),
+            Padding = new Thickness(12),
             Child = new FWStackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 8,
                 Children =
                 {
-                    CreateIcon(FluentIconRegular.InfoSparkle24, 18, ThemeBrush("TextSecondary")),
+                    CreateIcon(FluentIconRegular.InfoSparkle24, 16, ThemeBrush("TextSecondary")),
                     status
                 }
             }
         };
     }
 
-    private static FWStackPanel CreateSection(string title)
+    private string CurrentThemeLabel()
     {
-        return new FWStackPanel
+        return FluentThemeManager.CurrentTheme switch
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 14,
-            Children =
-            {
-                new FWStackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 10,
-                    Children =
-                    {
-                        CreateIcon(FluentIconRegular.Home24, 24, ThemeBrush("TextPrimary")),
-                        new FWTextBlock
-                        {
-                            Text = title,
-                            FontSize = 24,
-                            FontWeight = FontWeights.SemiBold,
-                            Foreground = ThemeBrush("TextPrimary"),
-                            VerticalAlignment = VerticalAlignment.Center
-                        }
-                    }
-                }
-            }
+            FluentThemeVariant.Light => Strings.Settings_ThemeLight,
+            FluentThemeVariant.Dark => Strings.Settings_ThemeDark,
+            _ => Strings.Settings_ThemeHighContrast
         };
+    }
+
+    private static string CurrentAccentHex()
+    {
+        var c = FluentThemeManager.CurrentAccentColor;
+        return $"{c.R:X2}{c.G:X2}{c.B:X2}";
     }
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
@@ -455,7 +548,6 @@ internal sealed class GalleryOverviewPage
         {
             return brush;
         }
-
         return new SolidColorBrush(Colors.Transparent);
     }
 }

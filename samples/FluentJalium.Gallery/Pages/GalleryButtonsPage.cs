@@ -426,30 +426,7 @@ internal sealed class GalleryButtonsPage
 
     private static FWStackPanel CreateSection(string title)
     {
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 14,
-            Children =
-            {
-                new FWStackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 10,
-                    Children =
-                    {
-                        CreateIcon(FluentIconRegular.ControlButton24, 24, ThemeBrush("TextPrimary")),
-                        new FWTextBlock
-                        {
-                            Text = title,
-                            FontSize = 22,
-                            Foreground = ThemeBrush("TextPrimary"),
-                            VerticalAlignment = VerticalAlignment.Center
-                        }
-                    }
-                }
-            }
-        };
+        return GalleryPageSection.Create(title, FluentIconRegular.ControlButton24);
     }
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)

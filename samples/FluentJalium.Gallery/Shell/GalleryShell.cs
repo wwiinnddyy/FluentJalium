@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Gallery.Resources;
@@ -7,12 +8,23 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
+using FWAutoSuggestBoxTextChangedEventArgs = FluentJalium.Controls.FWAutoSuggestBoxTextChangedEventArgs;
+using FWAutoSuggestBoxSuggestionChosenEventArgs = FluentJalium.Controls.FWAutoSuggestBoxSuggestionChosenEventArgs;
+using FWAutoSuggestBoxQuerySubmittedEventArgs = FluentJalium.Controls.FWAutoSuggestBoxQuerySubmittedEventArgs;
+using FWAutoSuggestBoxTextChangeReason = FluentJalium.Controls.FWAutoSuggestBoxTextChangeReason;
+using Jalium.UI.Input;
 using FWFrame = FluentJalium.Controls.FWFrame;
 using FWGrid = FluentJalium.Controls.FWGrid;
 using FWNavigationView = FluentJalium.Controls.FWNavigationView;
 using FWNavigationViewItem = FluentJalium.Controls.FWNavigationViewItem;
 using FWNavigationViewItemSeparator = FluentJalium.Controls.FWNavigationViewItemSeparator;
-using FWTextBox = FluentJalium.Controls.FWTextBox;
+using FWSnackbarHost = FluentJalium.Controls.FWSnackbarHost;
+using FWSnackbarPlacement = FluentJalium.Controls.FWSnackbarPlacement;
+using FWTransitioningContentControl = FluentJalium.Controls.FWTransitioningContentControl;
+using FWContentTransitionProfile = FluentJalium.Controls.FWContentTransitionProfile;
+using FWTeachingTip = FluentJalium.Controls.FWTeachingTip;
+using TeachingTipPlacementMode = FluentJalium.Controls.TeachingTipPlacementMode;
 
 namespace FluentJalium.Gallery.Shell;
 
@@ -26,7 +38,9 @@ internal sealed class GalleryShell : UserControl
     private GalleryPage[] _pages = [];
     private FWNavigationView? _navigationView;
     private FWFrame? _frame;
-    private FWTextBox? _searchBox;
+    private FWTransitioningContentControl? _transitionHost;
+    private FWAutoSuggestBox? _searchBox;
+    private FWSnackbarHost? _snackbarHost;
     private GalleryPage? _selectedPage;
     private string _navigationSearchText = string.Empty;
 
@@ -47,6 +61,13 @@ internal sealed class GalleryShell : UserControl
         };
 
         Content = BuildShell();
+
+        _owner.SizeChanged += OnOwnerSizeChanged;
+
+        if (GalleryFirstRunService.Instance.IsFirstRun)
+        {
+            Loaded += (_, _) => ShowFirstRunTip();
+        }
     }
 
     public void RefreshTheme()
@@ -55,9 +76,9 @@ internal sealed class GalleryShell : UserControl
 
         if (_navigationView != null)
         {
-            _navigationView.Background = GalleryThemeResources.Brush("WindowBackground");
-            _navigationView.PaneBackground = GalleryThemeResources.Brush("NavigationViewPaneBackground");
-            _navigationView.ContentBackground = GalleryThemeResources.Brush("NavigationViewContentBackground");
+            _navigationView.Background = new SolidColorBrush(Colors.Transparent);
+            _navigationView.PaneBackground = new SolidColorBrush(Color.FromArgb(200, 0xF3, 0xF3, 0xF3));
+            _navigationView.ContentBackground = new SolidColorBrush(Colors.Transparent);
             _navigationView.PaneHeader = CreatePaneHeader();
             _navigationView.Content = CreateContentHost();
             PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
@@ -80,15 +101,27 @@ internal sealed class GalleryShell : UserControl
         _frame = new FWFrame
         {
             CacheSize = 1,
-            Background = GalleryThemeResources.Brush("NavigationViewContentBackground")
+            Background = new SolidColorBrush(Colors.Transparent)
         };
         _frame.Navigated += OnFrameNavigated;
 
+        _transitionHost = new FWTransitioningContentControl
+        {
+            TransitionProfile = FWContentTransitionProfile.Entrance
+        };
+
+        _snackbarHost = new FWSnackbarHost
+        {
+            Placement = FWSnackbarPlacement.Bottom,
+            MaxVisibleSnackbars = 1
+        };
+        GalleryFeedback.SetHost(_snackbarHost);
+
         _navigationView = new FWNavigationView
         {
-            Background = GalleryThemeResources.Brush("WindowBackground"),
-            PaneBackground = GalleryThemeResources.Brush("NavigationViewPaneBackground"),
-            ContentBackground = GalleryThemeResources.Brush("NavigationViewContentBackground"),
+            Background = new SolidColorBrush(Colors.Transparent),
+            PaneBackground = new SolidColorBrush(Color.FromArgb(200, 0xF3, 0xF3, 0xF3)),
+            ContentBackground = new SolidColorBrush(Colors.Transparent),
             PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
             IsPaneOpen = true,
             OpenPaneLength = 320,
@@ -105,16 +138,22 @@ internal sealed class GalleryShell : UserControl
             SelectPage(firstPage);
         }
 
-        return _navigationView;
+        var shellRoot = new Grid();
+        shellRoot.Children.Add(_navigationView);
+        shellRoot.Children.Add(_snackbarHost);
+        return shellRoot;
     }
 
     private UIElement CreateContentHost()
     {
         var searchHeader = CreateSearchHeader();
         var frame = _frame!;
+        var transitionHost = _transitionHost!;
+        transitionHost.Content = frame;
+
         var host = new FWGrid
         {
-            Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
+            Background = new SolidColorBrush(Colors.Transparent),
             RowDefinitions =
             {
                 new RowDefinition { Height = GridLength.Auto },
@@ -123,9 +162,9 @@ internal sealed class GalleryShell : UserControl
         };
 
         Grid.SetRow(searchHeader, 0);
-        Grid.SetRow(frame, 1);
+        Grid.SetRow(transitionHost, 1);
         host.Children.Add(searchHeader);
-        host.Children.Add(frame);
+        host.Children.Add(transitionHost);
         return host;
     }
 
@@ -251,7 +290,7 @@ internal sealed class GalleryShell : UserControl
         };
 
         panel.Children.Add(CreateIcon(FluentIconRegular.Search24, 20, GalleryThemeResources.Brush("TextSecondary")));
-        _searchBox = new FWTextBox
+        _searchBox = new FWAutoSuggestBox
         {
             Text = _navigationSearchText,
             PlaceholderText = Strings.Shell_SearchPlaceholder,
@@ -259,19 +298,61 @@ internal sealed class GalleryShell : UserControl
             Width = 420,
             VerticalAlignment = VerticalAlignment.Center
         };
-        _searchBox.TextChanged += OnNavigationSearchTextChanged;
+        _searchBox.AutoSuggestTextChanged += OnAutoSuggestTextChanged;
+        _searchBox.SuggestionChosen += OnSearchSuggestionChosen;
+        _searchBox.QuerySubmitted += OnSearchQuerySubmitted;
         panel.Children.Add(_searchBox);
         return panel;
     }
 
-    private void OnNavigationSearchTextChanged(object sender, TextChangedEventArgs e)
+    private void OnAutoSuggestTextChanged(object sender, FWAutoSuggestBoxTextChangedEventArgs e)
     {
-        if (sender is not FWTextBox textBox)
+        if (sender is not FWAutoSuggestBox suggestBox)
         {
             return;
         }
 
-        var searchText = textBox.Text ?? string.Empty;
+        var searchText = suggestBox.Text ?? string.Empty;
+
+        if (e.Reason == FWAutoSuggestBoxTextChangeReason.SuggestionChosen)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            suggestBox.ItemsSource = null;
+            _navigationSearchText = string.Empty;
+            RefreshNavigationForSearch();
+            return;
+        }
+
+        var suggestions = _pages
+            .Where(page => page.MatchesSearch(searchText))
+            .Take(8)
+            .Select(page => new SearchSuggestion(page.Icon, page.Title, page.Group, page))
+            .ToArray();
+
+        suggestBox.ItemsSource = suggestions;
+    }
+
+    private void OnSearchSuggestionChosen(object sender, FWAutoSuggestBoxSuggestionChosenEventArgs e)
+    {
+        if (e.SelectedItem is SearchSuggestion suggestion)
+        {
+            NavigateToPage(suggestion.Page);
+        }
+    }
+
+    private void OnSearchQuerySubmitted(object sender, FWAutoSuggestBoxQuerySubmittedEventArgs e)
+    {
+        if (e.ChosenSuggestion is SearchSuggestion suggestion)
+        {
+            NavigateToPage(suggestion.Page);
+            return;
+        }
+
+        var searchText = e.QueryText ?? string.Empty;
         if (string.Equals(_navigationSearchText, searchText, StringComparison.Ordinal))
         {
             return;
@@ -279,6 +360,18 @@ internal sealed class GalleryShell : UserControl
 
         _navigationSearchText = searchText;
         RefreshNavigationForSearch();
+    }
+
+    private void NavigateToPage(GalleryPage page)
+    {
+        if (_navigationView == null) return;
+
+        var item = _navigationItems.FirstOrDefault(ni => ni.Tag is GalleryPage p && p.Title == page.Title);
+        if (item != null)
+        {
+            _navigationView.SelectedItem = item;
+            SelectPage(page);
+        }
     }
 
     private void RefreshNavigationForSearch()
@@ -342,6 +435,7 @@ internal sealed class GalleryShell : UserControl
     private void SelectPage(GalleryPage page)
     {
         _selectedPage = page;
+        GalleryRecentSamplesService.Instance.RecordVisit(page);
         _frame?.Navigate(typeof(GalleryHostPage), page);
     }
 
@@ -356,10 +450,125 @@ internal sealed class GalleryShell : UserControl
         {
             hostPage.RefreshTheme();
         }
+
+        if (_transitionHost != null && e.Content is UIElement contentElement)
+        {
+            _transitionHost.ApplyTransitionProfile(FWContentTransitionProfile.Entrance);
+        }
+    }
+
+    private void OnOwnerSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (_navigationView == null) return;
+
+        if (e.NewSize.Width < 980)
+        {
+            _navigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
+            _navigationView.IsPaneOpen = false;
+        }
+        else
+        {
+            _navigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+            _navigationView.IsPaneOpen = true;
+        }
+    }
+
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        base.OnPreviewKeyDown(e);
+
+        var modifiers = Keyboard.Modifiers;
+
+        if (modifiers == ModifierKeys.Control && e.Key == Key.F)
+        {
+            _searchBox?.Focus();
+            e.Handled = true;
+            return;
+        }
+
+        if (modifiers == ModifierKeys.Alt)
+        {
+            if (e.Key == Key.Left && _frame != null && _frame.CanGoBack)
+            {
+                _frame.GoBack();
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.Right && _frame != null && _frame.CanGoForward)
+            {
+                _frame.GoForward();
+                e.Handled = true;
+                return;
+            }
+        }
+    }
+
+    private void ShowFirstRunTip()
+    {
+        if (_searchBox == null) return;
+
+        var tip = new FWTeachingTip
+        {
+            Target = _searchBox,
+            Title = "Quick Search",
+            Subtitle = "Press Ctrl+F at any time to focus the search box and find controls instantly.",
+            IsLightDismissEnabled = true,
+            PreferredPlacement = TeachingTipPlacementMode.Bottom
+        };
+        tip.Closed += (_, _) =>
+        {
+            GalleryFirstRunService.Instance.MarkCompleted();
+            ShowSecondTip();
+        };
+        tip.IsOpen = true;
+
+        var root = Content as Grid;
+        root?.Children.Add(tip);
+    }
+
+    private void ShowSecondTip()
+    {
+        if (_navigationView == null) return;
+
+        var tip = new FWTeachingTip
+        {
+            Title = "Browse by Category",
+            Subtitle = "Use the navigation pane to explore controls grouped by Design, Input, Layout, Collections, and more.",
+            IsLightDismissEnabled = true,
+            PreferredPlacement = TeachingTipPlacementMode.Right
+        };
+        tip.Closed += (_, _) =>
+        {
+            ShowThirdTip();
+        };
+        tip.IsOpen = true;
+
+        var root = Content as Grid;
+        root?.Children.Add(tip);
+    }
+
+    private void ShowThirdTip()
+    {
+        var tip = new FWTeachingTip
+        {
+            Title = "Theme & Accent",
+            Subtitle = "Switch between Light, Dark, and High Contrast themes, and customize the accent color from the Settings page.",
+            IsLightDismissEnabled = true,
+            PreferredPlacement = TeachingTipPlacementMode.Auto
+        };
+        tip.IsOpen = true;
+
+        var root = Content as Grid;
+        root?.Children.Add(tip);
     }
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
     {
         return FluentIconFactory.Regular(icon, size, foreground ?? GalleryThemeResources.Brush("TextPrimary"));
     }
+}
+
+internal sealed record SearchSuggestion(FluentIconRegular Icon, string Title, string Group, GalleryPage Page)
+{
+    public override string ToString() => Title;
 }

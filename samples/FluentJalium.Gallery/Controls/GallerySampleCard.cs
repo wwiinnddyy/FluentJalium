@@ -5,6 +5,8 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
+using FWButton = FluentJalium.Controls.FWButton;
+using FWButtonDensity = FluentJalium.Controls.FWButtonDensity;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWExpander = FluentJalium.Controls.FWExpander;
@@ -55,7 +57,16 @@ internal static class GallerySampleCard
         {
             var codeExpander = new FWExpander
             {
-                Header = Strings.SampleCard_Code,
+                Header = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        FluentIconFactory.Regular(FluentIconRegular.Code24, 16, GalleryThemeResources.Brush("TextPrimary")),
+                        new FWTextBlock { Text = Strings.SampleCard_Code, FontSize = 14, Foreground = GalleryThemeResources.Brush("TextPrimary"), VerticalAlignment = VerticalAlignment.Center }
+                    }
+                },
                 Content = CreateCodeBlock(code),
                 Margin = new Thickness(0, 8, 0, 0)
             };
@@ -247,20 +258,57 @@ internal static class GallerySampleCard
 
     private static UIElement CreateCodeBlock(string code)
     {
-        return new FWBorder
+        var copyBtn = new FWButton
         {
-            Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
-            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(16),
-            Child = new FWTextBlock
+            Density = FWButtonDensity.Compact,
+            Content = new FWStackPanel
             {
-                Text = code,
-                FontFamily = "Cascadia Code",
-                FontSize = 13,
-                Foreground = GalleryThemeResources.Brush("TextPrimary"),
-                TextWrapping = TextWrapping.Wrap
+                Orientation = Orientation.Horizontal,
+                Spacing = 6,
+                Children =
+                {
+                    FluentIconFactory.Regular(FluentIconRegular.Copy24, 14, GalleryThemeResources.Brush("TextPrimary")),
+                    new FWTextBlock { Text = "Copy", FontSize = 12, Foreground = GalleryThemeResources.Brush("TextPrimary"), VerticalAlignment = VerticalAlignment.Center }
+                }
+            },
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        copyBtn.Click += (_, _) => { Clipboard.SetText(code); GalleryFeedback.Copied("code"); };
+
+        var header = new Grid
+        {
+            ColumnDefinitions =
+            {
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
+            }
+        };
+        Grid.SetColumn(copyBtn, 1);
+        header.Children.Add(copyBtn);
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8,
+            Children =
+            {
+                header,
+                new FWBorder
+                {
+                    Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
+                    BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(16),
+                    Child = new FWTextBlock
+                    {
+                        Text = code,
+                        FontFamily = "Cascadia Code",
+                        FontSize = 13,
+                        Foreground = GalleryThemeResources.Brush("TextPrimary"),
+                        TextWrapping = TextWrapping.Wrap
+                    }
+                }
             }
         };
     }

@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
@@ -7,6 +8,7 @@ using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
 using FWButtonDensity = FluentJalium.Controls.FWButtonDensity;
+using FWExpander = FluentJalium.Controls.FWExpander;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
@@ -161,7 +163,7 @@ internal sealed class GalleryHostPage : Page
                     }
                 }
             };
-            sourceBtn.Click += (_, _) => Clipboard.SetText(page.SourcePath);
+            sourceBtn.Click += (_, _) => { Clipboard.SetText(page.SourcePath); GalleryFeedback.Copied(page.SourcePath); };
             rightPanel.Children.Add(sourceBtn);
         }
 
@@ -181,7 +183,7 @@ internal sealed class GalleryHostPage : Page
                     }
                 }
             };
-            docBtn.Click += (_, _) => Clipboard.SetText(link.Uri);
+            docBtn.Click += (_, _) => { Clipboard.SetText(link.Uri); GalleryFeedback.Copied(link.Uri); };
             rightPanel.Children.Add(docBtn);
         }
 
@@ -207,8 +209,7 @@ internal sealed class GalleryHostPage : Page
         {
             Orientation = Orientation.Vertical,
             Spacing = 12,
-            Margin = new Thickness(0, 10, 0, 0),
-            Visibility = Visibility.Collapsed
+            Margin = new Thickness(0, 4, 0, 0)
         };
 
         detailsPanel.Children.Add(CreateMetadataSummary(page));
@@ -233,51 +234,20 @@ internal sealed class GalleryHostPage : Page
             detailsPanel.Children.Add(CreateSampleCodeBlock(sampleCode));
         }
 
-        var toggleButton = new FWButton
+        var expander = new FWExpander
         {
-            Content = new FWStackPanel
+            Header = new FWStackPanel
             {
                 Orientation = Orientation.Horizontal,
                 Spacing = 8,
                 Children =
                 {
-                    CreateIcon(FluentIconRegular.ChevronDown24, 14),
-                    new FWTextBlock { Text = "Show Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
+                    CreateIcon(FluentIconRegular.Code24, 16, "TextPrimary"),
+                    new FWTextBlock { Text = "Developer Details", FontSize = 14, FontWeight = FontWeights.SemiBold, Foreground = GalleryThemeResources.Brush("TextPrimary"), VerticalAlignment = VerticalAlignment.Center }
                 }
             },
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-
-        toggleButton.Click += (_, _) =>
-        {
-            if (detailsPanel.Visibility == Visibility.Visible)
-            {
-                detailsPanel.Visibility = Visibility.Collapsed;
-                toggleButton.Content = new FWStackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 8,
-                    Children =
-                    {
-                        CreateIcon(FluentIconRegular.ChevronDown24, 14),
-                        new FWTextBlock { Text = "Show Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
-                    }
-                };
-            }
-            else
-            {
-                detailsPanel.Visibility = Visibility.Visible;
-                toggleButton.Content = new FWStackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 8,
-                    Children =
-                    {
-                        CreateIcon(FluentIconRegular.ChevronUp24, 14),
-                        new FWTextBlock { Text = "Hide Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
-                    }
-                };
-            }
+            Content = detailsPanel,
+            IsExpanded = false
         };
 
         var border = new FWBorder
@@ -287,16 +257,7 @@ internal sealed class GalleryHostPage : Page
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(16),
-            Child = new FWStackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 16,
-                Children =
-                {
-                    toggleButton,
-                    detailsPanel
-                }
-            }
+            Child = expander
         };
 
         return border;
@@ -530,7 +491,7 @@ internal sealed class GalleryHostPage : Page
             VerticalAlignment = VerticalAlignment.Center
         };
 
-        button.Click += (_, _) => Clipboard.SetText(text);
+        button.Click += (_, _) => { Clipboard.SetText(text); GalleryFeedback.Copied(text); };
         return button;
     }
 
