@@ -110,13 +110,15 @@ public class FluentIcon : FontIcon
     /// </summary>
     public FluentIcon()
     {
+        Width = DefaultSize;
+        Height = DefaultSize;
         UpdateIcon();
         UpdateSize();
     }
 
     private static void OnIconPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FluentIcon icon)
+        if (d is FluentIcon icon && !icon._isUpdating)
         {
             icon.UpdateIcon();
         }
@@ -124,7 +126,7 @@ public class FluentIcon : FontIcon
 
     private static void OnSizePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FluentIcon icon)
+        if (d is FluentIcon icon && !icon._isUpdating)
         {
             icon.UpdateSize();
         }
@@ -164,6 +166,8 @@ public class FluentIcon : FontIcon
     {
         var size = Size;
         SetCurrentValue(FontSizeProperty, size);
+        SetCurrentValue(WidthProperty, size);
+        SetCurrentValue(HeightProperty, size);
     }
 
     private (string Glyph, string FontFamily) ResolveIcon()
