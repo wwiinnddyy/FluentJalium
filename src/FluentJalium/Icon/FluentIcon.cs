@@ -164,8 +164,6 @@ public class FluentIcon : FontIcon
     {
         var size = Size;
         SetCurrentValue(FontSizeProperty, size);
-        SetCurrentValue(WidthProperty, size);
-        SetCurrentValue(HeightProperty, size);
     }
 
     private (string Glyph, string FontFamily) ResolveIcon()

@@ -9,6 +9,7 @@ internal sealed record GalleryPageInfo(
     string Title,
     string Subtitle,
     string Description,
+    string GroupId,
     string Group,
     FluentIconRegular Icon,
     string[] Tags,

@@ -18,15 +18,31 @@ internal sealed class GalleryLocalizationService
             new GalleryLanguageOption(ChineseCultureName, "Chinese", "简体中文")
         ];
         _currentLanguage = SupportedLanguages[0];
+
+        LocalizationService.Instance.PropertyChanged += (s, e) =>
+        {
+            LanguageChanged?.Invoke(this, EventArgs.Empty);
+        };
     }
 
     public event EventHandler? LanguageChanged;
 
     public IReadOnlyList<GalleryLanguageOption> SupportedLanguages { get; }
 
-    public GalleryLanguageOption CurrentLanguage => _currentLanguage;
+    public GalleryLanguageOption CurrentLanguage
+    {
+        get
+        {
+            var name = LocalizationService.Instance.CurrentCulture.Name;
+            if (name.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+            {
+                return SupportedLanguages.FirstOrDefault(option => option.CultureName == ChineseCultureName) ?? SupportedLanguages[0];
+            }
+            return SupportedLanguages[0];
+        }
+    }
 
-    public bool IsChinese => string.Equals(_currentLanguage.CultureName, ChineseCultureName, StringComparison.OrdinalIgnoreCase);
+    public bool IsChinese => LocalizationService.Instance.CurrentCulture.Name.StartsWith("zh", StringComparison.OrdinalIgnoreCase);
 
     public void SetLanguage(GalleryLanguageOption language)
     {
@@ -35,22 +51,28 @@ internal sealed class GalleryLocalizationService
 
     public void SetLanguage(string cultureName)
     {
-        var language = SupportedLanguages.FirstOrDefault(option =>
-            string.Equals(option.CultureName, cultureName, StringComparison.OrdinalIgnoreCase));
-        if (language == null || string.Equals(language.CultureName, _currentLanguage.CultureName, StringComparison.OrdinalIgnoreCase))
+        if (cultureName.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
         {
-            return;
+            LocalizationService.Instance.ChangeLanguage("zh-CN");
         }
-
-        _currentLanguage = language;
-        LanguageChanged?.Invoke(this, EventArgs.Empty);
+        else
+        {
+            LocalizationService.Instance.ChangeLanguage("en-US");
+        }
     }
 
     public string Text(string key)
     {
         if (_localizedText.TryGetValue(key, out var values))
         {
-            if (values.TryGetValue(_currentLanguage.CultureName, out var localized))
+            var culture = LocalizationService.Instance.CurrentCulture.Name;
+            string targetKey = EnglishCultureName;
+            if (culture.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+            {
+                targetKey = ChineseCultureName;
+            }
+
+            if (values.TryGetValue(targetKey, out var localized))
             {
                 return localized;
             }

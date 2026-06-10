@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
+using FluentJalium.Gallery.Resources;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -38,6 +40,12 @@ internal sealed class GalleryShell : UserControl
         _catalogService = catalogService;
         _applyTheme = applyTheme;
         _applyAccent = applyAccent;
+
+        LocalizationService.Instance.PropertyChanged += (s, e) =>
+        {
+            RefreshTheme();
+        };
+
         Content = BuildShell();
     }
 
@@ -138,11 +146,11 @@ internal sealed class GalleryShell : UserControl
         }
 
         var groupedPages = GalleryNavigationGroup.Order
-            .Select(groupName => new
+            .Select(groupId => new
             {
-                GroupName = groupName,
+                GroupId = groupId,
                 Pages = matchingPages
-                    .Where(page => !page.IsFooter && page.Group == groupName)
+                    .Where(page => !page.IsFooter && page.GroupId == groupId)
                     .ToArray()
             })
             .Where(group => group.Pages.Length > 0)
@@ -155,7 +163,8 @@ internal sealed class GalleryShell : UserControl
 
         foreach (var group in groupedPages)
         {
-            var groupItem = CreateNavigationGroupItem(group.GroupName);
+            var localizedGroupName = group.Pages.First().Group;
+            var groupItem = CreateNavigationGroupItem(localizedGroupName, group.GroupId);
             foreach (var page in group.Pages)
             {
                 groupItem.MenuItems.Add(CreateNavigationItem(page));
@@ -172,15 +181,15 @@ internal sealed class GalleryShell : UserControl
         navigationView.UpdateMenuItems();
     }
 
-    private static FWNavigationViewItem CreateNavigationGroupItem(string groupName)
+    private static FWNavigationViewItem CreateNavigationGroupItem(string localizedGroupName, string groupId)
     {
         return new FWNavigationViewItem
         {
-            Content = groupName,
-            Icon = CreateIcon(GalleryNavigationGroup.GetIcon(groupName)),
+            Content = localizedGroupName,
+            Icon = CreateIcon(GalleryNavigationGroup.GetIcon(groupId)),
             IsExpanded = true,
             SelectsOnInvoked = false,
-            Tag = groupName
+            Tag = groupId
         };
     }
 
@@ -214,7 +223,7 @@ internal sealed class GalleryShell : UserControl
                 CreateIcon(FluentIconRegular.WindowBrush24, 24),
                 new TextBlock
                 {
-                    Text = "FluentJalium",
+                    Text = Strings.Shell_Title,
                     FontSize = 24,
                     FontFamily = "Segoe UI Variable Display",
                     Foreground = GalleryThemeResources.Brush("TextPrimary"),
@@ -224,7 +233,7 @@ internal sealed class GalleryShell : UserControl
         });
         panel.Children.Add(new TextBlock
         {
-            Text = "Control gallery",
+            Text = Strings.Shell_Subtitle,
             FontSize = 12,
             Foreground = GalleryThemeResources.Brush("TextSecondary")
         });
@@ -245,7 +254,7 @@ internal sealed class GalleryShell : UserControl
         _searchBox = new FWTextBox
         {
             Text = _navigationSearchText,
-            PlaceholderText = "Search controls, materials, and samples",
+            PlaceholderText = Strings.Shell_SearchPlaceholder,
             MinHeight = 34,
             Width = 420,
             VerticalAlignment = VerticalAlignment.Center

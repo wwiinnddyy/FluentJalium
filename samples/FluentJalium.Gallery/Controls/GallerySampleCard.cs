@@ -7,6 +7,7 @@ using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWExpander = FluentJalium.Controls.FWExpander;
 
 namespace FluentJalium.Gallery.Controls;
 
@@ -20,23 +21,31 @@ internal static class GallerySampleCard
         UIElement? output = null,
         UIElement? options = null,
         string? code = null,
-        double width = 600)
+        double width = double.NaN)
     {
-        var mainContent = CreateThreeColumnLayout(sample, output, options);
+        var mainContent = CreateContentArea(sample, output, options);
 
         var sections = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
-            Spacing = 10,
+            Spacing = 16,
             Children =
             {
-                CreateHeader(icon, title),
-                new FWTextBlock
+                new FWStackPanel
                 {
-                    Text = description,
-                    FontSize = 12,
-                    Foreground = GalleryThemeResources.Brush("TextSecondary"),
-                    TextWrapping = TextWrapping.Wrap
+                    Orientation = Orientation.Vertical,
+                    Spacing = 8,
+                    Children =
+                    {
+                        CreateHeader(icon, title),
+                        new FWTextBlock
+                        {
+                            Text = description,
+                            FontSize = 14,
+                            Foreground = GalleryThemeResources.Brush("TextSecondary"),
+                            TextWrapping = TextWrapping.Wrap
+                        }
+                    }
                 },
                 mainContent
             }
@@ -44,68 +53,74 @@ internal static class GallerySampleCard
 
         if (!string.IsNullOrWhiteSpace(code))
         {
-            sections.Children.Add(CreateRegion(Strings.SampleCard_Code, CreateCodeBlock(code)));
+            var codeExpander = new FWExpander
+            {
+                Header = Strings.SampleCard_Code,
+                Content = CreateCodeBlock(code),
+                Margin = new Thickness(0, 8, 0, 0)
+            };
+            sections.Children.Add(codeExpander);
         }
 
         return new FWBorder
         {
             Width = width,
-            Background = GalleryThemeResources.Brush("ControlBackground"),
-            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
+            MaxWidth = double.IsNaN(width) ? 1000 : double.NaN,
+            HorizontalAlignment = double.IsNaN(width) ? HorizontalAlignment.Stretch : HorizontalAlignment.Left,
+            Padding = new Thickness(0, 0, 0, 32),
             Child = sections
         };
     }
 
-    private static UIElement CreateThreeColumnLayout(UIElement example, UIElement? output, UIElement? options)
+    private static UIElement CreateContentArea(UIElement example, UIElement? output, UIElement? options)
     {
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = GridLength.Star },
-                new ColumnDefinition { Width = GridLength.Auto },
-                new ColumnDefinition { Width = GridLength.Auto }
-            }
-        };
+        var grid = new Grid();
 
-        var exampleBorder = new FWBorder
+        var col0 = new ColumnDefinition { Width = GridLength.Star };
+        var col1 = new ColumnDefinition { Width = GridLength.Auto };
+        var col2 = new ColumnDefinition { Width = GridLength.Auto };
+        grid.ColumnDefinitions.Add(col0);
+        grid.ColumnDefinitions.Add(col1);
+        grid.ColumnDefinitions.Add(col2);
+
+        var row0 = new RowDefinition { Height = GridLength.Auto };
+        var row1 = new RowDefinition { Height = GridLength.Auto };
+        var row2 = new RowDefinition { Height = GridLength.Auto };
+        grid.RowDefinitions.Add(row0);
+        grid.RowDefinitions.Add(row1);
+        grid.RowDefinitions.Add(row2);
+
+        var exampleContainer = new FWStackPanel
         {
-            Background = GalleryThemeResources.Brush("LayerFillColorDefaultBrush"),
-            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(12),
+            Margin = new Thickness(24),
             MinHeight = 120,
-            Child = example
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+            Children = { example }
         };
-        Grid.SetColumn(exampleBorder, 0);
-        grid.Children.Add(exampleBorder);
+        
+        Grid.SetColumn(exampleContainer, 0);
+        Grid.SetRow(exampleContainer, 0);
+        grid.Children.Add(exampleContainer);
 
+        FWBorder? outputContainer = null;
         if (output != null)
         {
-            var outputBorder = new FWBorder
+            outputContainer = new FWBorder
             {
-                Background = GalleryThemeResources.Brush("ControlBackground"),
-                BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(12),
-                Margin = new Thickness(8, 0, 0, 0),
+                Margin = new Thickness(24),
                 MinWidth = 140,
-                MaxWidth = 180,
+                MaxWidth = 200,
                 Child = new FWStackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Spacing = 6,
+                    Spacing = 12,
                     Children =
                     {
                         new FWTextBlock
                         {
                             Text = Strings.SampleCard_Output,
-                            FontSize = 12,
+                            FontSize = 14,
                             Foreground = GalleryThemeResources.Brush("TextPrimary"),
                             FontWeight = FontWeights.SemiBold
                         },
@@ -113,32 +128,29 @@ internal static class GallerySampleCard
                     }
                 }
             };
-            Grid.SetColumn(outputBorder, 1);
-            grid.Children.Add(outputBorder);
+            Grid.SetColumn(outputContainer, 1);
+            Grid.SetRow(outputContainer, 0);
+            grid.Children.Add(outputContainer);
         }
 
+        FWBorder? optionsContainer = null;
         if (options != null)
         {
-            var optionsBorder = new FWBorder
+            optionsContainer = new FWBorder
             {
-                Background = GalleryThemeResources.Brush("CardBackgroundFillColorDefaultBrush"),
-                BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(12),
-                Margin = new Thickness(8, 0, 0, 0),
+                Margin = new Thickness(24),
                 MinWidth = 160,
-                MaxWidth = 220,
+                MaxWidth = 240,
                 Child = new FWStackPanel
                 {
                     Orientation = Orientation.Vertical,
-                    Spacing = 6,
+                    Spacing = 12,
                     Children =
                     {
                         new FWTextBlock
                         {
                             Text = Strings.SampleCard_Options,
-                            FontSize = 12,
+                            FontSize = 14,
                             Foreground = GalleryThemeResources.Brush("TextPrimary"),
                             FontWeight = FontWeights.SemiBold
                         },
@@ -146,11 +158,70 @@ internal static class GallerySampleCard
                     }
                 }
             };
-            Grid.SetColumn(optionsBorder, 2);
-            grid.Children.Add(optionsBorder);
+            Grid.SetColumn(optionsContainer, 2);
+            Grid.SetRow(optionsContainer, 0);
+            grid.Children.Add(optionsContainer);
         }
 
-        return grid;
+        void UpdateLayout(double width)
+        {
+            if (width < 640)
+            {
+                col0.Width = GridLength.Star;
+                col1.Width = new GridLength(0);
+                col2.Width = new GridLength(0);
+
+                if (outputContainer != null)
+                {
+                    Grid.SetColumn(outputContainer, 0);
+                    Grid.SetRow(outputContainer, 1);
+                    outputContainer.Margin = new Thickness(24, 0, 24, 24);
+                    outputContainer.MaxWidth = double.NaN;
+                }
+                if (optionsContainer != null)
+                {
+                    Grid.SetColumn(optionsContainer, 0);
+                    Grid.SetRow(optionsContainer, 2);
+                    optionsContainer.Margin = new Thickness(24, 0, 24, 24);
+                    optionsContainer.MaxWidth = double.NaN;
+                }
+            }
+            else
+            {
+                col0.Width = GridLength.Star;
+                col1.Width = GridLength.Auto;
+                col2.Width = GridLength.Auto;
+
+                if (outputContainer != null)
+                {
+                    Grid.SetColumn(outputContainer, 1);
+                    Grid.SetRow(outputContainer, 0);
+                    outputContainer.Margin = new Thickness(24);
+                    outputContainer.MaxWidth = 200;
+                }
+                if (optionsContainer != null)
+                {
+                    Grid.SetColumn(optionsContainer, 2);
+                    Grid.SetRow(optionsContainer, 0);
+                    optionsContainer.Margin = new Thickness(24);
+                    optionsContainer.MaxWidth = 240;
+                }
+            }
+        }
+
+        grid.SizeChanged += (s, e) =>
+        {
+            UpdateLayout(e.NewSize.Width);
+        };
+
+        return new FWBorder
+        {
+            Background = GalleryThemeResources.Brush("CardBackgroundFillColorDefaultBrush"),
+            BorderBrush = GalleryThemeResources.Brush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Child = grid
+        };
     }
 
     private static UIElement CreateHeader(FluentIconRegular icon, string title)
@@ -158,37 +229,18 @@ internal static class GallerySampleCard
         return new FWStackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 8,
+            Spacing = 12,
             Children =
             {
-                FluentIconFactory.Regular(icon, 20, GalleryThemeResources.Brush("TextPrimary")),
+                FluentIconFactory.Regular(icon, 24, GalleryThemeResources.Brush("TextPrimary")),
                 new FWTextBlock
                 {
                     Text = title,
-                    FontSize = 15,
+                    FontSize = 20,
+                    FontWeight = FontWeights.SemiBold,
                     Foreground = GalleryThemeResources.Brush("TextPrimary"),
                     VerticalAlignment = VerticalAlignment.Center
                 }
-            }
-        };
-    }
-
-    private static UIElement CreateRegion(string label, UIElement content)
-    {
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Spacing = 6,
-            Children =
-            {
-                new FWTextBlock
-                {
-                    Text = label,
-                    FontSize = 11,
-                    Foreground = GalleryThemeResources.Brush("TextSecondary"),
-                    FontWeight = FontWeights.SemiBold
-                },
-                content
             }
         };
     }
@@ -201,16 +253,15 @@ internal static class GallerySampleCard
             BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
+            Padding = new Thickness(16),
             Child = new FWTextBlock
             {
                 Text = code,
                 FontFamily = "Cascadia Code",
-                FontSize = 12,
+                FontSize = 13,
                 Foreground = GalleryThemeResources.Brush("TextPrimary"),
                 TextWrapping = TextWrapping.Wrap
             }
         };
     }
-
 }

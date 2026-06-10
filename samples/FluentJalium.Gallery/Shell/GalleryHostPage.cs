@@ -18,6 +18,14 @@ internal sealed class GalleryHostPage : Page
 {
     private GalleryPage? _galleryPage;
 
+    public GalleryHostPage()
+    {
+        LocalizationService.Instance.PropertyChanged += (s, e) =>
+        {
+            RefreshTheme();
+        };
+    }
+
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
@@ -45,108 +53,253 @@ internal sealed class GalleryHostPage : Page
 
     private static UIElement CreatePageContent(GalleryPage page)
     {
-        return new FWScrollViewer
+        var scrollViewer = new FWScrollViewer
         {
             Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
             Padding = new Thickness(0),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            IsScrollBarAutoHideEnabled = true,
-            Content = new StackPanel
-            {
-                Orientation = Orientation.Vertical,
-                Spacing = 18,
-                Margin = new Thickness(40, 32, 40, 40),
-                Children =
-                {
-                    CreatePageHeader(page),
-                    new FWTextBlock
-                    {
-                        Text = page.Description,
-                        FontSize = 14,
-                        Foreground = GalleryThemeResources.Brush("TextSecondary"),
-                        TextWrapping = TextWrapping.Wrap
-                    },
-                    CreateMetadataPanel(page),
-                    page.CreateContent()
-                }
-            }
+            IsScrollBarAutoHideEnabled = true
         };
+
+        var mainPanel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 36,
+            Margin = new Thickness(36, 40, 36, 40)
+        };
+
+        var header = CreateWinUiHeader(page);
+        mainPanel.Children.Add(header);
+
+        mainPanel.Children.Add(page.CreateContent());
+
+        var metadataExpander = CreateCollapsibleMetadata(page);
+        if (metadataExpander != null)
+        {
+            mainPanel.Children.Add(metadataExpander);
+        }
+
+        scrollViewer.Content = mainPanel;
+        return scrollViewer;
     }
 
-    private static UIElement CreatePageHeader(GalleryPage page)
+    private static UIElement CreateWinUiHeader(GalleryPage page)
     {
-        var header = new StackPanel
+        var grid = new Grid
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 12,
-            Children =
+            ColumnDefinitions =
             {
-                CreateIcon(page.Icon, 30),
-                new FWTextBlock
-                {
-                    Text = page.Title,
-                    FontSize = 30,
-                    FontFamily = "Segoe UI Variable Display",
-                    Foreground = GalleryThemeResources.Brush("TextPrimary"),
-                    VerticalAlignment = VerticalAlignment.Center
-                }
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
             }
         };
+
+        var leftPanel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 8
+        };
+
+        var titleRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+
+        titleRow.Children.Add(CreateIcon(page.Icon, 28));
+        titleRow.Children.Add(new FWTextBlock
+        {
+            Text = page.Title,
+            FontSize = 36,
+            FontFamily = "Segoe UI Variable Display",
+            FontWeight = FontWeights.SemiBold,
+            Foreground = GalleryThemeResources.Brush("TextPrimary"),
+            VerticalAlignment = VerticalAlignment.Center
+        });
 
         if (page.Status != GalleryPageStatus.Stable)
         {
-            header.Children.Add(CreateStatusPill(page.Status));
+            titleRow.Children.Add(CreateStatusPill(page.Status));
         }
 
-        return header;
+        leftPanel.Children.Add(titleRow);
+
+        leftPanel.Children.Add(new FWTextBlock
+        {
+            Text = page.Description,
+            FontSize = 14,
+            Foreground = GalleryThemeResources.Brush("TextSecondary"),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 4, 0, 0)
+        });
+
+        Grid.SetColumn(leftPanel, 0);
+        grid.Children.Add(leftPanel);
+
+        var rightPanel = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(16, 0, 0, 0)
+        };
+
+        if (!string.IsNullOrWhiteSpace(page.SourcePath))
+        {
+            var sourceBtn = new FWButton
+            {
+                Density = FWButtonDensity.Compact,
+                Content = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 6,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.FolderOpen24, 14),
+                        new FWTextBlock { Text = "Source", FontSize = 12 }
+                    }
+                }
+            };
+            sourceBtn.Click += (_, _) => Clipboard.SetText(page.SourcePath);
+            rightPanel.Children.Add(sourceBtn);
+        }
+
+        foreach (var link in page.DocumentationLinks)
+        {
+            var docBtn = new FWButton
+            {
+                Density = FWButtonDensity.Compact,
+                Content = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 6,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.DocumentLink24, 14),
+                        new FWTextBlock { Text = link.Title, FontSize = 12 }
+                    }
+                }
+            };
+            docBtn.Click += (_, _) => Clipboard.SetText(link.Uri);
+            rightPanel.Children.Add(docBtn);
+        }
+
+        if (rightPanel.Children.Count > 0)
+        {
+            Grid.SetColumn(rightPanel, 1);
+            grid.Children.Add(rightPanel);
+        }
+
+        return grid;
     }
 
-    private static UIElement CreateMetadataPanel(GalleryPage page)
+    private static UIElement? CreateCollapsibleMetadata(GalleryPage page)
     {
-        var panel = new FWStackPanel
+        bool hasMetadata = !string.IsNullOrWhiteSpace(page.ApiNamespace) ||
+                           page.BaseClasses.Count > 0 ||
+                           page.RelatedControls.Count > 0 ||
+                           GallerySampleCodeRegistry.TryGetSampleCode(page.Info, out _);
+
+        if (!hasMetadata) return null;
+
+        var detailsPanel = new FWStackPanel
         {
             Orientation = Orientation.Vertical,
             Spacing = 12,
-            Children =
-            {
-                CreateMetadataSummary(page)
-            }
+            Margin = new Thickness(0, 10, 0, 0),
+            Visibility = Visibility.Collapsed
         };
 
-        AddOptionalMetadataLine(panel, FluentIconRegular.FolderOpen24, "Source", page.SourcePath, true);
-        AddOptionalMetadataLine(panel, FluentIconRegular.Code24, "Sample", page.SampleCodeKey, true);
-        AddOptionalMetadataLine(panel, FluentIconRegular.Braces24, "API", page.ApiNamespace, true);
+        detailsPanel.Children.Add(CreateMetadataSummary(page));
+
+        if (!string.IsNullOrWhiteSpace(page.ApiNamespace))
+        {
+            detailsPanel.Children.Add(CreateMetadataLine(FluentIconRegular.Braces24, "API", page.ApiNamespace, true));
+        }
 
         if (page.BaseClasses.Count > 0)
         {
-            panel.Children.Add(CreateMetadataGroup(FluentIconRegular.BranchFork24, "Base", page.BaseClasses));
+            detailsPanel.Children.Add(CreateMetadataGroup(FluentIconRegular.BranchFork24, "Base", page.BaseClasses));
         }
 
         if (page.RelatedControls.Count > 0)
         {
-            panel.Children.Add(CreateMetadataGroup(FluentIconRegular.Tag24, "Related", page.RelatedControls));
-        }
-
-        if (page.DocumentationLinks.Count > 0)
-        {
-            panel.Children.Add(CreateDocumentationGroup(page.DocumentationLinks));
+            detailsPanel.Children.Add(CreateMetadataGroup(FluentIconRegular.Tag24, "Related", page.RelatedControls));
         }
 
         if (GallerySampleCodeRegistry.TryGetSampleCode(page.Info, out var sampleCode))
         {
-            panel.Children.Add(CreateSampleCodeBlock(sampleCode));
+            detailsPanel.Children.Add(CreateSampleCodeBlock(sampleCode));
         }
 
-        return new FWBorder
+        var toggleButton = new FWButton
         {
-            Background = GalleryThemeResources.Brush("ControlBackground"),
-            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = panel
+            Content = new FWStackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Children =
+                {
+                    CreateIcon(FluentIconRegular.ChevronDown24, 14),
+                    new FWTextBlock { Text = "Show Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
+                }
+            },
+            HorizontalAlignment = HorizontalAlignment.Left
         };
+
+        toggleButton.Click += (_, _) =>
+        {
+            if (detailsPanel.Visibility == Visibility.Visible)
+            {
+                detailsPanel.Visibility = Visibility.Collapsed;
+                toggleButton.Content = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.ChevronDown24, 14),
+                        new FWTextBlock { Text = "Show Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
+                    }
+                };
+            }
+            else
+            {
+                detailsPanel.Visibility = Visibility.Visible;
+                toggleButton.Content = new FWStackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.ChevronUp24, 14),
+                        new FWTextBlock { Text = "Hide Developer Details", FontSize = 12, FontWeight = FontWeights.SemiBold }
+                    }
+                };
+            }
+        };
+
+        var border = new FWBorder
+        {
+            Background = GalleryThemeResources.Brush("CardBackgroundFillColorDefaultBrush"),
+            BorderBrush = GalleryThemeResources.Brush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(16),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 16,
+                Children =
+                {
+                    toggleButton,
+                    detailsPanel
+                }
+            }
+        };
+
+        return border;
     }
 
     private static UIElement CreateMetadataSummary(GalleryPage page)

@@ -1,5 +1,6 @@
 using FluentJalium.Icon;
 using FluentJalium.Gallery.Controls;
+using FluentJalium.Gallery.Resources;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -21,7 +22,7 @@ internal sealed class GallerySwitchesPage
 {
     public UIElement CreateContent()
     {
-        var panel = CreateSection("Switches");
+        var panel = CreateSection(Strings.Switches_Title);
         var examples = new FWWrapPanel
         {
             HorizontalSpacing = 16,
@@ -30,23 +31,23 @@ internal sealed class GallerySwitchesPage
 
         examples.Children.Add(CreateSwitchExampleCard(
             FluentIconRegular.ToggleMultiple24,
-            "FWToggleButton",
-            "Command-like boolean selection with checked, unchecked, indeterminate, and disabled states.",
+            Strings.Switches_ToggleButton,
+            Strings.Switches_ToggleButton_Desc,
             CreateToggleButtonStateSample()));
         examples.Children.Add(CreateSwitchExampleCard(
             FluentIconRegular.Power24,
-            "FWToggleSwitch",
-            "A WinUI-style switch surface for direct on/off settings, content labels, and disabled states.",
+            Strings.Switches_ToggleSwitch,
+            Strings.Switches_ToggleSwitch_Desc,
             CreateToggleSwitchStateSample()));
         examples.Children.Add(CreateSwitchExampleCard(
             FluentIconRegular.CursorClick24,
-            "Events and content",
-            "Toggle state changes update the content surface and raise the Jalium routed events.",
+            Strings.Switches_Events,
+            Strings.Switches_Events_Desc,
             CreateInteractiveSwitchSample()));
         examples.Children.Add(CreateSwitchExampleCard(
             FluentIconRegular.LayerDiagonalSparkle24,
-            "Material settings row",
-            "Switches stay readable on FluentJalium layered material surfaces.",
+            Strings.Switches_MaterialRow,
+            Strings.Switches_MaterialRow_Desc,
             CreateMaterialSwitchSample()));
 
         panel.Children.Add(examples);
@@ -55,17 +56,17 @@ internal sealed class GallerySwitchesPage
 
     private static UIElement CreateToggleButtonStateSample()
     {
-        var output = CreateSwitchOutputText("ToggleButton state: waiting for selection.");
+        var output = CreateSwitchOutputText(Strings.Switches_StateWaiting);
         var indeterminate = new FWToggleButton
         {
-            Content = CreateButtonContent(FluentIconRegular.Flash24, "Mixed"),
+            Content = CreateButtonContent(FluentIconRegular.Flash24, Strings.Switches_Mixed),
             Density = FWSwitchDensity.Comfortable,
             IsThreeState = true,
             IsChecked = null
         };
-        indeterminate.Checked += (_, _) => output.Text = "ToggleButton state: checked";
-        indeterminate.Unchecked += (_, _) => output.Text = "ToggleButton state: unchecked";
-        indeterminate.Indeterminate += (_, _) => output.Text = "ToggleButton state: indeterminate";
+        indeterminate.Checked += (_, _) => output.Text = Strings.Switches_StateChecked;
+        indeterminate.Unchecked += (_, _) => output.Text = Strings.Switches_StateUnchecked;
+        indeterminate.Indeterminate += (_, _) => output.Text = Strings.Switches_StateIndeterminate;
 
         return new FWStackPanel
         {
@@ -74,10 +75,10 @@ internal sealed class GallerySwitchesPage
             Children =
             {
                 CreateSwitchButtonRow(
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.DismissCircle24, "Off"), Density = FWSwitchDensity.Compact },
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.CheckmarkCircle24, "On"), Density = FWSwitchDensity.Comfortable, IsChecked = true },
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.DismissCircle24, Strings.Switches_Off), Density = FWSwitchDensity.Compact },
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.CheckmarkCircle24, Strings.Switches_On), Density = FWSwitchDensity.Comfortable, IsChecked = true },
                     indeterminate,
-                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.Pause24, "Disabled"), Density = FWSwitchDensity.Spacious, IsChecked = true, IsEnabled = false }),
+                    new FWToggleButton { Content = CreateButtonContent(FluentIconRegular.Pause24, Strings.Button_Label_Disabled), Density = FWSwitchDensity.Spacious, IsChecked = true, IsEnabled = false }),
                 CreateSwitchStatus(output)
             }
         };
@@ -93,37 +94,37 @@ internal sealed class GallerySwitchesPage
             {
                 new FWToggleSwitch
                 {
-                    Header = "Default",
+                    Header = Strings.Switches_Default,
                     Density = FWSwitchDensity.Compact,
-                    OffContent = "Off",
-                    OnContent = "On"
+                    OffContent = Strings.Switches_Off,
+                    OnContent = Strings.Switches_On
                 },
                 new FWToggleSwitch
                 {
-                    Header = "On",
+                    Header = Strings.Switches_On,
                     Density = FWSwitchDensity.Comfortable,
                     IsOn = true,
-                    OffContent = "Off",
-                    OnContent = "On"
+                    OffContent = Strings.Switches_Off,
+                    OnContent = Strings.Switches_On
                 },
                 new FWToggleSwitch
                 {
-                    Header = "Status",
-                    Description = "Comfortable settings row",
+                    Header = Strings.Switches_Status,
+                    Description = Strings.Switches_ComfortableRow,
                     Density = FWSwitchDensity.Comfortable,
                     IsOn = true,
-                    OffContent = "Paused",
-                    OnContent = "Running"
+                    OffContent = Strings.Switches_Paused,
+                    OnContent = Strings.Switches_Running
                 },
                 new FWToggleSwitch
                 {
-                    Header = "Disabled",
-                    Description = "Spacious disabled row",
+                    Header = Strings.Button_Label_Disabled,
+                    Description = Strings.Switches_SpaciousDisabledRow,
                     Density = FWSwitchDensity.Spacious,
                     IsOn = true,
                     IsEnabled = false,
-                    OffContent = "Off",
-                    OnContent = "On"
+                    OffContent = Strings.Switches_Off,
+                    OnContent = Strings.Switches_On
                 }
             }
         };
@@ -133,17 +134,17 @@ internal sealed class GallerySwitchesPage
     {
         var toggleSwitch = new FWToggleSwitch
         {
-            Header = "Live setting",
-            Description = "Cycle density or flip the state.",
+            Header = Strings.Switches_LiveSetting,
+            Description = Strings.Switches_LiveSetting_Desc,
             Density = FWSwitchDensity.Comfortable,
-            OffContent = "Notifications off",
-            OnContent = "Notifications on"
+            OffContent = Strings.Switches_NotificationsOff,
+            OnContent = Strings.Switches_NotificationsOn
         };
-        var output = CreateSwitchOutputText("Live setting: off. Density: comfortable");
+        var output = CreateSwitchOutputText(string.Format(Strings.Switches_LiveOutput, Strings.Switches_Off, FormatDensity(toggleSwitch.Density)));
 
         toggleSwitch.Toggled += (_, _) =>
         {
-            output.Text = $"Live setting: {(toggleSwitch.IsOn ? "on" : "off")}. Density: {FormatDensity(toggleSwitch.Density)}";
+            output.Text = string.Format(Strings.Switches_LiveOutput, toggleSwitch.IsOn ? Strings.Switches_On : Strings.Switches_Off, FormatDensity(toggleSwitch.Density));
         };
 
         return new FWStackPanel
@@ -154,13 +155,13 @@ internal sealed class GallerySwitchesPage
             {
                 toggleSwitch,
                 CreateSwitchButtonRow(
-                    CreateSwitchActionButton(FluentIconRegular.Play24, "Turn on", () => toggleSwitch.IsOn = true),
-                    CreateSwitchActionButton(FluentIconRegular.DismissCircle24, "Turn off", () => toggleSwitch.IsOn = false),
-                    CreateSwitchActionButton(FluentIconRegular.Keyboard24, "Flip", () => toggleSwitch.IsOn = !toggleSwitch.IsOn),
-                    CreateSwitchActionButton(FluentIconRegular.TextDensity24, "Density", () =>
+                    CreateSwitchActionButton(FluentIconRegular.Play24, Strings.Switches_TurnOn, () => toggleSwitch.IsOn = true),
+                    CreateSwitchActionButton(FluentIconRegular.DismissCircle24, Strings.Switches_TurnOff, () => toggleSwitch.IsOn = false),
+                    CreateSwitchActionButton(FluentIconRegular.Keyboard24, Strings.Switches_Flip, () => toggleSwitch.IsOn = !toggleSwitch.IsOn),
+                    CreateSwitchActionButton(FluentIconRegular.TextDensity24, Strings.Switches_Density, () =>
                     {
                         toggleSwitch.Density = NextDensity(toggleSwitch.Density);
-                        output.Text = $"Live setting: {(toggleSwitch.IsOn ? "on" : "off")}. Density: {FormatDensity(toggleSwitch.Density)}";
+                        output.Text = string.Format(Strings.Switches_LiveOutput, toggleSwitch.IsOn ? Strings.Switches_On : Strings.Switches_Off, FormatDensity(toggleSwitch.Density));
                     })),
                 CreateSwitchStatus(output)
             }
@@ -171,7 +172,8 @@ internal sealed class GallerySwitchesPage
     {
         return new FWFluentMaterialSurface
         {
-            Width = 456,
+            Width = double.NaN,
+            MaxWidth = 520,
             MaterialKind = FWFluentMaterialKind.LiquidGlass,
             TintColor = Color.FromArgb(180, 20, 84, 145),
             TintOpacity = 0.2,
@@ -193,9 +195,9 @@ internal sealed class GallerySwitchesPage
                 Children =
                 {
                     CreateMaterialHeader(),
-                    CreateMaterialSwitchRow("Mica layer", "Use backdrop-aware surfaces", FWSwitchDensity.Compact, isOn: true),
-                    CreateMaterialSwitchRow("Acrylic pass", "Show translucent panels", FWSwitchDensity.Comfortable, isOn: true),
-                    CreateMaterialSwitchRow("Reduced motion", "Keep state changes calm", FWSwitchDensity.Spacious, isOn: false)
+                    CreateMaterialSwitchRow(Strings.Switches_MicaLayer, Strings.Switches_MicaLayer_Desc, FWSwitchDensity.Compact, isOn: true),
+                    CreateMaterialSwitchRow(Strings.Switches_AcrylicPass, Strings.Switches_AcrylicPass_Desc, FWSwitchDensity.Comfortable, isOn: true),
+                    CreateMaterialSwitchRow(Strings.Switches_ReducedMotion, Strings.Switches_ReducedMotion_Desc, FWSwitchDensity.Spacious, isOn: false)
                 }
             }
         };
@@ -212,7 +214,7 @@ internal sealed class GallerySwitchesPage
                 CreateIcon(FluentIconRegular.Settings24, 18, ThemeBrush("TextPrimary")),
                 new FWTextBlock
                 {
-                    Text = "Fluent settings",
+                    Text = Strings.Overview_Settings,
                     FontSize = 15,
                     Foreground = ThemeBrush("TextPrimary"),
                     VerticalAlignment = VerticalAlignment.Center
@@ -236,8 +238,8 @@ internal sealed class GallerySwitchesPage
                 Description = detail,
                 Density = density,
                 IsOn = isOn,
-                OffContent = "Off",
-                OnContent = "On",
+                OffContent = Strings.Switches_Off,
+                OnContent = Strings.Switches_On,
                 VerticalAlignment = VerticalAlignment.Center
             }
         };
@@ -245,7 +247,7 @@ internal sealed class GallerySwitchesPage
 
     private static FWBorder CreateSwitchExampleCard(FluentIconRegular icon, string title, string description, UIElement content)
     {
-        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title), width: 520);
+        return GallerySampleCard.Create(icon, title, description, content, code: CreateSampleCode(title), width: double.NaN);
     }
 
     private static string CreateSampleCode(string title)
@@ -344,9 +346,9 @@ internal sealed class GallerySwitchesPage
     {
         return density switch
         {
-            FWSwitchDensity.Compact => "compact",
-            FWSwitchDensity.Spacious => "spacious",
-            _ => "comfortable"
+            FWSwitchDensity.Compact => Strings.Switches_Density_Compact,
+            FWSwitchDensity.Spacious => Strings.Switches_Density_Spacious,
+            _ => Strings.Switches_Density_Comfortable
         };
     }
 

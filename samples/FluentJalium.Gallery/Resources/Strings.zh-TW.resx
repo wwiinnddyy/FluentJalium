@@ -144,4 +144,355 @@
   <data name="Color_Green" xml:space="preserve">
     <value>綠色</value>
   </data>
+  <!-- Buttons Page -->
+  <data name="Buttons_Title" xml:space="preserve">
+    <value>按鈕</value>
+  </data>
+  <data name="Buttons_Surface_Title" xml:space="preserve">
+    <value>按鈕表面</value>
+  </data>
+  <data name="Buttons_Surface_Description" xml:space="preserve">
+    <value>Button、RepeatButton、HyperlinkButton、DropDownButton 和停用狀態的按鈕。</value>
+  </data>
+  <data name="Buttons_Split_Title" xml:space="preserve">
+    <value>分割命令按鈕</value>
+  </data>
+  <data name="Buttons_Split_Description" xml:space="preserve">
+    <value>分割按鈕、切換分割按鈕和下拉命令按鈕，具有相同的彈出功能表功能。</value>
+  </data>
+  <data name="Buttons_CommandBar_Title" xml:space="preserve">
+    <value>命令列</value>
+  </data>
+  <data name="Buttons_CommandBar_Description" xml:space="preserve">
+    <value>主要和次要命令，帶標籤、溢出狀態、切換命令和即時輸出。</value>
+  </data>
+
+  <!-- Button Labels -->
+  <data name="Button_Label_Button" xml:space="preserve">
+    <value>按鈕</value>
+  </data>
+  <data name="Button_Label_Repeat" xml:space="preserve">
+    <value>重複</value>
+  </data>
+  <data name="Button_Label_Link" xml:space="preserve">
+    <value>連結</value>
+  </data>
+  <data name="Button_Label_Menu" xml:space="preserve">
+    <value>功能表</value>
+  </data>
+  <data name="Button_Label_Disabled" xml:space="preserve">
+    <value>停用</value>
+  </data>
+  <data name="Button_Label_Split" xml:space="preserve">
+    <value>分割</value>
+  </data>
+  <data name="Button_Label_Toggle" xml:space="preserve">
+    <value>切換</value>
+  </data>
+
+  <!-- Sample Card -->
+  <data name="SampleCard_Output" xml:space="preserve">
+    <value>輸出</value>
+  </data>
+  <data name="SampleCard_Options" xml:space="preserve">
+    <value>選項</value>
+  </data>
+  <data name="SampleCard_Code" xml:space="preserve">
+    <value>程式碼 / XAML</value>
+  </data>
+
+  <!-- Options Labels -->
+  <data name="Options_MinWidth" xml:space="preserve">
+    <value>最小寬度</value>
+  </data>
+  <data name="Options_Width" xml:space="preserve">
+    <value>寬度</value>
+  </data>
+  <data name="Options_State" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="Options_IsEnabled" xml:space="preserve">
+    <value>啟用</value>
+  </data>
+  <data name="Options_IsVisible" xml:space="preserve">
+    <value>可見</value>
+  </data>
+  <data name="Options_IsChecked" xml:space="preserve">
+    <value>選中</value>
+  </data>
+  <data name="Options_IsOpen" xml:space="preserve">
+    <value>打開</value>
+  </data>
+  <data name="Options_LabelPosition" xml:space="preserve">
+    <value>標籤位置</value>
+  </data>
+  <data name="Options_LabelPosition_Right" xml:space="preserve">
+    <value>右側</value>
+  </data>
+  <data name="Options_LabelPosition_Bottom" xml:space="preserve">
+    <value>底部</value>
+  </data>
+  <data name="Options_LabelPosition_Collapsed" xml:space="preserve">
+    <value>折疊</value>
+  </data>
+
+  <!-- Output Messages -->
+  <data name="Output_Ready" xml:space="preserve">
+    <value>就緒</value>
+  </data>
+  <data name="Output_ButtonClicked" xml:space="preserve">
+    <value>按鈕已點擊</value>
+  </data>
+  <data name="Output_SplitClicked" xml:space="preserve">
+    <value>分割按鈕已點擊</value>
+  </data>
+  <data name="Output_Opening" xml:space="preserve">
+    <value>正在打開...</value>
+  </data>
+  <data name="Output_Opened" xml:space="preserve">
+    <value>已打開</value>
+  </data>
+  <data name="Output_Closed" xml:space="preserve">
+    <value>已關閉</value>
+  </data>
+  <data name="Output_Repeat" xml:space="preserve">
+    <value>重複: {0}</value>
+  </data>
+  <data name="Output_Checked" xml:space="preserve">
+    <value>選取: {0}</value>
+  </data>
+
+  <!-- Command Bar Labels -->
+  <data name="Command_Add" xml:space="preserve">
+    <value>添加</value>
+  </data>
+  <data name="Command_Edit" xml:space="preserve">
+    <value>編輯</value>
+  </data>
+  <data name="Command_Share" xml:space="preserve">
+    <value>分享</value>
+  </data>
+  <data name="Command_Pin" xml:space="preserve">
+    <value>固定</value>
+  </data>
+  <data name="Command_Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="Command_Open" xml:space="preserve">
+    <value>打開</value>
+  </data>
+  <data name="Command_Create" xml:space="preserve">
+    <value>建立</value>
+  </data>
+  <data name="Command_Export" xml:space="preserve">
+    <value>匯出</value>
+  </data>
+  <data name="Command_Clicked" xml:space="preserve">
+    <value>{0}已點擊</value>
+  </data>
+
+  <!-- Shell Strings -->
+  <data name="Shell_Title" xml:space="preserve">
+    <value>FluentJalium</value>
+  </data>
+  <data name="Shell_Subtitle" xml:space="preserve">
+    <value>展示庫</value>
+  </data>
+  <data name="Shell_SearchPlaceholder" xml:space="preserve">
+    <value>搜尋控制項、材質和範例</value>
+  </data>
+  <data name="Shell_Language" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="Shell_NoResults" xml:space="preserve">
+    <value>無結果</value>
+  </data>
+  <!-- Overview Page -->
+  <data name="Overview_Title" xml:space="preserve">
+    <value>概覽</value>
+  </data>
+  <data name="Overview_ThemeVariants" xml:space="preserve">
+    <value>主題變體</value>
+  </data>
+  <data name="Overview_ThemeVariants_Desc" xml:space="preserve">
+    <value>在淺色、深色和高對比度之間切換作用中的 FluentJalium 資源字典。</value>
+  </data>
+  <data name="Overview_AccentPalette" xml:space="preserve">
+    <value>主題色調色盤</value>
+  </data>
+  <data name="Overview_AccentPalette_Desc" xml:space="preserve">
+    <value>套用受 WinUI 啟發的主題色，並跨控制項驗證相依的畫筆。</value>
+  </data>
+  <data name="Overview_TypographyTokens" xml:space="preserve">
+    <value>排版權牌</value>
+  </data>
+  <data name="Overview_TypographyTokens_Desc" xml:space="preserve">
+    <value>展示、本文、等寬和控制項字型資源對應 Fluent 排版角色。</value>
+  </data>
+  <data name="Overview_MaterialPreview" xml:space="preserve">
+    <value>分層材質預覽</value>
+  </data>
+  <data name="Overview_MaterialPreview_Desc" xml:space="preserve">
+    <value>概覽控制項位於 LiquidGlass 之上，同時保持可讀的文字、邊框和主題色狀態。</value>
+  </data>
+  <data name="Overview_Theme" xml:space="preserve">
+    <value>主題：{0}。</value>
+  </data>
+  <data name="Overview_Accent" xml:space="preserve">
+    <value>主題色：#{0}。</value>
+  </data>
+  <data name="Overview_Material_Active" xml:space="preserve">
+    <value>材質預覽：LiquidGlass 層作用中。</value>
+  </data>
+  <data name="Overview_ResourceLayer" xml:space="preserve">
+    <value>FluentJalium 資源層</value>
+  </data>
+  <data name="Overview_ResourceLayer_Desc" xml:space="preserve">
+    <value>圖層填滿、主題色、排版和外殼畫筆將同時重新整理。</value>
+  </data>
+  <data name="Overview_Settings" xml:space="preserve">
+    <value>Fluent 設定</value>
+  </data>
+  <data name="Overview_BackdropAware" xml:space="preserve">
+    <value>感知背景</value>
+  </data>
+  <data name="Overview_MaterialAccent" xml:space="preserve">
+    <value>材質主題色：{0}。</value>
+  </data>
+  <data name="Overview_Typography_Display" xml:space="preserve">
+    <value>展示</value>
+  </data>
+  <data name="Overview_Typography_Body" xml:space="preserve">
+    <value>正文</value>
+  </data>
+  <data name="Overview_Typography_Mono" xml:space="preserve">
+    <value>等寬</value>
+  </data>
+  <data name="Overview_Typography_DisplaySample" xml:space="preserve">
+    <value>FluentJalium 控件庫</value>
+  </data>
+  <data name="Overview_Typography_BodySample" xml:space="preserve">
+    <value>清晰易讀的控件文檔與狀態標籤。</value>
+  </data>
+  <!-- Switches Page -->
+  <data name="Switches_Title" xml:space="preserve">
+    <value>開關</value>
+  </data>
+  <data name="Switches_ToggleButton" xml:space="preserve">
+    <value>FWToggleButton</value>
+  </data>
+  <data name="Switches_ToggleButton_Desc" xml:space="preserve">
+    <value>具有選取、未選取、三態和停用狀態的命令式布林選取。</value>
+  </data>
+  <data name="Switches_ToggleSwitch" xml:space="preserve">
+    <value>FWToggleSwitch</value>
+  </data>
+  <data name="Switches_ToggleSwitch_Desc" xml:space="preserve">
+    <value>用於直接開啟/關閉設定、內容標籤和停用狀態的 WinUI 風格開關表面。</value>
+  </data>
+  <data name="Switches_Events" xml:space="preserve">
+    <value>事件與內容</value>
+  </data>
+  <data name="Switches_Events_Desc" xml:space="preserve">
+    <value>狀態切換會更新內容表面並引發 Jalium 路由事件。</value>
+  </data>
+  <data name="Switches_MaterialRow" xml:space="preserve">
+    <value>材質設定列</value>
+  </data>
+  <data name="Switches_MaterialRow_Desc" xml:space="preserve">
+    <value>開關在 FluentJalium 分層材質表面上保持清晰可讀。</value>
+  </data>
+  <data name="Switches_StateWaiting" xml:space="preserve">
+    <value>ToggleButton 狀態：等待選取。</value>
+  </data>
+  <data name="Switches_StateChecked" xml:space="preserve">
+    <value>ToggleButton 狀態：已選取</value>
+  </data>
+  <data name="Switches_StateUnchecked" xml:space="preserve">
+    <value>ToggleButton 狀態：未選取</value>
+  </data>
+  <data name="Switches_StateIndeterminate" xml:space="preserve">
+    <value>ToggleButton 状态：不确定</value>
+  </data>
+  <data name="Switches_LiveSetting" xml:space="preserve">
+    <value>即時設定</value>
+  </data>
+  <data name="Switches_LiveSetting_Desc" xml:space="preserve">
+    <value>循環改變密度或翻轉狀態。</value>
+  </data>
+  <data name="Switches_LiveOutput" xml:space="preserve">
+    <value>即時設定：{0}。密度：{1}</value>
+  </data>
+  <data name="Switches_TurnOn" xml:space="preserve">
+    <value>開啟</value>
+  </data>
+  <data name="Switches_TurnOff" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Switches_Flip" xml:space="preserve">
+    <value>翻轉</value>
+  </data>
+  <data name="Switches_Density" xml:space="preserve">
+    <value>密度</value>
+  </data>
+  <data name="Switches_MicaLayer" xml:space="preserve">
+    <value>雲母層</value>
+  </data>
+  <data name="Switches_MicaLayer_Desc" xml:space="preserve">
+    <value>使用背景感知表面</value>
+  </data>
+  <data name="Switches_AcrylicPass" xml:space="preserve">
+    <value>亞克力通道</value>
+  </data>
+  <data name="Switches_AcrylicPass_Desc" xml:space="preserve">
+    <value>顯示半透明面板</value>
+  </data>
+  <data name="Switches_ReducedMotion" xml:space="preserve">
+    <value>減弱動態效果</value>
+  </data>
+  <data name="Switches_ReducedMotion_Desc" xml:space="preserve">
+    <value>保持狀態變化平緩</value>
+  </data>
+  <data name="Switches_On" xml:space="preserve">
+    <value>開啟</value>
+  </data>
+  <data name="Switches_Off" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="Switches_Mixed" xml:space="preserve">
+    <value>混合</value>
+  </data>
+  <data name="Switches_Default" xml:space="preserve">
+    <value>默認</value>
+  </data>
+  <data name="Switches_Status" xml:space="preserve">
+    <value>狀態</value>
+  </data>
+  <data name="Switches_ComfortableRow" xml:space="preserve">
+    <value>舒適的設置行</value>
+  </data>
+  <data name="Switches_Paused" xml:space="preserve">
+    <value>已暫停</value>
+  </data>
+  <data name="Switches_Running" xml:space="preserve">
+    <value>運行中</value>
+  </data>
+  <data name="Switches_SpaciousDisabledRow" xml:space="preserve">
+    <value>寬敞的禁用行</value>
+  </data>
+  <data name="Switches_NotificationsOff" xml:space="preserve">
+    <value>通知已關閉</value>
+  </data>
+  <data name="Switches_NotificationsOn" xml:space="preserve">
+    <value>通知已開啟</value>
+  </data>
+  <data name="Switches_Density_Compact" xml:space="preserve">
+    <value>緊湊</value>
+  </data>
+  <data name="Switches_Density_Comfortable" xml:space="preserve">
+    <value>舒適</value>
+  </data>
+  <data name="Switches_Density_Spacious" xml:space="preserve">
+    <value>寬敞</value>
+  </data>
 </root>

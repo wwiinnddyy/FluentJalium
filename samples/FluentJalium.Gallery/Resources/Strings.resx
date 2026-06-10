@@ -290,6 +290,208 @@
   </data>
   <data name="Command_Clicked" xml:space="preserve">
     <value>{0} clicked</value>
+  </data>  <!-- Shell Strings -->
+  <data name="Shell_Title" xml:space="preserve">
+    <value>FluentJalium</value>
   </data>
-
+  <data name="Shell_Subtitle" xml:space="preserve">
+    <value>Control gallery</value>
+  </data>
+  <data name="Shell_SearchPlaceholder" xml:space="preserve">
+    <value>Search controls, materials, and samples</value>
+  </data>
+  <data name="Shell_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Shell_NoResults" xml:space="preserve">
+    <value>No results</value>
+  </data>
+  <!-- Overview Page -->
+  <data name="Overview_Title" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="Overview_ThemeVariants" xml:space="preserve">
+    <value>Theme variants</value>
+  </data>
+  <data name="Overview_ThemeVariants_Desc" xml:space="preserve">
+    <value>Switch the active FluentJalium resource dictionary across light, dark, and high contrast.</value>
+  </data>
+  <data name="Overview_AccentPalette" xml:space="preserve">
+    <value>Accent palette</value>
+  </data>
+  <data name="Overview_AccentPalette_Desc" xml:space="preserve">
+    <value>Apply WinUI-inspired accent colors and validate dependent brushes across controls.</value>
+  </data>
+  <data name="Overview_TypographyTokens" xml:space="preserve">
+    <value>Typography tokens</value>
+  </data>
+  <data name="Overview_TypographyTokens_Desc" xml:space="preserve">
+    <value>Display, body, mono, and control font resources mirror Fluent typography roles.</value>
+  </data>
+  <data name="Overview_MaterialPreview" xml:space="preserve">
+    <value>Layered material preview</value>
+  </data>
+  <data name="Overview_MaterialPreview_Desc" xml:space="preserve">
+    <value>Overview controls sit on LiquidGlass while preserving readable text, borders, and accent states.</value>
+  </data>
+  <data name="Overview_Theme" xml:space="preserve">
+    <value>Theme: {0}.</value>
+  </data>
+  <data name="Overview_Accent" xml:space="preserve">
+    <value>Accent: #{0}.</value>
+  </data>
+  <data name="Overview_Material_Active" xml:space="preserve">
+    <value>Material preview: LiquidGlass layer active.</value>
+  </data>
+  <data name="Overview_ResourceLayer" xml:space="preserve">
+    <value>FluentJalium resource layer</value>
+  </data>
+  <data name="Overview_ResourceLayer_Desc" xml:space="preserve">
+    <value>Layer fill, accent, typography, and shell brushes are refreshed together.</value>
+  </data>
+  <data name="Overview_Settings" xml:space="preserve">
+    <value>Fluent settings</value>
+  </data>
+  <data name="Overview_BackdropAware" xml:space="preserve">
+    <value>Backdrop aware</value>
+  </data>
+  <data name="Overview_MaterialAccent" xml:space="preserve">
+    <value>Material accent: {0}.</value>
+  </data>
+  <data name="Overview_Typography_Display" xml:space="preserve">
+    <value>Display</value>
+  </data>
+  <data name="Overview_Typography_Body" xml:space="preserve">
+    <value>Body</value>
+  </data>
+  <data name="Overview_Typography_Mono" xml:space="preserve">
+    <value>Mono</value>
+  </data>
+  <data name="Overview_Typography_DisplaySample" xml:space="preserve">
+    <value>FluentJalium Gallery</value>
+  </data>
+  <data name="Overview_Typography_BodySample" xml:space="preserve">
+    <value>Readable control documentation and state labels.</value>
+  </data>
+  <!-- Switches Page -->
+  <data name="Switches_Title" xml:space="preserve">
+    <value>Switches</value>
+  </data>
+  <data name="Switches_ToggleButton" xml:space="preserve">
+    <value>FWToggleButton</value>
+  </data>
+  <data name="Switches_ToggleButton_Desc" xml:space="preserve">
+    <value>Command-like boolean selection with checked, unchecked, indeterminate, and disabled states.</value>
+  </data>
+  <data name="Switches_ToggleSwitch" xml:space="preserve">
+    <value>FWToggleSwitch</value>
+  </data>
+  <data name="Switches_ToggleSwitch_Desc" xml:space="preserve">
+    <value>A WinUI-style switch surface for direct on/off settings, content labels, and disabled states.</value>
+  </data>
+  <data name="Switches_Events" xml:space="preserve">
+    <value>Events and content</value>
+  </data>
+  <data name="Switches_Events_Desc" xml:space="preserve">
+    <value>Toggle state changes update the content surface and raise the Jalium routed events.</value>
+  </data>
+  <data name="Switches_MaterialRow" xml:space="preserve">
+    <value>Material settings row</value>
+  </data>
+  <data name="Switches_MaterialRow_Desc" xml:space="preserve">
+    <value>Switches stay readable on FluentJalium layered material surfaces.</value>
+  </data>
+  <data name="Switches_StateWaiting" xml:space="preserve">
+    <value>ToggleButton state: waiting for selection.</value>
+  </data>
+  <data name="Switches_StateChecked" xml:space="preserve">
+    <value>ToggleButton state: checked</value>
+  </data>
+  <data name="Switches_StateUnchecked" xml:space="preserve">
+    <value>ToggleButton state: unchecked</value>
+  </data>
+  <data name="Switches_StateIndeterminate" xml:space="preserve">
+    <value>ToggleButton state: indeterminate</value>
+  </data>
+  <data name="Switches_LiveSetting" xml:space="preserve">
+    <value>Live setting</value>
+  </data>
+  <data name="Switches_LiveSetting_Desc" xml:space="preserve">
+    <value>Cycle density or flip the state.</value>
+  </data>
+  <data name="Switches_LiveOutput" xml:space="preserve">
+    <value>Live setting: {0}. Density: {1}</value>
+  </data>
+  <data name="Switches_TurnOn" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="Switches_TurnOff" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="Switches_Flip" xml:space="preserve">
+    <value>Flip</value>
+  </data>
+  <data name="Switches_Density" xml:space="preserve">
+    <value>Density</value>
+  </data>
+  <data name="Switches_MicaLayer" xml:space="preserve">
+    <value>Mica layer</value>
+  </data>
+  <data name="Switches_MicaLayer_Desc" xml:space="preserve">
+    <value>Use backdrop-aware surfaces</value>
+  </data>
+  <data name="Switches_AcrylicPass" xml:space="preserve">
+    <value>Acrylic pass</value>
+  </data>
+  <data name="Switches_AcrylicPass_Desc" xml:space="preserve">
+    <value>Show translucent panels</value>
+  </data>
+  <data name="Switches_ReducedMotion" xml:space="preserve">
+    <value>Reduced motion</value>
+  </data>
+  <data name="Switches_ReducedMotion_Desc" xml:space="preserve">
+    <value>Keep state changes calm</value>
+  </data>
+  <data name="Switches_On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Switches_Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Switches_Mixed" xml:space="preserve">
+    <value>Mixed</value>
+  </data>
+  <data name="Switches_Default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="Switches_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Switches_ComfortableRow" xml:space="preserve">
+    <value>Comfortable settings row</value>
+  </data>
+  <data name="Switches_Paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="Switches_Running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="Switches_SpaciousDisabledRow" xml:space="preserve">
+    <value>Spacious disabled row</value>
+  </data>
+  <data name="Switches_NotificationsOff" xml:space="preserve">
+    <value>Notifications off</value>
+  </data>
+  <data name="Switches_NotificationsOn" xml:space="preserve">
+    <value>Notifications on</value>
+  </data>
+  <data name="Switches_Density_Compact" xml:space="preserve">
+    <value>compact</value>
+  </data>
+  <data name="Switches_Density_Comfortable" xml:space="preserve">
+    <value>comfortable</value>
+  </data>
+  <data name="Switches_Density_Spacious" xml:space="preserve">
+    <value>spacious</value>
+  </data>
 </root>

@@ -16,6 +16,8 @@ internal sealed record GalleryPage(
 
     public string Description => Info.Description;
 
+    public string GroupId => Info.GroupId;
+
     public string Group => Info.Group;
 
     public FluentIconRegular Icon => Info.Icon;

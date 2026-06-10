@@ -290,6 +290,208 @@
   </data>
   <data name="Command_Clicked" xml:space="preserve">
     <value>{0}已点击</value>
+  </data>  <!-- Shell Strings -->
+  <data name="Shell_Title" xml:space="preserve">
+    <value>FluentJalium</value>
   </data>
-
+  <data name="Shell_Subtitle" xml:space="preserve">
+    <value>控件库</value>
+  </data>
+  <data name="Shell_SearchPlaceholder" xml:space="preserve">
+    <value>搜索控件、材质和示例</value>
+  </data>
+  <data name="Shell_Language" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="Shell_NoResults" xml:space="preserve">
+    <value>无结果</value>
+  </data>
+  <!-- Overview Page -->
+  <data name="Overview_Title" xml:space="preserve">
+    <value>概览</value>
+  </data>
+  <data name="Overview_ThemeVariants" xml:space="preserve">
+    <value>主题变体</value>
+  </data>
+  <data name="Overview_ThemeVariants_Desc" xml:space="preserve">
+    <value>在亮色、暗色和高对比度之间切换激活的 FluentJalium 资源字典。</value>
+  </data>
+  <data name="Overview_AccentPalette" xml:space="preserve">
+    <value>强调色调色板</value>
+  </data>
+  <data name="Overview_AccentPalette_Desc" xml:space="preserve">
+    <value>应用受 WinUI 启发的强调色，并跨控件验证依赖的画刷。</value>
+  </data>
+  <data name="Overview_TypographyTokens" xml:space="preserve">
+    <value>排版令牌</value>
+  </data>
+  <data name="Overview_TypographyTokens_Desc" xml:space="preserve">
+    <value>展示、正文、等宽和控件字体资源镜像 Fluent 排版角色。</value>
+  </data>
+  <data name="Overview_MaterialPreview" xml:space="preserve">
+    <value>分层材质预览</value>
+  </data>
+  <data name="Overview_MaterialPreview_Desc" xml:space="preserve">
+    <value>概览控件位于 LiquidGlass 之上，同时保持可读的文本、边框和强调色状态。</value>
+  </data>
+  <data name="Overview_Theme" xml:space="preserve">
+    <value>主题：{0}。</value>
+  </data>
+  <data name="Overview_Accent" xml:space="preserve">
+    <value>强调色：#{0}。</value>
+  </data>
+  <data name="Overview_Material_Active" xml:space="preserve">
+    <value>材质预览：LiquidGlass 层活动。</value>
+  </data>
+  <data name="Overview_ResourceLayer" xml:space="preserve">
+    <value>FluentJalium 资源层</value>
+  </data>
+  <data name="Overview_ResourceLayer_Desc" xml:space="preserve">
+    <value>图层填充、强调色、排版和外壳画刷将同时刷新。</value>
+  </data>
+  <data name="Overview_Settings" xml:space="preserve">
+    <value>Fluent 设置</value>
+  </data>
+  <data name="Overview_BackdropAware" xml:space="preserve">
+    <value>感知背景</value>
+  </data>
+  <data name="Overview_MaterialAccent" xml:space="preserve">
+    <value>材质强调色：{0}。</value>
+  </data>
+  <data name="Overview_Typography_Display" xml:space="preserve">
+    <value>展示</value>
+  </data>
+  <data name="Overview_Typography_Body" xml:space="preserve">
+    <value>正文</value>
+  </data>
+  <data name="Overview_Typography_Mono" xml:space="preserve">
+    <value>等宽</value>
+  </data>
+  <data name="Overview_Typography_DisplaySample" xml:space="preserve">
+    <value>FluentJalium 控件库</value>
+  </data>
+  <data name="Overview_Typography_BodySample" xml:space="preserve">
+    <value>清晰易读的控件文档与状态标签。</value>
+  </data>
+  <!-- Switches Page -->
+  <data name="Switches_Title" xml:space="preserve">
+    <value>开关</value>
+  </data>
+  <data name="Switches_ToggleButton" xml:space="preserve">
+    <value>FWToggleButton</value>
+  </data>
+  <data name="Switches_ToggleButton_Desc" xml:space="preserve">
+    <value>具有选中、未选中、三态和禁用状态的命令式布尔选择。</value>
+  </data>
+  <data name="Switches_ToggleSwitch" xml:space="preserve">
+    <value>FWToggleSwitch</value>
+  </data>
+  <data name="Switches_ToggleSwitch_Desc" xml:space="preserve">
+    <value>用于直接开启/关闭设置、内容标签和禁用状态的 WinUI 风格开关表面。</value>
+  </data>
+  <data name="Switches_Events" xml:space="preserve">
+    <value>事件与内容</value>
+  </data>
+  <data name="Switches_Events_Desc" xml:space="preserve">
+    <value>状态切换会更新内容表面并引发 Jalium 路由事件。</value>
+  </data>
+  <data name="Switches_MaterialRow" xml:space="preserve">
+    <value>材质设置行</value>
+  </data>
+  <data name="Switches_MaterialRow_Desc" xml:space="preserve">
+    <value>开关在 FluentJalium 分层材质表面上保持清晰可读。</value>
+  </data>
+  <data name="Switches_StateWaiting" xml:space="preserve">
+    <value>ToggleButton 状态：等待选择。</value>
+  </data>
+  <data name="Switches_StateChecked" xml:space="preserve">
+    <value>ToggleButton 状态：已选中</value>
+  </data>
+  <data name="Switches_StateUnchecked" xml:space="preserve">
+    <value>ToggleButton 状态：未选中</value>
+  </data>
+  <data name="Switches_StateIndeterminate" xml:space="preserve">
+    <value>ToggleButton 状态：不确定</value>
+  </data>
+  <data name="Switches_LiveSetting" xml:space="preserve">
+    <value>实时设置</value>
+  </data>
+  <data name="Switches_LiveSetting_Desc" xml:space="preserve">
+    <value>循环改变密度或翻转状态。</value>
+  </data>
+  <data name="Switches_LiveOutput" xml:space="preserve">
+    <value>实时设置：{0}。密度：{1}</value>
+  </data>
+  <data name="Switches_TurnOn" xml:space="preserve">
+    <value>开启</value>
+  </data>
+  <data name="Switches_TurnOff" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Switches_Flip" xml:space="preserve">
+    <value>翻转</value>
+  </data>
+  <data name="Switches_Density" xml:space="preserve">
+    <value>密度</value>
+  </data>
+  <data name="Switches_MicaLayer" xml:space="preserve">
+    <value>云母层</value>
+  </data>
+  <data name="Switches_MicaLayer_Desc" xml:space="preserve">
+    <value>使用背景感知表面</value>
+  </data>
+  <data name="Switches_AcrylicPass" xml:space="preserve">
+    <value>亚克力通道</value>
+  </data>
+  <data name="Switches_AcrylicPass_Desc" xml:space="preserve">
+    <value>显示半透明面板</value>
+  </data>
+  <data name="Switches_ReducedMotion" xml:space="preserve">
+    <value>减弱动态效果</value>
+  </data>
+  <data name="Switches_ReducedMotion_Desc" xml:space="preserve">
+    <value>保持状态变化平缓</value>
+  </data>
+  <data name="Switches_On" xml:space="preserve">
+    <value>开启</value>
+  </data>
+  <data name="Switches_Off" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Switches_Mixed" xml:space="preserve">
+    <value>混合</value>
+  </data>
+  <data name="Switches_Default" xml:space="preserve">
+    <value>默认</value>
+  </data>
+  <data name="Switches_Status" xml:space="preserve">
+    <value>状态</value>
+  </data>
+  <data name="Switches_ComfortableRow" xml:space="preserve">
+    <value>舒适的设置行</value>
+  </data>
+  <data name="Switches_Paused" xml:space="preserve">
+    <value>已暂停</value>
+  </data>
+  <data name="Switches_Running" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="Switches_SpaciousDisabledRow" xml:space="preserve">
+    <value>宽敞的禁用行</value>
+  </data>
+  <data name="Switches_NotificationsOff" xml:space="preserve">
+    <value>通知已关闭</value>
+  </data>
+  <data name="Switches_NotificationsOn" xml:space="preserve">
+    <value>通知已开启</value>
+  </data>
+  <data name="Switches_Density_Compact" xml:space="preserve">
+    <value>紧凑</value>
+  </data>
+  <data name="Switches_Density_Comfortable" xml:space="preserve">
+    <value>舒适</value>
+  </data>
+  <data name="Switches_Density_Spacious" xml:space="preserve">
+    <value>宽敞</value>
+  </data>
 </root>

@@ -121,6 +121,7 @@ internal static class GalleryCatalog
             title,
             CreateSubtitle(group, entry.Status, localization),
             localization.PageDescription(entry.UniqueId),
+            entry.GroupId,
             group,
             entry.Icon,
             tags,

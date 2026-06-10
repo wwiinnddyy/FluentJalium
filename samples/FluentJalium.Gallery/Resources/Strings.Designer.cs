@@ -470,5 +470,407 @@ namespace FluentJalium.Gallery.Resources {
                 return ResourceManager.GetString("Command_Clicked", resourceCulture);
             }
         }
+
+        internal static string Shell_Title {
+            get {
+                return ResourceManager.GetString("Shell_Title", resourceCulture);
+            }
+        }
+
+        internal static string Shell_Subtitle {
+            get {
+                return ResourceManager.GetString("Shell_Subtitle", resourceCulture);
+            }
+        }
+
+        internal static string Shell_SearchPlaceholder {
+            get {
+                return ResourceManager.GetString("Shell_SearchPlaceholder", resourceCulture);
+            }
+        }
+
+        internal static string Shell_Language {
+            get {
+                return ResourceManager.GetString("Shell_Language", resourceCulture);
+            }
+        }
+
+        internal static string Shell_NoResults {
+            get {
+                return ResourceManager.GetString("Shell_NoResults", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Title {
+            get {
+                return ResourceManager.GetString("Overview_Title", resourceCulture);
+            }
+        }
+
+        internal static string Overview_ThemeVariants {
+            get {
+                return ResourceManager.GetString("Overview_ThemeVariants", resourceCulture);
+            }
+        }
+
+        internal static string Overview_ThemeVariants_Desc {
+            get {
+                return ResourceManager.GetString("Overview_ThemeVariants_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Overview_AccentPalette {
+            get {
+                return ResourceManager.GetString("Overview_AccentPalette", resourceCulture);
+            }
+        }
+
+        internal static string Overview_AccentPalette_Desc {
+            get {
+                return ResourceManager.GetString("Overview_AccentPalette_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Overview_TypographyTokens {
+            get {
+                return ResourceManager.GetString("Overview_TypographyTokens", resourceCulture);
+            }
+        }
+
+        internal static string Overview_TypographyTokens_Desc {
+            get {
+                return ResourceManager.GetString("Overview_TypographyTokens_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Overview_MaterialPreview {
+            get {
+                return ResourceManager.GetString("Overview_MaterialPreview", resourceCulture);
+            }
+        }
+
+        internal static string Overview_MaterialPreview_Desc {
+            get {
+                return ResourceManager.GetString("Overview_MaterialPreview_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Theme {
+            get {
+                return ResourceManager.GetString("Overview_Theme", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Accent {
+            get {
+                return ResourceManager.GetString("Overview_Accent", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Material_Active {
+            get {
+                return ResourceManager.GetString("Overview_Material_Active", resourceCulture);
+            }
+        }
+
+        internal static string Overview_ResourceLayer {
+            get {
+                return ResourceManager.GetString("Overview_ResourceLayer", resourceCulture);
+            }
+        }
+
+        internal static string Overview_ResourceLayer_Desc {
+            get {
+                return ResourceManager.GetString("Overview_ResourceLayer_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Settings {
+            get {
+                return ResourceManager.GetString("Overview_Settings", resourceCulture);
+            }
+        }
+
+        internal static string Overview_BackdropAware {
+            get {
+                return ResourceManager.GetString("Overview_BackdropAware", resourceCulture);
+            }
+        }
+
+        internal static string Overview_MaterialAccent {
+            get {
+                return ResourceManager.GetString("Overview_MaterialAccent", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Typography_Display {
+            get {
+                return ResourceManager.GetString("Overview_Typography_Display", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Typography_Body {
+            get {
+                return ResourceManager.GetString("Overview_Typography_Body", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Typography_Mono {
+            get {
+                return ResourceManager.GetString("Overview_Typography_Mono", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Typography_DisplaySample {
+            get {
+                return ResourceManager.GetString("Overview_Typography_DisplaySample", resourceCulture);
+            }
+        }
+
+        internal static string Overview_Typography_BodySample {
+            get {
+                return ResourceManager.GetString("Overview_Typography_BodySample", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Title {
+            get {
+                return ResourceManager.GetString("Switches_Title", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ToggleButton {
+            get {
+                return ResourceManager.GetString("Switches_ToggleButton", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ToggleButton_Desc {
+            get {
+                return ResourceManager.GetString("Switches_ToggleButton_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ToggleSwitch {
+            get {
+                return ResourceManager.GetString("Switches_ToggleSwitch", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ToggleSwitch_Desc {
+            get {
+                return ResourceManager.GetString("Switches_ToggleSwitch_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Events {
+            get {
+                return ResourceManager.GetString("Switches_Events", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Events_Desc {
+            get {
+                return ResourceManager.GetString("Switches_Events_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_MaterialRow {
+            get {
+                return ResourceManager.GetString("Switches_MaterialRow", resourceCulture);
+            }
+        }
+
+        internal static string Switches_MaterialRow_Desc {
+            get {
+                return ResourceManager.GetString("Switches_MaterialRow_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_StateWaiting {
+            get {
+                return ResourceManager.GetString("Switches_StateWaiting", resourceCulture);
+            }
+        }
+
+        internal static string Switches_StateChecked {
+            get {
+                return ResourceManager.GetString("Switches_StateChecked", resourceCulture);
+            }
+        }
+
+        internal static string Switches_StateUnchecked {
+            get {
+                return ResourceManager.GetString("Switches_StateUnchecked", resourceCulture);
+            }
+        }
+
+        internal static string Switches_StateIndeterminate {
+            get {
+                return ResourceManager.GetString("Switches_StateIndeterminate", resourceCulture);
+            }
+        }
+
+        internal static string Switches_LiveSetting {
+            get {
+                return ResourceManager.GetString("Switches_LiveSetting", resourceCulture);
+            }
+        }
+
+        internal static string Switches_LiveSetting_Desc {
+            get {
+                return ResourceManager.GetString("Switches_LiveSetting_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_LiveOutput {
+            get {
+                return ResourceManager.GetString("Switches_LiveOutput", resourceCulture);
+            }
+        }
+
+        internal static string Switches_TurnOn {
+            get {
+                return ResourceManager.GetString("Switches_TurnOn", resourceCulture);
+            }
+        }
+
+        internal static string Switches_TurnOff {
+            get {
+                return ResourceManager.GetString("Switches_TurnOff", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Flip {
+            get {
+                return ResourceManager.GetString("Switches_Flip", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Density {
+            get {
+                return ResourceManager.GetString("Switches_Density", resourceCulture);
+            }
+        }
+
+        internal static string Switches_MicaLayer {
+            get {
+                return ResourceManager.GetString("Switches_MicaLayer", resourceCulture);
+            }
+        }
+
+        internal static string Switches_MicaLayer_Desc {
+            get {
+                return ResourceManager.GetString("Switches_MicaLayer_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_AcrylicPass {
+            get {
+                return ResourceManager.GetString("Switches_AcrylicPass", resourceCulture);
+            }
+        }
+
+        internal static string Switches_AcrylicPass_Desc {
+            get {
+                return ResourceManager.GetString("Switches_AcrylicPass_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ReducedMotion {
+            get {
+                return ResourceManager.GetString("Switches_ReducedMotion", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ReducedMotion_Desc {
+            get {
+                return ResourceManager.GetString("Switches_ReducedMotion_Desc", resourceCulture);
+            }
+        }
+
+        internal static string Switches_On {
+            get {
+                return ResourceManager.GetString("Switches_On", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Off {
+            get {
+                return ResourceManager.GetString("Switches_Off", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Mixed {
+            get {
+                return ResourceManager.GetString("Switches_Mixed", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Default {
+            get {
+                return ResourceManager.GetString("Switches_Default", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Status {
+            get {
+                return ResourceManager.GetString("Switches_Status", resourceCulture);
+            }
+        }
+
+        internal static string Switches_ComfortableRow {
+            get {
+                return ResourceManager.GetString("Switches_ComfortableRow", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Paused {
+            get {
+                return ResourceManager.GetString("Switches_Paused", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Running {
+            get {
+                return ResourceManager.GetString("Switches_Running", resourceCulture);
+            }
+        }
+
+        internal static string Switches_SpaciousDisabledRow {
+            get {
+                return ResourceManager.GetString("Switches_SpaciousDisabledRow", resourceCulture);
+            }
+        }
+
+        internal static string Switches_NotificationsOff {
+            get {
+                return ResourceManager.GetString("Switches_NotificationsOff", resourceCulture);
+            }
+        }
+
+        internal static string Switches_NotificationsOn {
+            get {
+                return ResourceManager.GetString("Switches_NotificationsOn", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Density_Compact {
+            get {
+                return ResourceManager.GetString("Switches_Density_Compact", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Density_Comfortable {
+            get {
+                return ResourceManager.GetString("Switches_Density_Comfortable", resourceCulture);
+            }
+        }
+
+        internal static string Switches_Density_Spacious {
+            get {
+                return ResourceManager.GetString("Switches_Density_Spacious", resourceCulture);
+            }
+        }
     }
 }

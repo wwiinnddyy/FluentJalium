@@ -1,5 +1,6 @@
 using FluentJalium.Controls.Themes;
 using FluentJalium.Icon;
+using FluentJalium.Gallery.Resources;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -27,7 +28,7 @@ internal sealed class GalleryOverviewPage
 
     public UIElement CreateContent()
     {
-        var panel = CreateSection("Overview");
+        var panel = CreateSection(Strings.Overview_Title);
         var examples = new FWWrapPanel
         {
             HorizontalSpacing = 16,
@@ -36,23 +37,23 @@ internal sealed class GalleryOverviewPage
 
         examples.Children.Add(CreateOverviewCard(
             FluentIconRegular.DarkTheme24,
-            "Theme variants",
-            "Switch the active FluentJalium resource dictionary across light, dark, and high contrast.",
+            Strings.Overview_ThemeVariants,
+            Strings.Overview_ThemeVariants_Desc,
             CreateThemeVariantSample()));
         examples.Children.Add(CreateOverviewCard(
             FluentIconRegular.Color24,
-            "Accent palette",
-            "Apply WinUI-inspired accent colors and validate dependent brushes across controls.",
+            Strings.Overview_AccentPalette,
+            Strings.Overview_AccentPalette_Desc,
             CreateAccentPaletteSample()));
         examples.Children.Add(CreateOverviewCard(
             FluentIconRegular.TextFont24,
-            "Typography tokens",
-            "Display, body, mono, and control font resources mirror Fluent typography roles.",
+            Strings.Overview_TypographyTokens,
+            Strings.Overview_TypographyTokens_Desc,
             CreateTypographySample()));
         examples.Children.Add(CreateOverviewCard(
             FluentIconRegular.LayerDiagonalSparkle24,
-            "Layered material preview",
-            "Overview controls sit on LiquidGlass while preserving readable text, borders, and accent states.",
+            Strings.Overview_MaterialPreview,
+            Strings.Overview_MaterialPreview_Desc,
             CreateMaterialThemePreview()));
 
         panel.Children.Add(examples);
@@ -61,7 +62,13 @@ internal sealed class GalleryOverviewPage
 
     private UIElement CreateThemeVariantSample()
     {
-        var output = CreateOverviewOutput($"Theme: {FluentThemeManager.CurrentTheme}.");
+        string currentThemeLabel = FluentThemeManager.CurrentTheme switch
+        {
+            FluentThemeVariant.Light => Strings.Settings_ThemeLight,
+            FluentThemeVariant.Dark => Strings.Settings_ThemeDark,
+            _ => Strings.Settings_ThemeHighContrast
+        };
+        var output = CreateOverviewOutput(string.Format(Strings.Overview_Theme, currentThemeLabel));
 
         return new FWStackPanel
         {
@@ -70,20 +77,20 @@ internal sealed class GalleryOverviewPage
             Children =
             {
                 CreateOverviewButtonRow(
-                    CreateOverviewActionButton(FluentIconRegular.WeatherSunny24, "Light", () =>
+                    CreateOverviewActionButton(FluentIconRegular.WeatherSunny24, Strings.Settings_ThemeLight, () =>
                     {
                         _applyTheme(FluentThemeVariant.Light);
-                        output.Text = "Theme: Light.";
+                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeLight);
                     }),
-                    CreateOverviewActionButton(FluentIconRegular.DarkTheme24, "Dark", () =>
+                    CreateOverviewActionButton(FluentIconRegular.DarkTheme24, Strings.Settings_ThemeDark, () =>
                     {
                         _applyTheme(FluentThemeVariant.Dark);
-                        output.Text = "Theme: Dark.";
+                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeDark);
                     }),
-                    CreateOverviewActionButton(FluentIconRegular.Accessibility24, "High Contrast", () =>
+                    CreateOverviewActionButton(FluentIconRegular.Accessibility24, Strings.Settings_ThemeHighContrast, () =>
                     {
                         _applyTheme(FluentThemeVariant.HighContrast);
-                        output.Text = "Theme: HighContrast.";
+                        output.Text = string.Format(Strings.Overview_Theme, Strings.Settings_ThemeHighContrast);
                     })),
                 CreateOverviewStatus(output)
             }
@@ -92,7 +99,7 @@ internal sealed class GalleryOverviewPage
 
     private UIElement CreateAccentPaletteSample()
     {
-        var output = CreateOverviewOutput($"Accent: #{FluentThemeManager.CurrentAccentColor.R:X2}{FluentThemeManager.CurrentAccentColor.G:X2}{FluentThemeManager.CurrentAccentColor.B:X2}.");
+        var output = CreateOverviewOutput(string.Format(Strings.Overview_Accent, $"{FluentThemeManager.CurrentAccentColor.R:X2}{FluentThemeManager.CurrentAccentColor.G:X2}{FluentThemeManager.CurrentAccentColor.B:X2}"));
 
         return new FWStackPanel
         {
@@ -114,20 +121,21 @@ internal sealed class GalleryOverviewPage
             Spacing = 10,
             Children =
             {
-                CreateTypographyPreview("Display", FluentThemeManager.CurrentDisplayFontFamily, 22, "FluentJalium Gallery"),
-                CreateTypographyPreview("Body", FluentThemeManager.CurrentBodyFontFamily, 14, "Readable control documentation and state labels."),
-                CreateTypographyPreview("Mono", FluentThemeManager.CurrentMonoFontFamily, 13, "FWButton | FWTextBox | FWNavigationView")
+                CreateTypographyPreview(Strings.Overview_Typography_Display, FluentThemeManager.CurrentDisplayFontFamily, 22, Strings.Overview_Typography_DisplaySample),
+                CreateTypographyPreview(Strings.Overview_Typography_Body, FluentThemeManager.CurrentBodyFontFamily, 14, Strings.Overview_Typography_BodySample),
+                CreateTypographyPreview(Strings.Overview_Typography_Mono, FluentThemeManager.CurrentMonoFontFamily, 13, "FWButton | FWTextBox | FWNavigationView")
             }
         };
     }
 
     private UIElement CreateMaterialThemePreview()
     {
-        var output = CreateOverviewOutput("Material preview: LiquidGlass layer active.");
+        var output = CreateOverviewOutput(Strings.Overview_Material_Active);
 
         return new FWFluentMaterialSurface
         {
-            Width = 520,
+            Width = double.NaN,
+            MaxWidth = 800,
             MaterialKind = FWFluentMaterialKind.LiquidGlass,
             TintColor = Color.FromArgb(180, 20, 84, 145),
             TintOpacity = 0.2,
@@ -151,7 +159,7 @@ internal sealed class GalleryOverviewPage
                     CreateMaterialHeader(),
                     new FWTextBlock
                     {
-                        Text = "Layer fill, accent, typography, and shell brushes are refreshed together.",
+                        Text = Strings.Overview_ResourceLayer_Desc,
                         Foreground = ThemeBrush("TextSecondary"),
                         TextWrapping = TextWrapping.Wrap
                     },
@@ -161,19 +169,19 @@ internal sealed class GalleryOverviewPage
                         VerticalSpacing = 8,
                         Children =
                         {
-                            CreateOverviewActionButton(FluentIconRegular.Color24, "Blue", () =>
+                            CreateOverviewActionButton(FluentIconRegular.Color24, Strings.Color_Blue, () =>
                             {
                                 _applyAccent(Color.FromRgb(0x00, 0x78, 0xD4));
-                                output.Text = "Material accent: Blue.";
+                                output.Text = string.Format(Strings.Overview_MaterialAccent, Strings.Color_Blue);
                             }),
-                            CreateOverviewActionButton(FluentIconRegular.ColorFill24, "Rose", () =>
+                            CreateOverviewActionButton(FluentIconRegular.ColorFill24, Strings.Color_Rose, () =>
                             {
                                 _applyAccent(Color.FromRgb(0xC2, 0x39, 0xB3));
-                                output.Text = "Material accent: Rose.";
+                                output.Text = string.Format(Strings.Overview_MaterialAccent, Strings.Color_Rose);
                             }),
                             new FWToggleSwitch
                             {
-                                Header = "Backdrop aware",
+                                Header = Strings.Overview_BackdropAware,
                                 IsOn = true
                             }
                         }
@@ -192,10 +200,10 @@ internal sealed class GalleryOverviewPage
             VerticalSpacing = 10,
             Children =
             {
-                CreateAccentSwatch("Blue", Color.FromRgb(0x00, 0x78, 0xD4), output),
-                CreateAccentSwatch("Rose", Color.FromRgb(0xC2, 0x39, 0xB3), output),
-                CreateAccentSwatch("Orange", Color.FromRgb(0xD8, 0x3B, 0x01), output),
-                CreateAccentSwatch("Green", Color.FromRgb(0x10, 0x7C, 0x10), output)
+                CreateAccentSwatch(Strings.Color_Blue, Color.FromRgb(0x00, 0x78, 0xD4), output),
+                CreateAccentSwatch(Strings.Color_Rose, Color.FromRgb(0xC2, 0x39, 0xB3), output),
+                CreateAccentSwatch(Strings.Color_Orange, Color.FromRgb(0xD8, 0x3B, 0x01), output),
+                CreateAccentSwatch(Strings.Color_Green, Color.FromRgb(0x10, 0x7C, 0x10), output)
             }
         };
     }
@@ -230,7 +238,7 @@ internal sealed class GalleryOverviewPage
         button.Click += (_, _) =>
         {
             _applyAccent(color);
-            output.Text = $"Accent: #{color.R:X2}{color.G:X2}{color.B:X2}.";
+            output.Text = string.Format(Strings.Overview_Accent, $"{color.R:X2}{color.G:X2}{color.B:X2}");
         };
         return button;
     }
@@ -279,7 +287,7 @@ internal sealed class GalleryOverviewPage
                 CreateIcon(FluentIconRegular.LayerDiagonalSparkle24, 18, ThemeBrush("TextPrimary")),
                 new FWTextBlock
                 {
-                    Text = "FluentJalium resource layer",
+                    Text = Strings.Overview_ResourceLayer,
                     FontSize = 15,
                     Foreground = ThemeBrush("TextPrimary"),
                     VerticalAlignment = VerticalAlignment.Center
@@ -292,12 +300,14 @@ internal sealed class GalleryOverviewPage
     {
         return new FWBorder
         {
-            Width = 570,
-            Background = ThemeBrush("ControlBackground"),
-            BorderBrush = ThemeBrush("ControlBorder"),
+            Width = double.NaN,
+            MaxWidth = 800,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            Background = ThemeBrush("CardBackgroundFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(24),
             Child = new FWStackPanel
             {
                 Orientation = Orientation.Vertical,
@@ -391,7 +401,7 @@ internal sealed class GalleryOverviewPage
             BorderBrush = ThemeBrush("ControlBorder"),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(10),
+            Padding = new Thickness(16),
             Child = new FWStackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -423,7 +433,8 @@ internal sealed class GalleryOverviewPage
                         new FWTextBlock
                         {
                             Text = title,
-                            FontSize = 22,
+                            FontSize = 24,
+                            FontWeight = FontWeights.SemiBold,
                             Foreground = ThemeBrush("TextPrimary"),
                             VerticalAlignment = VerticalAlignment.Center
                         }
