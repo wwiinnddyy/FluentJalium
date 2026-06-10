@@ -1,0 +1,98 @@
+{
+  "en-US": {
+    "Buttons": {
+      "Title": "Buttons",
+      "Description": "Standard buttons, split buttons, dropdown buttons, and command bars demonstrate interactive surfaces across density modes.",
+      "Examples": {
+        "Surface": {
+          "Title": "Button Surface",
+          "Description": "Standard button, repeat button, hyperlink button, dropdown button, and disabled button showing basic interaction patterns."
+        },
+        "Split": {
+          "Title": "Split Command Buttons",
+          "Description": "Split button and toggle split button with primary action and flyout menu demonstrating combined command surfaces."
+        },
+        "CommandBar": {
+          "Title": "Command Bar",
+          "Description": "App bar buttons, toggle buttons, and separators organized in a command bar with primary and secondary command areas."
+        }
+      }
+    },
+    "Switches": {
+      "Title": "Switches",
+      "Description": "Toggle switches and toggle buttons for boolean state control."
+    },
+    "TextInput": {
+      "Title": "Text Input",
+      "Description": "Text boxes, password boxes, number boxes, and auto-suggest boxes for text entry."
+    },
+    "Selection": {
+      "Title": "Selection",
+      "Description": "Check boxes, radio buttons, combo boxes, and rating controls for making selections."
+    }
+  },
+  "zh-CN": {
+    "Buttons": {
+      "Title": "按钮",
+      "Description": "标准按钮、分割按钮、下拉按钮和命令栏展示了跨密度模式的交互表面。",
+      "Examples": {
+        "Surface": {
+          "Title": "按钮表面",
+          "Description": "标准按钮、重复按钮、超链接按钮、下拉按钮和禁用按钮展示了基本的交互模式。"
+        },
+        "Split": {
+          "Title": "分割命令按钮",
+          "Description": "分割按钮和切换分割按钮具有主操作和浮出菜单，演示了组合命令表面。"
+        },
+        "CommandBar": {
+          "Title": "命令栏",
+          "Description": "应用栏按钮、切换按钮和分隔符组织在命令栏中，具有主要和次要命令区域。"
+        }
+      }
+    },
+    "Switches": {
+      "Title": "开关",
+      "Description": "用于布尔状态控制的切换开关和切换按钮。"
+    },
+    "TextInput": {
+      "Title": "文本输入",
+      "Description": "用于文本输入的文本框、密码框、数字框和自动建议框。"
+    },
+    "Selection": {
+      "Title": "选择控件",
+      "Description": "用于进行选择的复选框、单选按钮、组合框和评分控件。"
+    }
+  },
+  "zh-TW": {
+    "Buttons": {
+      "Title": "按鈕",
+      "Description": "標準按鈕、分割按鈕、下拉按鈕和命令列展示了跨密度模式的互動表面。",
+      "Examples": {
+        "Surface": {
+          "Title": "按鈕表面",
+          "Description": "標準按鈕、重複按鈕、超連結按鈕、下拉按鈕和停用按鈕展示了基本的互動模式。"
+        },
+        "Split": {
+          "Title": "分割命令按鈕",
+          "Description": "分割按鈕和切換分割按鈕具有主要動作和飛出選單，示範了組合命令表面。"
+        },
+        "CommandBar": {
+          "Title": "命令列",
+          "Description": "應用程式列按鈕、切換按鈕和分隔符號組織在命令列中，具有主要和次要命令區域。"
+        }
+      }
+    },
+    "Switches": {
+      "Title": "開關",
+      "Description": "用於布林狀態控制的切換開關和切換按鈕。"
+    },
+    "TextInput": {
+      "Title": "文字輸入",
+      "Description": "用於文字輸入的文字方塊、密碼方塊、數字方塊和自動建議方塊。"
+    },
+    "Selection": {
+      "Title": "選擇控制項",
+      "Description": "用於進行選擇的核取方塊、選項按鈕、下拉式方塊和評分控制項。"
+    }
+  }
+}
