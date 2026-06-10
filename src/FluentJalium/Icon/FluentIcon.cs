@@ -18,12 +18,12 @@ public class FluentIcon : FontIcon
     /// <summary>
     /// Font family used for regular Fluent icon fallback glyphs.
     /// </summary>
-    public const string RegularFontFamily = FluentIconFonts.Regular;
+    public static readonly string RegularFontFamily = FluentIconFonts.Regular;
 
     /// <summary>
     /// Font family used for filled Fluent icon fallback glyphs.
     /// </summary>
-    public const string FilledFontFamily = FluentIconFonts.Filled;
+    public static readonly string FilledFontFamily = FluentIconFonts.Filled;
 
     /// <summary>
     /// Font family used for Windows Segoe Fluent Icons compatibility glyphs.

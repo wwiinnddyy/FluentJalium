@@ -11,6 +11,7 @@
     <PackageId>FluentJalium</PackageId>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
     <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
     <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
