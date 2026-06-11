@@ -10,6 +10,8 @@ using FWButtonDensity = FluentJalium.Controls.FWButtonDensity;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWExpander = FluentJalium.Controls.FWExpander;
+using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWFluentMaterialRole = FluentJalium.Controls.FWFluentMaterialRole;
 
 namespace FluentJalium.Gallery.Controls;
 
@@ -225,12 +227,9 @@ internal static class GallerySampleCard
             UpdateLayout(e.NewSize.Width);
         };
 
-        return new FWBorder
+        return new FWFluentMaterialSurface
         {
-            Background = GalleryThemeResources.Brush("CardBackgroundFillColorDefaultBrush"),
-            BorderBrush = GalleryThemeResources.Brush("ControlElevationBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            MaterialRole = FWFluentMaterialRole.Card,
             Child = grid
         };
     }

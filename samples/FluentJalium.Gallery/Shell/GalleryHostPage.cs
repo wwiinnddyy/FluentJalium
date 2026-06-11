@@ -13,6 +13,8 @@ using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
+using FWFluentMaterialRole = FluentJalium.Controls.FWFluentMaterialRole;
 
 namespace FluentJalium.Gallery.Shell;
 
@@ -68,7 +70,7 @@ internal sealed class GalleryHostPage : Page
         {
             Orientation = Orientation.Vertical,
             Spacing = 36,
-            Margin = new Thickness(36, 40, 36, 40)
+            Margin = new Thickness(36, 36, 36, 36)
         };
 
         var header = CreateWinUiHeader(page);
@@ -113,7 +115,7 @@ internal sealed class GalleryHostPage : Page
         titleRow.Children.Add(new FWTextBlock
         {
             Text = page.Title,
-            FontSize = 36,
+            FontSize = 28,
             FontFamily = "Segoe UI Variable Display",
             FontWeight = FontWeights.SemiBold,
             Foreground = GalleryThemeResources.Brush("TextPrimary"),
@@ -144,7 +146,7 @@ internal sealed class GalleryHostPage : Page
             HorizontalSpacing = 8,
             VerticalSpacing = 8,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(16, 0, 0, 0)
+            Margin = new Thickness(24, 0, 0, 0)
         };
 
         if (!string.IsNullOrWhiteSpace(page.SourcePath))
@@ -250,12 +252,9 @@ internal sealed class GalleryHostPage : Page
             IsExpanded = false
         };
 
-        var border = new FWBorder
+        var border = new FWFluentMaterialSurface
         {
-            Background = GalleryThemeResources.Brush("CardBackgroundFillColorDefaultBrush"),
-            BorderBrush = GalleryThemeResources.Brush("ControlElevationBorderBrush"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            MaterialRole = FWFluentMaterialRole.Card,
             Padding = new Thickness(16),
             Child = expander
         };

@@ -77,7 +77,7 @@ internal sealed class GalleryShell : UserControl
         if (_navigationView != null)
         {
             _navigationView.Background = new SolidColorBrush(Colors.Transparent);
-            _navigationView.PaneBackground = new SolidColorBrush(Color.FromArgb(200, 0xF3, 0xF3, 0xF3));
+            _navigationView.PaneBackground = GalleryThemeResources.Brush("FluentMaterialShellPaneBrush");
             _navigationView.ContentBackground = new SolidColorBrush(Colors.Transparent);
             _navigationView.PaneHeader = CreatePaneHeader();
             _navigationView.Content = CreateContentHost();
@@ -120,7 +120,7 @@ internal sealed class GalleryShell : UserControl
         _navigationView = new FWNavigationView
         {
             Background = new SolidColorBrush(Colors.Transparent),
-            PaneBackground = new SolidColorBrush(Color.FromArgb(200, 0xF3, 0xF3, 0xF3)),
+            PaneBackground = GalleryThemeResources.Brush("FluentMaterialShellPaneBrush"),
             ContentBackground = new SolidColorBrush(Colors.Transparent),
             PaneDisplayMode = NavigationViewPaneDisplayMode.Left,
             IsPaneOpen = true,
