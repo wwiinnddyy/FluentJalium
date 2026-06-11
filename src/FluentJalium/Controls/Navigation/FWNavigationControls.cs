@@ -387,6 +387,10 @@ public class FWNavigationView : NavigationView, IFluentJaliumControl
         DependencyProperty.Register(nameof(Density), typeof(FWNavigationDensity), typeof(FWNavigationView),
             new PropertyMetadata(FWNavigationDensity.Comfortable, OnDensityChanged));
 
+    public static readonly DependencyProperty IsPaneToggleButtonVisibleProperty =
+        DependencyProperty.Register(nameof(IsPaneToggleButtonVisible), typeof(bool), typeof(FWNavigationView),
+            new PropertyMetadata(true));
+
     public FWNavigationView()
     {
         ApplyDensity(this, Density);
@@ -397,6 +401,36 @@ public class FWNavigationView : NavigationView, IFluentJaliumControl
     {
         get => (FWNavigationDensity)GetValue(DensityProperty)!;
         set => SetValue(DensityProperty, value);
+    }
+
+    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
+    public bool IsPaneToggleButtonVisible
+    {
+        get => (bool)GetValue(IsPaneToggleButtonVisibleProperty)!;
+        set => SetValue(IsPaneToggleButtonVisibleProperty, value);
+    }
+
+    private Button? _togglePaneButton;
+
+    public override void OnApplyTemplate()
+    {
+        if (_togglePaneButton != null)
+        {
+            _togglePaneButton.Click -= OnTogglePaneButtonClick;
+        }
+
+        base.OnApplyTemplate();
+
+        _togglePaneButton = GetTemplateChild("PART_TogglePaneButton") as Button;
+        if (_togglePaneButton != null)
+        {
+            _togglePaneButton.Click += OnTogglePaneButtonClick;
+        }
+    }
+
+    private void OnTogglePaneButtonClick(object? sender, Jalium.UI.RoutedEventArgs e)
+    {
+        IsPaneOpen = !IsPaneOpen;
     }
 
     internal static (double OpenPaneLength, double CompactPaneLength) GetPaneMetrics(FWNavigationDensity density)

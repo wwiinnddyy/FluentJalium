@@ -134,21 +134,19 @@ internal static partial class FluentIconFontLoader
             using var key = Registry.CurrentUser.OpenSubKey(FontsRegistryKey, writable: true)
                             ?? Registry.CurrentUser.CreateSubKey(FontsRegistryKey);
 
-            // Registry value name format: "FontName (TrueType)"
             var valueName = $"{familyName} (TrueType)";
             var existing = key.GetValue(valueName);
 
-            if (existing is string existingPath && existingPath == fileName)
+            if (existing is string existingPath && existingPath == fontPath)
             {
-                return false; // Already registered
+                return false;
             }
 
-            key.SetValue(valueName, fileName, RegistryValueKind.String);
+            key.SetValue(valueName, fontPath, RegistryValueKind.String);
             return true;
         }
-        catch
+        catch (UnauthorizedAccessException)
         {
-            // Registry access may fail in restricted environments; continue gracefully.
             return false;
         }
     }

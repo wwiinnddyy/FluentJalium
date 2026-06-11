@@ -1,8 +1,10 @@
 using System.Reflection;
+using System.Runtime.InteropServices;
 using FluentJalium.Icon;
 using Jalium.UI.Controls;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using Microsoft.Win32;
 
 namespace FluentJalium.Tests;
 
@@ -135,5 +137,38 @@ public sealed class FluentIconTests
         Assert.Contains(prefixes, attribute =>
             attribute.XmlNamespace == "https://jalium.dev/fluent/icon"
             && attribute.Prefix == "fluentIcon");
+    }
+
+    [Fact]
+    public void FluentIconFonts_ShouldRegisterFontsWithFullPath()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        _ = FluentIconFonts.Regular;
+        _ = FluentIconFonts.Filled;
+
+        const string fontsRegistryKey = @"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts";
+        using var key = Registry.CurrentUser.OpenSubKey(fontsRegistryKey);
+        if (key == null)
+        {
+            return;
+        }
+
+        var regularValue = key.GetValue("FluentSystemIcons-Regular (TrueType)") as string;
+        var filledValue = key.GetValue("FluentSystemIcons-Filled (TrueType)") as string;
+
+        Assert.NotNull(regularValue);
+        Assert.NotNull(filledValue);
+        Assert.True(Path.IsPathRooted(regularValue), 
+            $"Font registry value should contain full path, but got: {regularValue}");
+        Assert.True(Path.IsPathRooted(filledValue), 
+            $"Font registry value should contain full path, but got: {filledValue}");
+        Assert.True(File.Exists(regularValue), 
+            $"Font file should exist at registered path: {regularValue}");
+        Assert.True(File.Exists(filledValue), 
+            $"Font file should exist at registered path: {filledValue}");
     }
 }
