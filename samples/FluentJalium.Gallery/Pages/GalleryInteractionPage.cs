@@ -48,6 +48,11 @@ internal sealed class GalleryInteractionPage
             "Material interaction workbench",
             "Scroll, swipe, and split interactions remain legible on a LiquidGlass command surface.",
             CreateMaterialInteractionWorkbenchSample()));
+        examples.Children.Add(CreateInteractionExampleCard(
+            FluentIconRegular.Target24,
+            "Focus visual styles",
+            "Dual-ring focus indicators with WinUI-style outer and inner strokes for keyboard navigation clarity.",
+            CreateFocusVisualSample()));
 
         panel.Children.Add(examples);
         return panel;
@@ -192,6 +197,125 @@ internal sealed class GalleryInteractionPage
                 CreateInteractionStatus(output)
             }
         };
+    }
+
+    private static UIElement CreateFocusVisualSample()
+    {
+        var output = CreateInteractionOutput("Focus visual: Tab through controls to see dual-ring indicators.");
+
+        var buttonsPanel = new FWWrapPanel
+        {
+            HorizontalSpacing = 12,
+            VerticalSpacing = 12,
+            Margin = new Thickness(0, 0, 0, 12),
+            Children =
+            {
+                CreateFocusButton("Primary", FluentIconRegular.CheckmarkCircle24),
+                CreateFocusButton("Secondary", FluentIconRegular.DismissCircle24),
+                CreateFocusButton("Tertiary", FluentIconRegular.Info24)
+            }
+        };
+
+        var textBox = new TextBox
+        {
+            Width = 200,
+            PlaceholderText = "Focus with Tab key",
+            Margin = new Thickness(0, 0, 0, 12)
+        };
+        textBox.GotFocus += (s, e) => output.Text = "Focus: TextBox received keyboard focus.";
+        textBox.LostFocus += (s, e) => output.Text = "Focus: TextBox lost focus.";
+
+        var checkBox = new CheckBox
+        {
+            Content = "Enable dual-ring focus visual",
+            IsChecked = true,
+            Margin = new Thickness(0, 0, 0, 8)
+        };
+
+        var focusInfo = new FWBorder
+        {
+            Background = ThemeBrush("LayerFillColorDefaultBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(12),
+            Margin = new Thickness(0, 0, 0, 12),
+            Child = new FWStackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Spacing = 6,
+                Children =
+                {
+                    new FWTextBlock
+                    {
+                        Text = "Dual-ring focus visual",
+                        FontSize = 13,
+                        FontWeight = FontWeights.SemiBold,
+                        Foreground = ThemeBrush("TextPrimary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "Outer ring: 2px stroke, 3px offset",
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary")
+                    },
+                    new FWTextBlock
+                    {
+                        Text = "Inner ring: 1px stroke, 1px offset",
+                        FontSize = 12,
+                        Foreground = ThemeBrush("TextSecondary")
+                    }
+                }
+            }
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 10,
+            Width = 420,
+            Children =
+            {
+                new FWLabel { Content = "Keyboard focus indicators" },
+                focusInfo,
+                buttonsPanel,
+                textBox,
+                checkBox,
+                CreateInteractionButtonRow(
+                    CreateInteractionActionButton(FluentIconRegular.Keyboard24, "Tab", () =>
+                    {
+                        output.Text = "Focus: Press Tab to navigate between focusable controls.";
+                    }),
+                    CreateInteractionActionButton(FluentIconRegular.Eye24, "Toggle", () =>
+                    {
+                        checkBox.IsChecked = !checkBox.IsChecked;
+                        output.Text = $"Focus visual: {FormatOnOff(checkBox.IsChecked == true)}.";
+                    })),
+                CreateInteractionStatus(output)
+            }
+        };
+    }
+
+    private static FWButton CreateFocusButton(string text, FluentIconRegular icon)
+    {
+        var button = new FWButton
+        {
+            Content = CreateInteractionButtonContent(icon, text)
+        };
+        button.GotFocus += (s, e) =>
+        {
+            if (s is FWButton btn && btn.Content is FWStackPanel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    if (child is FWTextBlock tb)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Focus: {tb.Text} button focused.");
+                    }
+                }
+            }
+        };
+        return button;
     }
 
     private static UIElement CreateMaterialInteractionWorkbenchSample()
@@ -495,6 +619,7 @@ internal sealed class GalleryInteractionPage
             "FWScrollViewer" => "<FWScrollViewer VerticalScrollBarVisibility=\"Visible\" IsScrollBarAutoHideEnabled=\"False\" />",
             "FWSwipeControl" => "<FWSwipeControl>\n  <FWSwipeControl.LeftItems>\n    <SwipeItems Mode=\"Reveal\" />\n  </FWSwipeControl.LeftItems>\n</FWSwipeControl>",
             "FWGridSplitter" => "<FWGridSplitter ResizeDirection=\"Columns\" ResizeBehavior=\"PreviousAndNext\" KeyboardIncrement=\"12\" />",
+            "Focus visual styles" => "// Dual-ring focus visual\nvar style = FocusVisualStyles.CreateFluentFocusVisualStyle();\nbutton.FocusVisualStyle = style;",
             _ => "<FWFluentMaterialSurface MaterialKind=\"LiquidGlass\">\n  <FWScrollViewer />\n  <FWSwipeControl />\n  <FWGridSplitter />\n</FWFluentMaterialSurface>"
         };
     }

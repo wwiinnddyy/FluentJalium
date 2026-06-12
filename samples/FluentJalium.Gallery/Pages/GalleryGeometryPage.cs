@@ -73,19 +73,79 @@ internal sealed class GalleryGeometryPage
 
     private static UIElement CreateCornerRadiusScaleSample()
     {
-        return new FWWrapPanel
+        var previewBorder = new FWBorder
         {
-            HorizontalSpacing = 10,
-            VerticalSpacing = 10,
+            Width = 180,
+            Height = 140,
+            Background = ThemeBrush("AccentBrush"),
+            BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = ResourceCornerRadius("ControlCornerRadius", 4),
+            Margin = new Thickness(0, 0, 0, 12),
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
+
+        var radiusLabel = new FWTextBlock
+        {
+            Text = "4 px",
+            FontSize = 14,
+            Foreground = ThemeBrush("TextPrimary"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 8)
+        };
+
+        var slider = new Slider
+        {
+            Minimum = 0,
+            Maximum = 32,
+            Value = 4,
+            Width = 240,
+            Margin = new Thickness(0, 0, 0, 16)
+        };
+        slider.ValueChanged += (s, e) =>
+        {
+            var radius = e.NewValue;
+            previewBorder.CornerRadius = new CornerRadius(radius);
+            radiusLabel.Text = $"{radius:0.##} px";
+        };
+
+        var tokenButtons = new FWWrapPanel
+        {
+            HorizontalSpacing = 8,
+            VerticalSpacing = 8,
+            HorizontalAlignment = HorizontalAlignment.Center,
             Children =
             {
-                CreateRadiusTile(FluentIconRegular.RectangleLandscape24, "Compact", "FluentCompactCornerRadius", "Small focus and in-control surfaces", 126, 72),
-                CreateRadiusTile(FluentIconRegular.ControlButton24, "Control", "ControlCornerRadius", "Buttons, text inputs, and dense commands", 126, 72),
-                CreateRadiusTile(FluentIconRegular.AppGeneric24, "Card", "CardCornerRadius", "Gallery cards and content panels", 126, 72),
-                CreateRadiusTile(FluentIconRegular.BorderOutside24, "Overlay", "OverlayCornerRadius", "Flyouts, menus, and transient layers", 126, 72),
-                CreateRadiusTile(FluentIconRegular.TextBulletListSquare24, "Pill", "FluentPillCornerRadius", "Badges, chips, and compact metadata", 164, 42)
+                CreateRadiusPresetButton("Compact", "FluentCompactCornerRadius", slider, previewBorder, radiusLabel),
+                CreateRadiusPresetButton("Control", "ControlCornerRadius", slider, previewBorder, radiusLabel),
+                CreateRadiusPresetButton("Card", "CardCornerRadius", slider, previewBorder, radiusLabel),
+                CreateRadiusPresetButton("Overlay", "OverlayCornerRadius", slider, previewBorder, radiusLabel)
             }
         };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 0,
+            Children = { previewBorder, radiusLabel, slider, tokenButtons }
+        };
+    }
+
+    private static UIElement CreateRadiusPresetButton(string label, string tokenKey, Slider slider, FWBorder preview, FWTextBlock output)
+    {
+        var button = new FluentJalium.Controls.FWButton
+        {
+            Content = new FWTextBlock { Text = label, FontSize = 12 },
+            Density = FluentJalium.Controls.FWButtonDensity.Compact
+        };
+        button.Click += (s, e) =>
+        {
+            var radius = ResourceCornerRadius(tokenKey, 4).TopLeft;
+            slider.Value = radius;
+            preview.CornerRadius = new CornerRadius(radius);
+            output.Text = $"{radius:0.##} px ({label})";
+        };
+        return button;
     }
 
     private static UIElement CreateStrokeElevationSample()

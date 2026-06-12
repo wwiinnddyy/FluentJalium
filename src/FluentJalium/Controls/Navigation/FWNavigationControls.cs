@@ -252,7 +252,7 @@ public sealed class FWNavigationService
     }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "FWNavigationService routes through registered Page types; public navigation APIs carry the trimming annotation.")]
-    private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
+    private void OnNavigationSelectionChanged(object? sender, FluentNavigationViewSelectionChangedEventArgs e)
     {
         if (_isSynchronizingSelection || e.SelectedItem is not FWNavigationViewItem item)
         {
@@ -267,9 +267,9 @@ public sealed class FWNavigationService
     }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "FWNavigationService routes through registered Page types; public navigation APIs carry the trimming annotation.")]
-    private void OnNavigationBackRequested(object? sender, NavigationViewBackRequestedEventArgs e)
+    private void OnNavigationBackRequested(object? sender, FluentNavigationViewBackRequestedEventArgs e)
     {
-        e.Handled = GoBack();
+        GoBack();
     }
 
     private void OnFrameNavigated(object? sender, NavigationEventArgs e)
@@ -336,7 +336,7 @@ public sealed class FWNavigationService
     {
         if (_navigationView != null && _frame != null)
         {
-            _navigationView.IsBackEnabled = _frame.CanGoBack;
+            _navigationView.CanGoBack = _frame.CanGoBack;
         }
     }
 
@@ -379,17 +379,13 @@ public sealed class FWNavigationService
 }
 
 /// <summary>
-/// FluentJalium NavigationView control.
+/// FluentJalium NavigationView control - now based on our custom FluentNavigationView implementation.
 /// </summary>
-public class FWNavigationView : NavigationView, IFluentJaliumControl
+public class FWNavigationView : FluentNavigationView, IFluentJaliumControl
 {
     public static readonly DependencyProperty DensityProperty =
         DependencyProperty.Register(nameof(Density), typeof(FWNavigationDensity), typeof(FWNavigationView),
             new PropertyMetadata(FWNavigationDensity.Comfortable, OnDensityChanged));
-
-    public static readonly DependencyProperty IsPaneToggleButtonVisibleProperty =
-        DependencyProperty.Register(nameof(IsPaneToggleButtonVisible), typeof(bool), typeof(FWNavigationView),
-            new PropertyMetadata(true));
 
     public FWNavigationView()
     {
@@ -401,36 +397,6 @@ public class FWNavigationView : NavigationView, IFluentJaliumControl
     {
         get => (FWNavigationDensity)GetValue(DensityProperty)!;
         set => SetValue(DensityProperty, value);
-    }
-
-    [DevToolsPropertyCategory(DevToolsPropertyCategory.State)]
-    public bool IsPaneToggleButtonVisible
-    {
-        get => (bool)GetValue(IsPaneToggleButtonVisibleProperty)!;
-        set => SetValue(IsPaneToggleButtonVisibleProperty, value);
-    }
-
-    private Button? _togglePaneButton;
-
-    public override void OnApplyTemplate()
-    {
-        if (_togglePaneButton != null)
-        {
-            _togglePaneButton.Click -= OnTogglePaneButtonClick;
-        }
-
-        base.OnApplyTemplate();
-
-        _togglePaneButton = GetTemplateChild("PART_TogglePaneButton") as Button;
-        if (_togglePaneButton != null)
-        {
-            _togglePaneButton.Click += OnTogglePaneButtonClick;
-        }
-    }
-
-    private void OnTogglePaneButtonClick(object? sender, Jalium.UI.RoutedEventArgs e)
-    {
-        IsPaneOpen = !IsPaneOpen;
     }
 
     internal static (double OpenPaneLength, double CompactPaneLength) GetPaneMetrics(FWNavigationDensity density)
@@ -460,9 +426,9 @@ public class FWNavigationView : NavigationView, IFluentJaliumControl
 }
 
 /// <summary>
-/// FluentJalium NavigationViewItem control.
+/// FluentJalium NavigationViewItem control - now based on our custom FluentNavigationViewItem implementation.
 /// </summary>
-public class FWNavigationViewItem : NavigationViewItem, IFluentJaliumControl
+public class FWNavigationViewItem : FluentNavigationViewItem, IFluentJaliumControl
 {
     public static readonly DependencyProperty RouteKeyProperty =
         DependencyProperty.Register(nameof(RouteKey), typeof(string), typeof(FWNavigationViewItem),

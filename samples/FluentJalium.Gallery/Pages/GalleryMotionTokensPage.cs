@@ -104,16 +104,107 @@ internal sealed class GalleryMotionTokensPage
 
     private static UIElement CreateTransitionRoleSample()
     {
-        return new FWWrapPanel
+        var transitionHost = new FluentJalium.Controls.FWTransitioningContentControl
         {
-            HorizontalSpacing = 10,
-            VerticalSpacing = 10,
+            Width = 280,
+            Height = 160,
+            TransitionProfile = FluentJalium.Controls.FWContentTransitionProfile.Entrance
+        };
+
+        var contentIndex = 0;
+        var modeLabel = new FWTextBlock
+        {
+            Text = "Entrance",
+            FontSize = 14,
+            Foreground = ThemeBrush("TextPrimary"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 0, 0, 8)
+        };
+
+        UIElement CreateDemoContent(int index)
+        {
+            return new FWBorder
+            {
+                Background = index % 2 == 0 ? ThemeBrush("AccentBrush") : ThemeBrush("LayerFillColorDefaultBrush"),
+                BorderBrush = ThemeBrush("ControlElevationBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Child = new FWStackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Spacing = 8,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Children =
+                    {
+                        CreateIcon(FluentIconRegular.Sparkle24, 32, ThemeBrush("TextPrimary")),
+                        new FWTextBlock { Text = $"Content {index + 1}", FontSize = 18, Foreground = ThemeBrush("TextPrimary") }
+                    }
+                }
+            };
+        }
+
+        transitionHost.Content = CreateDemoContent(contentIndex);
+
+        var playButton = new FluentJalium.Controls.FWButton
+        {
+            Content = CreateButtonContent(FluentIconRegular.Play24, "Play"),
+            Margin = new Thickness(0, 12, 0, 0)
+        };
+        playButton.Click += (s, e) =>
+        {
+            contentIndex++;
+            transitionHost.Content = CreateDemoContent(contentIndex);
+        };
+
+        var modeButtons = new FWWrapPanel
+        {
+            HorizontalSpacing = 6,
+            VerticalSpacing = 6,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new Thickness(0, 8, 0, 0),
             Children =
             {
-                CreateTransitionTile(FluentIconRegular.SlideTransition24, nameof(TransitionMode.Crossfade), "Subtle content replacement."),
-                CreateTransitionTile(FluentIconRegular.ArrowRight24, nameof(TransitionMode.SlideLeft), "Directional navigation motion."),
-                CreateTransitionTile(FluentIconRegular.LayerDiagonalSparkle24, nameof(TransitionMode.LiquidMorph), "Material-aware surface morphing."),
-                CreateTransitionTile(FluentIconRegular.Sparkle24, nameof(TransitionMode.SketchReveal), "Expressive reveal for generated or illustrative surfaces.")
+                CreateModeButton("Entrance", FluentJalium.Controls.FWContentTransitionProfile.Entrance, transitionHost, modeLabel),
+                CreateModeButton("DrillIn", FluentJalium.Controls.FWContentTransitionProfile.DrillIn, transitionHost, modeLabel),
+                CreateModeButton("BackNav", FluentJalium.Controls.FWContentTransitionProfile.BackNavigation, transitionHost, modeLabel),
+                CreateModeButton("LiquidMorph", FluentJalium.Controls.FWContentTransitionProfile.LiquidMorph, transitionHost, modeLabel)
+            }
+        };
+
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 0,
+            Children = { transitionHost, modeLabel, playButton, modeButtons }
+        };
+    }
+
+    private static UIElement CreateModeButton(string label, FluentJalium.Controls.FWContentTransitionProfile profile, FluentJalium.Controls.FWTransitioningContentControl host, FWTextBlock output)
+    {
+        var button = new FluentJalium.Controls.FWButton
+        {
+            Content = new FWTextBlock { Text = label, FontSize = 11 },
+            Density = FluentJalium.Controls.FWButtonDensity.Compact
+        };
+        button.Click += (s, e) =>
+        {
+            host.TransitionProfile = profile;
+            output.Text = label;
+        };
+        return button;
+    }
+
+    private static UIElement CreateButtonContent(FluentIconRegular icon, string text)
+    {
+        return new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            Children =
+            {
+                CreateIcon(icon, 14, ThemeBrush("TextPrimary")),
+                new FWTextBlock { Text = text, FontSize = 12, VerticalAlignment = VerticalAlignment.Center }
             }
         };
     }

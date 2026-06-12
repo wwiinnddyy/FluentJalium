@@ -1,9 +1,11 @@
 using System.ComponentModel;
+using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Gallery.Resources;
+using FluentJalium.Gallery.Styles;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -197,7 +199,8 @@ internal sealed class GalleryShell : UserControl
 
         if (homePage != null && groupedPages.Length > 0)
         {
-            navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+            // TODO: Add separator support to FluentNavigationView
+            // navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
         }
 
         foreach (var group in groupedPages)
@@ -222,7 +225,7 @@ internal sealed class GalleryShell : UserControl
 
     private static FWNavigationViewItem CreateNavigationGroupItem(string localizedGroupName, string groupId)
     {
-        return new FWNavigationViewItem
+        var item = new FWNavigationViewItem
         {
             Content = localizedGroupName,
             Icon = CreateIcon(GalleryNavigationGroup.GetIcon(groupId)),
@@ -230,6 +233,7 @@ internal sealed class GalleryShell : UserControl
             SelectsOnInvoked = false,
             Tag = groupId
         };
+        return item;
     }
 
     private FWNavigationViewItem CreateNavigationItem(GalleryPage page)
@@ -424,9 +428,9 @@ internal sealed class GalleryShell : UserControl
         return true;
     }
 
-    private void OnNavigationSelectionChanged(object? sender, NavigationViewSelectionChangedEventArgs e)
+    private void OnNavigationSelectionChanged(object? sender, FluentNavigationViewSelectionChangedEventArgs e)
     {
-        if (e.SelectedItem?.Tag is GalleryPage page)
+        if (e.SelectedItem is FWNavigationViewItem item && item.Tag is GalleryPage page)
         {
             SelectPage(page);
         }

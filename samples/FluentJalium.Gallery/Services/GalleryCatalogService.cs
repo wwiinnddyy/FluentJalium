@@ -61,7 +61,8 @@ internal sealed class GalleryCatalogService
             [PageId("Selectors and Properties")] = () => CreatePageStack(new GallerySelectorsPropertiesPage().CreateContent()),
             [PageId("Data Inspectors")] = () => CreatePageStack(new GalleryDataInspectorsPage().CreateContent()),
             [PageId("Charts")] = () => CreatePageStack(new GalleryChartsPage().CreateContent()),
-            [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent()),
+            // TODO: Re-enable after updating GalleryNavigationPage to work with FluentNavigationView
+            // [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent()),
             [PageId("Window Backdrops")] = () => CreatePageStack(new GalleryWindowBackdropsPage(owner).CreateContent()),
             [PageId("Materials and Effects")] = () => CreatePageStack(new GalleryMaterialsPage().CreateContent()),
             [PageId("Material Primitives")] = () => CreatePageStack(new MaterialsPage().CreateContent()),
