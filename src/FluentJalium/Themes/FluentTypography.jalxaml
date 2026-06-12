@@ -1,7 +1,9 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime">
 
+    <!-- Font Family Tokens -->
     <x:String x:Key="FluentDisplayFontFamily">Segoe UI Variable Display</x:String>
     <x:String x:Key="FluentBodyFontFamily">Segoe UI Variable Text</x:String>
     <x:String x:Key="FluentMonoFontFamily">Cascadia Code</x:String>
@@ -11,15 +13,105 @@
     <x:String x:Key="BodyFontFamily">Segoe UI Variable Text</x:String>
     <x:String x:Key="MonoFontFamily">Cascadia Code</x:String>
 
-    <system:Double x:Key="FluentCaptionFontSize"
-                   xmlns:system="clr-namespace:System;assembly=System.Runtime">12</system:Double>
-    <system:Double x:Key="FluentBodyFontSize"
-                   xmlns:system="clr-namespace:System;assembly=System.Runtime">14</system:Double>
-    <system:Double x:Key="FluentSubtitleFontSize"
-                   xmlns:system="clr-namespace:System;assembly=System.Runtime">20</system:Double>
-    <system:Double x:Key="FluentTitleFontSize"
-                   xmlns:system="clr-namespace:System;assembly=System.Runtime">28</system:Double>
-    <system:Double x:Key="ControlContentThemeFontSize"
-                   xmlns:system="clr-namespace:System;assembly=System.Runtime">14</system:Double>
-</ResourceDictionary>
+    <!-- Font Size Tokens -->
+    <system:Double x:Key="FluentCaptionFontSize">12</system:Double>
+    <system:Double x:Key="FluentBodySmallFontSize">12</system:Double>
+    <system:Double x:Key="FluentBodyFontSize">14</system:Double>
+    <system:Double x:Key="FluentBodyLargeFontSize">18</system:Double>
+    <system:Double x:Key="FluentSubtitleFontSize">20</system:Double>
+    <system:Double x:Key="FluentTitleFontSize">28</system:Double>
+    <system:Double x:Key="FluentTitleLargeFontSize">40</system:Double>
+    <system:Double x:Key="FluentHeaderFontSize">46</system:Double>
+    <system:Double x:Key="FluentDisplayFontSize">68</system:Double>
+    <system:Double x:Key="ControlContentThemeFontSize">14</system:Double>
 
+    <!-- Font Weight Tokens -->
+    <FontWeight x:Key="FluentFontWeightRegular">Normal</FontWeight>
+    <FontWeight x:Key="FluentFontWeightMedium">Medium</FontWeight>
+    <FontWeight x:Key="FluentFontWeightSemiBold">SemiBold</FontWeight>
+    <FontWeight x:Key="FluentFontWeightBold">Bold</FontWeight>
+
+    <!-- Line Height Tokens -->
+    <system:Double x:Key="FluentCaptionLineHeight">16</system:Double>
+    <system:Double x:Key="FluentBodyLineHeight">20</system:Double>
+    <system:Double x:Key="FluentBodyLargeLineHeight">24</system:Double>
+    <system:Double x:Key="FluentSubtitleLineHeight">28</system:Double>
+    <system:Double x:Key="FluentTitleLineHeight">36</system:Double>
+    <system:Double x:Key="FluentTitleLargeLineHeight">52</system:Double>
+    <system:Double x:Key="FluentHeaderLineHeight">56</system:Double>
+    <system:Double x:Key="FluentDisplayLineHeight">92</system:Double>
+
+    <!-- TextBlock Styles -->
+    <Style x:Key="CaptionTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="16" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Regular" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="BodyStrongTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource BodyFontFamily}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="20" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+
+    <Style x:Key="SubtitleTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="28" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}" />
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="36" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="TitleLargeTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}" />
+        <Setter Property="FontSize" Value="40" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="52" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="DisplayTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}" />
+        <Setter Property="FontSize" Value="68" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="92" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="HeaderTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}" />
+        <Setter Property="FontSize" Value="46" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="LineHeight" Value="56" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+</ResourceDictionary>

@@ -9,12 +9,33 @@
     <CornerRadius x:Key="FluentPillCornerRadius">999</CornerRadius>
     <Thickness x:Key="FluentControlBorderThickness">1</Thickness>
     <Thickness x:Key="FluentOverlayBorderThickness">1</Thickness>
-    <x:String x:Key="FluentElevationShadowDepthLow">2</x:String>
-    <x:String x:Key="FluentElevationShadowDepthMedium">4</x:String>
-    <x:String x:Key="FluentElevationShadowDepthHigh">8</x:String>
-    <x:String x:Key="FluentElevationShadowBlurLow">10</x:String>
-    <x:String x:Key="FluentElevationShadowBlurMedium">18</x:String>
-    <x:String x:Key="FluentElevationShadowBlurHigh">28</x:String>
+    <!-- Elevation Shadow Effect Styles -->
+    <Style x:Key="FluentElevationLow" TargetType="Border">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="10" Color="#000000" Direction="270" Opacity="0.18" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="FluentElevationMedium" TargetType="Border">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="4" BlurRadius="18" Color="#000000" Direction="270" Opacity="0.22" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="FluentElevationHigh" TargetType="Border">
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect ShadowDepth="8" BlurRadius="28" Color="#000000" Direction="270" Opacity="0.26" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Standalone DropShadowEffect resources for direct application -->
+    <DropShadowEffect x:Key="FluentShadowLow" ShadowDepth="2" BlurRadius="10" Color="#000000" Direction="270" Opacity="0.18" />
+    <DropShadowEffect x:Key="FluentShadowMedium" ShadowDepth="4" BlurRadius="18" Color="#000000" Direction="270" Opacity="0.22" />
+    <DropShadowEffect x:Key="FluentShadowHigh" ShadowDepth="8" BlurRadius="28" Color="#000000" Direction="270" Opacity="0.26" />
 
     <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
     <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>

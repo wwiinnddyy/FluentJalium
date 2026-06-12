@@ -23,5 +23,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FluentJalium;component/Themes/FluentResources.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/FluentControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentFocusVisual.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/FluentAliases.jalxaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
