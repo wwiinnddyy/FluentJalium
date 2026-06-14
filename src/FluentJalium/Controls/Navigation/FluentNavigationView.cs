@@ -243,8 +243,8 @@ public class FluentNavigationView : Control
 
         _menuItemsPanel.Children.Clear();
 
-        // Update PaneHeader if set
-        if (_paneHeader != null && _paneRoot?.Child is Grid paneGrid)
+        // Update PaneHeader if set and is UIElement
+        if (_paneHeader is UIElement paneHeaderElement && _paneRoot?.Child is Grid paneGrid)
         {
             // Remove old header border if exists
             if (_paneHeaderBorder != null && paneGrid.Children.Contains(_paneHeaderBorder))
@@ -258,10 +258,20 @@ public class FluentNavigationView : Control
             _paneHeaderBorder = new Border
             {
                 Margin = new Thickness(16, 12, 16, 8),
-                Child = _paneHeader as UIElement
+                Child = paneHeaderElement
             };
             Grid.SetRow(_paneHeaderBorder, 1);
             paneGrid.Children.Add(_paneHeaderBorder);
+        }
+        else if (_paneHeaderBorder != null && _paneRoot?.Child is Grid grid)
+        {
+            // Remove old header border if paneHeader is no longer valid
+            if (grid.Children.Contains(_paneHeaderBorder))
+            {
+                _paneHeaderBorder.Child = null;
+                grid.Children.Remove(_paneHeaderBorder);
+                _paneHeaderBorder = null;
+            }
         }
 
         foreach (var item in MenuItems)

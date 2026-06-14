@@ -254,7 +254,7 @@ public sealed class FWNavigationService
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "FWNavigationService routes through registered Page types; public navigation APIs carry the trimming annotation.")]
     private void OnNavigationSelectionChanged(object? sender, FluentNavigationViewSelectionChangedEventArgs e)
     {
-        if (_isSynchronizingSelection || e.SelectedItem is not FWNavigationViewItem item)
+        if (_isSynchronizingSelection || e.SelectedItem is not FluentNavigationViewItem item)
         {
             return;
         }

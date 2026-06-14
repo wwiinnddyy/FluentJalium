@@ -304,21 +304,37 @@ public class FluentNavigationViewItem : Control
 
     private static void OnContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FluentNavigationViewItem item && item._contentTextBlock != null)
+        if (d is FluentNavigationViewItem item && item._contentGrid != null)
         {
+            // Remove any previous custom content from column 1
+            var existingElement = item._contentGrid.Children
+                .OfType<UIElement>()
+                .FirstOrDefault(child => Grid.GetColumn(child) == 1 && child != item._contentTextBlock);
+            
+            if (existingElement != null)
+            {
+                item._contentGrid.Children.Remove(existingElement);
+            }
+
             if (e.NewValue is string text)
             {
+                // Ensure TextBlock is in the grid
+                if (!item._contentGrid.Children.Contains(item._contentTextBlock))
+                {
+                    Grid.SetColumn(item._contentTextBlock, 1);
+                    item._contentGrid.Children.Add(item._contentTextBlock);
+                }
                 item._contentTextBlock.Text = text;
             }
-            else if (e.NewValue is UIElement element)
+            else if (e.NewValue is UIElement element && element != item._contentTextBlock)
             {
-                // Replace text with custom content
-                if (item._contentGrid != null && item._contentTextBlock != null)
+                // Remove TextBlock and add custom content
+                if (item._contentGrid.Children.Contains(item._contentTextBlock))
                 {
                     item._contentGrid.Children.Remove(item._contentTextBlock);
-                    Grid.SetColumn(element, 1);
-                    item._contentGrid.Children.Add(element);
                 }
+                Grid.SetColumn(element, 1);
+                item._contentGrid.Children.Add(element);
             }
         }
     }

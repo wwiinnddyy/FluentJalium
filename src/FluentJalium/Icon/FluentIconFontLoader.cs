@@ -99,24 +99,20 @@ internal static partial class FluentIconFontLoader
     {
         var outputPath = Path.Combine(outputDir, fileName);
 
-        // Skip extraction if the file already exists with the expected size.
-        if (File.Exists(outputPath))
-        {
-            using var existingStream = assembly.GetManifestResourceStream(resourceName);
-            if (existingStream != null && new FileInfo(outputPath).Length == existingStream.Length)
-            {
-                return outputPath;
-            }
-        }
-
-        using var stream = assembly.GetManifestResourceStream(resourceName);
-        if (stream == null)
+        using var resourceStream = assembly.GetManifestResourceStream(resourceName);
+        if (resourceStream == null)
         {
             return null;
         }
 
+        // Skip extraction if the file already exists with the expected size.
+        if (File.Exists(outputPath) && new FileInfo(outputPath).Length == resourceStream.Length)
+        {
+            return outputPath;
+        }
+
         using var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        stream.CopyTo(fileStream);
+        resourceStream.CopyTo(fileStream);
 
         return outputPath;
     }
