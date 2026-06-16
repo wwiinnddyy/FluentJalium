@@ -38,6 +38,38 @@
     <Thickness x:Key="FluentMaterialFlyoutBorderThickness">1</Thickness>
     <Thickness x:Key="FluentMaterialFocusGlassBorderThickness">1</Thickness>
 
+    <!-- Fluent Design elevation (depth) scale. These are geometry tokens that drive
+         Jalium's DropShadowEffect via FWRevealSurface and the FW elevation helpers.
+         The scale mirrors WinUI/FluentAvalonia: None, Resting, Hover, Flyout, Dialog. -->
+    <system:Double x:Key="FluentDepthNoneShadowDepth">0</system:Double>
+    <system:Double x:Key="FluentDepthNoneBlurRadius">0</system:Double>
+    <system:Double x:Key="FluentDepthNoneOpacity">0</system:Double>
+
+    <system:Double x:Key="FluentDepthRestingShadowDepth">2</system:Double>
+    <system:Double x:Key="FluentDepthRestingBlurRadius">8</system:Double>
+    <system:Double x:Key="FluentDepthRestingOpacity">0.12</system:Double>
+
+    <system:Double x:Key="FluentDepthHoverShadowDepth">6</system:Double>
+    <system:Double x:Key="FluentDepthHoverBlurRadius">16</system:Double>
+    <system:Double x:Key="FluentDepthHoverOpacity">0.18</system:Double>
+
+    <system:Double x:Key="FluentDepthFlyoutShadowDepth">8</system:Double>
+    <system:Double x:Key="FluentDepthFlyoutBlurRadius">24</system:Double>
+    <system:Double x:Key="FluentDepthFlyoutOpacity">0.22</system:Double>
+
+    <system:Double x:Key="FluentDepthDialogShadowDepth">16</system:Double>
+    <system:Double x:Key="FluentDepthDialogBlurRadius">40</system:Double>
+    <system:Double x:Key="FluentDepthDialogOpacity">0.28</system:Double>
+
+    <!-- Fluent Reveal (Light pillar) tuning tokens. The accent-tinted edge light
+         ramps with pointer proximity and is rendered with Jalium's OuterGlowEffect. -->
+    <system:Double x:Key="FluentRevealBorderGlowSize">8</system:Double>
+    <system:Double x:Key="FluentRevealHaloGlowSize">18</system:Double>
+    <system:Double x:Key="FluentRevealBorderOpacity">0.55</system:Double>
+    <system:Double x:Key="FluentRevealHaloOpacity">0.65</system:Double>
+    <system:Double x:Key="FluentRevealHaloIntensity">1.2</system:Double>
+    <system:Double x:Key="FluentRevealMotionDurationMs">160</system:Double>
+
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="FluentMaterialMicaTintBrush" Color="#B4145491" />
@@ -55,6 +87,9 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#330078D4" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#12FFFFFF" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#66000000" />
+            <SolidColorBrush x:Key="FluentRevealAccentBrush" Color="#5C0078D4" />
+            <SolidColorBrush x:Key="FluentRevealAmbientBrush" Color="#26FFFFFF" />
+            <SolidColorBrush x:Key="FluentDepthShadowBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#B4145491" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#BE145491" />
             <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FF2C2C2C" />
@@ -80,6 +115,9 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#220078D4" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#0A000000" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#33000000" />
+            <SolidColorBrush x:Key="FluentRevealAccentBrush" Color="#660078D4" />
+            <SolidColorBrush x:Key="FluentRevealAmbientBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="FluentDepthShadowBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#B4F9F9F9" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#BEF2F2F2" />
             <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FFFFFFFF" />
@@ -105,6 +143,9 @@
             <SolidColorBrush x:Key="FluentMaterialRoleBadgeBrush" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="FluentMaterialRoleIconBackgroundBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="FluentMaterialElevationShadowBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="FluentRevealAccentBrush" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="FluentRevealAmbientBrush" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="FluentDepthShadowBrush" Color="#FF000000" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FF000000" />

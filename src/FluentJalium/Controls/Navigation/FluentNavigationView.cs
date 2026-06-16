@@ -258,8 +258,23 @@ public class FluentNavigationView : Control
             _paneHeaderBorder = new Border
             {
                 Margin = new Thickness(16, 12, 16, 8),
-                Child = paneHeaderElement
             };
+
+            // Disconnect paneHeaderElement from its current parent if it has one
+            // This prevents "Must be disconnected from parent Visual" errors
+            if (paneHeaderElement.Parent is Visual oldParent)
+            {
+                if (oldParent is Panel panel)
+                {
+                    panel.Children.Remove(paneHeaderElement);
+                }
+                else if (oldParent is ContentControl cc && cc.Content == paneHeaderElement)
+                {
+                    cc.Content = null;
+                }
+            }
+
+            _paneHeaderBorder.Child = paneHeaderElement;
             Grid.SetRow(_paneHeaderBorder, 1);
             paneGrid.Children.Add(_paneHeaderBorder);
         }
@@ -336,9 +351,16 @@ public class FluentNavigationView : Control
 
     private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FluentNavigationView navView && e.NewValue is FluentNavigationViewItem newItem)
+        if (d is FluentNavigationView navView)
         {
-            newItem.IsSelected = true;
+            if (e.OldValue is FluentNavigationViewItem oldItem)
+            {
+                oldItem.IsSelected = false;
+            }
+            if (e.NewValue is FluentNavigationViewItem newItem)
+            {
+                newItem.IsSelected = true;
+            }
         }
     }
 

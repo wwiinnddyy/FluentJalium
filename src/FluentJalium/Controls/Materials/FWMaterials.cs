@@ -2,6 +2,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Interop;
 using Jalium.UI.Media;
+using Jalium.UI.Media.Effects;
 
 namespace FluentJalium.Controls;
 
@@ -1037,6 +1038,26 @@ public class FWFluentMaterialSurface : Border, IFluentJaliumControl
         return new FrostedGlassEffect((float)BlurRadius, (float)NoiseIntensity, TintColor, (float)TintOpacity);
     }
 
+    /// <summary>
+    /// Applies a Fluent elevation drop shadow derived from the FluentMaterials depth tokens.
+    /// Only runs when no explicit <see cref="UIElement.Effect"/> has been set, so consumer
+    /// overrides and BackdropEffect-driven materials are preserved.
+    /// </summary>
+    protected void ApplyDefaultElevation(FWElevationLevel level)
+    {
+        if (level == FWElevationLevel.None)
+        {
+            return;
+        }
+
+        // Defer until the element tree is realized so consumers that set Effect in
+        // markup or code-behind take precedence over the default elevation.
+        if (Effect is null)
+        {
+            Effect = FWFluentEffects.CreateElevation(level);
+        }
+    }
+
     private static bool IsValidMaterialRole(object? value)
     {
         return value is FWFluentMaterialRole role && Enum.IsDefined(role);
@@ -1121,6 +1142,7 @@ public class FWCardSurface : FWFluentMaterialSurface
     public FWCardSurface()
     {
         UseMaterialRole(FWFluentMaterialRole.Card);
+        ApplyDefaultElevation(FWElevationLevel.Resting);
     }
 }
 
@@ -1132,6 +1154,7 @@ public class FWFlyoutSurface : FWFluentMaterialSurface
     public FWFlyoutSurface()
     {
         UseMaterialRole(FWFluentMaterialRole.Flyout);
+        ApplyDefaultElevation(FWElevationLevel.Flyout);
     }
 }
 
