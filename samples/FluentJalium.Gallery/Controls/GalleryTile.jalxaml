@@ -1,0 +1,42 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Controls.GalleryTile"
+             Width="232"
+             Height="172">
+
+    <fw:FWButton x:Name="Root"
+                 Padding="0"
+                 HorizontalContentAlignment="Stretch"
+                 VerticalContentAlignment="Stretch"
+                 Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+        <Grid RowSpacing="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <fw:FWTextBlock x:Name="GlyphPresenter"
+                            Grid.Row="0"
+                            Text="&#xE8A7;"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="14"
+                            HorizontalAlignment="Right"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <StackPanel Grid.Row="1"
+                        Spacing="4"
+                        VerticalAlignment="Bottom">
+                <TextBlock x:Name="TitlePresenter"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <TextBlock x:Name="CaptionPresenter"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </Grid>
+    </fw:FWButton>
+</UserControl>

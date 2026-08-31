@@ -14,6 +14,7 @@ using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWToggleSwitch = FluentJalium.Controls.FWToggleSwitch;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
+using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -21,11 +22,13 @@ internal sealed class GalleryOverviewPage
 {
     private readonly Action<FluentThemeVariant> _applyTheme;
     private readonly Action<Color> _applyAccent;
+    private readonly Action<string> _navigate;
 
-    public GalleryOverviewPage(Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
+    public GalleryOverviewPage(Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent, Action<string> navigate)
     {
         _applyTheme = applyTheme;
         _applyAccent = applyAccent;
+        _navigate = navigate;
     }
 
     public UIElement CreateContent()
@@ -37,11 +40,51 @@ internal sealed class GalleryOverviewPage
         };
 
         root.Children.Add(CreateHeroBanner());
+        root.Children.Add(CreateQuickLinks());
         root.Children.Add(CreateThemeAndAccentSection());
         root.Children.Add(CreateTypographySection());
         root.Children.Add(CreateMaterialSection());
 
         return root;
+    }
+
+    private UIElement CreateQuickLinks()
+    {
+        (string Id, string Title, string Caption, int Glyph)[] links =
+        [
+            ("allcontrols", "All controls", "Browse every control the library ships", 0xE71D),
+            ("newcontrols", "What's new", "Controls added in the current release", 0xE7C9),
+            ("updatedcontrols", "Recently updated", "Controls that changed recently", 0xE823),
+            ("colors", "Design tokens", "Colour, typography, geometry and motion", 0xE790),
+            ("textinput", "Text input", "Text, password, number and autosuggest", 0xE8D2),
+            ("settings", "Settings", "Theme, accent colour and navigation mode", 0xE713)
+        ];
+
+        var strip = new FWStackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 12
+        };
+
+        foreach (var link in links)
+        {
+            var target = link.Id;
+            var tile = new GalleryTile
+            {
+                Title = link.Title,
+                Caption = link.Caption,
+                Glyph = char.ConvertFromUtf32(link.Glyph)
+            };
+            tile.Activated += (_, _) => _navigate(target);
+            strip.Children.Add(tile);
+        }
+
+        return new FWScrollViewer
+        {
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            Content = strip
+        };
     }
 
     private UIElement CreateHeroBanner()

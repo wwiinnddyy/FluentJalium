@@ -75,7 +75,7 @@ internal sealed class GalleryShell : UserControl
 
     public void RefreshTheme()
     {
-        _pages = _catalogService.CreatePages(_owner, _applyTheme, _applyAccent);
+        _pages = _catalogService.CreatePages(_owner, _applyTheme, _applyAccent, NavigateByUniqueId);
 
         if (_navigationView != null)
         {
@@ -101,7 +101,7 @@ internal sealed class GalleryShell : UserControl
 
     private UIElement BuildShell()
     {
-        _pages = _catalogService.CreatePages(_owner, _applyTheme, _applyAccent);
+        _pages = _catalogService.CreatePages(_owner, _applyTheme, _applyAccent, NavigateByUniqueId);
         _frame = new FWFrame
         {
             CacheSize = 1,
@@ -366,6 +366,15 @@ internal sealed class GalleryShell : UserControl
 
         _navigationSearchText = searchText;
         RefreshNavigationForSearch();
+    }
+
+    private void NavigateByUniqueId(string uniqueId)
+    {
+        var page = _pages.FirstOrDefault(candidate => string.Equals(candidate.UniqueId, uniqueId, StringComparison.Ordinal));
+        if (page != null)
+        {
+            NavigateToPage(page);
+        }
     }
 
     private void NavigateToPage(GalleryPage page)

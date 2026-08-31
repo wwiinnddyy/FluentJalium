@@ -9,18 +9,18 @@ namespace FluentJalium.Gallery.Services;
 
 internal sealed class GalleryCatalogService
 {
-    public GalleryPage[] CreatePages(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
+    public GalleryPage[] CreatePages(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent, Action<string> navigate)
     {
         var localization = new GalleryLocalizationService();
         var pageInfos = GalleryCatalog.CreatePageInfos(localization);
-        return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent, pageInfos));
+        return GalleryCatalog.Create(localization, CreateContentFactories(owner, applyTheme, applyAccent, navigate, pageInfos));
     }
 
-    public string[] CreateRegisteredPageIds(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent)
+    public string[] CreateRegisteredPageIds(Window owner, Action<FluentThemeVariant> applyTheme, Action<Color> applyAccent, Action<string> navigate)
     {
         var localization = new GalleryLocalizationService();
         var pageInfos = GalleryCatalog.CreatePageInfos(localization);
-        return CreateContentFactories(owner, applyTheme, applyAccent, pageInfos)
+        return CreateContentFactories(owner, applyTheme, applyAccent, navigate, pageInfos)
             .Keys
             .Order(StringComparer.Ordinal)
             .ToArray();
@@ -30,11 +30,12 @@ internal sealed class GalleryCatalogService
         Window owner,
         Action<FluentThemeVariant> applyTheme,
         Action<Color> applyAccent,
+        Action<string> navigate,
         GalleryPageInfo[] pageInfos)
     {
         var factories = new Dictionary<string, Func<UIElement>>(StringComparer.Ordinal)
         {
-            [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent).CreateContent()),
+            [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent, navigate).CreateContent()),
             [PageId("All Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.AllControls, pageInfos).CreateContent()),
             [PageId("New Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.New, pageInfos).CreateContent()),
             [PageId("Updated Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Updated, pageInfos).CreateContent()),
