@@ -16,7 +16,9 @@ public sealed class GalleryHomeTilesTests
     [Fact]
     public void OverviewPage_ShouldOfferQuickLinkTilesUnderTheHero()
     {
+        ResetApplicationState();
         var app = new Application();
+        Jalium.UI.Controls.Themes.ThemeManager.Initialize(app);
         FluentThemeManager.Apply(app);
 
         var navigated = new List<string>();
@@ -33,6 +35,14 @@ public sealed class GalleryHomeTilesTests
 
         tiles[0].Invoke();
         Assert.Single(navigated);
+    }
+
+    private static void ResetApplicationState()
+    {
+        var flags = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+        typeof(Application).GetField("_current", flags)?.SetValue(null, null);
+        typeof(Jalium.UI.Controls.Themes.ThemeManager).GetMethod("Reset", flags)?.Invoke(null, null);
+        typeof(FluentThemeManager).GetMethod("Reset", flags)?.Invoke(null, null);
     }
 
     private static IEnumerable<DependencyObject> Walk(DependencyObject node)
