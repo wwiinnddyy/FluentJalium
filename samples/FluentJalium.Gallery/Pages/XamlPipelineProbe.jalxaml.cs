@@ -21,18 +21,32 @@ public sealed partial class XamlPipelineProbe : Page
         ProbeLightButton.Click += (_, _) =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            ReportResolvedTheme();
+            ReportLiveTheme();
         };
         ProbeDarkButton.Click += (_, _) =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            ReportResolvedTheme();
+            ReportLiveTheme();
         };
+
+        Loaded += (_, _) => ReportLiveTheme();
     }
 
-    private void ReportResolvedTheme()
+    private void ReportLiveTheme()
     {
-        var brush = Application.Current?.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
-        ProbeStatus.Text = $"{FluentThemeManager.CurrentTheme} resolved={brush?.Color.ToString() ?? "<null>"}";
+        var before = ToHex(ProbeTitle.Foreground);
+
+        FluentThemeManager.ApplyTheme(
+            FluentThemeManager.CurrentTheme == FluentThemeVariant.Dark
+                ? FluentThemeVariant.Light
+                : FluentThemeVariant.Dark);
+
+        var after = ToHex(ProbeTitle.Foreground);
+        ProbeStatus.Text = $"live {before} -> {after} ({FluentThemeManager.CurrentTheme})";
     }
+
+    private static string ToHex(Brush? brush) =>
+        brush is SolidColorBrush solid
+            ? $"#{solid.Color.A:X2}{solid.Color.R:X2}{solid.Color.G:X2}{solid.Color.B:X2}"
+            : "<null>";
 }

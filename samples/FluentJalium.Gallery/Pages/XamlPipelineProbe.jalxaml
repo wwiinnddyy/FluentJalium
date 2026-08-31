@@ -5,7 +5,7 @@
       Title="XAML Pipeline Probe">
 
     <StackPanel Margin="36" Spacing="12">
-        <TextBlock Text="TitleTextBlockStyle + ThemeResource"
+        <TextBlock x:Name="ProbeTitle" Text="TitleTextBlockStyle + ThemeResource"
                    Style="{StaticResource TitleTextBlockStyle}"
                    Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
         <TextBlock Text="BodyTextBlockStyle + secondary text"
