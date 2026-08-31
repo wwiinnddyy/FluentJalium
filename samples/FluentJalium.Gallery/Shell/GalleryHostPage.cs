@@ -60,7 +60,7 @@ internal sealed class GalleryHostPage : Page
     {
         var scrollViewer = new FWScrollViewer
         {
-            Background = Brushes.Transparent,
+            Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
             Padding = new Thickness(0),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
