@@ -4,7 +4,7 @@
       x:Class="FluentJalium.Gallery.Pages.XamlPipelineProbe"
       Title="XAML Pipeline Probe">
 
-    <StackPanel Margin="36" Spacing="12">
+    <StackPanel x:Name="ProbeRoot" Width="1120" Margin="36" Spacing="12">
         <TextBlock x:Name="ProbeTitle" Text="TitleTextBlockStyle + ThemeResource"
                    Style="{StaticResource TitleTextBlockStyle}"
                    Foreground="{ThemeResource TextFillColorPrimaryBrush}" />

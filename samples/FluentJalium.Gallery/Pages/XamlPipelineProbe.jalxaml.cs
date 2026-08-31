@@ -1,3 +1,4 @@
+using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -30,6 +31,43 @@ public sealed partial class XamlPipelineProbe : Page
         };
 
         Loaded += (_, _) => ReportLiveTheme();
+
+        BuildExampleCard();
+    }
+
+    private void BuildExampleCard()
+    {
+        var clicks = 0;
+        var output = new TextBlock { Text = "Ready" };
+        var sample = new FWButton { Content = "Click me" };
+        sample.Click += (_, _) => output.Text = $"Clicked {++clicks} time(s)";
+
+        var options = new StackPanel { Spacing = 8, MinWidth = 180 };
+        options.Children.Add(new TextBlock { Text = "Actions" });
+        var reset = new FWButton { Content = "Reset" };
+        reset.Click += (_, _) =>
+        {
+            clicks = 0;
+            output.Text = "Ready";
+        };
+        options.Children.Add(reset);
+
+        ProbeRoot.Children.Add(new FluentJalium.Gallery.Controls.ControlExample
+        {
+            HeaderText = "Counter",
+            Example = sample,
+            Output = output,
+            Options = options,
+            XamlCode = """
+                <Button Content="Click me" Click="OnSampleClick" />
+                """,
+            CSharpCode = """
+                private void OnSampleClick(object sender, RoutedEventArgs e)
+                {
+                    Output.Text = $"Clicked {++_clicks} time(s)";
+                }
+                """
+        });
     }
 
     private void ReportLiveTheme()

@@ -17,7 +17,7 @@ internal static class Program
 
         if (args.Contains("--poc", StringComparer.Ordinal))
         {
-            app.Run(new Window { Title = "XAML Pipeline Probe", Width = 900, Height = 600, Content = new XamlPipelineProbe() });
+            app.Run(new Window { Title = "XAML Pipeline Probe", Width = 1240, Height = 860, Content = new XamlPipelineProbe() });
             return;
         }
 
