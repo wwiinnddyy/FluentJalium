@@ -3,30 +3,14 @@
     xmlns:fluent="https://jalium.dev/fluent"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- Image is not a Control: it has no template and no box properties, so decoration belongs on a wrapping Border. -->
     <Style TargetType="Image">
-        <Setter Property="Background" Value="{ThemeResource ImageBackground}" />
-        <Setter Property="BorderBrush" Value="{ThemeResource ImageBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="0" />
-        <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Stretch" Value="Uniform" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Template">
-            <ControlTemplate TargetType="Image">
-                <Border Name="PART_Container"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
-                        Padding="{TemplateBinding Padding}"
-                        ClipToBounds="True" />
-            </ControlTemplate>
-        </Setter>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.56" />
-                <Setter Property="BorderBrush" Value="{ThemeResource ControlBorderDisabled}" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -36,18 +20,12 @@
     <Style TargetType="fluent:FWBitmapIcon" BasedOn="{StaticResource {x:Type Image}}">
         <Setter Property="Width" Value="20" />
         <Setter Property="Height" Value="20" />
-        <Setter Property="Stretch" Value="Uniform" />
         <Setter Property="ShowAsMonochrome" Value="True" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style TargetType="fluent:FWImageIcon" BasedOn="{StaticResource {x:Type Image}}">
         <Setter Property="Width" Value="20" />
         <Setter Property="Height" Value="20" />
-        <Setter Property="Stretch" Value="Uniform" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
     </Style>
 
     <Style TargetType="fluent:FWPersonPicture">

@@ -546,6 +546,16 @@
             <!-- Layer On Acrylic -->
             <Color x:Key="LayerOnAcrylicFillColorDefault">#09FFFFFF</Color>
             <SolidColorBrush x:Key="LayerOnAcrylicFillColorDefaultBrush" Color="#09FFFFFF" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF9CC3E5" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFDEDEDE" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FF333333" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FF202020" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -1091,6 +1101,16 @@
             <!-- Layer On Acrylic -->
             <Color x:Key="LayerOnAcrylicFillColorDefault">#40FFFFFF</Color>
             <SolidColorBrush x:Key="LayerOnAcrylicFillColorDefaultBrush" Color="#40FFFFFF" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF003E92" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF00154F" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFEBEBEB" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FFF3F3F3" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -1549,6 +1569,17 @@
             <Color x:Key="FocusStrokeColorInner">#FF000000</Color>
             <SolidColorBrush x:Key="FocusStrokeColorOuterBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FocusStrokeColorInnerBrush" Color="#FF000000" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). HighContrast mirrors Dark until
+                 SystemColor* resources are reachable from a Jalium theme dictionary. -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B3000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF1AEBFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FFC7EFFF" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FF000000" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>
