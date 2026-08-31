@@ -67,7 +67,7 @@ internal sealed class GalleryShell : UserControl
 
         _owner.SizeChanged += OnOwnerSizeChanged;
 
-        if (GalleryFirstRunService.Instance.IsFirstRun)
+        if (System.Environment.GetEnvironmentVariable("FJ_NO_TIP") != "1" && GalleryFirstRunService.Instance.IsFirstRun)
         {
             Loaded += (_, _) => ShowFirstRunTip();
         }
