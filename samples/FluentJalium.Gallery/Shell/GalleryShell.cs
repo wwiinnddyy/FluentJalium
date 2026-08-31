@@ -82,8 +82,9 @@ internal sealed class GalleryShell : UserControl
             _navigationView.Background = new SolidColorBrush(Colors.Transparent);
             _navigationView.PaneBackground = GalleryThemeResources.Brush("FluentMaterialShellPaneBrush");
             _navigationView.ContentBackground = new SolidColorBrush(Colors.Transparent);
-            _navigationView.PaneHeader = CreatePaneHeader();
-            _navigationView.Content = CreateContentHost();
+
+            // PaneHeader and the content host are built once: re-assigning Content left the
+            // previous host in the tree, so the page rendered twice.
             PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
         }
 
@@ -439,6 +440,13 @@ internal sealed class GalleryShell : UserControl
 
     private void SelectPage(GalleryPage page)
     {
+        // Setting SelectedItem re-enters here through SelectionChanged; navigating again would
+        // leave the frame's cached page and the new one both on screen.
+        if (ReferenceEquals(_selectedPage, page))
+        {
+            return;
+        }
+
         _selectedPage = page;
         GalleryRecentSamplesService.Instance.RecordVisit(page);
         _frame?.Navigate(typeof(GalleryHostPage), page);
@@ -451,7 +459,7 @@ internal sealed class GalleryShell : UserControl
 
     private void OnFrameNavigated(object? sender, NavigationEventArgs e)
     {
-        if (e.Content is GalleryItemPage itemPage)
+        if (e.Content is GalleryItemHostPage itemPage)
         {
             itemPage.ApplyNavigationParameter(e.ExtraData);
         }

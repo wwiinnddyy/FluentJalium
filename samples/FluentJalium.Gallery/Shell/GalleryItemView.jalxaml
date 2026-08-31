@@ -1,7 +1,7 @@
-<Page xmlns="http://schemas.jalium.ui/2024"
+<UserControl xmlns="http://schemas.jalium.ui/2024"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
-      x:Class="FluentJalium.Gallery.Shell.GalleryItemPage">
+      x:Class="FluentJalium.Gallery.Shell.GalleryItemView">
 
     <fw:FWScrollViewer HorizontalScrollBarVisibility="Disabled"
                        VerticalScrollBarVisibility="Auto">
@@ -61,4 +61,4 @@
             </fw:FWExpander>
         </StackPanel>
     </fw:FWScrollViewer>
-</Page>
+</UserControl>

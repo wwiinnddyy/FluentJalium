@@ -9,9 +9,9 @@ namespace FluentJalium.Gallery.Shell;
 /// <summary>
 /// WinUI Gallery's item-page layout: page header, description, sample content, and metadata.
 /// </summary>
-public sealed partial class GalleryItemPage : Page
+public sealed partial class GalleryItemView : UserControl
 {
-    public GalleryItemPage()
+    public GalleryItemView()
     {
         InitializeComponent();
 
