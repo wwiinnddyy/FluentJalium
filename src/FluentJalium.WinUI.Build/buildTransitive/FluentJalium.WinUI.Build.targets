@@ -1,0 +1,75 @@
+<Project>
+  <!--
+    Makes an app's existing WinUI .xaml files visible to Jalium's markup compiler.
+
+    Why this exists: the Jalium source generator filters its inputs on the literal file
+    extension (JalxamlSourceGenerator.cs: `file.Path.EndsWith(".jalxaml")`) and the default
+    item glob is `**\*.jalxaml`. Nothing else in the toolchain can be pointed at a .xaml
+    without an upstream change, so the only available lever is to hand the generator a copy
+    that is named the way it expects.
+
+    The copies live under $(JalxamlRazorIntermediateOutputPath) on purpose. That is the one
+    location PrepareJalxamlForSourceGenerator knows how to make relative (targets:160/170),
+    so each item gets a correct JalxamlSourceRelativePath even though the file on disk has
+    moved — without that, generated resource names come out as obj.Debug.net10.0.... paths.
+    FilterGeneratedJalxamlInputs (targets:116) does not strip them, because it only removes
+    items whose DefiningProjectName is Jalium.UI.Build.
+  -->
+
+  <PropertyGroup>
+    <UseFluentJaliumWinUI Condition="'$(UseFluentJaliumWinUI)' == ''">true</UseFluentJaliumWinUI>
+  </PropertyGroup>
+
+  <!--
+    Code-behind name bridge.
+
+    WinUI code-behind writes `RoutedEventArgs`, `DependencyObject`, ... under
+    `using Microsoft.UI.Xaml;`. Those cannot be mirrored as real types in that namespace the way
+    Page/UserControl are: a subclass would not match Jalium's `RoutedEventHandler` signature, so
+    `Click="Button_Click"` would stop compiling. A global using alias points the simple name at
+    Jalium's actual type instead, which is what the handler has to be.
+
+    Only names the facade does NOT mirror as real types may appear here. Alias `UserControl`
+    while `Microsoft.UI.Xaml.Controls.UserControl` also exists and the two become ambiguous.
+  -->
+  <ItemGroup Condition="'$(UseFluentJaliumWinUI)' == 'true' and '$(ImplicitUsings)' == 'enable'">
+    <Using Include="Jalium.UI.DependencyObject" Alias="DependencyObject" />
+    <Using Include="Jalium.UI.DependencyProperty" Alias="DependencyProperty" />
+    <Using Include="Jalium.UI.RoutedEventArgs" Alias="RoutedEventArgs" />
+    <Using Include="Jalium.UI.RoutedEventHandler" Alias="RoutedEventHandler" />
+    <Using Include="Jalium.UI.UIElement" Alias="UIElement" />
+    <Using Include="Jalium.UI.FrameworkElement" Alias="FrameworkElement" />
+    <Using Include="Jalium.UI.Visibility" Alias="Visibility" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseFluentJaliumWinUI)' == 'true' and '$(EnableDefaultWinUiXamlItems)' != 'false'">
+    <WinUiXamlPage Include="**\*.xaml" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+  </ItemGroup>
+
+  <Target Name="MaterializeWinUiXaml"
+          BeforeTargets="ResolveEffectiveJalxamlSources;FilterGeneratedJalxamlInputs"
+          Condition="'$(UseFluentJaliumWinUI)' == 'true' and '@(WinUiXamlPage)' != ''">
+
+    <PropertyGroup>
+      <!-- Resolved at execution time: whether Jalium.UI.Build.targets has assigned these yet
+           depends on package import order, which is not stable. -->
+      <_FluentJaliumWinUiXamlRoot Condition="'$(JalxamlRazorIntermediateOutputPath)' != ''">$(JalxamlRazorIntermediateOutputPath)</_FluentJaliumWinUiXamlRoot>
+      <_FluentJaliumWinUiXamlRoot Condition="'$(_FluentJaliumWinUiXamlRoot)' == ''">$(JalxamlIntermediateOutputPath)WinUiXaml\</_FluentJaliumWinUiXamlRoot>
+      <_FluentJaliumWinUiXamlRoot Condition="'$(_FluentJaliumWinUiXamlRoot)' == ''">$(MSBuildProjectExtensionsPath)Jalxaml\WinUiXaml\</_FluentJaliumWinUiXamlRoot>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_FluentJaliumWinUiXamlRoot)" />
+
+    <Copy SourceFiles="@(WinUiXamlPage)"
+          DestinationFiles="@(WinUiXamlPage->'$(_FluentJaliumWinUiXamlRoot)%(RecursiveDir)%(Filename).jalxaml')"
+          SkipUnchangedFiles="true"
+          OverwriteReadOnlyFiles="true" />
+
+    <ItemGroup>
+      <JalxamlPage Include="@(WinUiXamlPage->'$(_FluentJaliumWinUiXamlRoot)%(RecursiveDir)%(Filename).jalxaml')" />
+    </ItemGroup>
+
+    <Message Importance="low"
+             Text="FluentJalium.WinUI: materialised @(WinUiXamlPage->Count()) WinUI .xaml file(s) as JALXAML under $(_FluentJaliumWinUiXamlRoot)" />
+  </Target>
+</Project>

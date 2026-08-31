@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Coverage probe: every .xaml / .xaml.cs here is a byte-for-byte copy out of the WinUI Gallery.
+    Nothing is edited. Building this project measures how far "unchanged WinUI markup" actually
+    gets, and the compiler errors are the honest answer rather than an estimate.
+  -->
+  <Import Project="..\..\src\FluentJalium.WinUI.Build\buildTransitive\FluentJalium.WinUI.Build.props" />
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>FluentJalium.WinUI.Probe</RootNamespace>
+    <AssemblyName>FluentJalium.WinUI.Probe</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FluentJalium.WinUI\FluentJalium.WinUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\FluentJalium.WinUI.Build\buildTransitive\FluentJalium.WinUI.Build.targets" />
+
+</Project>

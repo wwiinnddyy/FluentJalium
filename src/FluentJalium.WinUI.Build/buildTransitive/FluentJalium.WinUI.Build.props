@@ -1,0 +1,28 @@
+<Project>
+  <!--
+    Import-time defaults for the WinUI compatibility layer.
+
+    Set here (not in the .targets) because Jalium.UI.Build.targets only assigns these
+    properties when they are still empty; anything we want to pin has to be visible before
+    that file evaluates. Every one of them stays overridable by setting UseFluentJaliumWinUI=false.
+  -->
+  <PropertyGroup>
+    <!-- Referencing the package is the opt-in. Set <UseFluentJaliumWinUI>false</UseFluentJaliumWinUI>
+         in the app to go back to plain Jalium behaviour while keeping the package referenced. -->
+    <UseFluentJaliumWinUI Condition="'$(UseFluentJaliumWinUI)' == ''">true</UseFluentJaliumWinUI>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseFluentJaliumWinUI)' == 'true'">
+    <!-- The app authors WinUI .xaml, not .jalxaml. Jalium's default glob would find nothing, and
+         anything it did find would be compiled twice alongside our materialised copies. -->
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+
+    <!-- WinUI markup contains no Razor directives; the transform only adds a rewrite step whose
+         output location this package has to route around. -->
+    <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
+
+    <!-- The .uic / ApplyBundle path does not wire up x:Name named elements, so code-behind that
+         touches a named control throws NullReferenceException. Keep the source generator path. -->
+    <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
+  </PropertyGroup>
+</Project>
