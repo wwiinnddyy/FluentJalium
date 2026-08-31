@@ -5,6 +5,7 @@ using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Pages;
+using SimulatedKeyboard = FluentJalium.Gallery.Controls.SimulatedKeyboard;
 using Jalium.UI;
 using Jalium.UI.Automation;
 using Jalium.UI.Controls;
@@ -14,6 +15,8 @@ using Jalium.UI.Documents;
 using Jalium.UI.Input;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using Jalium.UI.Automation.Peers;
+using Jalium.UI.Automation.Provider;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 using ICommand = System.Windows.Input.ICommand;
 
@@ -495,7 +498,7 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.True(dialog.RequestDefaultButtonClick());
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Secondary, result);
         Assert.Equal(FWTaskDialogResult.Secondary, dialog.Result);
@@ -526,7 +529,7 @@ public sealed class FluentDisclosureControlsTests
 
         cancellation.Cancel();
 
-        var result = await firstShowTask;
+        var result = await DispatcherPump.Run(firstShowTask);
 
         Assert.Equal(FWTaskDialogResult.Close, result);
         Assert.Equal(FWTaskDialogResult.Close, dialog.Result);
@@ -569,7 +572,7 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.True(dialog.RequestPrimaryButtonClick());
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Primary, result);
         Assert.Equal(FWTaskDialogResult.Primary, dialog.Result);
@@ -600,16 +603,10 @@ public sealed class FluentDisclosureControlsTests
         dialog.SecondaryButtonClick += (_, args) => secondaryClick = args;
 
         var showTask = dialog.ShowAsync();
-        var args = new Jalium.UI.Input.KeyEventArgs(
-            UIElement.KeyDownEvent,
-            Jalium.UI.Input.Key.Escape,
-            Jalium.UI.Input.ModifierKeys.None,
-            isDown: true,
-            isRepeat: false,
-            timestamp: 0);
+        var args = SimulatedKeyboard.CreateKeyDown(Key.Escape);
 
         dialog.RaiseEvent(args);
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.True(args.Handled);
         Assert.Equal(FWTaskDialogResult.Secondary, result);
@@ -703,7 +700,7 @@ public sealed class FluentDisclosureControlsTests
         Assert.Equal("The current profile will be updated.", peer.GetHelpText());
 
         Assert.True(dialog.RequestPrimaryButtonClick());
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Primary, result);
         Assert.Equal(nameof(FWTaskDialogHost), peer.GetName());
@@ -740,7 +737,7 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.True(dialog.RequestPrimaryButtonClick());
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Primary, result);
         Assert.False(host.IsOpen);
@@ -785,7 +782,7 @@ public sealed class FluentDisclosureControlsTests
 
         Assert.True(host.RequestLightDismiss());
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Close, result);
         Assert.False(host.IsOpen);
@@ -811,13 +808,7 @@ public sealed class FluentDisclosureControlsTests
             SecondaryButtonCommandParameter = "archive"
         };
         var showTask = host.ShowAsync(dialog);
-        var tabArgs = new KeyEventArgs(
-            UIElement.KeyDownEvent,
-            Key.Tab,
-            ModifierKeys.None,
-            isDown: true,
-            isRepeat: false,
-            timestamp: 0);
+        var tabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab);
 
         host.RaiseEvent(tabArgs);
 
@@ -827,17 +818,11 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(host.IsOpen);
         Assert.Same(dialog, host.CurrentDialog);
 
-        var escapeArgs = new KeyEventArgs(
-            UIElement.KeyDownEvent,
-            Key.Escape,
-            ModifierKeys.None,
-            isDown: true,
-            isRepeat: false,
-            timestamp: 0);
+        var escapeArgs = SimulatedKeyboard.CreateKeyDown(Key.Escape);
 
         host.RaiseEvent(escapeArgs);
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.True(escapeArgs.Handled);
         Assert.Equal(FWTaskDialogHostKeyboardRequest.EscapeCancel, host.GetDiagnostics().LastKeyboardRequest);
@@ -891,13 +876,7 @@ public sealed class FluentDisclosureControlsTests
 
             Assert.Equal(FWTaskDialogButton.Primary, dialog.LastFocusTarget);
 
-            var tabArgs = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                Key.Tab,
-                ModifierKeys.None,
-                isDown: true,
-                isRepeat: false,
-                timestamp: 0);
+            var tabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab);
 
             host.RaiseEvent(tabArgs);
 
@@ -906,13 +885,7 @@ public sealed class FluentDisclosureControlsTests
             Assert.Same(contentTextBox, focusProvider.FocusedElement);
             Assert.Equal(FWTaskDialogButton.None, dialog.LastFocusTarget);
 
-            var shiftTabArgs = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                Key.Tab,
-                ModifierKeys.Shift,
-                isDown: true,
-                isRepeat: false,
-                timestamp: 0);
+            var shiftTabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab, ModifierKeys.Shift);
 
             host.RaiseEvent(shiftTabArgs);
 
@@ -923,7 +896,7 @@ public sealed class FluentDisclosureControlsTests
             Assert.Equal("CloseButton", AutomationProperties.GetAutomationId(focusedCloseButton));
 
             Assert.True(dialog.RequestCloseButtonClick());
-            var result = await showTask;
+            var result = await DispatcherPump.Run(showTask);
 
             Assert.Equal(FWTaskDialogResult.Close, result);
         }
@@ -1007,13 +980,7 @@ public sealed class FluentDisclosureControlsTests
             Assert.Equal("PrimaryButton", AutomationProperties.GetAutomationId(focusedDefaultButton));
             Assert.Equal(FWTaskDialogButton.Primary, dialog.LastFocusTarget);
 
-            var tabArgs = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                Key.Tab,
-                ModifierKeys.None,
-                isDown: true,
-                isRepeat: false,
-                timestamp: 0);
+            var tabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab);
 
             host.RaiseEvent(tabArgs);
 
@@ -1039,16 +1006,10 @@ public sealed class FluentDisclosureControlsTests
             Assert.True(snapshot.HasRootWindowClippingGuard);
             Assert.True(snapshot.IsRootWindowSmokeReady);
 
-            var escapeArgs = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                Key.Escape,
-                ModifierKeys.None,
-                isDown: true,
-                isRepeat: false,
-                timestamp: 0);
+            var escapeArgs = SimulatedKeyboard.CreateKeyDown(Key.Escape);
 
             host.RaiseEvent(escapeArgs);
-            var result = await showTask;
+            var result = await DispatcherPump.Run(showTask);
 
             Assert.True(escapeArgs.Handled);
             Assert.Equal(FWTaskDialogResult.Close, result);
@@ -1096,13 +1057,7 @@ public sealed class FluentDisclosureControlsTests
             _ = host.ShowAsync(otherDialog);
         });
 
-        var shiftTabArgs = new KeyEventArgs(
-            UIElement.KeyDownEvent,
-            Key.Tab,
-            ModifierKeys.Shift,
-            isDown: true,
-            isRepeat: false,
-            timestamp: 0);
+        var shiftTabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab, ModifierKeys.Shift);
 
         host.RaiseEvent(shiftTabArgs);
 
@@ -1117,13 +1072,7 @@ public sealed class FluentDisclosureControlsTests
         Assert.False(diagnostics.HasFocusRestoreTarget);
 
         host.IsFocusTrapEnabled = true;
-        var tabArgs = new KeyEventArgs(
-            UIElement.KeyDownEvent,
-            Key.Tab,
-            ModifierKeys.None,
-            isDown: true,
-            isRepeat: false,
-            timestamp: 0);
+        var tabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab);
 
         host.RaiseEvent(tabArgs);
 
@@ -1132,7 +1081,7 @@ public sealed class FluentDisclosureControlsTests
         Assert.True(host.LastKeyboardRequestHandled);
 
         Assert.True(host.Close(FWTaskDialogResult.Close));
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWTaskDialogResult.Close, result);
         Assert.False(host.IsOpen);
@@ -1422,7 +1371,7 @@ public sealed class FluentDisclosureControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private sealed class RecordingCommand : ICommand

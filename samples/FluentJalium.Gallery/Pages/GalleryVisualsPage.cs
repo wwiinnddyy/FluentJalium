@@ -3,6 +3,7 @@ using FluentJalium.Gallery.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using Jalium.UI.Media.Imaging;
 using FWBitmapIcon = FluentJalium.Controls.FWBitmapIcon;
 using FWBorder = FluentJalium.Controls.FWBorder;
 using FWButton = FluentJalium.Controls.FWButton;
@@ -30,7 +31,7 @@ using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWViewbox = FluentJalium.Controls.FWViewbox;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
-using ShapePointCollection = Jalium.UI.Controls.Shapes.PointCollection;
+using ShapePointCollection = Jalium.UI.Media.PointCollection;
 
 namespace FluentJalium.Gallery.Pages;
 
@@ -449,18 +450,31 @@ internal sealed class GalleryVisualsPage
                     }),
                     CreateVisualActionButton(FluentIconRegular.Color24, "Tone", () =>
                     {
-                        if (markdown.CodeBackground == null)
+                        if (markdown.CodeBlockStyle == null)
                         {
                             markdown.LinkForeground = ThemeBrush("AccentBrush");
-                            markdown.CodeBackground = ThemeBrush("SelectionBackgroundWeak");
-                            markdown.QuoteBackground = ThemeBrush("LayerFillColorDefaultBrush");
+                            markdown.CodeBlockStyle = new Style(typeof(MarkdownCodePresenter))
+                            {
+                                Setters =
+                                {
+                                    new Setter(Control.BackgroundProperty, ThemeBrush("SelectionBackgroundWeak")),
+                                    new Setter(MarkdownCodePresenter.GutterBackgroundProperty, ThemeBrush("HighlightBackground"))
+                                }
+                            };
+                            markdown.QuoteStyle = new Style(typeof(MarkdownQuotePresenter))
+                            {
+                                Setters =
+                                {
+                                    new Setter(Control.BackgroundProperty, ThemeBrush("LayerFillColorDefaultBrush"))
+                                }
+                            };
                             output.Text = "Markdown: accent link, code, and quote brushes.";
                         }
                         else
                         {
                             markdown.LinkForeground = null;
-                            markdown.CodeBackground = null;
-                            markdown.QuoteBackground = null;
+                            markdown.CodeBlockStyle = null;
+                            markdown.QuoteStyle = null;
                             output.Text = "Markdown: default code and quote brushes.";
                         }
                     })),
@@ -704,7 +718,7 @@ internal sealed class GalleryVisualsPage
                         polygon.Points = polygon.Points?.Count == 4
                             ? ShapePointCollection.Parse("8,44 28,8 52,22 74,44")
                             : ShapePointCollection.Parse("8,28 28,8 52,8 74,28 60,48 22,48");
-                        path.Data = path.Data.StartsWith("M 4,36", StringComparison.Ordinal)
+                        path.Data = path.Data?.MayHaveCurves() == true
                             ? "M 6,44 L 22,10 L 42,38 L 62,10 L 82,44 Z"
                             : "M 4,36 C 16,6 38,6 48,30 S 74,54 84,20";
                         UpdateShapeOutput("Shape geometry morphed");
@@ -745,7 +759,7 @@ internal sealed class GalleryVisualsPage
             }
         }
 
-        var pathData = path.Data ?? string.Empty;
+        var pathData = path.Data;
         return new GalleryShapeControlsQaSnapshot(
             shapes.Length,
             enabledCount,
@@ -763,8 +777,8 @@ internal sealed class GalleryVisualsPage
             rectangle.RadiusY,
             polyline.Points?.Count ?? 0,
             polygon.Points?.Count ?? 0,
-            !string.IsNullOrWhiteSpace(pathData),
-            pathData.StartsWith("M 4,36", StringComparison.Ordinal) ? "curve" : "polygon");
+            pathData is { } geometry && !geometry.IsEmpty(),
+            pathData?.MayHaveCurves() == true ? "curve" : "polygon");
     }
 
     internal static string FormatShapeControlsVisualQa(string action, GalleryShapeControlsQaSnapshot snapshot)

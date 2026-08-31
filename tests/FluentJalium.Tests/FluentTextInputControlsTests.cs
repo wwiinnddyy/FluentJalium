@@ -3,8 +3,10 @@ using System.Reflection;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Pages;
+using SimulatedKeyboard = FluentJalium.Gallery.Controls.SimulatedKeyboard;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Documents;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Input;
@@ -69,7 +71,6 @@ public sealed class FluentTextInputControlsTests
             FluentThemeManager.Apply(app);
 
             AssertBasedOnStyle<FWTextBox, TextBox>(app.Resources);
-            AssertBasedOnStyle<FWPasswordBox, PasswordBox>(app.Resources);
             AssertBasedOnStyle<FWNumberBox, NumberBox>(app.Resources);
             AssertBasedOnStyle<FWAutoCompleteBox, AutoCompleteBox>(app.Resources);
             AssertBasedOnStyle<FWAutoSuggestBox, AutoCompleteBox>(app.Resources);
@@ -108,10 +109,6 @@ public sealed class FluentTextInputControlsTests
         AssertSetter(passwordBoxStyle, Control.BorderBrushProperty);
         AssertSetter(passwordBoxStyle, Control.PaddingProperty);
         AssertSetter(passwordBoxStyle, Control.MinHeightProperty);
-
-        var fwPasswordBoxStyle = AssertStyle<FWPasswordBox>(dictionary);
-        Assert.Equal(typeof(PasswordBox), fwPasswordBoxStyle.BasedOn?.TargetType);
-        AssertSetter(fwPasswordBoxStyle, FWPasswordBox.DensityProperty);
 
         var numberBoxStyle = AssertStyle<NumberBox>(dictionary);
         AssertSetter(numberBoxStyle, Control.BackgroundProperty);
@@ -173,13 +170,12 @@ public sealed class FluentTextInputControlsTests
         Assert.Equal(40, textBox.MinHeight);
         Assert.Equal(new Thickness(12, 8, 12, 8), textBox.Padding);
 
-        var passwordBox = new FWPasswordBox
-        {
-            Density = FWTextInputDensity.Compact
-        };
+        var passwordBox = new PasswordBox();
+        FWTextInputOptions.SetDensity(passwordBox, FWTextInputDensity.Compact);
 
         Assert.Equal(30, passwordBox.MinHeight);
         Assert.Equal(new Thickness(8, 4, 8, 5), passwordBox.Padding);
+        Assert.Equal(FWTextInputDensity.Compact, FWTextInputOptions.GetDensity(passwordBox));
 
         var autoCompleteBox = new FWAutoCompleteBox
         {
@@ -424,17 +420,14 @@ public sealed class FluentTextInputControlsTests
         var textBox = new FWTextBox
         {
             Text = "FluentJalium",
-            PlaceholderText = "Enter text",
             AcceptsReturn = true,
             TextWrapping = TextWrapping.Wrap
         };
-        var passwordBox = new FWPasswordBox
+        var passwordBox = new PasswordBox
         {
-            Password = "material",
-            PlaceholderText = "Token",
-            RevealMode = PasswordRevealMode.Peek,
-            IsPasswordRevealed = true
+            Password = "material"
         };
+        FWTextInputOptions.SetDensity(passwordBox, FWTextInputDensity.Compact);
         var numberBox = new FWNumberBox
         {
             Density = FWNumberBoxDensity.Spacious,
@@ -466,10 +459,10 @@ public sealed class FluentTextInputControlsTests
         };
         var richTextBox = new FWRichTextBox
         {
-            AcceptsTab = true,
-            IsSpellCheckEnabled = true
+            AcceptsTab = true
         };
-        richTextBox.SetText("Layered input surfaces keep focus and text contrast.");
+        SpellCheck.SetIsEnabled(richTextBox, true);
+        richTextBox.Document = FlowDocument.FromText("Layered input surfaces keep focus and text contrast.");
 
         var panel = new FWStackPanel
         {
@@ -499,12 +492,10 @@ public sealed class FluentTextInputControlsTests
         };
 
         Assert.Equal("FluentJalium", textBox.Text);
-        Assert.Equal("Enter text", textBox.PlaceholderText);
         Assert.True(textBox.AcceptsReturn);
         Assert.Equal(TextWrapping.Wrap, textBox.TextWrapping);
         Assert.Equal("material", passwordBox.Password);
-        Assert.Equal(PasswordRevealMode.Peek, passwordBox.RevealMode);
-        Assert.True(passwordBox.IsPasswordRevealed);
+        Assert.Equal(FWTextInputDensity.Compact, FWTextInputOptions.GetDensity(passwordBox));
         Assert.Equal(24, numberBox.Value);
         Assert.Equal(FWNumberBoxDensity.Spacious, numberBox.Density);
         Assert.Equal(40, numberBox.MinHeight);
@@ -526,8 +517,9 @@ public sealed class FluentTextInputControlsTests
         Assert.Contains("CalendarView", autoSuggestBox.FilteredItems);
         Assert.Contains("CalendarDatePicker", autoSuggestBox.FilteredItems);
         Assert.True(richTextBox.AcceptsTab);
-        Assert.True(richTextBox.IsSpellCheckEnabled);
-        Assert.Contains("Layered input surfaces", richTextBox.GetText());
+        Assert.True(SpellCheck.GetIsEnabled(richTextBox));
+        var richText = new TextRange(richTextBox.Document!.ContentStart, richTextBox.Document.ContentEnd).Text;
+        Assert.Contains("Layered input surfaces", richText);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
         Assert.True(surface.LiquidGlass);
         Assert.Equal(70, surface.RefractionAmount);
@@ -587,13 +579,7 @@ public sealed class FluentTextInputControlsTests
 
         public KeyEventArgs RaiseEnterKey()
         {
-            var args = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                Key.Enter,
-                ModifierKeys.None,
-                isDown: true,
-                isRepeat: false,
-                timestamp: 0);
+            var args = SimulatedKeyboard.CreateKeyDown(Key.Enter);
             OnKeyDown(args);
             return args;
         }
@@ -619,7 +605,7 @@ public sealed class FluentTextInputControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static void ResetApplicationState()

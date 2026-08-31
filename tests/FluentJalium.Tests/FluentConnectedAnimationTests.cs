@@ -2,7 +2,7 @@ using FluentJalium.Controls;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media.Animation;
-using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using AnimationDuration = Jalium.UI.Duration;
 
 namespace FluentJalium.Tests;
 

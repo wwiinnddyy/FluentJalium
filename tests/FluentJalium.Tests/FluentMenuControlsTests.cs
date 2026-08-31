@@ -848,7 +848,7 @@ public sealed class FluentMenuControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static TPresenter GetFlyoutPresenter<TPresenter>(FlyoutBase flyout)
@@ -862,8 +862,7 @@ public sealed class FluentMenuControlsTests
     private static void AssertForegroundSetter(Style style)
     {
         Assert.Contains(
-            style.Setters,
-            setter => setter.Property == Control.ForegroundProperty ||
+            style.Setters.OfType<Setter>(), setter => setter.Property == Control.ForegroundProperty ||
                 setter.Property == TextElement.ForegroundProperty);
     }
 

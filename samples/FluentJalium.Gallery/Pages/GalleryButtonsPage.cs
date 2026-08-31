@@ -23,6 +23,7 @@ using FWSeparator = FluentJalium.Controls.FWSeparator;
 using FWSplitButton = FluentJalium.Controls.FWSplitButton;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWToggleSplitButton = FluentJalium.Controls.FWToggleSplitButton;
 using FWToolBar = FluentJalium.Controls.FWToolBar;
 using FWToolBarTray = FluentJalium.Controls.FWToolBarTray;
@@ -134,7 +135,7 @@ internal sealed class GalleryButtonsPage
                     FontWeight = FontWeights.SemiBold,
                     Foreground = ThemeBrush("TextPrimary")
                 },
-                new TextBox
+                new FWTextBox
                 {
                     Text = "112",
                     MinWidth = 140,
@@ -242,7 +243,7 @@ internal sealed class GalleryButtonsPage
                     FontWeight = FontWeights.SemiBold,
                     Foreground = ThemeBrush("TextPrimary")
                 },
-                new TextBox
+                new FWTextBox
                 {
                     Text = "140",
                     MinWidth = 140,

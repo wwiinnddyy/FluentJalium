@@ -10,10 +10,9 @@ namespace FluentJalium.Gallery.Shell;
 
 internal sealed class GallerySearchEmptyPage : Page
 {
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    public void ApplyNavigationParameter(object? parameter)
     {
-        base.OnNavigatedTo(e);
-        Content = CreateSearchEmptyContent(e.Parameter as string ?? string.Empty);
+        Content = CreateSearchEmptyContent(parameter as string ?? string.Empty);
     }
 
     private static UIElement CreateSearchEmptyContent(string searchText)

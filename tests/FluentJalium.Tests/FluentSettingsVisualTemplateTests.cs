@@ -180,7 +180,7 @@ public sealed class FluentSettingsVisualTemplateTests
 
     private static void AssertSetter(Style style, DependencyProperty property, object? expectedValue = null)
     {
-        var setter = Assert.Single(style.Setters, candidate => candidate.Property == property);
+        var setter = Assert.Single(style.Setters.OfType<Setter>(), candidate => candidate.Property == property);
         if (expectedValue != null)
         {
             AssertSetterValue(expectedValue, setter.Value);

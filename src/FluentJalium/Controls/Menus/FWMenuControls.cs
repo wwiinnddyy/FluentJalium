@@ -114,7 +114,7 @@ public class FWMenu : Menu, IFluentJaliumControl
 
     protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
-    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+    protected override bool IsItemItsOwnContainerOverride(object item) => item is MenuItem or Separator;
 
     protected override void PrepareContainerForItem(FrameworkElement element, object item)
     {
@@ -167,7 +167,7 @@ public class FWMenuItem : MenuItem, IFluentJaliumControl
 
     protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
-    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+    protected override bool IsItemItsOwnContainerOverride(object item) => item is MenuItem or Separator;
 
     protected override void PrepareContainerForItem(FrameworkElement element, object item)
     {
@@ -217,7 +217,7 @@ public class FWContextMenu : ContextMenu, IFluentJaliumControl
 
     protected override FrameworkElement GetContainerForItem(object item) => new FWMenuItem { Density = Density };
 
-    protected override bool IsItemItsOwnContainer(object item) => item is MenuItem or Separator;
+    protected override bool IsItemItsOwnContainerOverride(object item) => item is MenuItem or Separator;
 
     protected override void PrepareContainerForItem(FrameworkElement element, object item)
     {

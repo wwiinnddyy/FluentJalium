@@ -455,7 +455,6 @@ public sealed class FluentCommandToolbarTests
             Header = "Document",
             Band = 1,
             BandIndex = 2,
-            Orientation = Orientation.Horizontal,
             IsOverflowOpen = true
         };
         toolBar.Items.Add(save);
@@ -467,6 +466,7 @@ public sealed class FluentCommandToolbarTests
         Assert.Equal("Document", toolBar.Header);
         Assert.Equal(1, toolBar.Band);
         Assert.Equal(2, toolBar.BandIndex);
+        // Orientation is a read-only, tray-driven property as of Jalium.UI 26.10.7.
         Assert.Equal(Orientation.Horizontal, toolBar.Orientation);
         Assert.True(toolBar.IsOverflowOpen);
         Assert.Equal(3, toolBar.Items.Count);
@@ -630,12 +630,12 @@ public sealed class FluentCommandToolbarTests
 
     private static void AssertSetter(Style style, DependencyProperty property, string? propertyName = null)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property || setter.PropertyName == propertyName);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property || setter.PropertyName == propertyName);
     }
 
     private static void AssertSetter(Style style, string propertyName, object? value)
     {
-        Assert.Contains(style.Setters, setter =>
+        Assert.Contains(style.Setters.OfType<Setter>(), setter =>
             (setter.PropertyName == propertyName || setter.Property?.Name == propertyName)
             && SetterValueEquals(setter.Value, value));
     }

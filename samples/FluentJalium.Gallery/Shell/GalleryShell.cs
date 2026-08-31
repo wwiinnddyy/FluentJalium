@@ -10,6 +10,7 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
+using Jalium.UI.Navigation;
 using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
 using FWAutoSuggestBoxTextChangedEventArgs = FluentJalium.Controls.FWAutoSuggestBoxTextChangedEventArgs;
 using FWAutoSuggestBoxSuggestionChosenEventArgs = FluentJalium.Controls.FWAutoSuggestBoxSuggestionChosenEventArgs;
@@ -452,7 +453,12 @@ internal sealed class GalleryShell : UserControl
     {
         if (e.Content is GalleryHostPage hostPage)
         {
-            hostPage.RefreshTheme();
+            hostPage.ApplyNavigationParameter(e.ExtraData);
+        }
+
+        if (e.Content is GallerySearchEmptyPage searchEmptyPage)
+        {
+            searchEmptyPage.ApplyNavigationParameter(e.ExtraData);
         }
 
         if (_transitionHost != null && e.Content is UIElement contentElement)

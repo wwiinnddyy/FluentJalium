@@ -278,7 +278,7 @@ internal sealed class GalleryDateTimePage
             SelectedDate = today.AddDays(1),
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendar.BlackoutDates.Add(today.AddDays(2).Date);
+        calendar.BlackoutDates.Add(new CalendarDateRange(today.AddDays(2).Date));
         calendar.SelectedDateChanged += (_, _) =>
         {
             output.Text = $"Selected: {FormatDateTimeDate(calendar.SelectedDate)}";
@@ -332,7 +332,7 @@ internal sealed class GalleryDateTimePage
             SelectedDate = today.AddDays(4),
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendarView.BlackoutDates.Add(today.AddDays(2).Date);
+        calendarView.BlackoutDates.Add(new CalendarDateRange(today.AddDays(2).Date));
 
         void UpdateOutput(string action = "CalendarView QA")
         {
@@ -466,7 +466,7 @@ internal sealed class GalleryDateTimePage
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendar.BlackoutDates.Add(today.AddDays(1));
+        calendar.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1)));
 
         void UpdateOutput()
         {

@@ -93,7 +93,6 @@ public class FWTabView : Selector, IFluentJaliumControl
     public FWTabView()
     {
         ApplyDensity(this, Density);
-        Items.CollectionChanged += OnItemsChanged;
     }
 
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Content)]
@@ -378,8 +377,10 @@ public class FWTabView : Selector, IFluentJaliumControl
         }
     }
 
-    private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
     {
+        base.OnItemsChanged(e);
+
         if (e.OldItems != null)
         {
             foreach (var item in e.OldItems)
@@ -580,7 +581,7 @@ public class FWTabViewItem : TabItem, IFluentJaliumControl
         var isVisible = ResolveCloseButtonVisibility();
         if (IsCloseButtonVisible != isVisible)
         {
-            SetValue(IsCloseButtonVisiblePropertyKey.DependencyProperty, isVisible);
+            SetValue(IsCloseButtonVisiblePropertyKey, isVisible);
         }
 
         InvalidateMeasure();
@@ -687,7 +688,7 @@ public class FWTabViewItem : TabItem, IFluentJaliumControl
 
         var textBrush = IsSelected || IsMouseOver ? ResolvePrimaryTextBrush() : ResolveSecondaryTextBrush();
         var fontSize = FontSize > 0 ? FontSize : 13;
-        var fontFamily = !string.IsNullOrEmpty(FontFamily) ? FontFamily : FrameworkElement.DefaultFontFamilyName;
+        var fontFamily = FontFamily?.Source ?? FrameworkElement.DefaultFontFamilyName;
         var text = new FormattedText(headerText, fontFamily, fontSize)
         {
             Foreground = textBrush

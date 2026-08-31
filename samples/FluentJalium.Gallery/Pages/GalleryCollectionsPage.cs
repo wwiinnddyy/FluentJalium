@@ -630,7 +630,7 @@ internal sealed class GalleryCollectionsPage
         treeView.Items.Add(workspaceItem);
         treeView.Items.Add(archiveItem);
         treeView.Items.Add(disabledItem);
-        treeView.SelectedItem = buildItem;
+        buildItem.IsSelected = true;
 
         void UpdateOutput()
         {
@@ -663,13 +663,13 @@ internal sealed class GalleryCollectionsPage
                     }),
                     CreateCollectionActionButton("Select root", () =>
                     {
-                        treeView.SelectedItem = workspaceItem;
+                        workspaceItem.IsSelected = true;
                         UpdateOutput();
                     }),
                     CreateCollectionActionButton("Select child", () =>
                     {
                         workspaceItem.IsExpanded = true;
-                        treeView.SelectedItem = designItem;
+                        designItem.IsSelected = true;
                         UpdateOutput();
                     })),
                 CreateCollectionStatus(output)

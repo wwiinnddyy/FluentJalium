@@ -1507,9 +1507,9 @@ var showTask = host.ShowAsync(taskDialog);
 var diagnostics = host.GetDiagnostics();
 Debug.WriteLine($"TaskDialog real-window QA: open {diagnostics.IsOpen}; focus trap {diagnostics.IsFocusTrapEnabled}; restore target {diagnostics.HasFocusRestoreTarget}; z {Panel.GetZIndex(host)}.");
 
-var tabArgs = new KeyEventArgs(UIElement.KeyDownEvent, Key.Tab, ModifierKeys.None, isDown: true, isRepeat: false, timestamp: Environment.TickCount);
+var tabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab);
 host.RaiseEvent(tabArgs);
-var shiftTabArgs = new KeyEventArgs(UIElement.KeyDownEvent, Key.Tab, ModifierKeys.Shift, isDown: true, isRepeat: false, timestamp: Environment.TickCount);
+var shiftTabArgs = SimulatedKeyboard.CreateKeyDown(Key.Tab, ModifierKeys.Shift);
 host.RaiseEvent(shiftTabArgs);
 var lightDismissed = host.RequestLightDismiss();
 Debug.WriteLine($"TaskDialog keyboard QA: {host.LastKeyboardRequest}; handled {host.LastKeyboardRequestHandled}; light dismiss {lightDismissed}.");

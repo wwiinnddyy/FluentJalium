@@ -709,13 +709,7 @@ internal sealed class GalleryDisclosurePage
 
         bool RaiseHostKey(Key key, ModifierKeys modifiers)
         {
-            var args = new KeyEventArgs(
-                UIElement.KeyDownEvent,
-                key,
-                modifiers,
-                isDown: true,
-                isRepeat: false,
-                timestamp: Environment.TickCount);
+            var args = SimulatedKeyboard.CreateKeyDown(key, modifiers);
             taskDialogHost.RaiseEvent(args);
             lastKeyboard = $"{(modifiers == ModifierKeys.Shift ? "Shift+" : string.Empty)}{key} requested; handled {FormatOnOff(args.Handled)}.";
             return args.Handled;

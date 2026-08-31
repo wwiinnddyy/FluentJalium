@@ -13,6 +13,7 @@ using FWScrollViewer = FluentJalium.Controls.FWScrollViewer;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWSwipeControl = FluentJalium.Controls.FWSwipeControl;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
+using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
@@ -216,7 +217,7 @@ internal sealed class GalleryInteractionPage
             }
         };
 
-        var textBox = new TextBox
+        var textBox = new FWTextBox
         {
             Width = 200,
             PlaceholderText = "Focus with Tab key",

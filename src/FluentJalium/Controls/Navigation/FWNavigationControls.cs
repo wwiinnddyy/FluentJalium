@@ -1,5 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Navigation;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FluentJalium.Controls;
@@ -182,25 +183,27 @@ public sealed class FWNavigationService
     [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
     public bool GoBack()
     {
-        if (_frame?.GoBack() == true)
+        if (_frame?.CanGoBack != true)
         {
-            UpdateNavigationViewBackState();
-            return true;
+            return false;
         }
 
-        return false;
+        _frame.GoBack();
+        UpdateNavigationViewBackState();
+        return true;
     }
 
     [RequiresUnreferencedCode("Navigates a Frame by Page type. Keep registered page constructors reachable.")]
     public bool GoForward()
     {
-        if (_frame?.GoForward() == true)
+        if (_frame?.CanGoForward != true)
         {
-            UpdateNavigationViewBackState();
-            return true;
+            return false;
         }
 
-        return false;
+        _frame.GoForward();
+        UpdateNavigationViewBackState();
+        return true;
     }
 
     public FWNavigationServiceDiagnostics GetDiagnostics()
@@ -274,7 +277,7 @@ public sealed class FWNavigationService
 
     private void OnFrameNavigated(object? sender, NavigationEventArgs e)
     {
-        CurrentRouteKey = ResolveRouteKey(e.SourcePageType);
+        CurrentRouteKey = ResolveRouteKey(e.Content?.GetType());
         UpdateNavigationViewBackState();
         SynchronizeSelectionFromFrame();
 

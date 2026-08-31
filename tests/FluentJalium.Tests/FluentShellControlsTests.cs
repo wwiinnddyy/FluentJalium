@@ -98,8 +98,8 @@ public sealed class FluentShellControlsTests
             RightWindowCommands = rightCommands
         };
 
-        var snapshot = GalleryNavigationPage.CreateTitleBarVisualQaSnapshot(titleBar);
-        var text = GalleryNavigationPage.FormatTitleBarVisualQa("TitleBar preview ready", snapshot);
+        var snapshot = GalleryTitleBarQa.CreateTitleBarVisualQaSnapshot(titleBar);
+        var text = GalleryTitleBarQa.FormatTitleBarVisualQa("TitleBar preview ready", snapshot);
 
         Assert.Equal("FluentJalium Gallery", snapshot.Title);
         Assert.False(snapshot.IsShowIcon);

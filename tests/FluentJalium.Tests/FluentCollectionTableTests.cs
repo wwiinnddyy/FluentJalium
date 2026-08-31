@@ -8,6 +8,7 @@ using Jalium.UI.Controls.Themes;
 using Jalium.UI.Data;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using Jalium.UI.Controls.Primitives;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 
 namespace FluentJalium.Tests;
@@ -270,7 +271,7 @@ public sealed class FluentCollectionTableTests
     {
         var listBox = new FWListBox
         {
-            SelectionMode = Jalium.UI.Controls.Primitives.SelectionMode.Multiple
+            SelectionMode = Jalium.UI.Controls.SelectionMode.Multiple
         };
         listBox.Items.Add("Fluent tokens");
         listBox.Items.Add("Control states");
@@ -280,7 +281,7 @@ public sealed class FluentCollectionTableTests
 
         Assert.Equal(3, listBox.SelectedItems.Count);
 
-        listBox.SelectionMode = Jalium.UI.Controls.Primitives.SelectionMode.Single;
+        listBox.SelectionMode = Jalium.UI.Controls.SelectionMode.Single;
         listBox.SelectedIndex = 1;
 
         Assert.Equal("Control states", listBox.SelectedItem);
@@ -336,7 +337,7 @@ public sealed class FluentCollectionTableTests
         var gridView = new FWGridView
         {
             Density = FWCollectionDensity.Compact,
-            SelectionMode = Jalium.UI.Controls.Primitives.SelectionMode.Multiple
+            SelectionMode = Jalium.UI.Controls.SelectionMode.Multiple
         };
         var first = new CollectionRow("Buttons", "Complete", 9);
         var second = new CollectionRow("Navigation", "Active", 7);
@@ -591,7 +592,7 @@ public sealed class FluentCollectionTableTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static void ResetApplicationState()

@@ -641,7 +641,7 @@ public sealed class FWConnectedAnimationService
         };
         var durationMs = Math.Max(1.0, options.Duration.TotalMilliseconds);
         var startTime = Environment.TickCount64;
-        var timer = new DispatcherTimer { Interval = CompositionTarget.FrameInterval };
+        var timer = new DispatcherTimer { Interval = FWFramePacing.Interval };
 
         destination.RenderTransformOrigin = new Point(0, 0);
         destination.RenderTransform = originalTransform == null

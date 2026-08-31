@@ -1,8 +1,10 @@
 using Jalium.UI;
-using Jalium.UI.Automation;
+using Jalium.UI.Automation.Peers;
+using Jalium.UI.Automation.Provider;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Input;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using System.Collections;
@@ -10,7 +12,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Windows.Input;
-using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using AnimationDuration = Jalium.UI.Duration;
 using AnimationTransitionMode = Jalium.UI.Media.Animation.TransitionMode;
 
 namespace FluentJalium.Controls;
@@ -405,8 +407,8 @@ public class FWTwoPaneView : Control, IFluentJaliumControl
                 : FWTwoPaneViewVisiblePane.Pane1
             : FWTwoPaneViewVisiblePane.Both;
 
-        SetValue(ActualModePropertyKey.DependencyProperty, actualMode);
-        SetValue(VisiblePanePropertyKey.DependencyProperty, visiblePane);
+        SetValue(ActualModePropertyKey, actualMode);
+        SetValue(VisiblePanePropertyKey, visiblePane);
     }
 
     private FWTwoPaneViewMode ResolveActualMode(Size availableSize)
@@ -655,7 +657,7 @@ public class FWParallaxView : ContentControl, IFluentJaliumControl
     private void UpdateCurrentOffset()
     {
         var offset = GetParallaxOffset(Progress);
-        SetValue(CurrentOffsetPropertyKey.DependencyProperty, offset);
+        SetValue(CurrentOffsetPropertyKey, offset);
         UpdateContentTransform(offset);
     }
 
@@ -946,7 +948,7 @@ public class FWRelativePanel : Panel, IFluentJaliumControl
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        foreach (var child in Children)
+        foreach (UIElement child in Children)
         {
             child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         }
@@ -966,7 +968,7 @@ public class FWRelativePanel : Panel, IFluentJaliumControl
     protected override Size ArrangeOverride(Size finalSize)
     {
         var bounds = ResolveLayout(finalSize);
-        foreach (var child in Children)
+        foreach (UIElement child in Children)
         {
             if (bounds.TryGetValue(child, out var rect))
             {
@@ -1025,7 +1027,12 @@ public class FWRelativePanel : Panel, IFluentJaliumControl
     private Dictionary<UIElement, Rect> ResolveLayout(Size panelSize)
     {
         var bounds = new Dictionary<UIElement, Rect>();
-        var unresolved = new List<UIElement>(Children);
+        var unresolved = new List<UIElement>();
+        foreach (UIElement child in Children)
+        {
+            unresolved.Add(child);
+        }
+
         var passCount = Math.Max(1, unresolved.Count);
 
         for (var pass = 0; pass < passCount && unresolved.Count > 0; pass++)
@@ -1607,7 +1614,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     {
         var command = Command;
         var canExecute = command == null || CanExecuteCommand(command);
-        SetValue(CanExecutePropertyKey.DependencyProperty, canExecute);
+        SetValue(CanExecutePropertyKey, canExecute);
 
         if (!canExecute)
         {
@@ -1646,7 +1653,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     {
         if (IsPointerPressed != value)
         {
-            SetValue(IsPointerPressedPropertyKey.DependencyProperty, value);
+            SetValue(IsPointerPressedPropertyKey, value);
         }
     }
 
@@ -1654,7 +1661,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
     {
         if (IsKeyboardPressed != value)
         {
-            SetValue(IsKeyboardPressedPropertyKey.DependencyProperty, value);
+            SetValue(IsKeyboardPressedPropertyKey, value);
         }
     }
 
@@ -1663,7 +1670,7 @@ public class FWSettingsCard : ContentControl, IFluentJaliumControl
         var value = IsEnabled && IsClickEnabled && CanExecute && (IsPointerPressed || IsKeyboardPressed);
         if (IsInteractionPressed != value)
         {
-            SetValue(IsInteractionPressedPropertyKey.DependencyProperty, value);
+            SetValue(IsInteractionPressedPropertyKey, value);
         }
     }
 
@@ -2113,7 +2120,7 @@ public class FWSettingsExpander : Expander, IFluentJaliumControl
 
     private void UpdateItemCount()
     {
-        SetValue(ItemCountPropertyKey.DependencyProperty, CountItems(ItemsSource ?? _items));
+        SetValue(ItemCountPropertyKey, CountItems(ItemsSource ?? _items));
     }
 
     private static int CountItems(IEnumerable items)

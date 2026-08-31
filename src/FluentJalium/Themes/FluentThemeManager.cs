@@ -195,7 +195,6 @@ public static class FluentThemeManager
         AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
         AliasStyle<FWTextBox, TextBox>(dictionary);
-        AliasStyle<FWPasswordBox, PasswordBox>(dictionary);
         AliasStyle<FWNumberBox, NumberBox>(dictionary);
         AliasStyle<FWAutoCompleteBox, AutoCompleteBox>(dictionary);
         AliasStyle<FWRichTextBox, RichTextBox>(dictionary);
@@ -278,7 +277,7 @@ public static class FluentThemeManager
         AliasStyle<FWToastNotificationItem, ToastNotificationItem>(dictionary);
         AliasStyle<FWToastNotificationHost, ToastNotificationHost>(dictionary);
         AliasStyle<FWStatusBar, StatusBar>(dictionary);
-        AliasStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(dictionary);
+        AliasStyle<FWStatusBarItem, StatusBarItem>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWCommandBar, CommandBar>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);

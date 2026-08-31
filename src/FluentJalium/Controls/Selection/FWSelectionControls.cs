@@ -149,7 +149,7 @@ public class FWRadioButtons : Selector, IFluentJaliumControl
         return new FWRadioButton { Density = Density };
     }
 
-    protected override bool IsItemItsOwnContainer(object item)
+    protected override bool IsItemItsOwnContainerOverride(object item)
     {
         return item is FWRadioButton;
     }

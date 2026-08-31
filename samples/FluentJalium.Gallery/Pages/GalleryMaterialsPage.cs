@@ -101,7 +101,7 @@ internal sealed class GalleryMaterialsPage
             VerticalSpacing = 10,
             Children =
             {
-                CreateBackdropEffectTile(FluentIconRegular.CircleMultipleConcentric24, "BlurEffect", "Backdrop blur", new Jalium.UI.Media.BlurEffect(18f)),
+                CreateBackdropEffectTile(FluentIconRegular.CircleMultipleConcentric24, "BackdropBlurEffect", "Backdrop blur", new BackdropBlurEffect(18f)),
                 CreateMaterialSurfaceTile(FluentIconRegular.Drop24, "FW Acrylic", "Tint, blur, and noise preset", FWFluentMaterialKind.Acrylic),
                 CreateMaterialSurfaceTile(FluentIconRegular.WindowBrush24, "FW Mica", "Wallpaper-tinted material preset", FWFluentMaterialKind.Mica),
                 CreateMaterialSurfaceTile(FluentIconRegular.WeatherSnowflake24, "FW FrostedGlass", "High diffusion glass preset", FWFluentMaterialKind.FrostedGlass),

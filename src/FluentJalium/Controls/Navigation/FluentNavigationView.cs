@@ -244,7 +244,7 @@ public class FluentNavigationView : Control
         _menuItemsPanel.Children.Clear();
 
         // Update PaneHeader if set and is UIElement
-        if (_paneHeader is UIElement paneHeaderElement && _paneRoot?.Child is Grid paneGrid)
+        if (_paneHeader is FrameworkElement paneHeaderElement && _paneRoot?.Child is Grid paneGrid)
         {
             // Remove old header border if exists
             if (_paneHeaderBorder != null && paneGrid.Children.Contains(_paneHeaderBorder))
@@ -448,12 +448,12 @@ public class FluentNavigationView : Control
         return finalSize;
     }
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         return index == 0 ? _rootGrid : null;
     }
 
-    public override int VisualChildrenCount => _rootGrid != null ? 1 : 0;
+    protected override int VisualChildrenCount => _rootGrid != null ? 1 : 0;
 
     private static Brush GetThemeBrush(string key)
     {

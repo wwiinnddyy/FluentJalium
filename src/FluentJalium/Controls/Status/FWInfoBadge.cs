@@ -262,7 +262,7 @@ public class FWInfoBadge : Control, IFluentJaliumControl
             ? FWInfoBadgeDisplayKind.Value
             : string.IsNullOrEmpty(IconGlyph) ? FWInfoBadgeDisplayKind.Dot : FWInfoBadgeDisplayKind.Icon;
 
-        SetValue(DisplayKindPropertyKey.DependencyProperty, kind);
+        SetValue(DisplayKindPropertyKey, kind);
     }
 
     private static string GetBackgroundResourceKey(FWInfoBadgeSeverity severity)

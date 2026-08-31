@@ -1,5 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Input;
 using Jalium.UI.Media;
 using Jalium.UI.Threading;
@@ -475,7 +476,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     public void Show()
     {
-        SetValue(LastCloseReasonPropertyKey.DependencyProperty, FWSnackbarCloseReason.None);
+        SetValue(LastCloseReasonPropertyKey, FWSnackbarCloseReason.None);
         EnsureClosedTask();
         IsOpen = true;
     }
@@ -528,7 +529,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
     {
         if (!IsOpen)
         {
-            SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
+            SetValue(LastCloseReasonPropertyKey, reason);
             CompleteCloseTask(reason);
             return true;
         }
@@ -543,7 +544,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
             }
         }
 
-        SetValue(LastCloseReasonPropertyKey.DependencyProperty, reason);
+        SetValue(LastCloseReasonPropertyKey, reason);
         IsOpen = false;
         return true;
     }
@@ -617,8 +618,8 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         TimeSpan transitionDuration)
     {
         _lastTransitionKind = kind;
-        SetValue(PresenterTransitionDurationPropertyKey.DependencyProperty, transitionDuration);
-        SetValue(PresenterPlacementPropertyKey.DependencyProperty, placement);
+        SetValue(PresenterTransitionDurationPropertyKey, transitionDuration);
+        SetValue(PresenterPlacementPropertyKey, placement);
 
         if (kind == FWSnackbarTransitionKind.Show)
         {
@@ -682,7 +683,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         }
         else
         {
-            SetValue(PresenterStatePropertyKey.DependencyProperty, FWSnackbarPresenterState.Exiting);
+            SetValue(PresenterStatePropertyKey, FWSnackbarPresenterState.Exiting);
             StartPresenterTransition(FWSnackbarPresenterState.Exiting, 0.0, signedOffset, transitionDuration, completeCloseWhenFinished: true);
         }
     }
@@ -839,7 +840,7 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
         if (IsAutoDismissPaused != isPaused)
         {
-            SetValue(IsAutoDismissPausedPropertyKey.DependencyProperty, isPaused);
+            SetValue(IsAutoDismissPausedPropertyKey, isPaused);
         }
 
         ScheduleAutoDismiss();
@@ -909,11 +910,11 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
             return;
         }
 
-        SetValue(PresenterTransitionDurationPropertyKey.DependencyProperty, transitionDuration);
+        SetValue(PresenterTransitionDurationPropertyKey, transitionDuration);
         _presenterTransitionStopwatch.Restart();
         _presenterTransitionTimer = new DispatcherTimer
         {
-            Interval = CompositionTarget.FrameInterval
+            Interval = FWFramePacing.Interval
         };
         _presenterTransitionTimer.Tick += (_, _) => OnPresenterTransitionTick(completedState);
         _presenterTransitionTimer.Start();
@@ -926,8 +927,8 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
         var t = Math.Clamp(elapsed / durationMs, 0.0, 1.0);
         var eased = completedState == FWSnackbarPresenterState.Visible ? EaseOutCubic(t) : EaseInCubic(t);
 
-        SetValue(PresenterOpacityPropertyKey.DependencyProperty, Lerp(_presenterStartOpacity, _presenterTargetOpacity, eased));
-        SetValue(PresenterOffsetPropertyKey.DependencyProperty, Lerp(_presenterStartOffset, _presenterTargetOffset, eased));
+        SetValue(PresenterOpacityPropertyKey, Lerp(_presenterStartOpacity, _presenterTargetOpacity, eased));
+        SetValue(PresenterOffsetPropertyKey, Lerp(_presenterStartOffset, _presenterTargetOffset, eased));
         UpdatePresenterVisualState();
 
         if (t >= 1.0)
@@ -982,9 +983,9 @@ public class FWSnackbar : ContentControl, IFluentJaliumControl
 
     private void SetPresenterVisual(FWSnackbarPresenterState state, double opacity, double offset)
     {
-        SetValue(PresenterStatePropertyKey.DependencyProperty, state);
-        SetValue(PresenterOpacityPropertyKey.DependencyProperty, Math.Clamp(opacity, 0.0, 1.0));
-        SetValue(PresenterOffsetPropertyKey.DependencyProperty, offset);
+        SetValue(PresenterStatePropertyKey, state);
+        SetValue(PresenterOpacityPropertyKey, Math.Clamp(opacity, 0.0, 1.0));
+        SetValue(PresenterOffsetPropertyKey, offset);
         UpdatePresenterVisualState();
     }
 
@@ -1573,7 +1574,7 @@ public class FWSnackbarOverlayHost : FWSnackbarHost
             return false;
         }
 
-        SetValue(IsOverlayOpenPropertyKey.DependencyProperty, true);
+        SetValue(IsOverlayOpenPropertyKey, true);
         OverlayOpened?.Invoke(this, EventArgs.Empty);
         return true;
     }
@@ -1585,7 +1586,7 @@ public class FWSnackbarOverlayHost : FWSnackbarHost
             return false;
         }
 
-        SetValue(IsOverlayOpenPropertyKey.DependencyProperty, false);
+        SetValue(IsOverlayOpenPropertyKey, false);
         OverlayClosed?.Invoke(this, EventArgs.Empty);
         return true;
     }
@@ -1693,6 +1694,6 @@ public class FWStatusBar : StatusBar, IFluentJaliumControl
 /// <summary>
 /// FluentJalium StatusBarItem control.
 /// </summary>
-public class FWStatusBarItem : Jalium.UI.Controls.StatusBarItem, IFluentJaliumControl
+public class FWStatusBarItem : StatusBarItem, IFluentJaliumControl
 {
 }

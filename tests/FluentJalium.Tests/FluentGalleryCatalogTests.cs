@@ -554,7 +554,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("RootWindowSmoke", sampleCode);
         Assert.Contains("restore timing", sampleCode);
         Assert.Contains("clip guard", sampleCode);
-        Assert.Contains("new KeyEventArgs", sampleCode);
+        Assert.Contains("SimulatedKeyboard.CreateKeyDown", sampleCode);
         Assert.Contains("Key.Tab", sampleCode);
         Assert.Contains("ModifierKeys.Shift", sampleCode);
         Assert.Contains("RequestLightDismiss", sampleCode);

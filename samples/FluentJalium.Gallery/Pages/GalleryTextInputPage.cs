@@ -3,6 +3,7 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Documents;
 using Jalium.UI.Media;
 using FWAutoCompleteBox = FluentJalium.Controls.FWAutoCompleteBox;
 using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
@@ -13,12 +14,12 @@ using FWFluentMaterialKind = FluentJalium.Controls.FWFluentMaterialKind;
 using FWFluentMaterialSurface = FluentJalium.Controls.FWFluentMaterialSurface;
 using FWNumberBox = FluentJalium.Controls.FWNumberBox;
 using FWNumberBoxDensity = FluentJalium.Controls.FWNumberBoxDensity;
-using FWPasswordBox = FluentJalium.Controls.FWPasswordBox;
 using FWRichTextBox = FluentJalium.Controls.FWRichTextBox;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTextBox = FluentJalium.Controls.FWTextBox;
 using FWTextInputDensity = FluentJalium.Controls.FWTextInputDensity;
+using FWTextInputOptions = FluentJalium.Controls.FWTextInputOptions;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
 
 namespace FluentJalium.Gallery.Pages;
@@ -53,7 +54,7 @@ internal sealed class GalleryTextInputPage
             CreateTextBoxInputSample()));
         examples.Children.Add(CreateTextInputExampleCard(
             FluentIconRegular.Password24,
-            "FWPasswordBox and FWNumberBox",
+            "PasswordBox and FWNumberBox",
             "Reveal modes, password state, numeric stepping, coercion, decimal precision, and live output.",
             CreatePasswordNumberInputSample()));
         examples.Children.Add(CreateTextInputExampleCard(
@@ -146,13 +147,12 @@ internal sealed class GalleryTextInputPage
     private static UIElement CreatePasswordNumberInputSample()
     {
         var output = CreateTextInputOutput("NumberBox value: 42. Density: comfortable. Spin: inline");
-        var passwordBox = new FWPasswordBox
+        var passwordBox = new PasswordBox
         {
             Password = "fluent",
-            Width = 240,
-            PlaceholderText = "Password",
-            RevealMode = PasswordRevealMode.Visible
+            Width = 240
         };
+        FWTextInputOptions.SetDensity(passwordBox, FWTextInputDensity.Comfortable);
         var numberBox = new FWNumberBox
         {
             Header = "FWNumberBox",
@@ -203,10 +203,11 @@ internal sealed class GalleryTextInputPage
                     }
                 },
                 CreateTextInputButtonRow(
-                    CreateTextInputActionButton(FluentIconRegular.Eye24, "Reveal", () =>
+                    CreateTextInputActionButton(FluentIconRegular.TextDensity24, "Pwd density", () =>
                     {
-                        passwordBox.IsPasswordRevealed = !passwordBox.IsPasswordRevealed;
-                        output.Text = $"Password revealed: {FormatOnOff(passwordBox.IsPasswordRevealed)}";
+                        var next = NextDensity(FWTextInputOptions.GetDensity(passwordBox));
+                        FWTextInputOptions.SetDensity(passwordBox, next);
+                        output.Text = $"Password density: {FormatDensity(next)}";
                     }),
                     CreateTextInputActionButton(FluentIconRegular.NumberSymbol24, "Step up", () => numberBox.StepUp()),
                     CreateTextInputActionButton(FluentIconRegular.NumberSymbol24, "Step down", () => numberBox.StepDown()),
@@ -439,10 +440,10 @@ internal sealed class GalleryTextInputPage
         {
             Width = 500,
             Height = 120,
-            AcceptsTab = true,
-            IsSpellCheckEnabled = true
+            AcceptsTab = true
         };
-        richTextBox.SetText("FWRichTextBox uses the same text input resource tokens.");
+        SpellCheck.SetIsEnabled(richTextBox, true);
+        richTextBox.Document = FlowDocument.FromText("FWRichTextBox uses the same text input resource tokens.");
 
         return new FWStackPanel
         {
@@ -459,12 +460,12 @@ internal sealed class GalleryTextInputPage
                     }),
                     CreateTextInputActionButton(FluentIconRegular.DocumentText24, "Replace", () =>
                     {
-                        richTextBox.SetText("Rich text content updated inside the FluentJalium gallery.");
+                        richTextBox.Document = FlowDocument.FromText("Rich text content updated inside the FluentJalium gallery.");
                         output.Text = "RichTextBox text replaced";
                     }),
                     CreateTextInputActionButton(FluentIconRegular.DismissCircle24, "Clear selection", () =>
                     {
-                        richTextBox.ClearSelection();
+                        richTextBox.Selection.Select(richTextBox.CaretPosition!, richTextBox.CaretPosition!);
                         output.Text = $"Selection empty: {FormatOnOff(richTextBox.Selection.IsEmpty)}";
                     })),
                 CreateTextInputStatus(output)
@@ -495,21 +496,19 @@ internal sealed class GalleryTextInputPage
             SmallChange = 4,
             DecimalPlaces = 0
         };
-        var passwordBox = new FWPasswordBox
+        var passwordBox = new PasswordBox
         {
             Width = 220,
-            Password = "material",
-            PlaceholderText = "Token",
-            RevealMode = PasswordRevealMode.Peek
+            Password = "material"
         };
         var notes = new FWRichTextBox
         {
             Width = 480,
             Height = 104,
-            AcceptsTab = true,
-            IsSpellCheckEnabled = true
+            AcceptsTab = true
         };
-        notes.SetText("Layered input surfaces keep focus and text contrast on LiquidGlass.");
+        SpellCheck.SetIsEnabled(notes, true);
+        notes.Document = FlowDocument.FromText("Layered input surfaces keep focus and text contrast on LiquidGlass.");
 
         searchBox.TextChanged += (_, _) => output.Text = $"Material search: {searchBox.FilteredItems.Count} matches";
         numberBox.ValueChanged += (_, e) => output.Text = $"Material opacity value: {e.NewValue}";
@@ -554,10 +553,10 @@ internal sealed class GalleryTextInputPage
                     CreateTextInputButtonRow(
                         CreateTextInputActionButton(FluentIconRegular.Search24, "Controls", () => searchBox.Text = "controls"),
                         CreateTextInputActionButton(FluentIconRegular.NumberSymbol24, "Step", () => numberBox.StepUp()),
-                        CreateTextInputActionButton(FluentIconRegular.Eye24, "Reveal", () =>
+                        CreateTextInputActionButton(FluentIconRegular.Eraser24, "Clear", () =>
                         {
-                            passwordBox.IsPasswordRevealed = !passwordBox.IsPasswordRevealed;
-                            output.Text = $"Material token revealed: {FormatOnOff(passwordBox.IsPasswordRevealed)}";
+                            passwordBox.Clear();
+                            output.Text = "Material token cleared";
                         }),
                         CreateTextInputActionButton(FluentIconRegular.DocumentText24, "Select notes", () =>
                         {
@@ -600,7 +599,7 @@ internal sealed class GalleryTextInputPage
         return title switch
         {
             "FWTextBox" => "<FWTextBox PlaceholderText=\"Enter text\" />\n<FWTextBox AcceptsReturn=\"True\" TextWrapping=\"Wrap\" />",
-            "FWPasswordBox and FWNumberBox" => "<FWPasswordBox RevealMode=\"Visible\" PlaceholderText=\"Password\" />\n<FWNumberBox Minimum=\"0\" Maximum=\"100\" Value=\"42\" SpinButtonPlacementMode=\"Inline\" />",
+            "PasswordBox and FWNumberBox" => "<PasswordBox Password=\"fluent\" MaxLength=\"16\" />\n<FWNumberBox Minimum=\"0\" Maximum=\"100\" Value=\"42\" SpinButtonPlacementMode=\"Inline\" />",
             "FWAutoCompleteBox" => "<FWAutoCompleteBox ItemsSource=\"{Binding SearchItems}\" FilterMode=\"Contains\" MinimumPrefixLength=\"1\" />",
             "FWAutoSuggestBox" => "<FWAutoSuggestBox ItemsSource=\"{Binding SearchItems}\"\n                  Text=\"Auto\"\n                  FilterMode=\"Contains\"\n                  MinimumPrefixLength=\"1\"\n                  Density=\"Comfortable\" />",
             "Formatting recipe" => "phone.Text = FormatPhoneRecipe(phone.Text);\nlicenseKey.Text = FormatLicenseKeyRecipe(licenseKey.Text);\nvar snapshot = CreateFormattingRecipeSnapshot(phone.Text, licenseKey.Text);",

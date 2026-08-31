@@ -372,12 +372,12 @@ public class FluentNavigationViewItem : Control
         return finalSize;
     }
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         return index == 0 ? _rootBorder : null;
     }
 
-    public override int VisualChildrenCount => _rootBorder != null ? 1 : 0;
+    protected override int VisualChildrenCount => _rootBorder != null ? 1 : 0;
 
     private static Brush GetThemeBrush(string key)
     {
@@ -439,12 +439,12 @@ public class FluentNavigationViewItemSeparator : Control
         return finalSize;
     }
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         return index == 0 ? _line : null;
     }
 
-    public override int VisualChildrenCount => _line != null ? 1 : 0;
+    protected override int VisualChildrenCount => _line != null ? 1 : 0;
 
     private static Brush GetThemeBrush(string key)
     {

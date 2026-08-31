@@ -764,7 +764,7 @@ public sealed class FluentSelectionControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static void InvokeToggleButtonClick(ToggleButton button)

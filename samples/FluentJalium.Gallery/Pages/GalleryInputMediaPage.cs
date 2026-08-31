@@ -2,7 +2,7 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
-using Jalium.UI.Controls.Ink;
+using Jalium.UI.Ink;
 using Jalium.UI.Input;
 using Jalium.UI.Media;
 using FWBorder = FluentJalium.Controls.FWBorder;

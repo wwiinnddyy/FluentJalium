@@ -10,7 +10,7 @@ using FWBorder = FluentJalium.Controls.FWBorder;
 using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
-using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using AnimationDuration = Jalium.UI.Duration;
 
 namespace FluentJalium.Gallery.Pages;
 

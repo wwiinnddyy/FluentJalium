@@ -94,10 +94,6 @@
         </Style.Triggers>
     </Style>
 
-    <Style TargetType="fluent:FWPasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
-        <Setter Property="Density" Value="Comfortable" />
-    </Style>
-
     <Style TargetType="NumberBox">
         <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
         <Setter Property="Foreground" Value="{ThemeResource TextPrimary}" />

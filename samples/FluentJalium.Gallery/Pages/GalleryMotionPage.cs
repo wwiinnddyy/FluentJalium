@@ -15,7 +15,7 @@ using FWStackPanel = FluentJalium.Controls.FWStackPanel;
 using FWTextBlock = FluentJalium.Controls.FWTextBlock;
 using FWTransitioningContentControl = FluentJalium.Controls.FWTransitioningContentControl;
 using FWWrapPanel = FluentJalium.Controls.FWWrapPanel;
-using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using AnimationDuration = Jalium.UI.Duration;
 
 namespace FluentJalium.Gallery.Pages;
 

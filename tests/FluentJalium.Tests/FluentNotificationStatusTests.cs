@@ -11,6 +11,7 @@ using Jalium.UI.Input;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using Jalium.UI.Controls.Primitives;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 using PopupPlacementMode = Jalium.UI.Controls.Primitives.PlacementMode;
 
@@ -149,8 +150,8 @@ public sealed class FluentNotificationStatusTests
         AssertContainsStyle<StatusBarItem>(dictionary);
 
         var badgeStyle = AssertStyle<FWInfoBadge>(dictionary);
-        Assert.DoesNotContain(badgeStyle.Setters, setter => setter.Property == Control.BackgroundProperty);
-        Assert.DoesNotContain(badgeStyle.Setters, setter => setter.Property == Control.ForegroundProperty);
+        Assert.DoesNotContain(badgeStyle.Setters.OfType<Setter>(), setter => setter.Property == Control.BackgroundProperty);
+        Assert.DoesNotContain(badgeStyle.Setters.OfType<Setter>(), setter => setter.Property == Control.ForegroundProperty);
         AssertSetter(badgeStyle, Control.CornerRadiusProperty);
         AssertSetter(badgeStyle, Control.PaddingProperty);
 
@@ -217,10 +218,10 @@ public sealed class FluentNotificationStatusTests
         var error = host.ShowError("Error", "Fourth", TimeSpan.FromSeconds(12));
 
         Assert.IsType<FWToastNotificationItem>(info);
-        Assert.DoesNotContain(info, host.Children);
-        Assert.Contains(success, host.Children);
-        Assert.Contains(warning, host.Children);
-        Assert.Contains(error, host.Children);
+        Assert.DoesNotContain(info, host.Children.OfType<UIElement>());
+        Assert.Contains(success, host.Children.OfType<UIElement>());
+        Assert.Contains(warning, host.Children.OfType<UIElement>());
+        Assert.Contains(error, host.Children.OfType<UIElement>());
         Assert.Equal(3, host.Children.Count);
         Assert.Equal(ToastPosition.BottomRight, host.Position);
         Assert.Equal(400, host.ToastWidth);
@@ -229,7 +230,7 @@ public sealed class FluentNotificationStatusTests
         success.IsOpen = false;
 
         Assert.Equal(2, host.Children.Count);
-        Assert.DoesNotContain(success, host.Children);
+        Assert.DoesNotContain(success, host.Children.OfType<UIElement>());
 
         host.DismissAll();
         Assert.Equal(2, host.Children.Count);
@@ -298,7 +299,7 @@ public sealed class FluentNotificationStatusTests
         snackbar.Closed += (_, _) => closedCount++;
 
         var showTask = snackbar.ShowAsync();
-        var completed = await Task.WhenAny(showTask, Task.Delay(TimeSpan.FromSeconds(2)));
+        var completed = await DispatcherPump.Run(Task.WhenAny(showTask, Task.Delay(TimeSpan.FromSeconds(2))));
 
         Assert.Same(showTask, completed);
         Assert.False(snackbar.IsOpen);
@@ -325,7 +326,7 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal(FWSnackbarCloseReason.None, snackbar.LastCloseReason);
         Assert.False(snackbar.RequestAction());
 
-        var result = await showTask;
+        var result = await DispatcherPump.Run(showTask);
 
         Assert.Equal(FWSnackbarCloseReason.Action, result);
         Assert.Equal(FWSnackbarCloseReason.Action, snackbar.LastCloseReason);
@@ -366,7 +367,7 @@ public sealed class FluentNotificationStatusTests
 
         Assert.True(snackbar.RequestClose(FWSnackbarCloseReason.CloseButton));
 
-        var result = await resultTask;
+        var result = await DispatcherPump.Run(resultTask);
 
         Assert.Equal(FWSnackbarCloseReason.CloseButton, result);
         Assert.Equal(FWSnackbarCloseReason.CloseButton, snackbar.LastCloseReason);
@@ -390,18 +391,18 @@ public sealed class FluentNotificationStatusTests
 
         Assert.True(snackbar.IsAutoDismissPaused);
 
-        await Task.Delay(TimeSpan.FromMilliseconds(100));
+        await DispatcherPump.Run(Task.Delay(TimeSpan.FromMilliseconds(100)));
 
         Assert.True(snackbar.IsOpen);
         Assert.False(resultTask.IsCompleted);
 
         snackbar.RaiseEvent(new Jalium.UI.Input.MouseEventArgs(UIElement.MouseLeaveEvent));
 
-        var completed = await Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2)));
+        var completed = await DispatcherPump.Run(Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2))));
 
         Assert.Same(resultTask, completed);
         Assert.False(snackbar.IsAutoDismissPaused);
-        Assert.Equal(FWSnackbarCloseReason.Timeout, await resultTask);
+        Assert.Equal(FWSnackbarCloseReason.Timeout, await DispatcherPump.Run(resultTask));
         Assert.False(snackbar.IsOpen);
     }
 
@@ -420,18 +421,18 @@ public sealed class FluentNotificationStatusTests
 
         Assert.True(snackbar.IsAutoDismissPaused);
 
-        await Task.Delay(TimeSpan.FromMilliseconds(100));
+        await DispatcherPump.Run(Task.Delay(TimeSpan.FromMilliseconds(100)));
 
         Assert.True(snackbar.IsOpen);
         Assert.False(resultTask.IsCompleted);
 
         snackbar.RaiseEvent(new KeyboardFocusChangedEventArgs(UIElement.LostKeyboardFocusEvent, snackbar, null));
 
-        var completed = await Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2)));
+        var completed = await DispatcherPump.Run(Task.WhenAny(resultTask, Task.Delay(TimeSpan.FromSeconds(2))));
 
         Assert.Same(resultTask, completed);
         Assert.False(snackbar.IsAutoDismissPaused);
-        Assert.Equal(FWSnackbarCloseReason.Timeout, await resultTask);
+        Assert.Equal(FWSnackbarCloseReason.Timeout, await DispatcherPump.Run(resultTask));
         Assert.False(snackbar.IsOpen);
     }
 
@@ -737,7 +738,7 @@ public sealed class FluentNotificationStatusTests
             CompleteSnackbarPresenterTransition(snackbar, FWSnackbarPresenterState.Exiting);
 
             Assert.Empty(host.Snackbars);
-            Assert.Equal(FWSnackbarCloseReason.Programmatic, await resultTask);
+            Assert.Equal(FWSnackbarCloseReason.Programmatic, await DispatcherPump.Run(resultTask));
         }
         finally
         {
@@ -1063,12 +1064,12 @@ public sealed class FluentNotificationStatusTests
 
         Assert.True(first.RequestClose(FWSnackbarCloseReason.Action));
 
-        Assert.Equal(FWSnackbarCloseReason.Action, await firstResult);
+        Assert.Equal(FWSnackbarCloseReason.Action, await DispatcherPump.Run(firstResult));
         Assert.True(second.IsOpen);
 
         host.Clear();
 
-        Assert.Equal(FWSnackbarCloseReason.HostCleared, await secondResult);
+        Assert.Equal(FWSnackbarCloseReason.HostCleared, await DispatcherPump.Run(secondResult));
         Assert.False(second.IsOpen);
         Assert.Empty(host.Snackbars);
     }
@@ -1154,7 +1155,7 @@ public sealed class FluentNotificationStatusTests
 
         Assert.True(service.CloseCurrent());
 
-        Assert.Equal(FWSnackbarCloseReason.Programmatic, await resultTask);
+        Assert.Equal(FWSnackbarCloseReason.Programmatic, await DispatcherPump.Run(resultTask));
         Assert.Empty(host.Snackbars);
     }
 
@@ -1230,7 +1231,7 @@ public sealed class FluentNotificationStatusTests
 
         var itemsHost = Assert.IsAssignableFrom<Panel>(statusBar.GetVisualChild(0));
         Assert.Equal(3, itemsHost.Children.Count);
-        Assert.All(itemsHost.Children, child => Assert.IsType<FWStatusBarItem>(child));
+        Assert.All(itemsHost.Children.OfType<UIElement>(), child => Assert.IsType<FWStatusBarItem>(child));
     }
 
     [Fact]
@@ -1320,8 +1321,8 @@ public sealed class FluentNotificationStatusTests
         Assert.Equal("Rollback", snackbar.ActionContent);
         Assert.Equal(ToastSeverity.Warning, snackbar.Severity);
         Assert.Equal(2, toastHost.Children.Count);
-        Assert.Contains(success, toastHost.Children);
-        Assert.Contains(warning, toastHost.Children);
+        Assert.Contains(success, toastHost.Children.OfType<UIElement>());
+        Assert.Contains(warning, toastHost.Children.OfType<UIElement>());
         Assert.False(success.IsAutoDismissEnabled);
         Assert.False(warning.IsAutoDismissEnabled);
         Assert.Equal(4, statusBar.Items.Count);
@@ -1401,7 +1402,7 @@ public sealed class FluentNotificationStatusTests
 
     private static void AssertSetter(Style style, DependencyProperty property, object? expectedValue = null)
     {
-        var setter = Assert.Single(style.Setters, s => s.Property == property);
+        var setter = Assert.Single(style.Setters.OfType<Setter>(), s => s.Property == property);
         if (expectedValue != null)
         {
             if (expectedValue is int expectedInt)

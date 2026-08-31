@@ -30,14 +30,15 @@ internal sealed class GalleryHostPage : Page
         };
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    public void ApplyNavigationParameter(object? parameter)
     {
-        base.OnNavigatedTo(e);
-
-        if (e.Parameter is GalleryPage page)
+        if (parameter is GalleryPage page)
         {
             LoadPage(page);
+            return;
         }
+
+        RefreshTheme();
     }
 
     public void RefreshTheme()
