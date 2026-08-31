@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
 using Jalium.UI;
@@ -37,7 +38,7 @@ internal sealed class GallerySearchEmptyPage : Page
                         Spacing = 12,
                         Children =
                         {
-                            FluentIconFactory.Regular(FluentIconRegular.SearchInfo24, 28, GalleryThemeResources.Brush("TextPrimary")),
+                            GalleryGlyph.Create(FluentIconRegular.SearchInfo24, 28, GalleryThemeResources.Brush("TextPrimary")),
                             new FWTextBlock
                             {
                                 Text = "No results",

@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using System.Collections.ObjectModel;
 using Jalium.UI;
@@ -1348,7 +1349,7 @@ internal sealed class GalleryChartsPage
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary", Color.FromRgb(240, 240, 240)));
+        return GalleryGlyph.Create(icon, size, foreground ?? ThemeBrush("TextPrimary", Color.FromRgb(240, 240, 240)));
     }
 
     private static Brush[] CreateChartPalette()

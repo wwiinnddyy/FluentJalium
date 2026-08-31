@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Gallery.Resources;
 using FluentJalium.Icon;
@@ -65,7 +66,7 @@ internal static class GallerySampleCard
                     Spacing = 8,
                     Children =
                     {
-                        FluentIconFactory.Regular(FluentIconRegular.Code24, 16, GalleryThemeResources.Brush("TextPrimary")),
+                        GalleryGlyph.Create(FluentIconRegular.Code24, 16, GalleryThemeResources.Brush("TextPrimary")),
                         new FWTextBlock { Text = Strings.SampleCard_Code, FontSize = 14, Foreground = GalleryThemeResources.Brush("TextPrimary"), VerticalAlignment = VerticalAlignment.Center }
                     }
                 },
@@ -242,7 +243,7 @@ internal static class GallerySampleCard
             Spacing = 12,
             Children =
             {
-                FluentIconFactory.Regular(icon, 24, GalleryThemeResources.Brush("TextPrimary")),
+                GalleryGlyph.Create(icon, 24, GalleryThemeResources.Brush("TextPrimary")),
                 new FWTextBlock
                 {
                     Text = title,
@@ -266,7 +267,7 @@ internal static class GallerySampleCard
                 Spacing = 6,
                 Children =
                 {
-                    FluentIconFactory.Regular(FluentIconRegular.Copy24, 14, GalleryThemeResources.Brush("TextPrimary")),
+                    GalleryGlyph.Create(FluentIconRegular.Copy24, 14, GalleryThemeResources.Brush("TextPrimary")),
                     new FWTextBlock { Text = "Copy", FontSize = 12, Foreground = GalleryThemeResources.Brush("TextPrimary"), VerticalAlignment = VerticalAlignment.Center }
                 }
             },

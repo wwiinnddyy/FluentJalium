@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 
 namespace FluentJalium.Gallery.Services;
@@ -1123,13 +1124,13 @@ var overviewItem = new FWNavigationViewItem
 {
     Content = "Overview",
     RouteKey = "overview",
-    Icon = FluentIconFactory.Regular(FluentIconRegular.Home24)
+    Icon = GalleryGlyph.Create(FluentIconRegular.Home24)
 };
 var settingsItem = new FWNavigationViewItem
 {
     Content = "Settings",
     RouteKey = "settings",
-    Icon = FluentIconFactory.Regular(FluentIconRegular.Settings24)
+    Icon = GalleryGlyph.Create(FluentIconRegular.Settings24)
 };
 
 navigationView.MenuItems.Add(overviewItem);
@@ -1569,7 +1570,7 @@ var teachingTip = new FWTeachingTip
     Target = target,
     Title = "Use metadata filters",
     Subtitle = "TeachingTip anchors guidance to a specific control.",
-    IconSource = FluentIconFactory.Regular(FluentIconRegular.Info24),
+    IconSource = GalleryGlyph.Create(FluentIconRegular.Info24),
     ActionButtonContent = "Open docs",
     CloseButtonContent = "Got it",
     PreferredPlacement = TeachingTipPlacementMode.Bottom,

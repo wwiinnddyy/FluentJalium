@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
 using Jalium.UI;
@@ -24,7 +25,7 @@ internal static class GalleryPageSection
                     Spacing = GalleryLayoutTokens.SectionTitleSpacing,
                     Children =
                     {
-                        FluentIconFactory.Regular(icon, GalleryLayoutTokens.SectionTitleIconSize, ThemeBrush("TextPrimary")),
+                        GalleryGlyph.Create(icon, GalleryLayoutTokens.SectionTitleIconSize, ThemeBrush("TextPrimary")),
                         new FWTextBlock
                         {
                             Text = title,

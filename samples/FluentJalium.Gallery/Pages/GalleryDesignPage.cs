@@ -556,6 +556,6 @@ internal sealed class GalleryDesignPage
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush foreground)
     {
-        return FluentIconFactory.Regular(icon, size, foreground);
+        return GalleryGlyph.Create(icon, size, foreground);
     }
 }

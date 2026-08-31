@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
@@ -151,7 +152,7 @@ internal sealed class GalleryVisualQaCoveragePage
             Spacing = 8,
             Children =
             {
-                FluentIconFactory.Regular(icon, 18, ThemeBrush("TextPrimary")),
+                GalleryGlyph.Create(icon, 18, ThemeBrush("TextPrimary")),
                 new FWTextBlock
                 {
                     Text = text,
@@ -217,7 +218,7 @@ internal sealed class GalleryVisualQaCoveragePage
                     Spacing = 10,
                     Children =
                     {
-                        FluentIconFactory.Regular(FluentIconRegular.DataUsage24, 24, ThemeBrush("TextPrimary")),
+                        GalleryGlyph.Create(FluentIconRegular.DataUsage24, 24, ThemeBrush("TextPrimary")),
                         new FWTextBlock
                         {
                             Text = title,

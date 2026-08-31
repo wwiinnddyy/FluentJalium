@@ -587,7 +587,7 @@ internal sealed class GalleryShell : UserControl
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, size, foreground ?? GalleryThemeResources.Brush("TextPrimary"));
+        return GalleryGlyph.Create(icon, size, foreground ?? GalleryThemeResources.Brush("TextPrimary"));
     }
 }
 

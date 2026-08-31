@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Icon;
@@ -142,7 +143,7 @@ internal sealed class GalleryCatalogFilterPage
             Spacing = 8,
             Children =
             {
-                FluentIconFactory.Regular(control.Icon, 20, GalleryThemeResources.Brush("TextPrimary")),
+                GalleryGlyph.Create(control.Icon, 20, GalleryThemeResources.Brush("TextPrimary")),
                 new FWTextBlock
                 {
                     Text = control.Name,
@@ -213,7 +214,7 @@ internal sealed class GalleryCatalogFilterPage
                 Spacing = 6,
                 Children =
                 {
-                    FluentIconFactory.Regular(icon, 14, GalleryThemeResources.Brush("TextSecondary")),
+                    GalleryGlyph.Create(icon, 14, GalleryThemeResources.Brush("TextSecondary")),
                     new FWTextBlock
                     {
                         Text = text,

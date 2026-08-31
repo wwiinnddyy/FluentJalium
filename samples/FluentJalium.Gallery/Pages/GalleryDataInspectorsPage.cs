@@ -1,3 +1,4 @@
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -565,7 +566,7 @@ internal sealed class GalleryDataInspectorsPage
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+        return GalleryGlyph.Create(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
 
     private static Brush ThemeBrush(string key)

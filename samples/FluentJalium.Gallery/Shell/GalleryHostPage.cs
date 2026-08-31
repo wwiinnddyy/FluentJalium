@@ -546,6 +546,6 @@ internal sealed class GalleryHostPage : Page
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, string brushKey)
     {
-        return FluentIconFactory.Regular(icon, size, GalleryThemeResources.Brush(brushKey));
+        return GalleryGlyph.Create(icon, size, GalleryThemeResources.Brush(brushKey));
     }
 }

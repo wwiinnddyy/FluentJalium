@@ -942,7 +942,7 @@ await SaveDataFormDraftAsync();
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+        return GalleryGlyph.Create(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
 
     private static Brush ThemeBrush(string key)

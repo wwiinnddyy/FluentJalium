@@ -582,7 +582,7 @@ internal sealed class GalleryMaterialsPage
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size, Brush? foreground = null)
     {
-        return FluentIconFactory.Regular(icon, size, foreground ?? ThemeBrush("TextPrimary"));
+        return GalleryGlyph.Create(icon, size, foreground ?? ThemeBrush("TextPrimary"));
     }
 
     private static string FormatPercentResourceValue(string key)
