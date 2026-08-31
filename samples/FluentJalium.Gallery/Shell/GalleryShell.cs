@@ -451,6 +451,11 @@ internal sealed class GalleryShell : UserControl
 
     private void OnFrameNavigated(object? sender, NavigationEventArgs e)
     {
+        if (e.Content is GalleryItemPage itemPage)
+        {
+            itemPage.ApplyNavigationParameter(e.ExtraData);
+        }
+
         if (e.Content is GalleryHostPage hostPage)
         {
             hostPage.ApplyNavigationParameter(e.ExtraData);

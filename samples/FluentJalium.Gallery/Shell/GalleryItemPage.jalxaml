@@ -1,0 +1,64 @@
+<Page xmlns="http://schemas.jalium.ui/2024"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+      x:Class="FluentJalium.Gallery.Shell.GalleryItemPage">
+
+    <fw:FWScrollViewer HorizontalScrollBarVisibility="Disabled"
+                       VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="ContentRoot" Margin="36,0,36,36">
+
+            <!--  Page header  -->
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock x:Name="TitlePresenter"
+                           Style="{StaticResource TitleTextBlockStyle}"
+                           VerticalAlignment="Center"
+                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <fw:FWButton x:Name="InfoButton"
+                             Content="?"
+                             Padding="10,0"
+                             VerticalAlignment="Center" />
+            </StackPanel>
+
+            <fw:FWExpander x:Name="InfoExpander"
+                           Margin="0,12,0,0"
+                           Header="Namespace and inheritance"
+                           Visibility="Collapsed">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="NamespacePresenter"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               FontFamily="Consolas"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock x:Name="InheritancePresenter"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               FontFamily="Consolas"
+                               TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </fw:FWExpander>
+
+            <fw:FWButton x:Name="ThemeButton"
+                         Margin="0,12,0,0"
+                         HorizontalAlignment="Left"
+                         Width="88"
+                         Content="Theme" />
+
+            <TextBlock x:Name="DescriptionPresenter"
+                       Margin="0,12,0,0"
+                       MaxWidth="1064"
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <!--  Sample content  -->
+            <ContentControl x:Name="SampleHost" Margin="0,12,0,0" HorizontalContentAlignment="Stretch" />
+
+            <!--  Related controls  -->
+            <fw:FWExpander x:Name="RelatedExpander"
+                           Margin="0,16,0,0"
+                           Header="Related controls"
+                           Visibility="Collapsed">
+                <StackPanel x:Name="RelatedPanel" Spacing="4" />
+            </fw:FWExpander>
+        </StackPanel>
+    </fw:FWScrollViewer>
+</Page>
