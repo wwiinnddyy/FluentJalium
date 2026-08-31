@@ -291,17 +291,15 @@ internal sealed class GalleryShell : UserControl
         var panel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 10,
-            Margin = new Thickness(40, 24, 40, 0)
+            Margin = new Thickness(36, 24, 36, 0)
         };
 
-        panel.Children.Add(CreateIcon(FluentIconRegular.Search24, 20, GalleryThemeResources.Brush("TextSecondary")));
         _searchBox = new FWAutoSuggestBox
         {
             Text = _navigationSearchText,
             PlaceholderText = Strings.Shell_SearchPlaceholder,
             MinHeight = 34,
-            Width = 420,
+            Width = 580,
             VerticalAlignment = VerticalAlignment.Center
         };
         _searchBox.AutoSuggestTextChanged += OnAutoSuggestTextChanged;
