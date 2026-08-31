@@ -1,0 +1,29 @@
+<Page xmlns="http://schemas.jalium.ui/2024"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+      x:Class="FluentJalium.Gallery.Pages.XamlPipelineProbe"
+      Title="XAML Pipeline Probe">
+
+    <StackPanel Margin="36" Spacing="12">
+        <TextBlock Text="TitleTextBlockStyle + ThemeResource"
+                   Style="{StaticResource TitleTextBlockStyle}"
+                   Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+        <TextBlock Text="BodyTextBlockStyle + secondary text"
+                   Style="{StaticResource BodyTextBlockStyle}"
+                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                Padding="16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <fw:FWButton x:Name="ProbeButton" Content="Increment" />
+                <fw:FWButton x:Name="ProbeLightButton" Content="Light" />
+                <fw:FWButton x:Name="ProbeDarkButton" Content="Dark" />
+                <TextBlock x:Name="ProbeStatus"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           VerticalAlignment="Center"
+                           Text="Clicks: 0" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</Page>
