@@ -182,7 +182,7 @@ internal sealed class GalleryShell : UserControl
             .Where(page => page.MatchesSearch(searchText))
             .ToArray();
 
-        var homePage = matchingPages.FirstOrDefault(page => page.Group == GalleryNavigationGroup.Home);
+        var homePage = matchingPages.FirstOrDefault(page => page.GroupId == GalleryNavigationGroup.Home);
         if (homePage != null)
         {
             navigationView.MenuItems.Add(CreateNavigationItem(homePage));

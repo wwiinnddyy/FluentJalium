@@ -72,15 +72,20 @@ internal sealed class GalleryHostPage : Page
             Orientation = Orientation.Vertical
         };
 
-        var header = CreateWinUiHeader(page);
-        header.Margin = new Thickness(36, 24, 36, 0);
-        root.Children.Add(header);
+        // WinUI Gallery's home page is its own hero; a page header on top of it repeats the title.
+        var hasHeader = page.GroupId != GalleryNavigationGroup.Home;
+        if (hasHeader)
+        {
+            var header = CreateWinUiHeader(page);
+            header.Margin = new Thickness(36, 24, 36, 0);
+            root.Children.Add(header);
+        }
 
         var contentRoot = new StackPanel
         {
             Orientation = Orientation.Vertical,
             Spacing = 16,
-            Margin = new Thickness(36, 0, 36, 36),
+            Margin = new Thickness(36, hasHeader ? 0 : 24, 36, 36),
             MaxWidth = 1028,
             HorizontalAlignment = HorizontalAlignment.Left
         };
