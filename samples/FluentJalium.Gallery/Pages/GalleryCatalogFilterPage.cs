@@ -81,20 +81,35 @@ internal sealed class GalleryCatalogFilterPage
                 VerticalSpacing = 8,
                 Children =
                 {
-                    CreateSummaryPill(FluentIconRegular.ControlButton24, $"{snapshot.ControlCount} controls"),
+                    CreateSummaryPill(FluentIconRegular.ControlButton24, $"{GalleryImplementedControls.Count} controls"),
+                    CreateSummaryPill(FluentIconRegular.CheckboxChecked24, $"{CountCatalogued(snapshot)} catalogued"),
+                    CreateSummaryPill(FluentIconRegular.Add24, $"{CountWithoutSample(snapshot)} without sample"),
                     CreateSummaryPill(FluentIconRegular.DocumentBulletList24, $"{snapshot.PageCount} pages"),
                     CreateSummaryPill(FluentIconRegular.Tag24, $"{snapshot.GroupCounts.Length} groups"),
                     CreateSummaryPill(FluentIconRegular.New24, $"{snapshot.NewCount} new"),
                     CreateSummaryPill(FluentIconRegular.ArrowClockwise24, $"{snapshot.UpdatedCount} updated"),
                     CreateSummaryPill(FluentIconRegular.Sparkle24, $"{snapshot.PreviewCount} preview"),
                     CreateSummaryPill(FluentIconRegular.DataUsage24, $"{snapshot.DiagnosticCount} diagnostic"),
-                    CreateSummaryPill(FluentIconRegular.FolderOpen24, $"{snapshot.WithSourcePathCount} sources"),
-                    CreateSummaryPill(FluentIconRegular.ClipboardCode24, $"{snapshot.WithSampleCodeKeyCount} samples"),
-                    CreateSummaryPill(FluentIconRegular.Braces24, $"{snapshot.WithApiNamespaceCount} api")
+                    CreateSummaryPill(FluentIconRegular.FolderOpen24, $"{CountImplementedWith(snapshot, control => control.SourcePath)} sources"),
+                    CreateSummaryPill(FluentIconRegular.ClipboardCode24, $"{CountImplementedWith(snapshot, control => control.SampleCodeKey)} samples"),
+                    CreateSummaryPill(FluentIconRegular.Braces24, $"{CountImplementedWith(snapshot, control => control.ApiNamespace)} api")
                 }
             }
         };
     }
+
+    private static int CountCatalogued(GalleryCatalogFilterSnapshot snapshot) =>
+        snapshot.Matches.Count(control => GalleryImplementedControls.IsImplemented(control.Name));
+
+    private static int CountImplementedWith(
+        GalleryCatalogFilterSnapshot snapshot,
+        Func<GalleryControlInfo, string?> selector) =>
+        snapshot.Matches.Count(control =>
+            GalleryImplementedControls.IsImplemented(control.Name) &&
+            !string.IsNullOrWhiteSpace(selector(control)));
+
+    private static int CountWithoutSample(GalleryCatalogFilterSnapshot snapshot) =>
+        GalleryImplementedControls.Count - CountCatalogued(snapshot);
 
     private UIElement CreateControlCard(GalleryControlInfo control)
     {
