@@ -110,7 +110,7 @@ start bin/Debug/net10.0-windows/FluentJalium.Gallery.exe
 
 2. **构建失败** ✅
    - 根本原因：Jalium.UI.Build.dll 被 .NET Host 进程锁定
-   - 修复：切换到 NuGet 包模式（UseJaliumSourceReferences=false）
+   - 修复：包模式已是唯一模式，native DLL 由 `Jalium.UI.Interop` 包自动带入输出目录；出现该报错说明输出目录残留了旧的本地构建产物，清理 `bin/`、`obj/` 后重新构建
    - 构建时间：~25 秒
 
 3. **资源文件生成** ✅
