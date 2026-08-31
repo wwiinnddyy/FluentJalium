@@ -60,36 +60,46 @@ internal sealed class GalleryHostPage : Page
     {
         var scrollViewer = new FWScrollViewer
         {
-            Background = GalleryThemeResources.Brush("NavigationViewContentBackground"),
+            Background = Brushes.Transparent,
             Padding = new Thickness(0),
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             IsScrollBarAutoHideEnabled = true
         };
 
-        var mainPanel = new StackPanel
+        var root = new StackPanel
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 36,
-            Margin = new Thickness(36, 36, 36, 36)
+            Orientation = Orientation.Vertical
         };
 
         var header = CreateWinUiHeader(page);
-        mainPanel.Children.Add(header);
+        header.Margin = new Thickness(36, 24, 36, 0);
+        root.Children.Add(header);
 
-        mainPanel.Children.Add(page.CreateContent());
+        var contentRoot = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Spacing = 16,
+            Margin = new Thickness(36, 0, 36, 36),
+            MaxWidth = 1028,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+
+        contentRoot.Children.Add(page.CreateContent());
 
         var metadataExpander = CreateCollapsibleMetadata(page);
         if (metadataExpander != null)
         {
-            mainPanel.Children.Add(metadataExpander);
+            contentRoot.Children.Add(metadataExpander);
         }
 
-        scrollViewer.Content = mainPanel;
+        root.Children.Add(contentRoot);
+
+        scrollViewer.Content = root;
         return scrollViewer;
     }
 
-    private static UIElement CreateWinUiHeader(GalleryPage page)
+    private static Grid CreateWinUiHeader(GalleryPage page)
     {
         var grid = new Grid
         {
