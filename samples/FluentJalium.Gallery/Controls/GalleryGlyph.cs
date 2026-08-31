@@ -16,6 +16,8 @@ namespace FluentJalium.Gallery.Controls;
 /// </remarks>
 internal static class GalleryGlyph
 {
+    public static string Glyph(FluentIconRegular icon) => char.ConvertFromUtf32((int)Map(icon));
+
     public static FluentIcon Create(FluentIconRegular icon, double size = FluentIcon.DefaultSize, Brush? foreground = null)
     {
         var element = FluentIconFactory.Segoe(Map(icon), size, foreground);

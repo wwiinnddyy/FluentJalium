@@ -36,11 +36,11 @@ internal sealed class GalleryCatalogService
         var factories = new Dictionary<string, Func<UIElement>>(StringComparer.Ordinal)
         {
             [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent, navigate).CreateContent()),
-            [PageId("All Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.AllControls, pageInfos).CreateContent()),
-            [PageId("New Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.New, pageInfos).CreateContent()),
-            [PageId("Updated Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Updated, pageInfos).CreateContent()),
-            [PageId("Preview Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Preview, pageInfos).CreateContent()),
-            [PageId("Diagnostic Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Diagnostic, pageInfos).CreateContent()),
+            [PageId("All Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.AllControls, pageInfos, navigate).CreateContent()),
+            [PageId("New Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.New, pageInfos, navigate).CreateContent()),
+            [PageId("Updated Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Updated, pageInfos, navigate).CreateContent()),
+            [PageId("Preview Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Preview, pageInfos, navigate).CreateContent()),
+            [PageId("Diagnostic Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Diagnostic, pageInfos, navigate).CreateContent()),
             [PageId("Theme Architecture")] = () => CreatePageStack(new GalleryThemeArchitecturePage().CreateContent()),
             [PageId("Colors")] = () => CreatePageStack(new GalleryColorsPage().CreateContent()),
             [PageId("Typography")] = () => CreatePageStack(new GalleryTypographyPage().CreateContent()),

@@ -16,11 +16,13 @@ internal sealed class GalleryCatalogFilterPage
 {
     private readonly GalleryCatalogFilter _filter;
     private readonly GalleryControlInfo[] _controls;
+    private readonly Action<string> _navigate;
 
-    public GalleryCatalogFilterPage(GalleryCatalogFilter filter, IEnumerable<GalleryPageInfo> pages)
+    public GalleryCatalogFilterPage(GalleryCatalogFilter filter, IEnumerable<GalleryPageInfo> pages, Action<string>? navigate = null)
     {
         _filter = filter;
         _controls = GalleryControlInfo.CreateFromPages(pages);
+        _navigate = navigate ?? (_ => { });
     }
 
     public UIElement CreateContent()
@@ -94,109 +96,17 @@ internal sealed class GalleryCatalogFilterPage
         };
     }
 
-    private static FWBorder CreateControlCard(GalleryControlInfo control)
+    private UIElement CreateControlCard(GalleryControlInfo control)
     {
-        var body = new FWStackPanel
+        var card = new GalleryControlCard
         {
-            Orientation = Orientation.Vertical,
-            Spacing = 9,
-            Children =
-            {
-                CreateCardHeader(control),
-                new FWTextBlock
-                {
-                    Text = control.Page.Title,
-                    FontSize = 12,
-                    FontWeight = FontWeights.SemiBold,
-                    Foreground = GalleryThemeResources.Brush("TextSecondary"),
-                    TextWrapping = TextWrapping.Wrap
-                },
-                new FWTextBlock
-                {
-                    Text = control.Page.Description,
-                    FontSize = 12,
-                    Foreground = GalleryThemeResources.Brush("TextSecondary"),
-                    TextWrapping = TextWrapping.Wrap
-                },
-                CreateMetadataWrap(control)
-            }
+            Title = control.Name,
+            Subtitle = control.Page.Group,
+            Glyph = GalleryGlyph.Glyph(control.Page.Icon),
         };
-
-        return new FWBorder
-        {
-            Width = 360,
-            MinHeight = 190,
-            Background = GalleryThemeResources.Brush("ControlBackground"),
-            BorderBrush = GalleryThemeResources.Brush("ControlBorder"),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(6),
-            Padding = new Thickness(14),
-            Child = body
-        };
-    }
-
-    private static UIElement CreateCardHeader(GalleryControlInfo control)
-    {
-        return new FWStackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Children =
-            {
-                GalleryGlyph.Create(control.Icon, 20, GalleryThemeResources.Brush("TextPrimary")),
-                new FWTextBlock
-                {
-                    Text = control.Name,
-                    FontSize = 15,
-                    FontWeight = FontWeights.SemiBold,
-                    Foreground = GalleryThemeResources.Brush("TextPrimary"),
-                    TextWrapping = TextWrapping.Wrap,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
-            }
-        };
-    }
-
-    private static FWWrapPanel CreateMetadataWrap(GalleryControlInfo control)
-    {
-        var wrap = new FWWrapPanel
-        {
-            HorizontalSpacing = 6,
-            VerticalSpacing = 6
-        };
-
-        wrap.Children.Add(CreateChip(control.Group));
-        wrap.Children.Add(CreateChip(control.Status.ToString()));
-
-        if (control.IsNew)
-        {
-            wrap.Children.Add(CreateChip("New"));
-        }
-
-        if (control.IsUpdated)
-        {
-            wrap.Children.Add(CreateChip("Updated"));
-        }
-
-        AddOptionalChip(wrap, control.ApiNamespace);
-        AddOptionalChip(wrap, control.SourcePath);
-        AddOptionalChip(wrap, control.SampleCodeKey);
-        AddOptionalChip(wrap, control.Page.UniqueId);
-
-        foreach (var baseClass in control.BaseClasses)
-        {
-            wrap.Children.Add(CreateChip(baseClass));
-        }
-
-        return wrap;
-    }
-
-    private static void AddOptionalChip(FWWrapPanel wrap, string? value)
-    {
-        if (!string.IsNullOrWhiteSpace(value))
-        {
-            wrap.Children.Add(CreateChip(value));
-        }
+        var target = control.Page.UniqueId;
+        card.Activated += (_, _) => _navigate(target);
+        return card;
     }
 
     private static FWBorder CreateSummaryPill(FluentIconRegular icon, string text)

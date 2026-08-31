@@ -1,0 +1,43 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Controls.GalleryControlCard"
+             Width="300"
+             Height="96">
+
+    <fw:FWButton x:Name="Root"
+                 Padding="8"
+                 HorizontalContentAlignment="Stretch"
+                 VerticalContentAlignment="Stretch"
+                 Background="{ThemeResource ControlFillColorDefaultBrush}"
+                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                 BorderThickness="1">
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <fw:FWTextBlock x:Name="GlyphPresenter"
+                            Width="32"
+                            Margin="8,12,16,0"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="20"
+                            TextAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+
+            <StackPanel Grid.Column="1"
+                        Spacing="2"
+                        VerticalAlignment="Center">
+                <TextBlock x:Name="TitlePresenter"
+                           Style="{StaticResource BodyStrongTextBlockStyle}"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <TextBlock x:Name="SubtitlePresenter"
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </Grid>
+    </fw:FWButton>
+</UserControl>
