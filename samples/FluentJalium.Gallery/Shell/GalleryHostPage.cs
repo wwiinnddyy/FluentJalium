@@ -112,16 +112,14 @@ internal sealed class GalleryHostPage : Page
             Spacing = 12
         };
 
-        titleRow.Children.Add(CreateIcon(page.Icon, 28));
-        titleRow.Children.Add(new FWTextBlock
+        var title = new FWTextBlock
         {
             Text = page.Title,
-            FontSize = 28,
-            FontFamily = "Segoe UI Variable Display",
-            FontWeight = FontWeights.SemiBold,
-            Foreground = GalleryThemeResources.Brush("TextPrimary"),
+            Style = TextThemeStyle("TitleTextBlockStyle"),
             VerticalAlignment = VerticalAlignment.Center
-        });
+        };
+        title.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorPrimaryBrush");
+        titleRow.Children.Add(title);
 
         if (page.Status != GalleryPageStatus.Stable)
         {
@@ -130,14 +128,18 @@ internal sealed class GalleryHostPage : Page
 
         leftPanel.Children.Add(titleRow);
 
-        leftPanel.Children.Add(new FWTextBlock
+        var description = new FWTextBlock
         {
             Text = page.Description,
-            FontSize = 14,
-            Foreground = GalleryThemeResources.Brush("TextSecondary"),
+            Style = TextThemeStyle("BodyTextBlockStyle"),
             TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 1064,
+            HorizontalAlignment = HorizontalAlignment.Left,
             Margin = new Thickness(0, 4, 0, 0)
-        });
+        };
+        description.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush");
+
+        leftPanel.Children.Add(description);
 
         Grid.SetColumn(leftPanel, 0);
         grid.Children.Add(leftPanel);
@@ -538,6 +540,9 @@ internal sealed class GalleryHostPage : Page
             }
         };
     }
+
+    private static Style TextThemeStyle(string key) =>
+        (Style)(Application.Current?.Resources[key] ?? throw new InvalidOperationException($"Gallery theme resources are missing the {key} style."));
 
     private static FluentIcon CreateIcon(FluentIconRegular icon, double size)
     {
