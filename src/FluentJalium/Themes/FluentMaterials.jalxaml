@@ -93,8 +93,8 @@
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseBrush" Color="#B4145491" />
             <SolidColorBrush x:Key="MicaBackgroundFillColorBaseAltBrush" Color="#BE145491" />
             <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorDefaultBrush" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#B020548F" />
-            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#B020548F" />
+            <SolidColorBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" Color="#CC282828" />
+            <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#CC282828" />
             <SolidColorBrush x:Key="AccentAcrylicBackgroundFillColorDefaultBrush" Color="#B4145491" />
             <SolidColorBrush x:Key="AccentAcrylicInAppFillColorDefaultBrush" Color="#B4145491" />
         </ResourceDictionary>
