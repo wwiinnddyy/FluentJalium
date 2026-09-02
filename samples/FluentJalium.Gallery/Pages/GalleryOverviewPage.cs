@@ -107,7 +107,7 @@ internal sealed class GalleryOverviewPage
 
         heroContent.Children.Add(new FWTextBlock
         {
-            Text = "Explore the Fluent Design System for Jalium.UI — a comprehensive toolkit for building modern, accessible, and beautiful applications.",
+            Text = Strings.Overview_Subtitle,
             FontSize = 16,
             Foreground = ThemeBrush("TextSecondary"),
             TextWrapping = TextWrapping.Wrap,

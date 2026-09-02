@@ -294,6 +294,9 @@
   <data name="Shell_Title" xml:space="preserve">
     <value>FluentJalium</value>
   </data>
+  <data name="Overview_Subtitle" xml:space="preserve">
+    <value>Explore the Fluent Design System for Jalium.UI — a comprehensive toolkit for building modern, accessible, and beautiful applications.</value>
+  </data>
   <data name="Shell_Subtitle" xml:space="preserve">
     <value>Control gallery</value>
   </data>

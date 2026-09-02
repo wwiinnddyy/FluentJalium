@@ -294,6 +294,9 @@
   <data name="Shell_Title" xml:space="preserve">
     <value>FluentJalium</value>
   </data>
+  <data name="Overview_Subtitle" xml:space="preserve">
+    <value>用于探索 FluentJalium 的 Fluent 设计系统——一套构建现代、可访问且美观应用的完整工具集。</value>
+  </data>
   <data name="Shell_Subtitle" xml:space="preserve">
     <value>控件库</value>
   </data>

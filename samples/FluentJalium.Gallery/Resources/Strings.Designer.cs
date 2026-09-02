@@ -501,6 +501,12 @@ namespace FluentJalium.Gallery.Resources {
             }
         }
 
+        internal static string Overview_Subtitle {
+            get {
+                return ResourceManager.GetString("Overview_Subtitle", resourceCulture);
+            }
+        }
+
         internal static string Overview_Title {
             get {
                 return ResourceManager.GetString("Overview_Title", resourceCulture);
