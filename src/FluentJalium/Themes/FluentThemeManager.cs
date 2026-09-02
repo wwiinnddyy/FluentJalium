@@ -44,12 +44,10 @@ public static class FluentThemeManager
     public const string FluentResourcesResourceName = "FluentJalium.Themes.FluentResources.jalxaml";
     public const string FluentControlsResourceName = "FluentJalium.Themes.Controls.FluentControls.jalxaml";
 
-    private const string ThemeRefreshVersionKey = "__FluentJalium.ThemeVersion";
     private static ResourceDictionary? s_themeDictionary;
     private static ResourceDictionary? s_accentDictionary;
     private static ResourceDictionary? s_typographyDictionary;
     private static Application? s_application;
-    private static int s_themeVersion;
 
     public static readonly Color DefaultAccentColor = Color.FromRgb(0x00, 0x78, 0xD4);
 
@@ -161,7 +159,6 @@ public static class FluentThemeManager
         s_accentDictionary = null;
         s_typographyDictionary = null;
         s_application = null;
-        s_themeVersion = 0;
         CurrentTheme = FluentThemeVariant.Dark;
         CurrentAccentColor = DefaultAccentColor;
         CurrentDisplayFontFamily = "Segoe UI Variable Display";
@@ -442,7 +439,6 @@ public static class FluentThemeManager
     private static void ForceRefresh(Application app)
     {
         ResourceLookup.InvalidateResourceCache();
-        app.Resources[ThemeRefreshVersionKey] = ++s_themeVersion;
     }
 
     private static string NormalizeFontFamily(string? value, string fallback)
