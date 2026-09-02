@@ -221,7 +221,7 @@ internal sealed class GalleryHostPage : Page
         bool hasMetadata = !string.IsNullOrWhiteSpace(page.ApiNamespace) ||
                            page.BaseClasses.Count > 0 ||
                            page.RelatedControls.Count > 0 ||
-                           GallerySampleCodeRegistry.TryGetSampleCode(page.Info, out _);
+                           GallerySampleSourceRegistry.TryGetSource(page.Info, out _);
 
         if (!hasMetadata) return null;
 
@@ -249,7 +249,7 @@ internal sealed class GalleryHostPage : Page
             detailsPanel.Children.Add(CreateMetadataGroup(FluentIconRegular.Tag24, "Related", page.RelatedControls));
         }
 
-        if (GallerySampleCodeRegistry.TryGetSampleCode(page.Info, out var sampleCode))
+        if (GallerySampleSourceRegistry.TryGetSource(page.Info, out var sampleCode))
         {
             detailsPanel.Children.Add(CreateSampleCodeBlock(sampleCode));
         }
