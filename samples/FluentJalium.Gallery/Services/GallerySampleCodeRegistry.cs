@@ -1776,6 +1776,12 @@ var closeReason = await closeTask;
     {
         ArgumentNullException.ThrowIfNull(page);
 
+        if (GallerySampleSourceRegistry.TryGetSource(page, out var realSource))
+        {
+            sampleCode = realSource.Trim();
+            return true;
+        }
+
         if (!string.IsNullOrWhiteSpace(page.SampleCodeKey)
             && SampleCodeByKey.TryGetValue(page.SampleCodeKey.Trim(), out var registeredSampleCode))
         {

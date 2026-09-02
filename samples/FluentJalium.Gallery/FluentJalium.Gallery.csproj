@@ -19,6 +19,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Page sources, embedded under a flat manifest name so the source panel can show real code. -->
+    <EmbeddedResource Include="Pages\**\*.cs;Pages\**\*.jalxaml">
+      <LogicalName>FluentJalium.Gallery.Pages.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Localization resources -->
     <EmbeddedResource Update="Resources\Strings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
