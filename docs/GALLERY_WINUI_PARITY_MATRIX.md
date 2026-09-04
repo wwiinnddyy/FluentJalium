@@ -113,3 +113,29 @@ HorizontalScrollContainer), `Models/ControlInfoData.cs (+ Category.cs, IconData.
 
 *Doc freeze: this file describes the tree at §1. Later phase commits must not
 rewrite history here; append a short "Delta" note per phase instead.*
+
+## 9. Phase deltas
+
+### Phase 1 — Shell / Navigation (branch `new`)
+- `GalleryNavigationGroup`: added `Fundamentals` + `Accessibility`, ordered ahead of
+  `Catalog`; added `FirstControlsGroup` marker. 10 Preview shells
+  (resources/styles/binding/templates/customusercontrols/xamlconditions/scratchpad/
+  screenreadersupport/keyboardsupport/colorcontrast) with factories via the new
+  `Pages/GalleryPlaceholderPage.cs`.
+- `navigation` entry re-enabled; factory renders the new
+  `Pages/GalleryNavigationPage.cs` (preview shell + covered FW surface index). The
+  embedded page file also makes the `navigation.*` sample key resolvable, so the
+  VisualQA `navigation` family now passes (baseline: missing page).
+- `FluentNavigationView.MenuItems/FooterMenuItems` widened to
+  `ObservableCollection<Control>` (WinUI `IList<object>` semantics); shell inserts a
+  `FWNavigationViewItemSeparator` + localized "Controls" header ahead of `Catalog`.
+- Hidden UIA hooks `__CurrentPage` (UniqueId, updated on every navigation) and
+  `__GoBackInvoker` added to the shell root (zero-size, hit-test invisible).
+- Search placeholder aligned to WinUI ("Search controls and samples...") in
+  resx ×3 + localization dict. (`FWAutoSuggestBox` has no QueryIcon API — gap stays.)
+- Verification: Gallery build 0 errors; `FluentGalleryCatalogTests` 17/21 pass on a
+  zh-CN runner (baseline-referenced pre-existing failures: EN-literal assertions under
+  zh locale, plus source-registry filename mismatches for `layout`,
+  `controlgapmatrix`, `visualqacoverage` — all reproduced on the stashed baseline).
+  New `GalleryCatalog_ShouldExposeWinUiFundamentalsAndAccessibilityShells` is
+  locale-proof and green in both cultures.

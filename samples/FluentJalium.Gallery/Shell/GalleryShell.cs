@@ -8,6 +8,7 @@ using FluentJalium.Gallery.Resources;
 using FluentJalium.Gallery.Styles;
 using FluentJalium.Icon;
 using Jalium.UI;
+using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using Jalium.UI.Navigation;
@@ -44,6 +45,9 @@ internal sealed class GalleryShell : UserControl
     private FWTransitioningContentControl? _transitionHost;
     private FWAutoSuggestBox? _searchBox;
     private FWSnackbarHost? _snackbarHost;
+    private TextBlock? _currentPageText;
+    private Button? _goBackButton;
+    private readonly GalleryLocalizationService _localization = new();
     private GalleryPage? _selectedPage;
     private string _navigationSearchText = string.Empty;
 
@@ -145,7 +149,53 @@ internal sealed class GalleryShell : UserControl
         var shellRoot = new Grid();
         shellRoot.Children.Add(_navigationView);
         shellRoot.Children.Add(_snackbarHost);
+        shellRoot.Children.Add(CreateAutomationHelper(out _currentPageText, out _goBackButton));
         return shellRoot;
+    }
+
+    /// <summary>
+    /// Hidden UIA helpers mirroring WinUI Gallery's AutomationHelpers panel: zero-size and
+    /// hit-test invisible (never collapsed) so automation can read the current page and drive back.
+    /// </summary>
+    private UIElement CreateAutomationHelper(out TextBlock currentPageText, out Button goBackButton)
+    {
+        currentPageText = new TextBlock
+        {
+            Width = 0,
+            Height = 0,
+            Opacity = 0,
+            IsHitTestVisible = false
+        };
+        AutomationProperties.SetAutomationId(currentPageText, "__CurrentPage");
+
+        goBackButton = new Button
+        {
+            Width = 0,
+            Height = 0,
+            Opacity = 0,
+            IsHitTestVisible = false,
+            IsTabStop = false
+        };
+        AutomationProperties.SetAutomationId(goBackButton, "__GoBackInvoker");
+        goBackButton.Click += (_, _) =>
+        {
+            if (_frame?.CanGoBack == true)
+            {
+                _frame.GoBack();
+            }
+        };
+
+        var panel = new StackPanel
+        {
+            Width = 0,
+            Height = 0,
+            Opacity = 0,
+            IsHitTestVisible = false,
+            Orientation = Orientation.Vertical
+        };
+        panel.Children.Add(currentPageText);
+        panel.Children.Add(goBackButton);
+        return panel;
     }
 
     private UIElement CreateContentHost()
@@ -199,14 +249,20 @@ internal sealed class GalleryShell : UserControl
             .Where(group => group.Pages.Length > 0)
             .ToArray();
 
-        if (homePage != null && groupedPages.Length > 0)
-        {
-            // TODO: Add separator support to FluentNavigationView
-            // navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
-        }
-
+        var controlsHeaderInserted = false;
         foreach (var group in groupedPages)
         {
+            if (!controlsHeaderInserted &&
+                string.Equals(group.GroupId, GalleryNavigationGroup.FirstControlsGroup, StringComparison.Ordinal))
+            {
+                navigationView.MenuItems.Add(new FWNavigationViewItemSeparator());
+                navigationView.MenuItems.Add(new FWNavigationViewItemHeader
+                {
+                    Content = _localization.Text("shell.controlsHeader")
+                });
+                controlsHeaderInserted = true;
+            }
+
             var localizedGroupName = group.Pages.First().Group;
             var groupItem = CreateNavigationGroupItem(localizedGroupName, group.GroupId);
             foreach (var page in group.Pages)
@@ -456,11 +512,19 @@ internal sealed class GalleryShell : UserControl
 
         _selectedPage = page;
         GalleryRecentSamplesService.Instance.RecordVisit(page);
+        if (_currentPageText != null)
+        {
+            _currentPageText.Text = page.UniqueId;
+        }
         _frame?.Navigate(typeof(GalleryItemHostPage), page);
     }
 
     private void NavigateToEmptySearchState()
     {
+        if (_currentPageText != null)
+        {
+            _currentPageText.Text = string.Empty;
+        }
         _frame?.Navigate(typeof(GallerySearchEmptyPage), _navigationSearchText);
     }
 

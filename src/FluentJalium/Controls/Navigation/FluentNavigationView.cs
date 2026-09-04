@@ -28,8 +28,8 @@ public class FluentNavigationView : Control
     private double _openPaneLength = 320;
     private double _compactPaneLength = 48;
 
-    public ObservableCollection<FluentNavigationViewItem> MenuItems { get; } = new();
-    public ObservableCollection<FluentNavigationViewItem> FooterMenuItems { get; } = new();
+    public ObservableCollection<Control> MenuItems { get; } = new();
+    public ObservableCollection<Control> FooterMenuItems { get; } = new();
 
     public event EventHandler<FluentNavigationViewSelectionChangedEventArgs>? SelectionChanged;
     public event EventHandler<FluentNavigationViewBackRequestedEventArgs>? BackRequested;
@@ -291,7 +291,10 @@ public class FluentNavigationView : Control
 
         foreach (var item in MenuItems)
         {
-            item.ParentNavigationView = this;
+            if (item is FluentNavigationViewItem menuItem)
+            {
+                menuItem.ParentNavigationView = this;
+            }
             _menuItemsPanel.Children.Add(item);
         }
 
@@ -300,7 +303,10 @@ public class FluentNavigationView : Control
             _footerMenuItemsPanel.Children.Clear();
             foreach (var item in FooterMenuItems)
             {
-                item.ParentNavigationView = this;
+                if (item is FluentNavigationViewItem footerItem)
+                {
+                    footerItem.ParentNavigationView = this;
+                }
                 _footerMenuItemsPanel.Children.Add(item);
             }
         }
@@ -309,14 +315,14 @@ public class FluentNavigationView : Control
     internal void NotifyItemSelected(FluentNavigationViewItem item)
     {
         // Deselect all other items
-        foreach (var menuItem in MenuItems)
+        foreach (var menuItem in MenuItems.OfType<FluentNavigationViewItem>())
         {
             if (menuItem != item)
             {
                 menuItem.IsSelected = false;
             }
         }
-        foreach (var footerItem in FooterMenuItems)
+        foreach (var footerItem in FooterMenuItems.OfType<FluentNavigationViewItem>())
         {
             if (footerItem != item)
             {

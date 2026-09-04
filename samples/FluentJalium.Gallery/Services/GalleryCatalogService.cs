@@ -36,6 +36,16 @@ internal sealed class GalleryCatalogService
         var factories = new Dictionary<string, Func<UIElement>>(StringComparer.Ordinal)
         {
             [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent, navigate).CreateContent()),
+            [PageId("Resources")] = CreatePlaceholderContent(pageInfos, "resources"),
+            [PageId("Styles")] = CreatePlaceholderContent(pageInfos, "styles"),
+            [PageId("Binding")] = CreatePlaceholderContent(pageInfos, "binding"),
+            [PageId("Templates")] = CreatePlaceholderContent(pageInfos, "templates"),
+            [PageId("Custom User Controls")] = CreatePlaceholderContent(pageInfos, "customusercontrols"),
+            [PageId("XAML Conditions")] = CreatePlaceholderContent(pageInfos, "xamlconditions"),
+            [PageId("Scratch Pad")] = CreatePlaceholderContent(pageInfos, "scratchpad"),
+            [PageId("Screen Reader Support")] = CreatePlaceholderContent(pageInfos, "screenreadersupport"),
+            [PageId("Keyboard Support")] = CreatePlaceholderContent(pageInfos, "keyboardsupport"),
+            [PageId("Color Contrast")] = CreatePlaceholderContent(pageInfos, "colorcontrast"),
             [PageId("All Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.AllControls, pageInfos, navigate).CreateContent()),
             [PageId("New Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.New, pageInfos, navigate).CreateContent()),
             [PageId("Updated Controls")] = () => CreatePageStack(new GalleryCatalogFilterPage(GalleryCatalogFilter.Updated, pageInfos, navigate).CreateContent()),
@@ -62,8 +72,7 @@ internal sealed class GalleryCatalogService
             [PageId("Selectors and Properties")] = () => CreatePageStack(new GallerySelectorsPropertiesPage().CreateContent()),
             [PageId("Data Inspectors")] = () => CreatePageStack(new GalleryDataInspectorsPage().CreateContent()),
             [PageId("Charts")] = () => CreatePageStack(new GalleryChartsPage().CreateContent()),
-            // TODO: Re-enable after updating GalleryNavigationPage to work with FluentNavigationView
-            // [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent()),
+            [PageId("Navigation")] = () => CreatePageStack(new GalleryNavigationPage().CreateContent(FindPageInfo(pageInfos, "navigation"))),
             [PageId("Window Backdrops")] = () => CreatePageStack(new GalleryWindowBackdropsPage(owner).CreateContent()),
             [PageId("Materials and Effects")] = () => CreatePageStack(new GalleryMaterialsPage().CreateContent()),
             [PageId("Material Primitives")] = () => CreatePageStack(new MaterialsPage().CreateContent()),
@@ -84,6 +93,17 @@ internal sealed class GalleryCatalogService
     }
 
     private static string PageId(string title) => GalleryCatalog.CreateUniqueId(title);
+
+    private static Func<UIElement> CreatePlaceholderContent(GalleryPageInfo[] pageInfos, string uniqueId)
+    {
+        var info = FindPageInfo(pageInfos, uniqueId);
+        return () => CreatePageStack(GalleryPlaceholderPage.Create(info));
+    }
+
+    private static GalleryPageInfo FindPageInfo(GalleryPageInfo[] pageInfos, string uniqueId)
+    {
+        return pageInfos.First(page => string.Equals(page.UniqueId, uniqueId, StringComparison.Ordinal));
+    }
 
     private static UIElement CreatePageStack(params UIElement[] sections)
     {

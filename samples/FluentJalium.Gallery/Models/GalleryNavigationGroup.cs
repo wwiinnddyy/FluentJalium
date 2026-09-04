@@ -6,6 +6,8 @@ internal static class GalleryNavigationGroup
 {
     public const string Home = "Home";
     public const string Catalog = "Catalog";
+    public const string Fundamentals = "Fundamentals";
+    public const string Accessibility = "Accessibility";
     public const string Design = "Design";
     public const string ControlSurfaces = "Control surfaces";
     public const string Input = "Input";
@@ -16,10 +18,18 @@ internal static class GalleryNavigationGroup
     public const string AppStructure = "App structure";
     public const string Diagnostics = "Diagnostics";
 
+    /// <summary>
+    /// First group of the WinUI "Controls" section. A separator and a "Controls"
+    /// header are rendered ahead of it, mirroring WinUIGallery's MainWindow.
+    /// </summary>
+    public const string FirstControlsGroup = Catalog;
+
     public static readonly string[] Order =
     [
-        Catalog,
+        Fundamentals,
         Design,
+        Accessibility,
+        Catalog,
         ControlSurfaces,
         Input,
         LayoutAndMedia,
@@ -34,6 +44,8 @@ internal static class GalleryNavigationGroup
         return groupName switch
         {
             Catalog => FluentIconRegular.Filter24,
+            Fundamentals => FluentIconRegular.Book24,
+            Accessibility => FluentIconRegular.Accessibility24,
             Design => FluentIconRegular.DesignIdeas24,
             ControlSurfaces => FluentIconRegular.ControlButton24,
             Input => FluentIconRegular.Textbox24,

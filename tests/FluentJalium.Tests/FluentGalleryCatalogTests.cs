@@ -733,6 +733,56 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
+    public void GalleryCatalog_ShouldExposeWinUiFundamentalsAndAccessibilityShells()
+    {
+        var localization = new GalleryLocalizationService();
+        var pages = GalleryCatalog.CreatePageInfos(localization);
+
+        Assert.Equal(GalleryNavigationGroup.Catalog, GalleryNavigationGroup.FirstControlsGroup);
+        var order = GalleryNavigationGroup.Order;
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Fundamentals) >= 0);
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Accessibility) >= 0);
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Fundamentals) < Array.IndexOf(order, GalleryNavigationGroup.Catalog));
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Accessibility) < Array.IndexOf(order, GalleryNavigationGroup.Catalog));
+
+        Assert.Equal(
+            localization.IsChinese ? "控件" : "Controls",
+            localization.Text("shell.controlsHeader"));
+
+        var shells = new (string UniqueId, string GroupId)[]
+        {
+            ("resources", GalleryNavigationGroup.Fundamentals),
+            ("styles", GalleryNavigationGroup.Fundamentals),
+            ("binding", GalleryNavigationGroup.Fundamentals),
+            ("templates", GalleryNavigationGroup.Fundamentals),
+            ("customusercontrols", GalleryNavigationGroup.Fundamentals),
+            ("xamlconditions", GalleryNavigationGroup.Fundamentals),
+            ("scratchpad", GalleryNavigationGroup.Fundamentals),
+            ("screenreadersupport", GalleryNavigationGroup.Accessibility),
+            ("keyboardsupport", GalleryNavigationGroup.Accessibility),
+            ("colorcontrast", GalleryNavigationGroup.Accessibility)
+        };
+
+        foreach (var shell in shells)
+        {
+            var page = Assert.Single(pages, page => page.UniqueId == shell.UniqueId);
+            Assert.Equal(localization.PageTitle(shell.UniqueId), page.Title);
+            Assert.Equal(localization.GroupName(shell.GroupId), page.Group);
+            Assert.Equal(GalleryPageStatus.Preview, page.Status);
+            Assert.False(page.IsFooter);
+            Assert.False(string.IsNullOrWhiteSpace(page.Description));
+            Assert.True(page.MatchesSearch(page.Title));
+        }
+
+        var navigation = Assert.Single(pages, page => page.UniqueId == "navigation");
+        Assert.Equal(localization.PageTitle("navigation"), navigation.Title);
+        Assert.Equal(localization.GroupName(GalleryNavigationGroup.AppStructure), navigation.Group);
+        Assert.True(navigation.IsUpdated);
+        Assert.Equal("/Navigation/FWNavigationService", navigation.SourcePath);
+        Assert.Equal("navigation.breadcrumb.pips.selector.tabview.titlebar", navigation.SampleCodeKey);
+    }
+
+    [Fact]
     public void FluentControlBacklogMatrix_ShouldKeepReferenceAndExecutionCoverage()
     {
         var document = File.ReadAllText(FindRepositoryFile("docs", "FLUENT_CONTROL_BACKLOG_MATRIX.md"));

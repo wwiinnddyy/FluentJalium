@@ -114,11 +114,13 @@ internal sealed class GalleryLocalizationService
 
         Add("shell.title", "FluentJalium", "Fluent Jalium");
         Add("shell.subtitle", "Control gallery", "控件库");
-        Add("shell.searchPlaceholder", "Search controls, materials, and samples", "搜索控件、材质和示例");
+        Add("shell.searchPlaceholder", "Search controls and samples...", "搜索控件和示例");
         Add("shell.language", "Language", "语言");
         Add("shell.noResultsTitle", "No results", "无结果");
         Add("shell.noPages", "No Gallery pages are available.", "没有可用的 Gallery 页面。");
         Add("shell.noSearchMatches", "No Gallery pages match \"{0}\".", "没有与“{0}”匹配的 Gallery 页面。");
+
+        Add("shell.controlsHeader", "Controls", "控件");
 
         Add("sample.example", "Example", "示例");
         Add("sample.states", "States", "状态");
@@ -145,6 +147,8 @@ internal sealed class GalleryLocalizationService
 
         Add("group.Home", "Home", "主页");
         Add("group.Catalog", "Catalog", "目录");
+        Add("group.Fundamentals", "Fundamentals", "基础");
+        Add("group.Accessibility", "Accessibility", "无障碍");
         Add("group.Design", "Design", "设计");
         Add("group.Control surfaces", "Control surfaces", "控件表面");
         Add("group.Input", "Input", "输入");
@@ -156,6 +160,16 @@ internal sealed class GalleryLocalizationService
         Add("group.Diagnostics", "Diagnostics", "诊断");
 
         AddPage(text, "overview", "Overview", "概览", "Theme, typography, and accent controls for validating FluentJalium across variants.", "用于验证 FluentJalium 多种变体的主题、排版和强调色控件。", "home design system theme typography accent light dark high contrast 主页 设计系统 主题 排版 强调色 亮色 暗色 高对比度");
+        AddPage(text, "resources", "Resources", "资源", "Preview shell for the WinUI Resources fundamentals page. ResourceDictionary coverage lands with the FW resource samples.", "WinUI Resources 基础页的预览空壳，ResourceDictionary 覆盖随 FW 资源示例落地。", "resources resourcedictionary staticresource themeresource fundamentals WinUI 资源 字典 基础");
+        AddPage(text, "styles", "Styles", "样式", "Preview shell for the WinUI Styles fundamentals page. Implicit and explicit style samples land with the FW style coverage.", "WinUI Styles 基础页的预览空壳，隐式与显式样式示例随 FW 样式覆盖落地。", "styles implicit explicit style setter fundamentals WinUI 样式 基础");
+        AddPage(text, "binding", "Binding", "绑定", "Preview shell for the WinUI Binding fundamentals page. Data-context and x:Bind samples land with the FW binding coverage.", "WinUI Binding 基础页的预览空壳，数据上下文与 x:Bind 示例随 FW 绑定覆盖落地。", "binding xbind data context fundamentals WinUI 绑定 数据 上下文 基础");
+        AddPage(text, "templates", "Templates", "模板", "Preview shell for the WinUI Templates fundamentals page. DataTemplate and ControlTemplate samples land with the FW template coverage.", "WinUI Templates 基础页的预览空壳，数据模板与控件模板示例随 FW 模板覆盖落地。", "templates datatemplate controltemplate itemspanel fundamentals WinUI 模板 数据 控件 基础");
+        AddPage(text, "customusercontrols", "Custom User Controls", "自定义用户控件", "Preview shell for the WinUI Custom and User Controls fundamentals page.", "WinUI 自定义与用户控件基础页的预览空壳。", "custom user controls templated usercontrol fundamentals WinUI 自定义 用户 控件 基础");
+        AddPage(text, "xamlconditions", "XAML Conditions", "XAML 条件", "Preview shell for the WinUI XAML Conditions fundamentals page.", "WinUI XAML 条件基础页的预览空壳。", "xaml conditions conditional namespace contract fundamentals WinUI 条件 基础");
+        AddPage(text, "scratchpad", "Scratch Pad", "草稿本", "Preview shell for the WinUI Scratch Pad fundamentals page.", "WinUI Scratch Pad 基础页的预览空壳。", "scratch pad playground experiment fundamentals WinUI 草稿 实验 基础");
+        AddPage(text, "screenreadersupport", "Screen Reader Support", "屏幕阅读器支持", "Preview shell for the WinUI screen reader accessibility page. Automation name and help-text coverage lands with the FW accessibility pass.", "WinUI 屏幕阅读器无障碍页的预览空壳，自动化名称与帮助文本覆盖随 FW 无障碍专项落地。", "accessibility screen reader narrator automation name help text WinUI 无障碍 屏幕 阅读器 自动化 名称 帮助文本");
+        AddPage(text, "keyboardsupport", "Keyboard Support", "键盘支持", "Preview shell for the WinUI keyboard accessibility page. Tab order and accelerator coverage lands with the FW accessibility pass.", "WinUI 键盘无障碍页的预览空壳，Tab 顺序与快捷键覆盖随 FW 无障碍专项落地。", "accessibility keyboard tab focus accelerator shortcut WinUI 无障碍 键盘 焦点 快捷键");
+        AddPage(text, "colorcontrast", "Color Contrast", "颜色对比度", "Preview shell for the WinUI color contrast accessibility page. Contrast-ratio coverage lands with the FW accessibility pass.", "WinUI 颜色对比度无障碍页的预览空壳，对比度覆盖随 FW 无障碍专项落地。", "accessibility color contrast high contrast ratio WinUI 无障碍 颜色 对比度");
         AddPage(text, "allcontrols", "All Controls", "全部控件", "Filterable index of FluentJalium control pages with source paths, API namespaces, base classes, and related FW controls.", "可筛选的 FluentJalium 控件页索引，包含源码路径、API 命名空间、基类和相关 FW 控件。", "all controls catalog filter metadata FW index 全部 控件 目录 筛选 元数据");
         AddPage(text, "newcontrols", "New Controls", "新增控件", "First-wave Gallery entries marked with IsNew metadata.", "标记为 IsNew 的第一波 Gallery 条目。", "new controls catalog filter IsNew first wave FW index 新增 控件 目录");
         AddPage(text, "updatedcontrols", "Updated Controls", "更新控件", "Gallery entries marked with IsUpdated metadata for recently expanded samples.", "标记为 IsUpdated 的近期扩展示例条目。", "updated controls catalog filter IsUpdated improved FW index 更新 控件 目录");

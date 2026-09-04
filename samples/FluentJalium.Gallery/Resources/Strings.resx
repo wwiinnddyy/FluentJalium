@@ -301,7 +301,7 @@
     <value>Control gallery</value>
   </data>
   <data name="Shell_SearchPlaceholder" xml:space="preserve">
-    <value>Search controls, materials, and samples</value>
+    <value>Search controls and samples...</value>
   </data>
   <data name="Shell_Language" xml:space="preserve">
     <value>Language</value>

@@ -301,7 +301,7 @@
     <value>控件库</value>
   </data>
   <data name="Shell_SearchPlaceholder" xml:space="preserve">
-    <value>搜索控件、材质和示例</value>
+    <value>搜索控件和示例</value>
   </data>
   <data name="Shell_Language" xml:space="preserve">
     <value>语言</value>
