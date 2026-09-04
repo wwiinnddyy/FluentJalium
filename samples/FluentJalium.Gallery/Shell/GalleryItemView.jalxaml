@@ -7,8 +7,9 @@
                        VerticalScrollBarVisibility="Auto">
         <StackPanel x:Name="ContentRoot" Margin="36,24,36,36">
 
-            <!--  Page header: title/API on the left, actions on the right  -->
-            <Grid>
+            <!--  Page header: title/API on the left, actions on the right.
+                  Hidden for Home-group pages: WinUI Gallery's Home is not an item page.  -->
+            <Grid x:Name="HeaderGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -54,7 +55,7 @@
             </Grid>
 
             <!--  Documentation and source menus  -->
-            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,12,0,0">
+            <StackPanel x:Name="LinkRow" Orientation="Horizontal" Spacing="4" Margin="0,12,0,0">
                 <fw:FWDropDownButton x:Name="DocsDrop" />
                 <fw:FWDropDownButton x:Name="SourceDrop" />
             </StackPanel>

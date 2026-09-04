@@ -33,6 +33,13 @@ internal static class GalleryGlyph
     private static SegoeFluentIcon Map(FluentIconRegular icon) => icon switch
     {
         FluentIconRegular.Home24 => SegoeFluentIcon.Home,
+        FluentIconRegular.Book24 => SegoeFluentIcon.Document,
+        FluentIconRegular.Accessibility24 => SegoeFluentIcon.People,
+        FluentIconRegular.Keyboard24 => SegoeFluentIcon.Keyboard,
+        FluentIconRegular.Eye24 => SegoeFluentIcon.Eye,
+        FluentIconRegular.Window24 => SegoeFluentIcon.Layout,
+        FluentIconRegular.Clock24 => SegoeFluentIcon.Clock,
+        FluentIconRegular.Star24 => SegoeFluentIcon.FavoriteStar,
         FluentIconRegular.Filter24 => SegoeFluentIcon.SelectAll,
         FluentIconRegular.DesignIdeas24 => SegoeFluentIcon.Color,
         FluentIconRegular.ControlButton24 => SegoeFluentIcon.Button,

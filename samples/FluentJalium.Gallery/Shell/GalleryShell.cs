@@ -466,8 +466,12 @@ internal sealed class GalleryShell : UserControl
     private void SelectPage(GalleryPage page)
     {
         // Setting SelectedItem re-enters here through SelectionChanged; navigating again would
-        // leave the frame's cached page and the new one both on screen.
-        if (ReferenceEquals(_selectedPage, page))
+        // leave the frame's cached page and the new one both on screen. Compare by UniqueId as
+        // well: RefreshTheme rebuilds page objects, and re-navigating to the same sample must
+        // never stack a second copy in the frame.
+        if (_selectedPage is not null &&
+            (ReferenceEquals(_selectedPage, page) ||
+             string.Equals(_selectedPage.UniqueId, page.UniqueId, StringComparison.Ordinal)))
         {
             return;
         }

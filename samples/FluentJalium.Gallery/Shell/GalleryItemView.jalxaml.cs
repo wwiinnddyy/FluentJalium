@@ -3,6 +3,7 @@ using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -17,12 +18,14 @@ namespace FluentJalium.Gallery.Shell;
 /// </summary>
 public sealed partial class GalleryItemView : UserControl
 {
-    private const string FavoriteGlyphOutline = "\uE734";
-    private const string FavoriteGlyphFilled = "\uE735";
+    private static readonly string FavoriteGlyphOutline = char.ConvertFromUtf32((int)SegoeFluentIcon.FavoriteStar);
+    private static readonly string FavoriteGlyphFilled = char.ConvertFromUtf32((int)SegoeFluentIcon.FavoriteStarFill);
 
     private readonly GalleryLocalizationService _localization = new();
     private GalleryPage? _page;
     private bool _copyTipShown;
+
+    internal bool IsHeaderVisible => HeaderGrid.Visibility == Visibility.Visible;
 
     public GalleryItemView()
     {
@@ -42,6 +45,11 @@ public sealed partial class GalleryItemView : UserControl
 
         _page = page;
         _copyTipShown = false;
+
+        // WinUI Gallery's Home is not an item page: no PageHeader, just content.
+        var showHeader = !string.Equals(page.GroupId, GalleryNavigationGroup.Home, StringComparison.Ordinal);
+        HeaderGrid.Visibility = showHeader ? Visibility.Visible : Visibility.Collapsed;
+        LinkRow.Visibility = showHeader ? Visibility.Visible : Visibility.Collapsed;
 
         TitlePresenter.Text = page.Title;
         DescriptionPresenter.Text = page.Description;

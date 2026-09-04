@@ -1,8 +1,10 @@
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
+using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Models;
 using FluentJalium.Gallery.Services;
 using FluentJalium.Gallery.Shell;
+using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
@@ -84,6 +86,43 @@ public sealed class GalleryItemPageTests
 
         Assert.Empty(GallerySectionPage.CreateSnapshot(pages, ""));
         Assert.Empty(GallerySectionPage.CreateSnapshot(pages, "no-such-group"));
+    }
+
+    [Theory]
+    [InlineData(FluentIconRegular.Star24, 0xE734)]
+    [InlineData(FluentIconRegular.Keyboard24, 0xE8D2)]
+    [InlineData(FluentIconRegular.Eye24, 0xE7B3)]
+    [InlineData(FluentIconRegular.Accessibility24, 0xE716)]
+    [InlineData(FluentIconRegular.Book24, 0xE8A5)]
+    [InlineData(FluentIconRegular.Clock24, 0xE823)]
+    [InlineData(FluentIconRegular.Window24, 0xE8A9)]
+    public void GalleryGlyph_ShouldMapShellIconsToSegoeCodepoints(FluentIconRegular icon, int expected)
+    {
+        Assert.Equal(char.ConvertFromUtf32(expected), GalleryGlyph.Glyph(icon));
+    }
+
+    [Fact]
+    public void ItemView_ShouldHidePageHeaderForHomePages()
+    {
+        ResetApplicationState();
+        var app = new Application();
+        Jalium.UI.Controls.Themes.ThemeManager.Initialize(app);
+        FluentThemeManager.Apply(app);
+
+        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
+        var overview = new GalleryPage(
+            pages.First(page => page.UniqueId == "overview"),
+            () => new TextBlock());
+        var buttons = new GalleryPage(
+            pages.First(page => page.UniqueId == "buttons"),
+            () => new TextBlock());
+
+        var view = new GalleryItemView();
+        view.ApplyNavigationParameter(overview);
+        Assert.False(view.IsHeaderVisible);
+
+        view.ApplyNavigationParameter(buttons);
+        Assert.True(view.IsHeaderVisible);
     }
 
     [Fact]

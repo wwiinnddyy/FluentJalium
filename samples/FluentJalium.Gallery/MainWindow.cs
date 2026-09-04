@@ -26,7 +26,7 @@ public sealed class MainWindow : Window
             Type = FWBackdropType.Mica,
             TintOpacity = 0.82,
             LuminosityOpacity = 0.85,
-            FallbackColor = Color.FromRgb(0xF3, 0xF3, 0xF3)
+            FallbackColor = FallbackColorFor(FluentThemeManager.CurrentTheme)
         };
 
         var root = new Grid();
@@ -52,6 +52,7 @@ public sealed class MainWindow : Window
     private void RefreshTheme()
     {
         Background = GalleryThemeResources.Brush("WindowBackground");
+        _backdrop.FallbackColor = FallbackColorFor(FluentThemeManager.CurrentTheme);
 
         if (Content is Grid root)
         {
@@ -63,5 +64,18 @@ public sealed class MainWindow : Window
                 }
             }
         }
+    }
+
+    private static Color FallbackColorFor(FluentThemeVariant theme)
+    {
+        // The Mica fallback shows wherever the compositor cannot sample behind the window
+        // (and through the shell's transparent layers), so it must track the theme like
+        // WindowBackground does. A fixed light fallback washes the content out in dark mode.
+        return theme switch
+        {
+            FluentThemeVariant.Light => Color.FromRgb(0xF3, 0xF3, 0xF3),
+            FluentThemeVariant.HighContrast => Color.FromRgb(0x00, 0x00, 0x00),
+            _ => Color.FromRgb(0x20, 0x20, 0x20)
+        };
     }
 }

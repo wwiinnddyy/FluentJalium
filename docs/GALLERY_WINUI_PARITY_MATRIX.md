@@ -182,3 +182,26 @@ rewrite history here; append a short "Delta" note per phase instead.*
   `GalleryItemPageTests` 12/12 green (deep-link roundtrip/rejections, broker
   delivery, search/section snapshots, item-view favorite toggle); Home 5/5 and
   catalog 17/21 unchanged.
+
+## 10. Bugfix log (post-Phase 3, from the running app)
+
+- Item header on Home: every page (including Overview) rendered the full PageHeader.
+  `GalleryItemView` now collapses the header/link rows for Home-group pages
+  (`IsHeaderVisible`, covered by test), matching WinUI where Home is not an item page.
+- Mica fallback washed out the content in dark mode (default theme): `MainWindow`
+  hardcoded a light `FallbackColor` while the shell layers are transparent.
+  The fallback is now per-theme (light `#F3F3F3`, dark `#202020`, HC black) and
+  refreshed on theme change.
+- Shell icon regressions from Phase 1/2: `GalleryGlyph` had no mapping for Book,
+  Accessibility, Keyboard, Eye, Window, Clock, or Star, so nav/group/selector icons
+  fell back to the generic Controls glyph — worst case `Star24` rendered the
+  warning triangle (E7BA) on the Favorites switcher. Explicit Segoe mappings added
+  (`Keyboard`/`Eye`/`FavoriteStar`/`FavoriteStarFill` codepoints added to
+  `SegoeFluentIcon`; favorite toggle now derives its glyphs from the same enum),
+  covered by `GalleryGlyph_ShouldMapShellIconsToSegoeCodepoints`.
+- `SelectPage` now also guards on UniqueId, so `RefreshTheme` rebuilds can never
+  stack a second copy of the same sample in the frame (the frame shows cached +
+  current pages together when double-navigated).
+- Verified: headless nav-model dump shows all 11 groups with correct page counts;
+  `GalleryItemPageTests` 20/20; Home 5/5 and catalog 17/21 unchanged (same 4
+  pre-existing failures).

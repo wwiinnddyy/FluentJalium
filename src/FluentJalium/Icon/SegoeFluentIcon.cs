@@ -61,6 +61,11 @@ public enum SegoeFluentIcon
     Clock = 0xE823,
     Grid = 0xE80A,
     Accept = 0xE8FB,
-    Switch = 0xE8AB
+    Switch = 0xE8AB,
+    // Canonical Segoe MDL2 Assets assignments (same font revision as the values above).
+    Keyboard = 0xE8D2,
+    Eye = 0xE7B3,
+    FavoriteStar = 0xE734,
+    FavoriteStarFill = 0xE735
 }
 #pragma warning restore CS1591
