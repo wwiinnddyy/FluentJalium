@@ -122,6 +122,24 @@ internal sealed class GalleryLocalizationService
 
         Add("shell.controlsHeader", "Controls", "控件");
 
+        Add("item.theme", "Theme", "主题");
+        Add("item.copyLink", "Copy link", "复制链接");
+        Add("item.copyLinkHint", "Share with others or paste this link into the Run dialog to open the app to this page directly.", "与他人分享，或将此链接粘贴到“运行”对话框直接打开应用的此页面。");
+        Add("item.apiDetails", "API namespace and inheritance", "API 命名空间与继承");
+        Add("item.docs", "Documentation", "文档");
+        Add("item.source", "Source", "源码");
+        Add("item.namespace", "Namespace", "命名空间");
+        Add("item.noApiNamespace", "No API namespace recorded.", "未记录 API 命名空间。");
+        Add("item.inheritance", "Inheritance", "继承");
+        Add("item.noBaseClasses", "No base-class chain recorded.", "未记录基类链。");
+        Add("item.controlSource", "Control source", "控件源码");
+        Add("item.sampleSource", "Sample page", "示例页面");
+        Add("home.favoriteAdded", "Added to favorites", "已添加到收藏");
+        Add("home.favoriteRemoved", "Removed from favorites", "已取消收藏");
+        Add("search.resultsCount", "{0} results for \"{1}\"", "“{1}”的 {0} 个结果");
+        Add("search.noResults", "No results match your search.", "没有与你的搜索匹配的结果。");
+        Add("search.noResultsHint", "No Gallery pages match \"{0}\". Try a different search term.", "没有与“{0}”匹配的 Gallery 页面，请换个搜索词试试。");
+
         Add("home.recent", "Recent", "最近");
         Add("home.favorites", "Favorites", "收藏");
         Add("home.recentlyVisited", "Recently visited", "最近访问");

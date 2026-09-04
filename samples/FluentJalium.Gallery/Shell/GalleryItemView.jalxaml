@@ -5,46 +5,64 @@
 
     <fw:FWScrollViewer HorizontalScrollBarVisibility="Disabled"
                        VerticalScrollBarVisibility="Auto">
-        <StackPanel x:Name="ContentRoot" Margin="36,0,36,36">
+        <StackPanel x:Name="ContentRoot" Margin="36,24,36,36">
 
-            <!--  Page header  -->
-            <StackPanel Orientation="Horizontal" Spacing="12">
-                <TextBlock x:Name="TitlePresenter"
-                           Style="{StaticResource TitleTextBlockStyle}"
-                           VerticalAlignment="Center"
-                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                <fw:FWButton x:Name="InfoButton"
-                             Content="?"
-                             Padding="10,0"
-                             VerticalAlignment="Center" />
-            </StackPanel>
+            <!--  Page header: title/API on the left, actions on the right  -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-            <fw:FWExpander x:Name="InfoExpander"
-                           Margin="0,12,0,0"
-                           Header="Namespace and inheritance"
-                           Visibility="Collapsed">
-                <StackPanel Spacing="4">
-                    <TextBlock x:Name="NamespacePresenter"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               FontFamily="Consolas"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <TextBlock x:Name="InheritancePresenter"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               FontFamily="Consolas"
-                               TextWrapping="Wrap"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock x:Name="TitlePresenter"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               VerticalAlignment="Center"
+                               Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                    <fw:FWBorder x:Name="StatusPill"
+                                 Visibility="Collapsed"
+                                 VerticalAlignment="Center"
+                                 CornerRadius="999"
+                                 Padding="9,3,9,3"
+                                 Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                 BorderBrush="{ThemeResource ControlBorder}"
+                                 BorderThickness="1">
+                        <TextBlock x:Name="StatusText"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextSecondary}" />
+                    </fw:FWBorder>
+                    <fw:FWDropDownButton x:Name="InfoDrop"
+                                         Content="?"
+                                         Padding="10,0"
+                                         VerticalAlignment="Center"
+                                         ShowChevronArrow="False" />
                 </StackPanel>
-            </fw:FWExpander>
 
-            <fw:FWButton x:Name="ThemeButton"
-                         Margin="0,12,0,0"
-                         HorizontalAlignment="Left"
-                         Width="88"
-                         Content="Theme" />
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center">
+                    <fw:FWButton x:Name="ThemeButton" />
+                    <fw:FWButton x:Name="CopyButton" />
+                    <fw:FWToggleButton x:Name="FavoriteToggle">
+                        <TextBlock x:Name="FavoriteGlyph"
+                                   FontFamily="Segoe MDL2 Assets"
+                                   FontSize="16"
+                                   VerticalAlignment="Center" />
+                    </fw:FWToggleButton>
+                </StackPanel>
+            </Grid>
+
+            <!--  Documentation and source menus  -->
+            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,12,0,0">
+                <fw:FWDropDownButton x:Name="DocsDrop" />
+                <fw:FWDropDownButton x:Name="SourceDrop" />
+            </StackPanel>
 
             <TextBlock x:Name="DescriptionPresenter"
                        Margin="0,12,0,0"
                        MaxWidth="1064"
+                       HorizontalAlignment="Left"
                        Style="{StaticResource BodyTextBlockStyle}"
                        TextWrapping="Wrap"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />

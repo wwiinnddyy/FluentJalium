@@ -49,7 +49,6 @@ internal sealed class GalleryShell : UserControl
     private Button? _goBackButton;
     private readonly GalleryLocalizationService _localization = new();
     private GalleryPage? _selectedPage;
-    private string _navigationSearchText = string.Empty;
 
     public GalleryShell(
         Window owner,
@@ -66,6 +65,7 @@ internal sealed class GalleryShell : UserControl
         {
             RefreshTheme();
         };
+        GalleryNavigationBroker.NavigateRequested += NavigateByUniqueId;
 
         Content = BuildShell();
 
@@ -89,7 +89,7 @@ internal sealed class GalleryShell : UserControl
 
             // PaneHeader and the content host are built once: re-assigning Content left the
             // previous host in the tree, so the page rendered twice.
-            PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
+            PopulateNavigationItems(_navigationView, _pages);
         }
 
         if (_selectedPage != null)
@@ -97,9 +97,10 @@ internal sealed class GalleryShell : UserControl
             var refreshedPage = _pages.FirstOrDefault(page => page.Title == _selectedPage.Title) ?? _selectedPage;
             SelectPage(refreshedPage);
         }
-        else
+        else if (_navigationView != null && _navigationItems.Count > 0 && _navigationItems[0].Tag is GalleryPage firstPage)
         {
-            NavigateToEmptySearchState();
+            _navigationView.SelectedItem = _navigationItems[0];
+            SelectPage(firstPage);
         }
     }
 
@@ -139,7 +140,7 @@ internal sealed class GalleryShell : UserControl
         };
         _navigationView.SelectionChanged += OnNavigationSelectionChanged;
 
-        PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
+        PopulateNavigationItems(_navigationView, _pages);
         if (_navigationItems.Count > 0 && _navigationItems[0].Tag is GalleryPage firstPage)
         {
             _navigationView.SelectedItem = _navigationItems[0];
@@ -222,17 +223,13 @@ internal sealed class GalleryShell : UserControl
         return host;
     }
 
-    private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages, string searchText)
+    private void PopulateNavigationItems(FWNavigationView navigationView, GalleryPage[] pages)
     {
         _navigationItems.Clear();
         navigationView.MenuItems.Clear();
         navigationView.FooterMenuItems.Clear();
 
-        var matchingPages = pages
-            .Where(page => page.MatchesSearch(searchText))
-            .ToArray();
-
-        var homePage = matchingPages.FirstOrDefault(page => page.GroupId == GalleryNavigationGroup.Home);
+        var homePage = pages.FirstOrDefault(page => page.GroupId == GalleryNavigationGroup.Home);
         if (homePage != null)
         {
             navigationView.MenuItems.Add(CreateNavigationItem(homePage));
@@ -242,7 +239,7 @@ internal sealed class GalleryShell : UserControl
             .Select(groupId => new
             {
                 GroupId = groupId,
-                Pages = matchingPages
+                Pages = pages
                     .Where(page => !page.IsFooter && page.GroupId == groupId)
                     .ToArray()
             })
@@ -273,7 +270,7 @@ internal sealed class GalleryShell : UserControl
             navigationView.MenuItems.Add(groupItem);
         }
 
-        foreach (var page in matchingPages.Where(page => page.IsFooter))
+        foreach (var page in pages.Where(page => page.IsFooter))
         {
             navigationView.FooterMenuItems.Add(CreateNavigationItem(page));
         }
@@ -281,7 +278,7 @@ internal sealed class GalleryShell : UserControl
         navigationView.UpdateMenuItems();
     }
 
-    private static FWNavigationViewItem CreateNavigationGroupItem(string localizedGroupName, string groupId)
+    private FWNavigationViewItem CreateNavigationGroupItem(string localizedGroupName, string groupId)
     {
         var item = new FWNavigationViewItem
         {
@@ -291,6 +288,7 @@ internal sealed class GalleryShell : UserControl
             SelectsOnInvoked = false,
             Tag = groupId
         };
+        item.Invoked += (_, _) => NavigateToSection(groupId);
         return item;
     }
 
@@ -352,7 +350,6 @@ internal sealed class GalleryShell : UserControl
 
         _searchBox = new FWAutoSuggestBox
         {
-            Text = _navigationSearchText,
             PlaceholderText = Strings.Shell_SearchPlaceholder,
             MinHeight = 34,
             Width = 580,
@@ -382,8 +379,6 @@ internal sealed class GalleryShell : UserControl
         if (string.IsNullOrWhiteSpace(searchText))
         {
             suggestBox.ItemsSource = null;
-            _navigationSearchText = string.Empty;
-            RefreshNavigationForSearch();
             return;
         }
 
@@ -413,13 +408,12 @@ internal sealed class GalleryShell : UserControl
         }
 
         var searchText = e.QueryText ?? string.Empty;
-        if (string.Equals(_navigationSearchText, searchText, StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(searchText))
         {
             return;
         }
 
-        _navigationSearchText = searchText;
-        RefreshNavigationForSearch();
+        NavigateToSearchResults(searchText);
     }
 
     private void NavigateByUniqueId(string uniqueId)
@@ -443,54 +437,22 @@ internal sealed class GalleryShell : UserControl
         }
     }
 
-    private void RefreshNavigationForSearch()
+    private void NavigateToSearchResults(string query)
     {
-        if (_navigationView == null)
+        if (_currentPageText != null)
         {
-            return;
+            _currentPageText.Text = query;
         }
-
-        var preferredPage = _selectedPage;
-        PopulateNavigationItems(_navigationView, _pages, _navigationSearchText);
-
-        if (preferredPage != null && TrySelectNavigationPage(preferredPage))
-        {
-            return;
-        }
-
-        if (_navigationItems.Count > 0 && _navigationItems[0].Tag is GalleryPage firstPage)
-        {
-            _navigationView.SelectedItem = _navigationItems[0];
-            SelectPage(firstPage);
-            return;
-        }
-
-        _navigationView.SelectedItem = null;
-        _selectedPage = null;
-        NavigateToEmptySearchState();
+        _frame?.Navigate(typeof(GallerySearchResultsPage), query);
     }
 
-    private bool TrySelectNavigationPage(GalleryPage page)
+    private void NavigateToSection(string groupId)
     {
-        if (_navigationView == null)
+        if (_currentPageText != null)
         {
-            return false;
+            _currentPageText.Text = groupId;
         }
-
-        var item = _navigationItems.FirstOrDefault(navigationItem =>
-            navigationItem.Tag is GalleryPage candidate && candidate.Title == page.Title);
-        if (item == null)
-        {
-            return false;
-        }
-
-        if (item.Tag is GalleryPage selectedPage)
-        {
-            _navigationView.SelectedItem = item;
-            SelectPage(selectedPage);
-        }
-
-        return true;
+        _frame?.Navigate(typeof(GallerySectionPage), groupId);
     }
 
     private void OnNavigationSelectionChanged(object? sender, FluentNavigationViewSelectionChangedEventArgs e)
@@ -519,15 +481,6 @@ internal sealed class GalleryShell : UserControl
         _frame?.Navigate(typeof(GalleryItemHostPage), page);
     }
 
-    private void NavigateToEmptySearchState()
-    {
-        if (_currentPageText != null)
-        {
-            _currentPageText.Text = string.Empty;
-        }
-        _frame?.Navigate(typeof(GallerySearchEmptyPage), _navigationSearchText);
-    }
-
     private void OnFrameNavigated(object? sender, NavigationEventArgs e)
     {
         if (e.Content is GalleryItemHostPage itemPage)
@@ -540,9 +493,14 @@ internal sealed class GalleryShell : UserControl
             hostPage.ApplyNavigationParameter(e.ExtraData);
         }
 
-        if (e.Content is GallerySearchEmptyPage searchEmptyPage)
+        if (e.Content is GallerySearchResultsPage searchResultsPage)
         {
-            searchEmptyPage.ApplyNavigationParameter(e.ExtraData);
+            searchResultsPage.ApplyNavigationParameter(e.ExtraData);
+        }
+
+        if (e.Content is GallerySectionPage sectionPage)
+        {
+            sectionPage.ApplyNavigationParameter(e.ExtraData);
         }
 
         if (_transitionHost != null && e.Content is UIElement contentElement)

@@ -158,3 +158,27 @@ rewrite history here; append a short "Delta" note per phase instead.*
 - Verification: Gallery build 0 errors, warnings unchanged at 30;
   `GalleryHomeTilesTests` 5/5 green; `FluentGalleryCatalogTests` still 17/21 with
   the same 4 pre-existing failures.
+
+### Phase 3 — Item / Search / Section (branch `new`)
+- `Shell/GalleryItemView` rewritten to PageHeader parity: title + status pill, API
+  flyout (`FWDropDownButton` + `FWFlyout`: Namespace + `FWBreadcrumbBar` base chain),
+  Documentation and Source `FWDropDownButton` menus (repo code-search links, copied
+  with snackbar feedback), per-sample Theme button, Copy-link button
+  (`fluentjalium://sample?uniqueId=…`, first copy per page shows the WinUI
+  TeachingTip text), and a star `FWToggleButton` wired to
+  `GalleryFavoritesService` (E734/E735 glyph swap + snackbar).
+- New `Shell/GalleryDeepLink.cs` (link format/parse + repo search URLs) and
+  `Services/GalleryNavigationBroker.cs` (frame-created pages request navigation by
+  UniqueId; the shell routes). New `Shell/GallerySectionPage.cs` (group grid,
+  `ItemGridView` AutomationId) reached via the new `FluentNavigationViewItem.Invoked`
+  event on group headers; new `Shell/GallerySearchResultsPage.cs` (result count,
+  card grid, `ResultsGridView` AutomationId, no-results state) reached on search
+  submit — the shell no longer rewrites the nav tree on submit, and the text-only
+  `GallerySearchEmptyPage` is deleted.
+- Documented adaptations (no Jalium API): links copy instead of opening a browser;
+  Theme button still cycles the app theme (per-sample scope needs framework support);
+  no narrow adaptive margins.
+- Verification: Gallery build 0 errors, warnings unchanged at 30; new
+  `GalleryItemPageTests` 12/12 green (deep-link roundtrip/rejections, broker
+  delivery, search/section snapshots, item-view favorite toggle); Home 5/5 and
+  catalog 17/21 unchanged.

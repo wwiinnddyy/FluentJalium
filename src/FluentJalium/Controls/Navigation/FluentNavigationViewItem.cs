@@ -94,6 +94,12 @@ public class FluentNavigationViewItem : Control
 
     public new object? Tag { get; set; }
 
+    /// <summary>
+    /// Raised when an item with children is invoked (it expands and, in the Gallery,
+    /// navigates to its section page, mirroring WinUI Gallery).
+    /// </summary>
+    public event EventHandler? Invoked;
+
     #endregion
 
     public FluentNavigationViewItem()
@@ -250,6 +256,7 @@ public class FluentNavigationViewItem : Control
         if (MenuItems.Count > 0)
         {
             IsExpanded = !IsExpanded;
+            Invoked?.Invoke(this, EventArgs.Empty);
         }
     }
 
