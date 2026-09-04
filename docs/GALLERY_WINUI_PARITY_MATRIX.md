@@ -139,3 +139,22 @@ rewrite history here; append a short "Delta" note per phase instead.*
   `controlgapmatrix`, `visualqacoverage` — all reproduced on the stashed baseline).
   New `GalleryCatalog_ShouldExposeWinUiFundamentalsAndAccessibilityShells` is
   locale-proof and green in both cultures.
+
+### Phase 2 — Home (branch `new`)
+- `Pages/GalleryOverviewPage.cs` rewritten to the WinUI Home structure: hero banner
+  (title + subtitle, dead buttons removed), localized 6-tile quick-link strip,
+  centered `FWSelectorBar` Recent/Favorites switcher, "Recently visited" horizontal
+  rail (collapses when empty, like WinUI's NoRecent state), "Recently added or
+  updated" grid from `IsNew/IsUpdated` metadata, favorites grid plus the "No
+  favorites yet" fallback. Removed theme/accent/type-ramp/material demos (already
+  covered by Settings/Typography/Materials pages).
+- New `Services/GalleryFavoritesService.cs`: UniqueId-keyed favorites persisted to
+  `%LocalAppData%/FluentJalium/Gallery/favorites`, most-recent-first, with change
+  notification. The star toggle that writes to it arrives with the Phase 3 PageHeader.
+- Rails use `GalleryControlCard` (same card as the filter pages) with WinUI grid
+  AutomationIds (`RecentlyVisitedGridView`, `RecentlyAddedAndUpdatedGridView`,
+  `FavoriteSamplesGridView`); rail data flows through the headless-testable
+  `GalleryHomeSnapshot`.
+- Verification: Gallery build 0 errors, warnings unchanged at 30;
+  `GalleryHomeTilesTests` 5/5 green; `FluentGalleryCatalogTests` still 17/21 with
+  the same 4 pre-existing failures.

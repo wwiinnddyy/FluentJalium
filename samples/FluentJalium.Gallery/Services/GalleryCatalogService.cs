@@ -35,7 +35,7 @@ internal sealed class GalleryCatalogService
     {
         var factories = new Dictionary<string, Func<UIElement>>(StringComparer.Ordinal)
         {
-            [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(applyTheme, applyAccent, navigate).CreateContent()),
+            [PageId("Overview")] = () => CreatePageStack(new GalleryOverviewPage(pageInfos, navigate).CreateContent()),
             [PageId("Resources")] = CreatePlaceholderContent(pageInfos, "resources"),
             [PageId("Styles")] = CreatePlaceholderContent(pageInfos, "styles"),
             [PageId("Binding")] = CreatePlaceholderContent(pageInfos, "binding"),

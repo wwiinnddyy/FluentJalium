@@ -122,6 +122,25 @@ internal sealed class GalleryLocalizationService
 
         Add("shell.controlsHeader", "Controls", "控件");
 
+        Add("home.recent", "Recent", "最近");
+        Add("home.favorites", "Favorites", "收藏");
+        Add("home.recentlyVisited", "Recently visited", "最近访问");
+        Add("home.recentlyAddedOrUpdated", "Recently added or updated", "最近新增或更新");
+        Add("home.noFavoritesTitle", "No favorites yet", "暂无收藏");
+        Add("home.noFavoritesHint", "Favorite samples by clicking the star icon on the sample page.", "在示例页面上点击星形图标即可收藏示例。");
+        Add("home.tile.allcontrols.title", "All controls", "全部控件");
+        Add("home.tile.allcontrols.caption", "Browse every control the library ships", "浏览库附带的所有控件");
+        Add("home.tile.newcontrols.title", "What's new", "新增内容");
+        Add("home.tile.newcontrols.caption", "Controls added in the current release", "当前版本新增的控件");
+        Add("home.tile.updatedcontrols.title", "Recently updated", "最近更新");
+        Add("home.tile.updatedcontrols.caption", "Controls that changed recently", "最近有所变化的控件");
+        Add("home.tile.colors.title", "Design tokens", "设计令牌");
+        Add("home.tile.colors.caption", "Colour, typography, geometry and motion", "颜色、排版、几何与动效");
+        Add("home.tile.textinput.title", "Text input", "文本输入");
+        Add("home.tile.textinput.caption", "Text, password, number and autosuggest", "文本、密码、数字和自动建议");
+        Add("home.tile.settings.title", "Settings", "设置");
+        Add("home.tile.settings.caption", "Theme, accent colour and navigation mode", "主题、强调色和导航模式");
+
         Add("sample.example", "Example", "示例");
         Add("sample.states", "States", "状态");
         Add("sample.properties", "Properties", "属性");
