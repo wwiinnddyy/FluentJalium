@@ -456,7 +456,7 @@ internal sealed class GalleryShell : UserControl
 
         _selectedPage = page;
         GalleryRecentSamplesService.Instance.RecordVisit(page);
-        _frame?.Navigate(typeof(GalleryHostPage), page);
+        _frame?.Navigate(typeof(GalleryItemHostPage), page);
     }
 
     private void NavigateToEmptySearchState()
