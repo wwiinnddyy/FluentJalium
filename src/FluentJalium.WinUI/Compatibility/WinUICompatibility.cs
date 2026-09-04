@@ -51,6 +51,11 @@ public static class WinUICompatibility
         XmlnsDefinitionRegistry.ScanAssembly(typeof(WinUICompatibility).Assembly);
 
         ControlAliases.Register();
+
+        // SPIKE: the generator emits `{x:Bind ...}` as a verbatim attribute string, so the only
+        // way to intercept it is ResolveTypeUncached step 5, which retries a failed `Bind`
+        // lookup as `BindExtension` by simple name.
+        XamlTypeRegistry.RegisterType<Markup.XamlBindExtension>("BindExtension");
     }
 }
 

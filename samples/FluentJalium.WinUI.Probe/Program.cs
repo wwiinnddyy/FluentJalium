@@ -1,6 +1,7 @@
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.WinUI;
+using FluentJalium.WinUI.Markup;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Themes;
@@ -34,6 +35,8 @@ internal static class Program
                 // The generator emitted: SetProperty(button, "IsEnabled", "{x:Bind HasText(...), Mode=OneWay}", ctx)
                 // The text box starts empty, so HasText("") is false: a binding that actually works
                 // leaves the button disabled, while one that was dropped or coerced to a string does not.
+                // IsEnabled alone is ambiguous, so the hit counter decides where the string actually went.
+                Console.WriteLine($"    BindExtension hits = {XamlBindExtension.HitCount}  (>0 means the facade can intercept x:Bind)");
                 Console.WriteLine($"    IsEnabled = {button.IsEnabled}  (expected False if x:Bind evaluated)");
                 return control;
             });
