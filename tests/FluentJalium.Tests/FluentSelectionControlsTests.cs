@@ -727,12 +727,9 @@ public sealed class FluentSelectionControlsTests
 
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
-        var loaded = ResourceDictionary.SourceLoader?.Invoke(
-            new ResourceDictionary(),
-            new Uri("/FluentJalium;component/Themes/Generic.jalxaml", UriKind.Relative),
-            FluentThemeManager.ThemeAssembly);
-
-        return Assert.IsType<ResourceDictionary>(loaded);
+        var app = new Application();
+        FluentThemeManager.Apply(app);
+        return app.Resources;
     }
 
     private static Style AssertStyle<TControl>(ResourceDictionary dictionary)

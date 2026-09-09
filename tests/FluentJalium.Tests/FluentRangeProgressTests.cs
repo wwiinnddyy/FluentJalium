@@ -499,12 +499,9 @@ public sealed class FluentRangeProgressTests
 
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
-        var loaded = ResourceDictionary.SourceLoader?.Invoke(
-            new ResourceDictionary(),
-            new Uri("/FluentJalium;component/Themes/Generic.jalxaml", UriKind.Relative),
-            FluentThemeManager.ThemeAssembly);
-
-        return Assert.IsType<ResourceDictionary>(loaded);
+        var app = new Application();
+        FluentThemeManager.Apply(app);
+        return app.Resources;
     }
 
     private static void AssertContainsStyle<TControl>(ResourceDictionary dictionary)

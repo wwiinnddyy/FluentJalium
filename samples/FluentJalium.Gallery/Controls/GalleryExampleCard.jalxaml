@@ -1,0 +1,32 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Controls.GalleryExampleCard"
+             Margin="0,4,0,0"
+             AutomationProperties.AutomationId="GalleryExampleCard">
+    <fw:FWCardSurface Padding="24">
+      <fw:FWStackPanel Orientation="Vertical" Spacing="14">
+        <fw:FWTextBlock x:Name="TitlePresenter"
+                        Style="{StaticResource GalleryCardTitle}" />
+        <fw:FWTextBlock x:Name="DescriptionPresenter"
+                        Style="{StaticResource GalleryCardDescription}" />
+        <fw:FWBorder Background="{ThemeResource LayerFillColorAltBrush}"
+                     CornerRadius="8"
+                     Padding="20">
+            <ContentControl x:Name="SampleHost"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+        </fw:FWBorder>
+        <fw:FWExpander x:Name="CodeExpander"
+                       Header="View source"
+                       IsExpanded="False">
+            <fw:FWScrollViewer MaxHeight="220"
+                               HorizontalScrollBarVisibility="Auto"
+                               VerticalScrollBarVisibility="Auto">
+                <fw:FWTextBlock x:Name="CodePresenter"
+                                Style="{StaticResource GalleryCodeText}" />
+            </fw:FWScrollViewer>
+        </fw:FWExpander>
+      </fw:FWStackPanel>
+    </fw:FWCardSurface>
+</UserControl>

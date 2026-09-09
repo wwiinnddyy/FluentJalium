@@ -1,0 +1,22 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.SelectorsSample">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="12" MaxWidth="680">
+        <fw:FWTextBlock Text="Hierarchical selection"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWTreeSelector x:Name="TreeSelector"
+                           Width="360"
+                           PlaceholderText="Choose a component"
+                           IsSearchEnabled="True"
+                           ShowCheckBoxes="True"
+                           CheckCascadeMode="Cascade" />
+        <fw:FWTextBlock Text="Inspect and tune a control"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWPropertyGrid x:Name="PropertyGrid"
+                           Width="560"
+                           Height="220"
+                           ShowSearchBox="True"
+                           ShowDescription="True" />
+    </fw:FWStackPanel>
+</UserControl>

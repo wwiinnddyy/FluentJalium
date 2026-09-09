@@ -19,6 +19,7 @@ public enum FluentThemeVariant
     HighContrast
 }
 
+
 /// <summary>
 /// Options used to apply the FluentJalium theme layer.
 /// </summary>
@@ -462,4 +463,3 @@ public static class FluentThemeManager
             Lerp(color.B, target.B, factor));
     }
 }
-

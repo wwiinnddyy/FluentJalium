@@ -1,0 +1,8 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.MenuSample">
+    <fw:FWMenuBar x:Name="MenuBar"
+                  Width="420"
+                  AutomationProperties.AutomationId="GalleryMenuBar" />
+</UserControl>
