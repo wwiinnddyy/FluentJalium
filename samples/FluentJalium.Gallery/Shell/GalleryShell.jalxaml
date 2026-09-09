@@ -19,7 +19,7 @@
                 <fw:FWStackPanel Orientation="Vertical" Spacing="12">
                     <fw:FWStackPanel Orientation="Horizontal" Spacing="12">
                         <fw:FWFontIcon Glyph="&#xECAA;"
-                                       FontFamily="Segoe MDL2 Assets"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                        FontSize="28"
                                        Width="28"
                                        Height="28"

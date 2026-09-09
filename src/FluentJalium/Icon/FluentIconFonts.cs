@@ -18,7 +18,10 @@ public static class FluentIconFonts
     public static string Filled => FluentIconFontLoader.Filled;
 
     /// <summary>
-    /// Segoe MDL2 Assets fallback for compatibility.
+    /// Windows system icon font stack: prefers Win11 "Segoe Fluent Icons" glyphs and
+    /// falls back to "Segoe MDL2 Assets" on older Windows. Both fonts share the
+    /// same code points, so the Segoe compatibility glyph set renders with the
+    /// modern Fluent look wherever the font exists.
     /// </summary>
-    public const string Segoe = "Segoe MDL2 Assets";
+    public static string Segoe => "Segoe Fluent Icons, Segoe MDL2 Assets";
 }

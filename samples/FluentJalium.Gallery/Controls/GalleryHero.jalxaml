@@ -12,7 +12,7 @@
                             AutomationProperties.AutomationId="GalleryHero">
     <fw:FWStackPanel Orientation="Horizontal" Spacing="18">
         <fw:FWFontIcon Glyph="&#xE790;"
-                       FontFamily="Segoe MDL2 Assets"
+                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                        FontSize="42"
                        Width="42"
                        Height="42"

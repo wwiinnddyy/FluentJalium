@@ -10,7 +10,7 @@
                  VerticalContentAlignment="Stretch">
         <fw:FWStackPanel Orientation="Vertical" Spacing="10">
             <fw:FWFontIcon x:Name="IconPresenter"
-                           FontFamily="Segoe MDL2 Assets"
+                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                            FontSize="24"
                            Width="24"
                            Height="24"

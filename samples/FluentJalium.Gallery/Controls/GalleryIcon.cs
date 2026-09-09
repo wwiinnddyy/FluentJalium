@@ -5,13 +5,15 @@ using Jalium.UI.Media;
 namespace FluentJalium.Gallery.Controls;
 
 /// <summary>
-/// Creates icons for Gallery chrome using the Windows compatibility font.
+/// Creates icons for Gallery chrome using the Windows compatibility font stack.
 ///
 /// FluentSystemIcons are embedded in the FluentJalium assembly and installed lazily. DirectWrite
 /// keeps a shared font collection, so a window created during the same process can still render
 /// a missing-glyph box until the collection is refreshed. Gallery chrome must be visible on first
-/// frame, therefore it uses the stable Segoe MDL2 compatibility glyphs while still returning a
-/// FluentJalium <see cref="FluentIcon"/> control.
+/// frame, therefore it uses the stable Segoe compatibility glyphs (rendered through the
+/// "Segoe Fluent Icons, Segoe MDL2 Assets" fallback stack, so Win11 shows the modern Fluent
+/// look while older Windows falls back to MDL2) while still returning a FluentJalium
+/// <see cref="FluentIcon"/> control.
 /// </summary>
 internal static class GalleryIcon
 {
