@@ -4,7 +4,6 @@ using FluentJalium.Gallery.Controls;
 using FluentJalium.Gallery.Pages;
 using FluentJalium.Icon;
 using Jalium.UI;
-using Jalium.UI.Automation;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using FWAutoSuggestBox = FluentJalium.Controls.FWAutoSuggestBox;
@@ -13,16 +12,42 @@ using FWAutoSuggestBoxQuerySubmittedEventArgs = FluentJalium.Controls.FWAutoSugg
 namespace FluentJalium.Gallery.Shell;
 
 /// <summary>
-/// Jalxaml-defined Gallery shell. Markup owns the visual tree; code-behind only supplies the
-/// catalog and navigation behavior, mirroring WinUI Gallery's separation of chrome and content.
+/// Jalxaml-defined Gallery shell.
+/// Supports dual navigation presentation styles (mirrors ModernWPF & WPF-UI multi-mode designs):
+/// - <see cref="FluentNavigationItemStyle.Tree"/>: Canonical WinUI 3 hierarchical tree list.
+/// - <see cref="FluentNavigationItemStyle.Fluent"/>: Modern Fluent card layout (Windows Store / Settings style).
 /// </summary>
 public sealed partial class GalleryShell : UserControl
 {
+    private const double ExpandedModeThresholdWidth = 1008;
+    private const double CompactModeThresholdWidth = 641;
+
+    private static FluentNavigationItemStyle s_activeSidebarStyle = FluentNavigationItemStyle.Tree;
+
+    /// <summary>
+    /// Gets or sets the globally active navigation sidebar style in the Gallery.
+    /// Changing this property immediately notifies active shells to re-populate their nav tree.
+    /// </summary>
+    public static FluentNavigationItemStyle ActiveSidebarStyle
+    {
+        get => s_activeSidebarStyle;
+        set
+        {
+            if (s_activeSidebarStyle == value) return;
+            s_activeSidebarStyle = value;
+            SidebarStyleChanged?.Invoke();
+        }
+    }
+
+    public static event Action? SidebarStyleChanged;
+
     private readonly Window _owner;
     private readonly IReadOnlyList<GalleryEntry> _entries = GalleryPages.All;
+    private readonly List<FWNavigationViewItem> _groupItems = new();
     private ContentControl _contentHost = null!;
     private FWNavigationView _navigation = null!;
     private FWAutoSuggestBox _searchBox = null!;
+    private GalleryEntry? _current;
 
     public GalleryShell(Window owner)
     {
@@ -34,46 +59,156 @@ public sealed partial class GalleryShell : UserControl
         _searchBox = SearchBox;
         _searchBox.QuerySubmitted += OnSearchSubmitted;
         _navigation.SelectionChanged += OnSelectionChanged;
-        ThemeSwitch.Toggled += OnThemeToggled;
+        FluentThemeManager.ThemeChanged += OnThemeChanged;
+        SidebarStyleChanged += OnSidebarStyleChanged;
+        Unloaded += OnShellUnloaded;
 
+        ApplyCurrentSidebarStyle();
         PopulateNavigation();
-        _navigation.SelectedItem = _navigation.MenuItems.OfType<FWNavigationViewItem>().First();
         Navigate(_entries[0]);
+        SelectItem(_entries[0].Key);
         _owner.SizeChanged += OnWindowSizeChanged;
+
+        DumpVisualTree();
+    }
+
+    private void DumpVisualTree()
+    {
+        try
+        {
+            var sb = new System.Text.StringBuilder();
+            void Walk(DependencyObject node, int depth)
+            {
+                var count = VisualTreeHelper.GetChildrenCount(node);
+                var name = node is FrameworkElement fe ? fe.Name : "";
+                sb.AppendLine($"{new string(' ', depth * 2)}{node.GetType().Name} [{name}] children={count}");
+                for (var i = 0; i < count; i++)
+                {
+                    if (VisualTreeHelper.GetChild(node, i) is { } child)
+                        Walk(child, depth + 1);
+                }
+            }
+            Walk(this, 0);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "gallery_vtree.txt"), sb.ToString());
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "gallery_vtree.txt"), ex.ToString());
+        }
+    }
+
+    private void ApplyCurrentSidebarStyle()
+    {
+        _navigation.ItemStyle = ActiveSidebarStyle;
     }
 
     private void PopulateNavigation()
     {
-        string? lastGroup = null;
-        foreach (var entry in _entries)
+        _navigation.MenuItems.Clear();
+        _navigation.FooterMenuItems.Clear();
+        _groupItems.Clear();
+
+        if (ActiveSidebarStyle == FluentNavigationItemStyle.Fluent)
         {
-            if (lastGroup is not null && !string.Equals(lastGroup, entry.Group, StringComparison.Ordinal))
-            {
-                _navigation.MenuItems.Add(new FWNavigationViewItemSeparator());
-            }
+            // Modern Fluent Card Style (WPF-UI / Windows Store flat catalog):
+            // All pages listed directly as comfortable 40px cards with generous icon padding.
+            _navigation.MenuItems.Add(CreateLeaf(_entries[0]));
+            _navigation.MenuItems.Add(new FWNavigationViewItemSeparator());
+            _navigation.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Controls" });
 
-            if (lastGroup is null || !string.Equals(lastGroup, entry.Group, StringComparison.Ordinal))
+            foreach (var entry in _entries.Skip(1))
             {
-                _navigation.MenuItems.Add(new FWNavigationViewItemHeader { Content = entry.Group });
+                _navigation.MenuItems.Add(CreateLeaf(entry));
             }
+        }
+        else
+        {
+            // WinUI 3 Canonical Tree Style:
+            // Home / "Controls" header / All / expandable category groups.
+            _navigation.MenuItems.Add(CreateLeaf(_entries[0]));
+            _navigation.MenuItems.Add(new FWNavigationViewItemHeader { Content = "Controls" });
+            _navigation.MenuItems.Add(CreateLeaf(_entries[1]));
 
-            _navigation.MenuItems.Add(new FWNavigationViewItem
+            var groups = _entries.Skip(2)
+                .GroupBy(entry => entry.Group)
+                .OrderBy(group => group.Key, StringComparer.Ordinal);
+
+            foreach (var group in groups)
             {
-                Content = entry.Title,
-                Icon = GalleryIcon.Create(entry.Icon, 20, Brush("TextFillColorPrimaryBrush")),
-                RouteKey = entry.Key,
-                Tag = entry
-            });
-            lastGroup = entry.Group;
+                var children = group.ToList();
+                if (children.Count == 1)
+                {
+                    _navigation.MenuItems.Add(CreateLeaf(children[0]));
+                    continue;
+                }
+
+                var sectionEntry = new GalleryEntry(
+                    "section:" + group.Key,
+                    group.Key,
+                    group.Key,
+                    $"Browse the {group.Key} section.",
+                    GalleryPages.GroupIcon(group.Key),
+                    navigate => GalleryPages.SectionPage(group.Key, children, navigate));
+
+                var parent = new FWNavigationViewItem
+                {
+                    Content = group.Key,
+                    Icon = GalleryIcon.Create(sectionEntry.Icon, 16, Brush("TextFillColorPrimaryBrush")),
+                    RouteKey = sectionEntry.Key,
+                    Tag = sectionEntry
+                };
+                foreach (var child in children)
+                {
+                    parent.MenuItems.Add(CreateLeaf(child));
+                }
+                _groupItems.Add(parent);
+                _navigation.MenuItems.Add(parent);
+            }
         }
 
+        // Settings in footer
         _navigation.FooterMenuItems.Add(new FWNavigationViewItem
         {
-            Content = "About FluentJalium",
-            Icon = GalleryIcon.Create(FluentIconRegular.BookInformation24, 20, Brush("TextFillColorPrimaryBrush")),
-            Tag = GalleryPages.About
+            Content = GalleryPages.Settings.Title,
+            Icon = GalleryIcon.Create(GalleryPages.Settings.Icon, 16, Brush("TextFillColorPrimaryBrush")),
+            RouteKey = GalleryPages.Settings.Key,
+            Tag = GalleryPages.Settings
         });
+
         _navigation.UpdateMenuItems();
+    }
+
+    private static FWNavigationViewItem CreateLeaf(GalleryEntry entry) => new()
+    {
+        Content = entry.Title,
+        Icon = GalleryIcon.Create(entry.Icon, 16, Brush("TextFillColorPrimaryBrush")),
+        RouteKey = entry.Key,
+        Tag = entry
+    };
+
+    private void SelectItem(string key)
+    {
+        foreach (var item in EnumerateItems())
+        {
+            if (item.Tag is GalleryEntry entry && entry.Key == key)
+            {
+                _navigation.SelectedItem = item;
+                return;
+            }
+        }
+    }
+
+    private IEnumerable<FWNavigationViewItem> EnumerateItems()
+    {
+        foreach (var item in _navigation.MenuItems.OfType<FWNavigationViewItem>())
+        {
+            yield return item;
+            foreach (var child in item.MenuItems.OfType<FWNavigationViewItem>()) yield return child;
+        }
+        foreach (var item in _navigation.FooterMenuItems.OfType<FWNavigationViewItem>())
+        {
+            yield return item;
+        }
     }
 
     private void OnSelectionChanged(object? sender, FluentNavigationViewSelectionChangedEventArgs e)
@@ -86,6 +221,7 @@ public sealed partial class GalleryShell : UserControl
 
     private void Navigate(GalleryEntry entry)
     {
+        _current = entry;
         _searchBox.Text = string.Empty;
         _contentHost.Content = entry.CreateContent(Navigate);
     }
@@ -95,31 +231,60 @@ public sealed partial class GalleryShell : UserControl
         var query = e.QueryText?.Trim();
         if (string.IsNullOrWhiteSpace(query)) return;
 
-        var match = _entries.FirstOrDefault(entry =>
+        var match = _entries.Concat(new[] { GalleryPages.Settings }).FirstOrDefault(entry =>
             entry.Title.Contains(query, StringComparison.OrdinalIgnoreCase) ||
             entry.Description.Contains(query, StringComparison.OrdinalIgnoreCase));
         if (match is null) return;
 
-        if (_navigation.MenuItems.OfType<FWNavigationViewItem>().FirstOrDefault(item => item.Tag is GalleryEntry entry && entry.Key == match.Key) is { } item)
-        {
-            _navigation.SelectedItem = item;
-        }
+        SelectItem(match.Key);
         Navigate(match);
     }
 
     private void OnWindowSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        var compact = e.NewSize.Width < 1040;
-        _navigation.IsPaneOpen = !compact;
-        _navigation.PaneDisplayMode = compact
-            ? NavigationViewPaneDisplayMode.LeftCompact
-            : NavigationViewPaneDisplayMode.Left;
+        if (e.NewSize.Width <= 0) return;
+
+        if (e.NewSize.Width >= ExpandedModeThresholdWidth)
+        {
+            _navigation.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
+            _navigation.IsPaneOpen = true;
+        }
+        else if (e.NewSize.Width >= CompactModeThresholdWidth)
+        {
+            _navigation.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
+            _navigation.IsPaneOpen = false;
+        }
+        else
+        {
+            _navigation.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
+            _navigation.IsPaneOpen = false;
+        }
     }
 
-    private void OnThemeToggled(object? sender, RoutedEventArgs e)
+    private void OnSidebarStyleChanged()
     {
-        FluentThemeManager.ApplyTheme(ThemeSwitch.IsOn ? FluentThemeVariant.Dark : FluentThemeVariant.Light);
-        ThemeSwitch.Header = ThemeSwitch.IsOn ? "Dark theme" : "Light theme";
+        ApplyCurrentSidebarStyle();
+        PopulateNavigation();
+        if (_current is not null)
+        {
+            SelectItem(_current.Key);
+        }
+    }
+
+    private void OnThemeChanged()
+    {
+        PopulateNavigation();
+        if (_current is not null)
+        {
+            SelectItem(_current.Key);
+        }
+    }
+
+    private void OnShellUnloaded(object? sender, RoutedEventArgs e)
+    {
+        FluentThemeManager.ThemeChanged -= OnThemeChanged;
+        SidebarStyleChanged -= OnSidebarStyleChanged;
+        Unloaded -= OnShellUnloaded;
     }
 
     private static Brush Brush(string key) =>

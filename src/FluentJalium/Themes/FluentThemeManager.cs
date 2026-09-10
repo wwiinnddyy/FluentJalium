@@ -65,6 +65,14 @@ public static class FluentThemeManager
     public static Assembly ThemeAssembly => typeof(FluentThemeManager).Assembly;
 
     /// <summary>
+    /// Raised after <see cref="ApplyTheme"/>, <see cref="ApplyAccent"/>, or <see cref="ApplyTypography"/>
+    /// has swapped the resource dictionaries.
+    /// </summary>
+    public static event Action? ThemeChanged;
+
+    internal static void RaiseThemeChanged() => ThemeChanged?.Invoke();
+
+    /// <summary>
     /// Applies the FluentJalium theme layer with default options.
     /// </summary>
     [RequiresUnreferencedCode("Loads a generated or XAML resource dictionary through Jalium.UI theme infrastructure.")]
@@ -119,6 +127,7 @@ public static class FluentThemeManager
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_themeDictionary, LoadGenericTheme());
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_accentDictionary, BuildAccentDictionary(CurrentAccentColor));
         ForceRefresh(s_application);
+        RaiseThemeChanged();
     }
 
     /// <summary>
@@ -133,6 +142,7 @@ public static class FluentThemeManager
 
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_accentDictionary, BuildAccentDictionary(accent));
         ForceRefresh(s_application);
+        RaiseThemeChanged();
     }
 
     /// <summary>
@@ -383,8 +393,7 @@ public static class FluentThemeManager
             ["ComboBoxItemSelectedIndicator"] = new SolidColorBrush(accent),
             ["RatingControlSelectedForeground"] = new SolidColorBrush(accent),
             ["RatingControlPointerOverSelectedForeground"] = new SolidColorBrush(hover),
-            ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
-            ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
+            ["NavigationViewSelectionIndicatorForeground"] = new SolidColorBrush(accent),
             ["TabItemIndicator"] = new SolidColorBrush(accent),
             ["DatePickerBorderBrushFocused"] = new SolidColorBrush(accent),
             ["TimePickerBorderBrushFocused"] = new SolidColorBrush(accent),

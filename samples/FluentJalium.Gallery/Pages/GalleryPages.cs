@@ -1,5 +1,7 @@
 using FluentJalium.Controls;
+using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Controls;
+using FluentJalium.Gallery.Shell;
 using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -14,32 +16,57 @@ public static class GalleryPages
 {
     public static readonly GalleryEntry About = new("about", "Resources", "About", "The FluentJalium control library and its design principles.", FluentIconRegular.BookInformation24, _ => AboutPage());
 
+    public static readonly GalleryEntry Settings = new("settings", "", "Settings", "App theme and gallery preferences.", FluentIconRegular.Settings24, _ => SettingsPage());
+
+    /// <summary>Top-level destinations that are not part of any expandable group (mirrors WinUI Gallery).</summary>
+    public const string HomeGroup = "";
+    public const string ControlsGroup = "";
+
     public static IReadOnlyList<GalleryEntry> All { get; } =
     [
-        new("home", "Getting started", "Overview", "A focused tour of FluentJalium controls and Fluent Design foundations.", FluentIconRegular.Home24, navigate => HomePage(navigate)),
-        new("controls", "Getting started", "All controls", "A live inventory of the FluentJalium control surface, grouped by capability.", FluentIconRegular.DocumentBulletList24, _ => ControlsPage()),
+        new("home", HomeGroup, "Home", "A focused tour of FluentJalium controls and Fluent Design foundations.", FluentIconRegular.Home24, navigate => HomePage(navigate)),
+        new("controls", ControlsGroup, "All controls", "A live inventory of the FluentJalium control surface, grouped by capability.", FluentIconRegular.Apps24, _ => ControlsPage()),
         new("buttons", "Basic input", "Buttons", "Command surfaces with clear hierarchy, density, and keyboard focus.", FluentIconRegular.Cursor24, _ => ButtonsPage()),
         new("forms", "Basic input", "Forms", "Text input, selection, and toggles composed into a familiar form.", FluentIconRegular.Edit24, _ => FormsPage()),
         new("selection", "Basic input", "Selection", "Choose one or many options with clear selected states.", FluentIconRegular.CheckmarkCircle24, _ => SelectionPage()),
         new("range", "Basic input", "Range & progress", "Sliders and progress indicators make value and state legible.", FluentIconRegular.DataBarVertical24, _ => RangePage()),
+        new("collections", "Collections", "Collections", "Present repeated content with predictable rhythm and grouping.", FluentIconRegular.ContentView24, _ => CollectionsPage()),
+        new("advancedcollections", "Collections", "Advanced collections", "Data grids and list surfaces for dense, keyboard-friendly information architecture.", FluentIconRegular.Table24, _ => AdvancedCollectionsPage()),
+        new("selectors", "Data", "Selectors & inspectors", "Hierarchical selection and property inspection with explicit state and density contracts.", FluentIconRegular.Branch24, _ => SelectorsPage()),
+        new("charts", "Data", "Charts", "Data visualization controls with axes, legends, and accessible values.", FluentIconRegular.ChartMultiple24, _ => ChartsPage()),
+        new("datainspectors", "Data", "Data inspectors", "Inspect JSON, source changes, and binary payloads using Jalium.UI data controls.", FluentIconRegular.Database24, _ => DataInspectorsPage()),
+        new("datetime", "Date & time", "Date & time", "Pickers and calendars follow the same density and focus contract.", FluentIconRegular.CalendarLtr24, _ => DateTimePage()),
         new("layout", "Layout", "Layout", "Responsive spacing and content surfaces built from Fluent layout primitives.", FluentIconRegular.Grid24, _ => LayoutPage()),
-        new("collections", "Layout", "Collections", "Present repeated content with predictable rhythm and grouping.", FluentIconRegular.ContentView24, _ => CollectionsPage()),
-        new("advancedcollections", "Layout", "Advanced collections", "Data grids and list surfaces for dense, keyboard-friendly information architecture.", FluentIconRegular.Table24, _ => AdvancedCollectionsPage()),
+        new("disclosure", "Layout", "Disclosure", "Expanders and settings surfaces reveal complexity progressively.", FluentIconRegular.PanelLeft24, _ => DisclosurePage()),
+        new("visuals", "Media", "Visuals & icons", "Shapes, avatars, and icon elements for expressive but consistent UI.", FluentIconRegular.Image24, _ => VisualsPage()),
+        new("inputmedia", "Media", "Input & media", "Color, ink, and media controls for rich interactive surfaces.", FluentIconRegular.Color24, _ => InputMediaPage()),
+        new("menus", "Menus & toolbars", "Menus & commands", "Menu bars and commands keep actions discoverable and keyboard-friendly.", FluentIconRegular.List24, _ => MenusPage()),
+        new("motion", "Motion", "Motion", "Connected transitions and animated visuals that preserve context.", FluentIconRegular.SlideTransition24, _ => MotionPage()),
         new("navigation", "Navigation", "Navigation", "NavigationView, tabs, and command affordances in a coherent shell.", FluentIconRegular.Navigation24, _ => NavigationPage()),
-        new("selectors", "Input & data", "Selectors & inspectors", "Hierarchical selection and property inspection with explicit state and density contracts.", FluentIconRegular.Branch24, _ => SelectorsPage()),
-        new("datetime", "Input & data", "Date & time", "Pickers and calendars follow the same density and focus contract.", FluentIconRegular.CalendarLtr24, _ => DateTimePage()),
-        new("charts", "Input & data", "Charts", "Data visualization controls with axes, legends, and accessible values.", FluentIconRegular.ChartMultiple24, _ => ChartsPage()),
-        new("datainspectors", "Input & data", "Data inspectors", "Inspect JSON, source changes, and binary payloads using Jalium.UI data controls.", FluentIconRegular.Database24, _ => DataInspectorsPage()),
-        new("interaction", "Interaction", "Interaction", "Scrolling, zooming, pull-to-refresh, and annotated scroll affordances.", FluentIconRegular.ArrowSync24, _ => InteractionPage()),
-        new("menus", "App structure", "Menus & commands", "Menu bars and commands keep actions discoverable and keyboard-friendly.", FluentIconRegular.List24, _ => MenusPage()),
-        new("disclosure", "App structure", "Disclosure", "Expanders and settings surfaces reveal complexity progressively.", FluentIconRegular.PanelLeft24, _ => DisclosurePage()),
-        new("visuals", "Visuals", "Visuals & icons", "Shapes, avatars, and icon elements for expressive but consistent UI.", FluentIconRegular.Image24, _ => VisualsPage()),
-        new("inputmedia", "Visuals", "Input & media", "Color, ink, and media controls for rich interactive surfaces.", FluentIconRegular.Color24, _ => InputMediaPage()),
-        new("motion", "Design", "Motion", "Connected transitions and animated visuals that preserve context.", FluentIconRegular.SlideTransition24, _ => MotionPage()),
-        new("shell", "App structure", "Shell & window", "Title bars, panes, and window-level composition primitives.", FluentIconRegular.Window24, _ => ShellPage()),
-        new("materials", "Design", "Materials", "Mica, Acrylic, and Liquid Glass surfaces with semantic elevation.", FluentIconRegular.Sparkle24, _ => MaterialsPage()),
-        new("status", "Design", "Status & progress", "Communicate state with progress, info, warning, and success treatments.", FluentIconRegular.Alert24, _ => StatusPage())
+        new("interaction", "Scrolling", "Interaction", "Scrolling, zooming, pull-to-refresh, and annotated scroll affordances.", FluentIconRegular.ArrowSync24, _ => InteractionPage()),
+        new("status", "Status & info", "Status & progress", "Communicate state with progress, info, warning, and success treatments.", FluentIconRegular.Alert24, _ => StatusPage()),
+        new("materials", "Styles", "Materials", "Mica, Acrylic, and Liquid Glass surfaces with semantic elevation.", FluentIconRegular.Sparkle24, _ => MaterialsPage()),
+        new("shell", "Windowing", "Shell & window", "Title bars, panes, and window-level composition primitives.", FluentIconRegular.Window24, _ => ShellPage())
     ];
+
+    /// <summary>WinUI Gallery category icon for a navigation group.</summary>
+    public static FluentIconRegular GroupIcon(string group) => group switch
+    {
+        "Basic input" => FluentIconRegular.Cursor24,
+        "Collections" => FluentIconRegular.ContentView24,
+        "Data" => FluentIconRegular.Database24,
+        "Date & time" => FluentIconRegular.CalendarLtr24,
+        "Layout" => FluentIconRegular.Grid24,
+        "Media" => FluentIconRegular.Image24,
+        "Menus & toolbars" => FluentIconRegular.List24,
+        "Motion" => FluentIconRegular.SlideTransition24,
+        "Navigation" => FluentIconRegular.Navigation24,
+        "Scrolling" => FluentIconRegular.ArrowSync24,
+        "Status & info" => FluentIconRegular.Alert24,
+        "Styles" => FluentIconRegular.Sparkle24,
+        "Windowing" => FluentIconRegular.Window24,
+        _ => FluentIconRegular.Apps24
+    };
 
     private static UIElement HomePage(Action<GalleryEntry> navigate)
     {
@@ -164,6 +191,45 @@ public static class GalleryPages
 
     private static UIElement AboutPage() => Scroll(PageBody("About FluentJalium", "FluentJalium brings the Fluent Design System to Jalium UI with native, composable controls.",
         ExampleCard("Principles", "Accessible by default, theme-aware, responsive, and intentionally quiet.", new FWStackPanel { Orientation = Orientation.Vertical, Spacing = 8, Children = { Bullet("Use semantic colors and typography."), Bullet("Respect focus, keyboard, and touch."), Bullet("Prefer composition over one-off visuals.") } })));
+
+    /// <summary>WinUI Gallery-style section page for an expandable navigation group.</summary>
+    public static UIElement SectionPage(string group, IReadOnlyList<GalleryEntry> children, Action<GalleryEntry> navigate)
+    {
+        var body = PageBody(group, "Browse the pages in this section.");
+        var cards = new FWWrapPanel { HorizontalSpacing = 16, VerticalSpacing = 16 };
+        foreach (var entry in children) cards.Children.Add(new GalleryLinkCard(entry, navigate));
+        body.Add(cards);
+        return Scroll(body);
+    }
+
+    private static UIElement SettingsPage()
+    {
+        var themePicker = new FWComboBox
+        {
+            Width = 300,
+            ItemsSource = new[] { "Light", "Dark" },
+            SelectedIndex = FluentThemeManager.CurrentTheme == FluentThemeVariant.Dark ? 1 : 0
+        };
+        themePicker.SelectionChanged += (s, e) =>
+            FluentThemeManager.ApplyTheme(themePicker.SelectedIndex == 1 ? FluentThemeVariant.Dark : FluentThemeVariant.Light);
+
+        var sidebarStylePicker = new FWComboBox
+        {
+            Width = 300,
+            ItemsSource = new[] { "WinUI 3 Tree (Hierarchical)", "Modern Fluent (Store / Flat Cards)" },
+            SelectedIndex = GalleryShell.ActiveSidebarStyle == FluentNavigationItemStyle.Fluent ? 1 : 0
+        };
+        sidebarStylePicker.SelectionChanged += (s, e) =>
+            GalleryShell.ActiveSidebarStyle = sidebarStylePicker.SelectedIndex == 1
+                ? FluentNavigationItemStyle.Fluent
+                : FluentNavigationItemStyle.Tree;
+
+        return Scroll(PageBody("Settings", "Gallery preferences follow the Fluent Design System.",
+            ExampleCard("Appearance", "Choose the app theme used by the gallery.", themePicker),
+            ExampleCard("Navigation sidebar style", "Choose between canonical WinUI 3 hierarchical tree list and WPF-UI/Store style modern flat cards.", sidebarStylePicker),
+            ExampleCard("About", "FluentJalium brings the Fluent Design System to Jalium UI with native, composable controls.",
+                new FWStackPanel { Orientation = Orientation.Vertical, Spacing = 8, Children = { Bullet("Use semantic colors and typography."), Bullet("Respect focus, keyboard, and touch."), Bullet("Prefer composition over one-off visuals.") } })));
+    }
 
     private static GalleryPageFrame PageBody(string title, string description, params UIElement[] content)
     {

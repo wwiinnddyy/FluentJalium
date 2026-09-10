@@ -353,13 +353,15 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#4C3A3A3A" />
             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#12FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5DFFFFFF" />
@@ -908,13 +910,15 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5C000000" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#0F000000" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#09000000" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#06000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#09000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#06000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#09000000" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#9E000000" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5C000000" />
@@ -1450,6 +1454,8 @@
             <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FF333333" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#FF7F7F7F" />

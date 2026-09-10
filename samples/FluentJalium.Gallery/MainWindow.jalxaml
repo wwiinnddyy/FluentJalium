@@ -5,8 +5,8 @@
         Title="FluentJalium Gallery"
         Width="1360"
         Height="860"
-        MinWidth="920"
-        MinHeight="600"
+        MinWidth="640"
+        MinHeight="500"
         Background="Transparent">
     <Grid>
         <fw:FWBackdrop x:Name="Backdrop"

@@ -21,7 +21,7 @@ internal static class Program
         if (args.Contains("--selftest", StringComparer.OrdinalIgnoreCase))
         {
             var iconCount = 0;
-            var entries = GalleryPages.All.Append(GalleryPages.About).ToArray();
+            var entries = GalleryPages.All.Append(GalleryPages.About).Append(GalleryPages.Settings).ToArray();
             foreach (var entry in entries)
             {
                 var icon = GalleryIcon.Create(entry.Icon);

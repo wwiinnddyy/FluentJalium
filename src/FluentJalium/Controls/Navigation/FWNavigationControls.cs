@@ -404,12 +404,9 @@ public class FWNavigationView : FluentNavigationView, IFluentJaliumControl
 
     internal static (double OpenPaneLength, double CompactPaneLength) GetPaneMetrics(FWNavigationDensity density)
     {
-        return density switch
-        {
-            FWNavigationDensity.Compact => (240.0, 40.0),
-            FWNavigationDensity.Spacious => (320.0, 56.0),
-            _ => (280.0, 48.0)
-        };
+        // WinUI pane lengths are fixed (320/48) and do not vary with density; density only
+        // affects item height (see FWNavigationViewItem.GetItemMetrics).
+        return (FluentNavigationView.DefaultOpenPaneLength, FluentNavigationView.DefaultCompactPaneLength);
     }
 
     private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -460,13 +457,15 @@ public class FWNavigationViewItem : FluentNavigationViewItem, IFluentJaliumContr
         set => SetValue(RouteKeyProperty, value);
     }
 
-    internal static (double MinHeight, Thickness Margin) GetItemMetrics(FWNavigationDensity density)
+    internal static double GetItemMinHeight(FWNavigationDensity density)
     {
+        // WinUI fixes the item pill inset at 4,2 (applied inside the item template); density
+        // only changes the item minimum height.
         return density switch
         {
-            FWNavigationDensity.Compact => (32.0, new Thickness(4, 1, 4, 1)),
-            FWNavigationDensity.Spacious => (44.0, new Thickness(8, 2, 8, 2)),
-            _ => (36.0, new Thickness(6, 2, 6, 2))
+            FWNavigationDensity.Compact => 32.0,
+            FWNavigationDensity.Spacious => 40.0,
+            _ => FluentNavigationViewItem.ItemMinHeight
         };
     }
 
@@ -480,9 +479,7 @@ public class FWNavigationViewItem : FluentNavigationViewItem, IFluentJaliumContr
 
     private static void ApplyDensity(FWNavigationViewItem item, FWNavigationDensity density)
     {
-        var (minHeight, margin) = GetItemMetrics(density);
-        item.MinHeight = minHeight;
-        item.Margin = margin;
+        item.MinHeight = GetItemMinHeight(density);
     }
 }
 
@@ -494,9 +491,9 @@ public class FWNavigationViewItemHeader : NavigationViewItemHeader, IFluentJaliu
 }
 
 /// <summary>
-/// FluentJalium NavigationViewItemSeparator control.
+/// FluentJalium NavigationViewItemSeparator control - full-width 1px divider (WinUI margin 0,3,0,4).
 /// </summary>
-public class FWNavigationViewItemSeparator : NavigationViewItemSeparator, IFluentJaliumControl
+public class FWNavigationViewItemSeparator : FluentNavigationViewItemSeparator, IFluentJaliumControl
 {
 }
 
