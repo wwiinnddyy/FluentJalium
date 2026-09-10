@@ -1,0 +1,31 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.DataInspectorSample">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="12" MaxWidth="720">
+        <fw:FWTextBlock Text="Structured data"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWJsonTreeViewer x:Name="JsonViewer"
+                             Width="680"
+                             Height="210"
+                             IsEditable="True"
+                             ShowTypeIndicators="True"
+                             ShowItemCount="True" />
+        <fw:FWTextBlock Text="Code changes"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWDiffViewer x:Name="DiffViewer"
+                         Width="680"
+                         Height="190"
+                         ViewMode="Unified"
+                         ShowLineNumbers="True"
+                         ShowMinimap="False" />
+        <fw:FWTextBlock Text="Binary preview"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWHexEditor x:Name="HexViewer"
+                        Width="680"
+                        Height="150"
+                        IsReadOnly="True"
+                        ShowOffsetColumn="True"
+                        ShowAsciiColumn="True" />
+    </fw:FWStackPanel>
+</UserControl>

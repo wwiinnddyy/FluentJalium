@@ -455,12 +455,12 @@ public class FWPersonPicture : Control, IFluentJaliumControl
             _ => string.Empty
         };
 
-        SetValue(HasProfilePicturePropertyKey.DependencyProperty, hasImage);
-        SetValue(DisplayInitialsPropertyKey.DependencyProperty, displayInitials);
-        SetValue(DisplayKindPropertyKey.DependencyProperty, displayKind);
-        SetValue(BadgeKindPropertyKey.DependencyProperty, badgeKind);
-        SetValue(HasBadgePropertyKey.DependencyProperty, badgeKind != FWPersonPictureBadgeKind.None);
-        SetValue(BadgeDisplayTextPropertyKey.DependencyProperty, badgeText);
+        SetValue(HasProfilePicturePropertyKey, hasImage);
+        SetValue(DisplayInitialsPropertyKey, displayInitials);
+        SetValue(DisplayKindPropertyKey, displayKind);
+        SetValue(BadgeKindPropertyKey, badgeKind);
+        SetValue(HasBadgePropertyKey, badgeKind != FWPersonPictureBadgeKind.None);
+        SetValue(BadgeDisplayTextPropertyKey, badgeText);
     }
 
     private FWPersonPictureBadgeKind ResolveBadgeKind()

@@ -4,15 +4,18 @@ using System.Windows.Input;
 using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Pages;
+using SimulatedKeyboard = FluentJalium.Gallery.Controls.SimulatedKeyboard;
 using Jalium.UI;
 using Jalium.UI.Automation;
+using Jalium.UI.Automation.Peers;
+using Jalium.UI.Automation.Provider;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Controls.Themes;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
-using AnimationDuration = Jalium.UI.Media.Animation.Duration;
+using AnimationDuration = Jalium.UI.Duration;
 using JaliumThemeManager = Jalium.UI.Controls.Themes.ThemeManager;
 
 namespace FluentJalium.Tests;
@@ -819,22 +822,22 @@ public sealed class FluentContentLayoutControlsTests
             CommandParameter = "material"
         };
 
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Enter, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyDown(Jalium.UI.Input.Key.Enter));
 
         Assert.Equal(1, command.ExecuteCount);
         Assert.Equal("material", command.LastParameter);
 
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyDown(Jalium.UI.Input.Key.Space));
         Assert.Equal(1, command.ExecuteCount);
 
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyUpEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: false, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyUp(Jalium.UI.Input.Key.Space));
         Assert.Equal(2, command.ExecuteCount);
 
         card.ClickMode = ClickMode.Press;
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyDown(Jalium.UI.Input.Key.Space));
         Assert.Equal(3, command.ExecuteCount);
 
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyUpEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: false, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyUp(Jalium.UI.Input.Key.Space));
         Assert.Equal(3, command.ExecuteCount);
 
         card.ClickMode = ClickMode.Hover;
@@ -866,7 +869,7 @@ public sealed class FluentContentLayoutControlsTests
         Assert.False(initialDiagnostics.IsKeyboardPressed);
         Assert.False(initialDiagnostics.IsInteractionPressed);
 
-        card.RaiseEvent(new Jalium.UI.Input.KeyEventArgs(UIElement.KeyDownEvent, Jalium.UI.Input.Key.Space, Jalium.UI.Input.ModifierKeys.None, isDown: true, isRepeat: false, timestamp: 0));
+        card.RaiseEvent(SimulatedKeyboard.CreateKeyDown(Jalium.UI.Input.Key.Space));
 
         Assert.True(card.IsKeyboardPressed);
         Assert.False(card.IsPointerPressed);
@@ -1213,7 +1216,7 @@ public sealed class FluentContentLayoutControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static void AssertTriggerSetter(
@@ -1226,7 +1229,7 @@ public sealed class FluentContentLayoutControlsTests
         var trigger = Assert.Single(
             style.Triggers.OfType<Trigger>(),
             candidate => candidate.Property == triggerProperty && TriggerValueEquals(candidate.Value, triggerValue));
-        var setter = Assert.Single(trigger.Setters, candidate => candidate.Property == setterProperty);
+        var setter = Assert.Single(trigger.Setters.OfType<Setter>(), candidate => candidate.Property == setterProperty);
 
         if (setter.Value is IDynamicResourceReference dynamicReference)
         {

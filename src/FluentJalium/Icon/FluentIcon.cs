@@ -26,9 +26,10 @@ public class FluentIcon : FontIcon
     public static readonly string FilledFontFamily = FluentIconFonts.Filled;
 
     /// <summary>
-    /// Font family used for Windows Segoe Fluent Icons compatibility glyphs.
+    /// Font family used for Windows Segoe Fluent Icons compatibility glyphs,
+    /// with a "Segoe MDL2 Assets" fallback on older Windows.
     /// </summary>
-    public const string SegoeFontFamily = FluentIconFonts.Segoe;
+    public static string SegoeFontFamily => FluentIconFonts.Segoe;
 
     private bool _isUpdating;
 

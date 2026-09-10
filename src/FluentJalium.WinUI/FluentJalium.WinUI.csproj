@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>FluentJalium.WinUI</RootNamespace>
+    <AssemblyName>FluentJalium.WinUI</AssemblyName>
+    <Description>WinUI 3 compatibility facade for Jalium.UI: run existing WinUI markup on Jalium with FluentJalium styling.</Description>
+    <IsPackable>true</IsPackable>
+    <PackageId>FluentJalium.WinUI</PackageId>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
+    <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Jalium.UI.Core" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Media" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Input" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Interop" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Xaml" Version="$(JaliumPackageVersion)" />
+    <PackageReference Include="Jalium.UI.Xaml.SourceGenerator" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
+    <PackageReference Include="Jalium.UI.Build" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

@@ -3,6 +3,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
+using Jalium.UI.Threading;
 
 namespace FluentJalium.Controls;
 
@@ -44,7 +45,7 @@ public class FWProgressRing : RangeBase, IFluentJaliumControl
     private const double MinimumArcDegrees = 42.0;
     private const double IndeterminateArcDegrees = 96.0;
     private double _animationAngle;
-    private bool _isAnimationSubscribed;
+    private DispatcherTimer? _animationTimer;
     private long _lastAnimationTickMs;
 
     public FWProgressRing()
@@ -237,26 +238,30 @@ public class FWProgressRing : RangeBase, IFluentJaliumControl
 
     private void StartAnimation()
     {
-        if (_isAnimationSubscribed)
+        if (_animationTimer is not null)
+        {
             return;
+        }
 
         _lastAnimationTickMs = Environment.TickCount64;
-        CompositionTarget.Rendering += OnRendering;
-        CompositionTarget.Subscribe();
-        _isAnimationSubscribed = true;
+        _animationTimer = new DispatcherTimer { Interval = FWFramePacing.Interval };
+        _animationTimer.Tick += OnAnimationTick;
+        _animationTimer.Start();
     }
 
     private void StopAnimation()
     {
-        if (!_isAnimationSubscribed)
+        if (_animationTimer is null)
+        {
             return;
+        }
 
-        CompositionTarget.Rendering -= OnRendering;
-        CompositionTarget.Unsubscribe();
-        _isAnimationSubscribed = false;
+        _animationTimer.Tick -= OnAnimationTick;
+        _animationTimer.Stop();
+        _animationTimer = null;
     }
 
-    private void OnRendering(object? sender, EventArgs e)
+    private void OnAnimationTick(object? sender, EventArgs e)
     {
         var now = Environment.TickCount64;
         var elapsed = Math.Clamp((now - _lastAnimationTickMs) / 1000.0, 0.0, 0.1);

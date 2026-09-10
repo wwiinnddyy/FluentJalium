@@ -1,0 +1,27 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.BasicInputSample">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="12" MaxWidth="440">
+        <fw:FWTextBlock Text="Display name"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWTextBox x:Name="NameBox"
+                      PlaceholderText="Enter your name" />
+        <fw:FWTextBlock Text="Workspace"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWComboBox x:Name="WorkspaceBox"
+                       PlaceholderText="Choose a workspace" />
+        <fw:FWToggleSwitch x:Name="UpdatesSwitch"
+                           Header="Enable product updates"
+                           Description="Receive occasional release notes"
+                           IsOn="True" />
+        <fw:FWButton Content="Save changes"
+                     HorizontalAlignment="Left"
+                     Click="OnSaveClick" />
+        <fw:FWInfoBar x:Name="SavedInfo"
+                      Title="Ready"
+                      Message="Your preferences are ready to save."
+                      Severity="Informational"
+                      IsOpen="True" />
+    </fw:FWStackPanel>
+</UserControl>

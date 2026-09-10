@@ -69,7 +69,7 @@ xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
 
 ### Input & Forms
 - **Buttons**: FWButton, FWRepeatButton, FWHyperlinkButton, FWDropDownButton, FWSplitButton, FWToggleSplitButton
-- **Text Input**: FWTextBox, FWPasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox
+- **Text Input**: FWTextBox, PasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox
 - **Selection**: FWCheckBox, FWRadioButton, FWComboBox, FWToggleSwitch, FWSlider, FWRangeSlider
 
 ### Collections & Data
@@ -145,11 +145,11 @@ dotnet test tests/FluentJalium.Tests/FluentJalium.Tests.csproj
 dotnet run --project samples/FluentJalium.Gallery/FluentJalium.Gallery.csproj
 ```
 
-### Using Local Jalium.UI Source
+### Dependency Model
 
-```bash
-dotnet build FluentJalium.slnx -c Debug /p:UseJaliumSourceReferences=true
-```
+FluentJalium consumes Jalium.UI only through the `Jalium.UI.*` packages on nuget.org. The
+version is pinned once by `JaliumPackageVersion` in `Directory.Build.props`; no sibling
+`../Jalium.UI/` source tree is required to build, test, or run the gallery.
 
 ## 🤝 Contributing
 
@@ -244,7 +244,7 @@ xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
 
 ### 输入与表单
 - **按钮**: FWButton, FWRepeatButton, FWHyperlinkButton, FWDropDownButton, FWSplitButton, FWToggleSplitButton
-- **文本输入**: FWTextBox, FWPasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox
+- **文本输入**: FWTextBox, PasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox
 - **选择控件**: FWCheckBox, FWRadioButton, FWComboBox, FWToggleSwitch, FWSlider, FWRangeSlider
 
 ### 集合与数据

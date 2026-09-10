@@ -258,7 +258,7 @@ public class FWSplitView : ContentControl, IFluentJaliumControl
                 ? CompactPaneLength
                 : 0.0;
 
-        SetValue(ActualPaneLengthPropertyKey.DependencyProperty, paneLength);
+        SetValue(ActualPaneLengthPropertyKey, paneLength);
     }
 
     private static bool IsValidDisplayMode(object? value)

@@ -21,5 +21,6 @@
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/DateTimeControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/StatusControls.jalxaml" />
         <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/AdvancedControls.jalxaml" />
+        <ResourceDictionary Source="/FluentJalium;component/Themes/Controls/MotionControls.jalxaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

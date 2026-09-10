@@ -4,7 +4,8 @@ using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
-using ShapePointCollection = Jalium.UI.Controls.Shapes.PointCollection;
+using Jalium.UI.Media.Imaging;
+using ShapePointCollection = Jalium.UI.Media.PointCollection;
 
 namespace FluentJalium.Tests;
 

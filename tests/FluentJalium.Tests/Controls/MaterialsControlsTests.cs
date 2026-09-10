@@ -1,5 +1,4 @@
 using FluentJalium.Controls;
-using Jalium.UI;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests.Controls;

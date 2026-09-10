@@ -1,0 +1,18 @@
+<fw:FWScrollViewer xmlns="http://schemas.jalium.ui/2024"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+                   x:Class="FluentJalium.Gallery.Controls.GalleryPageFrame"
+                   VerticalScrollBarVisibility="Auto"
+                   HorizontalScrollBarVisibility="Disabled">
+    <fw:FWStackPanel x:Name="Body"
+                     Orientation="Vertical"
+                     Spacing="18"
+                     Margin="40,32,40,48"
+                     MaxWidth="1100"
+                     HorizontalAlignment="Left">
+        <fw:FWTextBlock x:Name="TitlePresenter"
+                        Style="{StaticResource GalleryPageTitle}" />
+        <fw:FWTextBlock x:Name="DescriptionPresenter"
+                        Style="{StaticResource GalleryPageDescription}" />
+    </fw:FWStackPanel>
+</fw:FWScrollViewer>

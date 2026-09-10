@@ -1,0 +1,30 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Shell.GalleryShell">
+    <!-- WinUI Gallery Shell: clean stock NavigationView without intrusive brand card,
+         allowing smooth 320px/48px collapse and pure Windows 11 Fluent aesthetic. -->
+    <fw:FWNavigationView x:Name="Navigation"
+                         PaneDisplayMode="Left"
+                         IsPaneOpen="True"
+                         AutomationProperties.AutomationId="GalleryNavigation">
+        <fw:FWNavigationView.Content>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <fw:FWAutoSuggestBox x:Name="SearchBox"
+                                    Grid.Row="0"
+                                    MaxWidth="580"
+                                    Margin="40,20,40,18"
+                                    HorizontalAlignment="Stretch"
+                                    PlaceholderText="Search controls and samples..." />
+                <ContentControl x:Name="ContentHost"
+                                Grid.Row="1"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch" />
+            </Grid>
+        </fw:FWNavigationView.Content>
+    </fw:FWNavigationView>
+</UserControl>

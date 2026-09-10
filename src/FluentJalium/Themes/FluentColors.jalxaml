@@ -60,7 +60,7 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#87FFFFFF" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#202020" />
-            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#FF202020" />
             <SolidColorBrush x:Key="TitleBarText" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="TitleBarGlyph" Color="#FFFFFFFF" />
@@ -353,13 +353,15 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5DFFFFFF" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#15FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FF2C2C2C" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF202020" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#4C3A3A3A" />
             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#12FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#08FFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#0AFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#0FFFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#C5FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5DFFFFFF" />
@@ -546,6 +548,16 @@
             <!-- Layer On Acrylic -->
             <Color x:Key="LayerOnAcrylicFillColorDefault">#09FFFFFF</Color>
             <SolidColorBrush x:Key="LayerOnAcrylicFillColorDefaultBrush" Color="#09FFFFFF" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#80FFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF4CC2FF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF9CC3E5" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFDEDEDE" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FF333333" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FF202020" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="Light">
@@ -605,7 +617,7 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#72000000" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#FFF3F3F3" />
-            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#FFF3F3F3" />
             <SolidColorBrush x:Key="TitleBarText" Color="#E4000000" />
             <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="TitleBarGlyph" Color="#E4000000" />
@@ -898,13 +910,15 @@
             <SolidColorBrush x:Key="AppBarButtonForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="AppBarButtonForegroundDisabled" Color="#5C000000" />
             <SolidColorBrush x:Key="AppBarSeparatorForeground" Color="#0F000000" />
-            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#FFFFFFFF" />
-            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FFF3F3F3" />
+            <SolidColorBrush x:Key="NavigationViewPaneBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#80FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemBackground" Color="#00FFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundHover" Color="#09000000" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#06000000" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#330078D4" />
-            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#660078D4" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#09000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#06000000" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#09000000" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FF0078D4" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#E4000000" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#9E000000" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#5C000000" />
@@ -1091,6 +1105,16 @@
             <!-- Layer On Acrylic -->
             <Color x:Key="LayerOnAcrylicFillColorDefault">#40FFFFFF</Color>
             <SolidColorBrush x:Key="LayerOnAcrylicFillColorDefaultBrush" Color="#40FFFFFF" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B3FFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF003E92" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF00154F" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFEBEBEB" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FFF3F3F3" />
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -1430,6 +1454,8 @@
             <SolidColorBrush x:Key="NavigationViewItemBackgroundPressed" Color="#FF333333" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelected" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedHover" Color="#FFFFFF00" />
+            <SolidColorBrush x:Key="NavigationViewItemBackgroundSelectedPressed" Color="#FF333333" />
+            <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFFFFF00" />
             <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundSecondary" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="NavigationViewItemForegroundDisabled" Color="#FF7F7F7F" />
@@ -1549,6 +1575,17 @@
             <Color x:Key="FocusStrokeColorInner">#FF000000</Color>
             <SolidColorBrush x:Key="FocusStrokeColorOuterBrush" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="FocusStrokeColorInnerBrush" Color="#FF000000" />
+            <!-- Gallery-facing tokens (WinUI names, verbatim values). HighContrast mirrors Dark until
+                 SystemColor* resources are reachable from a Jalium theme dictionary. -->
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B3000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF1AEBFF" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FFC7EFFF" />
+            <SolidColorBrush x:Key="ControlFillColorInputActiveBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="CardStrokeColorDefaultSolidBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="SolidBackgroundFillColorQuarternaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ControlExampleDisplayBrush" Color="#FF000000" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

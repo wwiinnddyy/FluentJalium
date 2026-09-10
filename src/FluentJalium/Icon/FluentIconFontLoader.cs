@@ -50,40 +50,47 @@ internal static partial class FluentIconFontLoader
     {
         var assembly = typeof(FluentIconFontLoader).Assembly;
 
-        if (OperatingSystem.IsWindows())
+        try
         {
-            // Install to Windows user fonts directory (%LOCALAPPDATA%\Microsoft\Windows\Fonts\)
-            // so that DirectWrite's system font collection can discover them.
-            var userFontsDir = GetUserFontsDirectory();
-            Directory.CreateDirectory(userFontsDir);
-
-            var regularPath = ExtractResource(assembly, RegularResourceName, userFontsDir, RegularFileName);
-            var filledPath = ExtractResource(assembly, FilledResourceName, userFontsDir, FilledFileName);
-
-            var installed = false;
-            installed |= InstallFontInRegistry(RegularFamilyName, RegularFileName, regularPath);
-            installed |= InstallFontInRegistry(FilledFamilyName, FilledFileName, filledPath);
-
-            // Also register with GDI (without FR_PRIVATE) for legacy GDI consumers.
-            if (regularPath != null) AddFontResourceW(regularPath);
-            if (filledPath != null) AddFontResourceW(filledPath);
-
-            // Notify all top-level windows that the font list has changed.
-            if (installed)
+            if (OperatingSystem.IsWindows())
             {
-                SendMessageTimeoutW(
-                    HWND_BROADCAST, WM_FONTCHANGE,
-                    nuint.Zero, nint.Zero,
-                    SMTO_ABORTIFHUNG, 1000, out _);
+                // Install to Windows user fonts directory (%LOCALAPPDATA%\Microsoft\Windows\Fonts\)
+                // so that DirectWrite's system font collection can discover them.
+                var userFontsDir = GetUserFontsDirectory();
+                Directory.CreateDirectory(userFontsDir);
+
+                var regularPath = ExtractResource(assembly, RegularResourceName, userFontsDir, RegularFileName);
+                var filledPath = ExtractResource(assembly, FilledResourceName, userFontsDir, FilledFileName);
+
+                var installed = false;
+                installed |= InstallFontInRegistry(RegularFamilyName, RegularFileName, regularPath);
+                installed |= InstallFontInRegistry(FilledFamilyName, FilledFileName, filledPath);
+
+                // Also register with GDI (without FR_PRIVATE) for legacy GDI consumers.
+                if (regularPath != null) AddFontResourceW(regularPath);
+                if (filledPath != null) AddFontResourceW(filledPath);
+
+                // Notify all top-level windows that the font list has changed.
+                if (installed)
+                {
+                    SendMessageTimeoutW(
+                        HWND_BROADCAST, WM_FONTCHANGE,
+                        nuint.Zero, nint.Zero,
+                        SMTO_ABORTIFHUNG, 1000, out _);
+                }
+            }
+            else
+            {
+                // On non-Windows, extract to a temp directory for Fontconfig discovery.
+                var fontDir = Path.Combine(Path.GetTempPath(), "FluentJalium", "Fonts");
+                Directory.CreateDirectory(fontDir);
+                ExtractResource(assembly, RegularResourceName, fontDir, RegularFileName);
+                ExtractResource(assembly, FilledResourceName, fontDir, FilledFileName);
             }
         }
-        else
+        catch (Exception)
         {
-            // On non-Windows, extract to a temp directory for Fontconfig discovery.
-            var fontDir = Path.Combine(Path.GetTempPath(), "FluentJalium", "Fonts");
-            Directory.CreateDirectory(fontDir);
-            ExtractResource(assembly, RegularResourceName, fontDir, RegularFileName);
-            ExtractResource(assembly, FilledResourceName, fontDir, FilledFileName);
+            // Icons are cosmetic; an unwritable font folder must not stop the application.
         }
 
         return new LoadResult(RegularFamilyName, FilledFamilyName);
@@ -111,10 +118,41 @@ internal static partial class FluentIconFontLoader
             return outputPath;
         }
 
-        using var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
-        resourceStream.CopyTo(fileStream);
+        try
+        {
+            Write(outputPath, resourceStream);
+            return outputPath;
+        }
+        catch (IOException)
+        {
+            // Windows holds an installed font file open for the lifetime of the session, so a
+            // replaced font cannot overwrite its predecessor. Register the fresh copy instead.
+            var fallbackPath = Path.Combine(
+                outputDir,
+                $"{Path.GetFileNameWithoutExtension(fileName)}-{resourceStream.Length}{Path.GetExtension(fileName)}");
 
-        return outputPath;
+            if (File.Exists(fallbackPath) && new FileInfo(fallbackPath).Length == resourceStream.Length)
+            {
+                return fallbackPath;
+            }
+
+            try
+            {
+                Write(fallbackPath, resourceStream);
+                return fallbackPath;
+            }
+            catch (IOException)
+            {
+                return null;
+            }
+        }
+    }
+
+    private static void Write(string path, Stream resourceStream)
+    {
+        resourceStream.Position = 0;
+        using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
+        resourceStream.CopyTo(fileStream);
     }
 
     /// <summary>

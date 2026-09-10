@@ -1,0 +1,34 @@
+<ResourceDictionary x:Class="FluentJalium.Gallery.Themes.GalleryStyles"
+                    xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+    <!-- Shared Gallery design tokens. Pages consume these keyed styles instead of repeating
+         typography and spacing values, just like the reference WinUI Gallery. -->
+    <Style x:Key="GalleryPageTitle" TargetType="fw:FWTextBlock">
+        <Setter Property="FontSize" Value="34" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Display" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+    <Style x:Key="GalleryPageDescription" TargetType="fw:FWTextBlock">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="MaxWidth" Value="760" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+    <Style x:Key="GalleryCardTitle" TargetType="fw:FWTextBlock">
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    </Style>
+    <Style x:Key="GalleryCardDescription" TargetType="fw:FWTextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+    <Style x:Key="GalleryCodeText" TargetType="fw:FWTextBlock">
+        <Setter Property="FontFamily" Value="Cascadia Code" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+    </Style>
+</ResourceDictionary>

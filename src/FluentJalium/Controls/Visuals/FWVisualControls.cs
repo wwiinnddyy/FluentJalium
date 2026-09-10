@@ -1,7 +1,5 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
-using Jalium.UI.Controls.Shapes;
-using ShapePath = Jalium.UI.Controls.Shapes.Path;
 
 namespace FluentJalium.Controls;
 
@@ -104,47 +102,5 @@ public class FWLabel : Label, IFluentJaliumControl
 /// FluentJalium Separator control.
 /// </summary>
 public class FWSeparator : Separator, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Rectangle shape.
-/// </summary>
-public class FWRectangle : Rectangle, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Ellipse shape.
-/// </summary>
-public class FWEllipse : Ellipse, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Line shape.
-/// </summary>
-public class FWLine : Line, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Polyline shape.
-/// </summary>
-public class FWPolyline : Polyline, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Polygon shape.
-/// </summary>
-public class FWPolygon : Polygon, IFluentJaliumControl
-{
-}
-
-/// <summary>
-/// FluentJalium Path shape.
-/// </summary>
-public class FWPath : ShapePath, IFluentJaliumControl
 {
 }

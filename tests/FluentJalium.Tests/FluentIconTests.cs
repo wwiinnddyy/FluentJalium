@@ -29,6 +29,16 @@ public sealed class FluentIconTests
     }
 
     [Fact]
+    public void SegoeFontStack_ShouldPreferFluentIconsWithMdl2Fallback()
+    {
+        Assert.Equal("Segoe Fluent Icons, Segoe MDL2 Assets", FluentIconFonts.Segoe);
+        Assert.Equal(FluentIconFonts.Segoe, FluentIcon.SegoeFontFamily);
+
+        var icon = new FluentIcon { Icon = SegoeFluentIcon.Home };
+        Assert.Equal(FluentIcon.SegoeFontFamily, icon.FontFamily?.ToString());
+    }
+
+    [Fact]
     public void FluentIcon_ShouldUseRegularFontAndUpdateSizeByDefault()
     {
         var icon = new FluentIcon

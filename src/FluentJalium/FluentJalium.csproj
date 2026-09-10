@@ -1,8 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.props"
-          Condition="'$(UseJaliumSourceReferences)' == 'true' and Exists('$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.props')" />
-
   <PropertyGroup>
     <RootNamespace>FluentJalium</RootNamespace>
     <AssemblyName>FluentJalium</AssemblyName>
@@ -17,44 +14,17 @@
     <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
     <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">false</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath Condition="'$(CompilerGeneratedFilesOutputPath)' == ''">$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
-    <_JalxamlTasksPath Condition="'$(UseJaliumSourceReferences)' == 'true'">$(JaliumSourceRoot)src\managed\Jalium.UI.Build\bin\$(Configuration)\net10.0\Jalium.UI.Build.dll</_JalxamlTasksPath>
-    <JalxamlCompilerPath Condition="'$(UseJaliumSourceReferences)' == 'true'">$(JaliumSourceRoot)src\managed\Jalium.UI.Build\tools\jalxamlc.exe</JalxamlCompilerPath>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Core\Jalium.UI.Core.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Media\Jalium.UI.Media.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Input\Jalium.UI.Input.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Interop\Jalium.UI.Interop.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Controls\Jalium.UI.Controls.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Xaml\Jalium.UI.Xaml.csproj" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Xaml.SourceGenerator\Jalium.UI.Xaml.SourceGenerator.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false"
-                      PrivateAssets="all"
-                      UndefineProperties="PublishAot;PublishTrimmed;PublishSingleFile;PublishReadyToRun;SelfContained;RuntimeIdentifier;RuntimeIdentifiers;IsTrimmable;IsAotCompatible" />
-    <ProjectReference Include="$(JaliumSourceRoot)src\managed\Jalium.UI.Build\Jalium.UI.Build.csproj"
-                      ReferenceOutputAssembly="false"
-                      BuildReference="false" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(UseJaliumSourceReferences)' != 'true'">
+  <ItemGroup>
     <PackageReference Include="Jalium.UI.Core" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Media" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Input" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Interop" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Xaml" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Xaml.SourceGenerator" Version="$(JaliumPackageVersion)"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false"
-                      PrivateAssets="all" />
+    <PackageReference Include="Jalium.UI.Xaml.SourceGenerator" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
     <PackageReference Include="Jalium.UI.Build" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(UseJaliumSourceReferences)' == 'true'">
-    <PackageReference Update="Jalium.UI.Xaml.SourceGenerator" ExcludeAssets="all" />
-    <PackageReference Update="Jalium.UI.Build" ExcludeAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,8 +34,5 @@
   <ItemGroup>
     <EmbeddedResource Include="Fonts\*.ttf" />
   </ItemGroup>
-
-  <Import Project="$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets"
-          Condition="'$(UseJaliumSourceReferences)' == 'true' and Exists('$(JaliumSourceRoot)src\managed\Jalium.UI.Build\build\Jalium.UI.Build.targets')" />
 
 </Project>

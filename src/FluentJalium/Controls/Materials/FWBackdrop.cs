@@ -1,3 +1,4 @@
+using FluentJalium.Controls.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -19,6 +20,13 @@ public enum FWBackdropType
 /// <summary>
 /// FluentJalium Backdrop control for background material effects.
 /// </summary>
+/// <remarks>
+/// Jalium.UI does not expose a blur / sampling backdrop yet, so every material is rendered as a
+/// solid, opaque approximation: an opaque base surface (<see cref="FallbackColor"/>) with the
+/// theme tint (<see cref="TintColor"/>) composited over it. The control always resolves a
+/// non-transparent base and a theme-correct tint, so it can never wash the window with an
+/// opaque white or black rectangle regardless of the active theme.
+/// </remarks>
 public class FWBackdrop : Control, IFluentJaliumControl
 {
     public static readonly DependencyProperty TypeProperty =
@@ -39,7 +47,7 @@ public class FWBackdrop : Control, IFluentJaliumControl
 
     public static readonly DependencyProperty FallbackColorProperty =
         DependencyProperty.Register(nameof(FallbackColor), typeof(Color), typeof(FWBackdrop),
-            new PropertyMetadata(Color.FromRgb(0xF3, 0xF3, 0xF3), OnVisualPropertyChanged));
+            new PropertyMetadata(Colors.Transparent, OnVisualPropertyChanged));
 
     public static readonly DependencyProperty AlwaysUseFallbackProperty =
         DependencyProperty.Register(nameof(AlwaysUseFallback), typeof(bool), typeof(FWBackdrop),
@@ -51,6 +59,8 @@ public class FWBackdrop : Control, IFluentJaliumControl
     public FWBackdrop()
     {
         IsHitTestVisible = false;
+        FluentThemeManager.ThemeChanged += OnThemeChanged;
+        Unloaded += OnUnloaded;
     }
 
     /// <summary>
@@ -66,6 +76,11 @@ public class FWBackdrop : Control, IFluentJaliumControl
     /// <summary>
     /// Gets or sets the tint color overlay.
     /// </summary>
+    /// <remarks>
+    /// A fully transparent color (the default, <see cref="Colors.Transparent"/>) means
+    /// "use the active theme tint" (<c>LayerFillColorDefault</c>) instead of painting a
+    /// transparent — and therefore meaningless — overlay.
+    /// </remarks>
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public Color TintColor
     {
@@ -96,6 +111,12 @@ public class FWBackdrop : Control, IFluentJaliumControl
     /// <summary>
     /// Gets or sets the fallback color when backdrop effects are not available.
     /// </summary>
+    /// <remarks>
+    /// The default is <see cref="Colors.Transparent"/>, which means "use the active theme base"
+    /// (<c>SolidBackgroundFillColorBase</c>, or <c>WindowBackground</c> when the active variant does
+    /// not define it). A transparent default is deliberate: the property is rendered opaque, so a
+    /// baked-in light default would wash out a dark window.
+    /// </remarks>
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Appearance)]
     public Color FallbackColor
     {
@@ -122,77 +143,121 @@ public class FWBackdrop : Control, IFluentJaliumControl
 
         var rect = new Rect(0, 0, RenderSize.Width, RenderSize.Height);
 
-        if (AlwaysUseFallback || Type == FWBackdropType.None)
-        {
-            drawingContext.DrawRectangle(new SolidColorBrush(FallbackColor), null, rect);
-            return;
-        }
+        var color = AlwaysUseFallback || Type == FWBackdropType.None
+            ? ResolveBaseColor()
+            : ResolveBackdropColor();
 
-        // Render backdrop effect
-        var brush = CreateBackdropBrush();
-        drawingContext.DrawRectangle(brush, null, rect);
+        drawingContext.DrawRectangle(new SolidColorBrush(color), null, rect);
     }
 
-    private Brush CreateBackdropBrush()
+    /// <summary>
+    /// Resolves the opaque base surface. Never returns a transparent color: a "solid" backdrop
+    /// that let the desktop show through was the source of the washed-out/muddy window.
+    /// </summary>
+    private Color ResolveBaseColor()
+    {
+        var color = FallbackColor;
+        if (color.A == 0)
+        {
+            color = TryThemeColor("SolidBackgroundFillColorBase")
+                ?? TryThemeColorFromBrush("SolidBackgroundFillColorBaseBrush")
+                ?? TryThemeColorFromBrush("WindowBackground")
+                ?? color;
+        }
+
+        return color.A == 255 ? color : Color.FromArgb(255, color.R, color.G, color.B);
+    }
+
+    /// <summary>
+    /// Resolves the tint overlay. A transparent <see cref="TintColor"/> means "follow the theme";
+    /// that is also the dependency property default, so an unstyled <see cref="FWBackdrop"/>
+    /// cannot fall back to painting <see cref="Colors.Transparent"/>'s white RGB as a full-strength
+    /// overlay (which used to render as ~86% opaque white in every theme).
+    /// </summary>
+    private Color ResolveTintColor()
+    {
+        var tint = TintColor;
+        if (tint.A != 0)
+            return tint;
+
+        return TryThemeColor("LayerFillColorDefault")
+            ?? TryThemeColorFromBrush("LayerFillColorDefaultBrush")
+            ?? tint;
+    }
+
+    private Color ResolveBackdropColor()
+    {
+        var baseColor = ResolveBaseColor();
+        var tint = ResolveTintColor();
+        var tintAlpha = tint.A / 255.0;
+        if (tintAlpha <= 0)
+            return baseColor;
+
+        var tintRgb = AdjustTintForMaterial(tint);
+
+        // WinUI Mica/Acrylic composite a tint layer (TintOpacity) and a luminosity layer
+        // (LuminosityOpacity) over the base. Without a sampling backdrop both layers reduce to
+        // alpha blends, so compose them with source-over math instead of choosing one and
+        // leaving the other property dead.
+        var tintLayer = Math.Clamp(TintOpacity, 0.0, 1.0) * tintAlpha;
+        var luminosityLayer = Math.Clamp(LuminosityOpacity, 0.0, 1.0) * tintAlpha;
+        var strength = 1.0 - ((1.0 - tintLayer) * (1.0 - luminosityLayer));
+
+        return Blend(baseColor, tintRgb, strength);
+    }
+
+    private Color AdjustTintForMaterial(Color tint)
     {
         return Type switch
         {
-            FWBackdropType.Acrylic => CreateAcrylicBrush(),
-            FWBackdropType.Mica => CreateMicaBrush(),
-            FWBackdropType.MicaAlt => CreateMicaAltBrush(),
-            FWBackdropType.Tabbed => CreateTabbedBrush(),
-            _ => new SolidColorBrush(FallbackColor)
+            FWBackdropType.MicaAlt => Color.FromArgb(tint.A, Scale(tint.R, 0.9), Scale(tint.G, 0.9), Scale(tint.B, 0.9)),
+            FWBackdropType.Tabbed => Color.FromArgb(tint.A, Offset(tint.R, 10), Offset(tint.G, 10), Offset(tint.B, 10)),
+            _ => tint
         };
     }
 
-    private Brush CreateAcrylicBrush()
-    {
-        // Acrylic effect: semi-transparent with tint and blur
-        // Note: Actual blur effect would require native platform support
-        var color = Color.FromArgb(
-            (byte)(255 * TintOpacity),
-            TintColor.R,
-            TintColor.G,
-            TintColor.B);
+    private static byte Scale(byte channel, double factor) =>
+        (byte)Math.Clamp((int)Math.Round(channel * factor), 0, 255);
 
-        var brush = new SolidColorBrush(color);
-        return brush;
+    private static byte Offset(byte channel, int delta) =>
+        (byte)Math.Clamp(channel + delta, 0, 255);
+
+    private static Color? TryThemeColor(string key)
+    {
+        if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Color color)
+            return color;
+
+        return null;
     }
 
-    private Brush CreateMicaBrush()
+    private static Color? TryThemeColorFromBrush(string key)
     {
-        // Mica effect: subtle texture with tint
-        var color = Color.FromArgb(
-            (byte)(255 * TintOpacity),
-            TintColor.R,
-            TintColor.G,
-            TintColor.B);
+        if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is SolidColorBrush brush)
+            return brush.Color;
 
-        return new SolidColorBrush(color);
+        return null;
     }
 
-    private Brush CreateMicaAltBrush()
+    private static Color Blend(Color baseColor, Color tint, double factor)
     {
-        // Mica Alt: darker variant for contrast surfaces
-        var color = Color.FromArgb(
-            (byte)(255 * TintOpacity),
-            (byte)(TintColor.R * 0.9),
-            (byte)(TintColor.G * 0.9),
-            (byte)(TintColor.B * 0.9));
+        factor = Math.Clamp(factor, 0.0, 1.0);
 
-        return new SolidColorBrush(color);
+        static byte Lerp(byte from, byte to, double t) =>
+            (byte)Math.Clamp((int)Math.Round(from + ((to - from) * t)), 0, 255);
+
+        return Color.FromArgb(
+            255,
+            Lerp(baseColor.R, tint.R, factor),
+            Lerp(baseColor.G, tint.G, factor),
+            Lerp(baseColor.B, tint.B, factor));
     }
 
-    private Brush CreateTabbedBrush()
-    {
-        // Tabbed: lighter variant optimized for tabbed interfaces
-        var color = Color.FromArgb(
-            (byte)(255 * TintOpacity * 0.9),
-            (byte)Math.Min(255, TintColor.R + 10),
-            (byte)Math.Min(255, TintColor.G + 10),
-            (byte)Math.Min(255, TintColor.B + 10));
+    private void OnThemeChanged() => InvalidateVisual();
 
-        return new SolidColorBrush(color);
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        FluentThemeManager.ThemeChanged -= OnThemeChanged;
+        Unloaded -= OnUnloaded;
     }
 
     private static void OnTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

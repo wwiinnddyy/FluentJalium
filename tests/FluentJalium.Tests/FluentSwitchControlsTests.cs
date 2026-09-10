@@ -250,12 +250,9 @@ public sealed class FluentSwitchControlsTests
 
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
-        var loaded = ResourceDictionary.SourceLoader?.Invoke(
-            new ResourceDictionary(),
-            new Uri("/FluentJalium;component/Themes/Generic.jalxaml", UriKind.Relative),
-            FluentThemeManager.ThemeAssembly);
-
-        return Assert.IsType<ResourceDictionary>(loaded);
+        var app = new Application();
+        FluentThemeManager.Apply(app);
+        return app.Resources;
     }
 
     private static Style AssertStyle<TControl>(ResourceDictionary dictionary)
@@ -278,7 +275,7 @@ public sealed class FluentSwitchControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static void InvokeToggleButtonClick(ToggleButton button)

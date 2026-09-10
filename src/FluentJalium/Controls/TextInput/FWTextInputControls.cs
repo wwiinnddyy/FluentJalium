@@ -40,6 +40,25 @@ public class FWTextBox : TextBox, IFluentJaliumControl
         ApplyDensity(this, Density);
     }
 
+    /// <summary>
+    /// Gets or sets the text shown while <see cref="TextBox.Text"/> is empty.
+    /// </summary>
+    /// <remarks>
+    /// <c>TextBox.PlaceholderText</c> turned internal in Jalium.UI 26.10.7 while the base control kept
+    /// drawing the value, so the property is re-exposed against the dependency property the base type
+    /// already registers rather than a duplicate one.
+    /// </remarks>
+    public string PlaceholderText
+    {
+        get => (string)(GetValue(BasePlaceholderTextProperty) ?? string.Empty);
+        set => SetValue(BasePlaceholderTextProperty, value);
+    }
+
+    private static readonly DependencyProperty BasePlaceholderTextProperty =
+        DependencyProperty.FromName(typeof(TextBox), nameof(PlaceholderText))
+            ?? throw new InvalidOperationException(
+                "Jalium.UI.TextBox no longer registers a dependency property named PlaceholderText.");
+
     [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
     public FWTextInputDensity Density
     {
@@ -74,39 +93,36 @@ public class FWTextBox : TextBox, IFluentJaliumControl
 }
 
 /// <summary>
-/// FluentJalium PasswordBox control.
+/// Applies FluentJalium text input density to Jalium.UI text input controls that seal
+/// their own subclassing contract, such as <c>PasswordBox</c>.
 /// </summary>
-public class FWPasswordBox : PasswordBox, IFluentJaliumControl
+public static class FWTextInputOptions
 {
     public static readonly DependencyProperty DensityProperty =
-        DependencyProperty.Register(nameof(Density), typeof(FWTextInputDensity), typeof(FWPasswordBox),
+        DependencyProperty.RegisterAttached(
+            "Density", typeof(FWTextInputDensity), typeof(FWTextInputOptions),
             new PropertyMetadata(FWTextInputDensity.Comfortable, OnDensityChanged));
 
-    public FWPasswordBox()
+    public static FWTextInputDensity GetDensity(DependencyObject target)
     {
-        ApplyDensity(this, Density);
+        return (FWTextInputDensity)target.GetValue(DensityProperty)!;
     }
 
-    [DevToolsPropertyCategory(DevToolsPropertyCategory.Layout)]
-    public FWTextInputDensity Density
+    public static void SetDensity(DependencyObject target, FWTextInputDensity value)
     {
-        get => (FWTextInputDensity)GetValue(DensityProperty)!;
-        set => SetValue(DensityProperty, value);
+        target.SetValue(DensityProperty, value);
     }
 
     private static void OnDensityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FWPasswordBox passwordBox && e.NewValue is FWTextInputDensity density)
+        if (d is not Control control || e.NewValue is not FWTextInputDensity density)
         {
-            ApplyDensity(passwordBox, density);
+            return;
         }
-    }
 
-    private static void ApplyDensity(FWPasswordBox passwordBox, FWTextInputDensity density)
-    {
         var (minHeight, padding) = FWTextBox.GetDensityMetrics(density);
-        passwordBox.MinHeight = minHeight;
-        passwordBox.Padding = padding;
+        control.MinHeight = minHeight;
+        control.Padding = padding;
     }
 }
 
@@ -366,7 +382,12 @@ public class FWAutoSuggestBox : AutoCompleteBox, IFluentJaliumControl
 
     private void OnAutoCompleteSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        var selectedItem = SelectedItem ?? e.AddedItems.FirstOrDefault();
+        object? selectedItem = SelectedItem;
+        if (selectedItem is null && e.AddedItems.Count > 0)
+        {
+            selectedItem = e.AddedItems[0];
+        }
+
         if (selectedItem == null)
         {
             return;

@@ -19,6 +19,7 @@ public enum FluentThemeVariant
     HighContrast
 }
 
+
 /// <summary>
 /// Options used to apply the FluentJalium theme layer.
 /// </summary>
@@ -44,12 +45,10 @@ public static class FluentThemeManager
     public const string FluentResourcesResourceName = "FluentJalium.Themes.FluentResources.jalxaml";
     public const string FluentControlsResourceName = "FluentJalium.Themes.Controls.FluentControls.jalxaml";
 
-    private const string ThemeRefreshVersionKey = "__FluentJalium.ThemeVersion";
     private static ResourceDictionary? s_themeDictionary;
     private static ResourceDictionary? s_accentDictionary;
     private static ResourceDictionary? s_typographyDictionary;
     private static Application? s_application;
-    private static int s_themeVersion;
 
     public static readonly Color DefaultAccentColor = Color.FromRgb(0x00, 0x78, 0xD4);
 
@@ -64,6 +63,14 @@ public static class FluentThemeManager
     public static string CurrentMonoFontFamily { get; private set; } = "Cascadia Code";
 
     public static Assembly ThemeAssembly => typeof(FluentThemeManager).Assembly;
+
+    /// <summary>
+    /// Raised after <see cref="ApplyTheme"/>, <see cref="ApplyAccent"/>, or <see cref="ApplyTypography"/>
+    /// has swapped the resource dictionaries.
+    /// </summary>
+    public static event Action? ThemeChanged;
+
+    internal static void RaiseThemeChanged() => ThemeChanged?.Invoke();
 
     /// <summary>
     /// Applies the FluentJalium theme layer with default options.
@@ -103,6 +110,7 @@ public static class FluentThemeManager
         ReplaceOrAppend(resources, ref s_typographyDictionary, typography);
 
         ForceRefresh(app);
+        FluentWindowChrome.ApplyToOpenWindows(app);
     }
 
     /// <summary>
@@ -120,6 +128,8 @@ public static class FluentThemeManager
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_themeDictionary, LoadGenericTheme());
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_accentDictionary, BuildAccentDictionary(CurrentAccentColor));
         ForceRefresh(s_application);
+        FluentWindowChrome.ApplyToOpenWindows(s_application);
+        RaiseThemeChanged();
     }
 
     /// <summary>
@@ -134,6 +144,7 @@ public static class FluentThemeManager
 
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_accentDictionary, BuildAccentDictionary(accent));
         ForceRefresh(s_application);
+        RaiseThemeChanged();
     }
 
     /// <summary>
@@ -161,7 +172,6 @@ public static class FluentThemeManager
         s_accentDictionary = null;
         s_typographyDictionary = null;
         s_application = null;
-        s_themeVersion = 0;
         CurrentTheme = FluentThemeVariant.Dark;
         CurrentAccentColor = DefaultAccentColor;
         CurrentDisplayFontFamily = "Segoe UI Variable Display";
@@ -195,7 +205,6 @@ public static class FluentThemeManager
         AliasStyle<FWRepeatButton, RepeatButton>(dictionary);
         AliasStyle<FWHyperlinkButton, HyperlinkButton>(dictionary);
         AliasStyle<FWTextBox, TextBox>(dictionary);
-        AliasStyle<FWPasswordBox, PasswordBox>(dictionary);
         AliasStyle<FWNumberBox, NumberBox>(dictionary);
         AliasStyle<FWAutoCompleteBox, AutoCompleteBox>(dictionary);
         AliasStyle<FWRichTextBox, RichTextBox>(dictionary);
@@ -278,7 +287,7 @@ public static class FluentThemeManager
         AliasStyle<FWToastNotificationItem, ToastNotificationItem>(dictionary);
         AliasStyle<FWToastNotificationHost, ToastNotificationHost>(dictionary);
         AliasStyle<FWStatusBar, StatusBar>(dictionary);
-        AliasStyle<FWStatusBarItem, Jalium.UI.Controls.StatusBarItem>(dictionary);
+        AliasStyle<FWStatusBarItem, StatusBarItem>(dictionary);
         AliasStyle<FWSplitButton, SplitButton>(dictionary);
         AliasStyle<FWCommandBar, CommandBar>(dictionary);
         AliasStyle<FWAppBarButton, AppBarButton>(dictionary);
@@ -386,8 +395,7 @@ public static class FluentThemeManager
             ["ComboBoxItemSelectedIndicator"] = new SolidColorBrush(accent),
             ["RatingControlSelectedForeground"] = new SolidColorBrush(accent),
             ["RatingControlPointerOverSelectedForeground"] = new SolidColorBrush(hover),
-            ["NavigationViewItemBackgroundSelected"] = new SolidColorBrush(Color.FromArgb(0x33, accent.R, accent.G, accent.B)),
-            ["NavigationViewItemBackgroundSelectedHover"] = new SolidColorBrush(Color.FromArgb(0x66, accent.R, accent.G, accent.B)),
+            ["NavigationViewSelectionIndicatorForeground"] = new SolidColorBrush(accent),
             ["TabItemIndicator"] = new SolidColorBrush(accent),
             ["DatePickerBorderBrushFocused"] = new SolidColorBrush(accent),
             ["TimePickerBorderBrushFocused"] = new SolidColorBrush(accent),
@@ -443,7 +451,6 @@ public static class FluentThemeManager
     private static void ForceRefresh(Application app)
     {
         ResourceLookup.InvalidateResourceCache();
-        app.Resources[ThemeRefreshVersionKey] = ++s_themeVersion;
     }
 
     private static string NormalizeFontFamily(string? value, string fallback)
@@ -467,4 +474,3 @@ public static class FluentThemeManager
             Lerp(color.B, target.B, factor));
     }
 }
-

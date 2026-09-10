@@ -1,0 +1,33 @@
+<fw:FWFluentMaterialSurface xmlns="http://schemas.jalium.ui/2024"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                            xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+                            x:Class="FluentJalium.Gallery.Controls.GalleryHero"
+                            MaterialKind="LiquidGlass"
+                            TintOpacity="0.12"
+                            BlurRadius="20"
+                            RefractionAmount="35"
+                            FusionRadius="18"
+                            CornerRadius="12"
+                            Padding="28,24"
+                            AutomationProperties.AutomationId="GalleryHero">
+    <fw:FWStackPanel Orientation="Horizontal" Spacing="18">
+        <fw:FWFontIcon Glyph="&#xE790;"
+                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                       FontSize="42"
+                       Width="42"
+                       Height="42"
+                       Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                       VerticalAlignment="Center" />
+        <fw:FWStackPanel Orientation="Vertical" Spacing="6" VerticalAlignment="Center">
+            <fw:FWTextBlock Text="Build with confidence"
+                            FontSize="24"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+            <fw:FWTextBlock Text="Explore polished, accessible controls that feel at home on every Windows surface."
+                            FontSize="15"
+                            TextWrapping="Wrap"
+                            MaxWidth="660"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </fw:FWStackPanel>
+    </fw:FWStackPanel>
+</fw:FWFluentMaterialSurface>

@@ -40,7 +40,7 @@ FluentJalium 是一个 Fluent Design System 主题和控件库，运行在 Jaliu
 | 目标框架 | net10.0 / net10.0-windows |
 | SDK | .NET 10.0.201 |
 | 许可证 | MIT |
-| Jalium.UI 包版本 | 26.10.4 |
+| Jalium.UI 包版本 | 26.10.9 |
 
 ---
 
@@ -434,10 +434,16 @@ AliasStyle<FWButton, Button>(dictionary);
 | 控件 | 基类 | 特有属性 |
 |------|------|----------|
 | `FWTextBox` | `TextBox` | `Density` (FWTextInputDensity) |
-| `FWPasswordBox` | `PasswordBox` | `Density` |
 | `FWNumberBox` | `NumberBox` | `Density` (FWNumberBoxDensity) |
 | `FWAutoCompleteBox` | `AutoCompleteBox` | `Density` |
 | `FWRichTextBox` | `RichTextBox` | `Density` |
+
+`PasswordBox` 在 26.10.7 起被 `sealed`，无法再有 FluentJalium 子类，因此不存在 `FWPasswordBox`。
+它的密度由附加属性 `FWTextInputOptions.Density`（`FluentJalium.Controls`）施加到任意 `Control` 上：
+
+```csharp
+FWTextInputOptions.SetDensity(passwordBox, FWTextInputDensity.Comfortable);
+```
 
 ##### Menus (菜单/弹出类)
 
@@ -485,6 +491,26 @@ AliasStyle<FWButton, Button>(dictionary);
 | `FWViewbox` | `Viewbox` |
 | `FWLabel` | `Label` |
 | `FWSeparator` | `Separator` |
+
+##### Shapes (图形类)
+
+**文件：** [FWShapeControls.cs](file:///d:/github/Jalium/FluentJalium/src/FluentJalium/Controls/Visuals/FWShapeControls.cs)
+
+`Jalium.UI.Shapes` 的 6 个叶子类型在 26.10.7 起全部 `sealed`，所以这些控件不再是薄包装，
+而是直接继承抽象基类 `Jalium.UI.Shapes.Shape` 自行实现几何与绘制：
+
+| 控件 | 基类 | 说明 |
+|------|------|------|
+| `FWShape` | `Shape` | 共享描边 `Pen` 组装、笔宽内缩布局、`Stretch` 矩阵计算 |
+| `FWShapeWithPoints` | `FWShape` | `Points` / `FillRule` 与 `PathGeometry` 缓存，供折线/多边形复用 |
+| `FWRectangle` | `FWShape` | `RadiusX` / `RadiusY` |
+| `FWEllipse` | `FWShape` | 按 `RenderSize` 生成 `EllipseGeometry` |
+| `FWLine` | `FWShape` | `X1` / `Y1` / `X2` / `Y2` |
+| `FWPolyline` | `FWShapeWithPoints` | 开放折线，最少 2 点 |
+| `FWPolygon` | `FWShapeWithPoints` | 闭合多边形，最少 3 点 |
+| `FWPath` | `FWShape` | `Data` + `GeometryTransform` 承载 `Stretch` |
+
+公开属性名与 `Jalium.UI.Shapes` 保持一致，主题样式（`VisualControls.jalxaml`）可直接继续套用。
 
 ##### Interaction (交互/滚动类)
 
@@ -696,7 +722,7 @@ FluentJalium.csproj 中配置了 JALXAML 页面项和编译器路径：
 </ItemGroup>
 ```
 
-当 `UseJaliumSourceReferences=true` 时，使用本地 Jalium.UI 源码中的 `jalxamlc.exe`；否则使用 NuGet 包中的编译器。
+XAML 编译器取自 `Jalium.UI.Build` 包内的 `tools/net10.0/jalxamlc.dll`，路径由该包的 targets 自动解析。
 
 ---
 
@@ -838,16 +864,12 @@ FluentJalium.Tests ──→ FluentJalium ────────────�
 
 ### FluentJalium 对 Jalium.UI 的依赖
 
-FluentJalium 支持两种引用模式，由 `UseJaliumSourceReferences` 属性控制：
+FluentJalium 只通过 nuget.org 上的 `Jalium.UI.*` 包消费 Jalium.UI，不再引用本地 `../Jalium.UI/` 源码树。
+版本由 `Directory.Build.props` 的 `JaliumPackageVersion`（当前 `26.10.9`）统一决定。
 
-| 模式 | 条件 | 说明 |
-|------|------|------|
-| **源码引用** | `UseJaliumSourceReferences=true`（默认） | 直接引用 `../Jalium.UI/` 源码树中的项目 |
-| **包引用** | `UseJaliumSourceReferences=false` | 引用 NuGet 上的 Jalium.UI 包 (26.10.4) |
+`src/FluentJalium/FluentJalium.csproj` 直接引用的包：
 
-源码引用模式下引用的 Jalium.UI 项目：
-
-| 项目 | 说明 |
+| 包 | 说明 |
 |------|------|
 | Jalium.UI.Core | 核心基础类型 |
 | Jalium.UI.Media | 媒体和绘图类型 |
@@ -855,15 +877,20 @@ FluentJalium 支持两种引用模式，由 `UseJaliumSourceReferences` 属性�
 | Jalium.UI.Interop | 互操作层 |
 | Jalium.UI.Controls | 控件基类 |
 | Jalium.UI.Xaml | XAML 基础设施 |
-| Jalium.UI.Xaml.SourceGenerator | XAML 源生成器 (Analyzer) |
-| Jalium.UI.Build | 构建工具 (jalxamlc) |
+| Jalium.UI.Gpu | GPU 资源与后端抽象 |
+| Jalium.UI.Managed | 统一托管实现程序集 |
+| Jalium.UI.Xaml.SourceGenerator | XAML 源生成器 (Analyzer，`PrivateAssets=all`) |
+| Jalium.UI.Build | 构建工具 jalxamlc (`PrivateAssets=all`) |
+
+最后两个包必须显式引用：`src` 的 TFM 是裸 `net10.0`，匹配不到 `Jalium.UI.Desktop` 元包的
+`net10.0-windows7.0` 依赖组，不会自动带入这条 XAML 工具链。
 
 ### Gallery 应用的额外依赖
 
 | 依赖 | 说明 |
 |------|------|
-| Jalium.UI.Desktop | 桌面应用宿主（源码引用模式） |
-| Jalium.UI.Interop (NuGet) | 原生运行时二进制（用于复制 native DLL） |
+| Jalium.UI.Desktop | 桌面应用宿主元包，传递带入托管与原生运行时 |
+| Jalium.UI.Interop | 由 Desktop 元包传递解析，`runtimes/win-x64/native/` 下的 native DLL 自动复制到输出目录 |
 
 ### 测试项目依赖
 
@@ -892,18 +919,16 @@ dotnet test tests/FluentJalium.Tests/FluentJalium.Tests.csproj -c Debug
 # 构建 Gallery 示例应用
 dotnet build samples/FluentJalium.Gallery/FluentJalium.Gallery.csproj -c Debug
 
-# 使用 NuGet 包引用构建（不需要 Jalium.UI 源码）
-dotnet build FluentJalium.slnx -c Debug /p:UseJaliumSourceReferences=false
+# 构建整个解决方案（依赖全部来自 NuGet）
+dotnet build FluentJalium.slnx -c Debug
 ```
 
 ### 运行 Gallery
 
 ```powershell
-# 默认运行（源码引用 + NuGet 原生运行时）
+# 运行 Gallery（依赖与原生运行时均来自 NuGet 包）
 dotnet run --project samples/FluentJalium.Gallery -c Debug
 
-# 禁用 NuGet 原生运行时回退（重建 Jalium.UI 原生二进制后使用）
-dotnet run --project samples/FluentJalium.Gallery -c Debug /p:UseJaliumPackageNativeRuntime=false
 ```
 
 ### 关键构建属性
@@ -911,11 +936,8 @@ dotnet run --project samples/FluentJalium.Gallery -c Debug /p:UseJaliumPackageNa
 | 属性 | 默认值 | 说明 |
 |------|--------|------|
 | `JaliumPlatform` | 空 | 设置为 `windows` 时目标框架变为 `net10.0-windows` |
-| `UseJaliumSourceReferences` | `true` | 是否使用 Jalium.UI 源码引用 |
-| `JaliumSourceRoot` | `../Jalium.UI/` | Jalium.UI 源码根目录 |
-| `JaliumPackageVersion` | `26.10.4` | Jalium.UI NuGet 包版本 |
-| `UseJaliumPackageNativeRuntime` | `true`（源码引用时） | 是否从 NuGet 包复制原生运行时 |
-| `JaliumNativePackRid` | `win-x64` | 原生运行时 RID |
+| `JaliumPackageVersion` | `26.10.9` | Jalium.UI NuGet 包版本，所有 `Jalium.UI.*` 引用共用 |
+| `JaliumPlatform` | 空 | 设为 `windows` 时 `TargetFramework` 变为 `net10.0-windows` |
 | `EnableJalxamlCodeGeneration` | `false` | JALXAML 代码生成 |
 | `EnableJalxamlRazorTransform` | `false` | JALXAML Razor 转换 |
 
@@ -1036,7 +1058,7 @@ private static void ApplyDensity(FWRangeSlider slider, FWRangeDensity density)
 | 6 | FWNavigationView, FWNavigationViewItem, FWNavigationViewItemHeader, FWNavigationViewItemSeparator, FWTabControl, FWTabItem, FWFrame | NavigationView / NavigationViewItem / NavigationViewItemHeader / NavigationViewItemSeparator / TabControl / TabItem / Frame |
 | 7 | FWDatePicker, FWTimePicker, FWCalendar | DatePicker / TimePicker / Calendar |
 | 8 | FWInfoBar, FWInfoBadge, FWToastNotificationItem, FWToastNotificationHost, FWStatusBar, FWStatusBarItem | InfoBar / Control / ToastNotificationItem / ToastNotificationHost / StatusBar / StatusBarItem |
-| 9 | FWTextBox, FWPasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox | TextBox / PasswordBox / NumberBox / AutoCompleteBox / RichTextBox |
+| 9 | FWTextBox, PasswordBox, FWNumberBox, FWAutoCompleteBox, FWRichTextBox | TextBox / PasswordBox / NumberBox / AutoCompleteBox / RichTextBox |
 | 10 | FWMenuBar, FWMenuBarItem, FWMenu, FWMenuItem, FWContextMenu, FWMenuFlyoutItem, FWToggleMenuFlyoutItem, FWMenuFlyoutSeparator, FWMenuFlyoutSubItem | MenuBar / MenuBarItem / Menu / MenuItem / ContextMenu / MenuFlyoutItem / ToggleMenuFlyoutItem / MenuFlyoutSeparator / MenuFlyoutItem |
 | 11 | FWExpander, FWToolTip, FWContentDialog, FWGroupBox | Expander / ToolTip / ContentDialog / GroupBox |
 | 12 | FWImage, FWFontIcon, FWSymbolIcon, FWPathIcon, FWViewbox, FWLabel, FWSeparator | Image / FontIcon / SymbolIcon / PathIcon / Viewbox / Label / Separator |

@@ -3,7 +3,9 @@ using System.Collections.Specialized;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
+using Jalium.UI.Threading;
 
 namespace FluentJalium.Controls;
 
@@ -430,7 +432,7 @@ public class FWMenuFlyoutSubItem : FluentMenuFlyoutItemBase, IFluentJaliumContro
             return;
         }
 
-        Dispatcher.BeginInvokeCritical(() =>
+        Dispatcher.BeginInvoke(DispatcherPriority.Send, () =>
         {
             foreach (var item in _items)
             {
@@ -643,9 +645,9 @@ public sealed class FWMenuFlyoutPresenter : Control
         set => SetValue(DensityProperty, value);
     }
 
-    public override int VisualChildrenCount => 1;
+    protected override int VisualChildrenCount => 1;
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         if (index == 0)
         {
@@ -743,9 +745,9 @@ internal sealed class FWSimpleMenuPopupScrollHost : Control
 
     public StackPanel ItemsPanel => _itemsPanel;
 
-    public override int VisualChildrenCount => 1;
+    protected override int VisualChildrenCount => 1;
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         if (index == 0)
         {

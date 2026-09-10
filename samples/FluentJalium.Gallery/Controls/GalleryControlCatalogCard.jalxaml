@@ -1,0 +1,24 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Controls.GalleryControlCatalogCard"
+             Width="250"
+             MinHeight="118">
+  <fw:FWCardSurface Padding="16">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="6">
+        <fw:FWTextBlock x:Name="NamePresenter"
+                        Style="{StaticResource GalleryCardTitle}"
+                        FontSize="16" />
+        <fw:FWTextBlock x:Name="BasePresenter"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWTextBlock x:Name="CategoryPresenter"
+                        FontSize="12"
+                        TextWrapping="Wrap"
+                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+        <fw:FWTextBlock Text="FluentJalium control"
+                        FontSize="11"
+                        Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+    </fw:FWStackPanel>
+  </fw:FWCardSurface>
+</UserControl>

@@ -302,7 +302,7 @@ public class FWAnimatedVisualPlayer : Control, IFluentJaliumControl
     private void LoadAnimatedVisual()
     {
         _animatedVisual = null;
-        SetValue(IsAnimatedVisualLoadedPropertyKey.DependencyProperty, false);
+        SetValue(IsAnimatedVisualLoadedPropertyKey, false);
 
         if (Source == null)
             return;
@@ -311,8 +311,8 @@ public class FWAnimatedVisualPlayer : Control, IFluentJaliumControl
         if (visual is IAnimatedVisual animatedVisual)
         {
             _animatedVisual = animatedVisual;
-            SetValue(DurationPropertyKey.DependencyProperty, animatedVisual.Duration);
-            SetValue(IsAnimatedVisualLoadedPropertyKey.DependencyProperty, true);
+            SetValue(DurationPropertyKey, animatedVisual.Duration);
+            SetValue(IsAnimatedVisualLoadedPropertyKey, true);
 
             if (AutoPlay)
             {

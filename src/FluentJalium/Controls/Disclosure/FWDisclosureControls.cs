@@ -1,7 +1,9 @@
 using Jalium.UI;
 using Jalium.UI.Automation;
+using Jalium.UI.Automation.Peers;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
+using Jalium.UI.Media;
 using System.Threading;
 using System.Threading.Tasks;
 using ICommand = System.Windows.Input.ICommand;
@@ -1408,8 +1410,8 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
         dialog.Closed += OnCurrentDialogClosed;
         RecordKeyboardRequest(FWTaskDialogHostKeyboardRequest.None, handled: false);
         CaptureFocusRestoreTarget(dialog);
-        SetValue(CurrentDialogPropertyKey.DependencyProperty, dialog);
-        SetValue(IsOpenPropertyKey.DependencyProperty, true);
+        SetValue(CurrentDialogPropertyKey, dialog);
+        SetValue(IsOpenPropertyKey, true);
         Content = dialog;
         Focus();
     }
@@ -1419,8 +1421,8 @@ public class FWTaskDialogHost : ContentControl, IFluentJaliumControl
         dialog.Closed -= OnCurrentDialogClosed;
         if (ReferenceEquals(CurrentDialog, dialog))
         {
-            SetValue(CurrentDialogPropertyKey.DependencyProperty, null);
-            SetValue(IsOpenPropertyKey.DependencyProperty, false);
+            SetValue(CurrentDialogPropertyKey, null);
+            SetValue(IsOpenPropertyKey, false);
             Content = null;
             _currentShowTask = null;
             RestoreFocus();

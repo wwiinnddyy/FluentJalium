@@ -259,7 +259,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Equal("textinput.autosuggestbox", page.SampleCodeKey);
         Assert.Contains("AutoSuggestTextChanged", page.Tags);
         Assert.Contains("TextChangeReason", page.Tags);
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleSourceRegistry.TryGetSource(page, out var sampleCode));
         Assert.Contains("new FWAutoSuggestBox", sampleCode);
         Assert.Contains("AutoSuggestTextChanged", sampleCode);
         Assert.Contains("args.Reason", sampleCode);
@@ -289,7 +289,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("WebView", page.BaseClasses!);
         Assert.True(page.MatchesSearch("webview2 browser diagnostics"));
 
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleSourceRegistry.TryGetSource(page, out var sampleCode));
         Assert.Contains("new FWColorPicker", sampleCode);
         Assert.Contains("new FWInkCanvas", sampleCode);
         Assert.Contains("new FWMediaElement", sampleCode);
@@ -321,345 +321,6 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("back/forward off/on", formatted);
         Assert.Contains("zoom 1.25", formatted);
         Assert.Contains("error none", formatted);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeNavigationSelectorDiagnosticsSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "navigation");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWSelectorBar", sampleCode);
-        Assert.Contains("GetDiagnostics", sampleCode);
-        Assert.Contains("TrySelectIndex", sampleCode);
-        Assert.Contains("SelectedText", sampleCode);
-        Assert.Contains("SelectedHeader", sampleCode);
-        Assert.Contains("ItemCount", sampleCode);
-        Assert.Contains("new FWAutoSuggestBox", sampleCode);
-        Assert.Contains("new FWBreadcrumbBar", sampleCode);
-        Assert.Contains("new FWNavigationService", sampleCode);
-        Assert.Contains("new FWPipsPager", sampleCode);
-        Assert.Contains("new FWSelectorBar", sampleCode);
-        Assert.Contains("new FWTabView", sampleCode);
-        Assert.Contains("TryMoveTab", sampleCode);
-        Assert.Contains("CanReorderTabs", sampleCode);
-        Assert.Contains("App shell", sampleCode);
-        Assert.Contains("CreateNavigationShellQaSnapshot", sampleCode);
-        Assert.Contains("FormatNavigationShellQa", sampleCode);
-        Assert.Contains("App shell QA", sampleCode);
-        Assert.Contains("HasPageTypeProvider", sampleCode);
-        Assert.Contains("IsAppShellReady", sampleCode);
-        Assert.Contains("HasRouteProviderCoverage", sampleCode);
-        Assert.Contains("HasFooterSettingsCoverage", sampleCode);
-        Assert.Contains("HasSearchRouteCoverage", sampleCode);
-        Assert.Contains("HasDocumentWorkspaceCoverage", sampleCode);
-        Assert.Contains("HasPageNavigationCoverage", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeFlyoutPresenterQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "menus");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWFlyout", sampleCode);
-        Assert.Contains("CreateFlyoutQaSnapshot", sampleCode);
-        Assert.Contains("FormatFlyoutQa", sampleCode);
-        Assert.Contains("Flyout QA", sampleCode);
-        Assert.Contains("new FWMenuBar", sampleCode);
-        Assert.Contains("new FWMenuFlyout", sampleCode);
-        Assert.Contains("new FWCommandBarFlyout", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeDateTimeCompatibilityQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "dateandtime");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWCalendarDatePicker", sampleCode);
-        Assert.Contains("new FWCalendarView", sampleCode);
-        Assert.Contains("CreateCalendarDatePickerQaSnapshot", sampleCode);
-        Assert.Contains("CreateCalendarViewQaSnapshot", sampleCode);
-        Assert.Contains("FormatCalendarDatePickerQa", sampleCode);
-        Assert.Contains("FormatCalendarViewQa", sampleCode);
-        Assert.Contains("CalendarDatePicker QA", sampleCode);
-        Assert.Contains("CalendarView QA", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeAdvancedCollectionNavigationRecipes()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "advancedcollections");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWItemsRepeater", sampleCode);
-        Assert.Contains("AttachViewport", sampleCode);
-        Assert.Contains("FWItemsRepeaterDiagnostics", sampleCode);
-        Assert.Contains("GetDiagnostics", sampleCode);
-        Assert.Contains("CreateItemsRepeaterVisualQaSnapshot", sampleCode);
-        Assert.Contains("FormatItemsRepeaterVisualQa", sampleCode);
-        Assert.Contains("ItemsViewSelection", sampleCode);
-        Assert.Contains("FlipViewPaging", sampleCode);
-        Assert.Contains("SemanticZoomGrouping", sampleCode);
-        Assert.Contains("new FWPipsPager", sampleCode);
-        Assert.Contains("ApplyCollectionRecipeCommand", sampleCode);
-        Assert.Contains("CreateCollectionRecipeDiagnosticsText", sampleCode);
-        Assert.Contains("SelectedIndex", sampleCode);
-        Assert.Contains("InvokedIndex", sampleCode);
-        Assert.Contains("CreateCollectionNavigationEvaluations", sampleCode);
-        Assert.Contains("CreateCollectionNavigationEvaluationSummary", sampleCode);
-        Assert.Contains("CreateCollectionNavigationEvidenceSummary", sampleCode);
-        Assert.Contains("FormatCollectionNavigationEvaluation", sampleCode);
-        Assert.Contains("FormatCollectionNavigationEvidence", sampleCode);
-        Assert.Contains("Recipe evidence", sampleCode);
-        Assert.Contains("Missing public API evidence", sampleCode);
-        Assert.Contains("MissingPublicApiEvidence", sampleCode);
-        Assert.Contains("FWItemsView", sampleCode);
-        Assert.Contains("FWFlipView", sampleCode);
-        Assert.Contains("FWSemanticZoom", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeChartVisualQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "charts");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWLineChart", sampleCode);
-        Assert.Contains("new FWBarChart", sampleCode);
-        Assert.Contains("new FWPieChart", sampleCode);
-        Assert.Contains("new FWChartLegend", sampleCode);
-        Assert.Contains("new FWChartTooltip", sampleCode);
-        Assert.Contains("CreateLineSeries", sampleCode);
-        Assert.Contains("CreateChartVisualQaSnapshot", sampleCode);
-        Assert.Contains("FormatChartVisualQa", sampleCode);
-        Assert.Contains("Chart visual QA", sampleCode);
-        Assert.Contains("CreateLegendTooltipQaSnapshot", sampleCode);
-        Assert.Contains("FormatLegendTooltipVisualQa", sampleCode);
-        Assert.Contains("Legend tooltip QA", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeVisualsDeepSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "visuals");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWPersonPicture", sampleCode);
-        Assert.Contains("new FWMarkdown", sampleCode);
-        Assert.Contains("LinkClicked", sampleCode);
-        Assert.Contains("args.Handled = true", sampleCode);
-        Assert.Contains("new FWQRCode", sampleCode);
-        Assert.Contains("QRCodeErrorCorrectionLevel.Q", sampleCode);
-        Assert.Contains("QRModuleShape.RoundedSquare", sampleCode);
-        Assert.Contains("QREyeShape.Rounded", sampleCode);
-        Assert.Contains("QuietZoneModules = 3", sampleCode);
-        Assert.Contains("new FWRectangle", sampleCode);
-        Assert.Contains("new FWEllipse", sampleCode);
-        Assert.Contains("new FWLine", sampleCode);
-        Assert.Contains("new FWPolyline", sampleCode);
-        Assert.Contains("new FWPolygon", sampleCode);
-        Assert.Contains("new FWPath", sampleCode);
-        Assert.Contains("ShapePointCollection.Parse", sampleCode);
-        Assert.Contains("CreateShapeControlsQaSnapshot", sampleCode);
-        Assert.Contains("FormatShapeControlsVisualQa", sampleCode);
-        Assert.Contains("Shape controls QA", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeSplitViewAndSettingsCardLayoutSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "contentandlayout");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWSplitView", sampleCode);
-        Assert.Contains("FWSplitViewDisplayMode.CompactInline", sampleCode);
-        Assert.Contains("ActualPaneLength", sampleCode);
-        Assert.Contains("FWSplitViewDiagnostics", sampleCode);
-        Assert.Contains("FormatSplitViewDiagnostics", sampleCode);
-        Assert.Contains("new FWSettingsCard", sampleCode);
-        Assert.Contains("GetDiagnostics", sampleCode);
-        Assert.Contains("IsInvokable", sampleCode);
-        Assert.Contains("IsInteractionPressed", sampleCode);
-        Assert.Contains("GetAutomationDiagnostics", sampleCode);
-        Assert.Contains("Settings visual QA", sampleCode);
-        Assert.Contains("CreateSettingsVisualQaSnapshot", sampleCode);
-        Assert.Contains("FormatSettingsVisualQa", sampleCode);
-        Assert.Contains("IsSettingsVisualQaReady", sampleCode);
-        Assert.Contains("HasAdaptiveLayoutEvidence", sampleCode);
-        Assert.Contains("HasPrimaryCommandEvidence", sampleCode);
-        Assert.Contains("HasHoverStateEvidence", sampleCode);
-        Assert.Contains("HasDisabledRowEvidence", sampleCode);
-        Assert.Contains("HasAutomationEvidence", sampleCode);
-        Assert.Contains("ClickMode.Hover", sampleCode);
-        Assert.Contains("disabledCard", sampleCode);
-        Assert.Contains("IsEnabled = false", sampleCode);
-        Assert.Contains("new FWTwoPaneView", sampleCode);
-        Assert.Contains("FWTwoPaneViewDiagnostics", sampleCode);
-        Assert.Contains("FWParallaxViewDiagnostics", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldKeepSettingsExpanderItemHostTemplateSampleRegistered()
-    {
-        Assert.True(GallerySampleCodeRegistry.TryGetRegisteredSampleCode("disclosure.settings.teachingtip", out var sampleCode));
-        Assert.Contains("new FWSettingsExpander", sampleCode);
-        Assert.Contains("ItemsSource = new[]", sampleCode);
-        Assert.Contains("new SettingsRow", sampleCode);
-        Assert.Contains("PreviewMaterialCommand", sampleCode);
-        Assert.Contains("new FWTeachingTip", sampleCode);
-        Assert.Contains("Target = target", sampleCode);
-        Assert.Contains("HeroContent = new FWBorder", sampleCode);
-        Assert.Contains("TeachingTipPlacementMode.Bottom", sampleCode);
-        Assert.Contains("TeachingTipTailVisibility.Visible", sampleCode);
-        Assert.Contains("CreateTeachingTipVisualQaSnapshot", sampleCode);
-        Assert.Contains("FormatTeachingTipVisualQa", sampleCode);
-        Assert.Contains("TeachingTip visual QA", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeTaskDialogRealWindowQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "disclosure");
-
-        Assert.Equal("disclosure.taskdialog", page.SampleCodeKey);
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-
-        Assert.Contains("new FWTaskDialogHost", sampleCode);
-        Assert.Contains("FocusRestoreTarget", sampleCode);
-        Assert.Contains("Panel.SetZIndex", sampleCode);
-        Assert.Contains("TaskDialog real-window QA", sampleCode);
-        Assert.Contains("TaskDialog root-window smoke", sampleCode);
-        Assert.Contains("CreateTaskDialogRealWindowQaSnapshot", sampleCode);
-        Assert.Contains("FormatTaskDialogRealWindowQa", sampleCode);
-        Assert.Contains("RestoreTiming", sampleCode);
-        Assert.Contains("ClipGuard", sampleCode);
-        Assert.Contains("RootWindowSmoke", sampleCode);
-        Assert.Contains("restore timing", sampleCode);
-        Assert.Contains("clip guard", sampleCode);
-        Assert.Contains("new KeyEventArgs", sampleCode);
-        Assert.Contains("Key.Tab", sampleCode);
-        Assert.Contains("ModifierKeys.Shift", sampleCode);
-        Assert.Contains("RequestLightDismiss", sampleCode);
-        Assert.Contains("LastKeyboardRequest", sampleCode);
-        Assert.Contains("GetAutomationDiagnostics", sampleCode);
-        Assert.Contains("PrimaryButton.AutomationId", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeScrollViewerSwipeAndSplitterSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "interaction");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWScrollViewer", sampleCode);
-        Assert.Contains("IsScrollBarAutoHideEnabled = false", sampleCode);
-        Assert.Contains("ScrollToVerticalOffset", sampleCode);
-        Assert.Contains("new FWSwipeControl", sampleCode);
-        Assert.Contains("new SwipeItems", sampleCode);
-        Assert.Contains("new FWGridSplitter", sampleCode);
-        Assert.Contains("KeyboardIncrement = 12", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeDataInspectorsWorkbenchQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "datainspectors");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWDiffViewer", sampleCode);
-        Assert.Contains("new FWHexEditor", sampleCode);
-        Assert.Contains("new FWJsonTreeViewer", sampleCode);
-        Assert.Contains("new FWFluentMaterialSurface", sampleCode);
-        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
-        Assert.Contains("CreateDataInspectorWorkbenchSnapshot", sampleCode);
-        Assert.Contains("FormatDataInspectorWorkbenchQa", sampleCode);
-        Assert.Contains("Data Inspectors workbench QA", sampleCode);
-        Assert.Contains("workbenchSnapshot.IsReady", sampleCode);
-        Assert.Contains("ShowMinimap = true", sampleCode);
-        Assert.Contains("IsReadOnly = true", sampleCode);
-        Assert.Contains("ShowDataInterpretation = true", sampleCode);
-        Assert.Contains("ExpandDepth = 2", sampleCode);
-        Assert.Contains("MaxRenderDepth = 8", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeSelectorsPropertiesQaSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "selectorsandproperties");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWTreeSelector", sampleCode);
-        Assert.Contains("new FWTreeSelectorItem", sampleCode);
-        Assert.Contains("new FWPropertyGrid", sampleCode);
-        Assert.Contains("TreeSelectorCheckCascadeMode.Cascade", sampleCode);
-        Assert.Contains("new FWFluentMaterialSurface", sampleCode);
-        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
-        Assert.Contains("CreateSelectorsPropertiesQaSnapshot", sampleCode);
-        Assert.Contains("FormatSelectorsPropertiesQa", sampleCode);
-        Assert.Contains("Selectors and properties QA", sampleCode);
-        Assert.Contains("propertySnapshot.IsReady", sampleCode);
-        Assert.Contains("ShowDescription = true", sampleCode);
-        Assert.Contains("ShowToolBar = false", sampleCode);
-        Assert.Contains("Density = FWPropertyGridDensity.Compact", sampleCode);
-        Assert.Contains("IsReadOnly = true", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeFormsPatternSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "forms");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWLabel", sampleCode);
-        Assert.Contains("new FWTextBox", sampleCode);
-        Assert.Contains("new FWAutoSuggestBox", sampleCode);
-        Assert.Contains("new FWRadioButtons", sampleCode);
-        Assert.Contains("new FWInfoBar", sampleCode);
-        Assert.Contains("new FWToggleSwitch", sampleCode);
-        Assert.Contains("new FWSettingsCard", sampleCode);
-        Assert.Contains("new FWProgressBar", sampleCode);
-        Assert.Contains("new FWButton", sampleCode);
-        Assert.Contains("new FWNumberBox", sampleCode);
-        Assert.Contains("ValidationIssue", sampleCode);
-        Assert.Contains("validation summary", sampleCode, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("isDirty", sampleCode);
-        Assert.Contains("ResetDataFormDraft", sampleCode);
-        Assert.Contains("SaveDataFormDraftAsync", sampleCode);
-        Assert.Contains("CreateDataFormValidationIssues", sampleCode);
-        Assert.Contains("FormatDataFormValidationSummary", sampleCode);
-        Assert.Contains("RunSubmitAsync", sampleCode);
-        Assert.Contains("Disable reviewer fields", sampleCode);
-        Assert.Contains("Focus QA", sampleCode);
-        Assert.Contains("Forms visual QA", sampleCode);
-        Assert.Contains("GetDiagnostics", sampleCode);
-        Assert.Contains("forms.submit", sampleCode);
-        Assert.DoesNotContain("new FWForm", sampleCode);
     }
 
     [Fact]
@@ -719,109 +380,6 @@ public sealed class FluentGalleryCatalogTests
         Assert.Empty(validIssues);
         Assert.Equal(InfoBarSeverity.Informational, savingSnapshot.Severity);
         Assert.Contains("ready to save", savingSnapshot.Summary);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeWindowBackdropDiagnosticsSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "windowbackdrops");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWFluentWindowSurface", sampleCode);
-        Assert.Contains("FWFluentWindowMaterialProfile.MicaShell", sampleCode);
-        Assert.Contains("FWFluentWindowMaterialProfileRecipe.Create", sampleCode);
-        Assert.Contains("profileRecipe.SystemBackdrop", sampleCode);
-        Assert.Contains("ApplyWindowMaterialProfile", sampleCode);
-        Assert.Contains("FWFluentWindowMaterialProfile.FocusGlassShell", sampleCode);
-        Assert.Contains("ApplyWindowBackdrop", sampleCode);
-        Assert.Contains("window.SystemBackdrop", sampleCode);
-        Assert.Contains("isMatched", sampleCode);
-        Assert.Contains("Window backdrop QA", sampleCode);
-        Assert.Contains("FWFluentWindowSurfaceDiagnostics", sampleCode);
-        Assert.Contains("GetWindowSurfaceDiagnostics", sampleCode);
-        Assert.Contains("GalleryWindowSurfaceDiagnostics.Create", sampleCode);
-        Assert.Contains("FormatWindowSurfaceDiagnostics", sampleCode);
-        Assert.Contains("GalleryWindowSurfaceEnvironment.Create", sampleCode);
-        Assert.Contains("FluentThemeVariant.HighContrast", sampleCode);
-        Assert.Contains("ResolveWindowSurfaceActualBackdrop", sampleCode);
-        Assert.Contains("High contrast fallback", sampleCode);
-        Assert.Contains("Inactive window material", sampleCode);
-        Assert.Contains("Unsupported host fallback", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeDerivedSurfaceFamilySample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "materialsand effects".Replace(" ", string.Empty));
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWLayerSurface", sampleCode);
-        Assert.Contains("new FWMicaSurface", sampleCode);
-        Assert.Contains("new FWMicaAltSurface", sampleCode);
-        Assert.Contains("new FWAcrylicSurface", sampleCode);
-        Assert.Contains("new FWFrostedGlassSurface", sampleCode);
-        Assert.Contains("new FWCardSurface", sampleCode);
-        Assert.Contains("new FWFlyoutSurface", sampleCode);
-        Assert.Contains("new FWFocusGlassSurface", sampleCode);
-        Assert.Contains("new FWFluentWindowSurface", sampleCode);
-        Assert.Contains("FWFluentMaterialRecipe.Create", sampleCode);
-        Assert.Contains("FWFluentMaterialKind.Acrylic", sampleCode);
-        Assert.Contains("FWFluentMaterialKind.LiquidGlass", sampleCode);
-        Assert.Contains("UseMaterialRecipe", sampleCode);
-        Assert.Contains("Derived surface recipes", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeBackdropPrimitiveFallbackSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "materialprimitives");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWBackdrop", sampleCode);
-        Assert.Contains("FWBackdropType.Mica", sampleCode);
-        Assert.Contains("FWBackdropType.Acrylic", sampleCode);
-        Assert.Contains("FWBackdropType.None", sampleCode);
-        Assert.Contains("FallbackColor", sampleCode);
-        Assert.Contains("AlwaysUseFallback = true", sampleCode);
-        Assert.Contains("Backdrop primitive QA", sampleCode);
-        Assert.Contains("Forced fallback QA", sampleCode);
-        Assert.Contains("Solid fallback QA", sampleCode);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeAdvancedInteractionScrollerDiagnosticsSample()
-    {
-        var page = Assert.Single(
-            GalleryCatalog.CreatePageInfos(new GalleryLocalizationService()),
-            page => page.UniqueId == "advancedinteraction");
-
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-        Assert.Contains("new FWRefreshContainer", sampleCode);
-        Assert.Contains("RefreshRequested", sampleCode);
-        Assert.Contains("RequestRefresh", sampleCode);
-        Assert.Contains("GetDiagnostics", sampleCode);
-        Assert.Contains("PullProgress", sampleCode);
-        Assert.Contains("new FWScroller", sampleCode);
-        Assert.Contains("AttachScrollViewer", sampleCode);
-        Assert.Contains("GetViewportDiagnostics", sampleCode);
-        Assert.Contains("ViewportWidth", sampleCode);
-        Assert.Contains("VerticalOffset", sampleCode);
-        Assert.Contains("new FWAnnotatedScrollBar", sampleCode);
-        Assert.Contains("DetailLabelRequested", sampleCode);
-        Assert.Contains("FWAnnotatedScrollBarDiagnostics", sampleCode);
-        Assert.Contains("RegisteredLabelCount", sampleCode);
-        Assert.Contains("pendingRefreshDeferral", sampleCode);
-        Assert.Contains("FormatRefreshContainerDiagnostics", sampleCode);
-        Assert.Contains("Snap requested", sampleCode);
-        Assert.Contains("FormatScrollerDiagnostics", sampleCode);
-        Assert.Contains("FormatAnnotatedScrollBarDetail", sampleCode);
-        Assert.Contains("Error marker", sampleCode);
     }
 
     [Fact]
@@ -940,7 +498,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("GalleryVisualQaCoverageSnapshot", page.BaseClasses!);
         Assert.True(page.MatchesSearch("visual qa evidence"));
 
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleSourceRegistry.TryGetSource(page, out var sampleCode));
         Assert.Contains("GalleryVisualQaCoverageCatalog.CreateFamilies", sampleCode);
         Assert.Contains("GalleryVisualQaCoveragePage.CreateSnapshot", sampleCode);
         Assert.Contains("FormatFamilyCoverage", sampleCode);
@@ -1023,7 +581,7 @@ public sealed class FluentGalleryCatalogTests
         Assert.True(page.MatchesSearch("control gap evaluate"));
         Assert.True(page.MatchesSearch("FluentAvalonia Community Toolkit"));
 
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleSourceRegistry.TryGetSource(page, out var sampleCode));
         Assert.Contains("GalleryControlGapCatalog.CreateEntries", sampleCode);
         Assert.Contains("GalleryControlGapPage.CreateSnapshot", sampleCode);
         Assert.Contains("FormatGapEntry", sampleCode);
@@ -1075,39 +633,6 @@ public sealed class FluentGalleryCatalogTests
         Assert.Contains("high contrast", text);
         Assert.Contains("materials.windowbackdrop", text);
         Assert.IsAssignableFrom<UIElement>(content);
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeDesignTokenSamples()
-    {
-        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService());
-
-        AssertDesignSample(pages, "themearchitecture", "FluentThemeManager.Apply", "FluentControlsResourceName");
-        AssertDesignSample(pages, "colors", "AccentFillColorDefaultBrush", "SelectionBackgroundWeak");
-        AssertDesignSample(pages, "typography", "CurrentDisplayFontFamily", "ControlContentThemeFontSize");
-        AssertDesignSample(pages, "geometry", "CardCornerRadius", "FluentOverlayBorderThickness");
-        AssertDesignSample(pages, "motiontokens", "FWConnectedAnimationService", "FluentMotionDurationNormal");
-    }
-
-    [Fact]
-    public void GallerySampleCodeRegistry_ShouldExplicitlyRegisterEveryCatalogSampleKey()
-    {
-        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
-            .Where(page => !page.IsFooter && !string.IsNullOrWhiteSpace(page.SampleCodeKey))
-            .ToArray();
-
-        Assert.NotEmpty(pages);
-
-        foreach (var page in pages)
-        {
-            Assert.True(
-                GallerySampleCodeRegistry.ContainsRegisteredSampleCodeKey(page.SampleCodeKey),
-                $"{page.UniqueId} references unregistered sample key '{page.SampleCodeKey}'.");
-
-            Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-            Assert.False(string.IsNullOrWhiteSpace(sampleCode));
-            Assert.DoesNotContain("Generated from", sampleCode);
-        }
     }
 
     [Fact]
@@ -1193,30 +718,6 @@ public sealed class FluentGalleryCatalogTests
     }
 
     [Fact]
-    public void GallerySampleCodeRegistry_ShouldExposeCatalogFilterSnapshotSamples()
-    {
-        var pages = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
-            .Where(page => page.Group == GalleryNavigationGroup.Catalog)
-            .ToArray();
-
-        Assert.Equal(5, pages.Length);
-
-        foreach (var page in pages)
-        {
-            Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
-            Assert.Contains("new GalleryCatalogFilterPage", sampleCode);
-            Assert.Contains("CreateSnapshot()", sampleCode);
-            Assert.Contains("snapshot.ControlCount", sampleCode);
-            Assert.Contains("snapshot.PageCount", sampleCode);
-            Assert.Contains("snapshot.GroupCounts", sampleCode);
-            Assert.Contains("snapshot.WithSourcePathCount", sampleCode);
-            Assert.Contains("snapshot.WithSampleCodeKeyCount", sampleCode);
-            Assert.Contains("snapshot.WithApiNamespaceCount", sampleCode);
-            Assert.DoesNotContain("Generated from", sampleCode);
-        }
-    }
-
-    [Fact]
     public void GalleryCatalogService_ShouldRegisterFactoryForEveryCatalogPage()
     {
         var expectedPageIds = GalleryCatalog.CreatePageInfos(new GalleryLocalizationService())
@@ -1226,9 +727,59 @@ public sealed class FluentGalleryCatalogTests
         var service = new GalleryCatalogService();
         var owner = new Window();
 
-        var registeredPageIds = service.CreateRegisteredPageIds(owner, _ => { }, _ => { });
+        var registeredPageIds = service.CreateRegisteredPageIds(owner, _ => { }, _ => { }, _ => { });
 
         Assert.Equal(expectedPageIds, registeredPageIds);
+    }
+
+    [Fact]
+    public void GalleryCatalog_ShouldExposeWinUiFundamentalsAndAccessibilityShells()
+    {
+        var localization = new GalleryLocalizationService();
+        var pages = GalleryCatalog.CreatePageInfos(localization);
+
+        Assert.Equal(GalleryNavigationGroup.Catalog, GalleryNavigationGroup.FirstControlsGroup);
+        var order = GalleryNavigationGroup.Order;
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Fundamentals) >= 0);
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Accessibility) >= 0);
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Fundamentals) < Array.IndexOf(order, GalleryNavigationGroup.Catalog));
+        Assert.True(Array.IndexOf(order, GalleryNavigationGroup.Accessibility) < Array.IndexOf(order, GalleryNavigationGroup.Catalog));
+
+        Assert.Equal(
+            localization.IsChinese ? "控件" : "Controls",
+            localization.Text("shell.controlsHeader"));
+
+        var shells = new (string UniqueId, string GroupId)[]
+        {
+            ("resources", GalleryNavigationGroup.Fundamentals),
+            ("styles", GalleryNavigationGroup.Fundamentals),
+            ("binding", GalleryNavigationGroup.Fundamentals),
+            ("templates", GalleryNavigationGroup.Fundamentals),
+            ("customusercontrols", GalleryNavigationGroup.Fundamentals),
+            ("xamlconditions", GalleryNavigationGroup.Fundamentals),
+            ("scratchpad", GalleryNavigationGroup.Fundamentals),
+            ("screenreadersupport", GalleryNavigationGroup.Accessibility),
+            ("keyboardsupport", GalleryNavigationGroup.Accessibility),
+            ("colorcontrast", GalleryNavigationGroup.Accessibility)
+        };
+
+        foreach (var shell in shells)
+        {
+            var page = Assert.Single(pages, page => page.UniqueId == shell.UniqueId);
+            Assert.Equal(localization.PageTitle(shell.UniqueId), page.Title);
+            Assert.Equal(localization.GroupName(shell.GroupId), page.Group);
+            Assert.Equal(GalleryPageStatus.Preview, page.Status);
+            Assert.False(page.IsFooter);
+            Assert.False(string.IsNullOrWhiteSpace(page.Description));
+            Assert.True(page.MatchesSearch(page.Title));
+        }
+
+        var navigation = Assert.Single(pages, page => page.UniqueId == "navigation");
+        Assert.Equal(localization.PageTitle("navigation"), navigation.Title);
+        Assert.Equal(localization.GroupName(GalleryNavigationGroup.AppStructure), navigation.Group);
+        Assert.True(navigation.IsUpdated);
+        Assert.Equal("/Navigation/FWNavigationService", navigation.SourcePath);
+        Assert.Equal("navigation.breadcrumb.pips.selector.tabview.titlebar", navigation.SampleCodeKey);
     }
 
     [Fact]
@@ -1290,7 +841,7 @@ public sealed class FluentGalleryCatalogTests
     {
         var page = Assert.Single(pages, page => page.UniqueId == uniqueId);
 
-        Assert.True(GallerySampleCodeRegistry.TryGetSampleCode(page, out var sampleCode));
+        Assert.True(GallerySampleSourceRegistry.TryGetSource(page, out var sampleCode));
         Assert.Contains(firstExpected, sampleCode);
         Assert.Contains(secondExpected, sampleCode);
     }

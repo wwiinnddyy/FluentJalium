@@ -1,0 +1,22 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.InteractionSample">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="12" MaxWidth="680">
+        <fw:FWTextBlock Text="Scroller and refresh"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWScroller x:Name="Scroller" Width="620" Height="150" />
+        <fw:FWRefreshContainer x:Name="Refresh" Width="620" Height="96">
+            <fw:FWTextBlock Text="Pull-to-refresh content"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+        </fw:FWRefreshContainer>
+        <fw:FWAnnotatedScrollBar x:Name="AnnotatedBar"
+                                 Orientation="Vertical"
+                                 Width="16"
+                                 Height="130"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Value="36" />
+    </fw:FWStackPanel>
+</UserControl>

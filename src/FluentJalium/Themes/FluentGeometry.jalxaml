@@ -204,4 +204,25 @@
             <SolidColorBrush x:Key="CircleElevationBorderBrush" Color="#FFFFFFFF" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
+    <!--
+        Spacing scale. WinUI has no official spacing tokens, so these are FluentJalium's own names;
+        the four semantic keys below carry the roles WinUI Gallery spells out as literals
+        (page padding 36, card padding 16, grid gutter 12, stack spacing 8).
+        FluentSpacing* is a bare scale; FluentMaterial*Padding in FluentMaterials.jalxaml is role padding.
+    -->
+    <x:Double x:Key="FluentSpacingXXS">2</x:Double>
+    <x:Double x:Key="FluentSpacingXS">4</x:Double>
+    <x:Double x:Key="FluentSpacingS">6</x:Double>
+    <x:Double x:Key="FluentSpacingM">8</x:Double>
+    <x:Double x:Key="FluentSpacingL">12</x:Double>
+    <x:Double x:Key="FluentSpacingXL">16</x:Double>
+    <x:Double x:Key="FluentSpacingXXL">20</x:Double>
+    <x:Double x:Key="FluentSpacing3XL">24</x:Double>
+    <x:Double x:Key="FluentSpacing4XL">32</x:Double>
+    <x:Double x:Key="FluentSpacing5XL">36</x:Double>
+    <x:Double x:Key="FluentSpacing6XL">48</x:Double>
+    <Thickness x:Key="FluentPagePadding">36</Thickness>
+    <Thickness x:Key="FluentCardPadding">16</Thickness>
+    <x:Double x:Key="FluentGridGutter">12</x:Double>
+    <x:Double x:Key="FluentStackSpacing">8</x:Double>
 </ResourceDictionary>

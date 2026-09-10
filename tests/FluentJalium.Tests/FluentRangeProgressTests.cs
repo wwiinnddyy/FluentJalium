@@ -499,12 +499,9 @@ public sealed class FluentRangeProgressTests
 
     private static ResourceDictionary LoadGenericThemeDictionary()
     {
-        var loaded = ResourceDictionary.SourceLoader?.Invoke(
-            new ResourceDictionary(),
-            new Uri("/FluentJalium;component/Themes/Generic.jalxaml", UriKind.Relative),
-            FluentThemeManager.ThemeAssembly);
-
-        return Assert.IsType<ResourceDictionary>(loaded);
+        var app = new Application();
+        FluentThemeManager.Apply(app);
+        return app.Resources;
     }
 
     private static void AssertContainsStyle<TControl>(ResourceDictionary dictionary)
@@ -543,7 +540,7 @@ public sealed class FluentRangeProgressTests
 
     private static void AssertSetter(Style style, DependencyProperty property, object? expectedValue = null)
     {
-        var setter = Assert.Single(style.Setters, s => s.Property == property);
+        var setter = Assert.Single(style.Setters.OfType<Setter>(), s => s.Property == property);
         if (expectedValue != null)
         {
             Assert.Equal(expectedValue, setter.Value);
@@ -552,7 +549,7 @@ public sealed class FluentRangeProgressTests
 
     private static void AssertBooleanSetter(Style style, DependencyProperty property, bool expectedValue)
     {
-        var setter = Assert.Single(style.Setters, s => s.Property == property);
+        var setter = Assert.Single(style.Setters.OfType<Setter>(), s => s.Property == property);
         Assert.Equal(expectedValue, Convert.ToBoolean(setter.Value));
     }
 
@@ -566,7 +563,7 @@ public sealed class FluentRangeProgressTests
         var trigger = Assert.Single(
             style.Triggers.OfType<Trigger>(),
             candidate => candidate.Property == triggerProperty && TriggerValueEquals(candidate.Value, triggerValue));
-        var setter = Assert.Single(trigger.Setters, candidate => candidate.Property == setterProperty);
+        var setter = Assert.Single(trigger.Setters.OfType<Setter>(), candidate => candidate.Property == setterProperty);
 
         if (setter.Value is IDynamicResourceReference dynamicReference)
         {

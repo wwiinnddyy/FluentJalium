@@ -1,0 +1,12 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.ChartSample">
+    <fw:FWLineChart x:Name="Chart"
+                    Width="560"
+                    Height="260"
+                    Title="Weekly activity"
+                    ShowDataPoints="True"
+                    IsLegendVisible="True"
+                    IsGridLinesVisible="True" />
+</UserControl>

@@ -1,40 +1,81 @@
+using System.Collections.Specialized;
 using FluentJalium.Controls.Themes;
-using FluentJalium.Icon;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Input;
 using Jalium.UI.Media;
-using Jalium.UI.Media.Animation;
 using System.Collections.ObjectModel;
 
 namespace FluentJalium.Controls;
 
 /// <summary>
-/// FluentJalium native NavigationViewItem - 100% custom implementation following WinUI 3 Fluent Design System.
+/// FluentJalium native NavigationViewItem - 100% custom implementation following WinUI 3,
+/// ModernWPF, and WPF-UI Fluent Design Systems.
+///
 /// Features:
-/// - Proper icon display (20x20px)
-/// - Selection indicator (3px left accent bar)
-/// - Hover/Pressed visual states
-/// - No text shifting on selection
-/// - Hierarchical menu support
+/// - 36px / 40px minimum item height with pill inset and corner radius.
+/// - Selection indicator: 3x16 / 3x20 accent pill on the left edge, vertically centered.
+/// - Compact mode: automatically hides content text, chevron, and nested children to cleanly display 48px icons.
+/// - Multi-mode layout support via <see cref="ItemStyle"/> (<see cref="FluentNavigationItemStyle.Tree"/> and <see cref="FluentNavigationItemStyle.Fluent"/>).
+/// - 31px階梯式子项缩进与箭头 180° 旋转。
 /// </summary>
 public class FluentNavigationViewItem : Control
 {
-    private Border? _rootBorder;
-    private Border? _selectionIndicator;
-    private Border? _contentBorder;
+    // WinUI metrics (NavigationView_themeresources.xaml / NavigationViewItemBase.h)
+    internal const double ItemMinHeight = 36;
+    internal const double FluentItemMinHeight = 40;
+    internal const double IconBoxWidth = 40;
+    internal const double IconSize = 16;
+    internal const double SelectionIndicatorWidth = 3;
+    internal const double SelectionIndicatorHeight = 16;
+    internal const double FluentSelectionIndicatorHeight = 20;
+    internal const double SelectionIndicatorRadius = 2;
+    internal const double ChildIndentation = 31;
+    internal const double ChevronHostWidth = 36;
+    internal const double ChevronGlyphSize = 12;
+    internal const double TextRightInset = 12;
+
+    private static readonly Thickness s_treeLayoutRootMargin = new(4, 2, 4, 2);
+    private static readonly Thickness s_fluentLayoutRootMargin = new(6, 2, 6, 2);
+
+    private StackPanel? _rootPanel;
+    private Border? _layoutRoot;
     private Grid? _contentGrid;
+    private Border? _selectionIndicator;
     private ContentPresenter? _iconPresenter;
     private TextBlock? _contentTextBlock;
-    private Border? _chevronBorder;
+    private TextBlock? _chevronText;
+    private Border? _chevronHost;
     private StackPanel? _childrenPanel;
     private bool _isMouseOver;
     private bool _isPressed;
     private bool _isSelected;
+    private bool _isCompact;
+    private FluentNavigationItemStyle _itemStyle = FluentNavigationItemStyle.Tree;
 
     public ObservableCollection<FluentNavigationViewItem> MenuItems { get; } = new();
 
-    internal FluentNavigationView? ParentNavigationView { get; set; }
+    private FluentNavigationView? _parentNavigationView;
+
+    internal FluentNavigationView? ParentNavigationView
+    {
+        get => _parentNavigationView;
+        set
+        {
+            _parentNavigationView = value;
+            if (value != null)
+            {
+                ItemStyle = value.ItemStyle;
+            }
+            foreach (var child in MenuItems)
+            {
+                child.ParentNavigationView = value;
+            }
+        }
+    }
+
+    /// <summary>Hierarchy depth; indents the content grid by 31px per level.</summary>
+    internal int Depth { get; set; }
 
     #region Dependency Properties
 
@@ -57,6 +98,10 @@ public class FluentNavigationViewItem : Control
     public static readonly DependencyProperty SelectsOnInvokedProperty =
         DependencyProperty.Register(nameof(SelectsOnInvoked), typeof(bool), typeof(FluentNavigationViewItem),
             new PropertyMetadata(true));
+
+    public static readonly DependencyProperty ItemStyleProperty =
+        DependencyProperty.Register(nameof(ItemStyle), typeof(FluentNavigationItemStyle), typeof(FluentNavigationViewItem),
+            new PropertyMetadata(FluentNavigationItemStyle.Tree, OnItemStyleChanged));
 
     #endregion
 
@@ -92,205 +137,350 @@ public class FluentNavigationViewItem : Control
         set => SetValue(SelectsOnInvokedProperty, value);
     }
 
+    public FluentNavigationItemStyle ItemStyle
+    {
+        get => (FluentNavigationItemStyle)GetValue(ItemStyleProperty)!;
+        set => SetValue(ItemStyleProperty, value);
+    }
+
     public new object? Tag { get; set; }
+
+    /// <summary>
+    /// Raised when an item with children is invoked.
+    /// </summary>
+    public event EventHandler? Invoked;
 
     #endregion
 
     public FluentNavigationViewItem()
     {
-        MinHeight = 40;
-        Margin = new Thickness(4, 2, 4, 2);
+        MinHeight = ItemMinHeight;
+        Margin = new Thickness(0);
         Cursor = Cursors.Hand;
 
         BuildVisualTree();
-        UpdateVisualState(false);
+        MenuItems.CollectionChanged += OnMenuItemsChanged;
+        FluentThemeManager.ThemeChanged += OnThemeChanged;
+        Unloaded += OnUnloaded;
+        ApplyItemStyle(ItemStyle);
+        UpdateVisualState();
     }
 
     private void BuildVisualTree()
     {
-        // Root grid with selection indicator
-        var mainGrid = new Grid
-        {
-            ColumnDefinitions =
-            {
-                new ColumnDefinition { Width = new GridLength(3) },      // Selection indicator
-                new ColumnDefinition { Width = GridLength.Star }         // Content
-            }
-        };
-
-        // Selection indicator (3px accent bar on the left)
-        _selectionIndicator = new Border
-        {
-            Width = 3,
-            Background = GetThemeBrush("AccentBrush"),
-            Opacity = 0,
-            CornerRadius = new CornerRadius(0, 2, 2, 0),
-            HorizontalAlignment = HorizontalAlignment.Left
-        };
-        Grid.SetColumn(_selectionIndicator, 0);
-        mainGrid.Children.Add(_selectionIndicator);
-
-        // Content area
-        _contentBorder = new Border
-        {
-            Background = new SolidColorBrush(Colors.Transparent),
-            CornerRadius = new CornerRadius(4),
-            Margin = new Thickness(4, 0, 4, 0)
-        };
-        Grid.SetColumn(_contentBorder, 1);
-
-        // Content grid: [Icon] [Text] [Chevron]
+        // Standard horizontal content grid: [40px icon box] [* text] [Auto chevron]
         _contentGrid = new Grid
         {
             ColumnDefinitions =
             {
-                new ColumnDefinition { Width = new GridLength(48) },    // Icon area
-                new ColumnDefinition { Width = GridLength.Star },       // Text
-                new ColumnDefinition { Width = GridLength.Auto }        // Chevron
+                new ColumnDefinition { Width = new GridLength(IconBoxWidth) },
+                new ColumnDefinition { Width = GridLength.Star },
+                new ColumnDefinition { Width = GridLength.Auto }
             },
-            Margin = new Thickness(0, 8, 8, 8)
+            Margin = new Thickness(0, 0, TextRightInset, 0)
         };
 
-        // Icon presenter (20x20px centered in 48px column)
         _iconPresenter = new ContentPresenter
         {
-            Width = 20,
-            Height = 20,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
         Grid.SetColumn(_iconPresenter, 0);
         _contentGrid.Children.Add(_iconPresenter);
 
-        // Content text
         _contentTextBlock = new TextBlock
         {
             FontSize = 14,
             FontFamily = FluentThemeManager.CurrentBodyFontFamily,
-            Foreground = GetThemeBrush("TextPrimary"),
+            Foreground = ResolveBrush("NavigationViewItemForeground"),
             VerticalAlignment = VerticalAlignment.Center,
             TextTrimming = TextTrimming.CharacterEllipsis
         };
         Grid.SetColumn(_contentTextBlock, 1);
         _contentGrid.Children.Add(_contentTextBlock);
 
-        // Chevron (for expandable items)
-        _chevronBorder = new Border
+        _chevronText = new TextBlock
         {
-            Width = 12,
-            Height = 12,
-            Margin = new Thickness(0, 0, 8, 0),
+            Text = "\uE70D",
+            FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
+            FontSize = ChevronGlyphSize,
+            Foreground = ResolveBrush("NavigationViewItemForeground"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            RenderTransformOrigin = new Point(0.5, 0.5)
+        };
+        _chevronHost = new Border
+        {
+            Width = ChevronHostWidth - TextRightInset,
+            Child = _chevronText,
             Visibility = Visibility.Collapsed,
             VerticalAlignment = VerticalAlignment.Center
         };
-        // TODO: Add chevron path
-        Grid.SetColumn(_chevronBorder, 2);
-        _contentGrid.Children.Add(_chevronBorder);
+        Grid.SetColumn(_chevronHost, 2);
+        _contentGrid.Children.Add(_chevronHost);
 
-        _contentBorder.Child = _contentGrid;
-        mainGrid.Children.Add(_contentBorder);
-
-        // Root border
-        _rootBorder = new Border
+        // Selection indicator: 3x16 (or 3x20 in Fluent) accent pill
+        _selectionIndicator = new Border
         {
-            Background = new SolidColorBrush(Colors.Transparent),
-            Child = mainGrid
+            Width = SelectionIndicatorWidth,
+            Height = SelectionIndicatorHeight,
+            CornerRadius = new CornerRadius(SelectionIndicatorRadius),
+            Background = ResolveBrush("NavigationViewSelectionIndicatorForeground"),
+            Opacity = 0,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false
         };
 
-        AddVisualChild(_rootBorder);
+        var overlayGrid = new Grid();
+        overlayGrid.Children.Add(_contentGrid);
+        overlayGrid.Children.Add(_selectionIndicator);
 
-        // Event handlers
+        _layoutRoot = new Border
+        {
+            Margin = s_treeLayoutRootMargin,
+            CornerRadius = new CornerRadius(4),
+            Background = new SolidColorBrush(Colors.Transparent),
+            Child = overlayGrid
+        };
+
+        _childrenPanel = new StackPanel
+        {
+            Orientation = Orientation.Vertical,
+            Visibility = Visibility.Collapsed
+        };
+
+        _rootPanel = new StackPanel { Orientation = Orientation.Vertical };
+        _rootPanel.Children.Add(_layoutRoot);
+        _rootPanel.Children.Add(_childrenPanel);
+
+        AddVisualChild(_rootPanel);
+
         MouseEnter += OnMouseEnterHandler;
         MouseLeave += OnMouseLeaveHandler;
         MouseLeftButtonDown += OnMouseLeftButtonDownHandler;
         MouseLeftButtonUp += OnMouseLeftButtonUpHandler;
     }
 
+    private void ApplyItemStyle(FluentNavigationItemStyle style)
+    {
+        _itemStyle = style;
+        if (_layoutRoot == null || _selectionIndicator == null) return;
+
+        switch (style)
+        {
+            case FluentNavigationItemStyle.Fluent:
+                MinHeight = FluentItemMinHeight;
+                _layoutRoot.Margin = s_fluentLayoutRootMargin;
+                _layoutRoot.CornerRadius = new CornerRadius(6);
+                _selectionIndicator.Height = FluentSelectionIndicatorHeight;
+                break;
+
+            case FluentNavigationItemStyle.Tree:
+            default:
+                MinHeight = ItemMinHeight;
+                _layoutRoot.Margin = s_treeLayoutRootMargin;
+                _layoutRoot.CornerRadius = new CornerRadius(4);
+                _selectionIndicator.Height = SelectionIndicatorHeight;
+                break;
+        }
+
+        foreach (var child in MenuItems)
+        {
+            child.ApplyItemStyle(style);
+        }
+    }
+
+    #region Interaction
+
     private void OnMouseEnterHandler(object? sender, MouseEventArgs e)
     {
         _isMouseOver = true;
-        UpdateVisualState(true);
+        UpdateVisualState();
     }
 
     private void OnMouseLeaveHandler(object? sender, MouseEventArgs e)
     {
         _isMouseOver = false;
         _isPressed = false;
-        UpdateVisualState(true);
+        UpdateVisualState();
     }
 
     private void OnMouseLeftButtonDownHandler(object? sender, MouseButtonEventArgs e)
     {
+        if (!IsEnabled) return;
         _isPressed = true;
-        UpdateVisualState(true);
+        UpdateVisualState();
         e.Handled = true;
     }
 
     private void OnMouseLeftButtonUpHandler(object? sender, MouseButtonEventArgs e)
     {
-        if (_isPressed && _isMouseOver)
+        if (_isPressed && _isMouseOver && IsEnabled)
         {
-            // Invoke
             OnItemClicked();
         }
         _isPressed = false;
-        UpdateVisualState(true);
+        UpdateVisualState();
         e.Handled = true;
     }
 
     private void OnItemClicked()
     {
+        if (MenuItems.Count > 0 && !_isCompact)
+        {
+            IsExpanded = !IsExpanded;
+            Invoked?.Invoke(this, EventArgs.Empty);
+        }
+
         if (SelectsOnInvoked)
         {
             IsSelected = true;
             ParentNavigationView?.NotifyItemSelected(this);
         }
-
-        // Toggle expand for items with children
-        if (MenuItems.Count > 0)
-        {
-            IsExpanded = !IsExpanded;
-        }
     }
 
-    private void UpdateVisualState(bool useTransitions)
+    #endregion
+
+    #region Visual states
+
+    private void UpdateVisualState()
     {
-        if (_contentBorder == null || _selectionIndicator == null) return;
+        if (_layoutRoot == null || _selectionIndicator == null) return;
 
-        // Background color based on state
-        Color backgroundColor;
-        double selectionIndicatorOpacity;
+        string backgroundKey;
+        string foregroundKey;
+        double indicatorOpacity;
 
-        if (_isSelected)
+        if (!IsEnabled)
         {
-            // Selected: SubtleFillColorSecondary + visible accent bar
-            backgroundColor = GetThemeColor("SubtleFillColorSecondary");
-            selectionIndicatorOpacity = 1.0;
+            backgroundKey = _isSelected
+                ? "NavigationViewItemBackgroundSelected"
+                : "NavigationViewItemBackground";
+            foregroundKey = "NavigationViewItemForegroundDisabled";
+            indicatorOpacity = _isSelected ? 1.0 : 0.0;
+        }
+        else if (_isSelected)
+        {
+            indicatorOpacity = 1.0;
+            if (_isPressed)
+            {
+                backgroundKey = "NavigationViewItemBackgroundSelectedPressed";
+                foregroundKey = "NavigationViewItemForegroundSecondary";
+            }
+            else if (_isMouseOver)
+            {
+                backgroundKey = "NavigationViewItemBackgroundSelectedHover";
+                foregroundKey = "NavigationViewItemForeground";
+            }
+            else
+            {
+                backgroundKey = "NavigationViewItemBackgroundSelected";
+                foregroundKey = "NavigationViewItemForeground";
+            }
         }
         else if (_isPressed)
         {
-            // Pressed: SubtleFillColorTertiary
-            backgroundColor = GetThemeColor("SubtleFillColorTertiary");
-            selectionIndicatorOpacity = 0;
+            backgroundKey = "NavigationViewItemBackgroundPressed";
+            foregroundKey = "NavigationViewItemForegroundSecondary";
+            indicatorOpacity = 0.0;
         }
         else if (_isMouseOver)
         {
-            // Hover: SubtleFillColorSecondary
-            backgroundColor = GetThemeColor("SubtleFillColorSecondary");
-            selectionIndicatorOpacity = 0;
+            backgroundKey = "NavigationViewItemBackgroundHover";
+            foregroundKey = "NavigationViewItemForeground";
+            indicatorOpacity = 0.0;
         }
         else
         {
-            // Normal: Transparent
-            backgroundColor = Colors.Transparent;
-            selectionIndicatorOpacity = 0;
+            backgroundKey = "NavigationViewItemBackground";
+            foregroundKey = "NavigationViewItemForeground";
+            indicatorOpacity = 0.0;
         }
 
-        // Apply directly without animation for now
-        // TODO: Add smooth transitions when Jalium.UI animation support is confirmed
-        _contentBorder.Background = new SolidColorBrush(backgroundColor);
-        _selectionIndicator.Opacity = selectionIndicatorOpacity;
+        _layoutRoot.Background = ResolveBrush(backgroundKey);
+        var foreground = ResolveBrush(foregroundKey);
+        if (_contentTextBlock != null) _contentTextBlock.Foreground = foreground;
+        if (_chevronText != null) _chevronText.Foreground = foreground;
+        _selectionIndicator.Background = ResolveBrush("NavigationViewSelectionIndicatorForeground");
+        _selectionIndicator.Opacity = indicatorOpacity;
     }
+
+    internal void UpdateCompactState(bool isCompact)
+    {
+        if (_isCompact == isCompact) return;
+        _isCompact = isCompact;
+
+        if (_contentTextBlock != null)
+        {
+            _contentTextBlock.Visibility = isCompact ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        if (_childrenPanel != null)
+        {
+            _childrenPanel.Visibility = (!isCompact && IsExpanded) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        ApplyIndentation();
+        ApplyChevronState();
+
+        foreach (var child in MenuItems)
+        {
+            child.UpdateCompactState(isCompact);
+        }
+    }
+
+    private void ApplyIndentation()
+    {
+        if (_contentGrid == null) return;
+        var indent = _isCompact ? 0 : Depth * ChildIndentation;
+        _contentGrid.Margin = new Thickness(indent, 0, _isCompact ? 0 : TextRightInset, 0);
+    }
+
+    private void ApplyChevronState()
+    {
+        if (_chevronHost == null || _chevronText == null) return;
+        var hasChildren = MenuItems.Count > 0;
+        _chevronHost.Visibility = hasChildren && !_isCompact ? Visibility.Visible : Visibility.Collapsed;
+        if (_contentGrid != null)
+        {
+            var indent = _isCompact ? 0 : Depth * ChildIndentation;
+            _contentGrid.Margin = new Thickness(indent, 0, (hasChildren && !_isCompact) ? 0 : TextRightInset, 0);
+        }
+        _chevronText.RenderTransform = new RotateTransform(IsExpanded ? 180 : 0);
+    }
+
+    private void OnThemeChanged() => UpdateVisualState();
+
+    private void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        FluentThemeManager.ThemeChanged -= OnThemeChanged;
+        Unloaded -= OnUnloaded;
+    }
+
+    #endregion
+
+    #region Children
+
+    private void OnMenuItemsChanged(object? sender, NotifyCollectionChangedEventArgs e) => RebuildChildren();
+
+    private void RebuildChildren()
+    {
+        if (_childrenPanel == null) return;
+        _childrenPanel.Children.Clear();
+        foreach (var child in MenuItems)
+        {
+            child.Depth = Depth + 1;
+            child.ParentNavigationView = ParentNavigationView;
+            child._isCompact = _isCompact;
+            child.ItemStyle = ItemStyle;
+            child.ApplyIndentation();
+            _childrenPanel.Children.Add(child);
+        }
+        ApplyChevronState();
+    }
+
+    #endregion
 
     #region Property Changed Handlers
 
@@ -306,11 +496,11 @@ public class FluentNavigationViewItem : Control
     {
         if (d is FluentNavigationViewItem item && item._contentGrid != null)
         {
-            // Remove any previous custom content from column 1
+            var textBlock = item._contentTextBlock!;
             var existingElement = item._contentGrid.Children
                 .OfType<UIElement>()
-                .FirstOrDefault(child => Grid.GetColumn(child) == 1 && child != item._contentTextBlock);
-            
+                .FirstOrDefault(child => Grid.GetColumn(child) == 1 && child != textBlock);
+
             if (existingElement != null)
             {
                 item._contentGrid.Children.Remove(existingElement);
@@ -318,20 +508,18 @@ public class FluentNavigationViewItem : Control
 
             if (e.NewValue is string text)
             {
-                // Ensure TextBlock is in the grid
-                if (!item._contentGrid.Children.Contains(item._contentTextBlock))
+                if (!item._contentGrid.Children.Contains(textBlock))
                 {
-                    Grid.SetColumn(item._contentTextBlock, 1);
-                    item._contentGrid.Children.Add(item._contentTextBlock);
+                    Grid.SetColumn(textBlock, 1);
+                    item._contentGrid.Children.Add(textBlock);
                 }
-                item._contentTextBlock.Text = text;
+                textBlock.Text = text;
             }
-            else if (e.NewValue is UIElement element && element != item._contentTextBlock)
+            else if (e.NewValue is UIElement element && element != textBlock)
             {
-                // Remove TextBlock and add custom content
-                if (item._contentGrid.Children.Contains(item._contentTextBlock))
+                if (item._contentGrid.Children.Contains(textBlock))
                 {
-                    item._contentGrid.Children.Remove(item._contentTextBlock);
+                    item._contentGrid.Children.Remove(textBlock);
                 }
                 Grid.SetColumn(element, 1);
                 item._contentGrid.Children.Add(element);
@@ -344,69 +532,84 @@ public class FluentNavigationViewItem : Control
         if (d is FluentNavigationViewItem item)
         {
             item._isSelected = (bool)e.NewValue!;
-            item.UpdateVisualState(true);
+            item.UpdateVisualState();
         }
     }
 
     private static void OnIsExpandedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is FluentNavigationViewItem item && item._childrenPanel != null)
+        if (d is FluentNavigationViewItem item)
         {
-            bool isExpanded = (bool)e.NewValue!;
-            item._childrenPanel.Visibility = isExpanded ? Visibility.Visible : Visibility.Collapsed;
-            // TODO: Update chevron rotation
+            var isExpanded = (bool)e.NewValue!;
+            if (item._childrenPanel != null)
+            {
+                item._childrenPanel.Visibility = (!item._isCompact && isExpanded) ? Visibility.Visible : Visibility.Collapsed;
+            }
+            item.ApplyChevronState();
+        }
+    }
+
+    private static void OnItemStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is FluentNavigationViewItem item && e.NewValue is FluentNavigationItemStyle style)
+        {
+            item.ApplyItemStyle(style);
         }
     }
 
     #endregion
 
+    #region Layout
+
     protected override Size MeasureOverride(Size availableSize)
     {
-        _rootBorder?.Measure(availableSize);
-        return _rootBorder?.DesiredSize ?? new Size(availableSize.Width, MinHeight);
+        _rootPanel?.Measure(availableSize);
+        return _rootPanel?.DesiredSize ?? new Size(availableSize.Width, MinHeight);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        _rootBorder?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
+        _rootPanel?.Arrange(new Rect(0, 0, finalSize.Width, finalSize.Height));
         return finalSize;
     }
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
-        return index == 0 ? _rootBorder : null;
+        return index == 0 ? _rootPanel : null;
     }
 
-    public override int VisualChildrenCount => _rootBorder != null ? 1 : 0;
+    protected override int VisualChildrenCount => _rootPanel != null ? 1 : 0;
 
-    private static Brush GetThemeBrush(string key)
+    // Like FluentNavigationView, this control builds its ENTIRE visual tree by hand in
+    // BuildVisualTree and drives measure/arrange/render through the overrides above, so it must
+    // never expand a ControlTemplate. FluentThemeManager aliases the stock NavigationViewItem
+    // Style — which carries a full item ControlTemplate — onto FWNavigationViewItem. Without
+    // this guard the base Control builds a second _templateRoot subtree, attaches the template
+    // triggers, and Control.RenderTemplatedBackground paints it every frame on top of
+    // _rootPanel. The result is the "doubled / ghosted" item artifact (icon and label painted
+    // twice at the hand-built and template offsets) that became visible after a runtime theme
+    // swap. Returning false keeps the hand-built tree the single source of visuals.
+    protected override bool ApplyTemplateCore() => false;
+
+    protected override void RenderTemplatedBackground(DrawingContext drawingContext)
+    {
+    }
+
+    #endregion
+
+    internal static Brush ResolveBrush(string key)
     {
         if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Brush brush)
         {
             return brush;
         }
-        return new SolidColorBrush(Colors.Gray);
-    }
-
-    private static Color GetThemeColor(string key)
-    {
-        if (Application.Current?.Resources.TryGetValue(key, out var value) == true)
-        {
-            if (value is SolidColorBrush brush)
-            {
-                return brush.Color;
-            }
-            if (value is Color color)
-            {
-                return color;
-            }
-        }
-        return Color.FromArgb(20, 128, 128, 128);
+        return new SolidColorBrush(Colors.Transparent);
     }
 }
 
 /// <summary>
-/// Separator for NavigationView menu items.
+/// Separator for NavigationView menu items. WinUI: 1px DividerStrokeColorDefault line,
+/// margin 0,3,0,4, stretching the full pane width.
 /// </summary>
 public class FluentNavigationViewItemSeparator : Control
 {
@@ -415,12 +618,12 @@ public class FluentNavigationViewItemSeparator : Control
     public FluentNavigationViewItemSeparator()
     {
         Height = 1;
-        Margin = new Thickness(16, 8, 16, 8);
+        Margin = new Thickness(0, 3, 0, 4);
 
         _line = new Border
         {
             Height = 1,
-            Background = GetThemeBrush("DividerStrokeColorDefaultBrush"),
+            Background = ResolveBrush(),
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
@@ -430,25 +633,34 @@ public class FluentNavigationViewItemSeparator : Control
     protected override Size MeasureOverride(Size availableSize)
     {
         _line?.Measure(availableSize);
-        return new Size(availableSize.Width, Height);
+        return new Size(availableSize.Width, Height + Margin.Top + Margin.Bottom);
     }
 
     protected override Size ArrangeOverride(Size finalSize)
     {
-        _line?.Arrange(new Rect(0, 0, finalSize.Width, Height));
+        _line?.Arrange(new Rect(Margin.Left, Margin.Top,
+            Math.Max(0, finalSize.Width - Margin.Left - Margin.Right), Height));
         return finalSize;
     }
 
-    public override Visual? GetVisualChild(int index)
+    protected override Visual? GetVisualChild(int index)
     {
         return index == 0 ? _line : null;
     }
 
-    public override int VisualChildrenCount => _line != null ? 1 : 0;
+    protected override int VisualChildrenCount => _line != null ? 1 : 0;
 
-    private static Brush GetThemeBrush(string key)
+    // See FluentNavigationViewItem: the hand-built tree is the only visual source; never let the
+    // aliased stock NavigationViewItemSeparator template paint a second, stray subtree.
+    protected override bool ApplyTemplateCore() => false;
+
+    protected override void RenderTemplatedBackground(DrawingContext drawingContext)
     {
-        if (Application.Current?.Resources.TryGetValue(key, out var value) == true && value is Brush brush)
+    }
+
+    private static Brush ResolveBrush()
+    {
+        if (Application.Current?.Resources.TryGetValue("DividerStrokeColorDefaultBrush", out var value) == true && value is Brush brush)
         {
             return brush;
         }

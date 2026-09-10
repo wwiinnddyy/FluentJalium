@@ -1,6 +1,8 @@
-<ResourceDictionary xmlns="http://jalium.ui/xaml/2024"
-                    xmlns:x="http://jalium.ui/xaml/x/2024"
-                    xmlns:controls="clr-namespace:FluentJalium.Controls">
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+    xmlns:fluent="https://jalium.dev/fluent"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <!-- FWAnimatedIcon Default Style -->
   <Style TargetType="controls:FWAnimatedIcon">
@@ -14,7 +16,7 @@
           <Border Background="{TemplateBinding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}">
-            <Panel x:Name="PART_RootPanel" />
+            <StackPanel x:Name="PART_RootPanel" />
           </Border>
         </ControlTemplate>
       </Setter.Value>
@@ -61,7 +63,7 @@
                     Height="60"
                     Background="{DynamicResource LayerFillColorDefaultBrush}"
                     Visibility="Collapsed">
-              <ProgressRing x:Name="PART_RefreshIndicator"
+              <controls:FWProgressRing x:Name="PART_RefreshIndicator"
                            Width="24"
                            Height="24"
                            HorizontalAlignment="Center"
@@ -136,11 +138,13 @@
     </Setter>
   </Style>
 
-  <!-- FWBackdrop Default Style -->
+  <!-- FWBackdrop Default Style.
+       Tint/base colors are NOT pinned here: FWBackdrop resolves them from the active theme
+       (LayerFillColorDefault / SolidBackgroundFillColorBase) at render time, so one style covers
+       Dark, Light and HighContrast even though HighContrast only ships the *Brush* variants. -->
   <Style TargetType="controls:FWBackdrop">
     <Setter Property="IsHitTestVisible" Value="False" />
-    <Setter Property="TintColor" Value="{DynamicResource LayerFillColorDefault}" />
-    <Setter Property="TintOpacity" Value="0.8" />
+    <Setter Property="TintOpacity" Value="0.86" />
     <Setter Property="LuminosityOpacity" Value="0.85" />
   </Style>
 

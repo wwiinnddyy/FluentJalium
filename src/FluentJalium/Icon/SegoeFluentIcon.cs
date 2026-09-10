@@ -49,6 +49,23 @@ public enum SegoeFluentIcon
     Rename = Edit,
     Badge = 0xE7BA,
     Home = 0xE80F,
-    Upload = 0xE898
+    Upload = 0xE898,
+    Search = 0xE721,
+    Copy = 0xE8C8,
+    Video = 0xE714,
+    Microphone = 0xE720,
+    Pause = 0xE769,
+    Heart = 0xEB51,
+    Font = 0xE8D3,
+    Bold = 0xE8DD,
+    Clock = 0xE823,
+    Grid = 0xE80A,
+    Accept = 0xE8FB,
+    Switch = 0xE8AB,
+    // Canonical Segoe MDL2 Assets assignments (same font revision as the values above).
+    Keyboard = 0xE8D2,
+    Eye = 0xE7B3,
+    FavoriteStar = 0xE734,
+    FavoriteStarFill = 0xE735
 }
 #pragma warning restore CS1591

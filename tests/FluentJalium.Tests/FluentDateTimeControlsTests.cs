@@ -393,7 +393,7 @@ public sealed class FluentDateTimeControlsTests
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendar.BlackoutDates.Add(today.AddDays(2).Date);
+        calendar.BlackoutDates.Add(new CalendarDateRange(today.AddDays(2).Date));
         var selectedChanged = 0;
         var displayChanged = 0;
         calendar.SelectedDateChanged += (_, _) => selectedChanged++;
@@ -406,7 +406,7 @@ public sealed class FluentDateTimeControlsTests
 
         Assert.Equal(today.AddDays(-14), calendar.DisplayDateStart);
         Assert.Equal(today.AddDays(45), calendar.DisplayDateEnd);
-        Assert.Contains(today.AddDays(2).Date, calendar.BlackoutDates);
+        Assert.True(calendar.BlackoutDates.Contains(today.AddDays(2).Date));
         Assert.Equal(today.AddDays(1), calendar.SelectedDate);
         Assert.Equal(today.AddMonths(1), calendar.DisplayDate);
         Assert.Equal(DayOfWeek.Sunday, calendar.FirstDayOfWeek);
@@ -445,7 +445,7 @@ public sealed class FluentDateTimeControlsTests
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendarView.BlackoutDates.Add(today.AddDays(4).Date);
+        calendarView.BlackoutDates.Add(new CalendarDateRange(today.AddDays(4).Date));
         var selectedChanged = 0;
         var displayChanges = new List<CalendarDateChangedEventArgs>();
         calendarView.SelectedDateChanged += (_, e) =>
@@ -464,7 +464,7 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(today.AddMonths(1), calendarView.DisplayDate);
         Assert.Equal(today.AddDays(-5), calendarView.DisplayDateStart);
         Assert.Equal(today.AddDays(45), calendarView.DisplayDateEnd);
-        Assert.Contains(today.AddDays(4).Date, calendarView.BlackoutDates);
+        Assert.True(calendarView.BlackoutDates.Contains(today.AddDays(4).Date));
         Assert.Equal(DayOfWeek.Sunday, calendarView.FirstDayOfWeek);
         Assert.False(calendarView.IsTodayHighlighted);
         Assert.Equal(CalendarSelectionMode.SingleDate, calendarView.SelectionMode);
@@ -500,7 +500,7 @@ public sealed class FluentDateTimeControlsTests
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendarView.BlackoutDates.Add(today.AddDays(4).Date);
+        calendarView.BlackoutDates.Add(new CalendarDateRange(today.AddDays(4).Date));
 
         var pickerSnapshot = GalleryDateTimePage.CreateCalendarDatePickerQaSnapshot(calendarDatePicker);
         var pickerText = GalleryDateTimePage.FormatCalendarDatePickerQa("CalendarDatePicker QA", pickerSnapshot);
@@ -593,7 +593,7 @@ public sealed class FluentDateTimeControlsTests
             IsTodayHighlighted = true,
             SelectionMode = CalendarSelectionMode.SingleDate
         };
-        calendar.BlackoutDates.Add(today.AddDays(1));
+        calendar.BlackoutDates.Add(new CalendarDateRange(today.AddDays(1)));
 
         var panel = new FWStackPanel
         {
@@ -634,7 +634,7 @@ public sealed class FluentDateTimeControlsTests
         Assert.Equal(datePicker.SelectedDate, calendar.SelectedDate);
         Assert.Equal(DayOfWeek.Monday, calendar.FirstDayOfWeek);
         Assert.True(calendar.IsTodayHighlighted);
-        Assert.Contains(today.AddDays(1), calendar.BlackoutDates);
+        Assert.True(calendar.BlackoutDates.Contains(today.AddDays(1)));
         Assert.Equal(calendarDatePicker.SelectedDate, calendarView.SelectedDate);
         Assert.Equal(today.AddDays(120), calendarView.DisplayDateEnd);
         Assert.Equal(FWFluentMaterialKind.LiquidGlass, surface.MaterialKind);
@@ -677,7 +677,7 @@ public sealed class FluentDateTimeControlsTests
 
     private static void AssertSetter(Style style, DependencyProperty property)
     {
-        Assert.Contains(style.Setters, setter => setter.Property == property);
+        Assert.Contains(style.Setters.OfType<Setter>(), setter => setter.Property == property);
     }
 
     private static Color GetBrushColor(object? value)

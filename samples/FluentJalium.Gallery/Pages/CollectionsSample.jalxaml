@@ -1,0 +1,20 @@
+<UserControl xmlns="http://schemas.jalium.ui/2024"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+             x:Class="FluentJalium.Gallery.Pages.CollectionsSample">
+    <fw:FWStackPanel Orientation="Vertical" Spacing="12" MaxWidth="720">
+        <fw:FWTextBlock Text="Data grid"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWDataGrid x:Name="Grid"
+                       Width="680"
+                       Height="190"
+                       AutoGenerateColumns="True"
+                       CanUserSortColumns="True"
+                       CanUserResizeColumns="True" />
+        <fw:FWTextBlock Text="List and tree surfaces"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <fw:FWListView x:Name="List"
+                       Width="320"
+                       Height="130" />
+    </fw:FWStackPanel>
+</UserControl>
