@@ -580,6 +580,21 @@ public class FluentNavigationViewItem : Control
 
     protected override int VisualChildrenCount => _rootPanel != null ? 1 : 0;
 
+    // Like FluentNavigationView, this control builds its ENTIRE visual tree by hand in
+    // BuildVisualTree and drives measure/arrange/render through the overrides above, so it must
+    // never expand a ControlTemplate. FluentThemeManager aliases the stock NavigationViewItem
+    // Style — which carries a full item ControlTemplate — onto FWNavigationViewItem. Without
+    // this guard the base Control builds a second _templateRoot subtree, attaches the template
+    // triggers, and Control.RenderTemplatedBackground paints it every frame on top of
+    // _rootPanel. The result is the "doubled / ghosted" item artifact (icon and label painted
+    // twice at the hand-built and template offsets) that became visible after a runtime theme
+    // swap. Returning false keeps the hand-built tree the single source of visuals.
+    protected override bool ApplyTemplateCore() => false;
+
+    protected override void RenderTemplatedBackground(DrawingContext drawingContext)
+    {
+    }
+
     #endregion
 
     internal static Brush ResolveBrush(string key)
@@ -634,6 +649,14 @@ public class FluentNavigationViewItemSeparator : Control
     }
 
     protected override int VisualChildrenCount => _line != null ? 1 : 0;
+
+    // See FluentNavigationViewItem: the hand-built tree is the only visual source; never let the
+    // aliased stock NavigationViewItemSeparator template paint a second, stray subtree.
+    protected override bool ApplyTemplateCore() => false;
+
+    protected override void RenderTemplatedBackground(DrawingContext drawingContext)
+    {
+    }
 
     private static Brush ResolveBrush()
     {

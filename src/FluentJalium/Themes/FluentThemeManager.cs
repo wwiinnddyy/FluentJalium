@@ -110,6 +110,7 @@ public static class FluentThemeManager
         ReplaceOrAppend(resources, ref s_typographyDictionary, typography);
 
         ForceRefresh(app);
+        FluentWindowChrome.ApplyToOpenWindows(app);
     }
 
     /// <summary>
@@ -127,6 +128,7 @@ public static class FluentThemeManager
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_themeDictionary, LoadGenericTheme());
         ReplaceOrAppend(s_application.Resources.MergedDictionaries, ref s_accentDictionary, BuildAccentDictionary(CurrentAccentColor));
         ForceRefresh(s_application);
+        FluentWindowChrome.ApplyToOpenWindows(s_application);
         RaiseThemeChanged();
     }
 

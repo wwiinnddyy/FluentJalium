@@ -2,7 +2,6 @@ using FluentJalium.Controls;
 using FluentJalium.Controls.Themes;
 using FluentJalium.Gallery.Shell;
 using Jalium.UI;
-using Jalium.UI.Media;
 
 namespace FluentJalium.Gallery;
 
@@ -11,14 +10,11 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        Backdrop.FallbackColor = FallbackColorFor(FluentThemeManager.CurrentTheme);
         ShellHost.Content = new GalleryShell(this);
-    }
 
-    private static Color FallbackColorFor(FluentThemeVariant theme) => theme switch
-    {
-        FluentThemeVariant.Light => Color.FromRgb(0xF3, 0xF3, 0xF3),
-        FluentThemeVariant.HighContrast => Color.FromRgb(0x00, 0x00, 0x00),
-        _ => Color.FromRgb(0x20, 0x20, 0x20)
-    };
+        // The window has no native handle until it is shown, so the chrome (DWM caption/border and
+        // immersive dark mode) must be synchronised once Loaded fires. Runtime theme switches are
+        // handled centrally by FluentThemeManager.
+        Loaded += (_, _) => FluentWindowChrome.Apply(this);
+    }
 }

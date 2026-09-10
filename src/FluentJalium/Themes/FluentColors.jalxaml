@@ -60,7 +60,7 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#87FFFFFF" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#202020" />
-            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#FF202020" />
             <SolidColorBrush x:Key="TitleBarText" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15FFFFFF" />
             <SolidColorBrush x:Key="TitleBarGlyph" Color="#FFFFFFFF" />
@@ -617,7 +617,7 @@
             <SolidColorBrush x:Key="TextPlaceholder" Color="#72000000" />
             <SolidColorBrush x:Key="TextOnAccent" Color="#FFFFFFFF" />
             <SolidColorBrush x:Key="WindowBackground" Color="#FFF3F3F3" />
-            <SolidColorBrush x:Key="TitleBarBackground" Color="#00FFFFFF" />
+            <SolidColorBrush x:Key="TitleBarBackground" Color="#FFF3F3F3" />
             <SolidColorBrush x:Key="TitleBarText" Color="#E4000000" />
             <SolidColorBrush x:Key="TitleBarBorderBrush" Color="#15000000" />
             <SolidColorBrush x:Key="TitleBarGlyph" Color="#E4000000" />

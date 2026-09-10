@@ -68,33 +68,6 @@ public sealed partial class GalleryShell : UserControl
         Navigate(_entries[0]);
         SelectItem(_entries[0].Key);
         _owner.SizeChanged += OnWindowSizeChanged;
-
-        DumpVisualTree();
-    }
-
-    private void DumpVisualTree()
-    {
-        try
-        {
-            var sb = new System.Text.StringBuilder();
-            void Walk(DependencyObject node, int depth)
-            {
-                var count = VisualTreeHelper.GetChildrenCount(node);
-                var name = node is FrameworkElement fe ? fe.Name : "";
-                sb.AppendLine($"{new string(' ', depth * 2)}{node.GetType().Name} [{name}] children={count}");
-                for (var i = 0; i < count; i++)
-                {
-                    if (VisualTreeHelper.GetChild(node, i) is { } child)
-                        Walk(child, depth + 1);
-                }
-            }
-            Walk(this, 0);
-            System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "gallery_vtree.txt"), sb.ToString());
-        }
-        catch (Exception ex)
-        {
-            System.IO.File.WriteAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "gallery_vtree.txt"), ex.ToString());
-        }
     }
 
     private void ApplyCurrentSidebarStyle()
