@@ -1,0 +1,16 @@
+<!-- WinUI 3 FlyoutPresenter_themeresources.xaml @19e3bdc3c (MIT), blob 621bf7d16825ae37cdd0b0ad05b7b5a49ddcd4c4.
+     Jalium has no FlyoutPresenter type, so this is the alias layer of that file transcribed verbatim
+     rather than its style: one definition for the surface every flyout, dropdown and overflow shares.
+     See docs/astra/audits/flyout-presenter.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Upstream's ThemeDictionaries rows are exactly these two StaticResource aliases, and they resolve
+       to the same brush instance the palette re-tints in place, so the upstream names follow both the
+       theme flip and the high-contrast decision made for the key below them. FlyoutPresenterBackground
+       asks for the in-app acrylic material, which this runtime cannot paint into a popup; the palette
+       carries it as upstream's own FallbackColor solid under upstream's own key name. -->
+  <StaticResource x:Key="FlyoutPresenterBackground" ResourceKey="AcrylicInAppFillColorDefaultBrush" />
+  <StaticResource x:Key="FlyoutBorderThemeBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
+  <!-- Upstream asks for 2 in the HighContrast branch; our metrics are not theme-switched, so this is
+       the light/dark value for every mode. Recorded as a gap, not silently widened. -->
+  <Thickness x:Key="FlyoutBorderThemeThickness">1</Thickness>
+</ResourceDictionary>

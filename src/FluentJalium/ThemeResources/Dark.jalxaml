@@ -93,6 +93,7 @@
   <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#60CDFF" Opacity="1" />
   <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#60CDFF" Opacity="1" />
   <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#60CDFF" Opacity="1" />
+  <SolidColorBrush x:Key="AcrylicInAppFillColorDefaultBrush" Color="#2C2C2C" Opacity="1" />
   <SolidColorBrush x:Key="CardBackgroundFillColorDefaultBrush" Color="#0DFFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="CardBackgroundFillColorSecondaryBrush" Color="#08FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="CardBackgroundFillColorTertiaryBrush" Color="#12FFFFFF" Opacity="1" />
@@ -127,7 +128,6 @@
   <SolidColorBrush x:Key="ControlStrongStrokeColorDefaultBrush" Color="#8BFFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="ControlStrongStrokeColorDisabledBrush" Color="#28FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="DividerStrokeColorDefaultBrush" Color="#15FFFFFF" Opacity="1" />
-  <SolidColorBrush x:Key="FlyoutPresenterBackgroundBrush" Color="#2C2C2C" Opacity="1" />
   <SolidColorBrush x:Key="FocusStrokeColorInnerBrush" Color="#B3000000" Opacity="1" />
   <SolidColorBrush x:Key="FocusStrokeColorOuterBrush" Color="#FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="LayerFillColorAltBrush" Color="#0DFFFFFF" Opacity="1" />

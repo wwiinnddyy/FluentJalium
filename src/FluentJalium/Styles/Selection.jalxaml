@@ -63,7 +63,7 @@
         <Border Name="ComboFocus" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" BorderThickness="2" Margin="1" CornerRadius="3" Opacity="0" IsHitTestVisible="False" />
         <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" StaysOpen="False" Placement="Bottom" PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}}">
           <Grid Name="PART_PopupBorder" Margin="0,4,0,0">
-            <Rectangle Fill="{ThemeResource FlyoutPresenterBackgroundBrush}" Stroke="{ThemeResource SurfaceStrokeColorFlyoutBrush}" StrokeThickness="1" RadiusX="8" RadiusY="8" />
+            <Border Background="{ThemeResource FlyoutPresenterBackground}" BorderBrush="{ThemeResource FlyoutBorderThemeBrush}" BorderThickness="{ThemeResource FlyoutBorderThemeThickness}" CornerRadius="{ThemeResource OverlayCornerRadius}" />
             <ScrollViewer Margin="4" MaxHeight="{TemplateBinding MaxDropDownHeight}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ItemsPresenter /></ScrollViewer>
           </Grid>
         </Popup>

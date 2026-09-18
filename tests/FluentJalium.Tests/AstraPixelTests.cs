@@ -267,4 +267,55 @@ public sealed class AstraPixelTests
             Assert.Equal(0, light.Count(Colors.White));
         });
     }
+
+    /// <summary>
+    /// ToolTip is the control whose template root is the shared flyout surface and that can still be
+    /// captured in-process. ComboBox and MenuFlyout hang the same chrome under a Popup, which lives in
+    /// its own visual root the harness cannot reach, so this is where the flyout claim is tested.
+    /// </summary>
+    private static ToolTip FlyoutSurface() => new() { Content = "flyout" };
+
+    [Fact]
+    public void The_flyout_surface_token_paints_the_shared_popup_chrome()
+    {
+        // Overriding the palette brush under upstream's own acrylic name is the claim that
+        // FlyoutPresenterBackground resolves to that object rather than to a copy frozen at parse time.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("AcrylicInAppFillColorDefaultBrush", Sentinel);
+            try
+            {
+                var sample = PixelHarness.Render(FlyoutSurface(), 200, 40);
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+                Assert.True(sample.Count(Sentinel) > 6_000,
+                    $"flyout surface did not paint the popup chrome; subject={sample.Subject} top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AcrylicInAppFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    [Fact]
+    public void The_flyout_surface_follows_the_theme_and_shows_no_brand_emerald()
+    {
+        // The same chrome read through the palette instead of a sentinel: WinUI's acrylic fallback
+        // values, which is what the popup shows on a runtime that cannot composite the material.
+        _fixture.Run(() =>
+        {
+            var light = PixelHarness.Render(FlyoutSurface(), 200, 40);
+            Assert.True(light.Count(Color.FromRgb(0xF9, 0xF9, 0xF9)) > 6_000,
+                $"light flyout surface missing; subject={light.Subject} top={light.Top(6)}");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            var dark = PixelHarness.Render(FlyoutSurface(), 200, 40);
+            Assert.True(dark.Count(Color.FromRgb(0x2C, 0x2C, 0x2C)) > 6_000,
+                $"dark flyout surface missing; subject={dark.Subject} top={dark.Top(6)}");
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+
+            Assert.Equal(0, light.CountAny(BrandEmerald));
+            Assert.Equal(0, dark.CountAny(BrandEmerald));
+        });
+    }
 }

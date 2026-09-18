@@ -150,6 +150,32 @@ public sealed class AstraThemeRuntimeTests
         });
     }
 
+    /// <summary>
+    /// The upstream flyout names are <c>StaticResource</c> aliases onto our palette keys, so a consumer
+    /// asking for <c>FlyoutPresenterBackground</c> must get the very instance the palette re-tints. If
+    /// the alias ever materialises its own brush it freezes at parse time and stops following the theme.
+    /// </summary>
+    [Fact]
+    public void Upstream_flyout_aliases_resolve_to_the_palette_brush_instance_and_follow_the_theme()
+    {
+        _fixture.Run(() =>
+        {
+            var surface = Assert.IsType<SolidColorBrush>(_fixture.Application.TryFindResource("FlyoutPresenterBackground"));
+            var border = Assert.IsType<SolidColorBrush>(_fixture.Application.TryFindResource("FlyoutBorderThemeBrush"));
+
+            Assert.Same(_fixture.Application.TryFindResource("AcrylicInAppFillColorDefaultBrush"), surface);
+            Assert.Same(_fixture.Application.TryFindResource("SurfaceStrokeColorFlyoutBrush"), border);
+            Assert.Equal(Color.FromRgb(0xF9, 0xF9, 0xF9), surface.Color);
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+
+            Assert.Same(surface, _fixture.Application.TryFindResource("FlyoutPresenterBackground"));
+            Assert.Equal(Color.FromRgb(0x2C, 0x2C, 0x2C), surface.Color);
+            // A missing key fails silently in this reader, so the non-alias key needs its own check.
+            Assert.NotNull(_fixture.Application.TryFindResource("FlyoutBorderThemeThickness"));
+        });
+    }
+
     [Fact]
     public void High_contrast_maps_semantic_roles_to_system_colors()
     {

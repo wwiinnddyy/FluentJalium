@@ -3,6 +3,7 @@
 # an entry with no embedded resource, and an embedded dictionary with no entry, both throw.
 ThemeResources/Metrics.jalxaml
 ThemeResources/Typography.jalxaml
+ThemeResources/FlyoutPresenter.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

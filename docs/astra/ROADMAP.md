@@ -117,6 +117,14 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    所以"原生控件优先重模板"这条对 ScrollBar 不成立，颜色层改走调色板生成刷；
    静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
    同一条判据现在可复用：`PixelHarness.RenderPart<T>` 能把框架内部件单独裁出来断言。
+   **Popup/FlyoutPresenter 也已落地，见 `audits/flyout-presenter.md`**：26.10.9 没有
+   `FlyoutPresenter` 类型，所以交付的是上游那一层**别名**（`FlyoutPresenterBackground`、
+   `FlyoutBorderThemeBrush`、`FlyoutBorderThemeThickness`），ComboBox 弹层外壳与 ToolTip 边框
+   都改成消费上游名。别名解析出的就是调色板那个对象（`Assert.Same` 有断言），所以翻主题/高对比
+   能穿过别名到达像素。顺带把一个自造键改回上游真名：
+   `FlyoutPresenterBackgroundBrush` → `AcrylicInAppFillColorDefaultBrush`，
+   值不变（就是上游自己的 `FallbackColor`），高对比值也不再是我们的判断而是上游那一行。
+   `FlyoutContentPadding` 与四个 `FlyoutTheme*` 尺寸键**不声明**（无消费点，声明即死键）。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
    原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
@@ -158,9 +166,9 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 阶段 | 内容 | 出口 |
 |---|---|---|
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
-| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 11/11 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 13/13 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
-| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar 一项（`audits/scrollbar.md` + 两条生成刷钩子 + 4 条像素断言 + `RenderPart<T>` 部件级判据）。仍欠：ScrollViewer、Thumb、条目容器、Popup、ToolTip、窗口外壳；目录差集为空；三个系统页有证据 |
+| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar 一项（`audits/scrollbar.md` + 两条生成刷钩子 + 4 条像素断言 + `RenderPart<T>` 部件级判据）、Popup/FlyoutPresenter 别名层一项（`audits/flyout-presenter.md` + 1 条行为断言 + 2 条像素断言 + 一个自造键回改成上游真名）。仍欠：ScrollViewer、Thumb、条目容器、ToolTip 本体、窗口外壳；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
@@ -174,4 +182,6 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 - 不声称逐位一致的上屏合成：RTB 离屏与上屏一致性未证。
 - 不声称 `Symbol` 全 764 码点可用：需逐个 cmap 命中验证。
 - 不声称液态玻璃/折射是 Fluent 的一部分。
+- 不声称弹层是 acrylic 材质：`FlyoutPresenterBackground` 走的是上游自己的 `FallbackColor` 实底，
+  运行时没有 `AcrylicBrush` 类型（见 `audits/flyout-presenter.md`）。
 - 不声称硬件触摸笔与混合 DPI 已经过真机验证。

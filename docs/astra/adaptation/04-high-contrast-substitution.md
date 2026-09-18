@@ -73,11 +73,14 @@ SubtleFillColorTransparentBrush=Transparent
 
 ## 与上游的三处偏差
 
-1. **三个我们自加的键**：`FlyoutPresenterBackgroundBrush`、`ToolbarSurfaceBrush`、
-   `SliderThumbStrokeBrush` 在 `Light/Dark` 里就是显式适配项（Jalium 的弹出层与平台 Slider
-   需要实底），上游没有对应条目。高对比里它们分别取
-   `SystemColorWindowColor`、`SystemColorWindowColor`、`SystemColorWindowTextColor`，
+1. **两个我们自加的键**：`ToolbarSurfaceBrush`、`SliderThumbStrokeBrush` 在 `Light/Dark` 里就是显式
+   适配项（Jalium 的工具条表面与平台 Slider 需要实底），上游没有对应条目。高对比里它们分别取
+   `SystemColorWindowColor`、`SystemColorWindowTextColor`，
    与上游对实底表面和边框笔刷的处理一致，但**这是我们的判断，不是上游逐键值**。
+   `AcrylicInAppFillColorDefaultBrush` 曾经也在这一类（叫 `FlyoutPresenterBackgroundBrush`，
+   一个上游没有的名字），`audits/flyout-presenter.md` 把它换成了上游真名，并且它的高对比值
+   `SystemColorWindowColor` 现在**有上游出处**：`Materials/Acrylic/AcrylicBrush_themeresources.xaml`
+   的 `HighContrast` 分支就是这么声明它的，只是那张表不在生成器读的 `Common_themeresources` 里。
 2. **三个上游键未采纳**：`AccentControlElevationBorderBrush`、`CircleElevationBorderBrush`、
    `ControlElevationBorderBrush` 在 `HighContrast` 分支存在而 `Light` 分支不存在，
    我们的调色板也还没有这些键，因此不进映射表。将来补这些键时，生成器会要求同时补高对比

@@ -43,8 +43,13 @@ foreach ($theme in @('Light', 'Dark')) {
         $opacity = if ($node.Attribute('Opacity')) { $node.Attribute('Opacity').Value } else { '1' }
         $brushes[$key] = @($color, $opacity)
     }
-    # Explicit Jalium adapters: solid popup fallback and the platform slider's outer stroke.
-    $brushes['FlyoutPresenterBackgroundBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#F9F9F9' }), '1')
+    # Explicit Jalium adapters: the platform slider's outer stroke and the acrylic tokens this runtime
+    # cannot paint. Upstream defines AcrylicInAppFillColorDefaultBrush as an AcrylicBrush, so the
+    # generator never emits it; Jalium has no AcrylicBrush type, and the material cannot be applied to
+    # a popup or an in-app layer anyway. The solid below is literally upstream's own FallbackColor
+    # (#F9F9F9 light / #2C2C2C dark from AcrylicBrush_themeresources.xaml), under upstream's key, so
+    # every alias chain stays verbatim and a later real material only replaces this line.
+    $brushes['AcrylicInAppFillColorDefaultBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#F9F9F9' }), '1')
     $brushes['ToolbarSurfaceBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#FFFFFF' }), '1')
     $brushes['SliderThumbStrokeBrush'] = @($(if ($theme -eq 'Dark') { '#26000000' } else { '#24000000' }), '1')
     # 26.10.9 draws the scrollbar itself and reads two hard-coded brush names out of the application
@@ -84,7 +89,11 @@ foreach ($node in $sections['HighContrast'].Elements($ui + 'SolidColorBrush')) {
     else { throw "Unmapped upstream high-contrast value '$color' for $key" }
 }
 # Explicit Jalium adapters, matching the solid-surface decision made for the light and dark palettes.
-$highContrast['FlyoutPresenterBackgroundBrush'] = 'SystemColorWindowColor'
+# AcrylicInAppFillColorDefaultBrush is not a guess: upstream's own HighContrast branch declares it as
+# <SolidColorBrush Color="{ThemeResource SystemColorWindowColor}"> in
+# Materials/Acrylic/AcrylicBrush_themeresources.xaml, which the Common_themeresources section this
+# loop reads does not contain.
+$highContrast['AcrylicInAppFillColorDefaultBrush'] = 'SystemColorWindowColor'
 $highContrast['ToolbarSurfaceBrush'] = 'SystemColorWindowColor'
 $highContrast['SliderThumbStrokeBrush'] = 'SystemColorWindowTextColor'
 # The two ScrollBar hooks above, from the HighContrast branch of the same upstream file the
