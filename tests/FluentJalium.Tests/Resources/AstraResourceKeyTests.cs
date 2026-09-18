@@ -166,6 +166,7 @@ public class AstraResourceKeyTests
     [Theory]
     [InlineData("ThemeResources/CheckBox.jalxaml")]
     [InlineData("ThemeResources/ComboBox.jalxaml")]
+    [InlineData("ThemeResources/AutoSuggestBox.jalxaml")]
     [InlineData("ThemeResources/RadioButton.jalxaml")]
     [InlineData("ThemeResources/TextBox.jalxaml")]
     [InlineData("ThemeResources/NumberBox.jalxaml")]

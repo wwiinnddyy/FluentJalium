@@ -13,8 +13,8 @@
 | **其中真空，且无自有类型顶替** | **41** |
 | 其中真空但已有自有类型顶替 | 2 |
 | ModernWpf 得自己写类型、Jalium 也无同名原生类型 | 28 |
-| Jalium 独有、不在这份范围内（只标注，不还原） | 106 |
-| 我们已样式、但 ModernWpf 无同名文件（按别名/内联实现） | 1 |
+| Jalium 独有、不在这份范围内（只标注，不还原） | 105 |
+| 我们已样式、但 ModernWpf 无同名文件（按别名/内联实现） | 2 |
 
 ## A. 真空：范围内、Jalium 有原生类型、我们还没有样式（41）
 
@@ -84,12 +84,12 @@
 
 'AnnotatedScrollBar' 'AutoSuggestBox' 'BreadcrumbBar' 'CommandBarFlyout' 'DropDownButton' 'Flyout' 'GridView' 'Hyperlink' 'InfoBadge' 'ItemContainer' 'ItemsView' 'LayoutPanel' 'MenuFlyout' 'NavigationBackButton' 'Page' 'PagerControl' 'PersonPicture' 'ProgressRing' 'RadioButtons' 'RadioMenuItem' 'RatingControl' 'Repeater' 'SelectorBar' 'SplitView' 'TabView' 'TeachingTip' 'TwoPaneView' 'WrapPanel'
 
-## E. Jalium 独有、这份范围不覆盖（106）
+## E. Jalium 独有、这份范围不覆盖（105）
 
 不做 Fluent 还原，但**它们会露出框架素外观**：Gallery 里出现任何一个都必须显式标"未样式化"，
 这也是把 Gallery 当成唯一回归面的原因。
 
-'CalendarDayButton' 'CalendarButton' 'RangeSlider' 'DiffViewer' 'HeaderedItemsControl' 'DataGridColumnHeader' 'PropertyGrid' 'MarkdownListPresenter' 'MarkdownHeadingPresenter' 'MarkdownQuotePresenter' 'Split' 'NavigationViewItemHeader' 'TabItem' 'PieChart' 'TreeSelectorItem' 'AppBarButton' 'ChartTooltip' 'Terminal' 'RibbonSplitMenuItem' 'MarkdownTableCellPresenter' 'RibbonQuickAccessToolBar' 'Sparkline' 'RibbonApplicationMenuItem' 'RibbonTab' 'SankeyDiagram' 'SwipeControl' 'MenuFlyoutSeparator' 'MarkdownTablePresenter' 'HexEditor' 'StickyNoteControl' 'RibbonGalleryItem' 'DatePickerTextBox' 'FlowDocumentPageViewer' 'TransitioningContentControl' 'RibbonMenuButton' 'NavigationViewItem' 'BarChart' 'RibbonToggleButton' 'RazorItemsHost' 'DockLayout' 'NavigationViewItemSeparator' 'RibbonMenuItem' 'TreeDataGridRow' 'GaugeChart' 'MarkdownDiagramPresenter' 'MarkdownCodePresenter' 'RibbonContextualTabGroup' 'JsonTreeViewer' 'RibbonGallery' 'DataGridCell' 'RibbonSeparator' 'TreeMap' 'MarkdownImagePresenter' 'MarkdownFootnotePresenter' 'ChartLegend' 'DevToolsWindow' 'AppBarToggleButton' 'CalendarItem' 'DataGridCellsPresenter' 'FlowDocumentReader' 'EditControl' 'DockTabPanel' 'DocumentViewer' 'QRCode' 'MenuFlyoutSubItem' 'RibbonComboBox' 'TitleBarButton' 'GridViewColumnHeader' 'MarkdownListItemPresenter' 'RibbonButton' 'TreeDataGrid' 'Markdown' 'DockItem' 'TreeSelector' 'RibbonApplicationMenu' 'AutoCompleteBox' 'RibbonCheckBox' 'RibbonTextBox' 'ScatterPlot' 'LineChart' 'StatusBarItem' 'MarkdownParagraphPresenter' 'MenuBarItem' 'GanttChart' 'ToggleMenuFlyoutItem' 'NetworkGraph' 'RibbonApplicationSplitMenuItem' 'FlowchartDiagram' 'CameraView' 'MenuFlyoutItem' 'RibbonGalleryCategory' 'AppBarSeparator' 'ToastNotificationItem' 'Control' 'CandlestickChart' 'RibbonSplitButton' 'MapView' 'FlowDocumentScrollViewer' 'Heatmap' 'DataGridRowHeader' 'MarkdownRulePresenter' 'MermaidDiagram' 'DataGridRow' 'DataGridColumnHeadersPresenter' 'RibbonGroup' 'Ribbon'
+'CalendarDayButton' 'CalendarButton' 'RangeSlider' 'DiffViewer' 'HeaderedItemsControl' 'DataGridColumnHeader' 'PropertyGrid' 'MarkdownListPresenter' 'MarkdownHeadingPresenter' 'MarkdownQuotePresenter' 'Split' 'NavigationViewItemHeader' 'TabItem' 'PieChart' 'TreeSelectorItem' 'AppBarButton' 'ChartTooltip' 'Terminal' 'RibbonSplitMenuItem' 'MarkdownTableCellPresenter' 'RibbonQuickAccessToolBar' 'Sparkline' 'RibbonApplicationMenuItem' 'RibbonTab' 'SankeyDiagram' 'SwipeControl' 'MenuFlyoutSeparator' 'MarkdownTablePresenter' 'HexEditor' 'StickyNoteControl' 'RibbonGalleryItem' 'DatePickerTextBox' 'FlowDocumentPageViewer' 'TransitioningContentControl' 'RibbonMenuButton' 'NavigationViewItem' 'BarChart' 'RibbonToggleButton' 'RazorItemsHost' 'DockLayout' 'NavigationViewItemSeparator' 'RibbonMenuItem' 'TreeDataGridRow' 'GaugeChart' 'MarkdownDiagramPresenter' 'MarkdownCodePresenter' 'RibbonContextualTabGroup' 'JsonTreeViewer' 'RibbonGallery' 'DataGridCell' 'RibbonSeparator' 'TreeMap' 'MarkdownImagePresenter' 'MarkdownFootnotePresenter' 'ChartLegend' 'DevToolsWindow' 'AppBarToggleButton' 'CalendarItem' 'DataGridCellsPresenter' 'FlowDocumentReader' 'EditControl' 'DockTabPanel' 'DocumentViewer' 'QRCode' 'MenuFlyoutSubItem' 'RibbonComboBox' 'TitleBarButton' 'GridViewColumnHeader' 'MarkdownListItemPresenter' 'RibbonButton' 'TreeDataGrid' 'Markdown' 'DockItem' 'TreeSelector' 'RibbonApplicationMenu' 'RibbonCheckBox' 'RibbonTextBox' 'ScatterPlot' 'LineChart' 'StatusBarItem' 'MarkdownParagraphPresenter' 'MenuBarItem' 'GanttChart' 'ToggleMenuFlyoutItem' 'NetworkGraph' 'RibbonApplicationSplitMenuItem' 'FlowchartDiagram' 'CameraView' 'MenuFlyoutItem' 'RibbonGalleryCategory' 'AppBarSeparator' 'ToastNotificationItem' 'Control' 'CandlestickChart' 'RibbonSplitButton' 'MapView' 'FlowDocumentScrollViewer' 'Heatmap' 'DataGridRowHeader' 'MarkdownRulePresenter' 'MermaidDiagram' 'DataGridRow' 'DataGridColumnHeadersPresenter' 'RibbonGroup' 'Ribbon'
 
 ## 这份清单证明不了什么
 
@@ -102,4 +102,4 @@
   （``TabItem``/``ComboBoxItem``/``MenuFlyoutItem`` 这类条目容器就是假阴性来源）。下面这份
   "已样式但名单没有"的差集是人工核对入口，不要当成"范围外"：
 
-'ComboBoxItem'
+'AutoCompleteBox' 'ComboBoxItem'

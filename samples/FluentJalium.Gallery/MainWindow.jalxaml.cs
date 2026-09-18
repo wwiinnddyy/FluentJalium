@@ -120,6 +120,12 @@ public partial class MainWindow : Window
             Report($"Volume: {Volume.Value:0}%.");
         };
         WireToggle(Notifications, "Notifications");
+        // AutoCompleteBox has no Items collection, only ItemsSource, so the candidate list is code-side.
+        var fruits = new[] { "Apple", "Apricot", "Banana", "Blueberry", "Cherry", "Grapefruit", "Lemon", "Mango", "Orange", "Peach" };
+        FruitBox.ItemsSource = fruits;
+        DisabledFruitBox.ItemsSource = fruits;
+        FruitBox.TextChanged += (_, _) => Report($"Fruit filter: {FruitBox.Text.Length} characters.");
+        FruitBox.SelectionChanged += (_, _) => Report($"Fruit suggestion: {Describe(FruitBox.SelectedItem)}.");
 
         ((Button)ApplyInputsButton!).Click += (_, _) =>
         {

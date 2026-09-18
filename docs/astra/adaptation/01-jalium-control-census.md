@@ -50,6 +50,15 @@ Template != null      （且 Template 上没有本地值，是代码赋的）
    对代码构建模板的控件，换模板是覆盖已有外观，不是从无到有。
    判断能不能重模板要测 `Template != null`，不能测 `Style != null`。
 
+**AutoSuggestBox 批是这条更正的第二个样本。** `AutoCompleteBox` 也在那 59 个"自绘"名单里，实测：
+未挂载时 `Style` 与 `Template` 双双为 null（框架**在挂载时**才建模板），挂上后模板部件是
+`OuterBorder` / `PART_ContentHost` / `PART_Popup`，样式的 `Template` setter 照样整套换掉，
+换完后静息表面与弹层底色来自我们的行（条目底色与禁用前景仍是框架占有的，见 `audits/autosuggestbox.md` §0.6/§0.7）。它与 NumberBox 的差别只有一条要记：
+**AutoCompleteBox 的默认模板不是挂载前就在**，所以对它"能不能重模板"必须在挂载后测
+（`audits/autosuggestbox.md` §0.1）。同批把 `Report-Control-Vacuum.ps1` 的读数从
+`outOfScope=106` 降到 105，并让 `AutoCompleteBox` 进入"已样式但 ModernWpf 名单没有"这份人工核对差集。
+
+
 ## 结论 2：应用级隐式样式确实落到原生控件上
 
 没有 Generic 主题不等于没有隐式样式查找。实测（代码构造 `Style` 塞进

@@ -1,0 +1,57 @@
+<!-- WinUI 3 AutoSuggestBox alias rows @19e3bdc3c.
+     Upstream ships TWO parallel dictionaries for this control and the census says to pick one and say
+     which: controls/dev/AutoSuggestBox/AutoSuggestBox_themeresources.xaml (blob 7cd762eb, states as
+     Storyboards) and AutoSuggestBox_themeresources_perf2026.xaml (blob 39e8d87f, the same surface with
+     the states rewritten to VisualState.Setters). Resource rows, keys and values are identical between
+     them, so this file transcribes from 7cd762eb and the state form is recorded in the style that reads
+     these rows. The template parts and the AutoSuggestList* rows come from the inbox theme,
+     dxaml/xcp/dxaml/themes/generic.xaml (blob def26a61), because that is where upstream declares them.
+     Host substitution: this runtime has no AutoSuggestBox. The control styled here is the native
+     Jalium.UI.Controls.AutoCompleteBox (docs/astra/audits/autosuggestbox.md), so a row only earns a
+     transcription when that type has a property or a template part to land on. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Suggestion popup surface. Upstream paints SuggestionsContainer with these two rows.
+       Deviation (value): AutoSuggestBoxSuggestionsListBackground is upstream an AcrylicBrush
+       (AcrylicBackgroundFillColorDefaultBrush: TintColor #2C2C2C / #FCFCFC with a #2C2C2C / #F9F9F9
+       FallbackColor). This runtime has no AcrylicBrush type at all, so the list wears the same solid
+       flyout surface the ComboBox dropdown, the FlyoutPresenter and the NumberBox popup use - the
+       FallbackColor route, one step further along because FlyoutPresenterBackground already carries
+       upstream's own fallback value. Same substitution as NumberBoxPopupBackground, same reason. -->
+  <StaticResource x:Key="AutoSuggestBoxSuggestionsListBackground" ResourceKey="FlyoutPresenterBackground" />
+  <StaticResource x:Key="AutoSuggestBoxSuggestionsListBorderBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
+  <!-- Metrics from generic.xaml. AutoSuggestListBorderThemeThickness paints the container's edge. -->
+  <Thickness x:Key="AutoSuggestListBorderThemeThickness">1</Thickness>
+  <!-- Upstream's own name swap, kept verbatim because it is what the pixels are made of:
+       AutoSuggestListMargin is applied as Padding on the container Border and AutoSuggestListPadding
+       is applied as Margin on the list. Reading the names instead of the rows moves 2 DIP of gap from
+       inside the border to outside it. -->
+  <Thickness x:Key="AutoSuggestListMargin">0,2,0,2</Thickness>
+  <Thickness x:Key="AutoSuggestListPadding">-1,0,-1,0</Thickness>
+  <!-- Not transcribed, all 14 remaining rows of the 19 this control declares upstream, each with the
+       reason the host type gives:
+       AutoSuggestListMaxHeight (x:Double 374) - a live row upstream: the suggestions list carries it as
+         MaxHeight. This reader cannot parse an x:Double resource, so the value rides as a literal on the
+         container instead. Placement deviation: upstream caps SuggestionsList, we cap
+         SuggestionsContainer, so our list gives up 6 DIP - the 4 of container padding and the 2 of border
+         the row does not have to fit under upstream.
+       AutoSuggestBoxIconFontSize (x:Double 12) - no query glyph to size on this host (see below).
+       AutoSuggestBoxLightDismissOverlayBackground - upstream binds it to a Rectangle the control creates
+         in code and appends to LayoutRoot. AutoCompleteBox has no light-dismiss overlay, so no element.
+       AutoSuggestBoxTopHeaderMargin, AutoSuggestBoxLeftHeaderMargin, AutoSuggestBoxLeftHeaderMaxWidth,
+         TextControlHeaderForeground* consumers - AutoCompleteBox has no Header property (NumberBox does;
+         the text box family here does not). The two LeftHeader rows have no consumer in upstream's own
+         AutoSuggestBox markup either.
+       AutoSuggestBoxInnerButtonMargin, AutoSuggestBoxDeleteButtonMargin, AutoSuggestBoxQueryButtonPadding,
+         AutoSuggestBoxLeftButtonMargin, AutoSuggestBoxRightButtonMargin, HelperButtonThemePadding -
+         these six place the delete button and the QueryIcon button. AutoCompleteBox has neither, and
+         QueryIcon has no property at all on this runtime, so there is nothing to place.
+         (Two of them - AutoSuggestBoxQueryButtonPadding and AutoSuggestBoxLeftButtonMargin - are dead
+         rows upstream too: zero consumers repo-wide at this commit.)
+       AutoSuggestListBorderOpacity (x:Double) and AutoSuggestListViewItemMargin - declared in generic.xaml
+         and consumed by nothing there, in the modern template or in any control markup repo-wide at this
+         commit, so a declaration here would fail the key-consumption gate.
+       AutoSuggestBackgroundThemeBrush - a legacy SolidColorBrush from the pre-Fluent theme sections of
+         generic.xaml, not part of the alias layer this library transcribes.
+       OverlayCornerRadius - already declared once for the whole library in ThemeResources/Metrics.jalxaml;
+         the style reads that row rather than aliasing a second copy of it. -->
+</ResourceDictionary>

@@ -1,0 +1,91 @@
+<!-- WinUI 3 AutoSuggestBox template @19e3bdc3c, painted from the AutoSuggestBox* / AutoSuggestList* rows in
+     ThemeResources/AutoSuggestBox.jalxaml and the TextControl* rows in ThemeResources/TextBox.jalxaml (which is
+     what upstream does too: AutoSuggestBoxTextBoxStyle is a hand-forked copy of DefaultTextBoxStyle, so the two
+     controls share every state row).
+     Host substitution: this runtime has no AutoSuggestBox. The type styled here is the native
+     Jalium.UI.Controls.AutoCompleteBox, whose text half is a TextBoxBase and whose suggestion popup the control
+     builds in code. Measured contract this template has to satisfy (docs/astra/audits/autosuggestbox.md S0):
+     PART_ContentHost must be a panel or the framework never grafts its text engine; PART_Popup is sized by the
+     framework; and the three names PART_DropDownBorder / PART_DropDownScrollViewer / PART_DropDownItemsHost are
+     the popup the framework fills with item containers - a Panel under the scroll host, because an ItemsControl
+     of that name is never populated.
+     Upstream's state group is Disabled / Normal / PointerOver / Focused and every one of its 28 key frames is
+     KeyTime="0" with zero TransitionProperty in the file, so these are discrete triggers by design: a transition
+     would interpolate the brush and hand back an instance that is in no palette. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="DefaultAutoCompleteBoxStyle" TargetType="AutoCompleteBox">
+    <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}" />
+    <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TextControlBorderBrush}" />
+    <Setter Property="SelectionBrush" Value="{ThemeResource TextControlSelectionHighlightColor}" />
+    <!-- No upstream key: WinUI draws the caret with the system caret brush. Ours follows the text token so it
+         stays legible across a theme flip. Same decision as the TextBox style made in the previous batch. -->
+    <Setter Property="CaretBrush" Value="{ThemeResource TextControlForeground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TextControlBorderThemeThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Padding" Value="{ThemeResource TextControlThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <!-- TextControlThemeMinHeight 32 / TextControlThemeMinWidth 64 are x:Double rows upstream and this reader
+         cannot parse one. They matter more here than anywhere else in the batch: the framework's own
+         AutoCompleteBox default is MinHeight=36, Padding=10,7,10,7, so leaving the literals out would keep a
+         4 DIP taller box than upstream and shift the popup's vertical offset with it. -->
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="MinWidth" Value="64" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="AutoCompleteBox">
+        <Grid>
+          <!-- Same elevation-line substitution the TextBox style documents: upstream mixes the strong and
+               default strokes into one LinearGradientBrush, the alias layer cannot carry a gradient, and the
+               theme flip only re-tints SolidColorBrush instances in place, so the bottom edge is its own
+               element painted from the two tokens that gradient mixes. -->
+          <Border Name="OuterBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+          </Border>
+          <Border Name="BottomEdge" Height="1" VerticalAlignment="Bottom" Margin="1,0,1,1" CornerRadius="0,0,3,3"
+                  Background="{ThemeResource ControlStrongStrokeColorDefaultBrush}" IsHitTestVisible="False" />
+          <Popup Name="PART_Popup" Placement="Bottom">
+            <!-- Upstream's SuggestionsContainer is a Border with exactly these five rows on it, plus a
+                 MaxHeight the control recomputes in code. AutoSuggestListMaxHeight is 374 upstream and is an
+                 x:Double row this reader cannot parse, so it rides as a literal; the framework overwrites the
+                 height of its own popup root at open time anyway (measured: 20 / 39.78 / 63.56 DIP for zero,
+                 one and two rows), so this is a ceiling, not a size. -->
+            <Border Name="SuggestionsContainer" Background="{ThemeResource AutoSuggestBoxSuggestionsListBackground}"
+                    BorderBrush="{ThemeResource AutoSuggestBoxSuggestionsListBorderBrush}"
+                    BorderThickness="{ThemeResource AutoSuggestListBorderThemeThickness}"
+                    CornerRadius="{ThemeResource OverlayCornerRadius}"
+                    Padding="{ThemeResource AutoSuggestListMargin}" MaxHeight="374">
+              <Grid Name="PART_DropDownBorder">
+                <ScrollViewer Name="PART_DropDownScrollViewer" Margin="{ThemeResource AutoSuggestListPadding}">
+                  <StackPanel Name="PART_DropDownItemsHost" />
+                </ScrollViewer>
+              </Grid>
+            </Border>
+          </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundPointerOver}" />
+            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{ThemeResource TextControlBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundFocused}" />
+            <Setter TargetName="OuterBorder" Property="BorderThickness" Value="{ThemeResource TextControlBorderThemeThicknessFocused}" />
+            <Setter TargetName="BottomEdge" Property="Background" Value="{ThemeResource TextControlBorderBrushFocused}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundFocused}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundDisabled}" />
+            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{ThemeResource TextControlBorderBrushDisabled}" />
+            <Setter TargetName="BottomEdge" Property="Background" Value="{ThemeResource TextControlBorderBrushDisabled}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundDisabled}" />
+            <Setter Property="CaretBrush" Value="{ThemeResource TextControlForegroundDisabled}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="AutoCompleteBox" BasedOn="{StaticResource DefaultAutoCompleteBoxStyle}" />
+</ResourceDictionary>

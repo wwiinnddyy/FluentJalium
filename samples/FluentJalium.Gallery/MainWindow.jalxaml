@@ -173,6 +173,21 @@
                              Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Suggested text" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Fruit" Style="{StaticResource BodyTextBlockStyle}" />
+                  <AutoCompleteBox x:Name="FruitBox" PlaceholderText="Start typing a fruit"
+                                   MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Disabled" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <AutoCompleteBox x:Name="DisabledFruitBox" Text="Blueberry" IsEnabled="False"
+                                   MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Upstream ships this as AutoSuggestBox; the native type here is AutoCompleteBox, and it wears the same TextControl* rows as the text box above plus the AutoSuggestBox* rows for the suggestion list. Type into the first box to open the list."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                  <TextBlock Text="Not claimed here: choosing a suggestion does not write its text back into the box once the framework template is replaced, the suggestion rows keep the framework's own fill, and there is no query button, header or description to place."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="Choices and values" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
                 <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">

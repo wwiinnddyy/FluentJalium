@@ -95,6 +95,14 @@
       "gaps": [ "5 of the 13 upstream NumberBox* keys have no row here: 4 are x:Double metrics this reader cannot parse and ride as literals, 1 has no second element to land on", "upstream's template-local RepeatButton* alias block is read through its targets instead, because those names belong to the RepeatButton control at application scope", "the spinner popup opens on focus, not on tapping the indicator: tapping needs code", "the header text element carries the framework's own local foreground, so the header rows are written and may not reach the pixels", "no real pointer or touch drives hover or press on the spin buttons" ]
     },
     {
+      "markup": "AutoCompleteBox",
+      "source": "Styles/AutoSuggestBox.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/autosuggestbox.md", "tests/FluentJalium.Tests/AstraAutoSuggestBoxTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream's AutoSuggestBox has no type here: the surface is the native AutoCompleteBox, so the 5 transcribed rows only earn their place where that type has a property or a part to land on", "14 of the 19 rows upstream declares for this control have no row here: this host has no query button, no delete button, no header and no light-dismiss overlay; 6 of the 14 are x:Double metrics this reader cannot parse anyway and 6 have no consumer upstream either", "choosing a suggestion no longer writes its text into the box: that behaviour lives in the framework template this one replaces", "the suggestion rows take their fill from the framework's own local value, so only their text colour is ours", "the list surface is a solid flyout substitution for upstream's AcrylicBrush", "no real pointer or touch opens or closes the popup" ]
+    },
+    {
       "markup": "Slider",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",

@@ -16,8 +16,10 @@ ThemeResources/TextBox.jalxaml
 ThemeResources/NumberBox.jalxaml
 ThemeResources/Slider.jalxaml
 ThemeResources/ComboBox.jalxaml
+ThemeResources/AutoSuggestBox.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml
+Styles/AutoSuggestBox.jalxaml
 Styles/Selection.jalxaml
 Styles/Navigation.jalxaml

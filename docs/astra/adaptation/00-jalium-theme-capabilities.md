@@ -15,8 +15,10 @@
 | S0-c WinUI 别名元素形式 | **能解析且解析到真实刷子实例** | 上游 `_themeresources.xaml` 可近乎逐字转录 |
 | S0-d 标记里写 `VisualStateManager` | **不能，两种写法都抛异常** | 模板改走 `ControlTemplate.Triggers` |
 | S0-e 编译期 `JalxamlPage` 产出字典 | **产出 0 个类型** | 字典保持 Embedded + `XamlReader.Load` |
-| S0-g `Trigger` 条件能匹配什么值 | **`{x:Null}` 能、`Value=""` 不能**（ComboBox 批实测） | 判据必须换成有非空表示的属性 |
+| S0-g `Trigger` 条件能匹配什么值 | **`{x:Null}` 能、`Value=""` 在 ComboBox 上不能**；AutoSuggestBox 批证明空串条件不是永久失效 | 判据仍要逐属性读回，不许按语法推断 |
 | S0-h 原生控件到底有没有默认外观 | **有：代码构建的 `ControlTemplate`，不是样式**（NumberBox 批实测） | 重模板可行，普查里"自绘"与"0 个有默认样式"两句话要分开读 |
+| S0-i 换掉框架模板要守住什么 | **弹层部件树是契约**：四个名字 + items host 必须是面板；框架还占有条目底色与禁用前景 | 弹层类控件先量部件名，再写模板 |
+| S0-j 弹层能不能断像素 | **能断"某色存在"，不能断"画面干净"**：裁剪含框架渐变的条目，`Stable` 与品牌绿闸口在此失效 | 弹层像素只作存在性证据，洁净度留给自有类型 |
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 
 ## S0-a：主题切换的真实驱动
@@ -243,7 +245,7 @@ Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
 | 条件写法 | 运行时 | 结论 |
 |---|---|---|
 | `<Condition Property="IsChecked" Value="{x:Null}" />` | 三态 CheckBox 命中（选择批已证） | null 判据可用 |
-| `<Trigger Property="Text" Value="" />` | 结构读取 `Property` 解析成功、setter 键名正确，但控件实际前景仍是静止值；换判据后立即命中 | **空字符串判据永不匹配** |
+| `<Trigger Property="Text" Value="" />` | 结构读取 `Property` 解析成功、setter 键名正确，但控件实际前景仍是静止值；换判据后立即命中 | ComboBox 上不生效；AutoSuggestBox 批给出反例，见本节末 |
 | `<Trigger Property="SelectedIndex" Value="-1" />` | 命中，占位符格读到 `ComboBoxPlaceHolderForeground` 实例，且 `ReadLocalValue=UnsetValue` | 数值判据可用 |
 
 `Value=""` 这一条最阴：结构与消费点两类闸口全绿，像素与读回全是静止态——和字典模板丢 `Trigger.Property`
@@ -281,3 +283,39 @@ Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
   部件可见性，`Trigger Property="Header" Value="Count"`（Object 属性配字符串）也会命中。
 - **同一目标上后写的格子赢。** 探针里 Compact 格被更靠后的 Header 格压掉，看起来像"条件不匹配"。
   写断言时要么让每格只碰自己的目标，要么按文档顺序断言优先级。
+
+## S0-i：弹层部件树是契约，不是实现细节（AutoSuggestBox 批，2026-09-18）
+
+`AutoCompleteBox`（本运行时的 AutoSuggestBox 替身）在挂载时才拿到框架自建的模板，未挂载时
+`Style` 与 `Template` 双双为 null——所以"能不能重模板"这类判断对它是**挂载后**才能测的那件事。
+换掉它的模板时，框架仍然按名字找它的弹层，实测到的最小可用形状是：
+
+```
+Popup 'PART_Popup' (Placement=Bottom)      ← 框架写本地 Width，等于控件宽度
+  └ Border（上游叫 SuggestionsContainer）    ← 我们的行落在这里
+      └ Grid 'PART_DropDownBorder'
+          └ ScrollViewer 'PART_DropDownScrollViewer'
+              └ Panel  'PART_DropDownItemsHost'   ← 必须是面板
+```
+
+三种失败都有读数：`PART_Popup` **没有 Child** → 弹层开成空的 20 DIP PopupRoot；
+`PART_DropDownItemsHost` 是 **ItemsControl** → 框架永不填它（容器数 0）；换成 `StackPanel` → 容器照常生成，
+类型是 `ComboBoxItem`。框架还会在两处写自己的值：条目容器的 `Background`（一个本地渐变，压过样式）与
+禁用态控件前景（`#FF636366`，不是我们的 `TextControlForegroundDisabled`）。这两条都只能用
+`Assert.NotSame` 钉成"已知损失"。
+
+**框架的模板里还藏着一处行为。** 用框架模板时"选中建议 → 把补全文本写进 `Text`"（上游的
+`UpdateTextOnSelect`）存在；换模板后同一操作不再写文本（聚焦、`IsTextCompletionEnabled=true` 也不写）。
+资源行找不回它——这是"外观走重模板、行为要自有类型"的分界线，本批把它写成断言而不是缺口清单里的一行字。
+
+## S0-j：弹层裁剪的像素证据有两条读不出的噪声（同上）
+
+`PixelHarness.Chrome(弹层部件)` 能证明弹层表面令牌真的到了像素（哨兵是该裁剪的第一大色，1092 px），
+但这个裁剪**包含条目容器**，容器带框架本地渐变，于是：
+
+- 连拍两轮永不同 → `Sample.Stable` 在此裁剪下不可断言；
+- 裁剪里会出现非调色板的颜色 → "品牌绿 `#207245` 不出现"这条闸口在弹层裁剪上也不成立。
+
+结论：**弹层像素只断"某色存在且够大"，不断"画面干净"**。要断后者得先把条目容器排除在裁剪之外，
+而条目底色本身是框架占有的（S0-i），本运行时做不到。
+
