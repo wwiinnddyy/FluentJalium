@@ -189,9 +189,12 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
 5. 系统焦点框缺失，我们自绘的 `FocusOutline` 与上游 `FocusVisualMargin=-3` 的框不逐位一致。
 6. `MinWidth=0`/`MinHeight=32` 是我们自加的约束，上游样式没有。
 7. `ContentTransitions`、`TransitionDuration` 仍是字面量（B5 未完成）。
-8. **三态没有通路**：12 条 `ToggleButton*Indeterminate*` 键按上游原样声明了，但样式里没有消费点——
-   匹配 `IsChecked=null` 要 `{x:Null}`，本运行时能否解析这项**未测**（与 `CheckBox` 三态同一个问题，
-   选择批一次做穿）。今天放三态按钮只会显示休息态或勾选态。
+8. **三态通路已补上**（原为"12 条 `ToggleButton*Indeterminate*` 键声明了但无消费点"）：
+   `{x:Null}` 触发条件在本运行时实测有效（值存成真正的 `null` 且能命中，`adaptation/11`），
+   样式因此补了休息/+悬停/+按下/+禁用四组消费点，`AstraSelectionTests` 断言到键名与休息底像素。
+   仍未测的是"真实点击循环能否走到 null"，以及混合条的像素归因。
+   另记一条会咬人的实测：`IsChecked="{x:Null}"` **写在标记里会得到 `false`**，三态只能在代码里设
+   （Gallery 的三态示例已按此改）。
    `RepeatButton`/`HyperlinkButton` 的别名块与状态映射本段已转录完毕。
 9. **文字色不能用像素断**：只画文字的捕获写 0 像素并会拖垮 UI 线程，字形不进直方图。
    本库的文字色一律走"建树 + 读回实例"（`PixelHarness.Build`），

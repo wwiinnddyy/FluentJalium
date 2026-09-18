@@ -27,8 +27,8 @@
       "source": "Styles/Common.jalxaml",
       "page": "buttons",
       "parity": "audited",
-      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
-      "gaps": [ "the indeterminate state has no upstream key to map", "the checked glyph is not a pixel claim" ]
+      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
+      "gaps": [ "press, keyboard and touch activation are not gated", "the checked glyph and the indeterminate bar are not attributed as separate pixels" ]
     },
     {
       "markup": "RepeatButton",
@@ -99,8 +99,8 @@
       "source": "Styles/Selection.jalxaml",
       "page": "selection",
       "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "upstream CheckBox keys not transcribed", "the check glyph is not in the capture path", "three-state not mapped" ]
+      "gaps": [ "upstream CheckBox keys not transcribed", "the check glyph is not in the capture path", "click, keyboard and touch paths unmeasured" ],
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ]
     },
     {
       "markup": "RadioButton",

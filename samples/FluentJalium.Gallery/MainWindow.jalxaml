@@ -202,7 +202,7 @@
                 <StackPanel Margin="16">
                   <CheckBox x:Name="PreviewCheckBox" Content="Show a preview" IsChecked="True" Margin="0,0,0,8" />
                   <CheckBox x:Name="DetailsCheckBox" Content="Include details" Margin="0,0,0,8" />
-                  <CheckBox x:Name="MixedCheckBox" Content="Three-state option" IsThreeState="True" IsChecked="{x:Null}" Margin="0,0,0,8" />
+                  <CheckBox x:Name="MixedCheckBox" Content="Three-state option" IsThreeState="True" Margin="0,0,0,8" />
                   <CheckBox Content="Unavailable option" IsEnabled="False" />
                 </StackPanel>
               </Border>

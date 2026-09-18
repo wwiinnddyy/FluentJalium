@@ -98,6 +98,23 @@ internal static class PixelHarness
     }
 
     /// <summary>
+    /// A template part by the name the template gave it. State claims are read back from parts rather
+    /// than captured when the subject has no opaque surface of its own - a glyph, an opacity flag.
+    /// </summary>
+    internal static FrameworkElement? Named(DependencyObject root, string name)
+    {
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (var index = 0; index < count; index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is FrameworkElement element && element.Name == name) return element;
+            if (Named(child, name) is { } deeper) return deeper;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Builds a control's tree inside the shown host and pumps frames, without rasterising anything.
     /// For a claim about what the style pipeline produced (a part, an inherited brush) this is the
     /// cheap path - and the only safe one for a subject that has no opaque surface: capturing a

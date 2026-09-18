@@ -144,6 +144,9 @@ public partial class MainWindow : Window
         WireToggle((CheckBox)PreviewCheckBox!, "Preview");
         WireToggle((CheckBox)DetailsCheckBox!, "Details");
         WireToggle((CheckBox)MixedCheckBox!, "Three-state option");
+        // IsChecked="{x:Null}" in markup arrives as false on this runtime, so the third state is set
+        // here or the sample would quietly show an unchecked box. See AstraSelectionTests.
+        ((CheckBox)MixedCheckBox!).IsChecked = null;
         ((RadioButton)ComfortableRadio!).Checked += (_, _) => Report("Density choice: Comfortable.");
         ((RadioButton)CompactRadio!).Checked += (_, _) => Report("Density choice: Compact.");
         ((ListBox)SampleListBox!).SelectionChanged += (_, _) =>
