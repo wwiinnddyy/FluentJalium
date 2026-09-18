@@ -6,6 +6,7 @@ ThemeResources/Typography.jalxaml
 ThemeResources/FlyoutPresenter.jalxaml
 ThemeResources/ToolTip.jalxaml
 ThemeResources/TitleBar.jalxaml
+ThemeResources/Button.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

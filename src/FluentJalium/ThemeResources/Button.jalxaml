@@ -1,0 +1,53 @@
+<!-- WinUI 3 Button_themeresources.xaml @19e3bdc3c (MIT), blob e63c32389e599c2277061d9ce29483516e6927a3.
+     The Light/Default branch's 36 alias rows plus ButtonBorderThemeThickness, transcribed so a Gallery
+     page or an app can override a button by upstream's name and never by ours. Every alias resolves to
+     the palette object the kernel re-tints in place, so the theme flip and the high-contrast decision
+     travel through it (audits/button.md). Five rows are deviations, each marked below. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StaticResource x:Key="AccentButtonBackground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="AccentButtonBackgroundPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="AccentButtonBackgroundPressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="AccentButtonBackgroundDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <StaticResource x:Key="AccentButtonForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="AccentButtonForegroundPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="AccentButtonForegroundPressed" ResourceKey="TextOnAccentFillColorSecondaryBrush" />
+  <!-- Deviation 1: upstream points this at TextOnAccentFillColorDisabled, which is a Color, and this
+       runtime has no measured Color-to-Brush coercion in a Foreground slot. The brush form of the same
+       upstream token carries the same value, so the alias keeps the name and takes that object. -->
+  <StaticResource x:Key="AccentButtonForegroundDisabled" ResourceKey="TextOnAccentFillColorDisabledBrush" />
+  <!-- Deviations 2 and 3: upstream's AccentControlElevationBorderBrush is a 3-DIP absolute gradient over
+       ControlStrokeColorOnAccent{Secondary,Default}. A gradient cannot ride the in-place retint model
+       (stops written with {ThemeResource} freeze at parse, audits/button.md), so the border takes the
+       solid token our style already used. Upstream's own HighContrast branch makes all three elevation
+       brushes solid, so a solid border is the shape high contrast already ships. -->
+  <StaticResource x:Key="AccentButtonBorderBrush" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <StaticResource x:Key="AccentButtonBorderBrushPointerOver" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <StaticResource x:Key="AccentButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AccentButtonBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="SubtleButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="SubtleButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="SubtleButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="SubtleButtonBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="SubtleButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="SubtleButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="SubtleButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="SubtleButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="SubtleButtonBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="SubtleButtonBorderBrushPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="SubtleButtonBorderBrushPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="SubtleButtonBorderBrushDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
+  <StaticResource x:Key="ButtonBackground" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="ButtonBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="ButtonBackgroundPressed" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <StaticResource x:Key="ButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Deviation 4 and 5: ControlElevationBorderBrush, same reason as the accent pair above. -->
+  <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ButtonBorderBrushPointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ButtonBorderBrushPressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ButtonBorderBrushDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+</ResourceDictionary>

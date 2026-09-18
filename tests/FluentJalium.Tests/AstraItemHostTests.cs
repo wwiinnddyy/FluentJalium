@@ -65,7 +65,7 @@ public sealed class AstraItemHostTests
             PixelHarness.Render(list, 200, 120);
             var viewer = PixelHarness.Descendant<ScrollViewer>(list)!;
 
-            Assert.False((bool)viewer.GetValue(Control.IsTabStopProperty));
+            Assert.False(viewer.GetValue(Control.IsTabStopProperty) is true);
             Assert.Equal(ScrollBarVisibility.Auto, viewer.VerticalScrollBarVisibility);
         });
     }

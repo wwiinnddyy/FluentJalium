@@ -139,8 +139,8 @@ public sealed class AstraWindowShellTests
             try
             {
                 Assert.Same(FluentThemeManager.GetBrush("SolidBackgroundFillColorBaseBrush"), bar.Background);
-                Assert.Equal(SystemColors.WindowColor, ((SolidColorBrush)bar.Background).Color);
-                Assert.Equal(SystemColors.WindowTextColor, ((SolidColorBrush)bar.Foreground).Color);
+                Assert.Equal(SystemColors.WindowColor, ((SolidColorBrush)bar.Background!).Color);
+                Assert.Equal(SystemColors.WindowTextColor, ((SolidColorBrush)bar.Foreground!).Color);
             }
             finally
             {
@@ -166,7 +166,7 @@ public sealed class AstraWindowShellTests
                 var bar = Chrome();
 
                 Assert.Same(style, bar.Style);
-                Assert.Equal(Color.FromRgb(0xFF, 0xA5, 0x00), ((SolidColorBrush)bar.Background).Color);
+                Assert.Equal(Color.FromRgb(0xFF, 0xA5, 0x00), ((SolidColorBrush)bar.Background!).Color);
             }
             finally
             {

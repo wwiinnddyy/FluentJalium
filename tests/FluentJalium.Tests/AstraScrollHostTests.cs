@@ -41,7 +41,7 @@ public sealed class AstraScrollHostTests
         {
             var viewer = Scroller();
             PixelHarness.Render(viewer, 200, 44);
-            Assert.False((bool)viewer.GetValue(Control.IsTabStopProperty));
+            Assert.False(viewer.GetValue(Control.IsTabStopProperty) is true);
             Assert.Equal(new Thickness(0), viewer.GetValue(Control.PaddingProperty));
             Assert.Equal(new Thickness(0), viewer.GetValue(Control.BorderThicknessProperty));
             Assert.Equal(Colors.Transparent, Assert.IsType<SolidColorBrush>(viewer.GetValue(Control.BackgroundProperty)).Color);
