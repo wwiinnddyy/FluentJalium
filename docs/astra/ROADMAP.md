@@ -248,7 +248,7 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信；Button 两段（Default/Accent/Subtle + Toggle/Repeat/Hyperlink）审计 `audits/button.md` + **四份字典 96 行别名逐行身份断言**（82 行逐字、14 行偏差就地标注）+ 状态映射 19 条触发器按键名断言 + 布局/命名空间形状读回 + 休息/勾选/禁用/换刷四组像素证据 + 真指针悬停通路（`spike/PointerProbe`，一次性、不进闸口）+ **第 7 步 Gallery 页落地**（Buttons 页补齐 Toggle/Repeat/Hyperlink 家族卡，Overview 页加内嵌 ScrollViewer 与静置 ToolTip 表面卡，底部 parity 条改由 `Catalog.json` 驱动）。全套 60/60 全绿 0 警告 0 skip。仍欠：按下/键盘/触摸的输入证据、三态通路、`SplitButton`/`DropDownButton`、新卡片自身的可见结果（E4 逐页渲染） |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
 | 4 | **D1 底座批 ✅ + E1 Gallery 目录闸口 ✅（`10`）+ E3 三个系统页 🬡** | 已到：ScrollBar、Popup/FlyoutPresenter、ToolTip、ScrollViewer 宿主、条目宿主基面、窗口外壳（TitleBar 钩子 + 背衬普查）六项，审计在 `audits/{scrollbar,flyout-presenter,tooltip,scrollviewer,window-shell}.md` + `adaptation/09-item-host-base.md`；外壳新增 4 条行为/读回断言 + 2 条像素/高对比断言（`AstraWindowShellTests` 6 条）。**E1 落地**：`Catalog.json` 17 条隐式样式宇宙 + 双向差集 + 名字必须命中唯一真类型 + 每条声明引存在的证据 + 反向"Gallery 不许用没样式控件"（3 条带理由豁免），6 条新断言，全套 60/60 全绿 0 skip，调色板 102 刷漂移 checked=True。仍欠：Thumb（与悬停/拖拽输入证据同批）、外壳的输入证据与材质合成；Tokens/Materials/Motion 三页有证据 |
-| 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地。**已开工：目标阶段 3 的选择批**（`adaptation/11` 量清三态语义，`AstraSelectionTests` 7 条断言，ToggleButton 12 条 indeterminate 键接上消费点）。**选择批第一段落地**：`CheckBox` 72 行 + `RadioButton` 40 行别名逐字转录（0 与 9 处替换，就地标注）+ 两份样式全量改吃上游键名（12 格 / 8 格状态矩阵，每槽按键名断言）+ 新结构闸口 `Transcribed_control_rows_are_read_by_a_template`（逐行反查别名行有无消费点，112 行全有）+ 审计 `audits/checkbox-radiobutton.md`。全套 82/82 全绿 0 警告 0 skip。顺带量到 `Setter.PropertyName` 这条延迟解析契约（跨部件 setter 的 `Property` 在读取期是 null，见审计）与"勾形确实进像素"（更正目录里旧的 capture-path gap） | 每批全 9 步 + 全闸口 |
+| 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地。**已开工：目标阶段 3 的选择批**（`adaptation/11` 量清三态语义，`AstraSelectionTests` 7 条断言，ToggleButton 12 条 indeterminate 键接上消费点）。**选择批第一段落地**：`CheckBox` 72 行 + `RadioButton` 40 行别名逐字转录（0 与 9 处替换，就地标注）+ 两份样式全量改吃上游键名（12 格 / 8 格状态矩阵，每槽按键名断言）+ 新结构闸口 `Transcribed_control_rows_are_read_by_a_template`（逐行反查别名行有无消费点，112 行全有）+ 审计 `audits/checkbox-radiobutton.md`。全套 82/82 全绿 0 警告 0 skip。顺带量到 `Setter.PropertyName` 这条延迟解析契约（跨部件 setter 的 `Property` 在读取期是 null，见审计）与"勾形确实进像素"（更正目录里旧的 capture-path gap）。**选择批第二段落地**：`ThemeResources/TextBox.jalxaml` 从 blob `6934b646` 声明 16 行（13 别名 + 3 度量，3 处值替换就地标注），`TextBox`/`PasswordBox` 两份样式改吃上游键名并补出四格状态（Normal/PointerOver/Focused/Disabled，上游文本框**没有 Pressed 格**）；先反射量出 26.10.9 的真实属性面再决定转录范围（`SelectionBrush`/`CaretBrush` 有、`PlaceholderText`/`Header` 没有，而 `ComboBox` 有 `PlaceholderText`），并把这条前提钉成闸口测试。**新增两条通用闸口**：`Style_setters_name_properties_the_controls_actually_have`（不带 TargetName 的 setter 属性名必须真的存在于目标类型，防静默丢弃）、消费点闸口扩到 3 份字典。同时删掉自造的 `TextControlPadding`=`11,5,11,6`，换成上游 `TextControlThemePadding`=`10,5,6,6`。**新测到的架构账单**：把原生默认交回 Jalium 之后，框架在个别状态上设的是**本地值**，优先级高于样式 setter 与模板触发器——禁用态 `TextBox.Foreground` 读回 `#FFAEAEB2`、`PasswordBox` 静息 `Background` 读回 `#D9FFFFFF`，两处都写成 `Assert.NotSame` 钉住，不允许再用"setter 上有键"当像素结论。全套 **104/104 全绿 0 警告 0 skip**，调色板三档 checked=True；键盘焦点态第一次有读回证据（真 `Focus()` + `1,1,1,2`），像素仍只有静息一格 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）
@@ -277,6 +277,12 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
   实测顶穿 fixture 的 60 秒看门狗；E4 逐页渲染要么一次一页，要么先把 `Capture` 的轮次与代价修掉。
   这条未归因，别把它当成"离屏通路不可信"。
 - 不声称三态是**操作得出来**的：`{x:Null}` 触发条件实测有效、12 条 `ToggleButton*Indeterminate*` 键已有消费点，但断言全部是直接设属性得到的；真实点击循环与混合条的像素归因仍未测。附带一条会咬人的实测：`IsChecked="{x:Null}"` 写在标记里得到的是 `false`，三态只能在代码里设（`adaptation/11`）。
+- 不声称"setter 上写了键 = 屏幕上就是这个色"。阶段 1 把原生控件默认交回 Jalium（`Application.ThemeMode`），
+  代价这轮才量到：框架在个别状态上给控件设的是**本地值**，压过样式 setter 与模板触发器。实测两处——
+  禁用挂载的 `TextBox.Foreground` 读回 `#FFAEAEB2`（不是我们的 `TextControlForegroundDisabled`），
+  静息 `PasswordBox.Background` 读回 `#D9FFFFFF`（不是 `TextControlBackground`）。文本框**模板里的面**
+  （`OuterBorder`/`BottomEdge`）不受影响，照常命中实例。两处结论都写成 `Assert.NotSame` 钉在闸口里，
+  PasswordBox 因此一格像素主张都不给（`audits/textbox-passwordbox.md`）。
 - 不声称硬件触摸笔与混合 DPI 已经过真机验证。
 - 不声称 Gallery 每页画对了：目录闸口证明的是"样式宇宙与目录一致、声明有存在的证据"，
   运行时冒烟只看到 Overview 一页（parity 条文案确实来自 `Catalog.json`，故读取通路成立）；

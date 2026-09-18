@@ -12,6 +12,7 @@ ThemeResources/RepeatButton.jalxaml
 ThemeResources/HyperlinkButton.jalxaml
 ThemeResources/CheckBox.jalxaml
 ThemeResources/RadioButton.jalxaml
+ThemeResources/TextBox.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

@@ -74,17 +74,17 @@
       "markup": "TextBox",
       "source": "Styles/TextInput.jalxaml",
       "page": "inputs",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "upstream TextBox resource keys were never transcribed key for key", "no pixel assertion", "watermark, selection and IME surfaces unmeasured" ]
+      "parity": "audited",
+      "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
+      "gaps": [ "12 of the 25 upstream rows have no property to read here: 4 placeholder rows (no PlaceholderText) and 8 delete-button rows (no such part)", "the elevation border pair is a documented value substitution, not upstream's gradient", "the disabled text colour is the framework's own local grey, not our token", "typing, selection, caret and IME paths unmeasured", "the focused cell is read back from a real Focus() but never captured to pixels" ]
     },
     {
       "markup": "PasswordBox",
       "source": "Styles/TextInput.jalxaml",
       "page": "inputs",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "the type is sealed and direct-rendered, so only native properties are styled", "no pixel assertion" ]
+      "parity": "audited",
+      "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
+      "gaps": [ "the type is drawn by the framework, so only native properties are styled and the focused accent border goes all the way round", "its resting Background reads back as the framework's own #D9FFFFFF, so no surface claim is made for any of its three states", "no reveal button, so upstream's reveal glyph and its state are absent", "no pixel assertion" ]
     },
     {
       "markup": "Slider",

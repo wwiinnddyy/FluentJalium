@@ -1,0 +1,49 @@
+<!-- WinUI 3 TextBox_themeresources.xaml @19e3bdc3c (MIT), blob 6934b646465eb602218f2ebf950268ac689ea33c.
+     The Light/Default branch carries 25 alias rows. 13 of them have a consumer on this runtime's TextBox or
+     PasswordBox and are transcribed here under upstream's names; 12 do not and stay undeclared, listed at the
+     bottom of audits/textbox-passwordbox.md with the property that would have to exist to read them.
+     PasswordBox has no alias block of its own: upstream's PasswordBox style consumes this same TextControl*
+     family (controls/dev/CommonStyles/PasswordBox_themeresources.xaml), so one dictionary serves both, as it
+     does upstream. Three rows needed a substitution - the only three in the batch - and each says so inline. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Metrics from Common_themeresources.xaml @19e3bdc3c. TextControlThemeMinHeight 32 and
+       TextControlThemeMinWidth 64 are x:Double rows in DensityStyles and this reader cannot parse an x:Double
+       resource at all, so those two stay literals in the styles that need them. -->
+  <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="TextControlBorderThemeThicknessFocused">1,1,1,2</Thickness>
+  <Thickness x:Key="TextControlThemePadding">10,5,6,6</Thickness>
+  <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillColorInputActiveBrush" />
+  <StaticResource x:Key="TextControlBackgroundDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <!-- Deviation (value): upstream points these two at TextControlElevationBorderBrush, a LinearGradientBrush
+       (strong stroke on top, default stroke at the bottom edge) declared per theme in the same file. An alias
+       row forwards the object the reader resolved at load, and the theme flip only re-tints SolidColorBrush
+       instances in place (Themes/FluentThemeManager.cs RefreshPalette), so a gradient behind an alias would
+       freeze on the Light stops. The neutral stroke is the bottom stop's own token, and the template's bottom
+       edge draws the strong stop from ControlStrongStrokeColorDefaultBrush - the two colours upstream mixes. -->
+  <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="TextControlBorderBrushPointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviation (value): TextControlElevationBorderFocusedBrush is upstream a two-stop gradient whose stops
+       both sit at offset 1.0 - SystemAccentColorLight2 over ControlStrokeColorDefault - and it is read with
+       TextControlBorderThemeThicknessFocused, so what it paints is a 2px accent edge under a neutral border.
+       The accent half rides on the template's bottom edge; the neutral half is the row above. -->
+  <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="TextControlBorderBrushDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="TextControlForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TextControlForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TextControlForegroundFocused" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- Deviation (value): upstream points at TemporaryTextFillColorDisabled, a per-theme Color - #5DFEFEFE in
+       Light, #5C010101 in Dark, i.e. 36% alpha on an inverted base channel, which is why upstream itself
+       names it temporary. A Color cannot ride an alias row either, so the neutral disabled text token is used
+       and the Light theme loses upstream's near-white disabled text. -->
+  <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="TextControlSelectionHighlightColor" ResourceKey="AccentFillColorSelectedTextBackgroundBrush" />
+  <!-- Not transcribed, with the measured reason for each:
+       TextControlPlaceholderForeground / PointerOver / Focused / Disabled (4) - TextBox and PasswordBox have
+       no PlaceholderText property (ComboBox, AutoCompleteBox, NumberBox, DatePicker and TimePicker all do;
+       the text controls do not), so there is no placeholder element to paint.
+       TextControlButtonBackgroundPointerOver / Pressed, TextControlButtonBorderBrush / PointerOver / Pressed,
+       TextControlButtonForeground / PointerOver / Pressed (8) - these paint the delete button upstream puts in
+       the template. Neither control exposes a part or state for it here. -->
+</ResourceDictionary>

@@ -66,6 +66,61 @@ public class AstraGateTests
         Assert.False(offenders.Count > 0, "Forbidden implementation pattern:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// The other half of the silent-drop family: an attribute the reader cannot resolve is discarded
+    /// without a word, so a style setter aimed at a property the control does not have builds, loads and
+    /// paints - showing whatever the previous token painted. Every setter and condition this repository
+    /// writes against a control itself is checked against the properties that control really has. Setters
+    /// aimed at a named template part are excluded: those defer to the part's type at runtime, which the
+    /// per-control read-back tests cover.
+    /// </summary>
+    [Fact]
+    public void Style_setters_name_properties_the_controls_actually_have()
+    {
+        var root = RepositoryRoot();
+        var types = typeof(Jalium.UI.Controls.Button).Assembly.GetTypes().Concat(typeof(FluentThemeManager).Assembly.GetTypes())
+            .Where(static type => type.IsPublic && type.IsSubclassOf(typeof(Jalium.UI.DependencyObject)))
+            .ToList();
+        var offenders = new List<string>();
+        var checkedSetters = 0;
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium", "Styles"), "*.jalxaml", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
+            foreach (var style in XDocument.Load(file).Descendants().Where(static element => element.Name.LocalName == "Style"))
+            {
+                var target = style.Attributes().First(static attribute => attribute.Name.LocalName == "TargetType").Value;
+                // The prefix names the owning assembly's xmlns, not a different type, and Border/TextBlock are
+                // styled too - so the lookup runs over every public DependencyObject, not only Controls.
+                var name = target[(target.IndexOf(':', StringComparison.Ordinal) + 1)..];
+                var candidates = types.Where(type => type.Name == name).ToList();
+                if (candidates.Count != 1)
+                {
+                    offenders.Add($"{relative}: TargetType {target} resolves to {candidates.Count} dependency types");
+                    continue;
+                }
+
+                var owner = candidates[0];
+                foreach (var member in style.Descendants()
+                             .Where(static element => element.Name.LocalName is "Setter" or "Condition" or "Trigger"))
+                {
+                    // A style nested in a template owns its own setters; charging them to the outer control
+                    // would invent offenders.
+                    if (member.Ancestors().FirstOrDefault(static ancestor => ancestor.Name.LocalName == "Style") != style) continue;
+                    var property = member.Attributes().FirstOrDefault(static attribute => attribute.Name.LocalName == "Property")?.Value;
+                    if (property is null || member.Attributes().Any(static attribute => attribute.Name.LocalName == "TargetName")) continue;
+                    if (property.Contains('.', StringComparison.Ordinal)) continue;
+                    checkedSetters++;
+                    if (owner.GetProperty(property, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance) is null)
+                        offenders.Add($"{relative}: {target}.{property}");
+                }
+            }
+        }
+
+        Assert.True(checkedSetters > 100, $"only {checkedSetters} setters were checked; the gate has gone vacuous.");
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, "Setters naming a property that does not exist:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

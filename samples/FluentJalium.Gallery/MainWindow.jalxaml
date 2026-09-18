@@ -152,6 +152,9 @@
                   <TextBlock Text="Only the number of password characters is shown in the output." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                   <TextBlock Text="Disabled text field" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
                   <TextBox Text="This field is disabled" IsEnabled="False" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Wrapping notes" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBox Text="Upstream ships a multi-line text box on this page; TextWrapping and the line counts are the parts our template has to keep painting from the same tokens at a taller surface."
+                           TextWrapping="Wrap" MinLines="3" MaxLines="6" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
               <TextBlock Text="Choices and values" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />

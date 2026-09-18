@@ -8,7 +8,6 @@
   <CornerRadius x:Key="MenuFlyoutItemCornerRadius">4</CornerRadius>
   <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
   <Thickness x:Key="ComboBoxPadding">11,5,11,6</Thickness>
-  <Thickness x:Key="TextControlPadding">11,5,11,6</Thickness>
   <Thickness x:Key="NavigationViewItemButtonMargin">4,2</Thickness>
   <Thickness x:Key="RadioButtonContentMargin">8,0,0,0</Thickness>
 </ResourceDictionary>
