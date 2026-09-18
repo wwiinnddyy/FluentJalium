@@ -3,8 +3,8 @@
      Elevation uses a solid stroke adapter, not the upstream gradient stroke. -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style x:Key="CardBorderStyle" TargetType="Border">
-    <Setter Property="Background" Value="{StaticResource CardBackgroundFillColorDefaultBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource CardStrokeColorDefaultBrush}" />
+    <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
     <Setter Property="Padding" Value="16" />
@@ -20,8 +20,8 @@
                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
       </Border>
       <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-              BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-        <Border BorderThickness="1" CornerRadius="2" BorderBrush="{StaticResource FocusStrokeColorInnerBrush}" />
+              BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+        <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
       </Border>
     </Grid>
     <ControlTemplate.Triggers>
@@ -38,55 +38,55 @@
     <Setter Property="Template" Value="{StaticResource ButtonSurfaceTemplate}" />
   </Style>
   <Style x:Key="DefaultButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource ButtonLayoutStyle}">
-    <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+    <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{StaticResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /></Trigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
     </Style.Triggers>
   </Style>
   <Style x:Key="AccentButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonLayoutStyle}">
-    <Setter Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorOnAccentDefaultBrush}" />
+    <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorOnAccentDefaultBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource AccentFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorSecondaryBrush}" /><Setter Property="BorderBrush" Value="Transparent" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" /><Setter Property="BorderBrush" Value="Transparent" /></Trigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource AccentFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource AccentFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorSecondaryBrush}" /><Setter Property="BorderBrush" Value="Transparent" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource AccentFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorDisabledBrush}" /><Setter Property="BorderBrush" Value="Transparent" /></Trigger>
     </Style.Triggers>
   </Style>
   <Style x:Key="SubtleButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource ButtonLayoutStyle}">
-    <Setter Property="Background" Value="{StaticResource SubtleFillColorTransparentBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /></Trigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="Transparent" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
     </Style.Triggers>
   </Style>
   <Style x:Key="DefaultToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource ButtonLayoutStyle}">
-    <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+    <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorTertiaryBrush}" /></Trigger>
-      <Trigger Property="IsChecked" Value="True"><Setter Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" /><Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorPrimaryBrush}" /></Trigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{StaticResource AccentFillColorSecondaryBrush}" /></MultiTrigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorSecondaryBrush}" /></MultiTrigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{StaticResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /></Trigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" /></MultiTrigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorTertiaryBrush}" /></Trigger>
+      <Trigger Property="IsChecked" Value="True"><Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorSecondaryBrush}" /></MultiTrigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorSecondaryBrush}" /></MultiTrigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorDisabledBrush}" /></MultiTrigger>
     </Style.Triggers>
   </Style>
   <Style x:Key="DefaultHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource SubtleButtonStyle}">
-    <Setter Property="Foreground" Value="{StaticResource AccentTextFillColorPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{StaticResource AccentTextFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Foreground" Value="{StaticResource AccentTextFillColorTertiaryBrush}" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /></Trigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorTertiaryBrush}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
     </Style.Triggers>
   </Style>
   <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
@@ -95,9 +95,9 @@
   <Style TargetType="HyperlinkButton" BasedOn="{StaticResource DefaultHyperlinkButtonStyle}" />
 
   <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
-    <Setter Property="Background" Value="{StaticResource FlyoutPresenterBackgroundBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{StaticResource SurfaceStrokeColorDefaultBrush}" /><Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="{ThemeResource FlyoutPresenterBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" /><Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="8,6" /><Setter Property="CornerRadius" Value="4" /><Setter Property="FontSize" Value="12" />
     <Setter Property="Template"><ControlTemplate TargetType="ToolTip"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
   </Style>

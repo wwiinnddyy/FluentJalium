@@ -10,8 +10,8 @@
     <Setter Property="MinWidth" Value="40" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="Background" Value="{StaticResource SubtleFillColorTransparentBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
     <Setter Property="Template">
@@ -24,19 +24,19 @@
                               Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
           </Border>
           <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{StaticResource FocusStrokeColorInnerBrush}" />
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
           </Border>
         </Grid>
         <ControlTemplate.Triggers>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
           </Trigger>
           <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
-            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
           </Trigger>
           <Trigger Property="IsKeyboardFocused" Value="True">
             <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
@@ -54,8 +54,8 @@
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Margin" Value="4,2" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="Background" Value="{StaticResource SubtleFillColorTransparentBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="{StaticResource NavigationViewItemCornerRadius}" />
     <Setter Property="FontSize" Value="14" />
@@ -82,8 +82,8 @@
             </Grid>
           </Border>
           <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{StaticResource FocusStrokeColorInnerBrush}" />
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
           </Border>
         </Grid>
         <ControlTemplate.Triggers>
@@ -91,13 +91,13 @@
             <Setter TargetName="PART_Label" Property="Visibility" Value="Collapsed" />
           </Trigger>
           <Trigger Property="IsSelected" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
           </Trigger>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
           </Trigger>
           <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
           </Trigger>
           <MultiTrigger>
             <MultiTrigger.Conditions>
@@ -105,7 +105,7 @@
               <Condition Property="IsMouseOver" Value="True" />
               <Condition Property="IsEnabled" Value="True" />
             </MultiTrigger.Conditions>
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
           </MultiTrigger>
           <MultiTrigger>
             <MultiTrigger.Conditions>
@@ -113,10 +113,10 @@
               <Condition Property="IsPressed" Value="True" />
               <Condition Property="IsEnabled" Value="True" />
             </MultiTrigger.Conditions>
-            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
           </MultiTrigger>
           <Trigger Property="IsEnabled" Value="False">
-            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
           </Trigger>
           <Trigger Property="IsKeyboardFocused" Value="True">
             <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
@@ -130,15 +130,15 @@
   </Style>
 
   <Style x:Key="FluentNavigationViewStyle" TargetType="local:FluentNavigationView">
-    <Setter Property="Background" Value="{StaticResource LayerFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
     <Setter Property="Padding" Value="24" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Focusable" Value="False" />
     <Setter Property="Template">
       <ControlTemplate TargetType="local:FluentNavigationView">
-        <Grid Background="{StaticResource SolidBackgroundFillColorBaseBrush}">
+        <Grid Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -162,12 +162,12 @@
               <StackPanel Name="PART_FooterMenuItems" Grid.Row="2" Margin="0,12,0,0" />
               <Canvas Name="PART_IndicatorLayer" Grid.RowSpan="3" IsHitTestVisible="False" Focusable="False" ClipToBounds="True">
                 <Border Name="PART_SelectionIndicator" Width="3" Height="16" CornerRadius="2" Opacity="0"
-                        Background="{StaticResource AccentFillColorDefaultBrush}" IsHitTestVisible="False" Focusable="False" />
+                        Background="{ThemeResource AccentFillColorDefaultBrush}" IsHitTestVisible="False" Focusable="False" />
               </Canvas>
             </Grid>
           </Border>
           <Border Grid.Column="1" Margin="0,8,8,8" Background="{TemplateBinding Background}"
-                  BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
             <ContentPresenter Name="PART_ContentPresenter" Margin="{TemplateBinding Padding}"
                               Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="{TemplateBinding Foreground}" />

@@ -122,6 +122,40 @@ public class AstraResourceKeyTests
         Assert.False(offenders.Count > 0, "Theme references that cannot resolve in every branch:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// A key that the palette declares with a different value per theme is a theme token, and a
+    /// theme token has to be consumed as one. <c>{StaticResource}</c> freezes the lookup: today the
+    /// frozen value is the same brush instance the palette retints in place, so it still looks right,
+    /// but it no longer follows a per-branch token, and no upstream WinUI markup does it this way.
+    /// This is the invariant behind the <c>{ThemeResource}</c> conversion in the control dictionaries.
+    /// </summary>
+    [Fact]
+    public void Theme_tokens_are_never_frozen_with_static_resource()
+    {
+        var palette = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var name in new[] { "Resources/Light.jalxaml", "Resources/Dark.jalxaml" })
+        {
+            using var stream = typeof(FluentThemeManager).Assembly.GetManifestResourceStream(name)
+                ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
+            foreach (var key in DeclaredKeys(XDocument.Load(stream))) palette.Add(key);
+        }
+
+        Assert.NotEmpty(palette);
+
+        var offenders = new List<string>();
+        foreach (var (name, dictionary) in AstraDictionaries())
+        {
+            if (name.EndsWith("Light.jalxaml", StringComparison.Ordinal) || name.EndsWith("Dark.jalxaml", StringComparison.Ordinal)) continue;
+            foreach (var (attribute, key) in FrozenReferences(dictionary))
+            {
+                if (palette.Contains(key)) offenders.Add($"{name}: {attribute.Name.LocalName}=\"{{StaticResource {key}}}\"");
+            }
+        }
+
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, "Theme tokens frozen at parse time:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
     private static Dictionary<string, XDocument> AstraDictionaries()
     {
         var assembly = typeof(FluentThemeManager).Assembly;
@@ -163,6 +197,18 @@ public class AstraResourceKeyTests
                 && element.Attribute("ResourceKey")?.Value is { Length: > 0 } resourceKey)
             {
                 yield return resourceKey;
+            }
+        }
+    }
+
+    private static IEnumerable<(XAttribute Attribute, string Key)> FrozenReferences(XContainer root)
+    {
+        foreach (var element in root.Descendants())
+        {
+            foreach (var attribute in element.Attributes())
+            {
+                var match = MarkupReference.Match(attribute.Value);
+                if (match.Success && match.Groups[1].Value == "StaticResource") yield return (attribute, match.Groups[2].Value);
             }
         }
     }
