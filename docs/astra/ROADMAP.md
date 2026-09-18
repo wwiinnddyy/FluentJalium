@@ -105,10 +105,13 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
 **顺序按"底座先于叶子"**，因为框架没有默认主题、未样式化的控件会露出框架外观：
 
 1. **底座**：`ScrollViewer`、`ScrollBar`、`Thumb`、`Popup`、`ItemsControl`、`ContentPresenter`、
-   窗口外壳。开工前的运行时摸底在 `07`：26.10.9 只暴露 `ScrollBarStyle`/`ScrollBarTrack`/
-   `ScrollBarThumb`/`ScrollBarArrow` 四个键，源码树里那两个 `*ButtonStyle` 与 `ScrollBarThumbStyle`
-   在运行时**不存在**；`ScrollBar : RangeBase : Control` 有 `Template`，所以走隐式样式这条路
-   （`06` 已证这条对原生控件通）。
+   窗口外壳。开工前的运行时摸底在 `07`；**ScrollBar 已按实测落地，见 `audits/scrollbar.md`**：
+   它在代码里搭真的 `RepeatButton`/`Track`/`Thumb`/`Border`/`Path` 部件树，但
+   `ControlTemplate`、`ScrollBar`/`RepeatButton`/`Thumb`/`ScrollViewer` 的隐式样式**全部测不动像素**，
+   可达的只有命名刷 `ScrollBarThumb`/`ScrollBarTrack` 与 `ScrollBarStyle.Background`（后者有副作用，不发）。
+   所以"原生控件优先重模板"这条对 ScrollBar 不成立，颜色层改走调色板生成刷；
+   静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
+   同一条判据现在可复用：`PixelHarness.RenderPart<T>` 能把框架内部件单独裁出来断言。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
    原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
@@ -150,9 +153,9 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 阶段 | 内容 | 出口 |
 |---|---|---|
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
-| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 7/7 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 11/11 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
-| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 目录差集为空；三个系统页有证据 |
+| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar 一项（`audits/scrollbar.md` + 两条生成刷钩子 + 4 条像素断言 + `RenderPart<T>` 部件级判据）。仍欠：ScrollViewer、Thumb、条目容器、Popup、ToolTip、窗口外壳；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 

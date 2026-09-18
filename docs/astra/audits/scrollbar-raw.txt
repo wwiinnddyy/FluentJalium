@@ -1,0 +1,365 @@
+# spike/PixelAttribution 原始读数。运行时 NuGet Jalium.UI 26.10.9，Windows 26.10.9，
+# dpiScale=1.75，主题 Light，每个样本都走「已上屏窗口 + CompositionTarget.Rendering 推帧」。
+# 直方图键是 A,R,G,B 四个字节（RenderToBitmap 的 Bgr32 缓冲）；对内层部件的直接裁剪不写 alpha 字节，
+# 所以部件读数里的前缀 00 是采集通路的产物，不是透明度。
+#
+# ## scrollkeys：一次只装一个候选钩子（去掉其余），谁动像素就归谁
+# 哨兵色：ScrollBarStyle.Background=青 00FFFF / Foreground=绿 00FF00 / BorderBrush=品红 FF00FF /
+#         ThumbStyle.Background=红 FF0000；ScrollBarTrack=黄 FFFF00；ScrollBarThumb=橙 FFA500；
+#         ScrollBarArrow=deeppink FF1493；隐式 ScrollBar 模板=蓝 0000FF；隐式 ScrollBar Background=紫 800080
+px h0-baseline/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h1-style-background/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90002 #FFF5F5F7x12880 #FF00FFFFx99 #FF008D8Dx68 | self=350x77 #FF000000x18362 #FF0A140Ax8272 #FF00FFFFx144 #FF008D8Dx64 #FFD2D2D2x44
+px h2-style-foreground/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h3-style-border/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h4-style-thumbstyle/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h5-track/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90002 #FFF5F5F7x12880 #FFFFFF00x99 #FF8D8D00x68 | self=350x77 #FF000000x18362 #FF0A140Ax8272 #FFFFFF00x144 #FF8D8D00x64 #FFD2D2D2x44
+px h6-thumb/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90163 #FFF5F5F7x12880 #FFFFA500x68 #FFD2D2D2x41 | self=350x77 #FF000000x18506 #FF0A140Ax8272 #FFFFA500x92 #FFD2D2D2x80
+px h7-arrow/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h8-implicit-template/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+px h9-implicit-background/Light/s3 win=711x443 #FF000000x211595 #FF0A140Ax90166 #FFF5F5F7x12880 #FF060B06x69 #FFD2D2D2x41 | self=350x77 #FF000000x18598 #FF0A140Ax8272 #FFD2D2D2x80
+
+# ## parts：递归视觉树 + 逐部件裁剪（t0 起每个用例只加一样东西）
+case t0-baseline
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t1-named-style-template
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t2-named-style-background
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x212 #0000FFFFx144 #00008D8Dx64 #00D2D2D2x44 #00009191x12
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t3-implicit-scrollbar-template
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t4-implicit-repeatbutton
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t5-implicit-thumb
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t6-thumb-hook
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x212 #0000FF00x144 #00FF00FFx64 #00D2D2D2x44 #00F609F6x12
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00FF00FFx92 #00000000x4
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+case t7-implicit-scrollviewer-template
+tree   ScrollViewer 200x44
+tree     Border 188x800
+tree     ScrollBar 12x44
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree       Track 12x20
+tree         RepeatButton 12x0
+tree           Border 12x0
+tree         Thumb 8x12
+tree           Border 8x12
+tree         RepeatButton 12x8
+tree           Border 12x8
+tree       RepeatButton 12x12
+tree         Border 12x12
+tree           Path 8x8
+tree     ScrollBar 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+tree       Track 0x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree         Thumb 12x0
+tree           Border 12x0
+tree         RepeatButton 0x0
+tree           Border 0x0
+tree       RepeatButton 0x0
+tree         Border 0x0
+tree           Path 0x0
+  bar 12x44 12x44 #00000000x448 #00D2D2D2x80
+  bar 0x0 no-bounds
+  thumb 8x12 8x12 #00000000x96
+  thumb 12x0 no-bounds
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 12x0 no-bounds
+  repeat 12x8 12x8 #00000000x96
+  repeat 12x12 12x12 #00000000x104 #00D2D2D2x40
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds
+  repeat 0x0 no-bounds

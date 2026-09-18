@@ -3,6 +3,7 @@ using System.Reflection;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Interop;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
@@ -35,6 +36,8 @@ internal static class Program
         if (args.Length > 0 && args[0] == "dump") return Dump.Run();
         var noLoop = args.Length > 0 && args[0] == "nofun";
         if (args.Length > 0 && args[0] == "force") Probe.Forced = true;
+        if (args.Length > 0 && args[0] == "scrollkeys") Probe.ScrollKeys = true;
+        if (args.Length > 0 && args[0] == "parts") Probe.PartsMode = true;
 
         RenderContext.GetOrCreateCurrent(RenderBackend.Auto).DefaultRenderingEngine = RenderingEngine.Impeller;
         ThemeLoader.Initialize();
@@ -98,13 +101,33 @@ internal static class Program
     private static class Probe
     {
         internal static bool Forced;
+        internal static bool ScrollKeys;
+        internal static bool PartsMode;
 
         internal static void Run(Application application, Window window)
         {
+            if (PartsMode)
+            {
+                Parts(application, window);
+                return;
+            }
             Note($"env dpiScale={window.DpiScale} window={window.ActualWidth}x{window.ActualHeight} theme={FluentThemeManager.NativeThemeMode}");
             Note($"lookup app[typeof(Button)] = {Describe(Lookup(application.Resources, typeof(Button)))}");
             Note($"lookup app[\"Button\"] = {Describe(Lookup(application.Resources, "Button"))}");
             Note($"lookup app[\"DefaultButtonStyle\"] = {Describe(Lookup(application.Resources, "DefaultButtonStyle"))}");
+
+            if (ScrollKeys)
+            {
+                Hooks = application.Resources;
+                // The palette token overrides are skipped here: the only subject is a scroll viewer,
+                // and an override that itself reaches the scrollbar would be read as a hook hit.
+                foreach (var theme in new[] { FluentThemeVariant.Light })
+                {
+                    FluentThemeManager.ApplyTheme(theme);
+                    foreach (var (name, build) in ScrollBarCases()) RunCase(window, name, theme, build);
+                }
+                return;
+            }
 
             // These are colours no framework default ever paints, so one pixel of them proves the
             // token was consumed by whichever template rendered.
@@ -114,41 +137,88 @@ internal static class Program
             foreach (var theme in new[] { FluentThemeVariant.Light, FluentThemeVariant.Dark })
             {
                 FluentThemeManager.ApplyTheme(theme);
-                foreach (var (name, build) in Cases())
-                {
-                    try
-                    {
-                        var element = build();
-                        var root = new Grid { Background = new SolidColorBrush(Root) };
-                        root.Children.Add(element);
-                        window.Content = root;
-                        element.Width = 200;
-                        element.Height = 44;
-                        if (element is Control control) control.ApplyTemplate();
-                        window.UpdateLayout();
-
-                        for (var stage = 0; stage < 4; stage++)
-                        {
-                            if (stage > 0)
-                            {
-                                if (Forced) ForceFrames(window, 1 << (stage + 1));
-                                else Pump(1 << (stage + 1));
-                            }
-                            Capture(window, element, name, theme, stage);
-                        }
-
-                        var styled = element as Button ?? (element as Grid)?.Children.OfType<Button>().FirstOrDefault();
-                        Note($"meta {name}/{theme}: style={Describe(styled?.Style?.TargetType)} template={Describe(styled?.Template)} loaded={styled?.IsLoaded} bounds={styled?.ActualWidth}x{styled?.ActualHeight}");
-                    }
-                    catch (Exception exception)
-                    {
-                        Note($"case {name}/{theme} threw {exception.GetType().Name}: {exception.Message}");
-                    }
-                }
+                foreach (var (name, build) in Cases()) RunCase(window, name, theme, build);
             }
 
             FluentThemeManager.OverrideBrush("ControlFillColorDefaultBrush", null);
             FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+        }
+
+        private static ResourceDictionary? Hooks;
+
+        private static void RunCase(Window window, string name, FluentThemeVariant theme, Func<FrameworkElement> build)
+        {
+            try
+            {
+                var element = build();
+                var root = new Grid { Background = new SolidColorBrush(Root) };
+                root.Children.Add(element);
+                window.Content = root;
+                element.Width = 200;
+                element.Height = 44;
+                if (element is Control control) control.ApplyTemplate();
+                window.UpdateLayout();
+
+                for (var stage = 0; stage < 4; stage++)
+                {
+                    if (stage > 0)
+                    {
+                        if (Forced) ForceFrames(window, 1 << (stage + 1));
+                        else Pump(1 << (stage + 1));
+                    }
+                    Capture(window, element, name, theme, stage);
+                }
+
+                var styled = element as Button ?? (element as Grid)?.Children.OfType<Button>().FirstOrDefault();
+                Note($"meta {name}/{theme}: style={Describe(styled?.Style?.TargetType)} template={Describe(styled?.Template)} loaded={styled?.IsLoaded} bounds={styled?.ActualWidth}x{styled?.ActualHeight}");
+            }
+            catch (Exception exception)
+            {
+                Note($"case {name}/{theme} threw {exception.GetType().Name}: {exception.Message}");
+            }
+        }
+
+        /// <summary>
+        /// One case per candidate ScrollBar hook, with all the other hooks removed for that case.
+        /// Installing all five at once produced cyan 144 px plus lime 64 px and no way to say which
+        /// name owned the 144, so each reading here has exactly one candidate in the tree.
+        /// </summary>
+        private static IEnumerable<(string Name, Func<FrameworkElement> Build)> ScrollBarCases()
+        {
+            var candidates = new (string Name, Action<ResourceDictionary> Install)[]
+            {
+                ("h0-baseline", _ => { }),
+                ("h1-style-background", r => r["ScrollBarStyle"] = ScrollBarStyle((Control.BackgroundProperty, Brush("#FF00FFFF")))),
+                ("h2-style-foreground", r => r["ScrollBarStyle"] = ScrollBarStyle((Control.ForegroundProperty, Brush("#FF00FF00")))),
+                ("h3-style-border", r => r["ScrollBarStyle"] = ScrollBarStyle((Control.BorderBrushProperty, Brush("#FFFF00FF")))),
+                ("h4-style-thumbstyle", r => r["ScrollBarStyle"] = ScrollBarStyle((ScrollBar.ThumbStyleProperty, ScrollBarStyle((Control.BackgroundProperty, Brush("#FFFF0000")))))),
+                ("h5-track", r => r["ScrollBarTrack"] = Brush("#FFFFFF00")),
+                ("h6-thumb", r => r["ScrollBarThumb"] = Brush("#FFFFA500")),
+                ("h7-arrow", r => r["ScrollBarArrow"] = Brush("#FFFF1493")),
+                ("h8-implicit-template", r => r[typeof(ScrollBar)] = StyleWithTemplate(typeof(ScrollBar), "#FF0000FF")),
+                ("h9-implicit-background", r => r[typeof(ScrollBar)] = ScrollBarStyle((Control.BackgroundProperty, Brush("#FF800080")))),
+            };
+
+            foreach (var (name, install) in candidates)
+                yield return (name, () =>
+                {
+                    var hooks = Hooks!;
+                    foreach (var key in new object[] { typeof(ScrollBar), "ScrollBarStyle", "ScrollBarTrack", "ScrollBarThumb", "ScrollBarArrow" })
+                        hooks.Remove(key);
+                    install(hooks);
+                    return new ScrollViewer
+                    {
+                        VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                        Content = new Border { Height = 800, Background = new SolidColorBrush(Root) },
+                    };
+                });
+        }
+
+        private static Style ScrollBarStyle(params (DependencyProperty Property, object Value)[] setters)
+        {
+            var style = new Style(typeof(ScrollBar));
+            foreach (var (property, value) in setters) style.Setters.Add(new Setter(property, value));
+            return style;
         }
 
         private static IEnumerable<(string Name, Func<FrameworkElement> Build)> Cases()
@@ -185,6 +255,112 @@ internal static class Program
             """)!;
 
         private static Style TemplateStyle(string key) => (Style)Local[key]!;
+
+        private static SolidColorBrush Brush(string value) => (SolidColorBrush)new BrushConverter().ConvertFromString(value)!;
+
+        private static Style StyleWithTemplate(Type target, string color)
+        {
+            var style = new Style(target);
+            style.Setters.Add(new Setter(Control.TemplateProperty, (ControlTemplate)XamlReader.Parse(
+                $"<ControlTemplate xmlns='http://schemas.jalium.ui/2024' TargetType='{target.Name}'>" +
+                $"<Border Background='{color}' /></ControlTemplate>")!));
+            return style;
+        }
+
+        /// <summary>
+        /// The scroll bar turned out to have a real visual tree (two RepeatButtons, a Track holding a
+        /// Thumb, Borders and Paths), so "self-drawn" was the wrong reading. This asks the question the
+        /// ScrollBar batch now hinges on: which of those parts can a resource from our dictionaries
+        /// reach - the named ScrollBarStyle's Template, or an implicit style on the part types?
+        /// </summary>
+        internal static void Parts(Application application, Window window)
+        {
+            Hooks = application.Resources;
+            var cases = new (string Name, Action<ResourceDictionary> Install)[]
+            {
+                ("t0-baseline", _ => { }),
+                ("t1-named-style-template", r => r["ScrollBarStyle"] = ScrollBarStyle((Control.TemplateProperty, BarTemplate()))),
+                ("t2-named-style-background", r => r["ScrollBarStyle"] = ScrollBarStyle((Control.BackgroundProperty, Brush("#FF00FFFF")))),
+                ("t3-implicit-scrollbar-template", r => r[typeof(ScrollBar)] = StyleWithTemplate(typeof(ScrollBar), "#FFFF00FF")),
+                ("t4-implicit-repeatbutton", r => r[typeof(RepeatButton)] = StyleWithTemplate(typeof(RepeatButton), "#FF0000FF")),
+                ("t5-implicit-thumb", r => r[typeof(Thumb)] = StyleWithTemplate(typeof(Thumb), "#FFFF0000")),
+                ("t6-thumb-hook", r =>
+                {
+                    FluentThemeManager.OverrideBrush("ScrollBarThumb", Magenta);
+                    FluentThemeManager.OverrideBrush("ScrollBarTrack", Lime);
+                }),
+                // If the scroll host takes an implicit style, a template of our own is still on the
+                // table for the states the scroll bar itself cannot be given.
+                ("t7-implicit-scrollviewer-template", r => r[typeof(ScrollViewer)] = StyleWithTemplate(typeof(ScrollViewer), "#FF0000FF")),
+            };
+
+            foreach (var (name, install) in cases)
+            {
+                ClearHooks(Hooks);
+                FluentThemeManager.OverrideBrush("ScrollBarThumb", null);
+                FluentThemeManager.OverrideBrush("ScrollBarTrack", null);
+                install(Hooks);
+
+                var scroller = new ScrollViewer
+                {
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                    Content = new Border { Height = 800, Background = new SolidColorBrush(Root) },
+                };
+                var root = new Grid { Background = new SolidColorBrush(Root) };
+                root.Children.Add(scroller);
+                window.Content = root;
+                scroller.Width = 200;
+                scroller.Height = 44;
+                window.UpdateLayout();
+                Pump(16);
+                Note($"case {name}");
+                DumpTree(scroller, 1);
+                foreach (var bar in Descendants(scroller).OfType<ScrollBar>()) Note($"  bar {bar.ActualWidth}x{bar.ActualHeight} {CaptureOf(bar)}");
+                foreach (var thumb in Descendants(scroller).OfType<Thumb>()) Note($"  thumb {thumb.ActualWidth}x{thumb.ActualHeight} {CaptureOf(thumb)}");
+                foreach (var button in Descendants(scroller).OfType<RepeatButton>()) Note($"  repeat {button.ActualWidth}x{button.ActualHeight} {CaptureOf(button)}");
+            }
+        }
+
+        private static readonly object[] HookSlots = [typeof(ScrollBar), typeof(RepeatButton), typeof(Thumb), "ScrollBarStyle", "ScrollBarTrack", "ScrollBarThumb", "ScrollBarArrow"];
+
+        private static void ClearHooks(ResourceDictionary hooks)
+        {
+            foreach (var key in HookSlots) hooks.Remove(key);
+        }
+
+        private static ControlTemplate BarTemplate() => (ControlTemplate)XamlReader.Parse(
+            "<ControlTemplate xmlns='http://schemas.jalium.ui/2024' TargetType='ScrollBar'>" +
+            "<Border Background='#FFFF00FF' /></ControlTemplate>")!;
+
+
+        private static void DumpTree(Visual visual, int depth)
+        {
+            var text = new string(' ', depth * 2);
+            var bounds = visual is FrameworkElement element ? $"{element.ActualWidth}x{element.ActualHeight}" : "";
+            Note($"tree {text}{visual.GetType().Name} {bounds}");
+            foreach (var child in Children(visual)) DumpTree(child, depth + 1);
+        }
+
+        private static IEnumerable<Visual> Children(Visual visual)
+        {
+            var count = VisualTreeHelper.GetChildrenCount(visual);
+            for (var index = 0; index < count; index++)
+                yield return (Visual)VisualTreeHelper.GetChild(visual, index);
+        }
+
+        private static IEnumerable<Visual> Descendants(Visual visual)
+        {
+            foreach (var child in Children(visual))
+            {
+                yield return child;
+                foreach (var deeper in Descendants(child)) yield return deeper;
+            }
+        }
+
+        private static string CaptureOf(Visual visual) => visual is FrameworkElement { ActualWidth: > 0, ActualHeight: > 0 } element
+            ? CaptureRaw(element, (int)element.ActualWidth, (int)element.ActualHeight)
+            : "no-bounds";
+
         private static void ForceFrames(Window window, int count)
         {
             for (var index = 0; index < count; index++) window.ForceRenderFrame();

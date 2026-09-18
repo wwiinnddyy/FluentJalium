@@ -58,6 +58,47 @@ internal static class PixelHarness
     /// </summary>
     internal static Sample Render(FrameworkElement element, int width, int height)
     {
+        Place(element, width, height);
+
+        var sample = Capture(() => CaptureRaw(element, (int)element.ActualWidth, (int)element.ActualHeight));
+        return sample with { Subject = Describe(element) };
+    }
+
+    /// <summary>
+    /// Captures a part the subject built inside itself, at that part's own bounds, so a claim about a
+    /// scroll bar or a thumb is not diluted by the pixels around it. Two measured consequences: the
+    /// alpha byte of a direct capture is not written, and a part whose real colour is black therefore
+    /// reads as unpainted - capture an ancestor that has non-black pixels, or drive the part with an
+    /// opaque sentinel brush.
+    /// </summary>
+    internal static Sample RenderPart<T>(FrameworkElement root, int width, int height) where T : FrameworkElement
+    {
+        Place(root, width, height);
+        var part = Descendant<T>(root) ?? throw new InvalidOperationException($"No {typeof(T).Name} inside {Describe(root)}.");
+
+        var sample = Capture(() => CaptureRaw(part, (int)part.ActualWidth, (int)part.ActualHeight));
+        return sample with { Subject = Describe(part) };
+    }
+
+    /// <summary>
+    /// Depth-first search of the built tree. Walking it stays on the test side of the line: the gate
+    /// that forbids <c>VisualTreeHelper</c> under src/ is what keeps product code from needing it.
+    /// </summary>
+    internal static T? Descendant<T>(Visual root) where T : Visual
+    {
+        var count = VisualTreeHelper.GetChildrenCount(root);
+        for (var index = 0; index < count; index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match) return match;
+            if (child is Visual visual && Descendant<T>(visual) is { } deeper) return deeper;
+        }
+
+        return null;
+    }
+
+    private static void Place(FrameworkElement element, int width, int height)
+    {
         element.Width = width;
         element.Height = height;
         var window = EnsureHost(width, height);
@@ -66,9 +107,6 @@ internal static class PixelHarness
         window.Content = root;
         if (element is Control control) control.ApplyTemplate();
         window.UpdateLayout();
-
-        var sample = Capture(() => CaptureRaw(element, (int)element.ActualWidth, (int)element.ActualHeight));
-        return sample with { Subject = Describe(element) };
     }
 
     /// <summary>

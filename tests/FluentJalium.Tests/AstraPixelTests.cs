@@ -2,6 +2,7 @@ using FluentJalium.Themes;
 using FluentJalium.Tests.Pixel;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests;
@@ -173,6 +174,97 @@ public sealed class AstraPixelTests
             FluentThemeManager.ApplyAccent(Sentinel);
             var sample = PixelHarness.Render(new CheckBox { IsChecked = true }, 44, 44);
             Assert.True(sample.Count(Sentinel) > 0, $"check mark ignored the accent; top={sample.Top(6)}");
+        });
+    }
+
+    /// <summary>
+    /// A scroll bar only exists inside a scroll host, and the content has to be taller than the
+    /// viewport for the vertical one to appear. A standalone ScrollBar is not an option: it stops the
+    /// frame loop from returning (docs/astra/adaptation/07-scroll-host-substitution.md).
+    /// </summary>
+    private static ScrollViewer Scroller() => new()
+    {
+        VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+        Content = new Border { Height = 800 },
+    };
+
+    [Fact]
+    public void The_scroll_bar_matches_the_upstream_size_and_thumb_width()
+    {
+        // WinUI fixes the bar at ScrollBarSize=12 and the vertical thumb at
+        // ScrollBarVerticalThumbMinWidth=8. The runtime already builds those, so the metric is a
+        // claim to hold rather than a value to set, and a future framework default that drifts
+        // fails here.
+        _fixture.Run(() =>
+        {
+            Assert.Equal(12, PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44).Width);
+            Assert.Equal(8, PixelHarness.RenderPart<Thumb>(Scroller(), 200, 44).Width);
+        });
+    }
+
+    [Fact]
+    public void The_scrollbar_thumb_hook_paints_the_thumb()
+    {
+        // 26.10.9 builds the scroll bar's parts in code: ControlTemplate and every implicit style on
+        // ScrollBar, RepeatButton, Thumb and ScrollViewer itself were measured inert. The Thumb's own
+        // border paints with the resource named ScrollBarThumb, which is the only colour route the
+        // runtime leaves open and the reason that key is a palette brush.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("ScrollBarThumb", Sentinel);
+            try
+            {
+                var sample = PixelHarness.RenderPart<Thumb>(Scroller(), 200, 44);
+                Assert.True(sample.Count(Sentinel) > 48,
+                    $"ScrollBarThumb did not paint the thumb; subject={sample.Subject} top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("ScrollBarThumb", null);
+            }
+        });
+    }
+
+    [Fact]
+    public void The_scrollbar_track_hook_paints_the_track()
+    {
+        // ScrollBarTrack covers the bar behind the thumb; the thumb hook is left at its palette value
+        // so the two claims stay separate.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("ScrollBarTrack", Sentinel);
+            try
+            {
+                var sample = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
+                Assert.True(sample.Count(Sentinel) > 48,
+                    $"ScrollBarTrack did not paint the bar; subject={sample.Subject} top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("ScrollBarTrack", null);
+            }
+        });
+    }
+
+    [Fact]
+    public void The_scroll_bar_thumb_follows_the_theme_and_shows_no_brand_emerald()
+    {
+        // The palette holds ScrollBarThumb as #72000000 for Light and #8BFFFFFF for Dark, and the
+        // capture keeps the colour channels, so the dark branch has to show white pixels where the
+        // thumb is and the light branch must not leak them. The whole bar is captured rather than the
+        // thumb because a light-theme thumb is black, which an unpainted surface also reads as.
+        _fixture.Run(() =>
+        {
+            var light = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            var dark = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+
+            Assert.Equal(0, light.CountAny(BrandEmerald));
+            Assert.True(dark.Count(Colors.White) > 48,
+                $"dark thumb brush did not reach the bar; top={dark.Top(6)}");
+            Assert.Equal(0, light.Count(Colors.White));
         });
     }
 }

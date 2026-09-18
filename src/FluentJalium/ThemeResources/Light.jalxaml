@@ -138,6 +138,8 @@
   <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorSecondaryBrush" Color="#0A000000" Opacity="1" />
   <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorTertiaryBrush" Color="#F9F9F9" Opacity="1" />
   <SolidColorBrush x:Key="LayerOnMicaBaseAltFillColorTransparentBrush" Color="#00000000" Opacity="1" />
+  <SolidColorBrush x:Key="ScrollBarThumb" Color="#72000000" Opacity="1" />
+  <SolidColorBrush x:Key="ScrollBarTrack" Color="#00FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="SliderThumbStrokeBrush" Color="#24000000" Opacity="1" />
   <SolidColorBrush x:Key="SmokeFillColorDefaultBrush" Color="#4D000000" Opacity="1" />
   <SolidColorBrush x:Key="SolidBackgroundFillColorBaseAltBrush" Color="#DADADA" Opacity="1" />

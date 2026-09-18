@@ -38,6 +38,7 @@
    的键名逐字对齐（`ScrollBarBackground*`、`ScrollBarThumbFill*`、`ScrollBarTrackFill*`、
    `ScrollBarTrackStroke*`、`ScrollBarPanningThumbBackground*` 等 26 个刷键 + `ScrollBarSize`、
    `ScrollBarExpandDuration`、`ScrollBarContractDelay` 等时长/尺寸键）。
+   **⚠ 这一条已被后面的实测推翻，见文末"开工后的更正"。**
 3. 上游状态组（`CommonStates`、`ConsciousStates`、`ScrollingIndicatorStates`）在 Jalium 里
    只能映射成 `ControlTemplate.Triggers`——标记内 VSM 会抛异常（`00` S0-d）。
    `ScrollingIndicatorStates` 需要 `Touch`/`Pen` 指示来源，Jalium 侧没有对应输入信号 → 预期进 Known Gaps。
@@ -73,3 +74,23 @@ px 9-scrollbar-default/Light/s2 win=711x443 #FF000000x211595 #FF0A140Ax71999 #FF
 
 因此这一批的第一步不是写模板，而是：把 `Pump` 改成帧数/墙钟双闸且看门狗不依赖 dispatcher 空闲，
 并用一个裸 `ScrollBar` 的像素测试把它钉住（那条测试现在应当**失败或超时可见**，不是静默卡住）。
+
+## 开工后的更正（2026-09-18，`audits/scrollbar.md` 为准）
+
+把候选一样一样装进资源、再逐部件裁剪之后，前面几条推测里**站住的和站不住的**分别是：
+
+1. **"ScrollBar 自绘"这半句是错的。** 它有真的部件树：`ScrollBar 12x44` 里两个
+   `RepeatButton 12x12`（各含 `Border` + `Path 8x8`）、`Track 12x20`（含 `Thumb 8x12` 与两个页面按钮）。
+   census 的 `style=False render=True` 说的不是"画在一个矩形里"，而是"**部件由代码搭，没有可替换的模板**"。
+2. **但"没有可替换的模板"这半句是对的，而且比原先以为的更绝对。** 测了七条路，六条不通：
+   命名 `ScrollBarStyle` 的 `Template` setter、`ScrollBar`/`RepeatButton`/`Thumb`/`ScrollViewer` 的隐式样式
+   （带模板或带 `Background`）全都不动像素；`Foreground`/`BorderBrush`/`ThumbStyle` 三个 setter 也不动。
+   通的只有三条：`ScrollBarStyle.Background`、命名刷 `ScrollBarTrack`、命名刷 `ScrollBarThumb`。
+   所以本批不走重模板，也不做 Pump 的硬闸——**改为"不宿裸 ScrollBar"的规则**（部件裁剪都经 ScrollViewer 拿）。
+3. **`ScrollBarStyle` 不发。** 它的 `Background` 只要有值（哪怕透明）就压住 `ScrollBarTrack` 那 144 px；
+   而上游 `ScrollBarBackground` 本来就是透明、框架默认也什么都不画，这个 setter 只有副作用。
+   颜色层因此全部落在调色板的两条生成刷上（生成器里按指到上游 token 的键取值，不写第二份字面量）。
+4. **还有一件当时没想到的差**：框架静止就画箭头 glyph（两个各 40 px `#D2D2D2`，Light/Dark 同色），
+   上游静止时箭头 `Opacity="0"`。这一条既改不了色也改不了透明度，是当前 ScrollBar 唯一看得见的结构差，
+   记在审计的 Known Gaps 第 1 条。
+

@@ -340,13 +340,17 @@ public static class FluentThemeManager
 
     internal static Dictionary<string, string> HighContrastMap => _highContrastMap ??= ReadHighContrastMap();
 
-    /// <summary>Every brush key the live palette declares, for the resource gates.</summary>
+    /// <summary>
+    /// Every brush key the live palette declares, for the resource gates. Membership is decided by
+    /// the value, not by a name suffix: the ScrollBar hooks are brushes whose names the framework
+    /// fixed, and a suffix rule would drop them out of the high-contrast coverage gate.
+    /// </summary>
     internal static IReadOnlyList<string> PaletteBrushKeys
     {
         get
         {
             VerifyAccess();
-            return [.. _palette!.Keys.OfType<string>().Where(static key => key.EndsWith("Brush", StringComparison.Ordinal)).Order(StringComparer.Ordinal)];
+            return [.. _palette!.Keys.OfType<string>().Where(static key => _palette[key] is SolidColorBrush).Order(StringComparer.Ordinal)];
         }
     }
 

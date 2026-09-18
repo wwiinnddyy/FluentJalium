@@ -47,6 +47,20 @@ foreach ($theme in @('Light', 'Dark')) {
     $brushes['FlyoutPresenterBackgroundBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#F9F9F9' }), '1')
     $brushes['ToolbarSurfaceBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#FFFFFF' }), '1')
     $brushes['SliderThumbStrokeBrush'] = @($(if ($theme -eq 'Dark') { '#26000000' } else { '#24000000' }), '1')
+    # 26.10.9 draws the scrollbar itself and reads two hard-coded brush names out of the application
+    # resources rather than a ControlTemplate; docs/astra/audits/scrollbar.md measures which names
+    # move pixels. They have to live in the palette because that is the only place the kernel
+    # re-tints on a theme flip. Each one takes its value from the upstream token it stands in for,
+    # so a palette change reaches it without a second literal to keep in step:
+    # ScrollBarThumb   <- ScrollBarThumbFill  (ControlStrongFillColorDefault)
+    # ScrollBarTrack   <- ScrollBarTrackFill, whose upstream AcrylicInAppFillColorDefault is a
+    #                      backdrop material the framework cannot paint into its own track call, so
+    #                      the resting state falls back to the transparent WinUI shows un-hovered.
+    $hooks = [ordered]@{ ScrollBarThumb = 'ControlStrongFillColorDefaultBrush'; ScrollBarTrack = 'ControlFillColorTransparentBrush' }
+    foreach ($hook in $hooks.GetEnumerator()) {
+        if (-not $brushes.Contains($hook.Value)) { throw "ScrollBar hook $($hook.Key) resolves to missing upstream $($hook.Value)" }
+        $brushes[$hook.Key] = $brushes[$hook.Value]
+    }
     foreach ($key in ($brushes.Keys | Sort-Object)) { $lines.Add("  <SolidColorBrush x:Key=`"$key`" Color=`"$($brushes[$key][0])`" Opacity=`"$($brushes[$key][1])`" />") }
     $lines.Add('</ResourceDictionary>')
     $text = ($lines -join "`n") + "`n"
@@ -73,6 +87,12 @@ foreach ($node in $sections['HighContrast'].Elements($ui + 'SolidColorBrush')) {
 $highContrast['FlyoutPresenterBackgroundBrush'] = 'SystemColorWindowColor'
 $highContrast['ToolbarSurfaceBrush'] = 'SystemColorWindowColor'
 $highContrast['SliderThumbStrokeBrush'] = 'SystemColorWindowTextColor'
+# The two ScrollBar hooks above, from the HighContrast branch of the same upstream file the
+# aliases come from (ScrollBar_themeresources.xaml @19e3bdc3c). That branch states the system
+# colour directly on its legacy rows: ScrollBarThumbBackgroundThemeBrush is
+# {SystemColorButtonTextColor}, ScrollBarTrackBackgroundThemeBrush is {SystemColorButtonFaceColor}.
+$highContrast['ScrollBarThumb'] = 'SystemColorButtonTextColor'
+$highContrast['ScrollBarTrack'] = 'SystemColorButtonFaceColor'
 $missing = @($paletteKeys | Where-Object { -not $highContrast.ContainsKey($_) })
 if ($missing) { throw "No upstream high-contrast mapping for: $($missing -join ', ')" }
 $lines = [System.Collections.Generic.List[string]]::new()
