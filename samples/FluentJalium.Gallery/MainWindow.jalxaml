@@ -7,22 +7,11 @@
         AllowsTransparency="False" SystemBackdrop="None" UseLayoutRounding="True"
         Background="{StaticResource SolidBackgroundFillColorBaseBrush}"
         Foreground="{StaticResource TextFillColorPrimaryBrush}">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition Height="Auto" />
-      <RowDefinition Height="*" />
-    </Grid.RowDefinitions>
-    <Grid Margin="16,12,16,4">
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-      </Grid.ColumnDefinitions>
-      <TextBlock Text="FluentJalium  /  Gallery" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center" />
-      <TextBlock x:Name="ThemeStatus" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="16,0,0,0" />
-    </Grid>
-
-    <fluent:FluentNavigationView x:Name="NavigationRoot" Grid.Row="1" Padding="0"
-                                Style="{StaticResource FluentNavigationViewStyle}">
+  <!-- The pane owns the whole client height. A window-level band above the NavigationView stacked a second
+       header on top of the title bar and pushed the first item to 126 DIP from the client top, where WinUI's
+       pane reaches it at ~52; the header belongs to the content column, over the page. -->
+  <fluent:FluentNavigationView x:Name="NavigationRoot" Padding="0"
+                              Style="{StaticResource FluentNavigationViewStyle}">
       <fluent:FluentNavigationView.MenuItems>
         <fluent:FluentNavigationItem x:Name="OverviewItem" Content="Overview" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Home" /></fluent:FluentNavigationItem.Icon>
@@ -47,12 +36,21 @@
       </fluent:FluentNavigationView.FooterMenuItems>
       <Grid>
         <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
           <RowDefinition Height="*" />
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollViewer x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24,16,24,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="FluentJalium  /  Gallery" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center" />
+          <TextBlock x:Name="ThemeStatus" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="16,0,0,0" />
+        </Grid>
+        <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
           <!-- The constructor retains these pages and attaches only the current one. -->
-          <Grid x:Name="PageHost" Margin="24" MaxWidth="1000" HorizontalAlignment="Stretch">
+          <Grid x:Name="PageHost" Margin="24,8,24,24" MaxWidth="1000" HorizontalAlignment="Stretch">
             <StackPanel x:Name="OverviewPage">
               <TextBlock Text="FluentJalium" Style="{StaticResource TitleTextBlockStyle}" />
               <TextBlock Text="Explore familiar Windows controls, built on Jalium." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
@@ -303,7 +301,7 @@
             </StackPanel>
           </Grid>
         </ScrollViewer>
-        <Border Grid.Row="1" Margin="24,0,24,16" Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
+        <Border Grid.Row="2" Margin="24,0,24,16" Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
           <Grid Margin="12">
             <Grid.RowDefinitions>
@@ -328,5 +326,4 @@
         </Border>
       </Grid>
     </fluent:FluentNavigationView>
-  </Grid>
 </Window>
