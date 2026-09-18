@@ -43,6 +43,9 @@ internal static class Program
 
     private static void Run(Application application)
     {
+        ThemeManager.Initialize(application);
+        Note("S1b", $"ThemeManager.IsInitialized after Initialize: {ThemeManager.IsInitialized}");
+        ProbeColourAuthority(application);
         var palette = LoadEmbedded(application, "Embedded/Palette.jalxaml");
         var styles = LoadEmbedded(application, "Embedded/Styles.jalxaml");
         LoadEmbedded(application, "Embedded/Doubles.jalxaml");
@@ -81,6 +84,7 @@ internal static class Program
             {
                 Note("S0-a", "MEASURE-THREW " + exception.GetType().Name + ": " + Trim(exception.Message));
             }
+            MeasureNativeDefaults(root);
             MeasureVisualStates(application, root);
             window.Close();
         };
@@ -110,6 +114,74 @@ internal static class Program
         }
     }
 
+    private static readonly string[] SampledColors =
+    [
+        "WindowBackground", "ControlBackground", "Accent", "SliderThumb", "SliderTrack",
+        "ScrollBarThumb", "CheckMark", "ToggleCheckedBackground", "TabItemIndicator",
+        "TitleBarBackground", "TextBoxBackground", "ProgressBarFill",
+    ];
+
+    private static void ProbeColourAuthority(Application application)
+    {
+        var colorsType = typeof(ThemeColors);
+        Note("S1", $"BrandThemeOptions members: {string.Join(", ", typeof(BrandThemeOptions).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly).Select(static member => member.Name).Order(StringComparer.Ordinal))}");
+        Note("S1", $"ThemeColors kind: {colorsType.Name} statics={colorsType.GetProperties(BindingFlags.Public | BindingFlags.Static).Length} instance={colorsType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Length}");
+        Note("S1", ReadColors("baseline"));
+
+        ThemeManager.ApplyAccent(Color.FromRgb(0xFF, 0x00, 0xFF));
+        Note("S1", ReadColors("after ApplyAccent(magenta)"));
+
+        foreach (var staticOptions in typeof(BrandThemeOptions).GetProperties(BindingFlags.Public | BindingFlags.Static))
+        {
+            try
+            {
+                ThemeManager.ApplyBrandTheme((BrandThemeOptions)staticOptions.GetValue(null)!);
+                Note("S1", ReadColors($"after ApplyBrandTheme({staticOptions.Name})"));
+            }
+            catch (Exception exception)
+            {
+                Note("S1", $"ApplyBrandTheme({staticOptions.Name}): {exception.GetType().Name}: {Trim(exception.InnerException?.Message ?? exception.Message)}");
+            }
+        }
+
+        foreach (var constructor in typeof(BrandThemeOptions).GetConstructors())
+        {
+            try
+            {
+                var options = constructor.GetParameters().Length == 0
+                    ? constructor.Invoke(null)
+                    : constructor.Invoke(constructor.GetParameters().Select(static parameter => Default(parameter.ParameterType)).ToArray());
+                ThemeManager.ApplyBrandTheme((BrandThemeOptions)options);
+                Note("S1", ReadColors($"after ApplyBrandTheme(ctor({string.Join(",", constructor.GetParameters().Select(static parameter => parameter.ParameterType.Name))}))"));
+            }
+            catch (Exception exception)
+            {
+                Note("S1", $"BrandThemeOptions ctor: {exception.GetType().Name}: {Trim(exception.InnerException?.Message ?? exception.Message)}");
+            }
+        }
+
+        var modeType = typeof(Application).GetProperty("ThemeMode")?.PropertyType;
+        foreach (var name in new[] { "Light", "Dark" })
+        {
+            typeof(Application).GetProperty("ThemeMode")?.SetValue(application, modeType?.GetProperty(name)?.GetValue(null));
+            Note("S1", ReadColors($"after ThemeMode.{name}"));
+        }
+        Note("S1", $"ThemeManager.CurrentTheme={ThemeManager.CurrentTheme} CurrentAccentColor={ThemeManager.CurrentAccentColor}");
+    }
+
+    private static object? Default(Type type)
+    {
+        if (!type.IsValueType) return null;
+        return Activator.CreateInstance(type);
+    }
+
+    private static string ReadColors(string label) =>
+        $"{label}: " + string.Join(" ", SampledColors.Select(name =>
+        {
+            var property = typeof(ThemeColors).GetProperty(name, BindingFlags.Public | BindingFlags.Static);
+            return property is null ? $"{name}=absent" : $"{name}={property.GetValue(null)}";
+        }));
+
     private static void MeasureThemeSwitch(Button themeButton, Button staticButton, Border tokenBorder, Button doubleButton, Button durationButton)
     {
         var lightBrushInstance = themeButton.Background;
@@ -117,20 +189,20 @@ internal static class Program
         var lightPadding = tokenBorder.Padding.ToString();
         var lightWidth = doubleButton.Width.ToString();
         var lightDuration = durationButton.TransitionDuration.ToString();
-        Note("S0-a", $"baseline Light: theme={Color(themeButton)} static={Color(staticButton)}");
+        Note("S0-a", $"baseline Light: theme={BrushOf(themeButton)} static={BrushOf(staticButton)}");
 
         ResourceDictionary.CurrentThemeKey = "Dark";
-        Note("S0-a", $"[1] CurrentThemeKey=Dark alone: theme={Color(themeButton)} static={Color(staticButton)}");
+        Note("S0-a", $"[1] CurrentThemeKey=Dark alone: theme={BrushOf(themeButton)} static={BrushOf(staticButton)}");
 
         ThemeManager.ApplyTheme(ThemeVariant.Dark);
-        Note("S0-a", $"[2] + ThemeManager.ApplyTheme(Dark): theme={Color(themeButton)} static={Color(staticButton)} brushIdentityPreserved={ReferenceEquals(lightBrushInstance, themeButton.Background)}");
+        Note("S0-a", $"[2] + ThemeManager.ApplyTheme(Dark): theme={BrushOf(themeButton)} static={BrushOf(staticButton)} brushIdentityPreserved={ReferenceEquals(lightBrushInstance, themeButton.Background)}");
         Note("S0-b", $"CornerRadius {lightRadius} -> {tokenBorder.CornerRadius}; Padding {lightPadding} -> {tokenBorder.Padding}");
         Note("S0-b", $"Width(x:Double) {lightWidth} -> {doubleButton.Width}; TransitionDuration {lightDuration} -> {durationButton.TransitionDuration}");
 
         ResourceDictionary.CurrentThemeKey = "HighContrast";
         ThemeManager.ApplyTheme(ThemeVariant.Light);
         ResourceDictionary.CurrentThemeKey = "HighContrast";
-        Note("S0-b", $"HighContrast via CurrentThemeKey: theme={Color(themeButton)} radius={tokenBorder.CornerRadius} width={doubleButton.Width}");
+        Note("S0-b", $"HighContrast via CurrentThemeKey: theme={BrushOf(themeButton)} radius={tokenBorder.CornerRadius} width={doubleButton.Width}");
 
         var modeProperty = typeof(Application).GetProperty("ThemeMode");
         var modeType = modeProperty?.PropertyType;
@@ -148,12 +220,53 @@ internal static class Program
                 Note("S0-a", $"ThemeMode.{staticMember.Name}: rejected ({exception.InnerException?.GetType().Name ?? exception.GetType().Name})");
                 continue;
             }
-            Note("S0-a", $"[ThemeMode.{staticMember.Name}]: theme={Color(themeButton)} static={Color(staticButton)} radius={tokenBorder.CornerRadius} padding={tokenBorder.Padding} duration={durationButton.TransitionDuration} width={doubleButton.Width}");
+            Note("S0-a", $"[ThemeMode.{staticMember.Name}]: theme={BrushOf(themeButton)} static={BrushOf(staticButton)} radius={tokenBorder.CornerRadius} padding={tokenBorder.Padding} duration={durationButton.TransitionDuration} width={doubleButton.Width}");
         }
         ResourceDictionary.CurrentThemeKey = "HighContrast";
-        Note("S0-b", $"ThemeMode.Dark + forced CurrentThemeKey=HighContrast: theme={Color(themeButton)} radius={tokenBorder.CornerRadius} duration={durationButton.TransitionDuration}");
+        Note("S0-b", $"ThemeMode.Dark + forced CurrentThemeKey=HighContrast: theme={BrushOf(themeButton)} radius={tokenBorder.CornerRadius} duration={durationButton.TransitionDuration}");
         modeProperty.SetValue(_application, Enum.GetNames(modeType).Length > 0 ? modeType.GetProperty("Light")?.GetValue(null) : null);
-        Note("S0-b", $"back to ThemeMode.Light (CurrentThemeKey left at HighContrast): theme={Color(themeButton)} radius={tokenBorder.CornerRadius} duration={durationButton.TransitionDuration}");
+        Note("S0-b", $"back to ThemeMode.Light (CurrentThemeKey left at HighContrast): theme={BrushOf(themeButton)} radius={tokenBorder.CornerRadius} duration={durationButton.TransitionDuration}");
+    }
+
+    private static void MeasureNativeDefaults(Panel host)
+    {
+        var modeType = typeof(Application).GetProperty("ThemeMode")?.PropertyType;
+        var modeProperty = typeof(Application).GetProperty("ThemeMode");
+        if (modeType is null || modeProperty is null) { Note("S1b", "ThemeMode unavailable"); return; }
+
+        void SetMode(string name) => modeProperty.SetValue(_application, modeType.GetProperty(name)?.GetValue(null));
+
+        var subjects = new Control[] { new Button { Content = "plain" }, new CheckBox { Content = "plain" }, new Slider() };
+        foreach (var subject in subjects) host.Children.Add(subject);
+        foreach (var subject in subjects) subject.ApplyTemplate();
+
+        SetMode("Light");
+        var light = subjects.Select(static subject => Describe(subject)).ToList();
+        SetMode("Dark");
+        var dark = subjects.Select(static subject => Describe(subject)).ToList();
+
+        for (var index = 0; index < subjects.Length; index++)
+        {
+            Note("S1b", $"native {subjects[index].GetType().Name} (no style applied), templateApplied={HasTemplate(subjects[index])}: Light={light[index]} -> Dark={dark[index]} changed={light[index] != dark[index]}");
+        }
+    }
+
+    private static string Describe(Control control) =>
+        $"{control.GetType().Name}:bg={BrushOrName(control.Background)}:fg={BrushOrName(control.Foreground)}";
+
+    private static string BrushOrName(Brush brush) =>
+        brush is null ? "null" : brush is SolidColorBrush solid ? solid.Color.ToString() : brush.GetType().Name;
+
+    private static bool HasTemplate(Control control)
+    {
+        try
+        {
+            return VisualTreeHelper.GetChild(control, 0) is not null;
+        }
+        catch (Exception exception)
+        {
+            return false;
+        }
     }
 
     private static void MeasureVisualStates(Button button, string label)
@@ -182,7 +295,7 @@ internal static class Program
 
     private static int Count(object? groups) => groups is ICollection collection ? collection.Count : groups is null ? -1 : -2;
 
-    private static string Color(Button button) =>
+    private static string BrushOf(Button button) =>
         (button.Background as SolidColorBrush)?.Color.ToString() ?? button.Background?.GetType().Name ?? "null";
 
     private static ResourceDictionary? LoadEmbedded(Application application, string resourceName)
