@@ -102,6 +102,11 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
 `template-only` / `self-drawn-DP-honored` / `frozen-brush` / `live-ThemeColors`。
 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 
+`08` 之后这条有了可执行的问法，不必每个控件重跑探索：**先往应用级资源装一个同名哨兵刷看像素动不动**
+（动 = `resource-driven`，能驱动），**再看它是跟 `Application.ThemeMode` 还是跟系统强调色**
+（`ThemeColors` 本身是 public 只读、且不吃应用级资源，`Application` 上也没有任何 Accent/Color 属性 →
+框架自绘的强调色推不进去，只能记边界）。ScrollBar 就是第一种，Slider/Toggle 是第三种的样本。
+
 **顺序按"底座先于叶子"**，因为框架没有默认主题、未样式化的控件会露出框架外观：
 
 1. **底座**：`ScrollViewer`、`ScrollBar`、`Thumb`、`Popup`、`ItemsControl`、`ContentPresenter`、

@@ -34,10 +34,13 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.Length > 0 && args[0] == "dump") return Dump.Run();
+        if (args.Length > 0 && args[0] == "themecolors") return Dump.ThemeColours();
         var noLoop = args.Length > 0 && args[0] == "nofun";
         if (args.Length > 0 && args[0] == "force") Probe.Forced = true;
         if (args.Length > 0 && args[0] == "scrollkeys") Probe.ScrollKeys = true;
         if (args.Length > 0 && args[0] == "parts") Probe.PartsMode = true;
+        if (args.Length > 0 && args[0] == "themevalues") Probe.ThemeValueMode = true;
+        if (args.Length > 0 && args[0] == "colours") Probe.ColourMode = true;
 
         RenderContext.GetOrCreateCurrent(RenderBackend.Auto).DefaultRenderingEngine = RenderingEngine.Impeller;
         ThemeLoader.Initialize();
@@ -103,12 +106,24 @@ internal static class Program
         internal static bool Forced;
         internal static bool ScrollKeys;
         internal static bool PartsMode;
+        internal static bool ThemeValueMode;
+        internal static bool ColourMode;
 
         internal static void Run(Application application, Window window)
         {
             if (PartsMode)
             {
                 Parts(application, window);
+                return;
+            }
+            if (ThemeValueMode)
+            {
+                ThemeValues(application);
+                return;
+            }
+            if (ColourMode)
+            {
+                Colours(application, window);
                 return;
             }
             Note($"env dpiScale={window.DpiScale} window={window.ActualWidth}x{window.ActualHeight} theme={FluentThemeManager.NativeThemeMode}");
@@ -361,6 +376,91 @@ internal static class Program
             ? CaptureRaw(element, (int)element.ActualWidth, (int)element.ActualHeight)
             : "no-bounds";
 
+        /// <summary>
+        /// The framework's own colour surface, <c>ThemeColors</c>, is public with 71 read-only
+        /// properties whose names are suspiciously equal to the resource keys that moved ScrollBar
+        /// pixels. If each one reads the resource of the same name, that list is the general hook
+        /// table for every control batch - if it does not, everything painted from it is unreachable.
+        /// </summary>
+        internal static void ThemeValues(Application application)
+        {
+            var type = typeof(Jalium.UI.Controls.Themes.ThemeColors);
+            var instance = type.GetProperty("Current", BindingFlags.Public | BindingFlags.Static) is { } current
+                ? current.GetValue(null)
+                : type.GetProperties(BindingFlags.Public | BindingFlags.Static).Any() ? null : Activator.CreateInstance(type);
+            Note($"tc target={(instance?.GetType().Name ?? "static")}");
+
+            foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
+                         .OrderBy(static p => p.Name, StringComparer.Ordinal))
+            {
+                string value;
+                try { value = $"{property.GetValue(instance)}"; }
+                catch (Exception exception) { value = $"threw {exception.GetType().Name}"; }
+
+                Note($"tc {property.Name} = {value} | app-resource={Describe(Lookup(application.Resources, property.Name))}");
+            }
+        }
+
+        /// <summary>
+        /// 54 of the 71 ThemeColors properties have a same-named brush in Application.Resources, and
+        /// the ones holding the brand green (SliderThumb, ToggleCheckedBackground, SelectionBackground,
+        /// ControlBorderFocused, TabItemIndicator) are exactly the leaks documented as unreachable
+        /// ceilings. This asks whether a brush of ours under the same name takes the pixels.
+        /// </summary>
+        internal static void Colours(Application application, Window window)
+        {
+            Hooks = application.Resources;
+            foreach (var property in typeof(Application).GetProperties().Where(static p =>
+                         p.Name.Contains("Accent", StringComparison.Ordinal) || p.Name.Contains("Color", StringComparison.Ordinal)))
+                Note($"app-prop {property.PropertyType.Name} {property.Name} {{ {(property.CanWrite ? "get set" : "get")} }} = {Safe(() => property.GetValue(application))}");
+
+            var theme = typeof(Jalium.UI.Controls.Themes.ThemeColors);
+            string Colour(string name) => $"{Safe(() => theme.GetProperty(name)!.GetValue(null))}";
+
+            foreach (var (label, install) in new (string, Action<ResourceDictionary>)[]
+            {
+                ("base", _ => { }),
+                ("sentinel", resources =>
+                {
+                    resources["SliderThumb"] = Brush("#FFFF00FF");
+                    resources["ToggleCheckedBackground"] = Brush("#FFFF00FF");
+                    resources["CheckMark"] = Brush("#FF00FFFF");
+                    resources["SelectionBackground"] = Brush("#FF00FFFF");
+                }),
+            })
+            {
+                foreach (var key in new object[] { "SliderThumb", "ToggleCheckedBackground", "CheckMark", "SelectionBackground" })
+                    Hooks!.Remove(key);
+                install(Hooks!);
+                Note($"colour {label}: SliderThumb={Colour("SliderThumb")} ToggleCheckedBackground={Colour("ToggleCheckedBackground")} CheckMark={Colour("CheckMark")} SelectionBackground={Colour("SelectionBackground")}");
+
+                foreach (var (name, build) in new (string, Func<FrameworkElement>)[]
+                {
+                    ("slider", () => new Slider { Value = 50 }),
+                    ("checkbox", () => new CheckBox { IsChecked = true }),
+                    ("toggle", () => new ToggleButton { IsChecked = true }),
+                })
+                {
+                    var element = build();
+                    var root = new Grid { Background = new SolidColorBrush(Root) };
+                    root.Children.Add(element);
+                    window.Content = root;
+                    element.Width = 200;
+                    element.Height = 44;
+                    window.UpdateLayout();
+                    Pump(16);
+                    var thumb = Descendants(element).OfType<Thumb>().FirstOrDefault();
+                    Note($"  {name}/{label} whole={CaptureOf(element)} thumb={(thumb is { } part ? CaptureOf(part) : "none")}");
+                }
+            }
+        }
+
+        private static string Safe(Func<object?> read)
+        {
+            try { return $"{read()}"; }
+            catch (Exception exception) { return $"threw {exception.GetType().Name}"; }
+        }
+
         private static void ForceFrames(Window window, int count)
         {
             for (var index = 0; index < count; index++) window.ForceRenderFrame();
@@ -453,6 +553,38 @@ internal static class Dump
         "Width", "Height", "Show", "Close", "Run", "Shutdown", "Size", "Scale", "Dpi", "Bounds",
         "Parent", "Child", "Apply", "Measure", "Arrange", "Update", "Background", "IsLoaded",
     ];
+
+    /// <summary>
+    /// Is <c>ThemeColors</c> a drivable surface? The drawing code reads it for the parts no resource
+    /// key reaches (scroll bar arrows, slider, toggle hover), so if its setters work it beats every
+    /// per-control hook - and if they do not, that is the answer the whole program needs, once.
+    /// </summary>
+    internal static int ThemeColours()
+    {
+        _ = typeof(Jalium.UI.Application);
+        _ = typeof(Jalium.UI.Controls.Button);
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()
+                     .Where(static a => a.GetName().Name?.StartsWith("Jalium.UI", StringComparison.Ordinal) == true))
+        {
+            Type[] types;
+            try { types = assembly.GetTypes(); }
+            catch (ReflectionTypeLoadException exception) { types = exception.Types.OfType<Type>().ToArray(); }
+
+            foreach (var type in types.Where(static t => t.Name.Contains("ThemeColor", StringComparison.Ordinal))
+                         .OrderBy(static t => t.FullName, StringComparer.Ordinal))
+            {
+                Console.WriteLine($"## {type.FullName} [{assembly.GetName().Name}] public={type.IsPublic}");
+                foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                             .OrderBy(static p => p.Name, StringComparer.Ordinal))
+                {
+                    var setter = property.GetSetMethod(true);
+                    Console.WriteLine($"  P {property.PropertyType.Name} {property.Name} {{ get={(property.GetMethod is null ? "no" : property.GetMethod.IsPublic ? "public" : "nonpublic")} set={(setter is null ? "no" : setter.IsPublic ? "public" : "nonpublic")} }}");
+                }
+            }
+        }
+
+        return 0;
+    }
 
     internal static int Run()
     {

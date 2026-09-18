@@ -1,0 +1,85 @@
+# spike/PixelAttribution 读数（26.10.9，Light，Astra 门面已装载）。
+
+## themevalues：71 个 ThemeColors 属性 vs 同名的应用级资源
+tc target=static
+tc Accent = #FF207245 | app-resource=null
+tc AccentDisabled = #FF2A4A3A | app-resource=null
+tc AccentHover = #FF278A52 | app-resource=null
+tc AccentPressed = #FF185A37 | app-resource=null
+tc CheckMark = #FFFFFFFF | app-resource=SolidColorBrush
+tc CompositionBackground = #FF3C3C50 | app-resource=null
+tc CompositionText = #FFFFFFC8 | app-resource=null
+tc CompositionUnderline = #FFC8C864 | app-resource=null
+tc ControlBackground = #FF373737 | app-resource=SolidColorBrush
+tc ControlBackgroundDisabled = #FF282828 | app-resource=SolidColorBrush
+tc ControlBackgroundHover = #FF464646 | app-resource=SolidColorBrush
+tc ControlBackgroundPressed = #FF1E1E1E | app-resource=SolidColorBrush
+tc ControlBorder = #FF505050 | app-resource=SolidColorBrush
+tc ControlBorderDisabled = #FF323232 | app-resource=SolidColorBrush
+tc ControlBorderFocused = #FF207245 | app-resource=SolidColorBrush
+tc ControlBorderHover = #FF646464 | app-resource=SolidColorBrush
+tc DockCloseButtonHover = #FFE81123 | app-resource=SolidColorBrush
+tc DockContentBackground = #FF1E1E1E | app-resource=SolidColorBrush
+tc DockSplitterBackground = #FF252525 | app-resource=SolidColorBrush
+tc DockSplitterHover = #FF3C3C3C | app-resource=SolidColorBrush
+tc DockTabItemHoverBackground = #FF2D2D2D | app-resource=SolidColorBrush
+tc DockTabItemSelectedBackground = #FF1E1E1E | app-resource=SolidColorBrush
+tc DockTabStripBackground = #FF252525 | app-resource=SolidColorBrush
+tc DockTabStripBorder = #FF3C3C3C | app-resource=SolidColorBrush
+tc DropdownBackground = #FF323232 | app-resource=null
+tc DropdownShadow = #28000000 | app-resource=null
+tc HighlightBackground = #FF3C3C3C | app-resource=SolidColorBrush
+tc ProgressBarBackground = #FF323232 | app-resource=null
+tc ProgressBarFill = #FF207245 | app-resource=null
+tc ScrollBarThumb = #FF505050 | app-resource=SolidColorBrush
+tc ScrollBarThumbHover = #FF646464 | app-resource=SolidColorBrush
+tc ScrollBarTrack = #80282828 | app-resource=SolidColorBrush
+tc SecondaryBackground = #FF2D2D2D | app-resource=null
+tc SelectedItemBackground = #FF207245 | app-resource=null
+tc SelectionBackground = #801E793F | app-resource=SolidColorBrush
+tc SelectionText = #FFFFFFFF | app-resource=null
+tc SliderThumb = #FF207245 | app-resource=SolidColorBrush
+tc SliderTrack = #FF3C3C3C | app-resource=SolidColorBrush
+tc TabContentBackground = #FF1E1E1E | app-resource=SolidColorBrush
+tc TabItemHoverBackground = #FF414141 | app-resource=SolidColorBrush
+tc TabItemIndicator = #FF207245 | app-resource=SolidColorBrush
+tc TabItemSelectedBackground = #FF373737 | app-resource=SolidColorBrush
+tc TabStripBackground = #FF2D2D2D | app-resource=SolidColorBrush
+tc TabStripBorder = #FF3C3C3C | app-resource=SolidColorBrush
+tc TextBoxBackground = #FF2D2D2D | app-resource=null
+tc TextDisabled = #FF5A5A5A | app-resource=SolidColorBrush
+tc TextPlaceholder = #FF787878 | app-resource=SolidColorBrush
+tc TextPrimary = #FFFFFFFF | app-resource=SolidColorBrush
+tc TextSecondary = #FFB4B4B4 | app-resource=SolidColorBrush
+tc TitleBarBackground = #FF202020 | app-resource=SolidColorBrush
+tc TitleBarButtonBackground = #00FFFFFF | app-resource=SolidColorBrush
+tc TitleBarButtonHover = #FF3C3C3C | app-resource=SolidColorBrush
+tc TitleBarButtonPressed = #FF2D2D2D | app-resource=SolidColorBrush
+tc TitleBarCloseButtonHover = #FFE81123 | app-resource=SolidColorBrush
+tc TitleBarCloseButtonPressed = #FFC80F1E | app-resource=SolidColorBrush
+tc TitleBarGlyph = #FFFFFFFF | app-resource=SolidColorBrush
+tc TitleBarText = #FFFFFFFF | app-resource=SolidColorBrush
+tc ToggleCheckedBackground = #FF207245 | app-resource=LinearGradientBrush
+tc ToggleCheckedBackgroundHover = #FF278A52 | app-resource=LinearGradientBrush
+tc ToggleCheckedBackgroundPressed = #FF185A37 | app-resource=null
+tc ToggleCheckedBorder = #FF207245 | app-resource=LinearGradientBrush
+tc ToggleCheckedBorderHover = #FF278A52 | app-resource=LinearGradientBrush
+tc ToggleDisabledBackground = #FF282828 | app-resource=SolidColorBrush
+tc ToggleDisabledBorder = #FF464646 | app-resource=SolidColorBrush
+tc ToggleDisabledCheckMark = #FF5A5A5A | app-resource=null
+tc ToggleUncheckedBackground = #FF2D2D2D | app-resource=SolidColorBrush
+tc ToggleUncheckedBackgroundHover = #FF373737 | app-resource=SolidColorBrush
+tc ToggleUncheckedBackgroundPressed = #FF232323 | app-resource=SolidColorBrush
+tc ToggleUncheckedBorder = #FF8C8C8C | app-resource=SolidColorBrush
+tc ToggleUncheckedBorderHover = #FFA0A0A0 | app-resource=SolidColorBrush
+tc WindowBackground = #FF1E1E1E | app-resource=SolidColorBrush
+
+## colours：装同名哨兵刷前后的 ThemeColors 值与像素
+colour base: SliderThumb=#FF207245 ToggleCheckedBackground=#FF207245 CheckMark=#FFFFFFFF SelectionBackground=#801E793F
+  slider/base whole=200x44 #00000000x7806 #000078D4x346 #000062ADx344 #00FFFFFFx104 #000179D4x80 thumb=none
+  checkbox/base whole=200x44 #00000000x8412 #000078D4x346 #00FFFFFFx12 #00A1CDEFx11 #0074B5E8x11 thumb=none
+  toggle/base whole=200x44 #000078D4x8296 #00006BBDx456 #00000000x12 #00006ABCx12 #000062AEx8 thumb=none
+colour sentinel: SliderThumb=#FF207245 ToggleCheckedBackground=#FF207245 CheckMark=#FFFFFFFF SelectionBackground=#801E793F
+  slider/sentinel whole=200x44 #00000000x7806 #000078D4x346 #000062ADx344 #00FFFFFFx104 #00057BD5x80 thumb=none
+  checkbox/sentinel whole=200x44 #00000000x8412 #000078D4x346 #00FFFFFFx12 #00A1CDEFx11 #0074B5E8x11 thumb=none
+  toggle/sentinel whole=200x44 #000078D4x8296 #00006BBDx456 #00000000x12 #00006ABCx12 #000062AEx8 thumb=none
