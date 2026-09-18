@@ -15,6 +15,7 @@
 | S0-c WinUI 别名元素形式 | **能解析且解析到真实刷子实例** | 上游 `_themeresources.xaml` 可近乎逐字转录 |
 | S0-d 标记里写 `VisualStateManager` | **不能，两种写法都抛异常** | 模板改走 `ControlTemplate.Triggers` |
 | S0-e 编译期 `JalxamlPage` 产出字典 | **产出 0 个类型** | 字典保持 Embedded + `XamlReader.Load` |
+| S0-g `Trigger` 条件能匹配什么值 | **`{x:Null}` 能、`Value=""` 不能**（ComboBox 批实测） | 判据必须换成有非空表示的属性 |
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 
 ## S0-a：主题切换的真实驱动
@@ -233,3 +234,20 @@ Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
 **仍未证**：`ThemeMode.System` 是否真的跟住 OS 切换（测试只断言赋值生效）；
 `Host` 捕获到的是 `RenderTargetBitmap` 里的窗口合成结果，与真正上屏的帧是否逐像素一致仍未核对
 （本机没有可用的截屏核对手段，见 AGENTS 之外的既有结论）。
+
+## S0-g：触发条件的可用值形式（ComboBox 批，2026-09-18）
+
+`ControlTemplate.Triggers` 的条件不是"标记写了就算"。同一份模板里三种形式的实测结果：
+
+| 条件写法 | 运行时 | 结论 |
+|---|---|---|
+| `<Condition Property="IsChecked" Value="{x:Null}" />` | 三态 CheckBox 命中（选择批已证） | null 判据可用 |
+| `<Trigger Property="Text" Value="" />` | 结构读取 `Property` 解析成功、setter 键名正确，但控件实际前景仍是静止值；换判据后立即命中 | **空字符串判据永不匹配** |
+| `<Trigger Property="SelectedIndex" Value="-1" />` | 命中，占位符格读到 `ComboBoxPlaceHolderForeground` 实例，且 `ReadLocalValue=UnsetValue` | 数值判据可用 |
+
+`Value=""` 这一条最阴：结构与消费点两类闸口全绿，像素与读回全是静止态——和字典模板丢 `Trigger.Property`
+那一类是同一个坑的另一种形态（"看起来接上了，其实没匹配"）。因此本仓的规矩是：**每条状态格都必须有一条
+读回断言**，只有 markup 结构断言的格子不算证据（`AstraComboBoxTests` 里占位符那三条就是这么来的）。
+
+同时补一条控件级实测：ComboBox 的占位符不是独立可视元素，框架把占位串塞进 `SelectionBoxItem`
+（`SelectedIndex=-1` 时读回 `"Pick one"`），所以"没有选中项"这件事在 `SelectionBoxItem` 上没有 null 表示。

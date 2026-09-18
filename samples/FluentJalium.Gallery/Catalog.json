@@ -114,17 +114,17 @@
       "markup": "ComboBox",
       "source": "Styles/Selection.jalxaml",
       "page": "selection",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "upstream ComboBox keys not transcribed", "the dropdown surface is not asserted against FlyoutPresenter tokens" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/combobox.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraComboBoxTests.cs" ],
+      "gaps": [ "no real pointer or touch evidence for the hover, press and open states", "no header, so five upstream header rows are not transcribed", "the split open/close animations and the pill scale-in are not ported", "a disabled combo's text colour is the framework's own local value, not ComboBoxForegroundDisabled" ]
     },
     {
       "markup": "ComboBoxItem",
       "source": "Styles/Selection.jalxaml",
       "page": "selection",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/AstraItemHostTests.cs" ],
-      "gaps": [ "upstream ListItem keys not transcribed", "selection paint unmeasured" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/combobox.md", "tests/FluentJalium.Tests/AstraComboBoxTests.cs", "tests/FluentJalium.Tests/AstraItemHostTests.cs" ],
+      "gaps": [ "the nine item border-brush rows are inert upstream too, because the item style sets no BorderThickness", "no SelectedUnfocused state is reachable, so those three rows are not transcribed", "no InputMode states, so the touch and controller paddings are not transcribed" ]
     },
     {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",

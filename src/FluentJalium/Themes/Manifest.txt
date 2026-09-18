@@ -14,6 +14,7 @@ ThemeResources/CheckBox.jalxaml
 ThemeResources/RadioButton.jalxaml
 ThemeResources/TextBox.jalxaml
 ThemeResources/Slider.jalxaml
+ThemeResources/ComboBox.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

@@ -219,6 +219,38 @@
                   <RadioButton x:Name="CompactRadio" Content="Compact" GroupName="GalleryDensity" Style="{StaticResource DefaultRadioButtonStyle}" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Combo boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Nothing here names a style: each combo is wearing the implicit one, and each surface colour comes from upstream's ComboBox* rows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Transport" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="TransportComboBox" Width="180" VerticalAlignment="Center">
+                      <ComboBoxItem Content="Train" />
+                      <ComboBoxItem Content="Ferry" />
+                      <ComboBoxItem Content="Car" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Seat" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="SeatComboBox" Width="180" VerticalAlignment="Center" PlaceholderText="Pick a seat" />
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Note" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="NoteComboBox" Width="180" VerticalAlignment="Center" IsEditable="True" Text="Window side">
+                      <ComboBoxItem Content="Window side" />
+                      <ComboBoxItem Content="Aisle side" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Ticket office" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox Width="180" VerticalAlignment="Center" IsEnabled="False" SelectedIndex="0">
+                      <ComboBoxItem Content="Closed today" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <TextBlock Text="Hover, press and the dropdown animation are not claimed: the pressed states here are driven by mouse capture in a test, never by a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="List selection" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <ListBox x:Name="SampleListBox" Height="156">
                 <ListBoxItem Content="Design" />
