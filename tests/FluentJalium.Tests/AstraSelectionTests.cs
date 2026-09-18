@@ -106,8 +106,10 @@ public sealed class AstraSelectionTests
             // values by type would be wrong, so this shape is pinned here rather than assumed.
             Assert.True(Matches(triggers.First(static trigger => Matches(trigger, ToggleButton.IsCheckedProperty, "True")),
                 ToggleButton.IsCheckedProperty, "True"));
-            Assert.True(triggers.OfType<Trigger>().Any(static trigger =>
-                trigger.Property == ToggleButton.IsMouseOverProperty && trigger.Value is true));
+            // Same measured form on the pointer side: after the upstream rewiring every hover cell is a
+            // cell of the check matrix, so the boolean arrives inside a MultiTrigger condition.
+            Assert.True(triggers.OfType<MultiTrigger>().SelectMany(static multi => multi.Conditions.Cast<Condition>())
+                .Any(static condition => condition.Property == ToggleButton.IsMouseOverProperty && condition.Value is true));
         });
     }
 
@@ -164,6 +166,200 @@ public sealed class AstraSelectionTests
         });
     }
 
+    /// <summary>
+    /// Upstream's radio template drives seven properties from eight cells (CommonStates x CheckStates).
+    /// Asserted as a table because the point of the batch is that every transcribed <c>RadioButton*</c>
+    /// row has a consumer: a cell that quietly keeps a hardcoded token still renders, and only the key
+    /// name in the setter proves the alias layer is on the path an app override would take.
+    /// </summary>
+    [Fact]
+    public void The_radio_style_writes_upstream_seven_properties_in_every_state_cell()
+    {
+        _fixture.Run(() =>
+        {
+            var triggers = TemplateTriggers("DefaultRadioButtonStyle").ToList();
+
+            var cells = new (string Label, (string Property, string Value)[] Conditions, string Foreground, string RingFill, string RingStroke,
+                string DotFill, string DotStroke, int DotSize, bool DotVisible)[]
+            {
+                ("unchecked + pointer over", [("IsChecked", "False"), ("IsMouseOver", "True")], "RadioButtonForegroundPointerOver",
+                    "RadioButtonOuterEllipseFillPointerOver", "RadioButtonOuterEllipseStrokePointerOver",
+                    "RadioButtonCheckGlyphFillPointerOver", "RadioButtonCheckGlyphStrokePointerOver", 14, false),
+                ("unchecked + pressed", [("IsChecked", "False"), ("IsPressed", "True")], "RadioButtonForegroundPressed",
+                    "RadioButtonOuterEllipseFillPressed", "RadioButtonOuterEllipseStrokePressed",
+                    "RadioButtonCheckGlyphFillPressed", "RadioButtonCheckGlyphStrokePressed", 10, false),
+                ("checked", [("IsChecked", "True")], "RadioButtonForeground",
+                    "RadioButtonOuterEllipseCheckedFill", "RadioButtonOuterEllipseCheckedStroke",
+                    "RadioButtonCheckGlyphFill", "RadioButtonCheckGlyphStrokeChecked", 12, true),
+                ("checked + pointer over", [("IsChecked", "True"), ("IsMouseOver", "True")], "RadioButtonForegroundPointerOver",
+                    "RadioButtonOuterEllipseCheckedFillPointerOver", "RadioButtonOuterEllipseCheckedStrokePointerOver",
+                    "RadioButtonCheckGlyphFillPointerOver", "RadioButtonCheckGlyphStrokeCheckedPointerOver", 14, true),
+                ("checked + pressed", [("IsChecked", "True"), ("IsPressed", "True")], "RadioButtonForegroundPressed",
+                    "RadioButtonOuterEllipseCheckedFillPressed", "RadioButtonOuterEllipseCheckedStrokePressed",
+                    "RadioButtonCheckGlyphFillPressed", "RadioButtonCheckGlyphStrokeCheckedPressed", 10, true),
+                ("unchecked + disabled", [("IsEnabled", "False")], "RadioButtonForegroundDisabled",
+                    "RadioButtonOuterEllipseFillDisabled", "RadioButtonOuterEllipseStrokeDisabled",
+                    "RadioButtonCheckGlyphFillDisabled", "RadioButtonCheckGlyphStrokeDisabled", 14, false),
+                ("checked + disabled", [("IsChecked", "True"), ("IsEnabled", "False")], "RadioButtonForegroundDisabled",
+                    "RadioButtonOuterEllipseCheckedFillDisabled", "RadioButtonOuterEllipseCheckedStrokeDisabled",
+                    "RadioButtonCheckGlyphFillDisabled", "RadioButtonCheckGlyphStrokeCheckedDisabled", 14, true),
+            };
+
+            foreach (var cell in cells)
+            {
+                var wanted = new List<(string Part, string Property, string Key)>
+                {
+                    ("RadioLabel", "Foreground", cell.Foreground),
+                    ("RadioRoot", "Background", cell.Foreground.Replace("Foreground", "Background")),
+                    ("RadioRoot", "BorderBrush", cell.Foreground.Replace("Foreground", "BorderBrush")),
+                    ("RadioRing", "Background", cell.RingFill),
+                    ("RadioRing", "BorderBrush", cell.RingStroke),
+                    ("RadioDot", "Fill", cell.DotFill),
+                    ("RadioDot", "Stroke", cell.DotStroke),
+                };
+                AssertCell(triggers, cell.Label, cell.Conditions, wanted);
+                AssertCellSize(triggers, cell.Label, cell.Conditions, cell.DotSize);
+                AssertCellOpacity(triggers, cell.Label, cell.Conditions, cell.DotVisible);
+            }
+        });
+    }
+
+    [Fact]
+    public void An_unchecked_radio_button_rests_on_the_transcribed_ellipse_rows()
+    {
+        _fixture.Run(() =>
+        {
+            var radio = new RadioButton { Content = "plain", Width = 120, Height = 32 };
+            PixelHarness.Build(radio, 120, 32);
+
+            var ring = (Border)AssertPart(radio, "RadioRing");
+            var dot = (Jalium.UI.Shapes.Ellipse)AssertPart(radio, "RadioDot");
+            Assert.Equal(0d, dot.Opacity);
+            Assert.Same(_fixture.Application.TryFindResource("ControlAltFillColorSecondaryBrush"), ring.Background);
+            Assert.Same(_fixture.Application.TryFindResource("ControlStrongStrokeColorDefaultBrush"), ring.BorderBrush);
+        });
+    }
+
+    [Fact]
+    public void A_checked_radio_button_drops_the_accent_ring_behind_the_dot()
+    {
+        _fixture.Run(() =>
+        {
+            var radio = new RadioButton { Content = "picked", IsChecked = true, Width = 120, Height = 32 };
+            PixelHarness.Build(radio, 120, 32);
+
+            var ring = (Border)AssertPart(radio, "RadioRing");
+            var dot = (Jalium.UI.Shapes.Ellipse)AssertPart(radio, "RadioDot");
+            Assert.Equal(1d, dot.Opacity);
+            Assert.Same(_fixture.Application.TryFindResource("AccentFillColorDefaultBrush"), ring.Background);
+            Assert.Same(_fixture.Application.TryFindResource("AccentFillColorDefaultBrush"), ring.BorderBrush);
+
+            // The dot ring is the substitution's read-back: upstream asks for
+            // AccentControlElevationBorderBrush, a bounding-box gradient this palette has no row for,
+            // and ControlStrokeColorOnAccentDefaultBrush is what we hand it instead.
+            Assert.Same(_fixture.Application.TryFindResource("ControlStrokeColorOnAccentDefaultBrush"), dot.Stroke);
+        });
+    }
+
+    [Fact]
+    public void A_disabled_checked_radio_button_keeps_the_dot_and_loses_the_accent()
+    {
+        _fixture.Run(() =>
+        {
+            var radio = new RadioButton { Content = "off", IsChecked = true, Width = 120, Height = 32 };
+            PixelHarness.Build(radio, 120, 32);
+            radio.IsEnabled = false;
+            PixelHarness.Settle();
+
+            var ring = (Border)AssertPart(radio, "RadioRing");
+            var dot = (Jalium.UI.Shapes.Ellipse)AssertPart(radio, "RadioDot");
+            Assert.Equal(1d, dot.Opacity);
+            Assert.Same(_fixture.Application.TryFindResource("AccentFillColorDisabledBrush"), ring.Background);
+            Assert.Same(_fixture.Application.TryFindResource("ControlStrokeColorDefaultBrush"), dot.Stroke);
+        });
+    }
+
+    [Fact]
+    public void A_checked_radio_button_paints_the_accent_ring_to_pixels()
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", Sentinel);
+            try
+            {
+                var radio = new RadioButton { Content = "picked", IsChecked = true, Width = 32, Height = 32 };
+                var sample = PixelHarness.Render(radio, 32, 32);
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+
+                // A 20-DIP ring minus its 12-DIP dot is roughly 290 pixels; the threshold leaves room
+                // for the antialiased edge but not for a ring that only half took the token.
+                Assert.True(sample.Count(Sentinel) > 150, $"checked radio did not paint the accent ring; top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    [Fact]
+    public void Both_choice_controls_carry_upstream_minimum_width()
+    {
+        // Upstream gives both controls MinWidth 120 so a lone choice stays clickable at label width.
+        // Ours shipped 0, which is the value the inkcanvas reference port also carries - matching that
+        // reference here would have kept a deviation the token audit calls out, so the literal rides on.
+        _fixture.Run(() =>
+        {
+            foreach (var styleKey in new[] { "DefaultCheckBoxStyle", "DefaultRadioButtonStyle" })
+            {
+                var value = FluentThemeManager.GetStyle(styleKey).Setters.Cast<object>().OfType<Setter>()
+                    .First(static setter => NameOf(setter) == "MinWidth")
+                    .Value;
+                Assert.Equal(120d, Convert.ToDouble(value));
+            }
+        });
+    }
+
+    /// <summary>
+    /// The catalog carried "the check glyph is not in the capture path" as a standing gap. It is wrong:
+    /// with the surface token and the glyph token re-tinted to two different sentinels, both colours
+    /// have to appear, and neither can come from the other part. Measured: 12 exact sentinel pixels plus
+    /// 22 accent-magenta blends, since a 1.5 DIP stroke at 175% is mostly antialiased - so the claim is
+    /// "appears at all", not an area. Kept to one capture and no caption after a two-capture version of
+    /// this test blew the fixture's 60-second watchdog (the text and unchecked-box costs are in 06).
+    /// </summary>
+    [Fact]
+    public void The_check_box_paints_its_glyph_token_separately_from_its_surface_token()
+    {
+        _fixture.Run(() =>
+        {
+            var accent = Color.FromRgb(0xFF, 0x80, 0x00);
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", accent);
+            FluentThemeManager.OverrideBrush("TextOnAccentFillColorPrimaryBrush", Sentinel);
+            try
+            {
+                var sample = PixelHarness.Render(new CheckBox { IsChecked = true, Width = 32, Height = 32 }, 32, 32);
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+                Assert.True(sample.Count(accent) > 150, $"checked surface did not paint its token; top={sample.Top(6)}");
+                Assert.True(sample.Count(Sentinel) > 0, $"check mark did not paint; top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+                FluentThemeManager.OverrideBrush("TextOnAccentFillColorPrimaryBrush", null);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The property a setter writes, in either of the two forms the parser produces. A setter whose
+    /// target property exists on the style's own type (Background, Width) is resolved at parse time and
+    /// arrives as a DependencyProperty; one that only exists on the named part (Shape.Fill, Shape.Stroke)
+    /// is deferred as a name and resolved against the real element when the template is applied.
+    /// Reading only <see cref="Setter.Property"/> would call those deferred setters unnamed.
+    /// </summary>
+    private static string? NameOf(Setter setter) => setter.Property?.Name ?? setter.PropertyName;
+
     private static FrameworkElement AssertPart(Visual root, string name) =>
         PixelHarness.Named(root, name) ?? throw new InvalidOperationException($"No part named {name} in the built tree.");
 
@@ -204,15 +400,72 @@ public sealed class AstraSelectionTests
 
     private static void AssertSetter(object trigger, string setterProperty, string resourceKey)
     {
-        var setters = trigger switch
-        {
-            Trigger single => single.Setters.Cast<object>(),
-            MultiTrigger multi => multi.Setters.Cast<object>(),
-            _ => Enumerable.Empty<object>(),
-        };
-        var setter = setters.OfType<Setter>().FirstOrDefault(candidate => candidate.Property?.Name == setterProperty)
+        var setters = TriggerSetters(trigger);
+        var setter = setters.OfType<Setter>().FirstOrDefault(candidate => NameOf(candidate) == setterProperty)
             ?? throw new InvalidOperationException($"No {setterProperty} setter on the trigger.");
         var key = setter.Value?.GetType().GetProperty("ResourceKey")?.GetValue(setter.Value) as string;
         Assert.Equal(resourceKey, key);
+    }
+
+    private static object? FindCell(List<object> triggers, (string Property, string Value)[] conditions, string label)
+    {
+        var wanted = conditions.Select(static condition => (condition.Property, condition.Value)).ToArray();
+        return triggers.FirstOrDefault(candidate => Conditions(candidate).SequenceEqual(wanted))
+            ?? throw new InvalidOperationException($"No state cell for {label}; present: " +
+                string.Join(" | ", triggers.Select(static trigger => string.Join("+", Conditions(trigger).Select(static pair => pair.Item1 + "=" + pair.Item2)))));
+    }
+
+    private static IEnumerable<(string Property, string Value)> Conditions(object trigger) => trigger switch
+    {
+        MultiTrigger multi => multi.Conditions.Cast<Condition>().Select(static condition => (condition.Property.Name, Form(condition.Value))),
+        Trigger single => [(single.Property.Name, Form(single.Value))],
+        _ => [],
+    };
+
+    private static IEnumerable<object> TriggerSetters(object trigger) => trigger switch
+    {
+        Trigger single => single.Setters.Cast<object>(),
+        MultiTrigger multi => multi.Setters.Cast<object>(),
+        _ => Enumerable.Empty<object>(),
+    };
+
+    private static void AssertCell(List<object> triggers, string label, (string Property, string Value)[] conditions,
+        List<(string Part, string Property, string Key)> wanted)
+    {
+        var cell = FindCell(triggers, conditions, label);
+        foreach (var (part, property, key) in wanted)
+        {
+            var setter = TriggerSetters(cell).OfType<Setter>()
+                .FirstOrDefault(candidate => candidate.TargetName == part && NameOf(candidate) == property)
+                ?? throw new InvalidOperationException($"{label}: no {part}.{property} setter; the cell carries "
+                    + string.Join(", ", TriggerSetters(cell).OfType<Setter>().Select(static candidate => $"{candidate.TargetName}.{NameOf(candidate)}")));
+            var actual = setter.Value?.GetType().GetProperty("ResourceKey")?.GetValue(setter.Value) as string;
+            Assert.Equal(key, actual);
+        }
+    }
+
+    private static void AssertCellSize(List<object> triggers, string label, (string Property, string Value)[] conditions, int size)
+    {
+        var setter = TriggerSetters(FindCell(triggers, conditions, label)).OfType<Setter>()
+            .FirstOrDefault(candidate => candidate.TargetName == "RadioDot" && NameOf(candidate) == "Width")
+            ?? throw new InvalidOperationException($"{label}: the dot has no size cell.");
+        Assert.Equal(size, Convert.ToDouble(setter.Value));
+    }
+
+    private static void AssertCellOpacity(List<object> triggers, string label, (string Property, string Value)[] conditions, bool visible)
+    {
+        var setter = TriggerSetters(FindCell(triggers, conditions, label)).OfType<Setter>()
+            .FirstOrDefault(candidate => candidate.TargetName == "RadioDot" && NameOf(candidate) == "Opacity");
+        if (visible)
+        {
+            Assert.NotNull(setter);
+            Assert.Equal(1d, Convert.ToDouble(setter!.Value));
+        }
+        else
+        {
+            // The dot is only ever revealed by a checked cell; an unchecked cell that set it would
+            // make a hovered, unchecked radio show a filled ring center.
+            Assert.Null(setter);
+        }
     }
 }

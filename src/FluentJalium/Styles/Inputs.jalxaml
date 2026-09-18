@@ -163,10 +163,10 @@
         <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
         <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
       </Trigger>
-      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Trigger Property="IsKeyboardFocused" Value="True">
         <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
       </Trigger>
-      <Trigger Property="IsEnabled" Value="False">
+        <Trigger Property="IsEnabled" Value="False">
         <Setter TargetName="PART_Track" Property="Fill" Value="{ThemeResource ControlStrongFillColorDisabledBrush}" />
         <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
         <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
@@ -214,10 +214,10 @@
         <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
         <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
       </Trigger>
-      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Trigger Property="IsKeyboardFocused" Value="True">
         <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
       </Trigger>
-      <Trigger Property="IsEnabled" Value="False">
+        <Trigger Property="IsEnabled" Value="False">
         <Setter TargetName="PART_Track" Property="Fill" Value="{ThemeResource ControlStrongFillColorDisabledBrush}" />
         <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
         <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
@@ -243,105 +243,52 @@
   </Style>
   <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}" />
 
+  <!-- Upstream's RadioButton template splits the ring into OuterEllipse + CheckOuterEllipse and the dot into
+       CheckGlyph + PressedCheckGlyph, because its two orthogonal VisualState groups may not touch one property.
+       Our triggers are one precedence-ordered list, so a single ring and a single dot carry all eight cells;
+       the second pair of ellipses would be dead weight here. Every one of the 40 transcribed RadioButton* rows
+       has exactly one consumer: three on the style setters, four resting on the elements, the rest per cell.
+       Cells are upstream's CommonStates x CheckStates plus the dot size it animates (12 rest, 14 hover, 10
+       press, 14 disabled). Not ported: the PressedCheckGlyph squeeze and the two-ellipse crossfade. -->
   <Style x:Key="DefaultRadioButtonStyle" TargetType="RadioButton">
-    <Setter Property="MinHeight" Value="32" />
-    <Setter Property="MinWidth" Value="0" />
-    <Setter Property="Padding" Value="0" />
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="FontSize" Value="14" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
-    <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="Template">
-      <ControlTemplate TargetType="RadioButton">
-        <Grid Background="{TemplateBinding Background}" Margin="{TemplateBinding Padding}">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
+    <Setter Property="MinWidth" Value="120" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{ThemeResource RadioButtonForeground}" />
+    <Setter Property="Background" Value="{ThemeResource RadioButtonBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrush}" />
+    <Setter Property="Padding" Value="8,6,0,0" />
+    <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" /><Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Template"><ControlTemplate TargetType="RadioButton">
+      <Grid Name="RadioRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+        <Grid Name="RadioColumn" Width="20" Height="32" VerticalAlignment="Top">
           <Border Name="RadioRing" Width="20" Height="20" CornerRadius="10" VerticalAlignment="Center"
-                  BorderThickness="1" Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
-                  BorderBrush="{ThemeResource ControlStrongStrokeColorDefaultBrush}">
-            <Ellipse Name="RadioDot" Width="12" Height="12" Opacity="0"
-                     HorizontalAlignment="Center" VerticalAlignment="Center"
-                     Fill="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                  BorderThickness="{ThemeResource RadioButtonBorderThemeThickness}"
+                  Background="{ThemeResource RadioButtonOuterEllipseFill}" BorderBrush="{ThemeResource RadioButtonOuterEllipseStroke}">
+            <Ellipse Name="RadioDot" Width="12" Height="12" Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Fill="{ThemeResource RadioButtonCheckGlyphFill}" Stroke="{ThemeResource RadioButtonCheckGlyphStroke}"
                      TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
           </Border>
-          <ContentPresenter Grid.Column="1" Margin="8,0,0,0" Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                            Foreground="{TemplateBinding Foreground}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-          <Border Name="RadioFocus" Grid.ColumnSpan="2" Margin="-2,1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False" />
         </Grid>
-        <ControlTemplate.Triggers>
-          <Trigger Property="IsChecked" Value="True">
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-            <Setter TargetName="RadioRing" Property="BorderBrush" Value="Transparent" />
-            <Setter TargetName="RadioDot" Property="Opacity" Value="1" />
-          </Trigger>
-          <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="RadioDot" Property="Width" Value="14" />
-            <Setter TargetName="RadioDot" Property="Height" Value="14" />
-          </Trigger>
-          <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="RadioDot" Property="Width" Value="10" />
-            <Setter TargetName="RadioDot" Property="Height" Value="10" />
-          </Trigger>
-          <MultiTrigger>
-            <MultiTrigger.Conditions>
-              <Condition Property="IsChecked" Value="False" />
-              <Condition Property="IsMouseOver" Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource ControlAltFillColorTertiaryBrush}" />
-          </MultiTrigger>
-          <MultiTrigger>
-            <MultiTrigger.Conditions>
-              <Condition Property="IsChecked" Value="False" />
-              <Condition Property="IsPressed" Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource ControlAltFillColorQuarternaryBrush}" />
-            <Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource ControlStrongStrokeColorDisabledBrush}" />
-          </MultiTrigger>
-          <MultiTrigger>
-            <MultiTrigger.Conditions>
-              <Condition Property="IsChecked" Value="True" />
-              <Condition Property="IsMouseOver" Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource AccentFillColorSecondaryBrush}" />
-          </MultiTrigger>
-          <MultiTrigger>
-            <MultiTrigger.Conditions>
-              <Condition Property="IsChecked" Value="True" />
-              <Condition Property="IsPressed" Value="True" />
-            </MultiTrigger.Conditions>
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-          </MultiTrigger>
-          <Trigger Property="IsKeyboardFocused" Value="True">
-            <Setter TargetName="RadioFocus" Property="Opacity" Value="1" />
-          </Trigger>
-          <Trigger Property="IsEnabled" Value="False">
-            <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
-            <Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource ControlStrongStrokeColorDisabledBrush}" />
-            <Setter TargetName="RadioDot" Property="Width" Value="12" />
-            <Setter TargetName="RadioDot" Property="Height" Value="12" />
-            <Setter TargetName="RadioFocus" Property="Opacity" Value="0" />
-          </Trigger>
-          <MultiTrigger>
-            <MultiTrigger.Conditions>
-              <Condition Property="IsChecked" Value="True" />
-              <Condition Property="IsEnabled" Value="False" />
-            </MultiTrigger.Conditions>
-            <Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource AccentFillColorDisabledBrush}" />
-            <Setter TargetName="RadioRing" Property="BorderBrush" Value="Transparent" />
-            <Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource TextOnAccentFillColorDisabledBrush}" />
-          </MultiTrigger>
-        </ControlTemplate.Triggers>
-      </ControlTemplate>
-    </Setter>
+        <ContentPresenter Name="RadioLabel" Grid.Column="1" Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                          Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
+                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="Wrap" />
+        <Border Name="RadioFocus" Grid.ColumnSpan="2" Margin="-2,1" BorderThickness="2" CornerRadius="4"
+                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="False" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundPointerOver}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPointerOver}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPointerOver}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillPointerOver}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPointerOver}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="False" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundPressed}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPressed}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPressed}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillPressed}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokePressed}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPressed}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokePressed}" /><Setter TargetName="RadioDot" Property="Width" Value="10" /><Setter TargetName="RadioDot" Property="Height" Value="10" /></MultiTrigger>
+        <Trigger Property="IsChecked" Value="True"><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForeground}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackground}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrush}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFill}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStroke}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFill}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeChecked}" /><Setter TargetName="RadioDot" Property="Width" Value="12" /><Setter TargetName="RadioDot" Property="Height" Value="12" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundPointerOver}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPointerOver}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPointerOver}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillPointerOver}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPointerOver}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedPointerOver}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundPressed}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPressed}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPressed}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillPressed}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokePressed}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPressed}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedPressed}" /><Setter TargetName="RadioDot" Property="Width" Value="10" /><Setter TargetName="RadioDot" Property="Height" Value="10" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundDisabled}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundDisabled}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushDisabled}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillDisabled}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillDisabled}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioFocus" Property="Opacity" Value="0" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter TargetName="RadioLabel" Property="Foreground" Value="{ThemeResource RadioButtonForegroundDisabled}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundDisabled}" /><Setter TargetName="RadioRoot" Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushDisabled}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillDisabled}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillDisabled}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedDisabled}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
+        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RadioFocus" Property="Opacity" Value="1" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
   </Style>
   <Style TargetType="RadioButton" BasedOn="{StaticResource DefaultRadioButtonStyle}" />
 

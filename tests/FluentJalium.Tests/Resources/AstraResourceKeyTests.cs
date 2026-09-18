@@ -156,6 +156,36 @@ public class AstraResourceKeyTests
         Assert.False(offenders.Count > 0, "Theme tokens frozen at parse time:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// A transcribed alias row is only worth its upstream name if a template reads it. An idle row still
+    /// resolves, still appears in a key listing and still passes every other gate here, while the control
+    /// keeps painting whatever token its template hardcodes - so an app that overrides the upstream name
+    /// sees nothing. Dictionaries named below are held to full consumption; the rest are still
+    /// transitional until their control batch lands.
+    /// </summary>
+    [Theory]
+    [InlineData("ThemeResources/CheckBox.jalxaml")]
+    [InlineData("ThemeResources/RadioButton.jalxaml")]
+    public void Transcribed_control_rows_are_read_by_a_template(string file)
+    {
+        var dictionaries = AstraDictionaries();
+        var declared = DeclaredKeys(dictionaries.TryGetValue(file, out var source)
+            ? source
+            : throw new InvalidOperationException($"{file} is not embedded; the gate would pass vacuously.")).ToHashSet(StringComparer.Ordinal);
+        Assert.NotEmpty(declared);
+
+        var consumed = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (name, dictionary) in dictionaries)
+        {
+            if (name == file) continue;
+            foreach (var key in ReferencedKeys(dictionary)) consumed.Add(key);
+        }
+
+        var idle = declared.Except(consumed).Order(StringComparer.Ordinal).ToList();
+        Assert.False(idle.Count > 0, $"{file} declares {idle.Count} row(s) no template reads:{Environment.NewLine}" +
+            string.Join(Environment.NewLine, idle));
+    }
+
     private static Dictionary<string, XDocument> AstraDictionaries()
     {
         var assembly = typeof(FluentThemeManager).Assembly;

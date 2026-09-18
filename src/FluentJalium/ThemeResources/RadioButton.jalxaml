@@ -1,0 +1,63 @@
+<!-- WinUI 3 RadioButton_themeresources.xaml @19e3bdc3c (MIT), blob 223a28385186f36a4629d354928e5fb705ab10b3.
+     The Light/Default branch's 40 alias rows, transcribed so an app overrides a radio by upstream's name: ten rows
+     for the whole control (Foreground, Background, BorderBrush x rest/PointerOver/Pressed/Disabled), then
+     OuterEllipse{Stroke,Fill} and OuterEllipseChecked{Stroke,Fill} for the ring and CheckGlyph{Fill,Stroke}
+     plus CheckGlyphStrokeChecked for the dot, each x rest/PointerOver/Pressed/Disabled. Rows marked below are
+     substitutions, not transcriptions (audits/checkbox-radiobutton.md). Upstream's 15 legacy *ThemeBrush rows stay
+     undeclared, as elsewhere. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Deviation (type): upstream RadioButtonBorderThemeThickness is an x:Double feeding Ellipse.StrokeThickness;
+       this reader cannot parse an x:Double resource, so the same 1 rides a Thickness for our Border ring.
+       RadioButtonCheckGlyphSize 12, CheckGlyphPointerOverSize 14 and CheckGlyphPressedOverSize 10 stay
+       literals in the template for the same reason. -->
+  <Thickness x:Key="RadioButtonBorderThemeThickness">1</Thickness>
+  <StaticResource x:Key="RadioButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonForegroundPressed" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonBackground" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBackgroundPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBackgroundPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseStroke" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseStrokePointerOver" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseStrokePressed" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseStrokeDisabled" ResourceKey="ControlStrongStrokeColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseFill" ResourceKey="ControlAltFillColorSecondaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseFillPointerOver" ResourceKey="ControlAltFillColorTertiaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseFillPressed" ResourceKey="ControlAltFillColorQuarternaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseFillDisabled" ResourceKey="ControlAltFillColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedStroke" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokePressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedStrokeDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedFill" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillPressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="RadioButtonOuterEllipseCheckedFillDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <StaticResource x:Key="RadioButtonCheckGlyphFill" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonCheckGlyphFillPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonCheckGlyphFillPressed" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <!-- Deviation: upstream points this at TextOnAccentFillColorPrimary, which is a Color, and this runtime has no measured Color-to-Brush coercion in a Fill slot. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphFillDisabled" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <!-- Deviation: upstream points this at CircleElevationBorderBrush, which is a bounding-box gradient from ControlStrokeColorDefault to ControlStrokeColorSecondary. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStroke" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviation: upstream points this at CircleElevationBorderBrush, which is a bounding-box gradient from ControlStrokeColorDefault to ControlStrokeColorSecondary. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokePointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviation: upstream points this at CircleElevationBorderBrush, which is a bounding-box gradient from ControlStrokeColorDefault to ControlStrokeColorSecondary. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokePressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviation: upstream points this at CircleElevationBorderBrush, which is a bounding-box gradient from ControlStrokeColorDefault to ControlStrokeColorSecondary. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokeDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviation: upstream points this at AccentControlElevationBorderBrush, which is the same gradient on the accent side. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokeChecked" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <!-- Deviation: upstream points this at AccentControlElevationBorderBrush, which is the same gradient on the accent side. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokeCheckedPointerOver" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <!-- Deviation: upstream points this at AccentControlElevationBorderBrush, which is the same gradient on the accent side. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokeCheckedPressed" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <!-- Deviation: upstream points this at ControlElevationBorderBrush, which is a 3-DIP absolute gradient. Nearest token this palette carries. -->
+  <StaticResource x:Key="RadioButtonCheckGlyphStrokeCheckedDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+</ResourceDictionary>

@@ -98,17 +98,17 @@
       "markup": "CheckBox",
       "source": "Styles/Selection.jalxaml",
       "page": "selection",
-      "parity": "ported",
-      "gaps": [ "upstream CheckBox keys not transcribed", "the check glyph is not in the capture path", "click, keyboard and touch paths unmeasured" ],
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ]
+      "parity": "audited",
+      "gaps": [ "pointer-over and pressed cells have no real-pointer evidence", "the mark is geometry, not upstream's AnimatedIcon frame set", "the selection page is not measured on screen" ],
+      "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ]
     },
     {
       "markup": "RadioButton",
-      "source": "Styles/Selection.jalxaml",
+      "source": "Styles/Inputs.jalxaml",
       "page": "selection",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "upstream RadioButton keys not transcribed", "grouping and keyboard navigation unmeasured" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
+      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "grouping and keyboard navigation unmeasured", "the selection page is not measured on screen" ]
     },
     {
       "markup": "ComboBox",
