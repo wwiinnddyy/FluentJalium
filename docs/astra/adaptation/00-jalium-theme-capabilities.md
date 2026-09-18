@@ -156,14 +156,60 @@ ThemeMode.Dark + forced CurrentThemeKey=HighContrast: theme=#FF00FF00 radius=8,8
 而不是现在这套按键名猜 `Text`/`Stroke`/`Accent` 子串的启发式；
 并且必须如实写成 host substitution，不得声称 HC  parity。
 
-## 阶段 1 因此要做的事
+## 阶段 1 落地（2026-09-18，提交 `bbf3847`）
 
-1. `FluentThemeManager` 的切换入口收敛为 `Application.ThemeMode`；删掉
-   `ApplyMotionPolicy` 整树递归、`window.InvalidateVisual()`、
-   `ApplyHighContrastPalette` 的键名启发式（换成逐键映射表）。
-2. 调色板改为真正的 `ThemeDictionaries`（Light/Dark 两套 + HC 由映射表覆盖），
-   样式里的可变令牌从 `{StaticResource …Brush}` 改为 `{ThemeResource …}`。
-3. 强调色：`ThemeManager.SystemAccentResolver` 有 public setter，可以把 DWM 强调色接进来；
-   `ThemeManager.ApplyAccent(Color)` 是 public。两者都待阶段 1 实测是否驱动我们的键。
-4. 数值令牌保持字面量 + `.parts.md` 对照；键闸口要能查出被消费但不存在的键。
-5. 阶段 1 补测：`ThemeMode` 翻转后刷子实例标识是否保持（S0-a 的空白）。
+原计划五条，实测后处置如下。探针：`spike/ThemeRoute`（只读元数据与 IL，不渲染），
+原始输出 `00-theme-route-raw-output.txt`。
+
+### 公开面上确实没有替代驱动
+
+`Jalium.UI` 26.10.9 里带 `[Experimental]` 的 public 成员一共只有 4 个，全在同一族：
+
+```
+Jalium.UI.ThemeMode            [type]      Experimental(WPF0001)
+Jalium.UI.ThemeModeConverter   [type]      Experimental(WPF0001)
+Jalium.UI.Application.ThemeMode [property] Experimental(WPF0001)
+Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
+```
+
+诊断文本是「仅用于评估，在将来的更新中可能会被更改或删除。**取消此诊断以继续**」——
+框架给的唯一豁免方式就是按 ID 抑制。IL 调用图解释了 S0-a 的读数：
+
+- `Application.set_ThemeMode` → `ThemeManager.ApplyTheme(ThemeVariant)`（public）
+  + `ApplyWindowsSystemThemePreference`/`ApplyCachedSystemThemePreference`；
+- `ThemeManager.ApplyTheme` 只做 `ResourceDictionary.CurrentThemeKey` + 私有
+  `ForceThemeRefresh` + `CompositionTarget.RequestImmediateFrame`；
+- 真正广播重解析的 `Application.NotifyThemeResourcesChanged`（遍历
+  `Window.SnapshotOpenWindows`/`PopupWindow.SnapshotOpenPopupWindows` +
+  `ResourceLookup.InvalidateResourceCache`）是 **internal**，
+  `ResourceDictionary.InvalidateMergedLookupCaches`/`NotifyKeysChanged` 同样 **不是 public**。
+
+所以单独调用 public 的 `ThemeManager.ApplyTheme` 不动已解析的订阅，而 `ThemeMode` 会——
+它内部调 `ApplyTheme` 再补上那次广播。**结论：没有非实验性的替代路径。**
+`Application.NotifyThemeResourcesChanged` 的文档文本还顺带确认了混合模型是对的：
+「主题字典跨变体保持同一批 `Style`/`ControlTemplate` 实例，控件需要刷的是
+`ResourcesChanged` 钩子里手动缓存的刷子和保留的绘制命令」。
+
+### 五条计划的最终处置
+
+1. **门面收敛**——`ApplicationThemeDriver` 是全仓唯一 `#pragma warning disable WPF0001`
+   的文件，模式以字符串进出，实验性类型不外泄到 Astra 公共面；`ApplyMotionPolicy`
+   整树递归、逐窗口 `InvalidateVisual()` 已删除（三处产品控件与 Gallery 调用点一并移除）。
+2. ~~**调色板升级为真 `ThemeDictionaries`**~~ → 改为**混合模型**（用户决定）：保留单份就地
+   改色的调色板，笔刷实例跨主题不变，这样 `OverrideBrush`、强调色、`SystemColor*` 水合
+   都只有一处写入；再额外赋值 `Application.ThemeMode`，让框架自有的托管字典与原生默认
+   一起跟。放弃 ThemeDictionaries 的理由：S0-a 已证明就地改色足够驱动 `{ThemeResource}`
+   消费者，而双份实例会让"覆盖单个笔刷"变成多次写入。
+3. **强调色**——`ThemeManager.SystemAccentResolver`/`ApplyAccent` 不动 Astra 的键；
+   我们的 accent 族仍由 `FluentThemeManager.ApplyAccent(Color?)` 原地改色，
+   `OverrideBrush` 优先。DWM 强调色接入留到 Gallery 的 Tokens 页一起做。
+4. **键闸口**——`tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs` 解析全部内嵌
+   字典，断言每个 `{ThemeResource|StaticResource|DynamicResource}` 引用都有声明，
+   且 `{ThemeResource}` 键在每个主题分支都存在；Light/Dark 键集必须一一对应。
+5. **补测 `ThemeMode` 翻转后的实例标识**——`AstraThemeRuntimeTests` 断言
+   `Assert.Same` 跨 Light→Dark 成立且应用级查找回到同一实例，已通过。
+   附带发现：xunit 每个测试换一个工作线程，因此夹具自带一条 STA 线程并串行投递，
+   UI 线程守卫保持为真而不是为测试放宽。
+
+**仍未证**：`ThemeMode.System` 是否真的跟住 OS 切换（测试只断言赋值生效）；
+离屏 `RenderTargetBitmap` 与上屏合成是否逐像素一致（B4 先做一次性核对）。
