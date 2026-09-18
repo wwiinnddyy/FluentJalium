@@ -35,8 +35,8 @@ Push-Location $root
 try {
     Invoke-Step 'restore' { dotnet restore FluentJalium.slnx }
     Invoke-Step "build ($Configuration)" { dotnet build FluentJalium.slnx -c $Configuration --no-restore }
-    Invoke-Step 'structure gates' {
-        dotnet test tests/FluentJalium.Tests -c $Configuration --no-build --filter 'FullyQualifiedName~AstraGateTests'
+    Invoke-Step 'test suite (structure, resource keys, theme runtime)' {
+        dotnet test tests/FluentJalium.Tests -c $Configuration --no-build --no-restore
     }
     if (-not $SkipPalette) {
         Write-Host '==> palette drift'

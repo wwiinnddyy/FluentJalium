@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Runtime.CompilerServices;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Media;
@@ -9,9 +8,12 @@ using Microsoft.Win32;
 namespace FluentJalium.Themes;
 
 /// <summary>
-/// Installs the Astra dictionaries once. Theme changes update retained brush identities,
-/// never replace controls, reset user property values or reflect into framework internals.
-/// All mutation is owned by the application's UI thread.
+/// Installs the Astra dictionaries once and keeps one palette live across variants. Brushes keep
+/// their identity and are retinted in place, so existing references, user-set values and retained
+/// drawing all follow without replacing controls; <see cref="ApplicationThemeDriver"/> hands the
+/// same decision to Jalium so native defaults move together. High contrast applies WinUI's own
+/// per-key mapping instead of guessing from key names. All mutation is owned by the application's
+/// UI thread.
 /// </summary>
 public static class FluentThemeManager
 {
@@ -19,9 +21,9 @@ public static class FluentThemeManager
     private static ResourceDictionary? _palette;
     private static ResourceDictionary? _light;
     private static ResourceDictionary? _dark;
+    private static Dictionary<string, string>? _highContrastMap;
     private static readonly List<ResourceDictionary> Installed = [];
     private static readonly Dictionary<string, Color> BrushOverrides = new(StringComparer.Ordinal);
-    private static readonly ConditionalWeakTable<UIElement, MotionDuration> Durations = new();
     private static int _threadId;
     private static bool _reduceMotion;
     private static Color? _accent;
@@ -35,10 +37,21 @@ public static class FluentThemeManager
     public static bool IsDark { get; private set; }
     public static bool IsHighContrast { get; private set; }
     public static bool IsInitialized => _application is not null;
+
+    /// <summary>The mode Jalium itself was last asked for: Light, Dark, System or None.</summary>
+    public static string NativeThemeMode => _application is null ? ApplicationThemeDriver.None : ApplicationThemeDriver.Read(_application);
+
     public static Color CurrentAccentColor => _accent ?? (IsDark ? Color.FromRgb(0x60, 0xCD, 0xFF) : Color.FromRgb(0, 0x78, 0xD4));
     public static bool AnimationsEnabled => !_reduceMotion && SystemParameters.ClientAreaAnimation;
     public static event Action? Changed;
 
+    /// <summary>
+    /// Suppresses the animations Astra drives from code: the page entrance and the navigation
+    /// selection indicator. Template transitions — including the toggle switch thumb — keep their
+    /// designed durations until the motion stage turns them into resource keys; see
+    /// docs/astra/ROADMAP.md. Removing the old visual-tree walk means a mid-session flip of this
+    /// property no longer restyles already-realised templates, which is the honest behaviour.
+    /// </summary>
     public static bool ReduceMotion
     {
         get => _reduceMotion;
@@ -210,6 +223,22 @@ public static class FluentThemeManager
             SetColor("TextOnAccentFillColorSecondaryBrush", Color.FromArgb(0xB3, text.R, text.G, text.B));
         }
         foreach (var (key, value) in BrushOverrides) SetColor(key, value);
+        ApplyNativeThemeMode();
+    }
+
+    /// <summary>
+    /// Hands the decision about native control defaults back to Jalium. High contrast has no
+    /// Jalium equivalent, so it resolves to the concrete mode our palette is already showing.
+    /// </summary>
+    private static void ApplyNativeThemeMode()
+    {
+        var mode = CurrentTheme switch
+        {
+            FluentThemeVariant.Light => ApplicationThemeDriver.Light,
+            FluentThemeVariant.Dark => ApplicationThemeDriver.Dark,
+            _ => IsHighContrast ? (IsDark ? ApplicationThemeDriver.Dark : ApplicationThemeDriver.Light) : ApplicationThemeDriver.System,
+        };
+        ApplicationThemeDriver.Apply(_application!, mode);
     }
 
     private static IReadOnlyList<string> ReadManifest()
@@ -257,40 +286,90 @@ public static class FluentThemeManager
 
     private static void SetSystemBrushes()
     {
-        (string Key, Color Value)[] values =
-        [
-            ("SystemColorButtonFaceColorBrush", SystemColors.ControlColor),
-            ("SystemColorButtonTextColorBrush", SystemColors.ControlTextColor),
-            ("SystemColorGrayTextColorBrush", SystemColors.GrayTextColor),
-            ("SystemColorHighlightColorBrush", SystemColors.HighlightColor),
-            ("SystemColorHighlightTextColorBrush", SystemColors.HighlightTextColor),
-            ("SystemColorHotlightColorBrush", SystemColors.HotTrackColor),
-            ("SystemColorWindowColorBrush", SystemColors.WindowColor),
-            ("SystemColorWindowTextColorBrush", SystemColors.WindowTextColor),
-        ];
-        foreach (var (key, color) in values)
+        foreach (var (key, name) in SystemBrushKeys)
         {
+            var color = SystemColor(name);
             if (_palette![key] is SolidColorBrush brush) { brush.Color = color; brush.Opacity = 1; }
             else _palette[key] = new SolidColorBrush(color);
         }
     }
 
+    /// <summary>The eight Win32 high-contrast colors WinUI references, plus the transparent role.</summary>
+    private static Color SystemColor(string name) => name switch
+    {
+        "Transparent" => Colors.Transparent,
+        "SystemColorWindowColor" => SystemColors.WindowColor,
+        "SystemColorWindowTextColor" => SystemColors.WindowTextColor,
+        "SystemColorButtonFaceColor" => SystemColors.ControlColor,
+        "SystemColorButtonTextColor" => SystemColors.ControlTextColor,
+        "SystemColorGrayTextColor" => SystemColors.GrayTextColor,
+        "SystemColorHighlightColor" => SystemColors.HighlightColor,
+        "SystemColorHighlightTextColor" => SystemColors.HighlightTextColor,
+        "SystemColorHotlightColor" => SystemColors.HotTrackColor,
+        _ => throw new InvalidOperationException($"Unknown Win32 system color name: {name}"),
+    };
+
+    private static readonly (string Key, string Name)[] SystemBrushKeys =
+    [
+        ("SystemColorButtonFaceColorBrush", "SystemColorButtonFaceColor"),
+        ("SystemColorButtonTextColorBrush", "SystemColorButtonTextColor"),
+        ("SystemColorGrayTextColorBrush", "SystemColorGrayTextColor"),
+        ("SystemColorHighlightColorBrush", "SystemColorHighlightColor"),
+        ("SystemColorHighlightTextColorBrush", "SystemColorHighlightTextColor"),
+        ("SystemColorHotlightColorBrush", "SystemColorHotlightColor"),
+        ("SystemColorWindowColorBrush", "SystemColorWindowColor"),
+        ("SystemColorWindowTextColorBrush", "SystemColorWindowTextColor"),
+    ];
+
+    /// <summary>
+    /// Platform substitution: applies WinUI's own per-key high-contrast mapping, generated from the
+    /// upstream HighContrast branch by tools/Sync-AstraPalette.ps1. It does not claim every WinUI
+    /// per-control high-contrast visual-state override has been ported.
+    /// </summary>
     private static void ApplyHighContrastPalette()
     {
-        // Platform substitution: map semantic color roles to system colors. This does not
-        // claim every WinUI per-control HighContrast visual-state override has been ported.
-        foreach (DictionaryEntry entry in _palette!)
+        foreach (var (key, name) in HighContrastMap)
         {
-            if (entry.Key is not string key || entry.Value is not SolidColorBrush brush || key.StartsWith("SystemColor", StringComparison.Ordinal)) continue;
-            var color = key.Contains("Disabled", StringComparison.Ordinal) ? SystemColors.GrayTextColor
-                : key.StartsWith("TextOnAccent", StringComparison.Ordinal) ? SystemColors.HighlightTextColor
-                : key.StartsWith("Accent", StringComparison.Ordinal) ? SystemColors.HighlightColor
-                : key.Contains("Text", StringComparison.Ordinal) || key.Contains("Stroke", StringComparison.Ordinal) || key.Contains("StrongFill", StringComparison.Ordinal) ? SystemColors.WindowTextColor
-                : SystemColors.WindowColor;
-            if (key.Contains("Transparent", StringComparison.Ordinal) || key.StartsWith("SubtleFill", StringComparison.Ordinal)) color = Colors.Transparent;
-            brush.Color = color;
+            if (_palette![key] is not SolidColorBrush brush) throw new InvalidOperationException($"High-contrast map targets a key that is not a brush: {key}");
+            brush.Color = SystemColor(name);
             brush.Opacity = 1;
         }
+    }
+
+    internal static Dictionary<string, string> HighContrastMap => _highContrastMap ??= ReadHighContrastMap();
+
+    /// <summary>Every brush key the live palette declares, for the resource gates.</summary>
+    internal static IReadOnlyList<string> PaletteBrushKeys
+    {
+        get
+        {
+            VerifyAccess();
+            return [.. _palette!.Keys.OfType<string>().Where(static key => key.EndsWith("Brush", StringComparison.Ordinal)).Order(StringComparer.Ordinal)];
+        }
+    }
+
+    private static Dictionary<string, string> ReadHighContrastMap()
+    {
+        const string name = "Resources/HighContrast.map";
+        using var stream = OpenResource(name) ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
+        var map = new Dictionary<string, string>(StringComparer.Ordinal);
+        using var reader = new StreamReader(stream);
+        var lineNumber = 0;
+        while (reader.ReadLine() is { } text)
+        {
+            lineNumber++;
+            var line = text.Trim();
+            if (line.Length == 0 || line.StartsWith('#')) continue;
+            var separator = line.IndexOf('=');
+            if (separator <= 0) throw new InvalidOperationException($"{name} line {lineNumber} is not key=value.");
+            var key = line[..separator];
+            var target = line[(separator + 1)..];
+            SystemColor(target); // Fail on an unmappable name here rather than on every theme switch.
+            if (_palette is null || !_palette.Contains(key)) throw new InvalidOperationException($"{name} line {lineNumber} maps {key}, which the palette does not declare.");
+            map.Add(key, target);
+        }
+        if (map.Count == 0) throw new InvalidOperationException($"{name} lists no keys.");
+        return map;
     }
 
     private static bool IsSystemDark()
@@ -312,27 +391,7 @@ public static class FluentThemeManager
         return 0.2126 * Channel(color.R) + 0.7152 * Channel(color.G) + 0.0722 * Channel(color.B);
     }
 
-    private static void NotifyChanged()
-    {
-        Changed?.Invoke();
-        foreach (Window window in _application!.Windows)
-        {
-            ApplyMotionPolicy(window);
-            window.InvalidateVisual();
-        }
-    }
-
-    /// <summary>Applies the app/system motion preference to existing transition hosts.</summary>
-    public static void ApplyMotionPolicy(DependencyObject? root)
-    {
-        if (root is null) return;
-        if (root is UIElement element)
-        {
-            var original = Durations.GetValue(element, e => new MotionDuration(e.TransitionDuration));
-            element.TransitionDuration = AnimationsEnabled ? original.Value : new Duration(TimeSpan.Zero);
-        }
-        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++) ApplyMotionPolicy(VisualTreeHelper.GetChild(root, i));
-    }
+    private static void NotifyChanged() => Changed?.Invoke();
 
     /// <summary>Optional short content entrance; does not replace the host's content.</summary>
     public static void Enter(UIElement element)
@@ -346,6 +405,4 @@ public static class FluentThemeManager
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }, FillBehavior = FillBehavior.Stop,
         });
     }
-
-    private sealed record MotionDuration(Duration Value);
 }

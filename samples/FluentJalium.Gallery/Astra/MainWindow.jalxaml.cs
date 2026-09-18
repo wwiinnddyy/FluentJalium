@@ -59,11 +59,7 @@ public partial class MainWindow : Window
 
         FluentThemeManager.Changed += ApplyAppearance;
         ApplyAppearance();
-        Loaded += (_, _) =>
-        {
-            _loaded = true;
-            FluentThemeManager.ApplyMotionPolicy(this);
-        };
+        Loaded += (_, _) => _loaded = true;
         SystemSettingsChanged += (_, _) => FluentThemeManager.ApplyTheme(_theme);
         ((FrameworkElement)Content!).SizeChanged += (_, args) =>
             ContentHost.Margin = new Thickness(args.NewSize.Width < 720 ? 16 : 24);
@@ -196,7 +192,9 @@ public partial class MainWindow : Window
     {
         if (_syncControls) return;
         FluentThemeManager.ReduceMotion = MotionPreference.IsChecked == true;
-        Report(FluentThemeManager.ReduceMotion ? "Reduced motion enabled." : "App animations enabled; Windows preferences still apply.");
+        Report(FluentThemeManager.ReduceMotion
+            ? "Reduced motion enabled for Astra's own animations. Template transitions still use their designed durations."
+            : "App animations enabled; Windows preferences still apply.");
     }
 
     private void WireToggle(ToggleButton control, string label)
@@ -233,11 +231,7 @@ public partial class MainWindow : Window
         ContentHost.Children.Clear();
         ContentHost.Children.Add(page);
         ((ScrollViewer)PageScrollViewer!).ScrollToVerticalOffset(0);
-        if (_loaded)
-        {
-            FluentThemeManager.ApplyMotionPolicy(page);
-            FluentThemeManager.Enter(page);
-        }
+        if (_loaded) FluentThemeManager.Enter(page);
         Report($"Navigated to {args.SelectedItem.Content}.");
     }
 
@@ -251,7 +245,6 @@ public partial class MainWindow : Window
             titleBar.Foreground = Foreground;
         }
         ((TextBlock)ThemeStatus!).Text = $"{_theme} · {(FluentThemeManager.AnimationsEnabled ? "Motion on" : "Reduced motion")}";
-        FluentThemeManager.ApplyMotionPolicy(this);
     }
 
     private void Report(string message)

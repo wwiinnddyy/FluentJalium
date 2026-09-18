@@ -107,7 +107,6 @@ public sealed class FluentToggleSwitch : ToggleButton
     {
         base.OnApplyTemplate();
         Snap();
-        FluentThemeManager.ApplyMotionPolicy(this);
     }
 
     /// <inheritdoc />
@@ -147,11 +146,7 @@ public sealed class FluentToggleSwitch : ToggleButton
         if (!newValue) Cancel();
     }
 
-    private void OnThemeChanged()
-    {
-        ApplyDefaultStyle();
-        FluentThemeManager.ApplyMotionPolicy(this);
-    }
+    private void OnThemeChanged() => ApplyDefaultStyle();
 
     private void ApplyDefaultStyle()
     {

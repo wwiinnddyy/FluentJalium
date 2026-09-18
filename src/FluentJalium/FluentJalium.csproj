@@ -23,8 +23,18 @@
     <EmbeddedResource Include="Astra/Resources/Manifest.txt">
       <LogicalName>Resources/Manifest.txt</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Astra/Resources/HighContrast.map">
+      <LogicalName>Resources/HighContrast.map</LogicalName>
+    </EmbeddedResource>
     <None Include="../../README.md" Pack="true" PackagePath="/" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The gate tests assert Astra's internal resource tables directly rather than widening the
+         public surface to expose them. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FluentJalium.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />

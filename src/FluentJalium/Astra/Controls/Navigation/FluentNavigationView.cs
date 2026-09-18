@@ -300,7 +300,6 @@ public sealed class FluentNavigationView : ContentControl
         if (_indicatorBorder != null)
             _indicatorBorder.Background = FluentThemeManager.GetBrush("AccentFillColorDefaultBrush");
         if (!FluentThemeManager.AnimationsEnabled) _indicator?.Complete();
-        FluentThemeManager.ApplyMotionPolicy(this);
     }
 
     private void UpdateSelectionIndicator()
