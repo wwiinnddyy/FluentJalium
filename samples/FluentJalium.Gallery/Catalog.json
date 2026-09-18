@@ -1,0 +1,154 @@
+{
+  "note": "One file, two consumers: the Gallery renders its parity strip from it, and tests/FluentJalium.Tests/Gallery/AstraGalleryCatalogTests.cs fails when it stops matching the styles Astra actually ships. Scope is the implicit-style universe - every TargetType a product dictionary restyles without an x:Key - because that is the set an app inherits silently.",
+  "parityLegend": {
+    "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion. Whatever is missing is named in gaps.",
+    "ported": "Style came from the pre-Astra adapter and consumes Astra tokens, but the upstream key list was never transcribed verbatim and no pixel assertion covers it.",
+    "own-type": "Jalium has no native type for this control, so an Astra-owned type carries the behavior; adaptation/05 records the demonstrated gap."
+  },
+  "pages": [
+    { "id": "overview", "title": "Overview", "host": "OverviewPage" },
+    { "id": "buttons", "title": "Buttons", "host": "ButtonsPage" },
+    { "id": "inputs", "title": "Inputs", "host": "InputsPage" },
+    { "id": "selection", "title": "Selection", "host": "SelectionPage" },
+    { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
+    { "id": "settings", "title": "Settings", "host": "SettingsPage" }
+  ],
+  "controls": [
+    {
+      "markup": "Button",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "press, keyboard and touch activation are not gated", "text colour never reaches the capture path", "Compound, Split and DropDown variants are not built" ]
+    },
+    {
+      "markup": "ToggleButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "the indeterminate state has no upstream key to map", "the checked glyph is not a pixel claim" ]
+    },
+    {
+      "markup": "RepeatButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "hold-to-repeat interval and delay are framework behavior, unmeasured" ]
+    },
+    {
+      "markup": "HyperlinkButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "navigation of NavigateUri is untested", "the link text colour cannot be asserted in pixels" ]
+    },
+    {
+      "markup": "ScrollViewer",
+      "source": "Styles/Common.jalxaml",
+      "page": "overview",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/scrollviewer.md", "tests/FluentJalium.Tests/AstraScrollHostTests.cs" ],
+      "gaps": [ "drag, inertia and touch panning have no evidence", "ScrollBar restyling is limited to the two generated-brush hooks" ]
+    },
+    {
+      "markup": "ToolTip",
+      "source": "Styles/Common.jalxaml",
+      "page": "overview",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/tooltip.md", "tests/FluentJalium.Tests/AstraThemeRuntimeTests.cs" ],
+      "gaps": [ "show delay, auto-hide and placement are framework behavior, unmeasured" ]
+    },
+    {
+      "markup": "TextBlock",
+      "source": "ThemeResources/Typography.jalxaml",
+      "page": "overview",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "the size ramp is not transcribed key for key against upstream", "font fallback is the operating system's, not measured", "text colour never reaches the capture path" ]
+    },
+    {
+      "markup": "TextBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream TextBox resource keys were never transcribed key for key", "no pixel assertion", "watermark, selection and IME surfaces unmeasured" ]
+    },
+    {
+      "markup": "PasswordBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "the type is sealed and direct-rendered, so only native properties are styled", "no pixel assertion" ]
+    },
+    {
+      "markup": "Slider",
+      "source": "Styles/Inputs.jalxaml",
+      "page": "inputs",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream Slider keys not transcribed", "tick marks, direction and thumb drag paths unmeasured" ]
+    },
+    {
+      "markup": "CheckBox",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream CheckBox keys not transcribed", "the check glyph is not in the capture path", "three-state not mapped" ]
+    },
+    {
+      "markup": "RadioButton",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream RadioButton keys not transcribed", "grouping and keyboard navigation unmeasured" ]
+    },
+    {
+      "markup": "ComboBox",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream ComboBox keys not transcribed", "the dropdown surface is not asserted against FlyoutPresenter tokens" ]
+    },
+    {
+      "markup": "ComboBoxItem",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "ported",
+      "evidence": [ "tests/FluentJalium.Tests/AstraItemHostTests.cs" ],
+      "gaps": [ "upstream ListItem keys not transcribed", "selection paint unmeasured" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentToggleSwitch",
+      "source": "Styles/Inputs.jalxaml",
+      "page": "inputs",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream ToggleSwitch keys not transcribed", "the drag-to-toggle path has no evidence" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentNavigationView",
+      "source": "Styles/Navigation.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md" ],
+      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item", "back-button and item invocation not gated" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentNavigationItem",
+      "source": "Styles/Navigation.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md" ],
+      "gaps": [ "no expandable children, icon sources beyond SymbolIcon", "selection indicator motion unmeasured" ]
+    }
+  ]
+}

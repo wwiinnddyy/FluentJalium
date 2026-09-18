@@ -197,4 +197,9 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
    本库的文字色一律走"建树 + 读回实例"（`PixelHarness.Build`），
    所以"某个文字令牌在上屏画面里真的是这个颜色"这句话，我们的闸口证明不了，只能证明到"实例接上了"。
 10. 上游 10 条遗留 `*ThemeBrush` 不声明，若某个应用真的按老名字取刷，这里会落空。
-11. Gallery 的 Button 页未做（九步的第 7 步），本段的"外观"结论只到单控件捕获。
+11. **Gallery 页已落地（九步第 7 步），但它本身不是外观证据**。`samples/FluentJalium.Gallery`：
+    Buttons 页补了 Toggle/Repeat/Hyperlink 家族卡与按住连发读数，Overview 页加了内嵌 ScrollViewer
+    与静置 ToolTip 表面卡；底部 parity 条与"未声称"行由 `Catalog.json` 驱动，
+    四个按钮族在目录里的 parity 是 `audited`，各自的欠账逐条写在该文件里。
+    仍然欠的是这一页的**可见结果**：运行时冒烟只目视到 Overview 一页，家族卡没有断言、也没看到，
+    且屏幕坐标点击已被判定不可用（见 `adaptation/10`）→ 逐页证据归 E4 的进程内渲染。

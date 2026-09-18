@@ -12,6 +12,8 @@
   <ItemGroup>
     <Compile Include="*.cs" />
     <JalxamlPage Include="*.jalxaml" />
+    <!-- The parity strip and the catalog gate read the same file; it has to travel with the app. -->
+    <None Include="Catalog.json" CopyToOutputDirectory="PreserveNewest" />
     <ProjectReference Include="../../src/FluentJalium/FluentJalium.csproj" />
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
   </ItemGroup>

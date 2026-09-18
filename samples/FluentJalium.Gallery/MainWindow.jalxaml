@@ -83,6 +83,22 @@
                   <Button x:Name="ExploreNavigationButton" Content="Open navigation" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
                 </fluent:FluentSettingsRow>
               </Border>
+              <TextBlock Text="Base surfaces" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <TextBlock Text="ScrollViewer" Style="{StaticResource BodyTextBlockStyle}" />
+                  <TextBlock Text="Every page here scrolls through this host. The bar only appears while it is needed, and the thumb width is the upstream one." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,8" />
+                  <Border Background="{StaticResource LayerFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4">
+                    <ScrollViewer Height="120" Padding="12">
+                      <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"
+                                 Text="Astra does not retemplate the scroll host: the framework owns its parts, and the theme reaches it through the two generated brush hooks and the implicit style. Measured on 26.10.9: the resting bar paints, the thumb follows the theme, an opaque host background covers its own bar, and overlay mode takes the repeat arrows away. What is not measured is dragging, inertia and touch panning, so scroll this box yourself and treat the picture as the claim rather than the physics." />
+                    </ScrollViewer>
+                  </Border>
+                  <TextBlock Text="ToolTip" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBlock Text="Shown resting in the tree, because the hover timer that would normally open it is not gated." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,8" />
+                  <ToolTip Content="Flyout surface, acrylic fill, 1px stroke, 320 DIP cap" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="WinUI 3 styling · Jalium layout, input, and rendering" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
             </StackPanel>
 
@@ -107,6 +123,19 @@
                   <Button Content="Accent" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
                   <Button Content="Subtle" Style="{StaticResource SubtleButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
                 </WrapPanel>
+              </Border>
+              <TextBlock Text="The rest of the family" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <ToggleButton x:Name="QuietToggleButton" Content="Toggle" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="CheckedToggleButton" Content="Checked" IsChecked="True" Margin="0,0,8,8" />
+                    <RepeatButton x:Name="RepeatActionButton" Content="Repeat" Margin="0,0,8,8" />
+                    <HyperlinkButton Content="Hyperlink" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="These four take their fills from their own upstream alias files - ToggleButton, RepeatButton and HyperlinkButton each carry a transcribed key list, and the hyperlink inherits the layout style rather than the subtle button's fill." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="RepeatReadout" Text="Hold the repeat button to see it fire." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
               </Border>
               <TextBlock Text="Keyboard" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,8" />
               <TextBlock Text="Use Tab to move between buttons and Space or Enter to activate the focused action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
@@ -277,6 +306,10 @@
         <Border Grid.Row="1" Margin="24,0,24,16" Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
           <Grid Margin="12">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*" />
               <ColumnDefinition Width="Auto" />
@@ -286,6 +319,11 @@
               <TextBlock x:Name="LiveOutput" Text="Ready. Choose a control to try it." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
             </StackPanel>
             <Button x:Name="ClearOutputButton" Grid.Column="1" Content="Clear" Style="{StaticResource SubtleButtonStyle}" VerticalAlignment="Top" Margin="12,0,0,0" />
+            <!-- Generated from Catalog.json, so the parity claim cannot outlive the styles it describes. -->
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
+              <TextBlock x:Name="ParityStatus" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+              <TextBlock x:Name="ParityGaps" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{StaticResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" />
+            </StackPanel>
           </Grid>
         </Border>
       </Grid>

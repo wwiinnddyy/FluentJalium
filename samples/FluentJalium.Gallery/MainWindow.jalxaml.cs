@@ -11,10 +11,13 @@ namespace FluentJalium.Gallery;
 public partial class MainWindow : Window
 {
     private readonly Dictionary<FluentNavigationItem, FrameworkElement> _pages;
+    private readonly Dictionary<FluentNavigationItem, string> _pageIds = [];
+    private readonly GalleryCatalog _catalog = GalleryCatalog.Load();
     private FluentThemeVariant _theme = FluentThemeVariant.System;
     private bool _syncControls = true;
     private bool _loaded;
     private int _buttonCount;
+    private int _repeatCount;
 
     private FluentNavigationView Navigation => (FluentNavigationView)NavigationRoot!;
     private Grid ContentHost => (Grid)PageHost!;
@@ -39,6 +42,12 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
         };
+        _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
+        _pageIds[(FluentNavigationItem)ButtonsItem!] = "buttons";
+        _pageIds[(FluentNavigationItem)InputsItem!] = "inputs";
+        _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
+        _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
+        _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
 
         // Only the active page is in the visual tree and tab order. Reusing the same
         // page instances preserves native input state when moving between examples.
@@ -88,6 +97,11 @@ public partial class MainWindow : Window
             button.Click += (_, _) => Report($"{button.Content} button activated. Total actions: {++_buttonCount}.");
 
         ((Button)ClearOutputButton!).Click += (_, _) => Report("Output cleared. Choose a control to try it.");
+
+        ((RepeatButton)RepeatActionButton!).Click += (_, _) =>
+            ((TextBlock)RepeatReadout!).Text = $"Repeat button fired {++_repeatCount} times.";
+        foreach (var toggle in new[] { (ToggleButton)QuietToggleButton!, (ToggleButton)CheckedToggleButton! })
+            WireToggle(toggle, toggle.Content?.ToString() ?? "Toggle");
     }
 
     private void WireInputs()
@@ -232,7 +246,47 @@ public partial class MainWindow : Window
         ContentHost.Children.Add(page);
         ((ScrollViewer)PageScrollViewer!).ScrollToVerticalOffset(0);
         if (_loaded) FluentThemeManager.Enter(page);
+        ShowParity(args.SelectedItem);
         Report($"Navigated to {args.SelectedItem.Content}.");
+    }
+
+    /// <summary>
+    /// The per-control parity line the nine-step exit asks for, read straight out of Catalog.json. A
+    /// page with no type of its own says so instead of going quiet, and a missing catalog file says
+    /// that too - an empty strip would otherwise look like "nothing restyled here".
+    /// </summary>
+    private void ShowParity(FluentNavigationItem? item)
+    {
+        var status = (TextBlock)ParityStatus!;
+        var gaps = (TextBlock)ParityGaps!;
+        if (item is null)
+        {
+            status.Text = string.Empty;
+            gaps.Text = string.Empty;
+            return;
+        }
+
+        if (_catalog.Controls.Length == 0)
+        {
+            status.Text = "Catalog.json did not reach the output folder, so no parity claim on this page is checked.";
+            gaps.Text = string.Empty;
+            return;
+        }
+
+        if (!_pageIds.TryGetValue(item, out var pageId))
+        {
+            status.Text = $"{item.Content} is not in the catalog.";
+            gaps.Text = string.Empty;
+            return;
+        }
+
+        var onPage = _catalog.OnPage(pageId);
+        var title = _catalog.Page(pageId)?.Title ?? pageId;
+        status.Text = onPage.Length == 0
+            ? $"{title} · composes the {_catalog.Controls.Length} restyled types listed on their own pages"
+            : $"{title} · {string.Join(", ", onPage.Select(control => $"{control.Name} {control.Parity}"))} · {onPage.Length} of {_catalog.Controls.Length} restyled types";
+        var open = _catalog.GapsLine(pageId);
+        gaps.Text = open.Length == 0 ? string.Empty : $"Not claimed: {open}";
     }
 
     private void ApplyAppearance()
