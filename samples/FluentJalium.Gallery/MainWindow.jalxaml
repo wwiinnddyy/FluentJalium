@@ -186,7 +186,12 @@
                     <TextBlock Text="Volume" Style="{StaticResource BodyTextBlockStyle}" />
                     <TextBlock x:Name="VolumeValue" Text="45%" Style="{StaticResource CaptionTextBlockStyle}" />
                   </fluent:FluentSettingsRow>
-                  <Slider x:Name="VolumeSlider" Style="{StaticResource DefaultSliderStyle}" Minimum="0" Maximum="100" Value="45" SmallChange="1" LargeChange="10" Margin="0,12,0,0" />
+                  <Slider x:Name="VolumeSlider" Minimum="0" Maximum="100" Value="45" SmallChange="1" LargeChange="10" Margin="0,12,0,0" />
+                  <TextBlock Text="Tick marks and a disabled slider" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <Slider Minimum="0" Maximum="100" Value="30" TickPlacement="BottomRight" TickFrequency="10" Margin="0,8,0,0" />
+                  <Slider IsEnabled="False" Minimum="0" Maximum="100" Value="60" Margin="0,12,0,0" />
+                  <TextBlock Text="The first slider above carries no Style attribute, so it is the implicit Slider style doing the work."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
                 </StackPanel>
               </Border>
               <WrapPanel Margin="0,16,0,0">

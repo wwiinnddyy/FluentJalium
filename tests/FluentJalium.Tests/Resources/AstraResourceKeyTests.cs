@@ -167,6 +167,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/CheckBox.jalxaml")]
     [InlineData("ThemeResources/RadioButton.jalxaml")]
     [InlineData("ThemeResources/TextBox.jalxaml")]
+    [InlineData("ThemeResources/Slider.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

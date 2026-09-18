@@ -43,17 +43,18 @@ foreach ($theme in @('Light', 'Dark')) {
         $opacity = if ($node.Attribute('Opacity')) { $node.Attribute('Opacity').Value } else { '1' }
         $brushes[$key] = @($color, $opacity)
     }
-    # Explicit Jalium adapters: the platform slider's outer stroke and the acrylic tokens this runtime
-    # cannot paint. Upstream defines AcrylicInAppFillColorDefaultBrush as an AcrylicBrush, so the
-    # generator never emits it; Jalium has no AcrylicBrush type, and the material cannot be applied to
-    # a popup or an in-app layer anyway. The solid below is literally upstream's own FallbackColor
-    # (#F9F9F9 light / #2C2C2C dark from AcrylicBrush_themeresources.xaml), under upstream's key, so
-    # every alias chain stays verbatim and a later real material only replaces this line.
+    # Explicit Jalium adapters: the acrylic tokens this runtime cannot paint. Upstream defines
+    # AcrylicInAppFillColorDefaultBrush as an AcrylicBrush, so the generator never emits it; Jalium has no
+    # AcrylicBrush type, and the material cannot be applied to a popup or an in-app layer anyway. The solid
+    # below is literally upstream's own FallbackColor (#F9F9F9 light / #2C2C2C dark from
+    # AcrylicBrush_themeresources.xaml), under upstream's key, so every alias chain stays verbatim and a
+    # later real material only replaces this line.
     $brushes['AcrylicInAppFillColorDefaultBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#F9F9F9' }), '1')
-    # ToolbarSurfaceBrush used to sit here. It was a name we invented and nothing consumed it; the
-    # shell it was meant to serve turns out to have its own eight real hooks, which are tinted from
-    # ThemeResources/TitleBar.jalxaml instead (docs/astra/audits/window-shell.md).
-    $brushes['SliderThumbStrokeBrush'] = @($(if ($theme -eq 'Dark') { '#26000000' } else { '#24000000' }), '1')
+    # Two invented keys used to sit in this class. ToolbarSurfaceBrush had no consumer and the shell it was
+    # meant to serve turns out to have its own eight real hooks, tinted from ThemeResources/TitleBar.jalxaml
+    # instead (docs/astra/audits/window-shell.md). SliderThumbStrokeBrush filled the thumb ring's stroke,
+    # which upstream names SliderThumbBorderBrush; that row is now a verbatim alias in
+    # ThemeResources/Slider.jalxaml, so the palette entry is gone rather than renamed here.
     # 26.10.9 draws the scrollbar itself and reads two hard-coded brush names out of the application
     # resources rather than a ControlTemplate; docs/astra/audits/scrollbar.md measures which names
     # move pixels. They have to live in the palette because that is the only place the kernel
@@ -98,8 +99,10 @@ foreach ($node in $sections['HighContrast'].Elements($ui + 'SolidColorBrush')) {
 $highContrast['AcrylicInAppFillColorDefaultBrush'] = 'SystemColorWindowColor'
 # ToolbarSurfaceBrush had a row here too. It was an invented key with no consumer; the shell's real
 # hooks are the eight TitleBar* names tinted from ThemeResources/TitleBar.jalxaml, which alias palette
-# brushes instead of living in this map (docs/astra/audits/window-shell.md).
-$highContrast['SliderThumbStrokeBrush'] = 'SystemColorWindowTextColor'
+# brushes instead of living in this map (docs/astra/audits/window-shell.md). SliderThumbStrokeBrush was
+# the second one, and it took SystemColorWindowTextColor on a judgement call rather than an upstream row.
+# With the thumb ring now reading upstream's SliderThumbBorderBrush, which aliases a real palette token,
+# both invented rows are gone and the only adapter left in this block is the acrylic fallback above.
 # The two ScrollBar hooks above, from the HighContrast branch of the same upstream file the
 # aliases come from (ScrollBar_themeresources.xaml @19e3bdc3c). That branch states the system
 # colour directly on its legacy rows: ScrollBarThumbBackgroundThemeBrush is

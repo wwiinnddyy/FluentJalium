@@ -73,16 +73,21 @@ SubtleFillColorTransparentBrush=Transparent
 
 ## 与上游的三处偏差
 
-1. **一个我们自加的键**：`SliderThumbStrokeBrush` 在 `Light/Dark` 里就是显式
-   适配项（平台 Slider 需要实底），上游没有对应条目。高对比里它取
-   `SystemColorWindowTextColor`，与上游对边框笔刷的处理一致，但**这是我们的判断，不是上游逐键值**。
-   `ToolbarSurfaceBrush` 曾经也在这一类，因自造且无消费点整条删掉了；它当初的理由
+1. **曾经有三个我们自加的键，现在只剩一个**。`SliderThumbStrokeBrush` 已经在
+   `audits/slider.md` 这一批里整条删除：上游给滑块圆环描边起的名字是 `SliderThumbBorderBrush`，
+   我们把它原样收进 `ThemeResources/Slider.jalxaml` 做别名，调色板层就不再需要为这个位置造一个
+   没有出处的键，它的高对比行（`SystemColorWindowTextColor`）也跟着消失——那一行本来就是判断，
+   不是上游逐键值。`ToolbarSurfaceBrush` 更早被删：自造且无消费点，它当初的理由
    （"外壳没有可主题化表面"）被 `audits/window-shell.md` 更正——外壳有 8 个真名钩子，
    那 8 个走别名层指向已有调色板键，因此不需要映射表行。
-   `AcrylicInAppFillColorDefaultBrush` 曾经也在这一类（叫 `FlyoutPresenterBackgroundBrush`，
-   一个上游没有的名字），`audits/flyout-presenter.md` 把它换成了上游真名，并且它的高对比值
-   `SystemColorWindowColor` 现在**有上游出处**：`Materials/Acrylic/AcrylicBrush_themeresources.xaml`
-   的 `HighContrast` 分支就是这么声明它的，只是那张表不在生成器读的 `Common_themeresources` 里。
+   剩下的一个是 `AcrylicInAppFillColorDefaultBrush`，它曾经也在这一类（叫
+   `FlyoutPresenterBackgroundBrush`，一个上游没有的名字），`audits/flyout-presenter.md` 把它换成了
+   上游真名，并且它的高对比值 `SystemColorWindowColor` 现在**有上游出处**：
+   `Materials/Acrylic/AcrylicBrush_themeresources.xaml` 的 `HighContrast` 分支就是这么声明它的，
+   只是那张表不在生成器读的 `Common_themeresources` 里。
+   删除的记账方式：这两处都不在映射表里留"已删"行，而是由生成器
+   （`tools/Sync-AstraPalette.ps1` 的两段注释）说明为什么不再需要——-Check 模式下
+   调色板与映射表都必须与生成器逐字节一致，留下幽灵键会立刻被漂移闸口抓住。
 2. **三个上游键未采纳**：`AccentControlElevationBorderBrush`、`CircleElevationBorderBrush`、
    `ControlElevationBorderBrush` 在 `HighContrast` 分支存在而 `Light` 分支不存在，
    我们的调色板也还没有这些键，因此不进映射表。将来补这些键时，生成器会要求同时补高对比

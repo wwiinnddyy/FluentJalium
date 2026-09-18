@@ -1,0 +1,62 @@
+<!-- WinUI 3 Slider_themeresources.xaml @19e3bdc3c (MIT), blob 3804392c5c54081dcc64a1c533812f9b07a4155d.
+     The file's ThemeDictionaries are Default (lines 4-55), High Contrast (56-107) and Light (108-159). Each
+     block also carries 24 legacy *ThemeBrush rows from the Windows 8.1 era that no current template reads,
+     so they are out of scope here. The two current-generation blocks are counted by row, and they are NOT
+     identical the way a quick read suggests: Default has 23 alias rows of which only 22 are distinct names
+     (line 12 and line 13 both declare SliderContainerBackgroundDisabled, the second one pointing at the
+     Color ControlFillColorTransparent rather than a brush), and it declares no SliderContainerBackground at
+     all. Light has 23 distinct alias rows including SliderContainerBackground. The union across both scopes
+     is therefore 23 names, which is what this dictionary transcribes 20 of; the remaining three are named at
+     the bottom with what was measured about why. audits/slider.md records the High Contrast block separately
+     (22 alias rows + SliderTickBarFillDisabled as a solid brush - it re-points the thumb ring at the accent
+     and the track at SystemControlForegroundBaseMediumLowBrush, which our palette-level remap approximates
+     rather than matches). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Upstream's other metric rows are x:Double (SliderTrackThemeHeight 4, SliderOutsideTickBarThemeHeight 4,
+       SliderInnerThumbWidth/Height 12, SliderHorizontalThumbWidth/Height 18, SliderPreContentMargin 14,
+       SliderPostContentMargin 14, SliderHorizontalHeight 32, SliderVerticalWidth 32) and this reader cannot
+       parse an x:Double resource, so those ride as literals in the templates. SliderHeaderThemeMargin,
+       SliderHeaderThemeFontWeight and SliderTopHeaderMargin are not declared because there is no header to
+       put them on. The two CornerRadius rows are outside ThemeDictionaries upstream (lines 162-163) and
+       scope-independent, exactly as they are here. -->
+  <Thickness x:Key="SliderBorderThemeThickness">0</Thickness>
+  <CornerRadius x:Key="SliderTrackCornerRadius">2</CornerRadius>
+  <CornerRadius x:Key="SliderThumbCornerRadius">10</CornerRadius>
+  <!-- Deviation (scope): SliderContainerBackground exists upstream only in the Light and High Contrast
+       blocks; Dark declares no resting container row at all, so WinUI's dark slider container keeps whatever
+       the template's own value was. Our alias layer is scope-independent and the other three container rows
+       already resolve to the same transparent brush in both scopes, so declaring the fourth changes no pixel. -->
+  <StaticResource x:Key="SliderContainerBackground" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="SliderContainerBackgroundPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="SliderContainerBackgroundPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <!-- The duplicated Dark row (alias pointing at a Color) is not reproduced: the last writer wins there and
+       the value cannot paint a Background. -->
+  <StaticResource x:Key="SliderContainerBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="SliderThumbBackgroundDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <!-- Deviation (value): ControlElevationBorderBrush is a gradient and a gradient cannot ride the in-place
+       retint model, so the thumb ring takes the solid stop the same way the button border does
+       (audits/button.md, deviation 4). This replaces the key SliderThumbStrokeBrush that our own palette
+       generator used to invent for this slot; upstream has never had that name. -->
+  <StaticResource x:Key="SliderThumbBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="SliderOuterThumbBackground" ResourceKey="ControlSolidFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTrackFill" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTrackFillDisabled" ResourceKey="ControlStrongFillColorDisabledBrush" />
+  <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="SliderTrackValueFillDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <StaticResource x:Key="SliderTickBarFill" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="SliderTickBarFillDisabled" ResourceKey="ControlStrongFillColorDisabledBrush" />
+  <!-- Not transcribed, with the measured reason for each:
+       SliderHeaderForeground / SliderHeaderForegroundDisabled (2) - Slider has no Header property on this
+       runtime (measured: the control exposes 18 declared properties and none of them is a header), so there
+       is no header presenter to paint.
+       SliderInlineTickBarFill (1) - Jalium's TickBarPlacement enum is {Left, Top, Right, Bottom} and
+       Slider.TickPlacement is {None, TopLeft, BottomRight, Both}: there is no inline member on either side,
+       so no state can ever show an inline bar. Declaring the key would give it a setter nobody reaches. -->
+</ResourceDictionary>

@@ -145,12 +145,15 @@ PasswordBox 没有可用模板（框架自绘），所以三格写在 `Style.Tri
   再读回 `1,1,1,2` 与底边实例——这是本仓第一条**键盘焦点态**的读回证据（Button 批的 Pressed 仍无）。
 - **像素**：`A_resting_text_box_paints_its_surface_token_and_nothing_accented`——一次捕获、两个哨兵色：
   `ControlFillColorDefaultBrush` 覆盖后必须在 120×32 的框里出现 >1500 px，同时强调色哨兵必须为 0 px。
-  本段没有第二格像素断言，原因见 §5。
+  本段当时只留了这一格像素断言；聚焦格的第二张图在 Slider 批修好看门狗之后补上了，见 §5 第一条。
 
 ## 5. Known Gaps（不许用相邻证据替代）
 
-- 不声称聚焦态有像素证据。选择批里"一次 fixture 调用做两次捕获"两次挂满 60 秒看门狗且未归因，
-  本段每格只留一次捕获；聚焦格的证据止于真实 `Focus()` + 读回。
+- ~~不声称聚焦态有像素证据~~ **本条已被 Slider 批撤销**（2026-09-18）。当时"一次 fixture 调用做两次捕获"
+  两次挂满 60 秒看门狗，被记成"未归因"；真正的原因是 `PixelHarness.Pump` 的看门狗释放了线程池上的另一个调度器
+  （`adaptation/06` 的"Slider 批"一节）。修好后补上 `A_focused_text_box_paints_the_accent_edge_it_switches_to`：
+  真实 `Focus()` → 一次捕获 → 强调色底边哨兵 >40 px、聚焦面令牌 >1500 px。
+  仍然不声称的是**合成后**的样子（直接捕获的 alpha 字节不可信，见 `adaptation/06`）与光标/打字路径。
 - 不声称 Placeholder：4 行不声明是属性缺失的实测结论，不是偷懒；但这意味着上游"空文本时显示占位文案"
   这个可见行为我们根本没有，Gallery 里也没有可对比的卡片。
 - 不声称删除按钮：8 行 `TextControlButton*` 无消费点；上游"输入后悬停出现清除键"的行为缺失。

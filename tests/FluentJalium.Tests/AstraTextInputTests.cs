@@ -232,8 +232,9 @@ public sealed class AstraTextInputTests
 
     /// <summary>
     /// One capture, two sentinels: the resting surface has to come from its own token, and the accent must
-    /// not be on screen at rest. Two captures in one fixture call blew the watchdog in the selection batch,
-    /// so a focused-state pixel claim stays out of the gate until that hang is understood.
+    /// not be on screen at rest. The selection batch used to believe a second capture in the same fixture
+    /// call was what blew its watchdog; Slider's batch proved the watchdog itself was broken
+    /// (docs/astra/adaptation/06), so the focused cell now gets its own pixel claim too.
     /// </summary>
     [Fact]
     public void A_resting_text_box_paints_its_surface_token_and_nothing_accented()
@@ -256,6 +257,39 @@ public sealed class AstraTextInputTests
             {
                 FluentThemeManager.OverrideBrush("ControlFillColorDefaultBrush", null);
                 FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The focused cell as pixels rather than as a read-back: the accent bottom edge has to appear and the
+    /// resting surface has to give way to its own token. Reaching this state needs a real focus, so the
+    /// claim is only as good as the frame pump that let the control settle afterwards.
+    /// </summary>
+    [Fact]
+    public void A_focused_text_box_paints_the_accent_edge_it_switches_to()
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", AccentSentinel);
+            FluentThemeManager.OverrideBrush("ControlFillColorInputActiveBrush", SurfaceSentinel);
+            try
+            {
+                var box = new TextBox { Width = 120, Height = 32 };
+                PixelHarness.Build(box, 120, 32);
+                Assert.True(box.Focus(), "Focus() refused the text box, so the focused cell has no subject.");
+                var sample = PixelHarness.Render(box, 120, 32);
+                Assert.True(box.IsKeyboardFocusWithin, "the focused state did not survive the capture");
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+                Assert.True(sample.Count(AccentSentinel) > 40,
+                    $"the accent edge never appeared; top={sample.Top(6)}");
+                Assert.True(sample.Count(SurfaceSentinel) > 1500,
+                    $"the focused surface token did not reach the pixels; top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+                FluentThemeManager.OverrideBrush("ControlFillColorInputActiveBrush", null);
             }
         });
     }

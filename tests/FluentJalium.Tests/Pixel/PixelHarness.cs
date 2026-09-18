@@ -230,11 +230,16 @@ internal static class PixelHarness
     /// Pumps real rendered frames on the caller's dispatcher and reports how many arrived. The budget
     /// matters: once a scene is static the framework stops raising
     /// <see cref="CompositionTarget.Rendering"/>, so waiting for frames alone can block until the
-    /// watchdog releases the frame.
+    /// watchdog releases the frame. The watchdog has to be handed the dispatcher of the thread that
+    /// pushed the frame: <c>Dispatcher.CurrentDispatcher</c> inside the timer callback resolves on a
+    /// thread-pool thread, where it is an unrun dispatcher nobody pumps, so the release was queued and
+    /// never executed. Measured as a 60-second fixture timeout on any focus change that starts no
+    /// animation (a focused Slider) while controls that do animate returned in milliseconds.
     /// </summary>
     private static int Pump(int frames, int budgetMilliseconds = 400)
     {
         var frame = new DispatcherFrame();
+        var dispatcher = Dispatcher.CurrentDispatcher;
         var seen = 0;
         var deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * budgetMilliseconds / 1000;
         void OnRendering(object? sender, EventArgs arguments)
@@ -245,7 +250,7 @@ internal static class PixelHarness
 
         EventHandler handler = OnRendering;
         CompositionTarget.Rendering += handler;
-        using var watchdog = new System.Threading.Timer(_ => Dispatcher.CurrentDispatcher.InvokeAsync(() => frame.Continue = false));
+        using var watchdog = new System.Threading.Timer(_ => dispatcher.InvokeAsync(() => frame.Continue = false));
         watchdog.Change(TimeSpan.FromMilliseconds(budgetMilliseconds * 2), System.Threading.Timeout.InfiniteTimeSpan);
         Dispatcher.PushFrame(frame);
         CompositionTarget.Rendering -= handler;

@@ -10,25 +10,6 @@
     <Setter Property="Padding" Value="16" />
   </Style>
 
-  <ControlTemplate x:Key="ButtonSurfaceTemplate" TargetType="ButtonBase">
-    <Grid Background="Transparent">
-      <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-              BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-              Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
-        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                          ContentStringFormat="{TemplateBinding ContentStringFormat}" Foreground="{TemplateBinding Foreground}"
-                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-      </Border>
-      <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-              BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-        <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-      </Border>
-    </Grid>
-    <ControlTemplate.Triggers>
-      <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
-    </ControlTemplate.Triggers>
-  </ControlTemplate>
   <Style x:Key="ButtonLayoutStyle" TargetType="ButtonBase">
     <Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="32" />
     <Setter Property="Padding" Value="{StaticResource ButtonPadding}" /><Setter Property="FontSize" Value="14" />
@@ -37,7 +18,31 @@
     <Setter Property="BorderThickness" Value="{ThemeResource ButtonBorderThemeThickness}" />
     <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Center" /><Setter Property="VerticalContentAlignment" Value="Center" />
-    <Setter Property="Template" Value="{StaticResource ButtonSurfaceTemplate}" />
+    <!-- Written inline rather than as a keyed dictionary resource because a ControlTemplate that
+         lives in a resource keeps its state cells unresolved on this runtime (measured in
+         audits/slider.md: Trigger.Property comes back null for every cell of a keyed template, so
+         the two below never fired and a focused button kept its focus ring at Opacity 0). -->
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ButtonBase">
+        <Grid Background="Transparent">
+          <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              ContentStringFormat="{TemplateBinding ContentStringFormat}" Foreground="{TemplateBinding Foreground}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+          </Border>
+          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
   </Style>
   <Style x:Key="DefaultButtonStyle" TargetType="ButtonBase" BasedOn="{StaticResource ButtonLayoutStyle}">
     <Setter Property="Background" Value="{ThemeResource ButtonBackground}" />

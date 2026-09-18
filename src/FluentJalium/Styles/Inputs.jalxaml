@@ -124,120 +124,194 @@
   </Style>
   <Style TargetType="controls:FluentToggleSwitch" BasedOn="{StaticResource FluentToggleSwitchStyle}" />
 
-  <!-- Jalium's Slider positions PART_Thumb using a fixed 16 DIP layout anchor.
-       The 20 DIP visual overhangs that anchor by 2 DIP on each side. -->
-  <ControlTemplate x:Key="FluentHorizontalSliderTemplate" TargetType="Slider">
-    <Grid Background="Transparent">
-      <Rectangle Name="PART_Track" Height="4" RadiusX="2" RadiusY="2" Margin="8,0"
-                 VerticalAlignment="Center" Fill="{TemplateBinding Background}" />
-      <Rectangle Name="PART_SelectionRange" Height="4" RadiusX="2" RadiusY="2" Margin="8,0"
-                 VerticalAlignment="Center" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}" />
-      <Grid Name="PART_Thumb" Width="16" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
-        <Border Width="20" Height="20" Margin="-2,0" CornerRadius="10"
-                Background="{ThemeResource ControlSolidFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource SliderThumbStrokeBrush}" BorderThickness="1"
-                HorizontalAlignment="Center" VerticalAlignment="Center">
-          <Ellipse Name="ThumbFill" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Fill="{TemplateBinding Foreground}" TransitionProperty="Width, Height, Fill" TransitionDuration="0:0:0.167" />
-        </Border>
-      </Grid>
-      <Border Name="SliderFocus" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
-              IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
-    </Grid>
-    <ControlTemplate.Triggers>
-      <Trigger Property="IsMouseOver" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="14" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="14" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorSecondaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorSecondaryBrush}" />
-      </Trigger>
-      <Trigger Property="IsMouseCaptured" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-      </Trigger>
-      <Trigger Property="AreAnyTouchesCaptured" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-      </Trigger>
-        <Trigger Property="IsKeyboardFocused" Value="True">
-        <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
-      </Trigger>
-        <Trigger Property="IsEnabled" Value="False">
-        <Setter TargetName="PART_Track" Property="Fill" Value="{ThemeResource ControlStrongFillColorDisabledBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
-        <Setter TargetName="ThumbFill" Property="Width" Value="12" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="12" />
-        <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
-      </Trigger>
-    </ControlTemplate.Triggers>
-  </ControlTemplate>
+  <!-- Jalium's Slider positions PART_Thumb by writing its Margin (measured: 0, 51, 102, 153, 204 for
+       Value 0/25/50/75/100 on a 204 DIP track) and sizes PART_SelectionRange to the same length, so those two
+       names are a hard contract with the framework while upstream calls the same parts HorizontalThumb and
+       HorizontalDecreaseRect. Everything else follows upstream: SliderContainer, TopTickBar/BottomTickBar,
+       SliderInnerThumb for the ellipse inside the ring.
 
-  <ControlTemplate x:Key="FluentVerticalSliderTemplate" TargetType="Slider">
-    <Grid Background="Transparent">
-      <Rectangle Name="PART_Track" Width="4" RadiusX="2" RadiusY="2" Margin="0,8"
-                 HorizontalAlignment="Center" Fill="{TemplateBinding Background}" />
-      <Rectangle Name="PART_SelectionRange" Width="4" RadiusX="2" RadiusY="2" Margin="0,8"
-                 HorizontalAlignment="Center" VerticalAlignment="Top" Fill="{TemplateBinding Foreground}" />
-      <Grid Name="PART_Thumb" Width="20" Height="16" HorizontalAlignment="Center" VerticalAlignment="Top">
-        <Border Width="20" Height="20" Margin="0,-2" CornerRadius="10"
-                Background="{ThemeResource ControlSolidFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource SliderThumbStrokeBrush}" BorderThickness="1"
-                HorizontalAlignment="Center" VerticalAlignment="Center">
-          <Ellipse Name="ThumbFill" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Fill="{TemplateBinding Foreground}" TransitionProperty="Width, Height, Fill" TransitionDuration="0:0:0.167" />
-        </Border>
-      </Grid>
-      <Border Name="SliderFocus" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
-              IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
-    </Grid>
-    <ControlTemplate.Triggers>
-      <Trigger Property="IsMouseOver" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="14" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="14" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorSecondaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorSecondaryBrush}" />
-      </Trigger>
-      <Trigger Property="IsMouseCaptured" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-      </Trigger>
-      <Trigger Property="AreAnyTouchesCaptured" Value="True">
-        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorTertiaryBrush}" />
-      </Trigger>
-        <Trigger Property="IsKeyboardFocused" Value="True">
-        <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
-      </Trigger>
-        <Trigger Property="IsEnabled" Value="False">
-        <Setter TargetName="PART_Track" Property="Fill" Value="{ThemeResource ControlStrongFillColorDisabledBrush}" />
-        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
-        <Setter TargetName="ThumbFill" Property="Fill" Value="{ThemeResource AccentFillColorDisabledBrush}" />
-        <Setter TargetName="ThumbFill" Property="Width" Value="12" />
-        <Setter TargetName="ThumbFill" Property="Height" Value="12" />
-        <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
-      </Trigger>
-    </ControlTemplate.Triggers>
-  </ControlTemplate>
+       Both templates are written INLINE in the style, not as keyed resources, because that is the only shape
+       this reader hydrates state cells for. Measured on 26.10.9: a ControlTemplate held in a dictionary
+       resource keeps its trigger Property unresolved (Trigger.Property is null for every cell) while an inline
+       template resolves them, so the keyed Slider template's eight cells never fired - a disabled slider kept
+       painting #FF0078D4 in its thumb and TickPlacement never showed a tick bar. audits/slider.md records the
+       reading and the gate test that keeps it from coming back.
 
+       The fill transition is deliberately not in TransitionProperty: upstream swaps state brushes discretely
+       (ObjectAnimationUsingKeyFrames with KeyTime 0), and a brush mid-transition is an interpolated instance
+       that belongs to no palette (adaptation/12). The thumb squeeze really is animated upstream, so Width and
+       Height keep their transition. -->
   <Style x:Key="DefaultSliderStyle" TargetType="Slider">
     <Setter Property="MinHeight" Value="32" />
     <Setter Property="MinWidth" Value="32" />
     <Setter Property="IsMoveToPointEnabled" Value="True" />
-    <Setter Property="Background" Value="{ThemeResource ControlStrongFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-    <Setter Property="Template" Value="{StaticResource FluentHorizontalSliderTemplate}" />
+    <Setter Property="Background" Value="{ThemeResource SliderTrackFill}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource SliderBorderThemeThickness}" />
+    <Setter Property="Foreground" Value="{ThemeResource SliderTrackValueFill}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Slider">
+          <Border Name="SliderContainer" Background="{ThemeResource SliderContainerBackground}" Padding="{TemplateBinding Padding}">
+            <Grid>
+              <TickBar Name="TopTickBar" Visibility="Collapsed" Placement="Top" Height="4" Margin="8,2,8,0"
+                       VerticalAlignment="Top" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                       Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                       TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+              <TickBar Name="BottomTickBar" Visibility="Collapsed" Placement="Bottom" Height="4" Margin="8,0,8,2"
+                       VerticalAlignment="Bottom" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                       Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                       TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+              <Border Name="PART_Track" Height="4" Margin="8,0" VerticalAlignment="Center"
+                      CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Background}" />
+              <Border Name="PART_SelectionRange" Height="4" Margin="8,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                      CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Foreground}" />
+              <Grid Name="PART_Thumb" Width="16" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Border Width="20" Height="20" Margin="-2,0" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
+                        Background="{ThemeResource SliderOuterThumbBackground}"
+                        BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+                </Border>
+              </Grid>
+              <Border Name="SliderFocus" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
+                      IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
+            </Grid>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="TickPlacement" Value="TopLeft">
+              <Setter TargetName="TopTickBar" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement" Value="BottomRight">
+              <Setter TargetName="BottomTickBar" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="TickPlacement" Value="Both">
+              <Setter TargetName="TopTickBar" Property="Visibility" Value="Visible" />
+              <Setter TargetName="BottomTickBar" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPointerOver}" />
+              <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPointerOver}" />
+              <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPointerOver}" />
+              <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPointerOver}" />
+              <Setter TargetName="SliderInnerThumb" Property="Width" Value="14" />
+              <Setter TargetName="SliderInnerThumb" Property="Height" Value="14" />
+            </Trigger>
+            <Trigger Property="IsMouseCaptured" Value="True">
+              <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPressed}" />
+              <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+              <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPressed}" />
+              <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+              <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
+              <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
+            </Trigger>
+            <Trigger Property="AreAnyTouchesCaptured" Value="True">
+              <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPressed}" />
+              <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+              <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPressed}" />
+              <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+              <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
+              <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundDisabled}" />
+              <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
+              <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillDisabled}" />
+              <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundDisabled}" />
+              <Setter TargetName="TopTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
+              <Setter TargetName="BottomTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
+              <Setter TargetName="SliderInnerThumb" Property="Width" Value="12" />
+              <Setter TargetName="SliderInnerThumb" Property="Height" Value="12" />
+              <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Setter>
     <Style.Triggers>
       <Trigger Property="Orientation" Value="Vertical">
-        <Setter Property="Template" Value="{StaticResource FluentVerticalSliderTemplate}" />
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Slider">
+              <Border Name="SliderContainer" Background="{ThemeResource SliderContainerBackground}" Padding="{TemplateBinding Padding}">
+                <Grid>
+                  <TickBar Name="LeftTickBar" Visibility="Collapsed" Placement="Left" Width="4" Margin="2,8,0,8"
+                           HorizontalAlignment="Left" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                           Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                           TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+                  <TickBar Name="RightTickBar" Visibility="Collapsed" Placement="Right" Width="4" Margin="0,8,2,8"
+                           HorizontalAlignment="Right" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                           Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                           TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+                  <Border Name="PART_Track" Width="4" Margin="0,8" HorizontalAlignment="Center"
+                          CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Background}" />
+                  <Border Name="PART_SelectionRange" Width="4" Margin="0,8" HorizontalAlignment="Center" VerticalAlignment="Top"
+                          CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Foreground}" />
+                  <Grid Name="PART_Thumb" Width="20" Height="16" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Border Width="20" Height="20" Margin="0,-2" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
+                            Background="{ThemeResource SliderOuterThumbBackground}"
+                            BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1"
+                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                      <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+                    </Border>
+                  </Grid>
+                  <Border Name="SliderFocus" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
+                          IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
+                </Grid>
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="TickPlacement" Value="TopLeft">
+                  <Setter TargetName="LeftTickBar" Property="Visibility" Value="Visible" />
+                </Trigger>
+                <Trigger Property="TickPlacement" Value="BottomRight">
+                  <Setter TargetName="RightTickBar" Property="Visibility" Value="Visible" />
+                </Trigger>
+                <Trigger Property="TickPlacement" Value="Both">
+                  <Setter TargetName="LeftTickBar" Property="Visibility" Value="Visible" />
+                  <Setter TargetName="RightTickBar" Property="Visibility" Value="Visible" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPointerOver}" />
+                  <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPointerOver}" />
+                  <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPointerOver}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPointerOver}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Width" Value="14" />
+                  <Setter TargetName="SliderInnerThumb" Property="Height" Value="14" />
+                </Trigger>
+                <Trigger Property="IsMouseCaptured" Value="True">
+                  <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPressed}" />
+                  <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+                  <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPressed}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
+                  <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
+                </Trigger>
+                <Trigger Property="AreAnyTouchesCaptured" Value="True">
+                  <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundPressed}" />
+                  <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillPressed}" />
+                  <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillPressed}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundPressed}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
+                  <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                  <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                  <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundDisabled}" />
+                  <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
+                  <Setter TargetName="PART_SelectionRange" Property="Background" Value="{ThemeResource SliderTrackValueFillDisabled}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Fill" Value="{ThemeResource SliderThumbBackgroundDisabled}" />
+                  <Setter TargetName="LeftTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
+                  <Setter TargetName="RightTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
+                  <Setter TargetName="SliderInnerThumb" Property="Width" Value="12" />
+                  <Setter TargetName="SliderInnerThumb" Property="Height" Value="12" />
+                  <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter>
       </Trigger>
     </Style.Triggers>
   </Style>

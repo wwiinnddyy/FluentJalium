@@ -138,11 +138,34 @@ run3 复刻 xunit fixture 的处境：不跑应用循环，只 `Show()` + 嵌套
 名字里的"check mark"因此是过强的说法——证据支持的是"勾选态的强调色面跟随 `ApplyAccent`"。
 选择批做 `CheckBox` 时要重做这条归因（把勾形单独裁剪或用非强调色的哨兵把它和框分开）。
 
+## Slider 批：看门狗释放错了调度器（2026-09-18）
+
+选择批留了两条"未归因的 60 秒超时"。做 Slider 时同一形状第三次出现，这次跑到底归了因：
+`PixelHarness.Pump` 的看门狗是 `System.Threading.Timer`，回调里写的是
+
+```
+Dispatcher.CurrentDispatcher.InvokeAsync(() => frame.Continue = false)
+```
+
+`CurrentDispatcher` 在**线程池线程**上求值，拿到的是那个线程自己的、没有任何人运行的调度器；
+`frame.Continue = false` 因此入队后永不执行。也就是说：只要一次状态变化不带动画、
+`CompositionTarget.Rendering` 在预算内不再来帧，`PushFrame` 就永远不返回，
+60 秒后由夹具看门狗判超时——而 `PushFrame` 的内嵌循环本来是会处理投递到**它自己那个调度器**的项的。
+
+判据（同一次运行、同样的三步）：`Button` 聚焦后推帧 8 ms 返回；框架自带模板的 `Slider` 也返回；
+我们的 `Slider` 修复前挂死 60 s、修复后返回并读到焦点环 `Opacity=1`。
+修法是在推帧前抓住调用线程的调度器实例：`var dispatcher = Dispatcher.CurrentDispatcher;`，回调里用它投递。
+
+这条修复把"键盘焦点态"从不可测变成可测：本仓现在有两条真实 `Focus()` 读回
+（`A_focused_text_box_widens_only_the_bottom_edge`、`A_focused_slider_raises_its_focus_ring`），
+并且 Slider 那条同时是 §"时机不是一帧"里 `Settle()` 的验收。
+
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——
   alpha 字节不可信，这条只能等整窗裁剪基座做出来再验。
 - 混合 DPI（1.0 / 1.25 / 1.75）下的计数一致性：只在本机 1.75 上证过 1:1 这条规则。
-- 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时，原因没查（只影响到时长，不影响到判定）。
+- 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时。**很可能**就是上面那条看门狗缺陷（静止 → 不来帧 →
+  永不返回），但那次没有留下逐步日志，不能算已归因；本批只把"聚焦无动画的控件"这一条测到底。
 - 除 Button / ScrollViewer+ScrollBar / Popup+FlyoutPresenter / ToolTip / 窗口外壳之外的隐式样式归因。
   另外**真实输入→状态**这一半只在悬停上证过一次，且不进闸口（见 `audits/button.md` 的指针通路一节）。

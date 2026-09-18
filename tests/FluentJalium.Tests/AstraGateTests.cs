@@ -121,6 +121,41 @@ public class AstraGateTests
         Assert.False(offenders.Count > 0, "Setters naming a property that does not exist:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// A ControlTemplate that lives in a dictionary resource, rather than inline in a style's Template setter,
+    /// comes back from this reader with every <c>Trigger.Property</c> unresolved: the cells are in the object,
+    /// their setters are named, and none of them can ever match, so the control sits in its resting state no
+    /// matter what the app does. Measured on 26.10.9 with the Slider (docs/astra/audits/slider.md) - its eight
+    /// cells were inert for exactly this reason while the markup looked correct and the build stayed green.
+    /// A template resource with no state cells is harmless, so only the ones carrying triggers are offenders.
+    /// </summary>
+    [Fact]
+    public void State_cells_are_not_written_into_a_keyed_template_resource()
+    {
+        var root = RepositoryRoot();
+        var offenders = new List<string>();
+        var templates = 0;
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium"), "*.jalxaml", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
+            foreach (var template in XDocument.Load(file).Descendants()
+                         .Where(static element => element.Name.LocalName == "ControlTemplate"
+                                                  && element.Attributes().Any(static attribute => attribute.Name.LocalName == "Key")))
+            {
+                templates++;
+                var cells = template.Descendants().Count(static element => element.Name.LocalName is "Trigger" or "MultiTrigger");
+                if (cells > 0)
+                {
+                    offenders.Add($"{relative}: keyed template {template.Attributes().First(static attribute => attribute.Name.LocalName == "Key").Value} carries {cells} cell(s) this reader cannot resolve");
+                }
+            }
+        }
+
+        Assert.True(templates < 100, $"{templates} keyed template resources - more than this gate expects; re-read it before trusting it.");
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, "Keyed ControlTemplate resources with state cells:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

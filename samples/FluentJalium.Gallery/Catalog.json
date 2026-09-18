@@ -90,9 +90,9 @@
       "markup": "Slider",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",
-      "parity": "ported",
-      "evidence": [ "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "upstream Slider keys not transcribed", "tick marks, direction and thumb drag paths unmeasured" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/slider.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSliderTests.cs" ],
+      "gaps": [ "20 of the 23 upstream alias rows have a consumer; the two header rows and the inline tick-bar row are left out because this runtime has no Slider header and no Inline member in either tick enum", "the thumb ring stroke takes a solid token because upstream's gradient cannot ride the in-place retint model", "no real pointer or touch drives hover or press: those cells are named and read back, never clicked", "the thumb squeeze is markup only - no animation frame was captured", "High Contrast per-control rows are not ported, so the palette-level remap only approximates them" ]
     },
     {
       "markup": "CheckBox",
