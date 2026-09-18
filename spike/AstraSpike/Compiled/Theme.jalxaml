@@ -1,0 +1,20 @@
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- S0-e subject: the identical content the runtime reader is suspected of failing on,
+       lowered by the source generator instead of parsed by XamlReader. -->
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="CompiledBrush" Color="#FFFF0000" />
+      <x:Double x:Key="CompiledDouble">42</x:Double>
+      <Duration x:Key="CompiledDuration">0:0:0.167</Duration>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="CompiledBrush" Color="#FF00FF00" />
+      <x:Double x:Key="CompiledDouble">84</x:Double>
+      <Duration x:Key="CompiledDuration">0:0:0.333</Duration>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+  <Style x:Key="CompiledThemeStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource CompiledBrush}" />
+    <Setter Property="Width" Value="{ThemeResource CompiledDouble}" />
+  </Style>
+</ResourceDictionary>

@@ -1,0 +1,126 @@
+[SURFACE] ThemeColors (Jalium.UI.Controls.Themes.ThemeColors): get_ControlBackground, get_ControlBackgroundHover, get_ControlBackgroundPressed, get_ControlBackgroundDisabled, get_WindowBackground, get_SecondaryBackground, get_TextPrimary, get_TextSecondary, get_TextDisabled, get_TextPlaceholder, get_ControlBorder, get_ControlBorderFocused, get_ControlBorderHover, get_ControlBorderDisabled, get_Accent, get_AccentHover, get_AccentPressed, get_AccentDisabled, get_SelectionBackground, get_SelectionText, get_HighlightBackground, get_SelectedItemBackground, get_ScrollBarTrack, get_ScrollBarThumb, get_ScrollBarThumbHover, get_ProgressBarBackground, get_ProgressBarFill, get_SliderTrack, get_SliderThumb, get_CheckMark, get_ToggleUncheckedBackground, get_ToggleUncheckedBackgroundHover, get_ToggleUncheckedBackgroundPressed, get_ToggleUncheckedBorder, get_ToggleUncheckedBorderHover, get_ToggleCheckedBackground, get_ToggleCheckedBackgroundHover, get_ToggleCheckedBackgroundPressed, get_ToggleCheckedBorder, get_ToggleCheckedBorderHover, get_ToggleDisabledBackground, get_ToggleDisabledBorder, get_ToggleDisabledCheckMark, get_TextBoxBackground, get_DropdownBackground, get_TabStripBackground, get_TabStripBorder, get_TabItemSelectedBackground, get_TabItemHoverBackground, get_TabItemIndicator, get_TabContentBackground, get_DockTabStripBackground, get_DockTabStripBorder, get_DockTabItemSelectedBackground, get_DockTabItemHoverBackground, get_DockContentBackground, get_DockSplitterBackground, get_DockSplitterHover, get_DockCloseButtonHover, get_CompositionBackground, get_CompositionText, get_CompositionUnderline, get_DropdownShadow, get_TitleBarBackground, get_TitleBarText, get_TitleBarButtonBackground, get_TitleBarButtonHover, get_TitleBarButtonPressed, get_TitleBarCloseButtonHover, get_TitleBarCloseButtonPressed, get_TitleBarGlyph, ControlBackground, ControlBackgroundHover, ControlBackgroundPressed, ControlBackgroundDisabled, WindowBackground, SecondaryBackground, TextPrimary, TextSecondary, TextDisabled, TextPlaceholder, ControlBorder, ControlBorderFocused, ControlBorderHover, ControlBorderDisabled, Accent, AccentHover, AccentPressed, AccentDisabled, SelectionBackground, SelectionText, HighlightBackground, SelectedItemBackground, ScrollBarTrack, ScrollBarThumb, ScrollBarThumbHover, ProgressBarBackground, ProgressBarFill, SliderTrack, SliderThumb, CheckMark, ToggleUncheckedBackground, ToggleUncheckedBackgroundHover, ToggleUncheckedBackgroundPressed, ToggleUncheckedBorder, ToggleUncheckedBorderHover, ToggleCheckedBackground, ToggleCheckedBackgroundHover, ToggleCheckedBackgroundPressed, ToggleCheckedBorder, ToggleCheckedBorderHover, ToggleDisabledBackground, ToggleDisabledBorder, ToggleDisabledCheckMark, TextBoxBackground, DropdownBackground, TabStripBackground, TabStripBorder, TabItemSelectedBackground, TabItemHoverBackground, TabItemIndicator, TabContentBackground, DockTabStripBackground, DockTabStripBorder, DockTabItemSelectedBackground, DockTabItemHoverBackground, DockContentBackground, DockSplitterBackground, DockSplitterHover, DockCloseButtonHover, CompositionBackground, CompositionText, CompositionUnderline, DropdownShadow, TitleBarBackground, TitleBarText, TitleBarButtonBackground, TitleBarButtonHover, TitleBarButtonPressed, TitleBarCloseButtonHover, TitleBarCloseButtonPressed, TitleBarGlyph
+[SURFACE]   ThemeColors.ControlBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBackgroundHover: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBackgroundPressed: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBackgroundDisabled: Color (no public setter)
+[SURFACE]   ThemeColors.WindowBackground: Color (no public setter)
+[SURFACE]   ThemeColors.SecondaryBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TextPrimary: Color (no public setter)
+[SURFACE]   ThemeColors.TextSecondary: Color (no public setter)
+[SURFACE]   ThemeColors.TextDisabled: Color (no public setter)
+[SURFACE]   ThemeColors.TextPlaceholder: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBorder: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBorderFocused: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBorderHover: Color (no public setter)
+[SURFACE]   ThemeColors.ControlBorderDisabled: Color (no public setter)
+[SURFACE]   ThemeColors.Accent: Color (no public setter)
+[SURFACE]   ThemeColors.AccentHover: Color (no public setter)
+[SURFACE]   ThemeColors.AccentPressed: Color (no public setter)
+[SURFACE]   ThemeColors.AccentDisabled: Color (no public setter)
+[SURFACE]   ThemeColors.SelectionBackground: Color (no public setter)
+[SURFACE]   ThemeColors.SelectionText: Color (no public setter)
+[SURFACE]   ThemeColors.HighlightBackground: Color (no public setter)
+[SURFACE]   ThemeColors.SelectedItemBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ScrollBarTrack: Color (no public setter)
+[SURFACE]   ThemeColors.ScrollBarThumb: Color (no public setter)
+[SURFACE]   ThemeColors.ScrollBarThumbHover: Color (no public setter)
+[SURFACE]   ThemeColors.ProgressBarBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ProgressBarFill: Color (no public setter)
+[SURFACE]   ThemeColors.SliderTrack: Color (no public setter)
+[SURFACE]   ThemeColors.SliderThumb: Color (no public setter)
+[SURFACE]   ThemeColors.CheckMark: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleUncheckedBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleUncheckedBackgroundHover: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleUncheckedBackgroundPressed: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleUncheckedBorder: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleUncheckedBorderHover: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleCheckedBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleCheckedBackgroundHover: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleCheckedBackgroundPressed: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleCheckedBorder: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleCheckedBorderHover: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleDisabledBackground: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleDisabledBorder: Color (no public setter)
+[SURFACE]   ThemeColors.ToggleDisabledCheckMark: Color (no public setter)
+[SURFACE]   ThemeColors.TextBoxBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DropdownBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TabStripBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TabStripBorder: Color (no public setter)
+[SURFACE]   ThemeColors.TabItemSelectedBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TabItemHoverBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TabItemIndicator: Color (no public setter)
+[SURFACE]   ThemeColors.TabContentBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockTabStripBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockTabStripBorder: Color (no public setter)
+[SURFACE]   ThemeColors.DockTabItemSelectedBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockTabItemHoverBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockContentBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockSplitterBackground: Color (no public setter)
+[SURFACE]   ThemeColors.DockSplitterHover: Color (no public setter)
+[SURFACE]   ThemeColors.DockCloseButtonHover: Color (no public setter)
+[SURFACE]   ThemeColors.CompositionBackground: Color (no public setter)
+[SURFACE]   ThemeColors.CompositionText: Color (no public setter)
+[SURFACE]   ThemeColors.CompositionUnderline: Color (no public setter)
+[SURFACE]   ThemeColors.DropdownShadow: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarText: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarButtonBackground: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarButtonHover: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarButtonPressed: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarCloseButtonHover: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarCloseButtonPressed: Color (no public setter)
+[SURFACE]   ThemeColors.TitleBarGlyph: Color (no public setter)
+[SURFACE] ThemeVariant values: Dark, Light
+[SURFACE] ThemeManager methods: get_XamlLoader(), set_XamlLoader(Func`4), get_SystemAccentResolver(), set_SystemAccentResolver(Func`1), get_CurrentTheme(), get_CurrentAccentColor(), get_CurrentDisplayFontFamily(), get_CurrentBodyFontFamily(), get_CurrentMonospaceFontFamily(), get_CurrentBodyFontSize(), Initialize(Application), ApplyTheme(ThemeVariant), ApplyAccent(Color), ApplyTypography(String,String,String), ApplyTypography(String,String,String,Double), ApplyBrandTheme(BrandThemeOptions), GetGenericThemeStream(), get_ControlsAssembly(), get_IsInitialized()
+[SURFACE] NotifyThemeResourcesChanged is public on Application: False
+[SURFACE] Application public Theme/Resource members: FindResource, GetResourceStream, ResourceAssembly, Resources, ResourcesChanged, ThemeMode, TryFindResource, add_ResourcesChanged, get_ResourceAssembly, get_Resources, get_ThemeMode, remove_ResourcesChanged, set_ResourceAssembly, set_Resources, set_ThemeMode
+[SURFACE] ThemeLoader public methods: Initialize, LoadGenericTheme, LoadResourceDictionary
+[SURFACE] ResourceDictionary public Theme members: CurrentThemeKey, ThemeDictionaries, get_CurrentThemeKey, get_ThemeDictionaries, set_CurrentThemeKey
+[SURFACE] FrameworkElement public Theme/Resource members: FindResource, Resources, ResourcesChanged, SetResourceReference, ShouldSerializeResources, TryFindResource, add_ResourcesChanged, get_Resources, remove_ResourcesChanged, set_Resources
+[SURFACE] Application.ThemeMode type: Jalium.UI.ThemeMode
+[SURFACE] FrameworkElement.SetResourceReference overloads: (DependencyProperty,Object)
+[SURFACE] ThemeDictionaries type: IDictionary`2
+[SURFACE] VisualTransition exists: Jalium.UI.VisualTransition
+[SURFACE] VisualStateNames exists: Jalium.UI.VisualStateNames
+[LOAD] Embedded/Palette.jalxaml: OK directKeys=0 themeDictionaries=Light,Dark,HighContrast
+[TOKEN] Embedded/Palette.jalxaml Light.SpikeBrush -> SolidColorBrush
+[TOKEN] Embedded/Palette.jalxaml Light.SpikeColor -> Color
+[TOKEN] Embedded/Palette.jalxaml Light.SpikeRadius -> CornerRadius
+[TOKEN] Embedded/Palette.jalxaml Light.SpikeMargin -> Thickness
+[TOKEN] Embedded/Palette.jalxaml Light.SpikeDuration -> Duration
+[TOKEN] Embedded/Palette.jalxaml Dark.SpikeBrush -> SolidColorBrush
+[TOKEN] Embedded/Palette.jalxaml Dark.SpikeColor -> Color
+[TOKEN] Embedded/Palette.jalxaml Dark.SpikeRadius -> CornerRadius
+[TOKEN] Embedded/Palette.jalxaml Dark.SpikeMargin -> Thickness
+[TOKEN] Embedded/Palette.jalxaml Dark.SpikeDuration -> Duration
+[TOKEN] Embedded/Palette.jalxaml HighContrast.SpikeBrush -> SolidColorBrush
+[TOKEN] Embedded/Palette.jalxaml HighContrast.SpikeColor -> Color
+[TOKEN] Embedded/Palette.jalxaml HighContrast.SpikeRadius -> CornerRadius
+[TOKEN] Embedded/Palette.jalxaml HighContrast.SpikeMargin -> Thickness
+[TOKEN] Embedded/Palette.jalxaml HighContrast.SpikeDuration -> Duration
+[LOAD] Embedded/Styles.jalxaml: OK directKeys=4 themeDictionaries=
+[LOAD] Embedded/Doubles.jalxaml: PARSE-FAIL XamlParseException: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+[LOAD] Embedded/ThemedDoubles.jalxaml: PARSE-FAIL XamlParseException: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+[LOAD] Embedded/StaticConsumer.jalxaml: OK directKeys=1 themeDictionaries=
+[LOAD] Embedded/Alias.jalxaml: OK directKeys=1 themeDictionaries=
+[LOAD] Embedded/VsmStoryboard.jalxaml: OK directKeys=1 themeDictionaries=
+[LOAD] Embedded/VsmWinUiSetters.jalxaml: OK directKeys=1 themeDictionaries=
+[S0-e] assembly types: 6; ResourceDictionary-derived: []
+[S0-e] VisualStateGroups attached property type: DependencyProperty
+[S0-e] ResourceDictionary types emitted by the generator: 0
+[S0-c] alias value resolves to SolidColorBrush (expected SolidColorBrush)
+[S0-a] baseline Light: theme=#FFFF0000 static=#FFFF0000
+[S0-a] [1] CurrentThemeKey=Dark alone: theme=#FFFF0000 static=#FFFF0000
+[S0-a] [2] + ThemeManager.ApplyTheme(Dark): theme=#FFFF0000 static=#FFFF0000 brushIdentityPreserved=True
+[S0-b] CornerRadius 4,4,4,4 -> 4,4,4,4; Padding 8,4,8,4 -> 8,4,8,4
+[S0-b] Width(x:Double) NaN -> NaN; TransitionDuration 00:00:00.1670000 -> 00:00:00.1670000
+[S0-b] HighContrast via CurrentThemeKey: theme=#FFFF0000 radius=4,4,4,4 width=NaN
+[S0-a] ThemeMode is Jalium.UI.ThemeMode, ThemeMode members: get_None, get_Light, get_Dark, get_System, op_Equality, op_Inequality, None, Light, Dark, System
+[S0-a] [ThemeMode.None]: theme=#FFFF0000 static=#FFFF0000 radius=4,4,4,4 padding=8,4,8,4 duration=00:00:00.1670000 width=NaN
+[S0-a] [ThemeMode.Light]: theme=#FFFF0000 static=#FFFF0000 radius=4,4,4,4 padding=8,4,8,4 duration=00:00:00.1670000 width=NaN
+[S0-a] [ThemeMode.Dark]: theme=#FF00FF00 static=#FFFF0000 radius=8,8,8,8 padding=16,8,16,8 duration=00:00:00.3330000 width=NaN
+[S0-a] [ThemeMode.System]: theme=#FF00FF00 static=#FFFF0000 radius=8,8,8,8 padding=16,8,16,8 duration=00:00:00.3330000 width=NaN
+[S0-b] ThemeMode.Dark + forced CurrentThemeKey=HighContrast: theme=#FF00FF00 radius=8,8,8,8 duration=00:00:00.3330000
+[S0-a] MEASURE-THREW ArgumentException: Type provided must be an Enum. (Parameter 'enumType')
+[S0-d] VsmStoryboardStyle: APPLY-THREW ArgumentException: Object of type 'Jalium.UI.VisualStateGroup' cannot be converted to type 'System.Collections.IList'.
+[S0-d] VsmWinUiSettersStyle: APPLY-THREW ArgumentException: Object of type 'Jalium.UI.VisualStateGroup' cannot be converted to type 'System.Collections.IList'.

@@ -1,0 +1,7 @@
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Control for S0-a: StaticResource is expected to freeze at parse time. Kept in its own
+       dictionary because a resolution failure must not take the {ThemeResource} subjects down. -->
+  <Style x:Key="StaticBrushButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{StaticResource SpikeBrush}" />
+  </Style>
+</ResourceDictionary>

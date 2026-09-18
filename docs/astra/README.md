@@ -5,7 +5,7 @@
 
 | 位置 | 内容 | 状态 |
 |---|---|---|
-| `adaptation/` | Jalium 宿主能力与偏差 | `00-jalium-theme-capabilities.md` 待阶段 0 实验后填写 |
+| `adaptation/` | Jalium 宿主能力与偏差 | `00-jalium-theme-capabilities.md` 已完成（含 `00-spike-raw-output.txt` 原始输出） |
 | `audits/` | 逐控件的 WinUI 3 源码审计（上游文件 + commit + blob） | 待阶段 2 起逐控件填写 |
 | `resources/` | 公开资源键清单 | 待阶段 3 |
 | `testing/` | 证据链定义与人工核对清单 | 待阶段 2 |

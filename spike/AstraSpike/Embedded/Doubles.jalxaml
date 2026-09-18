@@ -1,0 +1,3 @@
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Double x:Key="IsolatedDouble">42</x:Double>
+</ResourceDictionary>
