@@ -27,7 +27,7 @@
 
 ## 别名为什么能跟着主题走
 
-调色板里 103 个笔刷是**同一批对象被就地改色**（`RefreshPalette` 保身份），
+调色板里的每个笔刷都是**同一批对象被就地改色**（`RefreshPalette` 保身份），
 所以 `<StaticResource x:Key="A" ResourceKey="B"/>` 在解析期绑定的正是那个对象：
 `FlyoutPresenterBackground` 与 `AcrylicInAppFillColorDefaultBrush`
 **`Assert.Same` 成立**，翻主题与高对比都透过这同一个笔刷到达消费者。

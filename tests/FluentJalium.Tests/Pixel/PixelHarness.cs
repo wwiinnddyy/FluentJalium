@@ -122,6 +122,23 @@ internal static class PixelHarness
         return Capture(() => CaptureRaw(window, (int)window.ActualWidth, (int)window.ActualHeight));
     }
 
+    /// <summary>
+    /// Captures a visual where it already sits, without reparenting it. Window chrome - the title bar
+    /// the window builds around its content - has no slot a subject can be placed in, so this is the
+    /// only way to ask what colour it actually painted.
+    /// </summary>
+    internal static Sample Chrome(FrameworkElement element)
+    {
+        var sample = Capture(() => CaptureRaw(element, (int)element.ActualWidth, (int)element.ActualHeight));
+        return sample with { Subject = Describe(element) };
+    }
+
+    /// <summary>
+    /// The one shown host window, for a claim about the chrome it builds itself. Callers must not
+    /// resize or replace its content as a side effect of measuring the shell.
+    /// </summary>
+    internal static Window HostWindow() => EnsureHost(420, 300);
+
     /// <summary>Closes the host. The fixture that owns the UI thread must call this before it exits.</summary>
     internal static void ReleaseHost()
     {

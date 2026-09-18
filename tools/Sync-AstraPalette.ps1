@@ -50,7 +50,9 @@ foreach ($theme in @('Light', 'Dark')) {
     # (#F9F9F9 light / #2C2C2C dark from AcrylicBrush_themeresources.xaml), under upstream's key, so
     # every alias chain stays verbatim and a later real material only replaces this line.
     $brushes['AcrylicInAppFillColorDefaultBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#F9F9F9' }), '1')
-    $brushes['ToolbarSurfaceBrush'] = @($(if ($theme -eq 'Dark') { '#2C2C2C' } else { '#FFFFFF' }), '1')
+    # ToolbarSurfaceBrush used to sit here. It was a name we invented and nothing consumed it; the
+    # shell it was meant to serve turns out to have its own eight real hooks, which are tinted from
+    # ThemeResources/TitleBar.jalxaml instead (docs/astra/audits/window-shell.md).
     $brushes['SliderThumbStrokeBrush'] = @($(if ($theme -eq 'Dark') { '#26000000' } else { '#24000000' }), '1')
     # 26.10.9 draws the scrollbar itself and reads two hard-coded brush names out of the application
     # resources rather than a ControlTemplate; docs/astra/audits/scrollbar.md measures which names
@@ -94,7 +96,9 @@ foreach ($node in $sections['HighContrast'].Elements($ui + 'SolidColorBrush')) {
 # Materials/Acrylic/AcrylicBrush_themeresources.xaml, which the Common_themeresources section this
 # loop reads does not contain.
 $highContrast['AcrylicInAppFillColorDefaultBrush'] = 'SystemColorWindowColor'
-$highContrast['ToolbarSurfaceBrush'] = 'SystemColorWindowColor'
+# ToolbarSurfaceBrush had a row here too. It was an invented key with no consumer; the shell's real
+# hooks are the eight TitleBar* names tinted from ThemeResources/TitleBar.jalxaml, which alias palette
+# brushes instead of living in this map (docs/astra/audits/window-shell.md).
 $highContrast['SliderThumbStrokeBrush'] = 'SystemColorWindowTextColor'
 # The two ScrollBar hooks above, from the HighContrast branch of the same upstream file the
 # aliases come from (ScrollBar_themeresources.xaml @19e3bdc3c). That branch states the system

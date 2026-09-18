@@ -186,5 +186,4 @@
   <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B3FFFFFF" Opacity="1" />
   <SolidColorBrush x:Key="TextOnAccentFillColorSelectedTextBrush" Color="#FFFFFF" Opacity="1" />
-  <SolidColorBrush x:Key="ToolbarSurfaceBrush" Color="#FFFFFF" Opacity="1" />
 </ResourceDictionary>

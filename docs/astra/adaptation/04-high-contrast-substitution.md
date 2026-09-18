@@ -73,10 +73,12 @@ SubtleFillColorTransparentBrush=Transparent
 
 ## 与上游的三处偏差
 
-1. **两个我们自加的键**：`ToolbarSurfaceBrush`、`SliderThumbStrokeBrush` 在 `Light/Dark` 里就是显式
-   适配项（Jalium 的工具条表面与平台 Slider 需要实底），上游没有对应条目。高对比里它们分别取
-   `SystemColorWindowColor`、`SystemColorWindowTextColor`，
-   与上游对实底表面和边框笔刷的处理一致，但**这是我们的判断，不是上游逐键值**。
+1. **一个我们自加的键**：`SliderThumbStrokeBrush` 在 `Light/Dark` 里就是显式
+   适配项（平台 Slider 需要实底），上游没有对应条目。高对比里它取
+   `SystemColorWindowTextColor`，与上游对边框笔刷的处理一致，但**这是我们的判断，不是上游逐键值**。
+   `ToolbarSurfaceBrush` 曾经也在这一类，因自造且无消费点整条删掉了；它当初的理由
+   （"外壳没有可主题化表面"）被 `audits/window-shell.md` 更正——外壳有 8 个真名钩子，
+   那 8 个走别名层指向已有调色板键，因此不需要映射表行。
    `AcrylicInAppFillColorDefaultBrush` 曾经也在这一类（叫 `FlyoutPresenterBackgroundBrush`，
    一个上游没有的名字），`audits/flyout-presenter.md` 把它换成了上游真名，并且它的高对比值
    `SystemColorWindowColor` 现在**有上游出处**：`Materials/Acrylic/AcrylicBrush_themeresources.xaml`
