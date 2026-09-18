@@ -5,7 +5,8 @@
 
 | 位置 | 内容 | 状态 |
 |---|---|---|
-| `adaptation/` | Jalium 宿主能力与偏差 | `00-jalium-theme-capabilities.md`（主题/令牌/VSM/加载路径）、`01-jalium-control-census.md`（163 控件普查）、`02-render-ceiling.md`（IL+DP+像素三重定位真实天花板，并更正 00 的两处过度结论）；各附原始输出 |
+| `ROADMAP.md` | 五条工作流：取色 / 基础 / 材质 / 控件 / Gallery，含阶段边界与不声称清单 | 现行 |
+| `adaptation/` | Jalium 宿主能力与偏差 | `00-jalium-theme-capabilities.md`（主题/令牌/VSM/加载路径）、`01-jalium-control-census.md`（163 控件普查）、`02-render-ceiling.md`（IL+DP+像素三重定位真实天花板，并更正 00 的两处过度结论）、`03-material-motion-raw-output.txt`（材质与动效公开面普查）；各附原始输出 |
 | `audits/` | 逐控件的 WinUI 3 源码审计（上游文件 + commit + blob） | 待阶段 2 起逐控件填写 |
 | `resources/` | 公开资源键清单 | 待阶段 3 |
 | `testing/` | 证据链定义与人工核对清单 | 待阶段 2 |

@@ -19,12 +19,19 @@ internal static class Program
     private static readonly List<string> Lines = [];
 
     [STAThread]
-    private static int Main()
+    private static int Main(string[] arguments)
     {
         var renderContext = RenderContext.GetOrCreateCurrent(RenderBackend.Auto);
         renderContext.DefaultRenderingEngine = RenderingEngine.Impeller;
         ThemeLoader.Initialize();
         new Application();
+
+        if (arguments.Contains("material"))
+        {
+            ProbeMaterial();
+            foreach (var line in Lines) Console.WriteLine(line);
+            return 0;
+        }
 
         ProbeRenderTarget();
         ProbeDependencyPropertyDefaults();
@@ -279,6 +286,30 @@ internal static class Program
     private static void KnownDirty() => Note("CALIBRATION", $"sentinels {ThemeColors.Accent} {ThemeColors.SliderThumb}");
 
     private static void KnownClean() => Note("CALIBRATION", "this method reads no theme colors");
+
+    private static readonly string[] MaterialKeywords =
+    [
+        "Backdrop", "Acrylic", "Mica", "Blur", "Noise", "Frosted", "Refraction", "Chromatic",
+        "Liquid", "Glass", "Ripple", "Reveal", "Shadow", "Effect", "Composition",
+    ];
+
+    private static void ProbeMaterial()
+    {
+        var types = typeof(Button).Assembly.GetTypes().Where(static type => type.IsPublic && !type.IsAbstract)
+            .Where(type => MaterialKeywords.Any(keyword => type.Name.Contains(keyword, StringComparison.Ordinal)))
+            .OrderBy(static type => type.FullName, StringComparer.Ordinal);
+        foreach (var type in types)
+        {
+            var surface = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                .Select(static property => property.Name).Order(StringComparer.Ordinal);
+            Note("MATERIAL", $"{type.FullName} : {(type.BaseType?.Name)} props=[{string.Join(",", surface.Take(10))}]");
+        }
+
+        Note("WINDOW", $"public Window members: {string.Join(", ", typeof(Window).GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(static member => member.Name).Distinct().Order(StringComparer.Ordinal))}");
+
+        Note("MOTION", $"animation types: {string.Join(", ", typeof(Button).Assembly.GetTypes().Where(static type => type.IsPublic && (type.Name.Contains("Animation", StringComparison.Ordinal) || type.Name.Contains("Easing", StringComparison.Ordinal) || type.Name.Contains("Storyboard", StringComparison.Ordinal) || type.Name.Contains("KeyFrame", StringComparison.Ordinal) || type.Name.Contains("Transition", StringComparison.Ordinal))).Select(static type => type.Name).Order(StringComparer.Ordinal))}");
+        Note("MOTION", $"UIElement transition surface: {string.Join(", ", typeof(UIElement).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(static property => property.Name.Contains("Transition", StringComparison.Ordinal)).Select(static property => property.Name).Order(StringComparer.Ordinal))}");
+    }
 
     private static void Note(string category, string message) => Lines.Add($"[{category}] {message}");
 }
