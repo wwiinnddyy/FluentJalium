@@ -26,13 +26,10 @@ public static class FluentThemeManager
     private static bool _reduceMotion;
     private static Color? _accent;
 
-    /// <summary>The dictionaries loaded in dependency order, after the palette.</summary>
-    public static IReadOnlyList<string> DictionaryNames { get; } = Array.AsReadOnly(new[]
-    {
-        "Metrics.jalxaml", "Typography.jalxaml", "Controls/Common.jalxaml",
-        "Controls/Inputs.jalxaml", "Controls/TextInput.jalxaml", "Controls/Selection.jalxaml", "Controls/Navigation.jalxaml",
-        "Controls/Collections.jalxaml", "Controls/Feedback.jalxaml",
-    });
+    /// <summary>The dictionaries loaded in dependency order, after the palette. Read from Resources/Manifest.txt.</summary>
+    public static IReadOnlyList<string> DictionaryNames => Manifest ??= ReadManifest();
+
+    private static IReadOnlyList<string>? Manifest;
 
     public static FluentThemeVariant CurrentTheme { get; private set; } = FluentThemeVariant.System;
     public static bool IsDark { get; private set; }
@@ -150,9 +147,8 @@ public static class FluentThemeManager
 
     private static ResourceDictionary Load(string path)
     {
-        var name = "Resources/" + path.Replace('\\', '/');
-        using var stream = typeof(FluentThemeManager).Assembly.GetManifestResourceStream(name)
-            ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
+        var name = "Resources/" + path;
+        using var stream = OpenResource(name) ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
         try
         {
             return Jalium.UI.Markup.XamlReader.Load(stream) as ResourceDictionary
@@ -162,6 +158,30 @@ public static class FluentThemeManager
         {
             throw new InvalidOperationException($"Cannot parse Astra resource: {name}", exception);
         }
+    }
+
+    /// <summary>
+    /// Embedded names keep the backslash that %(RecursiveDir) produces on Windows, so lookups
+    /// are normalised to forward slashes once here rather than at each call site.
+    /// </summary>
+    private static Stream? OpenResource(string name)
+    {
+        var normalized = name.Replace('\\', '/');
+        return EmbeddedNames.TryGetValue(normalized, out var actual)
+            ? typeof(FluentThemeManager).Assembly.GetManifestResourceStream(actual)
+            : null;
+    }
+
+    private static readonly Dictionary<string, string> EmbeddedNames = BuildEmbeddedNames();
+
+    private static Dictionary<string, string> BuildEmbeddedNames()
+    {
+        var names = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var name in typeof(FluentThemeManager).Assembly.GetManifestResourceNames())
+        {
+            if (name.StartsWith("Resources/", StringComparison.Ordinal)) names[name.Replace('\\', '/')] = name;
+        }
+        return names;
     }
 
     private static void RefreshPalette()
@@ -190,6 +210,43 @@ public static class FluentThemeManager
             SetColor("TextOnAccentFillColorSecondaryBrush", Color.FromArgb(0xB3, text.R, text.G, text.B));
         }
         foreach (var (key, value) in BrushOverrides) SetColor(key, value);
+    }
+
+    private static IReadOnlyList<string> ReadManifest()
+    {
+        const string prefix = "Resources/";
+        var names = new List<string>();
+        using (var stream = OpenResource(prefix + "Manifest.txt")
+            ?? throw new InvalidOperationException($"Missing Astra resource: {prefix}Manifest.txt"))
+        using (var reader = new StreamReader(stream))
+        {
+            var lineNumber = 0;
+            while (reader.ReadLine() is { } text)
+            {
+                lineNumber++;
+                var entry = text.Trim().Replace('\\', '/');
+                if (entry.Length == 0 || entry.StartsWith('#')) continue;
+                if (OpenResource(prefix + entry) is null)
+                    throw new InvalidOperationException($"Astra manifest line {lineNumber} lists {entry}, which is not an embedded resource.");
+                names.Add(entry);
+            }
+        }
+        if (names.Count == 0) throw new InvalidOperationException("Astra manifest lists no dictionaries.");
+
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var name in names)
+        {
+            if (!seen.Add(name)) throw new InvalidOperationException($"Astra manifest lists {name} more than once.");
+        }
+        var accounted = new HashSet<string>(seen, StringComparer.Ordinal) { "Light.jalxaml", "Dark.jalxaml" };
+        // An unlisted dictionary embeds and parses fine yet never loads; fail the same way a missing one does.
+        foreach (var resource in EmbeddedNames.Keys)
+        {
+            if (!resource.EndsWith(".jalxaml", StringComparison.Ordinal)) continue;
+            if (!accounted.Contains(resource[prefix.Length..]))
+                throw new InvalidOperationException($"{resource} is not listed in {prefix}Manifest.txt.");
+        }
+        return names.AsReadOnly();
     }
 
     private static void SetColor(string key, Color color)
