@@ -94,6 +94,21 @@
   <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}" />
   <Style TargetType="HyperlinkButton" BasedOn="{StaticResource DefaultHyperlinkButtonStyle}" />
 
+  <!-- WinUI 3 DefaultScrollViewerStyle @19e3bdc3c, blob 800d5040a5e73c28b75c5c5d2f4af40c7a48256b. Only the
+       setters this runtime has and can verify are here: IsTabStop, Padding, BorderThickness,
+       BorderBrush, Background and the two content alignments. HorizontalScrollMode/VerticalScrollMode,
+       IsVerticalRailEnabled/IsHorizontalRailEnabled and UseSystemFocusVisuals do not exist on
+       Jalium's ScrollViewer at all, and VerticalScrollBarVisibility deliberately stays at the
+       framework's Auto because 26.10.9 cannot reproduce the indicator states that let WinUI show a
+       Visible bar invisibly at rest - see audits/scrollviewer.md. -->
+  <Style x:Key="DefaultScrollViewerStyle" TargetType="ScrollViewer">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Padding" Value="0" /><Setter Property="BorderThickness" Value="0" />
+    <Setter Property="BorderBrush" Value="Transparent" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" /><Setter Property="VerticalContentAlignment" Value="Top" />
+  </Style>
+  <Style TargetType="ScrollViewer" BasedOn="{StaticResource DefaultScrollViewerStyle}" />
+
   <!-- WinUI 3 DefaultToolTipStyle @19e3bdc3c, blob 281d1efcf02c33f81b32fd04e2c691da9173a323. The root is
        a Border here while upstream puts the chrome on a ContentPresenter; the drawn result is the same
        and audits/tooltip.md records it as a shape difference rather than a claim of structural parity.

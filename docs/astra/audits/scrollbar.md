@@ -51,6 +51,21 @@
 全部测不出来。能改的只有拇指颜色、轨道颜色，和一个 `ScrollBarStyle.Background`。
 按 ROADMAP D 的分级，这是 `frozen-brush`，不是 `template-only`。
 
+> **2026-09-18 更正与加强（`audits/scrollviewer.md`，同一套部件级判据）**
+> 1. 措辞不准的地方：**宿主 `ScrollViewer` 的隐式样式是生效的**（`IsTabStop`/`Padding`/`Background`
+>    都能从建出来的宿主读回）——只是它对滚动条的像素没有影响，当时用像素判据就把两件事混成了一句。
+>    反过来，**ScrollBar 自己的隐式样式连值都落不上**：setter 写 `Padding=7`，建出来的 bar 读回
+>    仍是代码设的 `2`。所以"改结构无路"这条对 ScrollBar 更严重，对宿主不成立。
+> 2. 为什么只有两个刷名管用，现在有了机制层面的读数：`ScrollBar.ThumbStyle` 是框架自己设的
+>    （`TargetType==Thumb`），那份样式的 `Background` 就是 `ScrollBarThumb`；应用级
+>    `Resources[typeof(Thumb)]` 也顶不掉它。
+> 3. 箭头颜色**确实无路**，且这次是逐个名字量过的：dll 元数据里的
+>    `ScrollBarArrowBrushKey`/`ScrollBarArrowHoverBrushKey`/`ScrollBarArrowPressedBrushKey`/
+>    `ScrollBarBrushKey`/`ScrollBarColorKey` 所指向的 10 个公开名，一个一个塞进
+>    `Application.Resources` 后静止灰色不变（10 次 `sentinel=0`）。内部键名不在公开面上。
+> 4. 新增一条候选（未采用）：`ScrollViewer.IsOverlayScrollBarEnabled=true` 会让静止灰色归零，
+>    也就是唯一能做出上游"平时看不见"外观的开关；缺悬停证据，见 `scrollviewer.md`。
+
 ## 3. 落地
 
 - `ThemeResources/Light.jalxaml` / `Dark.jalxaml` 各加两条由生成器产出的刷：
