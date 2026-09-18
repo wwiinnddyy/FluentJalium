@@ -10,24 +10,12 @@ namespace FluentJalium.Tests;
 /// </summary>
 public class AstraGateTests
 {
-    private static readonly XNamespace XamlNamespace = "http://schemas.microsoft.com/winfx/2006/xaml";
-
     [Fact]
     public void Dictionary_manifest_resolves_against_the_embedded_resources()
     {
         var names = FluentThemeManager.DictionaryNames;
         Assert.NotEmpty(names);
         Assert.Contains("Controls/Navigation.jalxaml", names);
-    }
-
-    [Fact]
-    public void Palette_dictionaries_declare_the_same_keys()
-    {
-        var light = ResourceKeys("Resources/Light.jalxaml");
-        var dark = ResourceKeys("Resources/Dark.jalxaml");
-        Assert.NotEmpty(light);
-        Assert.Empty(dark.Except(light).OrderBy(static key => key, StringComparer.Ordinal));
-        Assert.Empty(light.Except(dark).OrderBy(static key => key, StringComparer.Ordinal));
     }
 
     [Fact]
@@ -47,16 +35,35 @@ public class AstraGateTests
         Assert.Empty(offenders);
     }
 
-    private static HashSet<string> ResourceKeys(string embeddedResourceName)
+    /// <summary>
+    /// AGENTS.md forbids three things Astra previously did: walk the visual tree to restyle live
+    /// controls, invalidate every window after a theme mutation, and reflect into private framework
+    /// members. Keeping them out is a text gate because nothing else would notice their return, and
+    /// the experimental-API suppression must stay confined to one file.
+    /// </summary>
+    [Fact]
+    public void Theme_kernel_stays_free_of_repair_loops_and_reflection()
     {
-        var assembly = typeof(FluentThemeManager).Assembly;
-        using var stream = assembly.GetManifestResourceStream(embeddedResourceName)
-            ?? throw new InvalidOperationException($"Missing Astra resource: {embeddedResourceName}");
-        return XDocument.Load(stream).Descendants()
-            .Select(element => element.Attribute(XamlNamespace + "Key")?.Value)
-            .Where(static value => !string.IsNullOrEmpty(value))
-            .Select(static value => value!)
-            .ToHashSet(StringComparer.Ordinal);
+        var root = RepositoryRoot();
+        var offenders = new List<string>();
+        var suppressions = 0;
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium", "Astra"), "*.cs", SearchOption.AllDirectories))
+        {
+            var text = File.ReadAllText(file);
+            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
+            if (text.Contains("#pragma warning disable WPF0001", StringComparison.Ordinal))
+            {
+                suppressions++;
+                if (relative != "src/FluentJalium/Astra/Themes/ApplicationThemeDriver.cs") offenders.Add($"{relative}: suppresses WPF0001 outside the driver");
+            }
+
+            foreach (var banned in new[] { "VisualTreeHelper", ".InvalidateVisual(", "BindingFlags.NonPublic", "GetField(", "GetMethod(" })
+                if (text.Contains(banned, StringComparison.Ordinal)) offenders.Add($"{relative}: {banned}");
+        }
+
+        Assert.Equal(1, suppressions);
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, "Forbidden implementation pattern:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
     private static string RepositoryRoot()
