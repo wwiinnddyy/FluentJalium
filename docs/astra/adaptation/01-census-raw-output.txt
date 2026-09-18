@@ -1,0 +1,190 @@
+[GENERIC] GetGenericThemeStream() returned null
+[CENSUS] controls assembly: Jalium.UI.Managed
+[CENSUS] public concrete Control-derived types: 163
+[CENSUS] generic theme defines styles for 0 target types, 0 keyed styles
+[TYPE] AppBarButton                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] AppBarSeparator                  style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] AppBarToggleButton               style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] AutoCompleteBox                  style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] BarChart                         style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] Button                           style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Calendar                         style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CalendarButton                   style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CalendarDayButton                style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CalendarItem                     style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CameraView                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CandlestickChart                 style=False render=False paint=False templateProp=True  parts=0 brushDps=13 => no-default-style
+[TYPE] ChartLegend                      style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ChartTooltip                     style=False render=True paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] CheckBox                         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ColorPicker                      style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ComboBox                         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ComboBoxItem                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] CommandBar                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ContentControl                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ContentDialog                    style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ContextMenu                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Control                          style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DataGrid                         style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] DataGridCell                     style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DataGridCellsPresenter           style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DataGridColumnHeader             style=False render=True paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] DataGridColumnHeadersPresenter   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DataGridRow                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DataGridRowHeader                style=False render=True paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] DatePicker                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DatePickerTextBox                style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] DevToolsWindow                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DiffViewer                       style=False render=True paint=False templateProp=True  parts=0 brushDps=14 => no-default-style
+[TYPE] DockItem                         style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] DockLayout                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] DockTabPanel                     style=False render=True paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] DocumentViewer                   style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] EditControl                      style=False render=True paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] Expander                         style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] FlowDocumentPageViewer           style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] FlowDocumentReader               style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] FlowDocumentScrollViewer         style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] FlowchartDiagram                 style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] Frame                            style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] GanttChart                       style=False render=False paint=False templateProp=True  parts=0 brushDps=13 => no-default-style
+[TYPE] GaugeChart                       style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] GridSplitter                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] GridViewColumnHeader             style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] GroupBox                         style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] GroupItem                        style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] HeaderedContentControl           style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] HeaderedItemsControl             style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Heatmap                          style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] HexEditor                        style=False render=True paint=False templateProp=True  parts=0 brushDps=12 => no-default-style
+[TYPE] HyperlinkButton                  style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] InfoBar                          style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ItemsControl                     style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] JsonTreeViewer                   style=False render=False paint=False templateProp=True  parts=0 brushDps=13 => no-default-style
+[TYPE] Label                            style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] LineChart                        style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] ListBox                          style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ListBoxItem                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ListView                         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ListViewItem                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MapView                          style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Markdown                         style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownCodePresenter            style=False render=False paint=False templateProp=True  parts=0 brushDps=12 => no-default-style
+[TYPE] MarkdownDiagramPresenter         style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownFootnotePresenter        style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] MarkdownHeadingPresenter         style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] MarkdownImagePresenter           style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] MarkdownListItemPresenter        style=False render=False paint=False templateProp=True  parts=0 brushDps=10 => no-default-style
+[TYPE] MarkdownListPresenter            style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownParagraphPresenter       style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownQuotePresenter           style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownRulePresenter            style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownTableCellPresenter       style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] MarkdownTablePresenter           style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] Menu                             style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuBar                          style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuBarItem                      style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuFlyoutItem                   style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuFlyoutSeparator              style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuFlyoutSubItem                style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MenuItem                         style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] MermaidDiagram                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] NavigationView                   style=False render=False paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] NavigationViewItem               style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] NavigationViewItemHeader         style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] NavigationViewItemSeparator      style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] NavigationWindow                 style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] NetworkGraph                     style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] NumberBox                        style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] PasswordBox                      style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] PieChart                         style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] ProgressBar                      style=False render=True paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] PropertyGrid                     style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] QRCode                           style=False render=True paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] RadioButton                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RangeSlider                      style=False render=True paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] RazorItemsHost                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RepeatButton                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ResizeGrip                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Ribbon                           style=False render=False paint=False templateProp=True  parts=0 brushDps=13 => no-default-style
+[TYPE] RibbonApplicationMenu            style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonApplicationMenuItem        style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonApplicationSplitMenuItem   style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonButton                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonCheckBox                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonComboBox                   style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonContextualTabGroup         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonGallery                    style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonGalleryCategory            style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonGalleryItem                style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonGroup                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonMenuButton                 style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonMenuItem                   style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonQuickAccessToolBar         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonSeparator                  style=False render=False paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] RibbonSplitButton                style=False render=False paint=False templateProp=True  parts=0 brushDps=13 => no-default-style
+[TYPE] RibbonSplitMenuItem              style=False render=False paint=False templateProp=True  parts=0 brushDps=11 => no-default-style
+[TYPE] RibbonTab                        style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RibbonTextBox                    style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] RibbonToggleButton               style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] RichTextBox                      style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] SankeyDiagram                    style=False render=False paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] ScatterPlot                      style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] ScrollBar                        style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ScrollViewer                     style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Separator                        style=False render=True paint=False templateProp=True  parts=0 brushDps=6 => no-default-style
+[TYPE] Slider                           style=False render=True paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] Sparkline                        style=False render=True paint=False templateProp=True  parts=0 brushDps=14 => no-default-style
+[TYPE] Split                            style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] SplitButton                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] StatusBar                        style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] StatusBarItem                    style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] StickyNoteControl                style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] SwipeControl                     style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TabControl                       style=False render=True paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] TabItem                          style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] Terminal                         style=False render=False paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] TextBox                          style=False render=True paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] Thumb                            style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TimePicker                       style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TitleBar                         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TitleBarButton                   style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ToastNotificationItem            style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ToggleButton                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ToggleMenuFlyoutItem             style=False render=True paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ToggleSwitch                     style=False render=False paint=False templateProp=True  parts=0 brushDps=7 => no-default-style
+[TYPE] ToolBar                          style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] ToolTip                          style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TransitioningContentControl      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TreeDataGrid                     style=False render=False paint=False templateProp=True  parts=0 brushDps=9 => no-default-style
+[TYPE] TreeDataGridRow                  style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TreeMap                          style=False render=False paint=False templateProp=True  parts=0 brushDps=8 => no-default-style
+[TYPE] TreeSelector                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TreeSelectorItem                 style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TreeView                         style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] TreeViewItem                     style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] UserControl                      style=False render=False paint=False templateProp=True  parts=0 brushDps=5 => no-default-style
+[TYPE] Window                           style=False render=True paint=True templateProp=True  parts=0 brushDps=5 => no-default-style
+[SUMMARY] template-driven=0 self-drawn=0 no-default-style=163 total=163
+[VSM] generic theme VisualStateManager occurrences: 0; ControlTemplate count: 0; Trigger count: 0
+[STYLE] GenericThemeResourceName: Jalium.UI.Controls.Themes.Generic.jalxaml
+[STYLE] ControlsAssembly: Jalium.UI.Managed, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+[STYLE] Jalium.UI.Managed embedded theme-ish resources: 0 []
+[STYLE] LoadGenericTheme() -> null
+[STYLE] ResolveThemeStyle is not public
+[IMPLICIT] Button via Application.Resources[typeof(Button)]: bg=#FF123456 fg=#FFABCDEF
+[IMPLICIT] ProgressBar implicit: fg=#FF010203 (WinUI accent equivalent)
+[IMPLICIT] Button with Style assigned directly: bg=#FFFEDCBA
+[IMPLICIT] after ThemeMode.Dark, implicit Button bg=#FF123456 (an explicit style setter is not theme-driven unless it uses {ThemeResource})
+[FLUENT] WindowBackdropType: None, Auto, Mica, Acrylic, MicaAlt
+[FLUENT] Symbol enum members: 764
+[FLUENT] SymbolIcon font surface: Symbol
+[FLUENT] brush type 'AcrylicBrush' present: False
+[FLUENT] brush type 'MicaBrush' present: False
+[FLUENT] brush type 'RevealBrush' present: False
+[FLUENT] brush type 'RadialGradientBrush' present: True
+[FLUENT] brush type 'LinearGradientBrush' present: True
+[FLUENT] brush type 'SolidColorBrush' present: True
+[FLUENT] ThemeManager.ApplyTypography: (String,String,String) | (String,String,String,Double)
+[FLUENT] fonts now: display=Microsoft YaHei UI body=Microsoft YaHei UI mono=Cascadia Code bodySize=12
+[FLUENT] SystemAccentResolver settable: True

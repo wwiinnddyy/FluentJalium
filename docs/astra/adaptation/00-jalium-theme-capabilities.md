@@ -15,7 +15,7 @@
 | S0-c WinUI 别名元素形式 | **能解析且解析到真实刷子实例** | 上游 `_themeresources.xaml` 可近乎逐字转录 |
 | S0-d 标记里写 `VisualStateManager` | **不能，两种写法都抛异常** | 模板改走 `ControlTemplate.Triggers` |
 | S0-e 编译期 `JalxamlPage` 产出字典 | **产出 0 个类型** | 字典保持 Embedded + `XamlReader.Load` |
-| S0-f `ThemeColors` 可否桥接 | **68 个 public 静态 `Color`，零 public setter** | 原生优先策略要按部件类型分层 |
+| S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 
 ## S0-a：主题切换的真实驱动
 
@@ -116,7 +116,12 @@ assembly types: 6; ResourceDictionary-derived: []
 
 ## S0-f：`ThemeColors` 读得到、写不进
 
-`Jalium.UI.Controls.Themes.ThemeColors` 暴露 68 个 public 静态 `Color` 属性，
+> **本节已被 `01-jalium-control-census.md` 收窄**：本框架**没有发布任何 Generic 主题**，
+> 未加样式的原生控件其 **DP 默认值本身是随 `ThemeMode` 变化的**，
+> 真正改不动的只有**直接读 `ThemeColors` 静态表的自绘代码**。
+> 下面"重模板改不动"的适用范围仅限那部分，不要按整类控件理解。
+
+`Jalium.UI.Controls.Themes.ThemeColors` 暴露 71 个 public 静态 `Color` 属性，
 **没有一个有 public setter**（逐个反射确认）。清单里与 WinUI 控件直接相关的包括
 `SliderTrack`、`SliderThumb`、`ScrollBarThumb/Hover/Track`、`TitleBar*`（含
 `TitleBarButtonHover`、`TitleBarCloseButtonPressed`、`TitleBarGlyph`）、`TabStripBackground`、
