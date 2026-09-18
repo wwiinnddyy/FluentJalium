@@ -265,9 +265,10 @@ internal static class Dump
         "FrameworkElementFactory", "RenderContext", "Button", "ContentControl", "Control",
         "DispatcherFrame", "Setter", "SetterBase", "Border", "Canvas", "Grid", "TextBlock",
         "BasedOnStyleCollection", "Condition", "Trigger", "MultiTrigger", "FrameworkTemplate",
+        "ScrollBar", "ScrollViewer", "Thumb", "Primitives", "RangeBase", "ScrollChangedEventArgs",
     ];
 
-    private static readonly string[] Ungated = ["DispatcherFrame", "FrameworkElementFactory", "Setter", "SetterBase", "Trigger", "Style", "CompositionTarget", "RenderTargetBitmap", "Window"];
+    private static readonly string[] Ungated = ["ScrollBar", "ScrollViewer", "Thumb", "DispatcherFrame", "FrameworkElementFactory", "Setter", "SetterBase", "Trigger", "Style", "CompositionTarget", "RenderTargetBitmap", "Window"];
 
     private static readonly string[] MemberWords =
     [

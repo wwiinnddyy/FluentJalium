@@ -105,7 +105,10 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
 **顺序按"底座先于叶子"**，因为框架没有默认主题、未样式化的控件会露出框架外观：
 
 1. **底座**：`ScrollViewer`、`ScrollBar`、`Thumb`、`Popup`、`ItemsControl`、`ContentPresenter`、
-   窗口外壳。`02` 已证明 `ScrollBar` 认 DP，这一批是可做的。
+   窗口外壳。开工前的运行时摸底在 `07`：26.10.9 只暴露 `ScrollBarStyle`/`ScrollBarTrack`/
+   `ScrollBarThumb`/`ScrollBarArrow` 四个键，源码树里那两个 `*ButtonStyle` 与 `ScrollBarThumbStyle`
+   在运行时**不存在**；`ScrollBar : RangeBase : Control` 有 `Template`，所以走隐式样式这条路
+   （`06` 已证这条对原生控件通）。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
    原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
