@@ -1,5 +1,7 @@
 Pixel harness readings, 2026-09-18, Jalium.UI 26.10.9, Impeller, RenderTargetBitmap Bgr32 at 96 dpi.
 Produced by temporarily replacing the assertions in tests/FluentJalium.Tests/AstraPixelTests.cs with
+SUPERSEDED for attribution: the four lines below marked '(empty)' were a capture that never pumped a frame.
+See 06-pixel-attribution.md. The raw bytes stay as the record of what was measured, not of what is true.
 one Assert.Fail dump; the same file keeps the permanent assertions. Format: #RRGGBB x pixel-count.
 
 --- capture path A: PixelHarness.Render(element) - the visual in its own coordinate space ---

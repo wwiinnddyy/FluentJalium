@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
+using FluentJalium.Tests.Pixel;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Interop;
@@ -67,9 +68,23 @@ public sealed class AstraThemeRuntimeFixture : IDisposable
 
     public void Dispose()
     {
+        ReleaseHostQuietly();
         _jobs.CompleteAdding();
         _thread.Join(TimeSpan.FromSeconds(10));
         _jobs.Dispose();
+    }
+
+    /// <summary>The pixel host is a window on this thread, so it has to be closed here, not on a worker.</summary>
+    private void ReleaseHostQuietly()
+    {
+        if (!_thread.IsAlive) return;
+        using var done = new ManualResetEventSlim();
+        _jobs.Add(() =>
+        {
+            try { PixelHarness.ReleaseHost(); }
+            finally { done.Set(); }
+        });
+        done.Wait(TimeSpan.FromSeconds(10));
     }
 
     private void Pump()

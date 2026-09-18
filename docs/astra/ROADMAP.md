@@ -16,7 +16,7 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
 | 材质**存在且丰富**：`BackdropEffect` → `AcrylicEffect`/`MicaEffect(UseAlt)`/`FrostedGlassEffect`/`BackdropBlurEffect`/`ColorAdjustmentEffect`/`CompositeBackdropEffect`；元素级 `BlurEffect`/`DropShadowEffect`/`InnerShadowEffect`/`OuterGlowEffect`/`EffectGroup` | `MATERIAL` |
 | `Window.SystemBackdrop`、`TitleBar`/`TitleBarStyle`/`CustomTitleBarStyle`/`Left(Right)WindowCommands`/`AdornerLayer`/`AllowsTransparency` 均 public | `WINDOW` |
 | 像素可在进程内回读：`RenderTargetBitmap(w,h,dpiX,dpiY,PixelFormat)`+`Render(Visual)`+`CopyPixels` | `02` |
-| 颜色天花板只剩：4 个实时 `ThemeColors.Accent` 读取点 + `CheckBox`/`RadioButton` 冻结勾选 glyph | `02` |
+| 颜色天花板只剩：4 个实时 `ThemeColors.Accent` 读取点（`CheckBox`/`RadioButton` 冻结勾选 glyph 一条**已撤回**） | `02`、`06` |
 | 无公开高对比驱动；无公开系统减弱动画 API；`FluentSystemIcons` 平面外码点成方框 | `00`、`01` |
 
 ## A. 取色系统
@@ -34,9 +34,9 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
   框架与我们的键一起跟；(ii) 显式：`ThemeManager.ApplyAccent(color)`（`02` 已证明它能改变
   Slider/ProgressBar 的像素）+ 我们自己那一族 accent 键原地改色保标识；
   (iii) `OverrideBrush(key,color)` 保留。
-- **A4 🬡 勾选 glyph 硬钉子的处置**。`CheckBox`/`RadioButton` 的勾选色既不吃 `ApplyAccent`
-  也不吃 DP 覆盖。先试**完整模板覆写**（WinUI 的勾是模板里的 glyph/Path，理论上换掉绘制源就行）；
-  不行才按毕业规则换自有类型。这是阶段 2 的一个独立实验，有像素断言。
+- **A4 ✅ 勾选 glyph：撤回，不是天花板**。`06` 查明那条"冻结"读数出自未推帧的捕获；
+  判据修好后 `Check_mark_follows_the_selected_accent` 直接通过——`ApplyAccent` 之后哨兵色出现在
+  勾选像素里。模板覆写实验与"毕业换自有类型"两条都不再需要。`RadioButton` 的圆点未单独量。
 - **A5 数值令牌**：继续内联字面量，但每个字面量必须在 `<control>.parts.md` 里有上游出处；
   闸口脚本比对两边，防手抄漂移。
 - **A6 键清单 + 消费点反查**（最高优先，因为缺失键是静默失败）：消费点反查**已落地** —
@@ -58,11 +58,12 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
   表达；动效允许 `Storyboard`+`BeginStoryboard`（public，能力比 `00` 里假设的强）。
   维护一张 `WinUI VisualState → Jalium trigger` 映射表，等同 ModernWpf 的
   `winui-visualstate-setters-audit.md`。
-- **B4 像素回归基座 ✅（阶段 1）**：`tests/FluentJalium.Tests/Pixel/PixelHarness.cs` 给出
-  `Render`（形状与自绘控件）与 `Host`（**模板控件必须经窗口**，直接捕获是空像素）两条路径 +
-  颜色直方图。已落地断言：哨兵 DP 到像素、同一控件 Light↔Dark 像素分布不同；
-  "像素里不得出现品牌绿"对未样式化的原生 Slider/ProgressBar **今天还不成立**，
-  按天花板写成带理由的 `Skip`，随 D4/D6 批次转成断言。RTB 与上屏一致性仍未证 🬡。
+- **B4 像素回归基座 ✅（判据可信，阶段 2 第 0 步做完）**：`PixelHarness` 改为**共用一个宿主窗口**、
+  换样本只换 `Content`、反复推帧直到两次直方图相同且非空才算稳定（`06` 的四条读数各对应一处）。
+  `AstraPixelTests` 7 条全绿、0 skip：哨兵 DP、令牌跟主题、隐式样式→原生 Button 像素、
+  本地 `Background` 压过 Setter、命名样式吃 accent 令牌、整窗 Light↔Dark、
+  未样式的 Slider/ProgressBar **0 px 品牌绿**。仍欠：RTB 与上屏合成的一致性 🬡、
+  半透明令牌与混合 DPI 下的计数一致性 🬡。
 - **B5 动效令牌 🔺 现在是 reduced-motion 的前置**：模板过渡时长目前是标记里的字面量，
   删掉整树递归后 `ReduceMotion` 只能管住 Astra 自己代码驱动的动画（页面入场、导航指示器）。
   要做 `Metrics.jalxaml` 增加 `ControlFastDuration` 等时长/节拍令牌，
@@ -107,8 +108,9 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    窗口外壳。`02` 已证明 `ScrollBar` 认 DP，这一批是可做的。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
-   起手就得修的一条（阶段 1 像素基座查出）：**模板根 Border 不吃本地 `Background`**，
-   WinUI 是 `{TemplateBinding Background}`；修完把 `AstraPixelTests` 的哨兵断言扩展到 Button。
+   原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
+   `{TemplateBinding Background}` 完整落到像素，Button 的哨兵断言也已进了 `AstraPixelTests`。
+   Button 批的活因此回到"逐键对齐上游 + 状态映射 + Gallery 页"，不含颜色通路修复。
 3. **文本录入**：`TextBox`、`PasswordBox`、`NumberBox`、`AutoSuggestBox`、`RichEditBox`。
 4. **选择**：**`CheckBox`/`RadioButton`（含 A4 冻结 glyph 实验）**、`ToggleSwitch`、`Slider`、
    `RatingControl`(自建)。
@@ -144,9 +146,9 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 
 | 阶段 | 内容 | 出口 |
 |---|---|---|
-| 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md`、B4 像素 harness |
-| 2 | **Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 四份测试 + 审计文档 + Gallery 页 + 像素无品牌绿 |
-| 3 | **A3/A4 + C2 🬡**（强调色三态、勾选 glyph 实验、材质参数摸底） | 强调色改动能被像素断言；glyph 结论落地（模板 or 自有类型）；C1 映射表可执行 |
+| 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 7/7 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
+| 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
 | 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |

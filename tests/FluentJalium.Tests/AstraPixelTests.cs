@@ -7,10 +7,11 @@ using Jalium.UI.Media;
 namespace FluentJalium.Tests;
 
 /// <summary>
-/// The pixel leg of the stage-1 base: the only evidence in this repository that a theme mutation
+/// The pixel leg of the theme base: the only evidence in this repository that a theme mutation
 /// reached rendered output rather than only a resource dictionary. Everything runs on the
-/// collection fixture's own thread because Jalium objects carry thread affinity, and a templated
-/// control is captured through a window because that is the only way one rasterises.
+/// collection fixture's own thread because Jalium objects carry thread affinity, and a control is
+/// captured through a shown window with real frames pumped, because nothing rasterises otherwise
+/// (docs/astra/adaptation/06-pixel-attribution.md).
 /// </summary>
 [Collection(AstraThemeRuntimeCollection.Name)]
 public sealed class AstraPixelTests
@@ -52,10 +53,8 @@ public sealed class AstraPixelTests
     [Fact]
     public void An_astra_token_reaches_the_pixels_and_follows_the_theme()
     {
-        // The claim stage 1 can actually make without any control being styled: an opaque palette
-        // brush is the object a visual paints with, so the token's own colour shows up, and the
-        // in-place retint moves it. Deliberately a Border rather than a Button - see the note on the
-        // test below about native controls not showing our tokens yet.
+        // The palette brush is the object a visual paints with, so the token's own colour shows up,
+        // and the in-place retint moves it.
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
@@ -74,14 +73,59 @@ public sealed class AstraPixelTests
     }
 
     [Fact]
+    public void The_implicit_astra_style_reaches_a_native_button()
+    {
+        // The claim stage 2 was blocked on, and the one every later control batch inherits: a plain
+        // native Button with nothing set on it picks up Astra's application-level implicit style,
+        // that style's template consumes the palette brush, and the brush colour is what the
+        // rasteriser wrote. A local Background outranks the style setter, which is the second half of
+        // the same evidence.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("ControlFillColorDefaultBrush", Sentinel);
+            try
+            {
+                var styled = PixelHarness.Render(new Button { Content = "astra" }, 200, 44);
+                Assert.True(styled.Stable, $"capture never settled: {styled.Top(6)}");
+                Assert.True(styled.Count(Sentinel) > 6_000, $"implicit style did not paint the button; subject={styled.Subject} top={styled.Top(6)}");
+                Assert.Equal(0, styled.CountAny(BrandEmerald));
+
+                var local = PixelHarness.Render(new Button { Content = "astra", Background = new SolidColorBrush(Color.FromRgb(0xFF, 0xA5, 0x00)) }, 200, 44);
+                Assert.True(local.Count(Color.FromRgb(0xFF, 0xA5, 0x00)) > 6_000, $"local Background did not reach the template; top={local.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("ControlFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    [Fact]
+    public void The_accent_token_reaches_an_explicit_button_style()
+    {
+        // Named styles resolve their {ThemeResource} setters the same way the implicit one does, so a
+        // Gallery page that asks for AccentButtonStyle by name is covered by the same kernel.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", Sentinel);
+            try
+            {
+                var sample = PixelHarness.Render(new Button { Content = "accent", Style = FluentThemeManager.GetStyle("AccentButtonStyle") }, 200, 44);
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+                Assert.True(sample.Count(Sentinel) > 6_000, $"accent token did not paint the button; top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    [Fact]
     public void The_theme_driver_moves_a_shown_window_to_the_pixels()
     {
-        // What this actually measures, from the raw captures in
-        // docs/astra/adaptation/00-pixel-harness-raw-output.txt: a shown window paints 9680 px of
-        // #F5F5F7 in Light and #1C1C1E in Dark. Neither value is in the Astra palette - it is Jalium's
-        // own surface following Application.ThemeMode. So this is evidence the driver reaches
-        // rendered output, and no more: the Button in the client area contributes nothing
-        // distinguishable here, because a native control captured on its own rasterises empty.
+        // A shown window repaints across the theme flip. Counts are monitor-scale, so this asserts
+        // the picture changed rather than a pixel total.
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
@@ -98,26 +142,36 @@ public sealed class AstraPixelTests
         });
     }
 
-    [Fact(Skip = "Ceiling, not a regression, measured 2026-09-18: an unstyled native Slider paints #207245 across 954 px and a native ProgressBar paints #1D733C-#2B804A, because Jalium ships no generic theme and both draw themselves from the frozen ThemeColors table (docs/astra/adaptation/02-render-ceiling.md). Enable when the Slider and ProgressBar batches re-template them; the claim is that a hosted control shows no brand emerald at all.")]
+    [Fact]
     public void Hosted_surfaces_show_no_brand_emerald()
     {
+        // Retrained claim: the 954 px of #207245 recorded for an unstyled Slider in
+        // docs/astra/adaptation/02-render-ceiling.md came from the old un-framed capture and does not
+        // reproduce. These two controls still have no Astra style, so what is on screen is the
+        // framework's own default, and the default follows the driver rather than the frozen brand.
+        // The IL reading that the drawing code consults ThemeColors is untouched by this.
         _fixture.Run(() =>
         {
             foreach (FrameworkElement subject in new FrameworkElement[] { new Slider { Value = 50 }, new ProgressBar { Value = 50 } })
             {
-                var sample = PixelHarness.Host(subject);
-                Assert.True(sample.CountAny(BrandEmerald) == 0, $"{subject.GetType().Name} paints brand emerald {sample.CountAny(BrandEmerald)} px; top={sample.Top(6)}");
+                var sample = PixelHarness.Render(subject, 220, 40);
+                // Guard against the trivial pass: an unpainted capture has no emerald either.
+                Assert.True(sample.PaintedPixels > 0, $"{subject.GetType().Name} captured empty; top={sample.Top(6)}");
+                Assert.Equal(0, sample.CountAny(BrandEmerald));
             }
         });
     }
 
-    [Fact(Skip = "Known ceiling: the CheckBox check mark is a frozen framework brush that survives both ApplyAccent and a Background/Foreground override (docs/astra/adaptation/02-render-ceiling.md, roadmap item A4). Re-enable when the template-override experiment settles whether a pure template can replace the glyph.")]
+    [Fact]
     public void Check_mark_follows_the_selected_accent()
     {
+        // Roadmap item A4 was recorded as a frozen-brush ceiling from a capture that never rendered a
+        // frame. With the harness fixed the same subject does follow the accent, so the ceiling is
+        // withdrawn for the check mark; it stays open for anything Astra has not templated yet.
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyAccent(Sentinel);
-            var sample = PixelHarness.Render(new CheckBox { IsChecked = true }, 40, 40);
+            var sample = PixelHarness.Render(new CheckBox { IsChecked = true }, 44, 44);
             Assert.True(sample.Count(Sentinel) > 0, $"check mark ignored the accent; top={sample.Top(6)}");
         });
     }

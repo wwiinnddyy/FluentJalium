@@ -90,8 +90,9 @@
 
 ## 这份清单证明不了什么
 
-- 只统计**声明**。声明的隐式样式是否真的落到原生控件像素上仍未证：
-  ``00-pixel-harness-raw-output.txt`` 的归因实验里，覆盖我们的令牌后原生 Button 的像素不动。
+- 只统计**声明**。"声明是否落到像素"这条限定现在只对 **Button 撤了**（``06-pixel-attribution.md``：
+  隐式样式 -> 模板 -> 令牌 -> 像素已有断言），其余真空控件仍未证。``00-pixel-harness-raw-output.txt``
+  里"像素不动"那组读数出自未推帧的捕获，不再作为证据。
 - 绘制方式列来自 census 的 ``OnRender``/``OnPaint`` 判定，不区分读 DP 还是读死的 ``ThemeColors``；
   后者见 ``02-render-ceiling.md``。
 - 范围以 ModernWpf 为**文件/目录名**为锚，所以按别名或内联在父控件文件里的条目样式会漏计

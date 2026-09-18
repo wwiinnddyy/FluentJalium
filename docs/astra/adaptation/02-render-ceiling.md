@@ -86,3 +86,17 @@ CEILING  TimePicker    BuildPopup        -> get_Accent
 
 未定：离屏 RTB 的成像是否与上屏合成完全一致（本次只用它做"变了没变"的比较，未做绝对色值断言）；
 `CheckBox`/`RadioButton` 那族冻结刷子的确切来源尚未定位；其余 57 个自绘控件未做像素对照。
+
+## 更正（同日稍后，`06-pixel-attribution.md`）
+
+本文件的**像素**读数出自一个不推帧的捕获路径，两处需要撤回；IL 与 `DeclaredOnly` 扫描的读数不受影响：
+
+- "`CheckBox` / `RadioButton` 的勾选 glyph 三遍恒定 `#207345`，既不吃 `ApplyAccent` 也不吃 DP 覆盖"
+  ——**不成立**。改用 `06` 修好的基座重测，`ApplyAccent(哨兵)` 之后哨兵色出现在勾选像素里
+  （`AstraPixelTests.Check_mark_follows_the_selected_accent`，现为常规断言，不再 skip）。
+  那条"扫描归因盲区"的推论随之一并撤回。
+- "未样式 `Slider` 画 `#207245` 共 954 px、`ProgressBar` 画 `#1D733C`–`#2B804A`"——**不复现**。
+  同一基座下两者品牌绿 0 px（`Hosted_surfaces_show_no_brand_emerald`）。
+  仍然成立的是：这两个控件的绘制码读 `ThemeColors`（59 自绘 / 25 引用名单里的 IL 事实）。
+- 本文件末尾"未定：离屏 RTB 的成像是否与上屏合成完全一致"——仍**未定**，而且更窄了：
+  直捕控件视觉的路径连 alpha 字节都不回写（`06`），所以它只能证 RGB，不能证合成可见性。
