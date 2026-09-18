@@ -63,8 +63,10 @@ PasswordBox 的 `PasswordBox_themeresources.xaml` 在 Light 分支里**没有别
 顺带记下的同类问题，ComboBox 里程碑已经处理，其中一条**是我当时写错的**：
 `Metrics.jalxaml` 里 `ComboBoxPadding` 其实是上游自己的键（`ComboBox_themeresources.xaml` 第 341 行，
 值 `12,5,0,7`），错的只是值——那行抄成了按钮的 `11,5,11,6`。键与值现在都搬到
-`ThemeResources/ComboBox.jalxaml` 并按上游改正。`RadioButtonContentMargin` 那条仍然成立：
-上游 `RadioButton_themeresources.xaml` 里没有任何 `RadioButton*Margin`/`*Padding` 键（实测 grep 为空）。
+`ThemeResources/ComboBox.jalxaml` 并按上游改正。`RadioButtonContentMargin` 那条也成立且已收尾：
+上游 `RadioButton_themeresources.xaml` 里没有任何 `RadioButton*Margin`/`*Padding` 键（实测 grep 为空），
+那段间距上游写成样式 setter `Padding=8,6,0,0`——我们的样式本来就是这个值，所以那行自造键
+在 AutoSuggestBox 批从 `Metrics.jalxaml` 删掉了。
 
 ## 2. 三处替换，以及为什么只能替换
 
@@ -172,7 +174,7 @@ PasswordBox 没有可用模板（框架自绘），所以三格写在 `Style.Tri
 - 不声称触摸：本段没有任何触摸输入证据，键盘也只有 `Focus()` 一步（Tab 进入、Ctrl+A、退格未测）。
 - 不声称 Gallery 的 Inputs 页画对了：本段没有跑页面渲染，页面上的 TextBox/PasswordBox 卡片可见结果未目视。
 - 已处理（含更正）：`ComboBoxPadding` 不是自造键，是上游键被抄错了值，现已按上游 `12,5,0,7` 落回
-  `ThemeResources/ComboBox.jalxaml`；`RadioButtonContentMargin` 仍是自造键，等 RadioButton 那段一起收尾。
+  `ThemeResources/ComboBox.jalxaml`；`RadioButtonContentMargin` 确实是自造键，AutoSuggestBox 批已删行收尾。
 - 同类账单第三例：禁用一个挂载的 ComboBox，框架在它自己的 `Foreground` 上写 `#FFAEAEB2` 本地值，
   压过样式 setter 与禁用格（`audits/combobox.md` §0.5）。
 - 未归因：带文本的 TextBox 在 `Build` + 实时翻转 `IsEnabled` + `Settle` 的组合下挂满 60 秒看门狗；

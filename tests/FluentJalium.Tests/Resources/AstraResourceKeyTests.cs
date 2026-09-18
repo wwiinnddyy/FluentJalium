@@ -161,7 +161,10 @@ public class AstraResourceKeyTests
     /// resolves, still appears in a key listing and still passes every other gate here, while the control
     /// keeps painting whatever token its template hardcodes - so an app that overrides the upstream name
     /// sees nothing. Dictionaries named below are held to full consumption; the rest are still
-    /// transitional until their control batch lands.
+    /// transitional until their control batch lands. <c>Metrics.jalxaml</c> joined the list in the
+    /// AutoSuggestBox batch, and the rule is the same for a shared row as for a control row: it caught
+    /// two invented names (<c>RadioButtonContentMargin</c>, <c>MenuFlyoutItemCornerRadius</c>) and one
+    /// upstream row nothing read yet (<c>NavigationViewItemButtonMargin</c>).
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/CheckBox.jalxaml")]
@@ -170,6 +173,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/RadioButton.jalxaml")]
     [InlineData("ThemeResources/TextBox.jalxaml")]
     [InlineData("ThemeResources/NumberBox.jalxaml")]
+    [InlineData("ThemeResources/Metrics.jalxaml")]
     [InlineData("ThemeResources/Slider.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {

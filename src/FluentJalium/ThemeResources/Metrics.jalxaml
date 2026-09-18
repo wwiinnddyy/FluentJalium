@@ -1,12 +1,19 @@
-<!-- WinUI 19e3bdc3c: CommonStyles/CornerRadius, Button, Slider, RadioButton,
-     ToggleSwitch and NavigationView resources. Units are device-independent pixels.
-     Literal numeric setters avoid the pinned Jalium reader's x:Double limitation. -->
+<!-- WinUI 19e3bdc3c: the corner-radius and padding rows every batch reads and no single control owns -
+     ControlCornerRadius / OverlayCornerRadius from CommonStyles/CornerRadius, ButtonPadding from
+     Button_themeresources. Units are device-independent pixels; literal numeric setters avoid the pinned
+     Jalium reader's x:Double limitation.
+     Three rows used to live here and are gone: RadioButtonContentMargin and MenuFlyoutItemCornerRadius were
+     invented names with no upstream row behind them (upstream puts that spacing on the control's own Padding
+     setter, and the menu item corner radius is not a resource), and NavigationViewItemButtonMargin is a real
+     upstream row that nothing read yet - an idle name only looks overridable. All three come back with the
+     batch that consumes them; ThemeResources/Metrics.jalxaml is now held to the same key-consumption gate as
+     the per-control dictionaries, so a row cannot sit here unused again.
+     NavigationViewItemCornerRadius stays and is still owed: our NavigationView template reads it, but no
+     upstream row carries that name, so the NavigationView batch has to settle what upstream actually uses
+     there (docs/astra/audits, task list) rather than leave our own name in the public key list. -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
   <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
   <CornerRadius x:Key="NavigationViewItemCornerRadius">4</CornerRadius>
-  <CornerRadius x:Key="MenuFlyoutItemCornerRadius">4</CornerRadius>
   <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
-  <Thickness x:Key="NavigationViewItemButtonMargin">4,2</Thickness>
-  <Thickness x:Key="RadioButtonContentMargin">8,0,0,0</Thickness>
 </ResourceDictionary>

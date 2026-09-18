@@ -82,7 +82,9 @@ StaysOpenOnEdit, Text`，外加 `Selector`（`SelectedIndex/SelectedItem/IsSelec
 **顺带纠正一处我自己写错的结论**：`audits/textbox-passwordbox.md` 记着 `ComboBoxPadding` 与
 `RadioButtonContentMargin` "不是上游键名"。前者不成立——上游第 341 行就是
 `<Thickness x:Key="ComboBoxPadding">12,5,0,7</Thickness>`；真正的错是**值**：那行从 `Metrics.jalxaml`
-搬过来时抄成了 Button 的 `11,5,11,6`，右边差了 0/6。`RadioButtonContentMargin` 那条不变。
+搬过来时抄成了 Button 的 `11,5,11,6`，右边差了 0/6。`RadioButtonContentMargin` 那条不变——它确实不是上游键
+（上游把这段间距写成样式 setter `Padding=8,6,0,0`，我们的样式也已经是这个值），AutoSuggestBox 批把那行
+从 `Metrics.jalxaml` 删掉了，理由记在该文件头注里。
 
 ## 2. 值替换（写代码前就知道要偏离的地方）
 
