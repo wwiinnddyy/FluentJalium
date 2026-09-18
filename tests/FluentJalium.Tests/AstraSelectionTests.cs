@@ -128,25 +128,11 @@ public sealed class AstraSelectionTests
         });
     }
 
-    [Fact]
-    public void The_toggle_button_indeterminate_states_carry_their_upstream_keys()
-    {
-        _fixture.Run(() =>
-        {
-            var triggers = FluentThemeManager.GetStyle("DefaultToggleButtonStyle").Triggers.Cast<object>().ToList();
-
-            AssertTriggerSetter(triggers, ToggleButton.IsCheckedProperty, null, "Background", "ToggleButtonBackgroundIndeterminate");
-            AssertTriggerSetter(triggers, ToggleButton.IsCheckedProperty, null, "Foreground", "ToggleButtonForegroundIndeterminate");
-            AssertTriggerSetter(triggers, ToggleButton.IsCheckedProperty, null, "BorderBrush", "ToggleButtonBorderBrushIndeterminate");
-            AssertConditionSetter(triggers, "indeterminate + pointer over", "Background", "ToggleButtonBackgroundIndeterminatePointerOver",
-                (ToggleButton.IsCheckedProperty, null), (ToggleButton.IsMouseOverProperty, "True"));
-            AssertConditionSetter(triggers, "indeterminate + pressed", "Background", "ToggleButtonBackgroundIndeterminatePressed",
-                (ToggleButton.IsCheckedProperty, null), (ToggleButton.IsPressedProperty, "True"));
-            AssertConditionSetter(triggers, "indeterminate + disabled", "Background", "ToggleButtonBackgroundIndeterminateDisabled",
-                (ToggleButton.IsCheckedProperty, null), (ToggleButton.IsEnabledProperty, "False"));
-        });
-    }
-
+    /// <summary>
+    /// Kept because it is the one tri-state reading taken from the shipped style rather than from a probe:
+    /// AstraToggleButtonTests owns the eleven-cell table and proves the null condition fires, but an app that
+    /// repointed Indeterminate at the accent would still have to survive this capture.
+    /// </summary>
     [Fact]
     public void An_indeterminate_toggle_button_paints_the_resting_fill_not_the_accent()
     {

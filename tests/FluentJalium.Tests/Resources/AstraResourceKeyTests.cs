@@ -164,14 +164,25 @@ public class AstraResourceKeyTests
     /// transitional until their control batch lands. <c>Metrics.jalxaml</c> joined the list in the
     /// AutoSuggestBox batch, and the rule is the same for a shared row as for a control row: it caught
     /// two invented names (<c>RadioButtonContentMargin</c>, <c>MenuFlyoutItemCornerRadius</c>) and one
-    /// upstream row nothing read yet (<c>NavigationViewItemButtonMargin</c>).
+    /// upstream row nothing read yet (<c>NavigationViewItemButtonMargin</c>). The four button-family
+    /// dictionaries joined with the ToggleButton batch, which is the one that turned out clean; the other
+    /// three each lost a row the same way (three hover <c>Foreground</c> rows that upstream writes and our
+    /// cells skipped, one border-thickness row upstream declares but leaves borrowed -
+    /// docs/astra/audits/togglebutton.md). <c>TitleBar.jalxaml</c> and <c>FlyoutPresenter.jalxaml</c>
+    /// deliberately stay out: their readers are the framework's own window-chrome and popup styles, not a
+    /// template of ours, so an app-level alias moves pixels there without any consumption site in this
+    /// assembly (docs/astra/audits/window-shell.md, flyout-presenter.md).
     /// </summary>
     [Theory]
+    [InlineData("ThemeResources/Button.jalxaml")]
     [InlineData("ThemeResources/CheckBox.jalxaml")]
     [InlineData("ThemeResources/ComboBox.jalxaml")]
     [InlineData("ThemeResources/AutoSuggestBox.jalxaml")]
+    [InlineData("ThemeResources/HyperlinkButton.jalxaml")]
     [InlineData("ThemeResources/RadioButton.jalxaml")]
+    [InlineData("ThemeResources/RepeatButton.jalxaml")]
     [InlineData("ThemeResources/TextBox.jalxaml")]
+    [InlineData("ThemeResources/ToggleButton.jalxaml")]
     [InlineData("ThemeResources/NumberBox.jalxaml")]
     [InlineData("ThemeResources/Metrics.jalxaml")]
     [InlineData("ThemeResources/Slider.jalxaml")]

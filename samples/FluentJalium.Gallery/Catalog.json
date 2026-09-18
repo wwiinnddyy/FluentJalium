@@ -19,7 +19,7 @@
       "source": "Styles/Common.jalxaml",
       "page": "buttons",
       "parity": "audited",
-      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
       "gaps": [ "press, keyboard and touch activation are not gated", "text colour never reaches the capture path", "Compound, Split and DropDown variants are not built" ]
     },
     {
@@ -27,15 +27,15 @@
       "source": "Styles/Common.jalxaml",
       "page": "buttons",
       "parity": "audited",
-      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
-      "gaps": [ "press, keyboard and touch activation are not gated", "the checked glyph and the indeterminate bar are not attributed as separate pixels" ]
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs", "tests/FluentJalium.Tests/AstraToggleButtonTests.cs" ],
+      "gaps": [ "press, keyboard and touch activation are not gated - the cycle is driven through the framework's own IToggleProvider, not a pointer", "mixed has no pixels of its own: upstream maps the indeterminate rows to the same brushes as rest, so only a probe style can show the cell firing", "a local Background outranks the state cells here, the opposite of upstream's VisualState storyboards", "PointerUp and PointerDown theme animations are missing; our surface fades between fills" ]
     },
     {
       "markup": "RepeatButton",
       "source": "Styles/Common.jalxaml",
       "page": "buttons",
       "parity": "audited",
-      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
       "gaps": [ "hold-to-repeat interval and delay are framework behavior, unmeasured" ]
     },
     {
@@ -43,7 +43,7 @@
       "source": "Styles/Common.jalxaml",
       "page": "buttons",
       "parity": "audited",
-      "evidence": [ "docs/astra/audits/button.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
       "gaps": [ "navigation of NavigateUri is untested", "the link text colour cannot be asserted in pixels" ]
     },
     {

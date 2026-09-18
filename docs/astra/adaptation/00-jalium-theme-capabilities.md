@@ -20,6 +20,7 @@
 | S0-i 换掉框架模板要守住什么 | **弹层部件树是契约**：四个名字 + items host 必须是面板；框架还占有条目底色与禁用前景 | 弹层类控件先量部件名，再写模板 |
 | S0-j 弹层能不能断像素 | **能断"某色存在"，不能断"画面干净"**：裁剪含框架渐变的条目，`Stable` 与品牌绿闸口在此失效 | 弹层像素只作存在性证据，洁净度留给自有类型 |
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
+| S0-k 不改模板怎么驱动交互，样式格子排在谁下面 | **`IToggleProvider.Toggle()` 就是框架自己的 `OnClick→OnToggle`**；样式格子输给本地值，`{x:Null}` 在样式格子里也命中 | 按钮族循环先走自动化模式；状态要覆盖本地底色就得自有类型 |
 
 ## S0-a：主题切换的真实驱动
 
@@ -318,4 +319,43 @@ Popup 'PART_Popup' (Placement=Bottom)      ← 框架写本地 Width，等于控
 
 结论：**弹层像素只断"某色存在且够大"，不断"画面干净"**。要断后者得先把条目容器排除在裁剪之外，
 而条目底色本身是框架占有的（S0-i），本运行时做不到。
+
+## S0-k：不动模板怎么驱动交互，样式格子排在谁下面（ToggleButton 批，2026-09-18）
+
+阶段 0 到阶段 2 为止，"交互"在这套闸口里是空的：测试不能设 `IsMouseOver`/`IsPressed`
+（那是 `UIElement` 上的框架内部状态），真指针要物理鼠标且会被同时用鼠标的人打断，
+真按左键又会点到用户桌面上的任何东西。这一批量到一条**不碰输入管线**的通路：
+
+```csharp
+((IToggleProvider)new ToggleButtonAutomationPeer(toggle)).Toggle();
+```
+
+`Jalium.UI.Automation.Peers.ToggleButtonAutomationPeer` 与
+`Jalium.UI.Automation.Provider.IToggleProvider` 都是 public，`Toggle()` 走的就是框架自己的
+`OnClick → OnToggle → OnIsCheckedChanged`，所以两态循环 `false→true→false`、
+三态 `false→true→null→false`、`Checked/Unchecked/Indeterminate` 三个事件的次数，
+全部能在闸口里、无指针、无桌面副作用地断。**限制要说清**：它证明的是"框架的激活路径还在"，
+不是"鼠标点得动"——指针/键盘/触摸三条通路的像素仍欠（Task #13）。
+附带一条契约：控件禁用时 `Toggle()` **抛** `InvalidOperationException("Cannot toggle a disabled control.")`，
+不是静默忽略（与 WinUI 该模式抛 `ElementNotEnabledException` 同侧），
+应用侧从自动化驱动开关要准备好接这个异常。
+
+同一批量到两条优先级读数和一条格子形式读数：
+
+1. **本地值压过样式格子**。挂载 + `Background` 本地刷 + `IsChecked=true` → 读回还是本地刷。
+   上游 `ToggleButton` 的三属性由 `VisualState` 故事板驱动，故事板压过本地值，
+   方向恰好相反。于是"给开关设个本地底色"这种 WinUI 里常见的写法，
+   在这里会产出一个**永不换色**的开关。这条与 S0-h/`audits/textbox-passwordbox.md` 那张
+   "框架本地值压过样式"的账单是同一族，但这次输的是**我们自己的格子**，
+   故按实测钉成 `A_local_fill_keeps_the_surface_over_the_checked_cell` 而不是写进缺口清单。
+2. **两条同时成立的格子，标记里后面的赢**（`IsChecked=True` 与 `IsChecked=True+IsEnabled=False`
+   同时成立时落地的是后者）。这意味着格子顺序是语义，不是排版。
+3. **`{x:Null}` 条件在样式格子里同样命中且可逆**。S0-g 记的是模板格子（CheckBox），
+   两条是不同的解析路径，不能互推——探针（只带 null 条件、混合底色指到没人读的强调刷）
+   才证明得到，并且设回 `false` 后底色回到休息位，排除了"一次性误命中"。
+
+**方法论收获**：上游把 `ToggleButton*Indeterminate*` 全部映射到与休息位同名的调色板刷
+（同一实例），所以混合态在像素上与未勾选态**不可区分**——这不是我们的缺口，是上游的定义。
+凡是"某状态看起来对不对"的主张，先问它有没有**可区分的像素**；没有，就只能给探针 + 读回，
+并且必须把这条写进不声称清单，免得后来者把那条代理信号当证据。
 

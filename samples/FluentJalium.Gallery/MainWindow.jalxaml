@@ -128,10 +128,11 @@
                   <WrapPanel>
                     <ToggleButton x:Name="QuietToggleButton" Content="Toggle" Margin="0,0,8,8" />
                     <ToggleButton x:Name="CheckedToggleButton" Content="Checked" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="MixedToggleButton" Content="Three state" IsThreeState="True" Margin="0,0,8,8" />
                     <RepeatButton x:Name="RepeatActionButton" Content="Repeat" Margin="0,0,8,8" />
                     <HyperlinkButton Content="Hyperlink" Margin="0,0,8,8" />
                   </WrapPanel>
-                  <TextBlock Text="These four take their fills from their own upstream alias files - ToggleButton, RepeatButton and HyperlinkButton each carry a transcribed key list, and the hyperlink inherits the layout style rather than the subtle button's fill." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock Text="These four take their fills from their own upstream alias files - ToggleButton, RepeatButton and HyperlinkButton each carry a transcribed key list, and the hyperlink inherits the layout style rather than the subtle button's fill. The third-state toggle cycles off, on, mixed; mixed paints the same brushes off does, because that is what upstream's own alias rows say, so the live readout is the only place the third state shows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                   <TextBlock x:Name="RepeatReadout" Text="Hold the repeat button to see it fire." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>

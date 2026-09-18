@@ -1,10 +1,13 @@
 <!-- WinUI 3 RepeatButton_themeresources.xaml @19e3bdc3c (MIT), blob 80add1b94686ed1e408ce05afde9d02249b5e229.
-     The Light/Default branch's 12 alias rows plus RepeatButtonBorderThemeThickness. Upstream's own
-     DefaultRepeatButtonStyle borrows ButtonBorderThemeThickness and ButtonPadding from the Button file, so
-     those two keys stay declared once, in ThemeResources/Button.jalxaml. Two rows are deviations, marked
-     below (audits/button.md). -->
+     The Light/Default branch's 12 alias rows. Upstream's own DefaultRepeatButtonStyle borrows
+     ButtonBorderThemeThickness and ButtonPadding from the Button file, so those two keys stay declared once,
+     in ThemeResources/Button.jalxaml. Two rows are deviations, marked below (audits/button.md).
+     RepeatButtonBorderThemeThickness used to sit here too. Upstream declares it in all three theme branches
+     and no shipping style reads it - the only {ThemeResource} hits in the whole reference tree are two
+     resource-loading test fixtures - so overriding that name in a real WinUI app changes nothing. A key we
+     publish is a promise that overriding it reaches pixels, so it is gone rather than wired up to a property
+     upstream leaves borrowed (same call as the 6 unconsumed AutoSuggestBox rows, audits/autosuggestbox.md). -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Thickness x:Key="RepeatButtonBorderThemeThickness">1</Thickness>
   <StaticResource x:Key="RepeatButtonBackground" ResourceKey="ControlFillColorDefaultBrush" />
   <StaticResource x:Key="RepeatButtonBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
   <StaticResource x:Key="RepeatButtonBackgroundPressed" ResourceKey="ControlFillColorTertiaryBrush" />

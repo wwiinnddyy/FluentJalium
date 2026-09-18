@@ -201,25 +201,17 @@ public sealed class AstraButtonTests
     }
 
     [Fact]
-    public void The_toggle_repeat_and_hyperlink_styles_carry_their_upstream_state_keys()
+    public void The_repeat_and_hyperlink_styles_carry_their_upstream_state_keys()
     {
-        // WinUI's CheckedUncheckedStates/IndeterminateStates become triggers here. IsChecked is settable
-        // from code, so unlike PointerOver and Pressed this state needs no pointer to reach the pixels
-        // (the next test does exactly that) - what this one pins is that each state carries the row
-        // upstream names it by.
+        // WinUI's CommonStates become triggers here. IsChecked is settable from code, so unlike PointerOver
+        // and Pressed the toggle's checked states can reach the pixels without a pointer - AstraToggleButtonTests
+        // owns that control now, including the full eleven-cell table, so only the two controls this file
+        // still speaks for are asserted below.
         _fixture.Run(() =>
         {
-            var toggle = FluentThemeManager.GetStyle("DefaultToggleButtonStyle");
-            AssertTriggerSetter(Setter(toggle, "IsMouseOver", "Background"), "ToggleButtonBackgroundPointerOver");
-            AssertTriggerSetter(Setter(toggle, "IsPressed", "Background"), "ToggleButtonBackgroundPressed");
-            AssertTriggerSetter(Setter(toggle, "IsEnabled", "Background"), "ToggleButtonBackgroundDisabled");
-            AssertTriggerSetter(Checked(toggle, "IsMouseOver", "Background"), "ToggleButtonBackgroundCheckedPointerOver");
-            AssertTriggerSetter(Checked(toggle, "IsPressed", "Background"), "ToggleButtonBackgroundCheckedPressed");
-            AssertTriggerSetter(Checked(toggle, "IsEnabled", "Foreground"), "ToggleButtonForegroundCheckedDisabled");
-            AssertTriggerSetter(Checked(toggle, "IsEnabled", "BorderBrush"), "ToggleButtonBorderBrushCheckedDisabled");
-
             var repeat = FluentThemeManager.GetStyle("DefaultRepeatButtonStyle");
             AssertTriggerSetter(Setter(repeat, "IsMouseOver", "Background"), "RepeatButtonBackgroundPointerOver");
+            AssertTriggerSetter(Setter(repeat, "IsMouseOver", "Foreground"), "RepeatButtonForegroundPointerOver");
             AssertTriggerSetter(Setter(repeat, "IsPressed", "Foreground"), "RepeatButtonForegroundPressed");
             AssertTriggerSetter(Setter(repeat, "IsEnabled", "BorderBrush"), "RepeatButtonBorderBrushDisabled");
 
@@ -227,7 +219,17 @@ public sealed class AstraButtonTests
             AssertTriggerSetter(Setter(hyperlink, "IsMouseOver", "Foreground"), "HyperlinkButtonForegroundPointerOver");
             AssertTriggerSetter(Setter(hyperlink, "IsPressed", "Foreground"), "HyperlinkButtonForegroundPressed");
             AssertTriggerSetter(Setter(hyperlink, "IsEnabled", "Foreground"), "HyperlinkButtonForegroundDisabled");
+            Assert.Equal("HyperlinkButtonBorderThemeThickness", StyleSetterKey(hyperlink, "BorderThickness"));
         });
+    }
+
+    /// <summary>The row a plain style setter names, or null when the setter carries a literal.</summary>
+    private static string? StyleSetterKey(Style style, string property)
+    {
+        var setter = style.Setters.Cast<object>().OfType<Setter>()
+            .FirstOrDefault(candidate => (candidate.Property?.Name ?? candidate.PropertyName) == property);
+
+        return setter?.Value?.GetType().GetProperty("ResourceKey")?.GetValue(setter.Value) as string;
     }
 
     [Fact]
@@ -300,28 +302,6 @@ public sealed class AstraButtonTests
             Assert.Equal("Jalium.UI.Controls.Primitives", typeof(RepeatButton).Namespace);
             Assert.Equal("Jalium.UI.Controls", typeof(HyperlinkButton).Namespace);
         });
-    }
-
-    /// <summary>
-    /// The setter a checked-state multi trigger applies, found by its second condition. The parser keeps
-    /// a trigger value as the string the markup carried instead of coercing it to the property type, so
-    /// matching has to be on the text form; the checked-toggle pixel test shows the runtime still fires
-    /// that string against a nullable-bool property.
-    /// </summary>
-    private static object? Checked(Style style, string secondProperty, string setterProperty)
-    {
-        foreach (var trigger in style.Triggers.OfType<MultiTrigger>())
-        {
-            var conditions = trigger.Conditions.OfType<Condition>().ToList();
-            if (!conditions.Any(static condition => condition.Property?.Name == "IsChecked" && string.Equals(condition.Value?.ToString(), "True", StringComparison.Ordinal))) continue;
-            if (!conditions.Any(condition => condition.Property?.Name == secondProperty)) continue;
-            foreach (var setter in trigger.Setters.OfType<Setter>())
-            {
-                if (setter.Property?.Name == setterProperty) return setter.Value;
-            }
-        }
-
-        return null;
     }
 
     /// <summary>The setter a style trigger applies for one property, found by name.</summary>

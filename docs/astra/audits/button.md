@@ -100,9 +100,11 @@
   `HyperlinkButton*` 全家族。上游样式里 `Padding` 用 `{ThemeResource ButtonPadding}`
   而同文件别处用 `{StaticResource …}`；我们统一按 `ButtonLayoutStyle` 的 `{StaticResource}` 走，
   因为 `ButtonPadding` 不在主题分支里，`{ThemeResource}` 只会多一次无谓的解析。
-- **`IsChecked=null`（三态）不做**：12 条 `*Indeterminate*` 键全部声明（公开契约要原样给出），
-  但**没有消费点**——触发器要匹配 null 需要 `{x:Null}`，本运行时没有这项证据。
-  这条与 `CheckBox` 的三态是同一个问题，挪到选择批一次做穿（Known Gap 8）。
+- **`IsChecked=null`（三态）**：本节写作时只有键名证据，`{x:Null}` 条件是否命中没有取过证。
+  选择批收尾时**已量穿**：样式格子里的 null 条件命中且可逆，混合态四组消费点全部落地，
+  连"真实点击循环能不能走到 null"也一起有了答案（走得到，走框架的 `IToggleProvider`）。
+  同时更正本节的一个提法：混合态与休息态在上游**同色**，所以那条像素归因问题不存在可测的差。
+  全部读数、映射表与新的不声称清单在 `audits/togglebutton.md`。
 
 一条命名空间事实（`The_button_family_is_split_across_two_namespaces` 逐条断言）：
 `Button`、`HyperlinkButton` 在 `Jalium.UI.Controls`，`ToggleButton`、`RepeatButton` 在
@@ -189,13 +191,17 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
 5. 系统焦点框缺失，我们自绘的 `FocusOutline` 与上游 `FocusVisualMargin=-3` 的框不逐位一致。
 6. `MinWidth=0`/`MinHeight=32` 是我们自加的约束，上游样式没有。
 7. `ContentTransitions`、`TransitionDuration` 仍是字面量（B5 未完成）。
-8. **三态通路已补上**（原为"12 条 `ToggleButton*Indeterminate*` 键声明了但无消费点"）：
-   `{x:Null}` 触发条件在本运行时实测有效（值存成真正的 `null` 且能命中，`adaptation/11`），
-   样式因此补了休息/+悬停/+按下/+禁用四组消费点，`AstraSelectionTests` 断言到键名与休息底像素。
-   仍未测的是"真实点击循环能否走到 null"，以及混合条的像素归因。
+8. **三态通路已量穿**（原为"12 条 `ToggleButton*Indeterminate*` 键声明了但无消费点"）：
+   `{x:Null}` 在模板格子与**样式格子**里都实测命中且可逆，11 格 × 3 属性 = 33 个消费点
+   由 `AstraToggleButtonTests` 按条件顺序逐个断言；真实点击循环走到 null 也已断言
+   （框架的 `IToggleProvider.Toggle()`，两态/三态各一条，禁用时抛 `InvalidOperationException`）。
+   同一批更正了两句话：混合态与休息态在上游**同色**，所以"混合条像素归因"不存在可测的差；
+   而"仍未测"的那半段（点击循环）现已测完，剩下没测的是 `Pressed`/键盘/触摸的像素。
    另记一条会咬人的实测：`IsChecked="{x:Null}"` **写在标记里会得到 `false`**，三态只能在代码里设
    （Gallery 的三态示例已按此改）。
-   `RepeatButton`/`HyperlinkButton` 的别名块与状态映射本段已转录完毕。
+   `RepeatButton`/`HyperlinkButton` 的别名块与状态映射本段已转录完毕；
+   本批另把 Button 全族四份字典纳入键消费闸口，抓出 4 条无人读的 `…ForegroundPointerOver`
+   与 1 条上游自己就不读的 `RepeatButtonBorderThemeThickness`（见 `audits/togglebutton.md` S7/S8）。
 9. **文字色不能用像素断**：只画文字的捕获写 0 像素并会拖垮 UI 线程，字形不进直方图。
    本库的文字色一律走"建树 + 读回实例"（`PixelHarness.Build`），
    所以"某个文字令牌在上屏画面里真的是这个颜色"这句话，我们的闸口证明不了，只能证明到"实例接上了"。

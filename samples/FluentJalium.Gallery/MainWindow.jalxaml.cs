@@ -105,8 +105,12 @@ public partial class MainWindow : Window
 
         ((RepeatButton)RepeatActionButton!).Click += (_, _) =>
             ((TextBlock)RepeatReadout!).Text = $"Repeat button fired {++_repeatCount} times.";
-        foreach (var toggle in new[] { (ToggleButton)QuietToggleButton!, (ToggleButton)CheckedToggleButton! })
+        foreach (var toggle in new[] { (ToggleButton)QuietToggleButton!, (ToggleButton)CheckedToggleButton!, (ToggleButton)MixedToggleButton! })
             WireToggle(toggle, toggle.Content?.ToString() ?? "Toggle");
+
+        // Set in code, not markup: IsChecked='{x:Null}' parses without error and yields false, so a
+        // three-state sample written the WinUI way would sit in off while looking tri-state on screen.
+        ((ToggleButton)MixedToggleButton!).IsChecked = null;
     }
 
     private void WireInputs()
