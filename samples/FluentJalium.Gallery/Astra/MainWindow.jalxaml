@@ -1,0 +1,294 @@
+<Window xmlns="http://schemas.jalium.ui/2024"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+        x:Class="FluentJalium.Gallery.MainWindow"
+        Title="FluentJalium Gallery" Width="1100" Height="820" MinWidth="560" MinHeight="480"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize" ShowInTaskbar="True"
+        AllowsTransparency="False" SystemBackdrop="None" UseLayoutRounding="True"
+        Background="{StaticResource SolidBackgroundFillColorBaseBrush}"
+        Foreground="{StaticResource TextFillColorPrimaryBrush}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <Grid Margin="16,12,16,4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Text="FluentJalium  /  Gallery" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center" />
+      <TextBlock x:Name="ThemeStatus" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="16,0,0,0" />
+    </Grid>
+
+    <fluent:FluentNavigationView x:Name="NavigationRoot" Grid.Row="1" Padding="0"
+                                Style="{StaticResource FluentNavigationViewStyle}">
+      <fluent:FluentNavigationView.MenuItems>
+        <fluent:FluentNavigationItem x:Name="OverviewItem" Content="Overview" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Home" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="ButtonsItem" Content="Buttons" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="TouchPointer" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="InputsItem" Content="Inputs" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Edit" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="SelectionItem" Content="Selection" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="List" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="NavigationItem" Content="Navigation" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="GlobalNavButton" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+      </fluent:FluentNavigationView.MenuItems>
+      <fluent:FluentNavigationView.FooterMenuItems>
+        <fluent:FluentNavigationItem x:Name="SettingsItem" Content="Settings" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Settings" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+      </fluent:FluentNavigationView.FooterMenuItems>
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ScrollViewer x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+          <!-- The constructor retains these pages and attaches only the current one. -->
+          <Grid x:Name="PageHost" Margin="24" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <StackPanel x:Name="OverviewPage">
+              <TextBlock Text="FluentJalium" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Explore familiar Windows controls, built on Jalium." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="20">
+                  <TextBlock Text="Astra" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="{StaticResource AccentTextFillColorPrimaryBrush}" />
+                  <TextBlock Text="A shared design language" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" />
+                  <TextBlock Text="Try the controls, navigate with a keyboard, and switch themes while your input stays in place." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <Button x:Name="ExploreInputsButton" Content="Explore inputs" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Margin="0,20,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Start exploring" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="460">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Buttons and selection" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Pointer, pressed, disabled, selected, and focus states." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="ExploreButtonsButton" Content="Open buttons" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="460">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Navigation that follows you" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Resize the window and watch the shared selection indicator." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="ExploreNavigationButton" Content="Open navigation" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="WinUI 3 styling · Jalium layout, input, and rendering" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
+            </StackPanel>
+
+            <StackPanel x:Name="ButtonsPage">
+              <TextBlock Text="Buttons" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Choose the emphasis that matches an action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Emphasis" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="StandardActionButton" Content="Standard" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="AccentActionButton" Content="Accent" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SubtleActionButton" Content="Subtle" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="Click a button to see its action in the live output below." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Disabled" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <WrapPanel Margin="16">
+                  <Button Content="Standard" Style="{StaticResource DefaultButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                  <Button Content="Accent" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                  <Button Content="Subtle" Style="{StaticResource SubtleButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                </WrapPanel>
+              </Border>
+              <TextBlock Text="Keyboard" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,8" />
+              <TextBlock Text="Use Tab to move between buttons and Space or Enter to activate the focused action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel x:Name="InputsPage">
+              <TextBlock Text="Inputs" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Edit text, choose a value, and adjust native controls." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Text and passwords" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Display name" Style="{StaticResource BodyTextBlockStyle}" />
+                  <TextBox x:Name="DisplayNameBox" Text="Astra" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Password" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <PasswordBox x:Name="SamplePasswordBox" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Only the number of password characters is shown in the output." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock Text="Disabled text field" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBox Text="This field is disabled" IsEnabled="False" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Choices and values" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Profile" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Open the list and choose a profile." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="ProfileComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Balanced" />
+                    <ComboBoxItem Content="Focused" />
+                    <ComboBoxItem Content="Relaxed" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="360">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Notifications" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Click, drag, or press Space to toggle." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <fluent:FluentToggleSwitch x:Name="NotificationsSwitch" Style="{StaticResource FluentToggleSwitchStyle}" IsChecked="True" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Volume" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock x:Name="VolumeValue" Text="45%" Style="{StaticResource CaptionTextBlockStyle}" />
+                  </fluent:FluentSettingsRow>
+                  <Slider x:Name="VolumeSlider" Style="{StaticResource DefaultSliderStyle}" Minimum="0" Maximum="100" Value="45" SmallChange="1" LargeChange="10" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+              <WrapPanel Margin="0,16,0,0">
+                <Button x:Name="ApplyInputsButton" Content="Apply values" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                <Button x:Name="ResetInputsButton" Content="Reset" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+              </WrapPanel>
+            </StackPanel>
+
+            <StackPanel x:Name="SelectionPage">
+              <TextBlock Text="Selection" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Independent options, a single choice, and a list." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Check boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <CheckBox x:Name="PreviewCheckBox" Content="Show a preview" IsChecked="True" Margin="0,0,0,8" />
+                  <CheckBox x:Name="DetailsCheckBox" Content="Include details" Margin="0,0,0,8" />
+                  <CheckBox x:Name="MixedCheckBox" Content="Three-state option" IsThreeState="True" IsChecked="{x:Null}" Margin="0,0,0,8" />
+                  <CheckBox Content="Unavailable option" IsEnabled="False" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Radio buttons" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <RadioButton x:Name="ComfortableRadio" Content="Comfortable" GroupName="GalleryDensity" IsChecked="True" Style="{StaticResource DefaultRadioButtonStyle}" Margin="0,0,0,8" />
+                  <RadioButton x:Name="CompactRadio" Content="Compact" GroupName="GalleryDensity" Style="{StaticResource DefaultRadioButtonStyle}" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="List selection" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <ListBox x:Name="SampleListBox" Height="156">
+                <ListBoxItem Content="Design" />
+                <ListBoxItem Content="Develop" />
+                <ListBoxItem Content="Review" />
+                <ListBoxItem Content="Ship" />
+              </ListBox>
+            </StackPanel>
+
+            <StackPanel x:Name="NavigationPage">
+              <TextBlock Text="Navigation" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="The Gallery sidebar is a FluentNavigationView." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Focus and selection" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Use Up, Down, Home, and End to move focus between destinations. Press Enter or Space to select the focused destination." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <TextBlock Text="The selection marker stays with the active page until a destination is activated." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="One moving indicator" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Move between menu and footer destinations to see the indicator stretch and settle. Rapid selection changes retarget the visible bar." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <WrapPanel Margin="0,16,0,0">
+                    <Button x:Name="JumpOverviewButton" Content="Go to Overview" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="JumpSettingsButton" Content="Go to Settings" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Adaptive pane" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Expanded or compact" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Resize below 800 DIPs or use the pane toggle. Settings rows also stack when space is limited." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="TogglePaneButton" Content="Toggle pane" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="SettingsPage">
+              <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Change the Gallery appearance while keeping control state." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Theme" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Choose a theme or follow Windows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="ThemeComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Light" />
+                    <ComboBoxItem Content="Dark" />
+                    <ComboBoxItem Content="Use system setting" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Accent color" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Apply one accent across actions and selection." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="AccentComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Default" />
+                    <ComboBoxItem Content="Blue" />
+                    <ComboBoxItem Content="Violet" />
+                    <ComboBoxItem Content="Green" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Motion" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="360">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Reduce motion" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Settle navigation immediately and turn off theme transitions and page entrances." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <fluent:FluentToggleSwitch x:Name="ReduceMotionSwitch" Style="{StaticResource FluentToggleSwitchStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Windows animation preferences are also respected." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <WrapPanel Margin="0,16,0,0">
+                <Button x:Name="ReplayEntranceButton" Content="Replay page entrance" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                <Button x:Name="RestoreDefaultsButton" Content="Restore appearance" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+              </WrapPanel>
+            </StackPanel>
+          </Grid>
+        </ScrollViewer>
+        <Border Grid.Row="1" Margin="24,0,24,16" Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+          <Grid Margin="12">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Live output" Style="{StaticResource CaptionTextBlockStyle}" />
+              <TextBlock x:Name="LiveOutput" Text="Ready. Choose a control to try it." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+            </StackPanel>
+            <Button x:Name="ClearOutputButton" Grid.Column="1" Content="Clear" Style="{StaticResource SubtleButtonStyle}" VerticalAlignment="Top" Margin="12,0,0,0" />
+          </Grid>
+        </Border>
+      </Grid>
+    </fluent:FluentNavigationView>
+  </Grid>
+</Window>

@@ -1,0 +1,26 @@
+<!-- WinUI CommonStyles/TextBlock_themeresources.xaml size hierarchy.
+     Font resolution is delegated to the operating system; no redistributed font files. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+  </Style>
+  <Style x:Key="CaptionTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorSecondaryBrush}" />
+  </Style>
+  <Style x:Key="BodyStrongTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style x:Key="SubtitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+    <Setter Property="FontSize" Value="20" />
+  </Style>
+  <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+    <Setter Property="FontSize" Value="28" />
+  </Style>
+  <Style x:Key="LargeTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+    <Setter Property="FontSize" Value="40" />
+  </Style>
+  <Style TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}" />
+</ResourceDictionary>

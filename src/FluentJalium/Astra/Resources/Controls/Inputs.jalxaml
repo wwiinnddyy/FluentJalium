@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  WinUI state brushes and geometry: microsoft-ui-xaml @19e3bdc3c,
+  controls/dev/CommonStyles and controls/dev/ComboBox (MIT).
+  Switch, slider, radio and combo adapters originate in
+  LanStartWrite.Inkcanvas/Themes/Fluent/Controls/FluentInput.jalxaml.
+  Template contracts are Jalium.UI 26.10.9, not WinUI/WPF contracts.
+-->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+
+  <Style x:Key="FluentToggleSwitchStyle" TargetType="controls:FluentToggleSwitch">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FluentToggleSwitch">
+        <Grid Background="{TemplateBinding Background}">
+          <Grid Width="40" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Name="SwitchTrack" CornerRadius="10" BorderThickness="1"
+                    BorderBrush="{StaticResource ControlStrongStrokeColorDefaultBrush}"
+                    Background="{StaticResource ControlAltFillColorSecondaryBrush}"
+                    TransitionProperty="Background" TransitionDuration="0:0:0.083" />
+            <Grid Name="ThumbHost" Width="20" Height="20" HorizontalAlignment="Left"
+                  Margin="{TemplateBinding ThumbOffset}" TransitionProperty="Margin"
+                  TransitionDuration="0:0:0.167" TransitionTimingFunction="Recommended">
+              <Border Name="Knob" Width="12" Height="12" CornerRadius="7"
+                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Background="{StaticResource TextFillColorSecondaryBrush}"
+                      TransitionProperty="Width, Height, Background" TransitionDuration="0:0:0.083" />
+            </Grid>
+          </Grid>
+          <Border Name="SwitchFocus" BorderThickness="2" Margin="1" CornerRadius="4"
+                  Opacity="0" BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" IsHitTestVisible="False" />
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsChecked" Value="True">
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" />
+            <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="Transparent" />
+            <Setter TargetName="Knob" Property="Background" Value="{StaticResource TextOnAccentFillColorPrimaryBrush}" />
+          </Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="Knob" Property="Width" Value="14" />
+            <Setter TargetName="Knob" Property="Height" Value="14" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="False" />
+              <Condition Property="IsMouseOver" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource ControlAltFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsMouseOver" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+          </MultiTrigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="Knob" Property="Width" Value="17" />
+            <Setter TargetName="Knob" Property="Height" Value="14" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="False" />
+              <Condition Property="IsPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource ControlAltFillColorQuarternaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="False" />
+              <Condition Property="IsPointerPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource ControlAltFillColorQuarternaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsPointerPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <Trigger Property="IsPointerPressed" Value="True">
+            <Setter TargetName="Knob" Property="Width" Value="17" />
+            <Setter TargetName="Knob" Property="Height" Value="14" />
+            <Setter TargetName="ThumbHost" Property="TransitionDuration" Value="0:0:0" />
+          </Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True">
+            <Setter TargetName="SwitchFocus" Property="Opacity" Value="1" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource ControlAltFillColorDisabledBrush}" />
+            <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDisabledBrush}" />
+            <Setter TargetName="Knob" Property="Background" Value="{StaticResource TextFillColorDisabledBrush}" />
+            <Setter TargetName="Knob" Property="Width" Value="12" />
+            <Setter TargetName="Knob" Property="Height" Value="12" />
+            <Setter TargetName="SwitchFocus" Property="Opacity" Value="0" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsEnabled" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="SwitchTrack" Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" />
+            <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="Transparent" />
+            <Setter TargetName="Knob" Property="Background" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" />
+          </MultiTrigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="controls:FluentToggleSwitch" BasedOn="{StaticResource FluentToggleSwitchStyle}" />
+
+  <!-- Jalium's Slider positions PART_Thumb using a fixed 16 DIP layout anchor.
+       The 20 DIP visual overhangs that anchor by 2 DIP on each side. -->
+  <ControlTemplate x:Key="FluentHorizontalSliderTemplate" TargetType="Slider">
+    <Grid Background="Transparent">
+      <Rectangle Name="PART_Track" Height="4" RadiusX="2" RadiusY="2" Margin="8,0"
+                 VerticalAlignment="Center" Fill="{TemplateBinding Background}" />
+      <Rectangle Name="PART_SelectionRange" Height="4" RadiusX="2" RadiusY="2" Margin="8,0"
+                 VerticalAlignment="Center" HorizontalAlignment="Left" Fill="{TemplateBinding Foreground}" />
+      <Grid Name="PART_Thumb" Width="16" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Border Width="20" Height="20" Margin="-2,0" CornerRadius="10"
+                Background="{StaticResource ControlSolidFillColorDefaultBrush}"
+                BorderBrush="{StaticResource SliderThumbStrokeBrush}" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Ellipse Name="ThumbFill" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Fill="{TemplateBinding Foreground}" TransitionProperty="Width, Height, Fill" TransitionDuration="0:0:0.167" />
+        </Border>
+      </Grid>
+      <Border Name="SliderFocus" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
+              IsHitTestVisible="False" BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" />
+    </Grid>
+    <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="14" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="14" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+      </Trigger>
+      <Trigger Property="IsMouseCaptured" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+      </Trigger>
+      <Trigger Property="AreAnyTouchesCaptured" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
+      </Trigger>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter TargetName="PART_Track" Property="Fill" Value="{StaticResource ControlStrongFillColorDisabledBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorDisabledBrush}" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorDisabledBrush}" />
+        <Setter TargetName="ThumbFill" Property="Width" Value="12" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="12" />
+        <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <ControlTemplate x:Key="FluentVerticalSliderTemplate" TargetType="Slider">
+    <Grid Background="Transparent">
+      <Rectangle Name="PART_Track" Width="4" RadiusX="2" RadiusY="2" Margin="0,8"
+                 HorizontalAlignment="Center" Fill="{TemplateBinding Background}" />
+      <Rectangle Name="PART_SelectionRange" Width="4" RadiusX="2" RadiusY="2" Margin="0,8"
+                 HorizontalAlignment="Center" VerticalAlignment="Top" Fill="{TemplateBinding Foreground}" />
+      <Grid Name="PART_Thumb" Width="20" Height="16" HorizontalAlignment="Center" VerticalAlignment="Top">
+        <Border Width="20" Height="20" Margin="0,-2" CornerRadius="10"
+                Background="{StaticResource ControlSolidFillColorDefaultBrush}"
+                BorderBrush="{StaticResource SliderThumbStrokeBrush}" BorderThickness="1"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+          <Ellipse Name="ThumbFill" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Fill="{TemplateBinding Foreground}" TransitionProperty="Width, Height, Fill" TransitionDuration="0:0:0.167" />
+        </Border>
+      </Grid>
+      <Border Name="SliderFocus" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
+              IsHitTestVisible="False" BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" />
+    </Grid>
+    <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="14" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="14" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+      </Trigger>
+      <Trigger Property="IsMouseCaptured" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+      </Trigger>
+      <Trigger Property="AreAnyTouchesCaptured" Value="True">
+        <Setter TargetName="ThumbFill" Property="Width" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="10" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+      </Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True">
+        <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
+      </Trigger>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter TargetName="PART_Track" Property="Fill" Value="{StaticResource ControlStrongFillColorDisabledBrush}" />
+        <Setter TargetName="PART_SelectionRange" Property="Fill" Value="{StaticResource AccentFillColorDisabledBrush}" />
+        <Setter TargetName="ThumbFill" Property="Fill" Value="{StaticResource AccentFillColorDisabledBrush}" />
+        <Setter TargetName="ThumbFill" Property="Width" Value="12" />
+        <Setter TargetName="ThumbFill" Property="Height" Value="12" />
+        <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
+      </Trigger>
+    </ControlTemplate.Triggers>
+  </ControlTemplate>
+
+  <Style x:Key="DefaultSliderStyle" TargetType="Slider">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="MinWidth" Value="32" />
+    <Setter Property="IsMoveToPointEnabled" Value="True" />
+    <Setter Property="Background" Value="{StaticResource ControlStrongFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource AccentFillColorDefaultBrush}" />
+    <Setter Property="Template" Value="{StaticResource FluentHorizontalSliderTemplate}" />
+    <Style.Triggers>
+      <Trigger Property="Orientation" Value="Vertical">
+        <Setter Property="Template" Value="{StaticResource FluentVerticalSliderTemplate}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}" />
+
+  <Style x:Key="DefaultRadioButtonStyle" TargetType="RadioButton">
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="RadioButton">
+        <Grid Background="{TemplateBinding Background}" Margin="{TemplateBinding Padding}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Border Name="RadioRing" Width="20" Height="20" CornerRadius="10" VerticalAlignment="Center"
+                  BorderThickness="1" Background="{StaticResource ControlAltFillColorSecondaryBrush}"
+                  BorderBrush="{StaticResource ControlStrongStrokeColorDefaultBrush}">
+            <Ellipse Name="RadioDot" Width="12" Height="12" Opacity="0"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Fill="{StaticResource TextOnAccentFillColorPrimaryBrush}"
+                     TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+          </Border>
+          <ContentPresenter Grid.Column="1" Margin="8,0,0,0" Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                            Foreground="{TemplateBinding Foreground}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+          <Border Name="RadioFocus" Grid.ColumnSpan="2" Margin="-2,1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False" />
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsChecked" Value="True">
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" />
+            <Setter TargetName="RadioRing" Property="BorderBrush" Value="Transparent" />
+            <Setter TargetName="RadioDot" Property="Opacity" Value="1" />
+          </Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="RadioDot" Property="Width" Value="14" />
+            <Setter TargetName="RadioDot" Property="Height" Value="14" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="RadioDot" Property="Width" Value="10" />
+            <Setter TargetName="RadioDot" Property="Height" Value="10" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="False" />
+              <Condition Property="IsMouseOver" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource ControlAltFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="False" />
+              <Condition Property="IsPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource ControlAltFillColorQuarternaryBrush}" />
+            <Setter TargetName="RadioRing" Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDisabledBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsMouseOver" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource AccentFillColorSecondaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsPressed" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <Trigger Property="IsKeyboardFocused" Value="True">
+            <Setter TargetName="RadioFocus" Property="Opacity" Value="1" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" />
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource ControlAltFillColorDisabledBrush}" />
+            <Setter TargetName="RadioRing" Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDisabledBrush}" />
+            <Setter TargetName="RadioDot" Property="Width" Value="12" />
+            <Setter TargetName="RadioDot" Property="Height" Value="12" />
+            <Setter TargetName="RadioFocus" Property="Opacity" Value="0" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsChecked" Value="True" />
+              <Condition Property="IsEnabled" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="RadioRing" Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" />
+            <Setter TargetName="RadioRing" Property="BorderBrush" Value="Transparent" />
+            <Setter TargetName="RadioDot" Property="Fill" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" />
+          </MultiTrigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="RadioButton" BasedOn="{StaticResource DefaultRadioButtonStyle}" />
+
+</ResourceDictionary>

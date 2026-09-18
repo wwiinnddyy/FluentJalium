@@ -1,0 +1,50 @@
+<!-- WinUI TextBox/PasswordBox resources @19e3bdc3c.
+     TextBox uses Jalium's real PART_ContentHost. PasswordBox is sealed/direct-rendered:
+     style native properties without a proxy text field or copying its password. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="DefaultTextBoxStyle" TargetType="TextBox">
+    <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" />
+    <Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Padding" Value="{StaticResource TextControlPadding}" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="32" /><Setter Property="MinWidth" Value="64" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="SelectionBrush" Value="{StaticResource AccentFillColorSelectedTextBackgroundBrush}" />
+    <Setter Property="CaretBrush" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="TextBox">
+        <Grid>
+          <Border Name="OuterBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+          </Border>
+          <Border Name="BottomStroke" Height="1" VerticalAlignment="Bottom" Margin="1,0,1,0" CornerRadius="0,0,3,3"
+                  Background="{StaticResource ControlStrongStrokeColorDefaultBrush}" IsHitTestVisible="False" />
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlFillColorSecondaryBrush}" /></Trigger>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlFillColorInputActiveBrush}" /><Setter TargetName="BottomStroke" Property="Height" Value="2" /><Setter TargetName="BottomStroke" Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="OuterBorder" Property="Background" Value="{StaticResource ControlFillColorDisabledBrush}" /><Setter TargetName="BottomStroke" Property="Background" Value="{StaticResource ControlStrokeColorDefaultBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="TextBox" BasedOn="{StaticResource DefaultTextBoxStyle}" />
+  <Style x:Key="DefaultPasswordBoxStyle" TargetType="PasswordBox">
+    <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDefaultBrush}" />
+    <Setter Property="BorderThickness" Value="1" /><Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Padding" Value="{StaticResource TextControlPadding}" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="32" /><Setter Property="MinWidth" Value="64" />
+    <Setter Property="SelectionBrush" Value="{StaticResource AccentFillColorSelectedTextBackgroundBrush}" />
+    <Setter Property="CaretBrush" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorSecondaryBrush}" /></Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="Background" Value="{StaticResource ControlFillColorInputActiveBrush}" /><Setter Property="BorderBrush" Value="{StaticResource AccentFillColorDefaultBrush}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{StaticResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /><Setter Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDisabledBrush}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}" />
+</ResourceDictionary>

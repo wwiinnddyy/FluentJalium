@@ -1,0 +1,14 @@
+<!-- WinUI 19e3bdc3c: CommonStyles/CornerRadius, Button, Slider, RadioButton,
+     ToggleSwitch and NavigationView resources. Units are device-independent pixels.
+     Literal numeric setters avoid the pinned Jalium reader's x:Double limitation. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+  <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
+  <CornerRadius x:Key="NavigationViewItemCornerRadius">4</CornerRadius>
+  <CornerRadius x:Key="MenuFlyoutItemCornerRadius">4</CornerRadius>
+  <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
+  <Thickness x:Key="ComboBoxPadding">11,5,11,6</Thickness>
+  <Thickness x:Key="TextControlPadding">11,5,11,6</Thickness>
+  <Thickness x:Key="NavigationViewItemButtonMargin">4,2</Thickness>
+  <Thickness x:Key="RadioButtonContentMargin">8,0,0,0</Thickness>
+</ResourceDictionary>

@@ -1,38 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>FluentJalium</RootNamespace>
     <AssemblyName>FluentJalium</AssemblyName>
-    <Description>Fluent Design System themes and controls for Jalium.UI.</Description>
+    <Description>Source-audited WinUI 3 styles and native Jalium controls. Astra implementation.</Description>
     <IsPackable>true</IsPackable>
     <PackageId>FluentJalium</PackageId>
-    <IsTrimmable>true</IsTrimmable>
-    <IsAotCompatible>true</IsAotCompatible>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
     <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
     <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
-    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
-    <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">false</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath Condition="'$(CompilerGeneratedFilesOutputPath)' == ''">$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+    <!-- Runtime resource parsing is intentional; trimming/AOT is not certified. -->
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Jalium.UI.Core" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Media" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Input" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Interop" Version="$(JaliumPackageVersion)" />
+    <Compile Include="Astra/**/*.cs" />
+    <EmbeddedResource Include="Astra/Resources/**/*.jalxaml">
+      <LogicalName>Resources/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Xaml" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Xaml.SourceGenerator" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
-    <PackageReference Include="Jalium.UI.Build" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
-
-  <ItemGroup>
-    <JalxamlPage Include="Themes\**\*.jalxaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Fonts\*.ttf" />
-  </ItemGroup>
-
 </Project>

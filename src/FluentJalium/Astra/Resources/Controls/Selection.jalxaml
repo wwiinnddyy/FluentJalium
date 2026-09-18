@@ -1,0 +1,97 @@
+<!-- WinUI CheckBox/ComboBox state definitions @19e3bdc3c; Jalium 26.10.9 part contracts. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="DefaultCheckBoxStyle" TargetType="CheckBox">
+    <Setter Property="MinHeight" Value="32" /><Setter Property="MinWidth" Value="0" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="Transparent" /><Setter Property="Padding" Value="0" />
+    <Setter Property="Template"><ControlTemplate TargetType="CheckBox">
+      <Grid Background="{TemplateBinding Background}" Margin="{TemplateBinding Padding}">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+        <Border Name="CheckSurface" Width="20" Height="20" CornerRadius="4" BorderThickness="1"
+                Background="{StaticResource ControlAltFillColorSecondaryBrush}" BorderBrush="{StaticResource ControlStrongStrokeColorDefaultBrush}" VerticalAlignment="Center">
+          <Grid>
+            <Path Name="CheckGlyph" Data="M 2,6 L 5,9 L 12,2" Width="14" Height="12" Stretch="Uniform" StrokeThickness="1.5"
+                  Stroke="{StaticResource TextOnAccentFillColorPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0" />
+            <Border Name="MixedGlyph" Width="8" Height="2" CornerRadius="1" Background="{StaticResource TextOnAccentFillColorPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0" />
+          </Grid>
+        </Border>
+        <ContentPresenter Grid.Column="1" Margin="8,0,0,0" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+        <Border Name="CheckFocus" Grid.ColumnSpan="2" Margin="-2,1" CornerRadius="4" BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" BorderThickness="2" Opacity="0" IsHitTestVisible="False" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource ControlAltFillColorTertiaryBrush}" /></Trigger>
+        <Trigger Property="IsPressed" Value="True"><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource ControlAltFillColorQuarternaryBrush}" /></Trigger>
+        <Trigger Property="IsChecked" Value="True"><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" /><Setter TargetName="CheckSurface" Property="BorderBrush" Value="Transparent" /><Setter TargetName="CheckGlyph" Property="Opacity" Value="1" /></Trigger>
+        <Trigger Property="IsChecked" Value="{x:Null}"><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorDefaultBrush}" /><Setter TargetName="CheckSurface" Property="BorderBrush" Value="Transparent" /><Setter TargetName="MixedGlyph" Property="Opacity" Value="1" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorSecondaryBrush}" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorTertiaryBrush}" /></MultiTrigger>
+        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="CheckFocus" Property="Opacity" Value="1" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /><Setter TargetName="CheckFocus" Property="Opacity" Value="0" /><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource ControlAltFillColorDisabledBrush}" /><Setter TargetName="CheckSurface" Property="BorderBrush" Value="{StaticResource ControlStrongStrokeColorDisabledBrush}" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" /><Setter TargetName="CheckGlyph" Property="Stroke" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="{x:Null}" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter TargetName="CheckSurface" Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" /><Setter TargetName="MixedGlyph" Property="Background" Value="{StaticResource TextOnAccentFillColorDisabledBrush}" /></MultiTrigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="CheckBox" BasedOn="{StaticResource DefaultCheckBoxStyle}" />
+
+  <Style x:Key="DefaultComboBoxStyle" TargetType="ComboBox">
+    <Setter Property="MinHeight" Value="32" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="Background" Value="{StaticResource ControlFillColorDefaultBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{StaticResource ControlStrokeColorDefaultBrush}" /><Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="{StaticResource ComboBoxPadding}" /><Setter Property="CornerRadius" Value="4" />
+    <Setter Property="Template"><ControlTemplate TargetType="ComboBox">
+      <Grid>
+        <Border Name="PART_MainBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="24" /></Grid.ColumnDefinitions>
+            <Grid>
+              <ContentPresenter Name="PART_SelectionPresenter" Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                ContentStringFormat="{Binding SelectionBoxItemStringFormat, RelativeSource={RelativeSource AncestorType=ComboBox}}"
+                Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+              <TextBox Name="PART_EditableTextBox" Text="{Binding Text, RelativeSource={RelativeSource AncestorType=ComboBox}}" IsReadOnly="{TemplateBinding IsReadOnly}" Visibility="Collapsed" Background="Transparent" BorderThickness="0" MinHeight="0" MinWidth="0" Padding="0" />
+            </Grid>
+            <Grid Name="PART_DropDownArea" Grid.Column="1" Background="Transparent">
+              <ToggleButton Name="PART_ToggleButton" IsChecked="{TemplateBinding IsDropDownOpen}" MinHeight="0" MinWidth="0" Padding="0" BorderThickness="0" Background="Transparent" Focusable="False" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ComboBox}}">
+                <ToggleButton.Template><ControlTemplate TargetType="ToggleButton">
+                  <Grid Background="Transparent"><Path Name="FluentDropDownChevron" Data="M 1,2 L 5,6 L 9,2" Width="10" Height="8" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.25" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" /></Grid>
+                </ControlTemplate></ToggleButton.Template>
+              </ToggleButton>
+            </Grid>
+          </Grid>
+        </Border>
+        <Border Name="ComboFocus" BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" BorderThickness="2" Margin="1" CornerRadius="3" Opacity="0" IsHitTestVisible="False" />
+        <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" StaysOpen="False" Placement="Bottom" PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}}">
+          <Grid Name="PART_PopupBorder" Margin="0,4,0,0">
+            <Rectangle Fill="{StaticResource FlyoutPresenterBackgroundBrush}" Stroke="{StaticResource SurfaceStrokeColorFlyoutBrush}" StrokeThickness="1" RadiusX="8" RadiusY="8" />
+            <ScrollViewer Margin="4" MaxHeight="{TemplateBinding MaxDropDownHeight}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ItemsPresenter /></ScrollViewer>
+          </Grid>
+        </Popup>
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PART_MainBorder" Property="Background" Value="{StaticResource ControlFillColorSecondaryBrush}" /></Trigger>
+        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="ComboFocus" Property="Opacity" Value="1" /></Trigger>
+        <Trigger Property="IsDropDownOpen" Value="True"><Setter TargetName="PART_MainBorder" Property="Background" Value="{StaticResource ControlFillColorTertiaryBrush}" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="PART_MainBorder" Property="Background" Value="{StaticResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /><Setter TargetName="ComboFocus" Property="Opacity" Value="0" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="ComboBox" BasedOn="{StaticResource DefaultComboBoxStyle}" />
+  <Style x:Key="DefaultComboBoxItemStyle" TargetType="ComboBoxItem">
+    <Setter Property="MinHeight" Value="32" /><Setter Property="Padding" Value="11,7" /><Setter Property="FontSize" Value="14" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template"><ControlTemplate TargetType="ComboBoxItem">
+      <Grid>
+        <Border Name="PART_BackgroundBorder" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" /></Border>
+        <Border Name="SelectionIndicator" Width="3" Height="16" CornerRadius="2" Margin="0,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{StaticResource AccentFillColorDefaultBrush}" Opacity="0" IsHitTestVisible="False" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PART_BackgroundBorder" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" /></Trigger>
+        <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="PART_BackgroundBorder" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" /></Trigger>
+        <Trigger Property="IsSelected" Value="True"><Setter TargetName="PART_BackgroundBorder" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" /><Setter TargetName="SelectionIndicator" Property="Background" Value="{StaticResource AccentFillColorDisabledBrush}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="ComboBoxItem" BasedOn="{StaticResource DefaultComboBoxItemStyle}" />
+</ResourceDictionary>

@@ -4,12 +4,15 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>FluentJalium.Gallery</RootNamespace>
     <AssemblyName>FluentJalium.Gallery</AssemblyName>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+    <Compile Include="Astra/**/*.cs" />
+    <JalxamlPage Include="Astra/**/*.jalxaml" />
+    <ProjectReference Include="../../src/FluentJalium/FluentJalium.csproj" />
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
   </ItemGroup>
 </Project>

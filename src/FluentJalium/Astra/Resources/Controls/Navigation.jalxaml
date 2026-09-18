@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source baseline: microsoft-ui-xaml 19e3bdc3c, NavigationView_themeresources.xaml.
+     The flat left pane uses a single shared selection indicator outside item clips. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="FluentNavigationPaneToggleButtonStyle" TargetType="Button">
+    <Setter Property="Width" Value="40" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="MinWidth" Value="40" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{StaticResource SubtleFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid Background="Transparent">
+          <Border Name="Root" Shape="RoundedRectangle" CornerRadius="{TemplateBinding CornerRadius}"
+                  Background="{TemplateBinding Background}" TransitionProperty="Background"
+                  TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+          </Border>
+          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{StaticResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" />
+          </Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True">
+            <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="FocusOutline" Property="Opacity" Value="0" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style x:Key="FluentNavigationItemStyle" TargetType="local:FluentNavigationItem">
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="36" />
+    <Setter Property="Margin" Value="4,2" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Background" Value="{StaticResource SubtleFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="{StaticResource NavigationViewItemCornerRadius}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="local:FluentNavigationItem">
+        <Grid Background="Transparent" MinHeight="36">
+          <Border Name="Root" Shape="RoundedRectangle" CornerRadius="{TemplateBinding CornerRadius}"
+                  Background="{TemplateBinding Background}" TransitionProperty="Background"
+                  TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <ContentPresenter Content="{TemplateBinding Icon}" Width="16" Height="16"
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Foreground="{TemplateBinding Foreground}" />
+              <ContentPresenter Name="PART_Label" Grid.Column="1" Margin="0,0,12,0"
+                                Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{StaticResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{StaticResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsCompact" Value="True">
+            <Setter TargetName="PART_Label" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="IsSelected" Value="True">
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+          </Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsSelected" Value="True" />
+              <Condition Property="IsMouseOver" Value="True" />
+              <Condition Property="IsEnabled" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorTertiaryBrush}" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsSelected" Value="True" />
+              <Condition Property="IsPressed" Value="True" />
+              <Condition Property="IsEnabled" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="Root" Property="Background" Value="{StaticResource SubtleFillColorSecondaryBrush}" />
+          </MultiTrigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter Property="Foreground" Value="{StaticResource TextFillColorDisabledBrush}" />
+          </Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True">
+            <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="FocusOutline" Property="Opacity" Value="0" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style x:Key="FluentNavigationViewStyle" TargetType="local:FluentNavigationView">
+    <Setter Property="Background" Value="{StaticResource LayerFillColorDefaultBrush}" />
+    <Setter Property="Foreground" Value="{StaticResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Padding" Value="24" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="local:FluentNavigationView">
+        <Grid Background="{StaticResource SolidBackgroundFillColorBaseBrush}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Border Name="PART_PaneRoot" Width="240" ClipToBounds="True"
+                  TransitionProperty="Width" TransitionDuration="0:0:0.200" TransitionTimingFunction="Recommended">
+            <Grid Margin="0,8">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <Button Name="PART_PaneToggle" Style="{StaticResource FluentNavigationPaneToggleButtonStyle}"
+                      Margin="4,0,4,12" HorizontalAlignment="Left">
+                <SymbolIcon Symbol="GlobalNavButton" Width="16" Height="16" />
+              </Button>
+              <ScrollViewer Name="PART_MenuScrollViewer" Grid.Row="1"
+                            VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Name="PART_MenuItems" />
+              </ScrollViewer>
+              <StackPanel Name="PART_FooterMenuItems" Grid.Row="2" Margin="0,12,0,0" />
+              <Canvas Name="PART_IndicatorLayer" Grid.RowSpan="3" IsHitTestVisible="False" Focusable="False" ClipToBounds="True">
+                <Border Name="PART_SelectionIndicator" Width="3" Height="16" CornerRadius="2" Opacity="0"
+                        Background="{StaticResource AccentFillColorDefaultBrush}" IsHitTestVisible="False" Focusable="False" />
+              </Canvas>
+            </Grid>
+          </Border>
+          <Border Grid.Column="1" Margin="0,8,8,8" Background="{TemplateBinding Background}"
+                  BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+            <ContentPresenter Name="PART_ContentPresenter" Margin="{TemplateBinding Padding}"
+                              Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="{TemplateBinding Foreground}" />
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="local:FluentNavigationItem" BasedOn="{StaticResource FluentNavigationItemStyle}" />
+  <Style TargetType="local:FluentNavigationView" BasedOn="{StaticResource FluentNavigationViewStyle}" />
+</ResourceDictionary>
