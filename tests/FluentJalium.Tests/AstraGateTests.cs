@@ -15,7 +15,7 @@ public class AstraGateTests
     {
         var names = FluentThemeManager.DictionaryNames;
         Assert.NotEmpty(names);
-        Assert.Contains("Controls/Navigation.jalxaml", names);
+        Assert.Contains("Styles/Navigation.jalxaml", names);
     }
 
     [Fact]
@@ -47,14 +47,14 @@ public class AstraGateTests
         var root = RepositoryRoot();
         var offenders = new List<string>();
         var suppressions = 0;
-        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium", "Astra"), "*.cs", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium"), "*.cs", SearchOption.AllDirectories))
         {
             var text = File.ReadAllText(file);
             var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
             if (text.Contains("#pragma warning disable WPF0001", StringComparison.Ordinal))
             {
                 suppressions++;
-                if (relative != "src/FluentJalium/Astra/Themes/ApplicationThemeDriver.cs") offenders.Add($"{relative}: suppresses WPF0001 outside the driver");
+                if (relative != "src/FluentJalium/Themes/ApplicationThemeDriver.cs") offenders.Add($"{relative}: suppresses WPF0001 outside the driver");
             }
 
             foreach (var banned in new[] { "VisualTreeHelper", ".InvalidateVisual(", "BindingFlags.NonPublic", "GetField(", "GetMethod(" })

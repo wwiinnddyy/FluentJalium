@@ -10,7 +10,7 @@ if ((& git -C $SourceRoot rev-parse HEAD) -ne $pin) { throw 'WinUI checkout does
 $document = [System.Xml.Linq.XDocument]::Load($source)
 $x = [System.Xml.Linq.XNamespace]'http://schemas.microsoft.com/winfx/2006/xaml'
 $ui = [System.Xml.Linq.XNamespace]'http://schemas.microsoft.com/winfx/2006/xaml/presentation'
-$destination = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../src/FluentJalium/Astra/Resources'))
+$destination = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../src/FluentJalium/ThemeResources'))
 if (-not $Check) { [System.IO.Directory]::CreateDirectory($destination) | Out-Null }
 $sections = @{}
 foreach ($entry in @(@('Light', 'Light'), @('Dark', 'Default'), @('HighContrast', 'HighContrast'))) {

@@ -67,8 +67,8 @@ public class AstraResourceKeyTests
         if (branches.Count < 2)
         {
             // Flat-palette form: the two files must still agree key for key.
-            var light = DeclaredKeys(Load("Resources/Light.jalxaml") ?? throw new InvalidOperationException("No palette to check.")).ToHashSet(StringComparer.Ordinal);
-            var dark = DeclaredKeys(Load("Resources/Dark.jalxaml") ?? throw new InvalidOperationException("No palette to check.")).ToHashSet(StringComparer.Ordinal);
+            var light = DeclaredKeys(Load("ThemeResources/Light.jalxaml") ?? throw new InvalidOperationException("No palette to check.")).ToHashSet(StringComparer.Ordinal);
+            var dark = DeclaredKeys(Load("ThemeResources/Dark.jalxaml") ?? throw new InvalidOperationException("No palette to check.")).ToHashSet(StringComparer.Ordinal);
             Assert.False(light.Count == 0);
             Assert.Empty(dark.Except(light).Order(StringComparer.Ordinal));
             Assert.Empty(light.Except(dark).Order(StringComparer.Ordinal));
@@ -133,7 +133,7 @@ public class AstraResourceKeyTests
     public void Theme_tokens_are_never_frozen_with_static_resource()
     {
         var palette = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var name in new[] { "Resources/Light.jalxaml", "Resources/Dark.jalxaml" })
+        foreach (var name in new[] { "ThemeResources/Light.jalxaml", "ThemeResources/Dark.jalxaml" })
         {
             using var stream = typeof(FluentThemeManager).Assembly.GetManifestResourceStream(name)
                 ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
@@ -145,7 +145,7 @@ public class AstraResourceKeyTests
         var offenders = new List<string>();
         foreach (var (name, dictionary) in AstraDictionaries())
         {
-            if (name.EndsWith("Light.jalxaml", StringComparison.Ordinal) || name.EndsWith("Dark.jalxaml", StringComparison.Ordinal)) continue;
+            if (name.StartsWith("ThemeResources/", StringComparison.Ordinal)) continue;
             foreach (var (attribute, key) in FrozenReferences(dictionary))
             {
                 if (palette.Contains(key)) offenders.Add($"{name}: {attribute.Name.LocalName}=\"{{StaticResource {key}}}\"");
@@ -160,8 +160,10 @@ public class AstraResourceKeyTests
     {
         var assembly = typeof(FluentThemeManager).Assembly;
         var documents = new Dictionary<string, XDocument>(StringComparer.Ordinal);
+        // Logical names mirror the source folders now, so "is it a namespaced dictionary" is the
+        // whole test; no prefix has to be kept in step with the csproj.
         foreach (var resourceName in assembly.GetManifestResourceNames()
-                     .Where(static name => name.Replace('\\', '/').StartsWith("Resources/", StringComparison.Ordinal) && name.EndsWith(".jalxaml", StringComparison.Ordinal))
+                     .Where(static name => name.Contains('/', StringComparison.Ordinal) && name.EndsWith(".jalxaml", StringComparison.Ordinal))
                      .Order(StringComparer.Ordinal))
         {
             using var stream = assembly.GetManifestResourceStream(resourceName)!;
