@@ -145,6 +145,13 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    另外量到两条框架陷阱：`Application.Resources` 增删条目会让 `{ThemeResource}` 重新解析、
    从此不指向调色板实例（表现是后面两条 Button 像素断言无声失败）；
    宿主设不透明 `Background` 会盖掉自己的滚动条（8800 全哨兵、灰色归 0）。
+   **条目宿主基面已摸底，见 `adaptation/09`**：`ListBox` 的树是
+   `Grid>Border>ScrollViewer>{ItemsPresenter>VirtualizingStackPanel>ListBoxItem…, ScrollBar×2}`——
+   容器是每控件自己的 CLR 类型，**没有**通用的"条目基样式"可抄（上游也不是这样组织的），
+   所以这一项交付的是通路证明：本地 `ItemContainerStyle` 能落到生成的容器上（Padding 读回 11），
+   且默认虚拟化面板与内嵌 ScrollViewer 都在（后者自动吃我们的宿主样式）。
+   另记一条坑：**裸 `ItemsControl` 放进宿主会挂住推帧循环**（60s 无回应，与裸 ScrollBar 同族），
+   测试与 Gallery 都别放裸的。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
    原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
@@ -188,7 +195,7 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
 | 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 14/14 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
-| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar、Popup/FlyoutPresenter、ToolTip、ScrollViewer 宿主四项，审计在 `audits/{scrollbar,flyout-presenter,tooltip,scrollviewer}.md`；新增 4 条行为/读回断言 + 9 条像素/布局断言（`AstraScrollHostTests` 6 条 + `AstraPixelTests` 14/14），全套 35/35 全绿 0 skip。仍欠：Thumb 与条目容器（`ItemsControl`/`ContentPresenter` 基面）、窗口外壳（TitleBar、背衬）；目录差集为空；三个系统页有证据 |
+| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar、Popup/FlyoutPresenter、ToolTip、ScrollViewer 宿主、条目宿主基面五项，审计在 `audits/{scrollbar,flyout-presenter,tooltip,scrollviewer}.md` + `adaptation/09-item-host-base.md`；新增 7 条行为/读回断言 + 9 条像素/布局断言（`AstraScrollHostTests` 6 条、`AstraItemHostTests` 3 条、`AstraPixelTests` 14/14），全套 38/38 全绿 0 skip。仍欠：Thumb（与悬停/拖拽输入证据同批）、窗口外壳（TitleBar、背衬）；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
