@@ -1,0 +1,56 @@
+[RTB] ctor(Int32 pixelWidth, Int32 pixelHeight, Double dpiX, Double dpiY, PixelFormat pixelFormat)
+[RTB] Render(Visual visual) -> Void
+[RTB] CopyPixels(Int32Rect sourceRect, Byte[] pixels, Int32 stride, Int32 offset) -> Void
+[RTB] PixelFormat isEnum=False; statics=[Default,Indexed1,Indexed2,Indexed4,Indexed8,BlackWhite,Gray2,Gray4,Gray8,Bgr555,Bgr565,Rgb128Float,Bgr24,Rgb24]
+[DP-DEFAULT] ColorPicker          ColorProperty default #FFFFFFFF == ThemeColors.TitleBarGlyph
+[DP-DEFAULT] NavigationView       ContentBackgroundProperty default #FF282828 == ThemeColors.ToggleDisabledBackground
+[DP-DEFAULT] types whose DP defaults literally equal a ThemeColors value: 2
+[CALIBRATION] KnownDirty: decoder reports 2 -> KnownDirty -> get_Accent; KnownDirty -> get_SliderThumb
+[CALIBRATION] KnownClean: decoder reports 0 -> 
+[SCAN] types=163 methods=8461 renderOverriding=59 themeColorsReferencing=25
+[DIRTY] AppBarSeparator                  .cctor -> get_ControlBorder
+[DIRTY] AutoCompleteBox                  .cctor -> get_CompositionBackground; .cctor -> get_CompositionText; .cctor -> get_CompositionUnderline; .cctor -> get_ControlBorder; .cctor -> get_ControlBorderFocused; .cctor -> get_DropdownBackground; .cctor -> get_DropdownShadow; .cctor -> get_HighlightBackground; .cctor -> get_SelectedItemBackground; .cctor -> get_TextPlaceholder
+[DIRTY] Calendar                         .cctor -> get_Accent; .cctor -> get_HighlightBackground; .cctor -> get_SecondaryBackground; .cctor -> get_TextDisabled; .cctor -> get_TextSecondary
+[DIRTY] CalendarDayButton                .cctor -> get_Accent; .cctor -> get_HighlightBackground; .cctor -> get_SelectedItemBackground
+[DIRTY] ColorPicker                      .cctor -> get_ControlBorder
+[DIRTY] ContextMenu                      .cctor -> get_ControlBackground; .cctor -> get_ControlBorder
+[DIRTY] Control                          .cctor -> get_TextPrimary
+[DIRTY] DataGrid                         .cctor -> get_ControlBackground; StartColumnDrag -> get_Accent
+[DIRTY] DataGridRowHeader                .cctor -> get_SelectedItemBackground
+[DIRTY] DatePicker                       .cctor -> get_ControlBorderFocused
+[DIRTY] DockLayout                       .cctor -> get_Accent; .cctor -> get_DockTabStripBorder; .cctor -> get_WindowBackground
+[DIRTY] InfoBar                          .cctor -> get_Accent; GetSeverityColors -> get_Accent
+[DIRTY] NumberBox                        .cctor -> get_ControlBorderFocused
+[DIRTY] PasswordBox                      .cctor -> get_ControlBorderFocused
+[DIRTY] ProgressBar                      .cctor -> get_ProgressBarFill
+[DIRTY] RangeSlider                      .cctor -> get_CheckMark; .cctor -> get_SliderThumb
+[DIRTY] ScrollBar                        .cctor -> get_ScrollBarTrack
+[DIRTY] Slider                           .cctor -> get_SliderThumb
+[DIRTY] Split                            .cctor -> get_Accent; .cctor -> get_DockSplitterBackground; .cctor -> get_DockSplitterHover
+[DIRTY] SwipeControl                     .cctor -> get_Accent; .cctor -> get_TextPrimary
+[DIRTY] TabControl                       .cctor -> get_TabStripBackground; .cctor -> get_TabStripBorder
+[DIRTY] TabItem                          .cctor -> get_TabItemHoverBackground; .cctor -> get_TabItemIndicator; .cctor -> get_TabItemSelectedBackground; .cctor -> get_TextPrimary; .cctor -> get_TextSecondary
+[DIRTY] TextBox                          .cctor -> get_ControlBorderFocused
+[DIRTY] TimePicker                       .cctor -> get_ControlBorderFocused; .cctor -> get_SelectedItemBackground; BuildPopup -> get_Accent
+[DIRTY] TreeDataGrid                     StartColumnDrag -> get_Accent
+[SPLIT] .cctor-only = 21 types; live reads = 4 types
+[CEILING] DataGrid         StartColumnDrag -> get_Accent
+[CEILING] InfoBar          GetSeverityColors -> get_Accent
+[CEILING] TimePicker       BuildPopup -> get_Accent
+[CEILING] TreeDataGrid     StartColumnDrag -> get_Accent
+[CLEAN-BUT-DRAWN] 38: CalendarButton CalendarItem CameraView ChartLegend ChartTooltip CommandBar DataGridCell DataGridColumnHeader DiffViewer DockItem DockTabPanel EditControl HexEditor HyperlinkButton ItemsControl Label MapView Menu MenuBar MenuBarItem MenuFlyoutItem MenuFlyoutSeparator MenuFlyoutSubItem MenuItem NavigationViewItemHeader NavigationViewItemSeparator QRCode ResizeGrip RichTextBox ScrollViewer Separator Sparkline StatusBar StatusBarItem Thumb ToastNotificationItem ToggleMenuFlyoutItem Window
+[PIXEL] [1-default                      ] Slider       magenta=False emerald=False top=[#700E88x32 #66047Dx30 #6D0B85x30 #64027Bx30]
+[PIXEL] [1-default                      ] ProgressBar  magenta=False emerald=False top=[#FFFFFFx660 #63017Ax40 #64027Bx36 #65037Cx36]
+[PIXEL] [1-default                      ] CheckBox     magenta=False emerald=True top=[#207345x34 #1C7F43x34 #1E7944x25 #FFFFFFx20]
+[PIXEL] [1-default                      ] RadioButton  magenta=False emerald=True top=[#FFFFFFx32 #207345x26 #1C7F43x26 #1E7944x20]
+[PIXEL] [1-default                      ] ScrollBar    magenta=False emerald=False top=[#FFFFFFx12304 #D2D2D2x56 #D5D5D5x6 #DADADAx4]
+[PIXEL] [2-ApplyAccent(magenta)         ] Slider       magenta=False emerald=False top=[#F505F5x38 #F707F7x38 #F808F8x38 #FA0AFAx38]
+[PIXEL] [2-ApplyAccent(magenta)         ] ProgressBar  magenta=False emerald=False top=[#FFFFFFx660 #F303F3x48 #F606F6x48 #F909F9x48]
+[PIXEL] [2-ApplyAccent(magenta)         ] CheckBox     magenta=False emerald=True top=[#207345x34 #1C7F43x34 #1E7944x25 #FFFFFFx20]
+[PIXEL] [2-ApplyAccent(magenta)         ] RadioButton  magenta=False emerald=True top=[#FFFFFFx32 #207345x26 #1C7F43x26 #1E7944x20]
+[PIXEL] [2-ApplyAccent(magenta)         ] ScrollBar    magenta=False emerald=False top=[#FFFFFFx12304 #D2D2D2x56 #D5D5D5x6 #DADADAx4]
+[PIXEL] [3-Background+Foreground=magenta] Slider       magenta=True emerald=False top=[#FF00FFx882]
+[PIXEL] [3-Background+Foreground=magenta] ProgressBar  magenta=True emerald=False top=[#FF00FFx660 #F303F3x48 #F606F6x48 #F909F9x48]
+[PIXEL] [3-Background+Foreground=magenta] CheckBox     magenta=False emerald=True top=[#207345x34 #1C7F43x34 #1E7944x25 #FFFFFFx20]
+[PIXEL] [3-Background+Foreground=magenta] RadioButton  magenta=False emerald=True top=[#FFFFFFx32 #207345x26 #1C7F43x26 #1E7944x20]
+[PIXEL] [3-Background+Foreground=magenta] ScrollBar    magenta=True emerald=False top=[#FF00FFx9064 #FF8BFFx2774 #FFFFFFx306 #D2D2D2x44]

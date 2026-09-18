@@ -116,10 +116,13 @@ assembly types: 6; ResourceDictionary-derived: []
 
 ## S0-f：`ThemeColors` 读得到、写不进
 
-> **本节已被 `01-jalium-control-census.md` 收窄**：本框架**没有发布任何 Generic 主题**，
-> 未加样式的原生控件其 **DP 默认值本身是随 `ThemeMode` 变化的**，
-> 真正改不动的只有**直接读 `ThemeColors` 静态表的自绘代码**。
-> 下面"重模板改不动"的适用范围仅限那部分，不要按整类控件理解。
+> **本节两处已被 `02-render-ceiling.md` 更正**：
+> 1. "四种公开写入口全部无效"只对 `ThemeColors` 这张**表**成立；实测像素证明
+>    `ThemeManager.ApplyAccent(color)` **能**驱动 Slider / ProgressBar 等控件的强调色渲染。
+>    当时我在 `ApplyAccent` 之后又调了一次空参数 `ApplyBrandTheme(options)`，
+>    把强调色重置回品牌默认值，是我自己引入的干扰变量。
+> 2. "重模板改不动一整类控件"言过其实：163 类型 / 8461 方法的 IL 扫描（带校准对照）显示
+>    真正的实时读取点只有 **4 处，且全部只读 `Accent`、全部不在 `OnRender` 里**。
 
 `Jalium.UI.Controls.Themes.ThemeColors` 暴露 71 个 public 静态 `Color` 属性，
 **没有一个有 public setter**（逐个反射确认）。清单里与 WinUI 控件直接相关的包括
