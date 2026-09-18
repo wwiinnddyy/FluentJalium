@@ -155,8 +155,11 @@
                       Margin="4,0,4,12" HorizontalAlignment="Left">
                 <SymbolIcon Symbol="GlobalNavButton" Width="16" Height="16" />
               </Button>
+              <!-- Auto reserves 12 DIP for the bar (measured: a 48-DIP viewport hands its content 36),
+                   which squeezes the 40-DIP icon column and leaves the selection pill narrower than the
+                   icon it is supposed to sit behind. Hidden reserves nothing and still scrolls. -->
               <ScrollViewer Name="PART_MenuScrollViewer" Grid.Row="1"
-                            VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Name="PART_MenuItems" />
               </ScrollViewer>
               <StackPanel Name="PART_FooterMenuItems" Grid.Row="2" Margin="0,12,0,0" />

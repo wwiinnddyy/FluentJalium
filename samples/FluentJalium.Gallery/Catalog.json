@@ -139,15 +139,15 @@
       "source": "Styles/Navigation.jalxaml",
       "page": "navigation",
       "parity": "own-type",
-      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md" ],
-      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item", "back-button and item invocation not gated" ]
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
+      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item", "back-button and item invocation not gated", "the pane bar is Hidden, not overlaid: Auto costs 12 DIP of layout width, which is what broke compact" ]
     },
     {
       "markup": "FluentJalium.Controls.FluentNavigationItem",
       "source": "Styles/Navigation.jalxaml",
       "page": "navigation",
       "parity": "own-type",
-      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md" ],
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
       "gaps": [ "no expandable children, icon sources beyond SymbolIcon", "selection indicator motion unmeasured" ]
     }
   ]

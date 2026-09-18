@@ -95,11 +95,40 @@ Actual:   SolidColorBrush(sc#0.6605243, 0, 0.12252378, 0.429487)
 Button / NavigationView / ToggleSwitch 上已有的过渡保持原样——它们是既有事实，
 本轮不重开这个决定，但要知道：那三处的画刷实例同样只在稳态等于调色板实例。
 
+## 第二轮：折叠态图标右边被遮（用户报）
+
+把窗口压到 700 DIP（<800 阈值）逼出 compact，抬到非置顶窗口最前后截客户区，逐像素分类选中行：
+
+```
+改前  pane 48 DIP；高亮框 6.9 … 32.0 DIP（28 宽）；图标 16.6 … 30.9（16 宽，中心 23.75 = pane 中心）
+改后  pane 48 DIP；高亮框 6.9 … 44.0 DIP（40 宽）；图标 16.6 … 30.9，完整落在框内
+```
+
+图标位置从头到尾是对的（它按 40 DIP 图标列居中，中心正好是 pane 中心 24）。
+**错的是高亮框**：它只有 28 宽，右边缘停在 32，于是图标的右半截露在框外，看起来就是"图标右边被遮住"。
+
+根因用一条断言钉死（`AstraNavigationTests.The_bar_mode_decides_whether_the_pane_loses_layout_width`）：
+**`ScrollViewer` 的 `VerticalScrollBarVisibility="Auto"` 即使不画滚动条，也要从视口里扣掉 12 DIP**
+（48 的视口只给内容 36）。`Hidden` 与 `Disabled` 实测都不扣（48）。
+所以展开态是 `240 - 4 - 12 - 4 = 220`（高亮框实测止于 224，含 4 边距，完全吻合），
+折叠态剩 `48 - 4 - 12 - 4 = 28`——比它要装的 40 DIP 图标列还窄 12。
+
+修法：`Styles/Navigation.jalxaml` 的 `PART_MenuScrollViewer` 从 `Auto` 改 `Hidden`。
+另加一条行为断言 `A_hidden_bar_still_lets_the_pane_scroll`：`ScrollToVerticalOffset(40)` 后
+`VerticalOffset == 40`，即扣掉的是**槽**不是**滚动能力**（滚轮/键盘/触摸路径不受影响）。
+代价写进目录 gaps：折叠/长列表时没有可拖的滑块，因为本框架没有覆盖式滚动条。
+
+顺带第二条实测（同一个坑的数值版）：`TransitionProperty="Width"` 会把 **`Border.Width` 这个 DP 值本身**
+插值——过渡在飞时读回 54.48 而不是 48。所以任何"读回布局/画刷值"的断言都必须先等过渡落地，
+`PixelHarness.Settle(frames)` 就是为此加的公开入口（`Capture` 的稳态判据只看像素直方图，
+空 pane 的宽度变化不足以让直方图改变，所以它当时没等到）。
+
 ## 这一轮不声称
 
 1. 侧边栏的**悬停/按下/键盘焦点**没有上屏证据：本轮只做了几何量尺，且真指针注入在这台机器上
    不可门控（`adaptation/11` 记过），屏幕坐标点击一律不用。
-2. **compact（48 DIP）态**没量过：需要点汉堡或代码置 `IsPaneOpen=false` 后再上一屏，本轮没做。
+2. **compact 态只量了静息几何**（第二轮已把高亮框与图标的位置钉死，并有 `AstraNavigationTests` 断言）；
+   汉堡点击后的**折叠动画**没有逐帧证据，长列表下的"没有可拖滑块"这条代价也未在真窗口里验证。
 3. 指示条的**移动动画**（200/400ms 两段）没有上屏逐帧证据，只有 `NavigationIndicatorAnimator`
    的代码路径与离屏断言。
 4. 90 DIP 是"当前窗口外壳下能做到的位置"，不是 WinUI 的 52 DIP；余下 42 DIP 归窗口外壳批。

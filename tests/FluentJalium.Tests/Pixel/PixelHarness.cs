@@ -252,6 +252,14 @@ internal static class PixelHarness
         return seen;
     }
 
+    /// <summary>
+    /// Pumps real rendered frames so a <c>TransitionProperty</c> has landed before a value is read back.
+    /// Such a transition animates the dependency value itself, so mid-flight <c>Border.Width</c> reports an
+    /// interpolated length and <c>Background</c> reports a brand-new interpolated brush rather than the
+    /// palette instance (docs/astra/adaptation/12).
+    /// </summary>
+    internal static void Settle(int frames = 30) => Pump(frames);
+
     private static Sample CaptureRaw(Visual target, int width, int height)
     {
         if (width <= 0 || height <= 0) return new Sample(0, 0, [], 0, false);
