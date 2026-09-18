@@ -94,16 +94,17 @@
   <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}" />
   <Style TargetType="HyperlinkButton" BasedOn="{StaticResource DefaultHyperlinkButtonStyle}" />
 
+  <!-- WinUI 3 DefaultToolTipStyle @19e3bdc3c, blob 281d1efcf02c33f81b32fd04e2c691da9173a323. The root is
+       a Border here while upstream puts the chrome on a ContentPresenter; the drawn result is the same
+       and audits/tooltip.md records it as a shape difference rather than a claim of structural parity.
+       FontSize stays a literal: upstream reads it from ToolTipContentThemeFontSize, an x:Double this
+       runtime's reader cannot parse. -->
   <Style x:Key="DefaultToolTipStyle" TargetType="ToolTip">
-    <!-- Upstream ToolTipBorderBrush is SurfaceStrokeColorFlyoutBrush, i.e. the shared flyout stroke.
-         The background is the unresolved half: upstream routes ToolTipBackground through the legacy
-         UWP token SystemControlBackgroundChromeMediumLowBrush, which microsoft-ui-xaml@19e3bdc does
-         not define, so the flyout surface stands in for it until the ToolTip item settles it. -->
-    <Setter Property="Background" Value="{ThemeResource FlyoutPresenterBackground}" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{ThemeResource FlyoutBorderThemeBrush}" /><Setter Property="BorderThickness" Value="{ThemeResource FlyoutBorderThemeThickness}" />
-    <Setter Property="Padding" Value="8,6" /><Setter Property="CornerRadius" Value="4" /><Setter Property="FontSize" Value="12" />
-    <Setter Property="Template"><ControlTemplate TargetType="ToolTip"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" /></Border></ControlTemplate></Setter>
+    <Setter Property="Background" Value="{ThemeResource ToolTipBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource ToolTipForegroundBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ToolTipBorderBrush}" /><Setter Property="BorderThickness" Value="{ThemeResource ToolTipBorderThemeThickness}" />
+    <Setter Property="Padding" Value="{ThemeResource ToolTipBorderPadding}" /><Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" /><Setter Property="FontSize" Value="12" /><Setter Property="MaxWidth" Value="320" />
+    <Setter Property="Template"><ControlTemplate TargetType="ToolTip"><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" MaxWidth="{TemplateBinding MaxWidth}" Padding="{TemplateBinding Padding}"><ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}"><ContentPresenter.Resources><Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap" /></Style></ContentPresenter.Resources></ContentPresenter></Border></ControlTemplate></Setter>
   </Style>
   <Style TargetType="ToolTip" BasedOn="{StaticResource DefaultToolTipStyle}" />
 </ResourceDictionary>

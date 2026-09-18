@@ -177,6 +177,22 @@ public sealed class AstraThemeRuntimeTests
     }
 
     [Fact]
+    public void Upstream_tooltip_aliases_resolve_to_the_same_palette_instances()
+    {
+        // ToolTip is the second consumer of the alias layer, and its three upstream brush names must
+        // land on the objects the kernel retints rather than on copies. Its border thickness is 1 in
+        // upstream's HighContrast branch too, so unlike the flyout border it carries no mode gap.
+        _fixture.Run(() =>
+        {
+            Assert.Same(_fixture.Application.TryFindResource("TextFillColorPrimaryBrush"), _fixture.Application.TryFindResource("ToolTipForegroundBrush"));
+            Assert.Same(_fixture.Application.TryFindResource("AcrylicInAppFillColorDefaultBrush"), _fixture.Application.TryFindResource("ToolTipBackgroundBrush"));
+            Assert.Same(_fixture.Application.TryFindResource("SurfaceStrokeColorFlyoutBrush"), _fixture.Application.TryFindResource("ToolTipBorderBrush"));
+            Assert.NotNull(_fixture.Application.TryFindResource("ToolTipBorderThemeThickness"));
+            Assert.NotNull(_fixture.Application.TryFindResource("ToolTipBorderPadding"));
+        });
+    }
+
+    [Fact]
     public void High_contrast_maps_semantic_roles_to_system_colors()
     {
         _fixture.Run(() =>

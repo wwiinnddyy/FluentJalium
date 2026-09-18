@@ -125,6 +125,15 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    `FlyoutPresenterBackgroundBrush` → `AcrylicInAppFillColorDefaultBrush`，
    值不变（就是上游自己的 `FallbackColor`），高对比值也不再是我们的判断而是上游那一行。
    `FlyoutContentPadding` 与四个 `FlyoutTheme*` 尺寸键**不声明**（无消费点，声明即死键）。
+   **ToolTip 也已按上游转录落地，见 `audits/tooltip.md`**：上游 10 个键逐个处置——
+   5 个进 `ThemeResources/ToolTip.jalxaml`，`ToolTipBackground` 故意不声明（它指向上游根本没定义的
+   UWP 遗留刷，宁可留缺口也不猜值），三个遗留 phone 时代的刷不声明（上游样式自己也不消费）。
+   两处顺带修正：内边距 `8,6` → 上游的 `9,6,9,8`；圆角改为消费 `ControlCornerRadius`。
+   两条新的框架结论对后面每一批都管用：
+   **(a) 模板部件自己的 `Resources` 里放隐式样式是生效的**（`TextBlock.TextWrapping` 从部件树读回
+   是 `Wrap`），上游/ModernWpf 靠这一招穿过 presenter 传文本属性；
+   **(b) 给部件写一个它没有的属性，读取器不报错也不生效**（`ContentPresenter` 没有 `TextWrapping`，
+   第一版模板"绿灯"通过却什么都没发生）——标记属性必须读回有效值才算证据。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
    原计划起手要修的"模板根 Border 不吃本地 `Background`"**已被 `06` 证伪**：本地值经
@@ -166,9 +175,9 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 阶段 | 内容 | 出口 |
 |---|---|---|
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
-| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 13/13 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信、`AstraPixelTests` 14/14 全绿 0 skip、隐式样式与令牌到像素有断言。仍欠：Button 审计文档、状态映射表、Gallery 页与逐键对齐 |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
-| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar 一项（`audits/scrollbar.md` + 两条生成刷钩子 + 4 条像素断言 + `RenderPart<T>` 部件级判据）、Popup/FlyoutPresenter 别名层一项（`audits/flyout-presenter.md` + 1 条行为断言 + 2 条像素断言 + 一个自造键回改成上游真名）。仍欠：ScrollViewer、Thumb、条目容器、ToolTip 本体、窗口外壳；目录差集为空；三个系统页有证据 |
+| 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar 一项（`audits/scrollbar.md` + 两条生成刷钩子 + 4 条像素断言 + `RenderPart<T>` 部件级判据）、Popup/FlyoutPresenter 别名层一项（`audits/flyout-presenter.md`）、ToolTip 一项（`audits/tooltip.md`：5 键转录 + 1 条行为断言 + 3 条像素/布局断言）。三项合计 2 条行为 + 7 条像素，全绿 0 skip。仍欠：ScrollViewer、Thumb、条目容器、窗口外壳；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 

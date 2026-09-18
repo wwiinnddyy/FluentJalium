@@ -270,8 +270,9 @@ public sealed class AstraPixelTests
 
     /// <summary>
     /// ToolTip is the control whose template root is the shared flyout surface and that can still be
-    /// captured in-process. ComboBox and MenuFlyout hang the same chrome under a Popup, which lives in
-    /// its own visual root the harness cannot reach, so this is where the flyout claim is tested.
+    /// captured in-process: its own upstream alias, ToolTipBackgroundBrush, resolves to that same
+    /// palette object. ComboBox and MenuFlyout hang the same chrome under a Popup, which lives in its
+    /// own visual root the harness cannot reach, so this is where the flyout claim is tested.
     /// </summary>
     private static ToolTip FlyoutSurface() => new() { Content = "flyout" };
 
@@ -316,6 +317,26 @@ public sealed class AstraPixelTests
 
             Assert.Equal(0, light.CountAny(BrandEmerald));
             Assert.Equal(0, dark.CountAny(BrandEmerald));
+        });
+    }
+
+    [Fact]
+    public void The_tooltip_respects_the_upstream_maximum_width()
+    {
+        // WinUI caps a tooltip at ToolTipMaxWidth=320 and wraps the text rather than growing past it.
+        // Upstream reads that number from an x:Double resource, which this runtime's reader cannot
+        // parse, so the style carries it as a literal and this is what keeps the literal honest.
+        _fixture.Run(() =>
+        {
+            var tooltip = new ToolTip { Content = new string('w', 400) };
+            var wide = PixelHarness.Render(tooltip, 600, 40);
+            Assert.Equal(320, wide.Width);
+
+            // Jalium's ContentPresenter has no TextWrapping at all (the attribute is accepted by the
+            // reader and then goes nowhere), so the wrap has to sit on the text element the presenter
+            // builds. Reading the value back is also the only evidence that an implicit style inside a
+            // template part's own Resources applies.
+            Assert.Equal(TextWrapping.Wrap, PixelHarness.Descendant<TextBlock>(tooltip)!.TextWrapping);
         });
     }
 }
