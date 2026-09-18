@@ -33,7 +33,7 @@ XAML 里的常量不起作用），所以只转录笔刷，不转录 `Color`。
 ## 产出物
 
 `tools/Sync-AstraPalette.ps1` 每次同步调色板时一并生成
-`src/FluentJalium/Astra/Resources/HighContrast.map`（内嵌名 `Resources/HighContrast.map`），
+`src/FluentJalium/ThemeResources/HighContrast.map`（内嵌名与之一致），
 一行一个笔刷键：
 
 ```

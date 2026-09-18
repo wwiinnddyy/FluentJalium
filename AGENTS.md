@@ -3,7 +3,11 @@
 This branch is a breaking replacement of the pre-Astra FW facade, not a WPF or WinUI runtime application.
 The old implementation remains available on branch `new` at `d03b377`.
 
-- Product code lives in `src/FluentJalium/Astra`. No retired FW types or compatibility parser belongs in the new runtime.
+- Product code lives in `src/FluentJalium`, laid out after ModernWpf's two layers: `ThemeResources/`
+  (generated palette and per-theme tokens), `Styles/` (styles and control templates), `Themes/` (the
+  theme facade and the load manifest), `Controls/` and `Motion/` (types for demonstrated behavior gaps).
+  "Astra" stays the name of this rewrite, not a directory. No retired FW types or compatibility
+  parser belongs in the new runtime.
 - Use native Jalium controls with `.jalxaml` templates. Add a custom control only for a demonstrated behavior gap.
 - Runtime authority is NuGet Jalium.UI **26.10.9**; a sibling source tree is reference only and may be newer.
 - WinUI reference: `../microsoft-ui-xaml`, commit `19e3bdc3ccf3361393d623d3a5d2667cb8f33229`.

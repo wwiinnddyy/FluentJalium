@@ -16,15 +16,21 @@
     <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Astra/**/*.cs" />
-    <EmbeddedResource Include="Astra/Resources/**/*.jalxaml">
-      <LogicalName>Resources/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    <Compile Include="Controls/**/*.cs" />
+    <Compile Include="Motion/**/*.cs" />
+    <Compile Include="Themes/**/*.cs" />
+    <!-- The logical name is the folder-relative path: no separate naming scheme to keep in sync. -->
+    <EmbeddedResource Include="ThemeResources/**/*.jalxaml">
+      <LogicalName>ThemeResources/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Astra/Resources/Manifest.txt">
-      <LogicalName>Resources/Manifest.txt</LogicalName>
+    <EmbeddedResource Include="Styles/*.jalxaml">
+      <LogicalName>Styles/%(Filename)%(Extension)</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="Astra/Resources/HighContrast.map">
-      <LogicalName>Resources/HighContrast.map</LogicalName>
+    <EmbeddedResource Include="Themes/Manifest.txt">
+      <LogicalName>Themes/Manifest.txt</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ThemeResources/HighContrast.map">
+      <LogicalName>ThemeResources/HighContrast.map</LogicalName>
     </EmbeddedResource>
     <None Include="../../README.md" Pack="true" PackagePath="/" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />

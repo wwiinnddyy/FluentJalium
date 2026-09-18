@@ -10,8 +10,8 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Astra/**/*.cs" />
-    <JalxamlPage Include="Astra/**/*.jalxaml" />
+    <Compile Include="*.cs" />
+    <JalxamlPage Include="*.jalxaml" />
     <ProjectReference Include="../../src/FluentJalium/FluentJalium.csproj" />
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
   </ItemGroup>

@@ -28,7 +28,7 @@ public static class FluentThemeManager
     private static bool _reduceMotion;
     private static Color? _accent;
 
-    /// <summary>The dictionaries loaded in dependency order, after the palette. Read from Resources/Manifest.txt.</summary>
+    /// <summary>The style dictionaries loaded in dependency order, after the palette. Read from Themes/Manifest.txt.</summary>
     public static IReadOnlyList<string> DictionaryNames => Manifest ??= ReadManifest();
 
     private static IReadOnlyList<string>? Manifest;
@@ -81,9 +81,9 @@ public static class FluentThemeManager
         CurrentTheme = theme;
         try
         {
-            _light = Load("Light.jalxaml");
-            _dark = Load("Dark.jalxaml");
-            _palette = Load("Light.jalxaml");
+            _light = Load(Palette + "Light.jalxaml");
+            _dark = Load(Palette + "Dark.jalxaml");
+            _palette = Load(Palette + "Light.jalxaml");
             RefreshPalette();
             Add(_palette);
             foreach (var path in DictionaryNames) Add(Load(path));
@@ -158,9 +158,8 @@ public static class FluentThemeManager
         if (_threadId != Environment.CurrentManagedThreadId) throw new InvalidOperationException("Theme changes must run on the application's UI thread.");
     }
 
-    private static ResourceDictionary Load(string path)
+    private static ResourceDictionary Load(string name)
     {
-        var name = "Resources/" + path;
         using var stream = OpenResource(name) ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
         try
         {
@@ -185,6 +184,9 @@ public static class FluentThemeManager
             : null;
     }
 
+    private const string Palette = "ThemeResources/";
+    private static readonly string[] ResourceRoots = ["ThemeResources/", "Styles/", "Themes/"];
+
     private static readonly Dictionary<string, string> EmbeddedNames = BuildEmbeddedNames();
 
     private static Dictionary<string, string> BuildEmbeddedNames()
@@ -192,7 +194,7 @@ public static class FluentThemeManager
         var names = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var name in typeof(FluentThemeManager).Assembly.GetManifestResourceNames())
         {
-            if (name.StartsWith("Resources/", StringComparison.Ordinal)) names[name.Replace('\\', '/')] = name;
+            if (ResourceRoots.Any(root => name.StartsWith(root, StringComparison.Ordinal))) names[name.Replace('\\', '/')] = name;
         }
         return names;
     }
@@ -243,10 +245,10 @@ public static class FluentThemeManager
 
     private static IReadOnlyList<string> ReadManifest()
     {
-        const string prefix = "Resources/";
+        const string manifest = "Themes/Manifest.txt";
         var names = new List<string>();
-        using (var stream = OpenResource(prefix + "Manifest.txt")
-            ?? throw new InvalidOperationException($"Missing Astra resource: {prefix}Manifest.txt"))
+        using (var stream = OpenResource(manifest)
+            ?? throw new InvalidOperationException($"Missing Astra resource: {manifest}"))
         using (var reader = new StreamReader(stream))
         {
             var lineNumber = 0;
@@ -255,7 +257,7 @@ public static class FluentThemeManager
                 lineNumber++;
                 var entry = text.Trim().Replace('\\', '/');
                 if (entry.Length == 0 || entry.StartsWith('#')) continue;
-                if (OpenResource(prefix + entry) is null)
+                if (OpenResource(entry) is null)
                     throw new InvalidOperationException($"Astra manifest line {lineNumber} lists {entry}, which is not an embedded resource.");
                 names.Add(entry);
             }
@@ -267,13 +269,13 @@ public static class FluentThemeManager
         {
             if (!seen.Add(name)) throw new InvalidOperationException($"Astra manifest lists {name} more than once.");
         }
-        var accounted = new HashSet<string>(seen, StringComparer.Ordinal) { "Light.jalxaml", "Dark.jalxaml" };
+        var accounted = new HashSet<string>(seen, StringComparer.Ordinal) { Palette + "Light.jalxaml", Palette + "Dark.jalxaml" };
         // An unlisted dictionary embeds and parses fine yet never loads; fail the same way a missing one does.
         foreach (var resource in EmbeddedNames.Keys)
         {
             if (!resource.EndsWith(".jalxaml", StringComparison.Ordinal)) continue;
-            if (!accounted.Contains(resource[prefix.Length..]))
-                throw new InvalidOperationException($"{resource} is not listed in {prefix}Manifest.txt.");
+            if (!accounted.Contains(resource))
+                throw new InvalidOperationException($"{resource} is not listed in {manifest}.");
         }
         return names.AsReadOnly();
     }
@@ -350,7 +352,7 @@ public static class FluentThemeManager
 
     private static Dictionary<string, string> ReadHighContrastMap()
     {
-        const string name = "Resources/HighContrast.map";
+        const string name = Palette + "HighContrast.map";
         using var stream = OpenResource(name) ?? throw new InvalidOperationException($"Missing Astra resource: {name}");
         var map = new Dictionary<string, string>(StringComparer.Ordinal);
         using var reader = new StreamReader(stream);

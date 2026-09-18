@@ -19,7 +19,8 @@
 因此里面长期挂着两个**根本不存在**的条目（`Controls/Collections.jalxaml`、
 `Controls/Feedback.jalxaml`），令每个宿主在 `Apply()` 时抛 `Missing Astra resource` 直接崩溃。
 
-现在顺序与成员来自内嵌资源 `Resources/Manifest.txt`（一行一项，`#` 起注释），并且加载时
+现在顺序与成员来自内嵌清单（一行一项，`#` 起注释；目录平铺后叫
+`Themes/Manifest.txt`，当时还在 `Resources/Manifest.txt`），并且加载时
 双向校验：
 
 - 清单指向不存在的内嵌资源 → 抛错并给出行号；
@@ -40,7 +41,9 @@ csproj 的 `LogicalName` 用 `%(RecursiveDir)` 拼接，而 MSBuild 在 Windows 
 字典在此之前从未被成功加载过**，只是崩溃点更靠前所以没人发现。
 
 现在所有内嵌资源查找统一走 `OpenResource`，按正斜杠键查一张预先构建的名字表，
-分隔符不再可能在调用点出错。
+分隔符不再可能在调用点出错。目录平铺之后，内嵌逻辑名直接等于源文件相对路径
+（`ThemeResources/Light.jalxaml`、`Styles/Common.jalxaml`、`Themes/Manifest.txt`），
+所以"磁盘上一个名字、程序里另一个名字"这层错位从结构上没有了。
 
 ### 构建与打包恢复
 

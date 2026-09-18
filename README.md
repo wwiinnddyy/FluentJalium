@@ -7,17 +7,18 @@ WinUI 3 风格的 Fluent 主题与控件库，构建在 **Jalium.UI** 之上。
 
 ## 当前实现：Astra
 
-`Astra` 是对旧 FW 外观层的**破坏性替换**。`src/FluentJalium/Astra/` 是唯一的产品代码，
-其中不再有退役的 FW 类型，也不再有伪装成 WinUI 的 `x:` 命名空间/`x:Bind` 兼容解析层。
+`Astra` 是对旧 FW 外观层的**破坏性替换**，这个名字只指这次重写，不是目录。产品代码全部在
+`src/FluentJalium/` 下，按 ModernWpf 的两层分工摆放；其中不再有退役的 FW 类型，
+也不再有伪装成 WinUI 的 `x:` 命名空间/`x:Bind` 兼容解析层。
 
 | 组成 | 位置 | 作用 |
 |---|---|---|
-| 主题门面 | `Astra/Themes/FluentThemeManager.cs` | `Apply` / `ApplyTheme` / `ApplyAccent` / `OverrideBrush` / `ReduceMotion` |
-| 调色板 | `Astra/Resources/Light.jalxaml`、`Dark.jalxaml` | 由 `tools/Sync-AstraPalette.ps1` 从上游生成，键名逐字照抄 WinUI |
-| 度量与排印 | `Astra/Resources/Metrics.jalxaml`、`Typography.jalxaml` | 圆角、厚度、`Type*` 文本样式 |
-| 控件字典 | `Astra/Resources/Controls/*.jalxaml` | 样式与 `ControlTemplate` |
-| 加载清单 | `Astra/Resources/Manifest.txt` | 控件字典的依赖顺序，唯一 authority |
-| 自有类型 | `Astra/Controls/**` | 仅用于已证明的框架行为缺口 |
+| 主题门面 | `Themes/FluentThemeManager.cs` | `Apply` / `ApplyTheme` / `ApplyAccent` / `OverrideBrush` / `ReduceMotion` |
+| 调色板 | `ThemeResources/Light.jalxaml`、`Dark.jalxaml` | 由 `tools/Sync-AstraPalette.ps1` 从上游生成，键名逐字照抄 WinUI |
+| 度量与排印 | `ThemeResources/Metrics.jalxaml`、`Typography.jalxaml` | 圆角、厚度、`Type*` 文本样式 |
+| 控件样式 | `Styles/*.jalxaml` | 样式与 `ControlTemplate`（按 ModernWpf 的 `Styles/` 一层放，暂不拆成一控件一文件） |
+| 加载清单 | `Themes/Manifest.txt` | 样式字典的依赖顺序，唯一 authority |
+| 自有类型 | `Controls/**`、`Motion/**` | 仅用于已证明的框架行为缺口 |
 
 ## 启动顺序
 

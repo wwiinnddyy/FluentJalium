@@ -1,10 +1,10 @@
 # Astra control dictionaries, in dependency order. One entry per line; # starts a comment.
 # Loaded after the Light/Dark palette. FluentThemeManager validates both directions:
 # an entry with no embedded resource, and an embedded dictionary with no entry, both throw.
-Metrics.jalxaml
-Typography.jalxaml
-Controls/Common.jalxaml
-Controls/Inputs.jalxaml
-Controls/TextInput.jalxaml
-Controls/Selection.jalxaml
-Controls/Navigation.jalxaml
+ThemeResources/Metrics.jalxaml
+ThemeResources/Typography.jalxaml
+Styles/Common.jalxaml
+Styles/Inputs.jalxaml
+Styles/TextInput.jalxaml
+Styles/Selection.jalxaml
+Styles/Navigation.jalxaml
