@@ -92,4 +92,185 @@
     </Style.Triggers>
   </Style>
   <Style TargetType="PasswordBox" BasedOn="{StaticResource DefaultPasswordBoxStyle}" />
+  <!-- NumberBox. Jalium ships a native NumberBox (TextBoxBase, with Header, PlaceholderText, DecimalPlaces,
+       AcceptsExpression, NumberFormatter and StepUp/StepDown in code), and it already carries a default
+       template built in code - so this is a retemplating, not an own type, which is what AGENTS.md asks for
+       and what the census had wrong (audits/numberbox.md, adaptation/01 and 05 corrected).
+       Three measured contracts shape the template:
+       - the framework grafts its text host into a *panel* named PART_ContentHost. A ContentPresenter with that
+         name gets no TextBoxContentHost and paints nothing, so the host stays a Grid.
+       - the framework writes local BorderThickness (1,0,0,0) and CornerRadius (0,10,0,0 / 0,0,10,0) onto
+         PART_UpSpinButton and PART_DownSpinButton. A local value outranks style setters and template cells, so
+         the inline spinners' NumberBoxSpinButtonBorderThickness is written in the template markup and may lose;
+         the rounding is kept because the framework's shape is the WinUI one (outer corners round, inner square).
+       - SpinButtonPlacementMode does nothing at all for a replaced template: the framework never touches our
+         parts when it changes. The three placement cells below are the only thing that makes Hidden and Compact
+         do anything, and Compact's popup opens on focus rather than on tapping the indicator, because tapping
+         needs the code we do not have. -->
+  <Style x:Key="NumberBoxSpinButtonStyle" TargetType="RepeatButton">
+    <!-- Upstream NumberBoxSpinButtonStyle (x:Name there; a key here because the template references it). -->
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="MinWidth" Value="32" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="Background" Value="{ThemeResource ControlFillColorTransparentBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TextControlButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TextControlButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource NumberBoxSpinButtonBorderThickness}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="RepeatButton">
+        <Border Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="ButtonBorder" Property="Background" Value="{ThemeResource TextControlButtonBackgroundPointerOver}" />
+            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{ThemeResource TextControlButtonBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlButtonForegroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="ButtonBorder" Property="Background" Value="{ThemeResource TextControlButtonBackgroundPressed}" />
+            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{ThemeResource TextControlButtonBorderBrushPressed}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlButtonForegroundPressed}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{ThemeResource TextControlButtonBorderBrush}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style x:Key="NumberBoxPopupSpinButtonStyle" TargetType="RepeatButton" BasedOn="{StaticResource NumberBoxSpinButtonStyle}">
+    <Setter Property="Width" Value="36" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="Background" Value="{ThemeResource NumberBoxPopupSpinButtonBackground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource NumberBoxPopupSpinButtonBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+  </Style>
+  <Style x:Key="DefaultNumberBoxStyle" TargetType="NumberBox">
+    <Setter Property="Foreground" Value="{ThemeResource TextControlForeground}" />
+    <Setter Property="Background" Value="{ThemeResource TextControlBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TextControlBorderBrush}" />
+    <Setter Property="SelectionBrush" Value="{ThemeResource TextControlSelectionHighlightColor}" />
+    <Setter Property="CaretBrush" Value="{ThemeResource TextControlForeground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TextControlBorderThemeThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Padding" Value="{ThemeResource TextControlThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="MinHeight" Value="32" />
+    <!-- NumberBoxMinWidth 120 is an x:Double row upstream and this reader cannot parse one. -->
+    <Setter Property="MinWidth" Value="120" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="NumberBox">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <!-- Upstream defers this presenter and collapses it until a Header exists; there is no defer here, so
+               an empty header keeps the Auto row at zero height on its own. -->
+          <ContentPresenter Name="HeaderContentPresenter" Grid.Row="0" Content="{TemplateBinding Header}"
+                            Foreground="{ThemeResource TextControlHeaderForeground}" Margin="{ThemeResource TextBoxTopHeaderMargin}"
+                            FontSize="{TemplateBinding FontSize}" FontWeight="Normal" VerticalAlignment="Top" />
+          <Border Name="OuterBorder" Grid.Row="1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Grid Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+              <StackPanel Name="InlineSpinners" Grid.Column="1" Orientation="Horizontal" Visibility="Collapsed">
+                <RepeatButton Name="PART_UpSpinButton" Style="{StaticResource NumberBoxSpinButtonStyle}"
+                              BorderThickness="{ThemeResource NumberBoxSpinButtonBorderThickness}" Margin="4">
+                  <Path Data="M 1,4.5 L 5,0.5 L 9,4.5" Width="10" Height="6" Stretch="Uniform" StrokeThickness="1.25"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+                </RepeatButton>
+                <RepeatButton Name="PART_DownSpinButton" Style="{StaticResource NumberBoxSpinButtonStyle}"
+                              BorderThickness="{ThemeResource NumberBoxSpinButtonBorderThickness}" Margin="0,4,4,4">
+                  <Path Data="M 1,0.5 L 5,4.5 L 9,0.5" Width="10" Height="6" Stretch="Uniform" StrokeThickness="1.25"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+                </RepeatButton>
+              </StackPanel>
+              <Path Name="PopupIndicator" Grid.Column="1" Data="M 1,4 L 5,0 L 9,4 M 1,8 L 5,4 L 9,8" Width="10" Height="9"
+                    Stretch="Uniform" Stroke="{ThemeResource NumberBoxPopupIndicatorForeground}" StrokeThickness="1.25"
+                    Margin="{ThemeResource NumberBoxIconMargin}" Visibility="Collapsed" IsHitTestVisible="False"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+          <Border Name="BottomEdge" Grid.Row="1" Height="1" VerticalAlignment="Bottom" Margin="1,0,1,1" CornerRadius="0,0,3,3"
+                  Background="{ThemeResource ControlStrongStrokeColorDefaultBrush}" IsHitTestVisible="False" />
+          <!-- Upstream anchors the spinner popup with two x:Double offsets (-21 / -27) that this reader cannot
+               parse as resources, and the runtime has no ThemeShadow for a Popup, so it is placed under the
+               control instead of overlapping its right edge. -->
+          <Popup Name="UpDownPopup" Grid.Row="1" IsOpen="False" StaysOpen="False" Placement="Bottom"
+                 PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=NumberBox}}">
+            <Grid Name="PopupContentRoot" Padding="6" CornerRadius="{ThemeResource OverlayCornerRadius}"
+                  Background="{ThemeResource NumberBoxPopupBackground}" BorderBrush="{ThemeResource NumberBoxPopupBorderBrush}"
+                  BorderThickness="{ThemeResource NumberBoxPopupBorderThickness}">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <RepeatButton Name="PopupUpSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Margin="0,0,0,4">
+                <Path Data="M 1,4.5 L 5,0.5 L 9,4.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+              </RepeatButton>
+              <RepeatButton Name="PopupDownSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Grid.Row="1">
+                <Path Data="M 1,0.5 L 5,4.5 L 9,0.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+              </RepeatButton>
+            </Grid>
+          </Popup>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundPointerOver}" />
+            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{ThemeResource TextControlBorderBrushPointerOver}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsKeyboardFocusWithin" Value="True">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundFocused}" />
+            <Setter TargetName="OuterBorder" Property="BorderThickness" Value="{ThemeResource TextControlBorderThemeThicknessFocused}" />
+            <Setter TargetName="BottomEdge" Property="Background" Value="{ThemeResource TextControlBorderBrushFocused}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundFocused}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="OuterBorder" Property="Background" Value="{ThemeResource TextControlBackgroundDisabled}" />
+            <Setter TargetName="OuterBorder" Property="BorderBrush" Value="{ThemeResource TextControlBorderBrushDisabled}" />
+            <Setter TargetName="BottomEdge" Property="Background" Value="{ThemeResource TextControlBorderBrushDisabled}" />
+            <Setter TargetName="HeaderContentPresenter" Property="Foreground" Value="{ThemeResource TextControlHeaderForegroundDisabled}" />
+            <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundDisabled}" />
+            <Setter Property="CaretBrush" Value="{ThemeResource TextControlForegroundDisabled}" />
+          </Trigger>
+          <Trigger Property="SpinButtonPlacementMode" Value="Inline">
+            <Setter TargetName="InlineSpinners" Property="Visibility" Value="Visible" />
+          </Trigger>
+          <Trigger Property="SpinButtonPlacementMode" Value="Hidden">
+            <Setter TargetName="InlineSpinners" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="PopupIndicator" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="SpinButtonPlacementMode" Value="Compact">
+            <Setter TargetName="InlineSpinners" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="PopupIndicator" Property="Visibility" Value="Visible" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="SpinButtonPlacementMode" Value="Compact" />
+              <Condition Property="IsKeyboardFocusWithin" Value="True" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="UpDownPopup" Property="IsOpen" Value="True" />
+          </MultiTrigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="NumberBox" BasedOn="{StaticResource DefaultNumberBoxStyle}" />
 </ResourceDictionary>

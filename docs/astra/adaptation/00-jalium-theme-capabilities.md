@@ -16,6 +16,7 @@
 | S0-d 标记里写 `VisualStateManager` | **不能，两种写法都抛异常** | 模板改走 `ControlTemplate.Triggers` |
 | S0-e 编译期 `JalxamlPage` 产出字典 | **产出 0 个类型** | 字典保持 Embedded + `XamlReader.Load` |
 | S0-g `Trigger` 条件能匹配什么值 | **`{x:Null}` 能、`Value=""` 不能**（ComboBox 批实测） | 判据必须换成有非空表示的属性 |
+| S0-h 原生控件到底有没有默认外观 | **有：代码构建的 `ControlTemplate`，不是样式**（NumberBox 批实测） | 重模板可行，普查里"自绘"与"0 个有默认样式"两句话要分开读 |
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 
 ## S0-a：主题切换的真实驱动
@@ -251,3 +252,32 @@ Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
 
 同时补一条控件级实测：ComboBox 的占位符不是独立可视元素，框架把占位串塞进 `SelectionBoxItem`
 （`SelectedIndex=-1` 时读回 `"Pick one"`），所以"没有选中项"这件事在 `SelectionBoxItem` 上没有 null 表示。
+
+## S0-h：原生控件自带的是"模板"，不是"样式"（NumberBox 批，2026-09-18）
+
+一个全新 `Jalium.UI.Controls.NumberBox` 挂上屏后：`Style` 是 null、`Template` 却非 null，树里已经
+有 `OuterBorder` / `PART_LayoutRoot` / `PART_ContentHost` / `PART_UpSpinButton` / `PART_DownSpinButton`，
+而 `Template` 上读不到本地值。也就是说 `adaptation/01` 那句"163 个控件 0 个有框架默认样式"是对的，
+但它推不出"这些控件没有外观"，更推不出 `adaptation/05` 里"NumberBox 自绘，模板只能改外围"——
+带 `Template` setter 的样式实测能把整套默认外观换掉（`ReferenceEquals(box.Template, ours) == true`，
+哨兵色进像素）。**判"能不能重模板"要看 `Control.Template` 能否被样式替换，不要看有没有样式。**
+
+换模板之后必须守住的三条框架契约（都有断言，见 `audits/numberbox.md`）：
+
+1. 文本宿主只能长在**面板**上：名为 `PART_ContentHost` 的元素是 `Grid` 时框架才把 `TextBoxContentHost`
+   嫁接进去；换成 `ContentPresenter` 就不嫁接，捕获直接塌成 2 个颜色。
+2. 框架会在它认识的部件名上写**本地值**：`PART_UpSpinButton` 拿到本地 `BorderThickness=1,0,0,0` 与
+   `CornerRadius=0,4,0,0`（圆角的 4 来自控件自己的 `ControlCornerRadius`，即我们的令牌在驱动它）。
+   本地值压过样式 setter 与模板格子，所以上游 `NumberBoxSpinButtonBorderThickness`（`0,1,1,1`）到不了。
+3. 换模板之后 `SpinButtonPlacementMode` 不再被框架处理：三种取值来回切，我们的部件毫无反应，
+   可见性与弹层只能由模板格子自己实现。
+
+另外三条与探针方法直接相关：
+
+- **裸模板不水合条件。** 把单独的 `ControlTemplate` 交给 `XamlReader.Parse`，每个 `Trigger.Property`
+  读回 null，连 `IsEnabled=False` 都不触发；同一标记放进 `ResourceDictionary → Style → Setter → 内联模板`
+  的生产形状就全部正常。第一轮据此得到的"枚举条件永不匹配"是探针伪影，已作废。
+- **枚举条件会触发。** 生产形状下 `Trigger Property="SpinButtonPlacementMode" Value="Hidden"` 实测改掉了
+  部件可见性，`Trigger Property="Header" Value="Count"`（Object 属性配字符串）也会命中。
+- **同一目标上后写的格子赢。** 探针里 Compact 格被更靠后的 Header 格压掉，看起来像"条件不匹配"。
+  写断言时要么让每格只碰自己的目标，要么按文档顺序断言优先级。

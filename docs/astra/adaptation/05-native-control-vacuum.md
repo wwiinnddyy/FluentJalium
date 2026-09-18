@@ -9,16 +9,21 @@
 | Jalium public 具体 `Control` 类型 | 163 |
 | ModernWpf 承诺覆盖的控件名（并集） | 84 |
 | 其中 Jalium 有同名原生类型（可走样式层） | 56 |
-| 其中我们已声明隐式样式 | 11 |
-| **其中真空，且无自有类型顶替** | **43** |
+| 其中我们已声明隐式样式 | 13 |
+| **其中真空，且无自有类型顶替** | **41** |
 | 其中真空但已有自有类型顶替 | 2 |
 | ModernWpf 得自己写类型、Jalium 也无同名原生类型 | 28 |
 | Jalium 独有、不在这份范围内（只标注，不还原） | 106 |
 | 我们已样式、但 ModernWpf 无同名文件（按别名/内联实现） | 1 |
 
-## A. 真空：范围内、Jalium 有原生类型、我们还没有样式（43）
+## A. 真空：范围内、Jalium 有原生类型、我们还没有样式（41）
 
 绘制方式列只说明**能不能**靠模板解决；排批顺序仍以"底座先于叶子"为准（见 ROADMAP D 节）。
+
+这一列是启发式：类型重写了 OnRender 或 OnPaint 就记作"自绘"。NumberBox 批实测它会把话说死——
+`NumberBox` 重写绘制，却仍带一个可替换的代码构建 `ControlTemplate`（样式 setter 换得动，
+见 `adaptation/00` S0-h 与 `audits/numberbox.md`）。**排到某个控件时先量一遍再决定要不要自有类型，
+不要把这一列当结论。**
 
 | 控件 | 绘制方式 | ModernWpf 放在哪一层 |
 |---|---|---|
@@ -47,12 +52,10 @@
 | MenuBar | 自绘，模板只能改外围 | Controls |
 | MenuItem | 自绘，模板只能改外围 | Styles |
 | NavigationWindow | 纯模板，可完全覆盖 | Styles |
-| NumberBox | 自绘，模板只能改外围 | Controls |
 | ProgressBar | 自绘，模板只能改外围 | Styles |
 | ResizeGrip | 自绘，模板只能改外围 | Styles |
 | RichTextBox | 自绘，模板只能改外围 | Styles |
 | ScrollBar | 自绘，模板只能改外围 | Styles |
-| ScrollViewer | 自绘，模板只能改外围 | Styles |
 | Separator | 自绘，模板只能改外围 | Styles |
 | SplitButton | 纯模板，可完全覆盖 | Controls |
 | StatusBar | 自绘，模板只能改外围 | Styles |
@@ -66,9 +69,9 @@
 | UserControl | 纯模板，可完全覆盖 | Styles |
 | Window | 自绘，模板只能改外围 | Styles |
 
-## B. 已上隐式样式（11）
+## B. 已上隐式样式（13）
 
-'Button' 'CheckBox' 'ComboBox' 'HyperlinkButton' 'PasswordBox' 'RadioButton' 'RepeatButton' 'Slider' 'TextBox' 'ToggleButton' 'ToolTip'
+'Button' 'CheckBox' 'ComboBox' 'HyperlinkButton' 'NumberBox' 'PasswordBox' 'RadioButton' 'RepeatButton' 'ScrollViewer' 'Slider' 'TextBox' 'ToggleButton' 'ToolTip'
 
 ## C. 真空但已有自有类型顶替（2）
 

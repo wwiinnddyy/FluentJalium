@@ -76,7 +76,7 @@
       "page": "inputs",
       "parity": "audited",
       "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
-      "gaps": [ "12 of the 25 upstream rows have no property to read here: 4 placeholder rows (no PlaceholderText) and 8 delete-button rows (no such part)", "the elevation border pair is a documented value substitution, not upstream's gradient", "the disabled text colour is the framework's own local grey, not our token", "typing, selection, caret and IME paths unmeasured", "the focused cell is read back from a real Focus() but never captured to pixels" ]
+      "gaps": [ "4 of the 25 upstream rows have no property to read here: the placeholder family, because TextBox and PasswordBox have no PlaceholderText", "the eight delete-button rows now exist as rows but are read by the NumberBox spin buttons, not by these two controls", "the elevation border pair is a documented value substitution, not upstream's gradient", "the disabled text colour is the framework's own local grey, not our token", "typing, selection, caret and IME paths unmeasured", "the focused cell is read back from a real Focus() but never captured to pixels" ]
     },
     {
       "markup": "PasswordBox",
@@ -85,6 +85,14 @@
       "parity": "audited",
       "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
       "gaps": [ "the type is drawn by the framework, so only native properties are styled and the focused accent border goes all the way round", "its resting Background reads back as the framework's own #D9FFFFFF, so no surface claim is made for any of its three states", "no reveal button, so upstream's reveal glyph and its state are absent", "no pixel assertion" ]
+    },
+    {
+      "markup": "NumberBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/numberbox.md", "tests/FluentJalium.Tests/AstraNumberBoxTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "5 of the 13 upstream NumberBox* keys have no row here: 4 are x:Double metrics this reader cannot parse and ride as literals, 1 has no second element to land on", "upstream's template-local RepeatButton* alias block is read through its targets instead, because those names belong to the RepeatButton control at application scope", "the spinner popup opens on focus, not on tapping the indicator: tapping needs code", "the header text element carries the framework's own local foreground, so the header rows are written and may not reach the pixels", "no real pointer or touch drives hover or press on the spin buttons" ]
     },
     {
       "markup": "Slider",

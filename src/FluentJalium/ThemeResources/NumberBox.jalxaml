@@ -1,0 +1,43 @@
+<!-- WinUI 3 NumberBox resources @19e3bdc3c (MIT). Upstream sources:
+       controls/dev/NumberBox/NumberBox_themeresources.xaml  blob 3b532d4b  13 keys
+       controls/dev/NumberBox/NumberBox.xaml                 blob d70025ee  the template, incl. its local
+                                                                             RepeatButton* alias block
+     The themeresources file has Light / Default / HighContrast scopes with the same six keys in each; Light and
+     Default are identical row for row, so one flat alias set carries them, as in every other control dictionary
+     here.
+     Of the 13 NumberBox* keys, 8 are transcribed and 5 are not: NumberBoxPopupHorizonalOffset -21,
+     NumberBoxPopupVerticalOffset -27, NumberBoxPopupShadowDepth 16 and NumberBoxMinWidth 120 are x:Double rows,
+     and this reader cannot parse an x:Double resource at all (adaptation/00), so those four values ride as
+     literals in Styles/TextInput.jalxaml. NumberBoxPopupShadowDepth additionally has no surface to land on:
+     upstream sets it as Popup ShadowDepth in code, and this runtime has no ThemeShadow on a Popup. The fifth,
+     NumberBoxPopupIndicatorMargin, is listed below the metrics. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Metrics (Thickness rows parse fine). -->
+  <Thickness x:Key="NumberBoxSpinButtonBorderThickness">0,1,1,1</Thickness>
+  <Thickness x:Key="NumberBoxIconMargin">10,0,0,0</Thickness>
+  <Thickness x:Key="NumberBoxPopupBorderThickness">1</Thickness>
+  <Thickness x:Key="NumberBoxPopupSpinButtonBorderThickness">0</Thickness>
+  <!-- Not transcribed: NumberBoxPopupIndicatorMargin (0,0,8,0). Upstream puts it on the indicator inside the
+       inner TextBox style and the other margin on the outer one; this runtime has one indicator element, so a
+       second margin row would have no consumer and the key-consumption gate would fail it. -->
+  <!-- Popup surface.
+       Deviation (value): upstream paints NumberBoxPopupBackground with AcrylicBackgroundFillColorDefaultBrush,
+       an AcrylicBrush. This runtime has no AcrylicBrush type at all, so the popup wears the same solid flyout
+       surface the ComboBox dropdown and FlyoutPresenter use - upstream's own FallbackColor route, one step
+       further along because that fallback (#F9F9F9) is what our FlyoutPresenterBackground already carries. -->
+  <StaticResource x:Key="NumberBoxPopupIndicatorForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="NumberBoxPopupBackground" ResourceKey="FlyoutPresenterBackground" />
+  <StaticResource x:Key="NumberBoxPopupBorderBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
+  <StaticResource x:Key="NumberBoxPopupSpinButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <!-- Not transcribed: the template-local RepeatButton* alias block (10 rows). Upstream declares it inside the
+       NumberBox template's own Grid.Resources - twice - precisely because those names belong to the RepeatButton
+       control, and this runtime has no template-local scope that survives a theme flip: every dictionary here
+       merges at application level. Measured by the first run of this batch - declaring RepeatButtonBackground /
+       Foreground / BorderBrush here clobbered ThemeResources/RepeatButton.jalxaml's own rows (it loads earlier in
+       the manifest) and two AstraButtonTests pixel claims failed. The same ten values are therefore read
+       through the upstream targets the alias forwards to (TextControlButton*, now in TextBox.jalxaml) straight
+       from the spin-button cells in Styles/TextInput.jalxaml, and the resting fill goes to
+       ControlFillColorTransparentBrush because upstream's TextControlButtonBackground is defined nowhere in the
+       checkout. What an app that overrides RepeatButtonBackground gets is: the ordinary repeat buttons, not the
+       NumberBox spinners - upstream's local scope would have given it the spinners. -->
+</ResourceDictionary>

@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private bool _loaded;
     private int _buttonCount;
     private int _repeatCount;
+    private string? _startPageId;
 
     private FluentNavigationView Navigation => (FluentNavigationView)NavigationRoot!;
     private Grid ContentHost => (Grid)PageHost!;
@@ -68,7 +69,11 @@ public partial class MainWindow : Window
 
         FluentThemeManager.Changed += ApplyAppearance;
         ApplyAppearance();
-        Loaded += (_, _) => _loaded = true;
+        Loaded += (_, _) =>
+        {
+            _loaded = true;
+            if (_startPageId is { } pageId) NavigateToPage(pageId);
+        };
         SystemSettingsChanged += (_, _) => FluentThemeManager.ApplyTheme(_theme);
         ((FrameworkElement)Content!).SizeChanged += (_, args) =>
             ContentHost.Margin = new Thickness(args.NewSize.Width < 720 ? 16 : 24);
@@ -238,6 +243,23 @@ public partial class MainWindow : Window
     }
 
     private void Select(FluentNavigationItem item) => Navigation.SelectedItem = item;
+
+    /// <summary>Page id to mount on start-up instead of Overview. Must be set before Show().</summary>
+    public void SetStartPage(string pageId) => _startPageId = pageId;
+
+    public void NavigateToPage(string pageId)
+    {
+        foreach (var pair in _pageIds)
+        {
+            if (string.Equals(pair.Value, pageId, StringComparison.OrdinalIgnoreCase))
+            {
+                Select(pair.Key);
+                return;
+            }
+        }
+
+        Report($"\"{pageId}\" is not a gallery page id. Options: {string.Join(", ", _pageIds.Values)}.");
+    }
 
     private void OnNavigationChanged(object? sender, FluentNavigationSelectionChangedEventArgs args)
     {

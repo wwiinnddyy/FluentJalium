@@ -27,6 +27,29 @@ FluentJalium 不是在重模板，**FluentJalium 就是这套控件的主题本�
 心智模型应当从「WinUI 样式覆盖 Jalium 样式」改成「我们提供 100% 的外观」，
 这正是 ModernWpf 的 `ControlsResources.xaml` 所处的位置。
 
+### 更正（NumberBox 批实测）：零默认样式 ≠ 零默认外观
+
+上面那段话被下一句读歪过：`no-default-style=163` 只说明**没有样式表**，
+不代表控件上屏是白纸。实测 `new NumberBox()`（未赋 Style、未进窗口）：
+
+```
+Style    == null
+Template != null      （且 Template 上没有本地值，是代码赋的）
+模板部件： OuterBorder / PART_LayoutRoot / PART_ContentHost
+           / PART_UpSpinButton / PART_DownSpinButton
+```
+
+也就是说框架为模板控件**在代码里构建了默认 `ControlTemplate`**。它照样能被
+`Style` 的 `Template` setter 整个换掉（我们换掉了，见 `audits/numberbox.md`），
+但它存在这件事本身改变了两条判断：
+
+1. 普查表里"自绘 / 模板绘制"那一列（`05-native-control-vacuum.md`）是
+   `OnRender`/`OnPaint` 反射启发式，它把 NumberBox 记成"自绘、模板只能改外围"——**错的**。
+   该表已加免责声明，计数也随之从 `done=11 HARDGAPS=43` 修正为 `done=13 HARDGAPS=41`。
+2. "我们提供 100% 的外观"仍然成立，但它是**我们的选择**而不是**唯一的出路**：
+   对代码构建模板的控件，换模板是覆盖已有外观，不是从无到有。
+   判断能不能重模板要测 `Template != null`，不能测 `Style != null`。
+
 ## 结论 2：应用级隐式样式确实落到原生控件上
 
 没有 Generic 主题不等于没有隐式样式查找。实测（代码构造 `Style` 塞进

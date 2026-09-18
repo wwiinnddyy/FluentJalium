@@ -1,10 +1,12 @@
 <!-- WinUI 3 TextBox_themeresources.xaml @19e3bdc3c (MIT), blob 6934b646465eb602218f2ebf950268ac689ea33c.
-     The Light/Default branch carries 25 alias rows. 13 of them have a consumer on this runtime's TextBox or
-     PasswordBox and are transcribed here under upstream's names; 12 do not and stay undeclared, listed at the
-     bottom of audits/textbox-passwordbox.md with the property that would have to exist to read them.
+     The Light/Default branch carries 25 alias rows. 21 of them now have a consumer and are transcribed here
+     under upstream's names; the 4 that do not are listed at the bottom with the property that would have to
+     exist to read them. The eight TextControlButton* rows arrived with the NumberBox batch (they paint the
+     delete button upstream's text controls have no part for, and the spin buttons NumberBox does) - see
+     audits/textbox-passwordbox.md and audits/numberbox.md.
      PasswordBox has no alias block of its own: upstream's PasswordBox style consumes this same TextControl*
      family (controls/dev/CommonStyles/PasswordBox_themeresources.xaml), so one dictionary serves both, as it
-     does upstream. Three rows needed a substitution - the only three in the batch - and each says so inline. -->
+     does upstream. Three rows needed a value substitution and each says so inline. -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <!-- Metrics from Common_themeresources.xaml @19e3bdc3c. TextControlThemeMinHeight 32 and
        TextControlThemeMinWidth 64 are x:Double rows in DensityStyles and this reader cannot parse an x:Double
@@ -39,11 +41,34 @@
        and the Light theme loses upstream's near-white disabled text. -->
   <StaticResource x:Key="TextControlForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
   <StaticResource x:Key="TextControlSelectionHighlightColor" ResourceKey="AccentFillColorSelectedTextBackgroundBrush" />
+  <!-- Header rows: TextBox and PasswordBox have no Header property, so nothing here could read them until the
+       NumberBox batch, whose template carries a header presenter. Upstream consumes both names in its TextBox
+       style (Controls/dev/CommonStyles/TextBox_themeresources.xaml:259,335) but defines neither in this
+       checkout - grep for x:Key="TextControlHeaderForeground" hits 0 - so the values follow what WinUI renders:
+       the primary text token at rest, the disabled token when the control is off. -->
+  <Thickness x:Key="TextBoxTopHeaderMargin">0,0,0,8</Thickness>
+  <StaticResource x:Key="TextControlHeaderForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TextControlHeaderForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- The eight delete-button rows upstream's TextBox template paints. The text controls still have no part for
+       them; the NumberBox spin buttons do, and upstream routes those through exactly this family (its
+       RepeatButtonBackground -> TextControlButtonBackground alias), so they are transcribed here under
+       upstream's names and consumed by ThemeResources/NumberBox.jalxaml.
+       Deviation (name): upstream points the three border rows at ControlFillColorTransparent, a key with no
+       "Brush" suffix that this checkout does not define either; our palette brush is ControlFillColorTransparentBrush. -->
+  <StaticResource x:Key="TextControlButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TextControlButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="TextControlButtonBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="TextControlButtonBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="TextControlButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="TextControlButtonForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TextControlButtonForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TextControlButtonForegroundPressed" ResourceKey="TextFillColorTertiaryBrush" />
   <!-- Not transcribed, with the measured reason for each:
        TextControlPlaceholderForeground / PointerOver / Focused / Disabled (4) - TextBox and PasswordBox have
        no PlaceholderText property (ComboBox, AutoCompleteBox, NumberBox, DatePicker and TimePicker all do;
        the text controls do not), so there is no placeholder element to paint.
-       TextControlButtonBackgroundPointerOver / Pressed, TextControlButtonBorderBrush / PointerOver / Pressed,
-       TextControlButtonForeground / PointerOver / Pressed (8) - these paint the delete button upstream puts in
-       the template. Neither control exposes a part or state for it here. -->
+       TextControlButtonBackground (1) - upstream's NumberBox alias points at this name and no row with it
+       exists anywhere in the checkout (grep for x:Key="TextControlButtonBackground" hits 0), so the resting
+       spin-button fill upstream paints is an unresolved resource, i.e. nothing. ThemeResources/NumberBox.jalxaml
+       carries the alias to a transparent brush instead and says so. -->
 </ResourceDictionary>

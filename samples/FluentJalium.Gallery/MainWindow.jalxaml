@@ -157,6 +157,22 @@
                            TextWrapping="Wrap" MinLines="3" MaxLines="6" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Number boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <NumberBox x:Name="PlainNumberBox" Header="Quantity" PlaceholderText="Any number" Value="3"
+                             MaxWidth="440" HorizontalAlignment="Stretch" />
+                  <NumberBox Minimum="0" Maximum="10" SmallChange="1" LargeChange="5" Value="4"
+                             SpinButtonPlacementMode="Inline" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <NumberBox SpinButtonPlacementMode="Compact" Value="7" Header="Compact spinners"
+                             MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <NumberBox IsEnabled="False" Value="12" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <TextBlock Text="These four wear the implicit NumberBox style: the surface, border and spinner fills come from the transcribed TextControl* and NumberBox* rows, and the spinner popup in the compact box opens when the control takes keyboard focus."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                  <TextBlock Text="Not claimed here: the spinner border is the framework's own local value, the header text keeps a local colour the tokens cannot reach, and nothing on this page was measured on screen."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="Choices and values" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
                 <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">

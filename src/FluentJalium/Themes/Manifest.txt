@@ -13,6 +13,7 @@ ThemeResources/HyperlinkButton.jalxaml
 ThemeResources/CheckBox.jalxaml
 ThemeResources/RadioButton.jalxaml
 ThemeResources/TextBox.jalxaml
+ThemeResources/NumberBox.jalxaml
 ThemeResources/Slider.jalxaml
 ThemeResources/ComboBox.jalxaml
 Styles/Common.jalxaml
