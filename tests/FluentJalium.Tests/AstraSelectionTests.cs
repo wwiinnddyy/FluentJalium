@@ -108,8 +108,8 @@ public sealed class AstraSelectionTests
                 ToggleButton.IsCheckedProperty, "True"));
             // Same measured form on the pointer side: after the upstream rewiring every hover cell is a
             // cell of the check matrix, so the boolean arrives inside a MultiTrigger condition.
-            Assert.True(triggers.OfType<MultiTrigger>().SelectMany(static multi => multi.Conditions.Cast<Condition>())
-                .Any(static condition => condition.Property == ToggleButton.IsMouseOverProperty && condition.Value is true));
+            Assert.Contains(triggers.OfType<MultiTrigger>().SelectMany(static multi => multi.Conditions.Cast<Condition>()),
+                static condition => condition.Property == ToggleButton.IsMouseOverProperty && condition.Value is true);
         });
     }
 
@@ -352,6 +352,33 @@ public sealed class AstraSelectionTests
     }
 
     /// <summary>
+    /// Radio exclusivity is the one piece of behaviour a retemplated radio cannot inherit from its own
+    /// template, and the catalog carried it as unmeasured. Read as a measurement, not an assumption:
+    /// a plain panel is the group, and the loser is released without anyone having to clear it.
+    /// </summary>
+    [Fact]
+    public void A_shared_parent_panel_is_the_radio_group()
+    {
+        _fixture.Run(() =>
+        {
+            var first = new RadioButton { Content = "first" };
+            var second = new RadioButton { Content = "second" };
+            var panel = new StackPanel();
+            panel.Children.Add(first);
+            panel.Children.Add(second);
+            PixelHarness.Build(panel, 200, 72);
+
+            first.IsChecked = true;
+            Assert.True(first.IsChecked);
+            Assert.False(second.IsChecked);
+
+            second.IsChecked = true;
+            Assert.True(second.IsChecked);
+            Assert.False(first.IsChecked);
+        });
+    }
+
+    /// <summary>
     /// The property a setter writes, in either of the two forms the parser produces. A setter whose
     /// target property exists on the style's own type (Background, Width) is resolved at parse time and
     /// arrives as a DependencyProperty; one that only exists on the named part (Shape.Fill, Shape.Stroke)
@@ -378,7 +405,7 @@ public sealed class AstraSelectionTests
         _ => false,
     };
 
-    private static string? Form(object? value) => value?.ToString() ?? "<null>";
+    private static string Form(object? value) => value?.ToString() ?? "<null>";
 
     private static void AssertTriggerSetter(List<object> triggers, DependencyProperty property, string? expected, string setterProperty, string resourceKey)
     {
@@ -392,7 +419,7 @@ public sealed class AstraSelectionTests
     {
         var wanted = conditions.Select(static condition => (condition.Property, Form(condition.Expected))).ToArray();
         var trigger = triggers.OfType<MultiTrigger>().FirstOrDefault(candidate =>
-            candidate.Conditions.Cast<Condition>().Select(static condition => (condition.Property, Form(condition.Value)))
+            candidate.Conditions.Cast<Condition>().Select(static condition => (condition.Property!, Form(condition.Value)))
                 .SequenceEqual(wanted))
             ?? throw new InvalidOperationException($"No multi-trigger for {label}.");
         AssertSetter(trigger, setterProperty, resourceKey);
@@ -407,7 +434,7 @@ public sealed class AstraSelectionTests
         Assert.Equal(resourceKey, key);
     }
 
-    private static object? FindCell(List<object> triggers, (string Property, string Value)[] conditions, string label)
+    private static object FindCell(List<object> triggers, (string Property, string Value)[] conditions, string label)
     {
         var wanted = conditions.Select(static condition => (condition.Property, condition.Value)).ToArray();
         return triggers.FirstOrDefault(candidate => Conditions(candidate).SequenceEqual(wanted))
@@ -417,8 +444,8 @@ public sealed class AstraSelectionTests
 
     private static IEnumerable<(string Property, string Value)> Conditions(object trigger) => trigger switch
     {
-        MultiTrigger multi => multi.Conditions.Cast<Condition>().Select(static condition => (condition.Property.Name, Form(condition.Value))),
-        Trigger single => [(single.Property.Name, Form(single.Value))],
+        MultiTrigger multi => multi.Conditions.Cast<Condition>().Select(static condition => (condition.Property!.Name, Form(condition.Value))),
+        Trigger single => [(single.Property!.Name, Form(single.Value))],
         _ => [],
     };
 

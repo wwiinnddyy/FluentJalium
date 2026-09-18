@@ -108,7 +108,7 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
-      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "grouping and keyboard navigation unmeasured", "the selection page is not measured on screen" ]
+      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen" ]
     },
     {
       "markup": "ComboBox",

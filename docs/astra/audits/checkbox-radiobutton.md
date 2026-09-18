@@ -130,16 +130,17 @@ CheckBox 的 `Padding` 由 `CheckBoxPadding` 行驱动。
 
 ## 四类证据
 
-1. **构建/闸口**：`tools/Test-AstraGates.ps1` 串行全绿 —— **81 通过 / 0 失败 / 0 跳过**，
+1. **构建/闸口**：`tools/Test-AstraGates.ps1` 串行全绿 —— **82 通过 / 0 失败 / 0 跳过 / 0 警告**，
    调色板漂移三侧 `checked=True`（Light/Dark 各 83 源色 102 brush；HC 仍扣住 3 个海拔渐变键，正是上面替换的那一族）。
 2. **结构闸口新增**：`Transcribed_control_rows_are_read_by_a_template`（Theory，已列入 CheckBox 与
    RadioButton）——逐行反查"声明的别名行有没有模板真的读它"。两份文件里 72+40 行全部有消费点，
    与 `Every_referenced_key_is_declared` 合起来构成双向集合相等。后面每一批把新文件加进 Theory 即可。
-3. **行为**：`AstraSelectionTests` 14 项全绿（本段新增 7 项）——7 个触发格的键名矩阵（每格 7 槽 +
+3. **行为**：`AstraSelectionTests` 15 项全绿（本段新增 8 项）——7 个触发格的键名矩阵（每格 7 槽 +
    点尺寸 + 只有 Checked 格允许露点）与本体格一起覆盖 8 格、
    Unchecked 本体落 `ControlAltFillColorSecondary`/`ControlStrongStrokeColorDefault`、
    Checked 环落 `AccentFillColorDefault` 且点描边落替换目标、Disabled+Checked 保留点并退到
-   `AccentFillColorDisabled`，外加两个控件的 `MinWidth=120`。
+   `AccentFillColorDisabled`，外加两个控件的 `MinWidth=120`，以及RadioButton 的互斥：
+   共用一个父面板即成组，后选的把先选的放开，不需要有人显式清（`A_shared_parent_panel_is_the_radio_group`）。
    三态与 `{x:Null}` 的旧断言（步 11 建的）一并复核：格矩阵化后 `IsMouseOver` 只出现在
    `MultiTrigger` 条件里，断言随之改形（不是放宽——仍然要求值的类型是 `Boolean`）。
 4. **视觉**：`A_checked_radio_button_paints_the_accent_ring_to_pixels` —— 覆盖
@@ -159,6 +160,8 @@ CheckBox 的 `Padding` 由 `CheckBoxPadding` 行驱动。
 
 ## Known Gaps（不许用相邻证据替代）
 
+- **勾形的像素证据只到"出现"**：没有做"未勾选时该哨兵色一个像素都不出现"的负控——那次连拍两次的
+  尝试顶穿了 60 秒看门狗（见上），所以正负两半目前分属两次测量，负的一半没做。
 - **没有真指针输入证据**：8 格里 `PointerOver`/`Pressed` 目前只有键名与结构断言，
   没有 SendInput 真 hover/press 落到像素（任务 #13）。触摸路径未测，键盘 Space/方向键未测。
 - **Gallery 选择页未上屏**：`MinWidth` 120 与 `Padding` 驱动的间距改变只由离屏像素与结构断言覆盖，

@@ -108,7 +108,7 @@ internal static class PixelHarness
         {
             var child = VisualTreeHelper.GetChild(root, index);
             if (child is FrameworkElement element && element.Name == name) return element;
-            if (Named(child, name) is { } deeper) return deeper;
+            if (child is not null && Named(child, name) is { } deeper) return deeper;
         }
 
         return null;
