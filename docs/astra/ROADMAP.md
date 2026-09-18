@@ -58,10 +58,11 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
   表达；动效允许 `Storyboard`+`BeginStoryboard`（public，能力比 `00` 里假设的强）。
   维护一张 `WinUI VisualState → Jalium trigger` 映射表，等同 ModernWpf 的
   `winui-visualstate-setters-audit.md`。
-- **B4 像素回归基座**（把"像素级"变成可断言）：`tests/FluentJalium.Tests/Pixel`
-  封装 `Render(element,w,h) → 像素直方图`，三条通用断言：
-  (1) 哨兵 DP 色要出现在像素里；(2) 主题化控件像素里**不得出现品牌绿 `#207245`/`#1E793F`**；
-  (3) Light 与 Dark 的取样必须有差异。先做一次 RTB 与上屏合成的一致性核对 🬡。
+- **B4 像素回归基座 ✅（阶段 1）**：`tests/FluentJalium.Tests/Pixel/PixelHarness.cs` 给出
+  `Render`（形状与自绘控件）与 `Host`（**模板控件必须经窗口**，直接捕获是空像素）两条路径 +
+  颜色直方图。已落地断言：哨兵 DP 到像素、同一控件 Light↔Dark 像素分布不同；
+  "像素里不得出现品牌绿"对未样式化的原生 Slider/ProgressBar **今天还不成立**，
+  按天花板写成带理由的 `Skip`，随 D4/D6 批次转成断言。RTB 与上屏一致性仍未证 🬡。
 - **B5 动效令牌 🔺 现在是 reduced-motion 的前置**：模板过渡时长目前是标记里的字面量，
   删掉整树递归后 `ReduceMotion` 只能管住 Astra 自己代码驱动的动画（页面入场、导航指示器）。
   要做 `Metrics.jalxaml` 增加 `ControlFastDuration` 等时长/节拍令牌，
@@ -106,6 +107,8 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    窗口外壳。`02` 已证明 `ScrollBar` 认 DP，这一批是可做的。
 2. **Button 族**（纵向样板，锁流程）：Default/Accent/Subtle/Compound/Link/Repeat/Toggle +
    `SplitButton`；`DropDownButton` 无原生类型 → 自有类型开端。
+   起手就得修的一条（阶段 1 像素基座查出）：**模板根 Border 不吃本地 `Background`**，
+   WinUI 是 `{TemplateBinding Background}`；修完把 `AstraPixelTests` 的哨兵断言扩展到 Button。
 3. **文本录入**：`TextBox`、`PasswordBox`、`NumberBox`、`AutoSuggestBox`、`RichEditBox`。
 4. **选择**：**`CheckBox`/`RadioButton`（含 A4 冻结 glyph 实验）**、`ToggleSwitch`、`Slider`、
    `RatingControl`(自建)。

@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using System.Runtime.ExceptionServices;
 using FluentJalium.Themes;
 using Jalium.UI;
+using Jalium.UI.Interop;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests;
@@ -31,6 +33,10 @@ public sealed class AstraThemeRuntimeFixture : IDisposable
         _thread.Start();
         Run(() =>
         {
+            // Same order the documented startup sequence uses; the pixel tests need a render
+            // context on this thread, and it has to exist before the Application does.
+            RenderContext.GetOrCreateCurrent(RenderBackend.Auto).DefaultRenderingEngine = RenderingEngine.Impeller;
+            ThemeLoader.Initialize();
             Application = new Application();
             FluentThemeManager.Apply(Application, FluentThemeVariant.Light);
         });

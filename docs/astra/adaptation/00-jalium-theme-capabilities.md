@@ -211,5 +211,25 @@ Jalium.UI.Window.ThemeMode      [property]  Experimental(WPF0001)
    附带发现：xunit 每个测试换一个工作线程，因此夹具自带一条 STA 线程并串行投递，
    UI 线程守卫保持为真而不是为测试放宽。
 
+### 像素基座的三个新读数（`tests/FluentJalium.Tests/Pixel/PixelHarness.cs`）
+
+1. **直接 `RenderTargetBitmap.Render(visual)` 只吃自绘内容。** 裸 `Border` 的 40×40 实心底色
+   1600 px 全中；未挂窗口的原生 `Slider`/`ProgressBar` 也拿到了像素（见下面第 3 条）；
+   但一个**有模板**的 `Button`，即使 `IsVisible=True`、`IsLoaded=True`、`Template != null`、
+   `ActualWidth=200`，直接捕获仍是 8800 px 全黑——只有把 `Window` 本身交给 `Render`
+   才出得来 `#F5F5F7` 那类真实表面色。所以带模板的控件必须**经窗口捕获**，
+   harness 因此有 `Render`（自绘/形状）与 `Host`（模板）两条路径。
+2. **主题驱动到像素这一步已经证到**：同一颗 `Button` 经 `Host` 在 Light 与 Dark 下的
+   主色分布不同（`A_hosted_control_rasterises_and_changes_with_the_theme` 绿）。
+   这是本仓第一条"渲染输出随主题改变"的断言，不再只是字典里的值变了。
+3. **未样式化的原生 Slider/ProgressBar 仍涂品牌绿**：`Slider` 954 px `#207245`、
+   `ProgressBar` `#1D733C`–`#2B804A`。与 `02` 的 IL+DP 结论一致——框架没发布 Generic 主题，
+   这两个是自绘的。已写成 `Skip` 断言并注明是天花板而非回归。
+
+**顺带查出的一个 Astra 缺陷**：给 `Button` 设本地 `Background` 在像素里看不到
+（模板根 `Border` 没走 `TemplateBinding Background`）。WinUI 的 `Button` 根 Border 是跟随 `Background` 的，
+这条归阶段 2 的 Button 样板一起修，别丢。
+
 **仍未证**：`ThemeMode.System` 是否真的跟住 OS 切换（测试只断言赋值生效）；
-离屏 `RenderTargetBitmap` 与上屏合成是否逐像素一致（B4 先做一次性核对）。
+`Host` 捕获到的是 `RenderTargetBitmap` 里的窗口合成结果，与真正上屏的帧是否逐像素一致仍未核对
+（本机没有可用的截屏核对手段，见 AGENTS 之外的既有结论）。

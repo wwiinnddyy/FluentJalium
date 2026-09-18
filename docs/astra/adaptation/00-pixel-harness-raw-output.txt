@@ -1,0 +1,38 @@
+Pixel harness readings, 2026-09-18, Jalium.UI 26.10.9, Impeller, RenderTargetBitmap Bgr32 at 96 dpi.
+Produced by temporarily replacing the assertions in tests/FluentJalium.Tests/AstraPixelTests.cs with
+one Assert.Fail dump; the same file keeps the permanent assertions. Format: #RRGGBB x pixel-count.
+
+--- capture path A: PixelHarness.Render(element) - the visual in its own coordinate space ---
+bare Border, 40x40, Background = #FF00FF ............... #FF00FF x1600               (harness works)
+implicit Button, 200x44 ................................. #000000 x8800               (empty)
+Button with Style = GetStyle("DefaultButtonStyle") ...... #000000 x8800               (empty)
+Button with local Background = #FF00FF .................. #000000 x8800               (empty)
+TextBlock "astra", 120x24 ............................... #000000 x2880               (text not visible at this size)
+native Slider, 220x40, Value=50 ......................... #000000 x7840  #207245 x954  #226E44 x4  #2B5D42 x2
+native ProgressBar, 220x20, Value=50 .................... #000000 x2204  #2B804A x124  #1D733C x120  #1E743D x120
+                                                      ... #1F753E x120  #297E48 x120
+
+A templated control captured on its own is empty even when it is IsVisible=True, IsLoaded=True,
+Template != null and ActualWidth x ActualHeight = 200 x 44. Self-drawn controls (Slider, ProgressBar)
+do capture, and they show the framework's brand green - the 02-render-ceiling.md reading, now in pixels.
+
+--- capture path B: PixelHarness.Host(element) - through a shown 320x200 window ---
+Light, native Button "astra" ............................ #000000 x54176  #F5F5F7 x9680  #1D1D1F x30  #5B5B5D x19  #B7B7B9 x19
+Dark,  native Button "astra" ............................ #000000 x54176  #1C1C1E x9680  #FFFFFF x30  #BEBEBF x19  #5D5D5E x19
+
+The 9680 px region is 220 x 44 - the Button's own bounds - and it flips Light #F5F5F7 -> Dark #1C1C1E
+with the theme. Neither value appears anywhere in Light.jalxaml or Dark.jalxaml, so that region is
+painted by Jalium's default surface, not by an Astra token.
+
+--- attribution probe: does an Astra token drive those pixels? ---
+OverrideBrush("ControlFillColorDefaultBrush", #FF00FF) .. magenta pixels = 0, top colours unchanged
+then OverrideBrush(..., null) restore ................... top colours unchanged again
+Set local Background = #FF00FF on the same Button ....... magenta pixels = 0
+
+So within this capture path neither the palette token nor a local property value reaches the Button's
+pixels. Two readings remain open and stage 2 has to separate them:
+  (i) the implicit <Style TargetType="Button"> never applies to a native control, or
+  (ii) the capture happens before the style/template applies, and only the window's own surface is
+      painted by then - which would also explain the empty path-A captures.
+The Gallery renders as Astra, so (ii) is the more likely of the two, but it is unproven: it needs a
+capture taken after a dispatcher/layout tick, or a capture of the Gallery's own live window.
