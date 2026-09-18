@@ -97,6 +97,18 @@ internal static class PixelHarness
         return null;
     }
 
+    /// <summary>
+    /// Builds a control's tree inside the shown host and pumps frames, without rasterising anything.
+    /// For a claim about what the style pipeline produced (a part, an inherited brush) this is the
+    /// cheap path - and the only safe one for a subject that has no opaque surface: capturing a
+    /// text-only visual costs tens of seconds in this runtime and writes no pixels at all.
+    /// </summary>
+    internal static void Build(FrameworkElement element, int width, int height)
+    {
+        Place(element, width, height);
+        Pump(FramesPerRound);
+    }
+
     private static void Place(FrameworkElement element, int width, int height)
     {
         element.Width = width;

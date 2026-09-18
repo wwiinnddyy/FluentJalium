@@ -7,6 +7,9 @@ ThemeResources/FlyoutPresenter.jalxaml
 ThemeResources/ToolTip.jalxaml
 ThemeResources/TitleBar.jalxaml
 ThemeResources/Button.jalxaml
+ThemeResources/ToggleButton.jalxaml
+ThemeResources/RepeatButton.jalxaml
+ThemeResources/HyperlinkButton.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

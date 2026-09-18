@@ -194,6 +194,14 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    顺带量到一条判据规则：**状态变化后的断言必须重复捕获到两张图一致**，固定帧数会采到过渡中间值
    （实测 `#E482E4`），已写进 `adaptation/06`。按下/键盘/触摸仍无证据：`press` 模式会真按键、
    可能点到用户桌面上的任何东西，未经同意不运行。
+   **第二段（Toggle/Repeat/Hyperlink）也已落地**：另三份 blob 各自一份字典
+   （36/12/12 行别名，偏差 7/2/0），样式全部改吃各自的上游键名，`RepeatButton` 从"借用 Button 样式"
+   改成自己的 `DefaultRepeatButtonStyle`；勾选态与休息态都有了像素证据，文字色改走读回
+   （量到一条硬边界：**字形不在这条离屏捕获通路里**，只画文字的捕获写 0 像素并且能挂住 UI 线程，
+   基座因此加了不光栅化的 `PixelHarness.Build`）。三态的 12 条键按上游声明但**没有消费点**
+   （`{x:Null}` 能否被解析未测），与 `CheckBox` 三态并到选择批。
+   另记一条 API 形状：`ToggleButton`/`RepeatButton`/`ButtonBase` 在 `Jalium.UI.Controls.Primitives`，
+   `Button`/`HyperlinkButton` 在 `Jalium.UI.Controls`——抄 WinUI 的 using 清单会编译不过。
 3. **文本录入**：`TextBox`、`PasswordBox`、`NumberBox`、`AutoSuggestBox`、`RichEditBox`。
 4. **选择**：**`CheckBox`/`RadioButton`（含 A4 冻结 glyph 实验）**、`ToggleSwitch`、`Slider`、
    `RatingControl`(自建)。
@@ -230,7 +238,7 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 阶段 | 内容 | 出口 |
 |---|---|---|
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
-| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信；Button 第一段（Default/Accent/Subtle）审计 `audits/button.md` + 36 行别名转录 + 状态映射表（6 条触发器按键名断言）+ 布局默认值读回 + 禁用分支像素证据 + 换刷/过渡时序证据，全套 49/49 全绿 0 警告 0 skip；真指针悬停通路建立（`spike/PointerProbe`，一次性、不进闸口）。仍欠：按下/键盘/触摸的输入证据、Toggle/Repeat/Hyperlink 别名块、Button 的 Gallery 页、`SplitButton`/`DropDownButton` |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信；Button 两段（Default/Accent/Subtle + Toggle/Repeat/Hyperlink）审计 `audits/button.md` + **四份字典 96 行别名逐行身份断言**（82 行逐字、14 行偏差就地标注）+ 状态映射 19 条触发器按键名断言 + 布局/命名空间形状读回 + 休息/勾选/禁用/换刷四组像素证据 + 真指针悬停通路（`spike/PointerProbe`，一次性、不进闸口），全套 54/54 全绿 0 警告 0 skip。仍欠：按下/键盘/触摸的输入证据、三态通路、Button 的 Gallery 页、`SplitButton`/`DropDownButton` |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
 | 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar、Popup/FlyoutPresenter、ToolTip、ScrollViewer 宿主、条目宿主基面、窗口外壳（TitleBar 钩子 + 背衬普查）六项，审计在 `audits/{scrollbar,flyout-presenter,tooltip,scrollviewer,window-shell}.md` + `adaptation/09-item-host-base.md`；外壳新增 4 条行为/读回断言 + 2 条像素/高对比断言（`AstraWindowShellTests` 6 条），全套 44/44 全绿 0 skip，调色板 102 刷漂移 checked=True。仍欠：Thumb（与悬停/拖拽输入证据同批）、外壳的输入证据与材质合成；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
@@ -253,4 +261,9 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 - 不声称窗口外壳完成：标题栏只承接了框架 8 个钩子里的 6 个，悬停/按下/拖拽/三个点击事件无输入证据，`SystemBackdrop` 只钉住了枚举与默认 `None`，Mica/Acrylic 的合成效果本环境无法验证；返回键、窗格键、`Subtitle`、中央自定义内容、`ExtendsContentIntoTitleBar` 没有对应公开面（`audits/window-shell.md`）。
 - 不声称弹层是 acrylic 材质：`FlyoutPresenterBackground` 走的是上游自己的 `FallbackColor` 实底，
   运行时没有 `AcrylicBrush` 类型（见 `audits/flyout-presenter.md`）。
+- 不声称文字颜色有像素证据：**字形不在这条离屏捕获通路里**（只画文字的捕获写 0 像素、且慢到能挂住
+  UI 线程），文字色一律只证明到"生成出来的文字元素接上了调色板那个实例"这一层（`adaptation/06`）。
+  连带的：`Check_mark_follows_the_selected_accent` 名字过强，它证明的是勾选态的强调色**面**，
+  不是勾形本身——选择批重做这条归因。
+- 不声称 `ToggleButton` 三态可用：12 条 `*Indeterminate*` 键声明了但无消费点（`{x:Null}` 未测）。
 - 不声称硬件触摸笔与混合 DPI 已经过真机验证。

@@ -1,0 +1,50 @@
+<!-- WinUI 3 ToggleButton_themeresources.xaml @19e3bdc3c (MIT), blob 868646a15b5a5062046b1edcc003f44288793b52.
+     The Light/Default branch's 36 alias rows plus ToggleButtonBorderThemeThickness, transcribed so an app
+     overrides a toggle by upstream's name and never by ours. Every alias resolves to the palette object the
+     kernel re-tints in place, so the theme flip and the high-contrast decision travel through it
+     (audits/button.md). Seven rows are deviations, each marked below. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="ToggleButtonBorderThemeThickness">1</Thickness>
+  <StaticResource x:Key="ToggleButtonBackground" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundPressed" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="AccentFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="AccentFillColorTertiaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundCheckedDisabled" ResourceKey="AccentFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundIndeterminate" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundIndeterminatePointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundIndeterminatePressed" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="ToggleButtonBackgroundIndeterminateDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="TextOnAccentFillColorSecondaryBrush" />
+  <!-- Deviation 1: upstream points this at TextOnAccentFillColorDisabled, a Color, and this runtime has no
+       measured Color-to-Brush coercion in a Foreground slot. Same token, brush form. -->
+  <StaticResource x:Key="ToggleButtonForegroundCheckedDisabled" ResourceKey="TextOnAccentFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundIndeterminate" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundIndeterminatePointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundIndeterminatePressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleButtonForegroundIndeterminateDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Deviations 2 to 5: ControlElevationBorderBrush is a 3-DIP absolute gradient, which cannot ride the
+       in-place retint model (stops written with {ThemeResource} freeze at parse). The solid token upstream
+       itself presses under it is used instead; upstream's HighContrast branch makes these solid too. -->
+  <StaticResource x:Key="ToggleButtonBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushPointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushPressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- Deviations 6 and 7: AccentControlElevationBorderBrush, same reason. -->
+  <StaticResource x:Key="ToggleButtonBorderBrushChecked" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushCheckedPointerOver" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushCheckedPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushCheckedDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushIndeterminate" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushIndeterminatePointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushIndeterminatePressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ToggleButtonBorderBrushIndeterminateDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+</ResourceDictionary>

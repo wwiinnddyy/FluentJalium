@@ -1,4 +1,4 @@
-# 审计：Button 族（第一段：Default / Accent / Subtle）
+# 审计：Button 族（第一段 Default/Accent/Subtle + 第二段 Toggle/Repeat/Hyperlink）
 
 - 上游：`microsoft-ui-xaml` @ `19e3bdc3ccf3361393d623d3a5d2667cb8f33229`
   - `controls/dev/CommonStyles/Button_themeresources.xaml`，blob `e63c32389e599c2277061d9ce29483516e6927a3`
@@ -73,7 +73,44 @@
 
 **10 条遗留 `*ThemeBrush`（phone 时代）不声明**：上游自己的样式也不消费它们，与 ToolTip 那三条同一处置。
 
-## 两条新的框架事实（对后面每一批都管用）
+## 第二段：ToggleButton / RepeatButton / HyperlinkButton（另三份 blob）
+
+三个控件各自一份字典，各自一个 blob，不混进 `Button.jalxaml` 冒充同一份证据：
+
+| 新文件 | 上游 blob | 上游 Light 分支 | 逐字 | 偏差 |
+|---|---|---|---|---|
+| `ThemeResources/ToggleButton.jalxaml` | `868646a15b5a5062046b1edcc003f44288793b52` | 36 条别名 + `ToggleButtonBorderThemeThickness` | 29 | 7 |
+| `ThemeResources/RepeatButton.jalxaml` | `80add1b94686ed1e408ce05afde9d02249b5e229` | 12 条别名 + `RepeatButtonBorderThemeThickness` | 10 | 2 |
+| `ThemeResources/HyperlinkButton.jalxaml` | `93b5efd391803a229e63e55c315e5675fef4362e` | 12 条别名 + `HyperlinkButtonBorderThemeThickness` | 12 | **0** |
+
+偏差仍是同两类老原因（`…ForegroundCheckedDisabled` 的 Color→Brush；elevation 渐变改实底），
+每行在文件里就地标注。HyperlinkButton **一条偏差都没有**：它要的刷全在调色板里，
+包括 Button 家用不上的 `AccentTextFillColorDisabledBrush`。
+
+样式侧的处置：
+
+- `DefaultToggleButtonStyle` 从"直接吃调色板键"改吃 `ToggleButton*` 键，并把上游 `Checked` 家族
+  补齐（原来勾选态只有 Background/Foreground，现在三件套 + Checked×{PointerOver,Pressed,Disabled}
+  的 MultiTrigger 全带上游键名）。样式名与上游一致。
+- 新增 `DefaultRepeatButtonStyle`（上游同名），隐式 `RepeatButton` 从"借用 `DefaultButtonStyle`"
+  改成自己的样式：`RepeatButton*` 键与 `Button*` 键是**两套公开契约**，借用会让应用按上游名字
+  覆盖无效。上游这条样式自己吃 `ButtonBorderThemeThickness` 与 `ButtonPadding`，
+  那两个键因此仍只声明在 `Button.jalxaml` 里（跨文件依赖，不是重复）。
+- `DefaultHyperlinkButtonStyle` 不再 `BasedOn SubtleButtonStyle`，改为 `ButtonLayoutStyle` +
+  `HyperlinkButton*` 全家族。上游样式里 `Padding` 用 `{ThemeResource ButtonPadding}`
+  而同文件别处用 `{StaticResource …}`；我们统一按 `ButtonLayoutStyle` 的 `{StaticResource}` 走，
+  因为 `ButtonPadding` 不在主题分支里，`{ThemeResource}` 只会多一次无谓的解析。
+- **`IsChecked=null`（三态）不做**：12 条 `*Indeterminate*` 键全部声明（公开契约要原样给出），
+  但**没有消费点**——触发器要匹配 null 需要 `{x:Null}`，本运行时没有这项证据。
+  这条与 `CheckBox` 的三态是同一个问题，挪到选择批一次做穿（Known Gap 8）。
+
+一条命名空间事实（`The_button_family_is_split_across_two_namespaces` 逐条断言）：
+`Button`、`HyperlinkButton` 在 `Jalium.UI.Controls`，`ToggleButton`、`RepeatButton` 在
+**`Jalium.UI.Controls.Primitives`**（`ButtonBase` 也在 Primitives）——上游四个全在
+`Microsoft.UI.Xaml.Controls`。抄 WinUI 的 using 清单写出来的代码在这里编译不过，
+1.0 的 CLR API 清单要按运行时形状记。
+
+## 五条新的框架事实（对后面每一批都管用）
 
 1. **样式 setter 里的 `{ThemeResource X}` 存的是惰性引用**，不是刷对象：
    读 `Trigger.Setters[i].Value` 拿到的是 `DynamicResourceReference { ResourceKey = "X" }`。
@@ -85,6 +122,14 @@
    在首帧之后仍然采纳新的刷对象（`swap` 读数 `transitionedAdopted=True`，与无过渡模板一致）。
    代价是**捕获时机会采到中间值**——`#E482E4`（品红↔绿）就是这么来的。
    见 `audits/button-input-raw.txt` 与 `adaptation/06` 里"重复捕获直到两张图一致"那条规则。
+4. **触发器的 `Value` 保留标记里的字符串形态**：`Condition.Value` 读出来是 `"True"` 而不是 `true`，
+   所以按键匹配触发器要按文本比。运行时仍然拿它对上 `bool?` 属性——勾选态的像素断言就是证据
+   （`IsChecked=true` 的按钮整片显强调色）。
+5. **文字不在这条像素通路里**：只画文字的捕获写 0 个像素，而且慢到能挂住 UI 线程
+   （实测一次让 fixture 的 60 s 上限耗尽，连坐 4 条测试）；即使底下有不透明实底，
+   glyph 也不进直方图（红底 HyperlinkButton 的 8800 px 里 8788 是底色）。
+   结论：**像素断言只能断"面"，文字色必须走读回**（新增 `PixelHarness.Build`：建树、推帧、不光栅化）。
+   这一条限制的是测量通路，不是说上屏看不见字——Gallery 里字是看得见的。
 
 ## 指针输入通路（这一批建立，后面每一批都用）
 
@@ -108,15 +153,21 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
 
 ## 四类证据
 
-- **构建**：`tools/Test-AstraGates.ps1` 串行全绿（restore → build 0 警告 → 49/49、0 skip →
+- **构建**：`tools/Test-AstraGates.ps1` 串行全绿（restore → build 0 警告 → 54/54、0 skip →
   调色板漂移 checked=True，102 刷）。
-- **行为**：`AstraButtonTests` 3 条——别名身份（5 个 `Assert.Same` + `ButtonBorderThemeThickness`
-  读回 `1`）、状态映射（6 个触发器逐条对上上游键名）、布局默认值（8 项读回，含新补的三条对齐）。
+- **行为**：`AstraButtonTests` 5 条——别名身份（5 个 `Assert.Same` + `ButtonBorderThemeThickness`
+  读回 `1`）、**全家 73 行别名逐行身份**（`Every_button_family_alias_resolves_to_its_target_instance`，
+  四份字典一次扫完）、状态映射（Button 6 条 + Toggle/Repeat/Hyperlink 13 条触发器逐条对上上游键名）、
+  布局默认值（8 项读回）、命名空间形状（4 条）。
 - **视觉**：`A_disabled_button_paints_the_upstream_disabled_fill`
   （覆盖 `ControlFillColorDisabledBrush` 为哨兵后，禁用按钮 >1000 像素命中、启用按钮 0 命中——
   既证明禁用分支真的落到像素，也证明别名没有变成副本）；
+  `A_checked_toggle_and_a_resting_repeat_button_paint_their_upstream_fills`
+  （勾选态强调色 >6000 px、未勾选 0 px；`RepeatButton` 自己的休息色 >6000 px）；
   `A_swapped_brush_object_reaches_the_transitioning_surface`（首帧后换一个新的 `Background` 刷对象，
   稳定捕获显新色 >4000 px——把"过渡层会不会吞掉换刷"这条风险钉成常跑断言）；
+  `The_implicit_hyperlink_style_reaches_the_text_element_it_builds`（文字色走读回：
+  生成出来的文字元素的 `Foreground` 就是 `HyperlinkButtonForeground` 那个调色板实例）；
   换别名层之后，原有的 `The_implicit_astra_style_reaches_a_native_button` 与
   `The_accent_token_reaches_an_explicit_button_style` 仍然全绿，这本身就是"就地改色穿过别名"的证据。
 - **硬件输入**：**悬停这一段有像素证据，按下/键盘/触摸没有**。
@@ -138,7 +189,12 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
 5. 系统焦点框缺失，我们自绘的 `FocusOutline` 与上游 `FocusVisualMargin=-3` 的框不逐位一致。
 6. `MinWidth=0`/`MinHeight=32` 是我们自加的约束，上游样式没有。
 7. `ContentTransitions`、`TransitionDuration` 仍是字面量（B5 未完成）。
-8. `ToggleButton`/`RepeatButton`/`HyperlinkButton` 的别名块本段未转录；三态（`IsIndeterminate`
-   在本运行时存在）也未实现。
-9. 上游 10 条遗留 `*ThemeBrush` 不声明，若某个应用真的按老名字取刷，这里会落空。
-10. Gallery 的 Button 页未做（九步的第 7 步），本段的"外观"结论只到单控件捕获。
+8. **三态没有通路**：12 条 `ToggleButton*Indeterminate*` 键按上游原样声明了，但样式里没有消费点——
+   匹配 `IsChecked=null` 要 `{x:Null}`，本运行时能否解析这项**未测**（与 `CheckBox` 三态同一个问题，
+   选择批一次做穿）。今天放三态按钮只会显示休息态或勾选态。
+   `RepeatButton`/`HyperlinkButton` 的别名块与状态映射本段已转录完毕。
+9. **文字色不能用像素断**：只画文字的捕获写 0 像素并会拖垮 UI 线程，字形不进直方图。
+   本库的文字色一律走"建树 + 读回实例"（`PixelHarness.Build`），
+   所以"某个文字令牌在上屏画面里真的是这个颜色"这句话，我们的闸口证明不了，只能证明到"实例接上了"。
+10. 上游 10 条遗留 `*ThemeBrush` 不声明，若某个应用真的按老名字取刷，这里会落空。
+11. Gallery 的 Button 页未做（九步的第 7 步），本段的"外观"结论只到单控件捕获。

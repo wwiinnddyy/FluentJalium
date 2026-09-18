@@ -70,29 +70,41 @@
     </Style.Triggers>
   </Style>
   <Style x:Key="DefaultToggleButtonStyle" TargetType="ToggleButton" BasedOn="{StaticResource ButtonLayoutStyle}">
-    <Setter Property="Background" Value="{ThemeResource ControlFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
-    <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+    <Setter Property="Background" Value="{ThemeResource ToggleButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource ToggleButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource ControlFillColorTertiaryBrush}" /></Trigger>
-      <Trigger Property="IsChecked" Value="True"><Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" /></Trigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorSecondaryBrush}" /></MultiTrigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorTertiaryBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorSecondaryBrush}" /></MultiTrigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource ControlFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
-      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource AccentFillColorDisabledBrush}" /><Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorDisabledBrush}" /></MultiTrigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource ToggleButtonForegroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsChecked" Value="True"><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundChecked}" /><Setter Property="Foreground" Value="{ThemeResource ToggleButtonForegroundChecked}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushChecked}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundCheckedPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushCheckedPointerOver}" /></MultiTrigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundCheckedPressed}" /><Setter Property="Foreground" Value="{ThemeResource ToggleButtonForegroundCheckedPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushCheckedPressed}" /></MultiTrigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource ToggleButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushDisabled}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Background" Value="{ThemeResource ToggleButtonBackgroundCheckedDisabled}" /><Setter Property="Foreground" Value="{ThemeResource ToggleButtonForegroundCheckedDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource ToggleButtonBorderBrushCheckedDisabled}" /></MultiTrigger>
     </Style.Triggers>
   </Style>
-  <Style x:Key="DefaultHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource SubtleButtonStyle}">
-    <Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+  <Style x:Key="DefaultRepeatButtonStyle" TargetType="RepeatButton" BasedOn="{StaticResource ButtonLayoutStyle}">
+    <Setter Property="Background" Value="{ThemeResource RepeatButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource RepeatButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderBrush}" />
     <Style.Triggers>
-      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorSecondaryBrush}" /></Trigger>
-      <Trigger Property="IsPressed" Value="True"><Setter Property="Foreground" Value="{ThemeResource AccentTextFillColorTertiaryBrush}" /></Trigger>
-      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" /></Trigger>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource RepeatButtonBackgroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource RepeatButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource RepeatButtonForegroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource RepeatButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource RepeatButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource RepeatButtonBorderBrushDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="DefaultHyperlinkButtonStyle" TargetType="HyperlinkButton" BasedOn="{StaticResource ButtonLayoutStyle}">
+    <Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderBrush}" />
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForegroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForegroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderBrushDisabled}" /></Trigger>
     </Style.Triggers>
   </Style>
   <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
-  <Style TargetType="RepeatButton" BasedOn="{StaticResource DefaultButtonStyle}" />
+  <Style TargetType="RepeatButton" BasedOn="{StaticResource DefaultRepeatButtonStyle}" />
   <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}" />
   <Style TargetType="HyperlinkButton" BasedOn="{StaticResource DefaultHyperlinkButtonStyle}" />
 

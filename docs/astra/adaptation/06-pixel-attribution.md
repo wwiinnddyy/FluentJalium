@@ -106,8 +106,6 @@ run3 复刻 xunit fixture 的处境：不跑应用循环，只 `Show()` + 嵌套
   **`UIElement` 上的属性**（探针打印 `trigger IsMouseOver owner=UIElement`），
   所以由真实输入置起来的状态与测试里直接设属性走的是同一个 DP——但只有真输入能证明"输入→状态"这半段。
 
-闸口现状：`tools/Test-AstraGates.ps1` 全绿，49 通过 / 0 跳过 / 0 失败。
-
 ## 两条天花板因此撤回
 
 判据可信之后重跑，原先因"像素不动"而 skip 的两条断言直接通过，已取消 skip：
@@ -117,6 +115,28 @@ run3 复刻 xunit fixture 的处境：不跑应用循环，只 `Show()` + 嵌套
   它记录的 IL 事实（绘制码读 `ThemeColors`）不在本文件撤回范围内。
 - `Check_mark_follows_the_selected_accent`：`ApplyAccent` 之后勾选 glyph 出现在像素里，
   ROADMAP 的 A4"冻结勾选刷"天花板对勾选标记撤回。
+
+闸口现状：`tools/Test-AstraGates.ps1` 全绿，54 通过 / 0 跳过 / 0 失败。
+
+## 又一条判据边界：文字不在这条通路里（Button 第二段量出来的）
+
+`Render(Visual)` 到 Bgr32 缓冲这条路**看不见字形**，三个读数：
+
+- 一个只有文字的捕获（`TextBlock`，前景不透明、字号 14–20）：`painted=0`，`Stable=False`，
+  并且耗时到能撞上 fixture 的 60 s UI 线程上限——一次失败连坐同集合后面 4 条测试。
+- `HyperlinkButton` 给不透明红底：`8800` px 里 `8788` 是底色、`12` 是边框，**没有任何一像素是字色**。
+- 同一个控件的文字元素在树里确实建出来了，`Foreground` 就是调色板那个实例
+  （`Assert.Same` 过），`Text="link"`、`FontSize=14`。
+
+所以规则是：**像素断言只用于"面"（填充、描边），文字色一律走读回**。
+为此基座加了 `PixelHarness.Build(element, width, height)`——放进已上屏宿主、推帧、建树，
+但**不做光栅化**；文字类主题用它，别用 `Render`。
+这条限制说的是测量通路，不是"上屏没有字"：Gallery 里字是看得见的，只是我们的离屏缓冲里没有。
+
+**它反过来质疑了一条既有断言**：`Check_mark_follows_the_selected_accent` 数的是 44×44 里的强调色像素，
+按上面这条规则，那些像素更可能来自**勾选方框的填充**而不是勾形本身（上游的勾是白字底、不是强调色）。
+名字里的"check mark"因此是过强的说法——证据支持的是"勾选态的强调色面跟随 `ApplyAccent`"。
+选择批做 `CheckBox` 时要重做这条归因（把勾形单独裁剪或用非强调色的哨兵把它和框分开）。
 
 ## 仍未证
 
