@@ -37,7 +37,6 @@ public sealed class FluentToggleSwitch : ToggleButton
     private bool _dragged;
     private bool? _gestureValue;
     private Style? _appliedDefaultStyle;
-    private bool _listeningToTheme;
 
     /// <summary>Gets the thumb offset used by FluentToggleSwitchStyle.</summary>
     public Thickness ThumbOffset
@@ -82,24 +81,12 @@ public sealed class FluentToggleSwitch : ToggleButton
             }
         };
 
-        Loaded += (_, _) =>
-        {
-            if (!_listeningToTheme)
-            {
-                FluentThemeManager.Changed += OnThemeChanged;
-                _listeningToTheme = true;
-            }
-            OnThemeChanged();
-        };
-        Unloaded += (_, _) =>
-        {
-            Cancel();
-            if (_listeningToTheme)
-            {
-                FluentThemeManager.Changed -= OnThemeChanged;
-                _listeningToTheme = false;
-            }
-        };
+        // The style lookup can legitimately fail in the constructor when the host attaches the
+        // Astra dictionaries after building its window, so try once more on load. A palette switch
+        // needs no second attempt: the style object and its brushes are mutated in place and keep
+        // their identity, and the template's own {ThemeResource} references follow.
+        Loaded += (_, _) => ApplyDefaultStyle();
+        Unloaded += (_, _) => Cancel();
     }
 
     /// <inheritdoc />
@@ -145,8 +132,6 @@ public sealed class FluentToggleSwitch : ToggleButton
         base.OnIsEnabledChanged(oldValue, newValue);
         if (!newValue) Cancel();
     }
-
-    private void OnThemeChanged() => ApplyDefaultStyle();
 
     private void ApplyDefaultStyle()
     {

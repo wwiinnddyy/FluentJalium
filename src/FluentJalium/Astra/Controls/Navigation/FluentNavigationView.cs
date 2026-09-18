@@ -297,8 +297,9 @@ public sealed class FluentNavigationView : ContentControl
 
     private void OnThemeChanged()
     {
-        if (_indicatorBorder != null)
-            _indicatorBorder.Background = FluentThemeManager.GetBrush("AccentFillColorDefaultBrush");
+        // The indicator's brush comes from the template's own {ThemeResource AccentFillColorDefaultBrush};
+        // under in-place palette mutation there is nothing to repaint here. What genuinely depends on
+        // the current settings is motion: an in-flight slide has to land instantly when motion is off.
         if (!FluentThemeManager.AnimationsEnabled) _indicator?.Complete();
     }
 
