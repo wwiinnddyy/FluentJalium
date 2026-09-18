@@ -185,8 +185,15 @@ Fluent 控件与主题系统"**，不是"兼容 WinUI 3 的 Jalium 运行时"。
    两条新框架事实对后面每一批都管用：**样式 setter 里的 `{ThemeResource}` 存的是惰性引用**
    （读出来是 `DynamicResourceReference{ResourceKey=…}`，所以触发器只能按键名断言，
    这也解释了翻主题能重绘已应用的样式）；**`GetBrush` 只看得见调色板键**，别名键要走应用级查找。
-   **下一段的硬性要求**：悬停/按下必须有真指针输入带来的像素证据（PowerShell SendInput +
-   活树捕获的通路在这一段建立），否则后面每一批的状态都停在"字典对了"。
+   **输入通路已在这一段建立（`spike/PointerProbe` + `audits/button-input-raw.txt`）**：
+   user32 `SetCursorPos` 是真实 `WM_MOUSEMOVE`，一次 run 走通
+   `IsMouseOver=True → 触发器 → 悬停刷 → 8296 px 悬停哨兵色 → 离手回休息位`；
+   但它依赖物理鼠标、且同一时间有人用鼠标就会失败（run 3/4 的"属性绿像素品红"就是这个），
+   **所以不进常跑闸口**。常跑的是无指针等价段：`A_swapped_brush_object_reaches_the_transitioning_surface`
+   （首帧后换 `Background` 刷对象，带 `TransitionProperty` 的模板面照样采纳，`transitionedAdopted=True`）。
+   顺带量到一条判据规则：**状态变化后的断言必须重复捕获到两张图一致**，固定帧数会采到过渡中间值
+   （实测 `#E482E4`），已写进 `adaptation/06`。按下/键盘/触摸仍无证据：`press` 模式会真按键、
+   可能点到用户桌面上的任何东西，未经同意不运行。
 3. **文本录入**：`TextBox`、`PasswordBox`、`NumberBox`、`AutoSuggestBox`、`RichEditBox`。
 4. **选择**：**`CheckBox`/`RadioButton`（含 A4 冻结 glyph 实验）**、`ToggleSwitch`、`Slider`、
    `RatingControl`(自建)。
@@ -223,7 +230,7 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 | 阶段 | 内容 | 出口 |
 |---|---|---|
 | 1 | **B1 ✅ + A1 ✅（改混合模型）+ A6 ✅（反查部分）+ A2 部分 + B4 基座**（门面收敛、键消费点反查、高对比逐键映射、像素断言基座） | 已到：`dotnet test` 12/12、门面内无 `VisualTreeHelper`/`InvalidateVisual`、Light↔Dark 笔刷实例保持并有断言。仍欠：A2 别名转录、`resources/keys.md` |
-| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信；Button 第一段（Default/Accent/Subtle）审计 `audits/button.md` + 36 行别名转录 + 状态映射表（6 条触发器按键名断言）+ 布局默认值读回 + 禁用分支像素证据，全套 48/48 全绿 0 警告 0 skip。仍欠：悬停/按下的真指针输入证据（并以此建立后续每批的输入通路）、Toggle/Repeat/Hyperlink 别名块、Button 的 Gallery 页、`SplitButton`/`DropDownButton` |
+| 2 | **像素归因 ✅（`06`）+ Button 纵向样板**（走完 9 步流水线，锁死后续样板） | 已到：判据可信；Button 第一段（Default/Accent/Subtle）审计 `audits/button.md` + 36 行别名转录 + 状态映射表（6 条触发器按键名断言）+ 布局默认值读回 + 禁用分支像素证据 + 换刷/过渡时序证据，全套 49/49 全绿 0 警告 0 skip；真指针悬停通路建立（`spike/PointerProbe`，一次性、不进闸口）。仍欠：按下/键盘/触摸的输入证据、Toggle/Repeat/Hyperlink 别名块、Button 的 Gallery 页、`SplitButton`/`DropDownButton` |
 | 3 | **A3 + C2 🬡**（强调色三态、材质参数摸底） | 强调色改动能被像素断言（A4 已撤回，不再是出口）；C1 映射表可执行 |
 | 4 | **D1 底座批 + E1/E3 Gallery 骨架与三个系统页** | 已到：ScrollBar、Popup/FlyoutPresenter、ToolTip、ScrollViewer 宿主、条目宿主基面、窗口外壳（TitleBar 钩子 + 背衬普查）六项，审计在 `audits/{scrollbar,flyout-presenter,tooltip,scrollviewer,window-shell}.md` + `adaptation/09-item-host-base.md`；外壳新增 4 条行为/读回断言 + 2 条像素/高对比断言（`AstraWindowShellTests` 6 条），全套 44/44 全绿 0 skip，调色板 102 刷漂移 checked=True。仍欠：Thumb（与悬停/拖拽输入证据同批）、外壳的输入证据与材质合成；目录差集为空；三个系统页有证据 |
 | 5+ | D2…D8 按批推进；C1/C3/C4 材质随批落地 | 每批全 9 步 + 全闸口 |
@@ -239,7 +246,10 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 - 不声称逐位一致的上屏合成：RTB 离屏与上屏一致性未证。
 - 不声称 `Symbol` 全 764 码点可用：需逐个 cmap 命中验证。
 - 不声称液态玻璃/折射是 Fluent 的一部分。
-- 不声称 Button 状态已完成：`PointerOver`/`Pressed` 只有"触发器带的是上游键名"这一层结构证据，没有像素证据；焦点框是我们自绘的，`BackgroundSizing`/`AnimatedIcon`/`UseSystemFocusVisuals` 在本运行时无对应属性（`audits/button.md`）。
+- 不声称 Button 状态已完成：`PointerOver` 除"触发器带的是上游键名"这层结构证据外，多了一次真指针像素
+  （`SetCursorPos` → 悬停哨兵色 8296 px），但它依赖物理鼠标、被人同时用鼠标打断过，**不在闸口里**；
+  `Pressed` 仍只有结构证据，键盘激活与触摸完全没有证据。焦点框是我们自绘的，
+  `BackgroundSizing`/`AnimatedIcon`/`UseSystemFocusVisuals` 在本运行时无对应属性（`audits/button.md`）。
 - 不声称窗口外壳完成：标题栏只承接了框架 8 个钩子里的 6 个，悬停/按下/拖拽/三个点击事件无输入证据，`SystemBackdrop` 只钉住了枚举与默认 `None`，Mica/Acrylic 的合成效果本环境无法验证；返回键、窗格键、`Subtitle`、中央自定义内容、`ExtendsContentIntoTitleBar` 没有对应公开面（`audits/window-shell.md`）。
 - 不声称弹层是 acrylic 材质：`FlyoutPresenterBackground` 走的是上游自己的 `FallbackColor` 实底，
   运行时没有 `AcrylicBrush` 类型（见 `audits/flyout-presenter.md`）。

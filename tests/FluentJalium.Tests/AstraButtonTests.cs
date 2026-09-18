@@ -113,6 +113,27 @@ public sealed class AstraButtonTests
         });
     }
 
+    [Fact]
+    public void A_swapped_brush_object_reaches_the_transitioning_surface()
+    {
+        // Every state this library has works by handing the surface a different brush object, and the
+        // template surface animates Background. A capture taken while that animation runs shows a
+        // blend, which is why the harness re-grabs until two pictures agree - measured with a fixed
+        // frame count the same swap read as #E482E4 (docs/astra/audits/button-input-raw.txt). This is
+        // the mouse-free half of the hover path: a real pointer move reaches the same brush swap.
+        _fixture.Run(() =>
+        {
+            var button = new Button { Content = "swap", Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF)) };
+            var first = PixelHarness.Render(button, 200, 44);
+            Assert.True(first.Count(Color.FromRgb(0xFF, 0x00, 0xFF)) > 4_000, $"rest object not painted; top={first.Top(6)}");
+
+            button.Background = new SolidColorBrush(Color.FromRgb(0x00, 0xFF, 0x00));
+            var second = PixelHarness.Render(button, 200, 44);
+            Assert.True(second.Count(Color.FromRgb(0x00, 0xFF, 0x00)) > 4_000,
+                        $"a new brush object did not reach the transitioning surface; top={second.Top(6)}");
+        });
+    }
+
     /// <summary>The setter a style trigger applies for one property, found by name.</summary>
     private static object? Setter(Style style, string triggerProperty, string setterProperty)
     {

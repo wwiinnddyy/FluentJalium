@@ -81,25 +81,57 @@
    按键→对象的解析由别名测试那一半负责。
 2. **`FluentThemeManager.GetBrush` 只看得见调色板键**，别名键要走应用级查找
    （`Application.TryFindResource`）。测试里两套查法的区别就在这里。
+3. **状态换刷这条路是通的，而且与过渡层不冲突**：带 `TransitionProperty="Background"` 的模板面
+   在首帧之后仍然采纳新的刷对象（`swap` 读数 `transitionedAdopted=True`，与无过渡模板一致）。
+   代价是**捕获时机会采到中间值**——`#E482E4`（品红↔绿）就是这么来的。
+   见 `audits/button-input-raw.txt` 与 `adaptation/06` 里"重复捕获直到两张图一致"那条规则。
+
+## 指针输入通路（这一批建立，后面每一批都用）
+
+`spike/PointerProbe`（默认只做 hover，不发送任何按键）。输入走 user32 `SetCursorPos`，
+框架看到的是真实 `WM_MOUSEMOVE`，不是谁把属性写成 `True`。跑通的链条：
+
+```
+SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（owner 正是 UIElement，不是被遮蔽的副本）
+→ 控件 Background 换成悬停刷 → 模板面 Background 同步 → 稳定捕获里 8296 px 是悬停哨兵色
+```
+
+读数与误读都留在 `audits/button-input-raw.txt`（5 次 hover run + 1 次 swap run）。两点必须记住：
+
+- **这条通路不能进常跑闸口**：run 3/4 的"属性绿、像素品红"不是框架缺陷，是物理光标在推帧期间
+  自己走掉了（`asked=(1237,634)`，而 `actual=(1478,702)` / `(4,4)`）——同一时间有人在用这只鼠标。
+  常跑测试因此换成**不需要指针**的版本：
+  `A_swapped_brush_object_reaches_the_transitioning_surface` 直接换 `Background` 刷对象，
+  走的正是触发器给控件换刷之后的同半段（换对象 → 模板面 → 像素）。
+- **按下/释放、键盘激活、触摸都没有证据**：`press` 模式要 `SendInput` 真按键，会点到用户桌面上
+  任何东西，未经同意不运行（该模式从未执行，所以原始读数里连橙色一行都没有）。
 
 ## 四类证据
 
-- **构建**：`tools/Test-AstraGates.ps1` 串行全绿（restore → build 0 警告 → 48/48、0 skip →
+- **构建**：`tools/Test-AstraGates.ps1` 串行全绿（restore → build 0 警告 → 49/49、0 skip →
   调色板漂移 checked=True，102 刷）。
-- **行为**：`AstraButtonTests` 4 条——别名身份（5 个 `Assert.Same` + `ButtonBorderThemeThickness`
+- **行为**：`AstraButtonTests` 3 条——别名身份（5 个 `Assert.Same` + `ButtonBorderThemeThickness`
   读回 `1`）、状态映射（6 个触发器逐条对上上游键名）、布局默认值（8 项读回，含新补的三条对齐）。
 - **视觉**：`A_disabled_button_paints_the_upstream_disabled_fill`
   （覆盖 `ControlFillColorDisabledBrush` 为哨兵后，禁用按钮 >1000 像素命中、启用按钮 0 命中——
   既证明禁用分支真的落到像素，也证明别名没有变成副本）；
+  `A_swapped_brush_object_reaches_the_transitioning_surface`（首帧后换一个新的 `Background` 刷对象，
+  稳定捕获显新色 >4000 px——把"过渡层会不会吞掉换刷"这条风险钉成常跑断言）；
   换别名层之后，原有的 `The_implicit_astra_style_reaches_a_native_button` 与
   `The_accent_token_reaches_an_explicit_button_style` 仍然全绿，这本身就是"就地改色穿过别名"的证据。
-- **硬件输入**：**未做**。`PointerOver`/`Pressed` 两个分支只有结构证据（触发器 + 键名），
-  没有像素证据；要真指针输入。这条判据从这一批开始必须补上（Button 批的下一段做），
-  否则后面每一批的状态都只能停在"字典对了"。
+- **硬件输入**：**悬停这一段有像素证据，按下/键盘/触摸没有**。
+  `PointerProbe` 用 `SetCursorPos` 走进真实 `WM_MOUSEMOVE`，一次 run 走通
+  `IsMouseOver=True → 触发器 → 悬停刷 → 8296 px 悬停哨兵色 → 离手回休息位`
+  （`audits/button-input-raw.txt` run 5，`RESULT pass`）。
+  这条不常跑（依赖物理鼠标，run 3/4 被人同时用鼠标打断过），常跑的是它的无指针等价段。
+  `PointerOver` 因此从"只有结构证据"升级为"结构 + 一次性真指针像素"；`Pressed` 仍只有结构证据。
 
 ## Known Gaps（不许用相邻证据替代）
 
-1. 悬停/按下的像素未证（同上）。
+1. **按下/释放、键盘激活（空格/回车）、触摸路径的像素未证**。悬停有一次性真指针证据，但它不可复现地
+   依赖物理鼠标与"这段时间没人动鼠标"，所以没有进闸口；`press` 模式要 `SendInput` 真按键、
+   会点到用户桌面上任何东西，未经同意不运行。常跑的换刷断言只覆盖"换对象→像素"这半段，
+   **不能**替代"输入→状态"这半段（除悬停外）。
 2. `BackgroundSizing=InnerBorderEdge` 无对应属性：1px 边框与内容的相对位置与上游不同。
 3. elevation 边框（4 行）用实底近似上游 3DIP 渐变，顶边/底边不会出现上游的深浅分层。
 4. `AnimatedIcon` 状态图标整条缺失：内容里有 `SymbolIcon`/`FontIcon` 的按钮不会有换帧动画。

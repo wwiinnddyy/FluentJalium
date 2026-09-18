@@ -88,6 +88,26 @@ run3 复刻 xunit fixture 的处境：不跑应用循环，只 `Show()` + 嵌套
 `Host(...)` 保留整窗捕获：那条路径的 alpha 字节是写的，用来说明合成后可见性；
 计数随显示器缩放变，所以只断"变没变"。
 
+## 补一条：状态**变化**之后的捕获时机（Button 批量出来的）
+
+上面第 2 条的"两次相同才算稳定"对静态样本够用，但换刷/换状态这类**动态**断言必须有它：
+模板面带 `TransitionProperty="Background"` 时，状态切换是一段真在跑的过渡（上游同一设计，83 ms），
+固定帧数捕获会采到中间值——`spike/PointerProbe` 的 `swap`/hover 读数里出现过
+`#E482E4`（品红↔绿的中间色）与 `#CB74CB`、`#CA73CA`，都是同一次采样的混合值，不是调色板里的颜色。
+
+- 判据写法：**重复捕获直到两张直方图一致**（`PixelHarness.Capture` 与探针的 `CaptureStable` 同一个意思），
+  不能写成"等 N 帧然后断言"。
+- `distinct` 数量不能用来判断"是不是还在过渡中"：一个 200×44 的静止按钮本来就 distinct=7
+  （主体 + 两层抗锯齿 + 文字），过渡中间值也只是把这三档换成中间色。要判断就比**颜色本身**。
+- 换刷本身没问题：`transitionedAdopted=True`（与无过渡模板 `plainAdopted=True` 一致）说明
+  首帧之后再赋一个新的 `Brush` 对象，带过渡的模板面照样采纳。已钉成常跑断言
+  `AstraButtonTests.A_swapped_brush_object_reaches_the_transitioning_surface`。
+- 顺带记一条与判据有关的框架事实：样式触发器的 `IsMouseOver`/`IsPressed` 都是
+  **`UIElement` 上的属性**（探针打印 `trigger IsMouseOver owner=UIElement`），
+  所以由真实输入置起来的状态与测试里直接设属性走的是同一个 DP——但只有真输入能证明"输入→状态"这半段。
+
+闸口现状：`tools/Test-AstraGates.ps1` 全绿，49 通过 / 0 跳过 / 0 失败。
+
 ## 两条天花板因此撤回
 
 判据可信之后重跑，原先因"像素不动"而 skip 的两条断言直接通过，已取消 skip：
@@ -98,13 +118,11 @@ run3 复刻 xunit fixture 的处境：不跑应用循环，只 `Show()` + 嵌套
 - `Check_mark_follows_the_selected_accent`：`ApplyAccent` 之后勾选 glyph 出现在像素里，
   ROADMAP 的 A4"冻结勾选刷"天花板对勾选标记撤回。
 
-闸口现状：`tools/Test-AstraGates.ps1` 全绿，20 通过 / 0 跳过 / 0 失败。
-
-
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——
   alpha 字节不可信，这条只能等整窗裁剪基座做出来再验。
 - 混合 DPI（1.0 / 1.25 / 1.75）下的计数一致性：只在本机 1.75 上证过 1:1 这条规则。
 - 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时，原因没查（只影响到时长，不影响到判定）。
-- 除 Button 之外任何控件的隐式样式归因。
+- 除 Button / ScrollViewer+ScrollBar / Popup+FlyoutPresenter / ToolTip / 窗口外壳之外的隐式样式归因。
+  另外**真实输入→状态**这一半只在悬停上证过一次，且不进闸口（见 `audits/button.md` 的指针通路一节）。
