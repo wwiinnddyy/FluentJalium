@@ -254,6 +254,14 @@
             <Setter Property="Foreground" Value="{ThemeResource TextControlForegroundDisabled}" />
             <Setter Property="CaretBrush" Value="{ThemeResource TextControlForegroundDisabled}" />
           </Trigger>
+          <!-- Upstream never has to say this: its header presenter is Collapsed and lazily loaded, and the
+               control opens it only when a Header exists. There is no defer here and the 0,0,0,8 is a local
+               margin, which a null Content does not cancel - so a headerless box measured 39 tall (31 box + 8)
+               against upstream's 32. Collapsing on a null Header takes the margin out of layout too, which is
+               the whole point, and leaves the case that has a header untouched. -->
+          <Trigger Property="Header" Value="{x:Null}">
+            <Setter TargetName="HeaderContentPresenter" Property="Visibility" Value="Collapsed" />
+          </Trigger>
           <Trigger Property="SpinButtonPlacementMode" Value="Inline">
             <Setter TargetName="InlineSpinners" Property="Visibility" Value="Visible" />
           </Trigger>

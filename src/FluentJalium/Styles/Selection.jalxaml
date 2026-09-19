@@ -132,7 +132,17 @@
       <Grid Margin="5,2,5,2">
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}" />
         <Border Name="Pill" Width="3" Height="16" CornerRadius="{ThemeResource ComboBoxItemPillCornerRadius}" Margin="1,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{ThemeResource ComboBoxItemPillFillBrush}" Opacity="0" IsHitTestVisible="False" />
-        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="Wrap" />
+        <!-- Upstream's ComboBoxItem ContentPresenter sets no TextWrapping at all
+             (ComboBox_themeresources.xaml:764), so a long item stays on one line; this runtime's generated
+             text element defaults to Wrap, which would grow the row. The presenter's own attribute is a dead
+             cell here, so the promise goes onto the text element the presenter builds. -->
+        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+          <ContentPresenter.Resources>
+            <Style TargetType="TextBlock">
+              <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+          </ContentPresenter.Resources>
+        </ContentPresenter>
       </Grid>
       <ControlTemplate.Triggers>
         <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource ComboBoxItemBackgroundPointerOver}" /><Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{ThemeResource ComboBoxItemBorderBrushPointerOver}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ComboBoxItemForegroundPointerOver}" /></Trigger>

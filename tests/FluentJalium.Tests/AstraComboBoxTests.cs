@@ -695,6 +695,40 @@ public sealed class AstraComboBoxTests
 
     private object? Res(string key) => _fixture.Application.TryFindResource(key);
 
+    /// <summary>
+    /// Upstream's ComboBoxItem presenter carries no TextWrapping at all
+    /// (ComboBox_themeresources.xaml:764), so a long item stays on one line and clips. This runtime's
+    /// generated text element defaults to Wrap, which would grow the row, and the presenter's own attribute
+    /// is a dead cell here - so the promise rides on the text element, and reading it back is also the only
+    /// evidence that an implicit style inside a template part's Resources reaches that element.
+    /// </summary>
+    [Fact]
+    public void A_long_combo_item_stays_on_one_line()
+    {
+        _fixture.Run(() =>
+        {
+            var combo = Mount(new ComboBox { Width = 200 });
+            combo.Items.Add("An option far too long for two hundred DIP of dropdown surface");
+            combo.SelectedIndex = 0;
+            combo.IsDropDownOpen = true;
+            PixelHarness.Settle(30);
+            var popupBorder = PixelHarness.Named(PixelHarness.HostWindow(), "PART_PopupBorder")
+                ?? throw new InvalidOperationException("The open dropdown never reached the overlay layer.");
+            var item = PixelHarness.Descendant<ComboBoxItem>(popupBorder)!;
+            var text = PixelHarness.Descendant<TextBlock>(item)!;
+            var wrapping = text.TextWrapping;
+            var height = text.ActualHeight;
+
+            // Close before asserting: an open dropdown leaves its grafted surface in the shared host window,
+            // and the next test that walks the overlay finds this item instead of its own.
+            combo.IsDropDownOpen = false;
+            PixelHarness.Settle(30);
+            Assert.Multiple(
+                () => Assert.Equal(TextWrapping.NoWrap, wrapping),
+                () => Assert.True(height < 25, $"the item's text took {height:0.#} DIP, more than one line"));
+        });
+    }
+
     private ComboBox Mount(ComboBox combo)
     {
         combo.Width = 220;

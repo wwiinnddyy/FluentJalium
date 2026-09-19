@@ -276,6 +276,25 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 **这一段的一条读数作废**：上面"建议列表修后仍 148/260"用的 `rightgap-*.png-455x140-168.png` 后来发现**不是弹层**——它在 `closed` / `combo` / `suggest2` / `suggest3` / `suggest4` 五种模式下 `painted` 计数与非黑扫描范围逐位相同（10864 / 19082 / 2041278；0..148 DIP），而 `closed` 模式什么都不开。所以那是进程里另一个 260x80 DIP 的可见顶层，"148/260"是一次读错窗口。正确说法是**上屏未测**，不是"上屏无效"；`audits/right-gap.md` §7·1 与 `adaptation/00` **S0-u·1** 已按此更正。
 
 **视觉缺陷批第七段（左右边距不等长的真根因，2026-09-20）**：用户第三次报同一件事并把范围点明到"下拉框 / flyout 这一类型"，同时新增"有的这种控件圆角好像都不对"。这次先换判据：`spike/VisualQA/grab-screen.ps1`（新）用 `CopyFromScreen` 抓**整屏**，绕开"这个顶层窗口是谁"的问题——PrintWindow 枚举可见顶层分不清弹层，整屏没有歧义。第一件被推翻的就是上一段那条 148/260（见上）。第二件是方向：**弹层一族本身没有左右不等长**。`MenuFlyout` 用 `ShowAt(anchor)` 真开上屏后逐行扫，无图标条目文本左 **16.0 DIP**，与上游 `1(border)+0(presenter padding)+4(MenuFlyoutItemMargin)+11(MenuFlyoutItemThemePadding)` 逐数吻合；带勾选列的 44.6 DIP 多出来的正是 `CheckGlyph` 的 `12+16`（`MenuFlyout_themeresources.xaml:483-487` 三列 `Auto/*/Auto`）；样式侧读回 `LayoutRoot 210.5x34 margin=4,2,4,2 padding=11,8,11,9 radius=4,4,4,4`，`OverlayCornerRadius=8` / `ControlCornerRadius=4` 逐字对上；`Expander` 头部圆角在 `IsExpanded=True` 时已经由 `Surfaces.jalxaml:95` 切到 `4,4,0,0`，与上游 `Expander.xaml:35/64` 的 Top/Bottom filter 同形。**圆角这一项本批没有量出缺陷**，不声称它不存在，只声称这些位置是对的。真根因在基座：整屏量 `page-selection.png`，样卡离内容区**左 25.1 DIP、右 36.6 DIP**，而声明是 `Margin="24,8,24,24"`——差的 11.5 DIP 正是 `AstraNavigationTests` 早就钉住的 **`ScrollViewer` 在 `Auto` 下只在右侧扣走 12 DIP 布局宽度**（WinUI 的滚动条是 overlay，不占布局）。这条不针对某个控件，而是**每个会溢出的表面右边都窄一条**：页面宿主、`ComboBox` 的 `PART_ScrollViewer`、`AutoCompleteBox` 的 `PART_DropDownScrollViewer` 全中；同一页里样卡右边缘 1820、Live output 右边缘 1841 这两条不平的线也是它。改法沿用仓内既有决定 `Auto` → `Hidden`（`A_hidden_bar_still_lets_the_pane_scroll` 已证明滚轮与键盘照常），四处落点各写一条注释。四类证据：构建 = Debug 闸口 **623/623、0 skip**、0 错误、调色板三档 checked=True；行为 = ComboBox 与 AutoSuggestBox 各加 2 条断言（表面宽度 + 条模式），全套 102/102 与闸口 623/623；视觉 = 改前后同一张 `page-selection.png` 的 DIP 复测，skew **11.5 → −0.6**，两条右边缘并成一条；硬件输入 = **仍为零**，且这一段新量出一条限制：**进程内开不出 `ComboBox` / `AutoCompleteBox` 的弹层**（`IsDropDownOpen=true` 读回 True 但整屏里控件是闭合的，`PART_Popup` 高度停在 32 = 控件自身高度），所以建议列表的宽度到底有没有落到屏幕上，仍未测。代价也写清楚：`Hidden` 之后**可见滚动条没有了**，上游溢出时是显示条的，这是基座替代不是等价。
+
+**视觉缺陷批第八段（结清这一批自己能证的两条，2026-09-20）**：第七段留下三条不需要真指针就能做的账，这一段结两条。
+**其一，`NumberBox` 无 Header 时高 39 而不是 32。** 上一段写的是"样式里给不出 Header 非空这种触发条件，
+`Trigger Property=Header Value={x:Null}` 未验证"——这句判断没做实验就按下了，而实验很便宜：加上那一格，
+无 Header 的盒子 **39 → 32**，与 ComboBox / AutoCompleteBox 同高。要点是 `Collapsed` 把本地 margin 一起
+请出布局，空 Content 不会。反向也钉住：给回 Header，presenter 回 `Visible`，控件按"文本行高 + 8"长回去
+（新用例 `A_headerless_numberbox_does_not_pay_the_headers_gap`）。这一格不在上游的 cell 清单里，所以
+`The_numberbox_template_carries_one_cell_per_upstream_state` 的期望表把它单列一行、注明是替代不是转录——
+清单守卫第一次真的拦住一次样式增格，而不是拦住一个错抄。
+**其二，三处死掉的 `TextWrapping="Wrap"` 格子，只有一处是真缺陷。** 逐处对上游之后结论分两边：上游**写了**
+`Wrap` 的（`CheckBox_themeresources.xaml:611`、`RadioButton_themeresources.xaml:378`）我们照抄一个死格子，
+而这条运行时的默认值恰好也是 Wrap，**后果相同，不动**；上游**没写**的（`ComboBox_themeresources.xaml:764`
+的 `ComboBoxItem` presenter）默认值反而错了——长条目会换行把行撑高，必须显式补 `NoWrap`，且只能补在
+`ContentPresenter.Resources` 的隐式 `TextBlock` 样式上（`A_long_combo_item_stays_on_one_line`）。
+"死格子"不等于"缺陷"，这条判断写进 `adaptation/00` **S0-u·5/6**。四类证据：构建 = Debug 闸口
+**625/625、0 skip、0 错误**（623→625，+2 用例），调色板三档 checked=True；行为 = 两条新用例双向读回；
+视觉 = 另一个进程的树读回独立确认 39 → 32（与闸口不同通道）；硬件输入 = **仍为零**。
+一条采集器纪律顺带量到：新用例最初把下拉留在打开态，下一个走 overlay 的用例就读到了它的条目
+（`ComboBoxItemBackground` 断成 PointerOver 色）——**开过 overlay 的用例必须先关掉再落断言**。
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

@@ -125,6 +125,12 @@ public sealed class AstraNumberBoxTests
                 "IsMouseOver=True",
                 "IsKeyboardFocusWithin=True",
                 "IsEnabled=False",
+                // Not an upstream cell. Upstream never has to switch the header off: its presenter is
+                // Collapsed and lazily loaded, and the control opens it only when a Header exists. This
+                // runtime has no defer in a template and the header's 0,0,0,8 is a local margin, so a
+                // null Header still cost 8 DIP. This row is the adaptation, and it is what
+                // A_headerless_numberbox_does_not_pay_the_headers_gap holds honest.
+                "Header=null",
                 "SpinButtonPlacementMode=Inline",
                 "SpinButtonPlacementMode=Hidden",
                 "SpinButtonPlacementMode=Compact",
@@ -355,6 +361,31 @@ public sealed class AstraNumberBoxTests
             // Measured limit: the framework writes a local Foreground onto the generated text element, so the
             // disabled header row cannot reach the glyphs. Pinned rather than quietly claimed.
             Assert.NotSame(disabled, generated!.Foreground);
+        });
+    }
+
+    [Fact]
+    public void A_headerless_numberbox_does_not_pay_the_headers_gap()
+    {
+        // Upstream's header presenter is Collapsed and lazily loaded, so an absent Header costs nothing.
+        // Here the 0,0,0,8 is a local margin on an element that still lays out, which measured the box 39
+        // tall against its own 31-tall surface. The null-Header trigger has to work in both directions,
+        // so this reads the gap out when there is no header and back in the moment there is one.
+        _fixture.Run(() =>
+        {
+            var box = Mount(new NumberBox { Value = 3 });
+            var presenter = (ContentPresenter)Part(box, "HeaderContentPresenter")!;
+            var surface = (Border)Part(box, "OuterBorder")!;
+            Assert.Multiple(
+                () => Assert.Equal(Visibility.Collapsed, presenter.Visibility),
+                () => Assert.Equal(32d, box.ActualHeight, 0.01),
+                () => Assert.Equal(surface.ActualHeight, box.ActualHeight, 0.01));
+
+            box.Header = "Count";
+            PixelHarness.Settle();
+            Assert.Multiple(
+                () => Assert.Equal(Visibility.Visible, presenter.Visibility),
+                () => Assert.Equal(presenter.ActualHeight + 8, box.ActualHeight - surface.ActualHeight, 0.01));
         });
     }
 

@@ -84,11 +84,15 @@
    探针里 `IsDropDownOpen=true` / `Text` setter 都不能把 `ComboBox`、`AutoCompleteBox` 的弹层送上屏
    （整屏截图里两个控件都是闭合的，见 §7·3），所以样式侧够不够得着仍未判定。
    `{TemplateBinding}` 与两种 `RelativeSource` 在 graft 之后实测 0，字面量会冻住一个用户可拖宽的盒子。
-2. **`NumberBox` 无 Header 时高 39 而不是 32。** `HeaderContentPresenter` 的 `0,0,0,8` 是本地 margin，
-   Content 为空也照扣（读回：presenter `0x0 margin=0,0,0,8`，`OuterBorder` 31，控件 39）。上游那个
-   presenter 默认 `Collapsed`，由 `NumberBox` 的代码在 Header 存在时才打开；这里的 `NumberBox` 是原生类型，
-   样式给不出"Header 非空"这种触发条件，`Trigger Property=Header Value={x:Null}` 未验证。
-   `TextInput.jalxaml:177` 那句"空 Header 让 Auto 行自己收到 0"是**错的**，本批已按实测改写。
+2. ~~**`NumberBox` 无 Header 时高 39 而不是 32。**~~ **已结（2026-09-20 追批）。**
+   `HeaderContentPresenter` 的 `0,0,0,8` 是本地 margin，Content 为空也照扣（读回：presenter `0x0 margin=0,0,0,8`，
+   `OuterBorder` 31，控件 39）。上游那个 presenter 默认 `Collapsed`、由代码在 Header 存在时才打开。
+   追批验证了样式侧的等价写法：`<Trigger Property="Header" Value="{x:Null}">` 在本运行时**会触发**，
+   把 presenter 收成 `Collapsed` 就连 margin 一起请出布局。两通道各读一遍：闸口里
+   `A_headerless_numberbox_does_not_pay_the_headers_gap` 断到 32，另一个进程的树读回也从 39 变 32；
+   反向也钉住——`Header` 一给，presenter 回 `Visible`，控件按"文本行高 + 8"长回去。
+   这条 cell 不在上游的 cell 清单里，所以 `The_numberbox_template_carries_one_cell_per_upstream_state`
+   的期望表里把它单列一行并注明是替代，不是转录。
 3. 建议列表条目的高亮是框架本地值，实测为紫色 `#6A0881` 一族，不是任何 Fluent token；
    `An_item_takes_our_text_row_but_keeps_the_frameworks_own_fill` 已经把这条损失钉住，本批不重复声称能改。
 4. ComboBox 下拉的 259.4 DIP 是"与宿主同宽"，不是上游的机制：上游由 `ComboBox` 的代码给 presenter

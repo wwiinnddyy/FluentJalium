@@ -809,3 +809,20 @@ presenter 上——所以弹层里"线还在不在"这种问题只能出进程�
 `LayoutRoot 210.5x34 margin=4,2,4,2 padding=11,8,11,9 radius=4,4,4,4`。`MenuBar` 的下拉缩进 43 DIP
 不是样式写的：26.10.9 的 `MenuItem` 存了 Template 却从不构建，缩进归框架。
 
+**5 · `Trigger Property="Header" Value="{x:Null}"` 在本运行时是会触发的。** 这条之前记成"未验证"，因为它
+是 S0-t 那批里唯一没做实验就按下的可能修法。做了：`NumberBox` 样式加一格把 `HeaderContentPresenter` 收成
+`Collapsed`，无 Header 的盒子从 **39 → 32**（闸口用例与另一个进程的树读回各一遍），给回 Header 时 presenter
+回 `Visible`、控件按"文本行高 + 8"长回去。要点是 **`Collapsed` 连本地 margin 一起请出布局**，而空 Content
+不会——这正是"样式里给不出 Header 非空"那句判断的出处，也是它错在哪。上游不需要这一格：它的 presenter 是
+`Collapsed` + `x:DeferLoadStrategy="Lazy"`，由代码在 Header 存在时才建。
+
+**6 · "上游不写 TextWrapping"和"上游写了 TextWrapping"在这条基座上后果不同，必须分开处理。**
+`ContentPresenter` 的 `TextWrapping` 是死格子（S0-t 已证），而这里生成的文本元素默认 **Wrap**。于是：
+上游写了 `Wrap` 的（`CheckBox_themeresources.xaml:611`、`RadioButton_themeresources.xaml:378`）我们照抄
+一个死格子，**后果恰好相同**——运行时默认就是 Wrap，不需要动；上游**没写**的
+（`ComboBox_themeresources.xaml:764` 的 `ComboBoxItem` presenter）默认值反而错了，长条目会换行撑高行，
+必须显式补 `NoWrap`，且只能补在 `ContentPresenter.Resources` 的隐式 `TextBlock` 样式上。
+`A_long_combo_item_stays_on_one_line` 钉住这一格。
+顺带一条采集器纪律：这条用例一开始把下拉留在打开态，下一个走 overlay 的用例就读到了它的条目
+（`ComboBoxItemBackground` 断成 PointerOver 色）。**开过 overlay 的用例必须在断言前关掉再落断言。**
+
