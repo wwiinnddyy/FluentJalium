@@ -402,7 +402,13 @@ public sealed class AstraComboBoxTests
                 // but measures the surface inside it against infinity, so a short item list painted a narrow
                 // card and left the rest of that window unpainted.
                 () => Assert.Equal(combo.ActualWidth, popupBorder.MinWidth),
-                () => Assert.Equal(combo.ActualWidth, popupBorder.ActualWidth));
+                () => Assert.Equal(combo.ActualWidth, popupBorder.ActualWidth),
+                // The bar mode decides whether the row column keeps the surface's own width: Auto reserves
+                // 12 DIP of layout width on the right only, so an overflowing dropdown put its rows 25 DIP
+                // from the surface's left edge and 36.6 from its right (page-selection.png). Hidden costs
+                // nothing and still scrolls, which is what the pane menu host already does.
+                () => Assert.Equal(ScrollBarVisibility.Hidden, (ScrollBarVisibility)Get(scroller, "VerticalScrollBarVisibility")),
+                () => Assert.Equal(popupBorder.ActualWidth - 2, scroller.ActualWidth, 0.01));
 
             var presenter = PixelHarness.Descendant<ItemsPresenter>(popupBorder)
                 ?? throw new InvalidOperationException("The dropdown has no items presenter to place.");

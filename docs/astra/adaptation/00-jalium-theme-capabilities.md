@@ -779,3 +779,33 @@ presenter 上——所以弹层里"线还在不在"这种问题只能出进程�
 的 `0,0,0,8` 本地 margin），上游是 32——上游那个 presenter 默认 `Collapsed`、由代码在 Header 存在时才打开，
 而 `NumberBox` 在这里是原生类型，样式里给不出"Header 非空"这种触发条件。记在 `audits/right-gap.md`。
 
+## S0-u：`Auto` 滚动条只在右侧扣布局宽度，所以"左右边距不等"是基座问题；S0-t 的弹层那条读数作废（追批，2026-09-20）
+
+**1 · 先更正 S0-t。** 那节里"真上屏的独立弹窗仍只画 148/260"用的是 `rightgap-*.png-455x140-168.png`。
+这张图在 `closed` / `combo` / `suggest2` / `suggest3` / `suggest4` 五种模式下的 `painted` 计数与非黑扫描
+范围**逐位相同**（10864 / 19082 / 2041278；0..148 DIP）——闭合的探针里不可能有弹层，所以那个 260x80 DIP
+的可见顶层不是建议列表。**"枚举该进程的每个可见顶层"仍然分不清哪个是弹层**：要判"上屏对不对"，只能出
+进程抓整屏（`spike/VisualQA/grab-screen.ps1`，`CopyFromScreen` + `SetProcessDpiAwarenessContext(-4)`），
+它没有窗口身份问题，量到的就是显示器上的几何。
+
+**2 · `ScrollViewer` 的 `Auto` 只在右边扣 12 DIP，这一条足以解释"左右边距不一样长"。** 整屏量 Gallery
+`page-selection.png`：样卡离内容区**左 25.1 DIP、右 36.6 DIP**，而声明是 `Margin="24,8,24,24"`。
+差的 11.5 DIP 就是 `AstraNavigationTests.The_bar_mode_decides_whether_the_pane_loses_layout_width`
+钉住的那个槽位——**内容不溢出时不扣，溢出时右边窄一条**。WinUI 的滚动条是 overlay，不占布局，所以这条
+差异不在任何控件的度量里，而在每一个会溢出的表面上：页面宿主、`ComboBox` 的 `PART_ScrollViewer`、
+`AutoCompleteBox` 的 `PART_DropDownScrollViewer` 全中。同一页里样卡右边缘 1820、Live output 右边缘 1841
+也是这 12 DIP 造成的两条线。改成 `Hidden` 后复测：左 25.1 / 右 24.6，skew 11.5 → −0.6 DIP，两条右边缘
+并成一条。代价是可见滚动条没有了，这是替代不是等价。
+
+**3 · 进程内开不出 `ComboBox` / `AutoCompleteBox` 的弹层。** `combo.Focus(); combo.IsDropDownOpen = true;`
+读回 `True`，`AutoCompleteBox` 走 `Text` setter 也一样，但整屏截图里两个控件都是闭合的，
+`PART_Popup` 的 `ActualHeight` 停在 32（控件自身的高度，不是下拉的高度）。`MenuFlyout` 是唯一能用
+`ShowAt(anchor)` 真正开上屏的弹层——所以弹层宽度这类问题只有 `MenuFlyout` 能在离线探针里出像素证据。
+
+**4 · flyout 一族量下来是对称的，别再往它身上找。** `MenuFlyout` 上屏逐行扫：无图标条目文本左
+**16.0 DIP**，正好等于上游 `1(border) + 0(presenter padding) + 4(MenuFlyoutItemMargin) +
+11(MenuFlyoutItemThemePadding)`；带勾选列的行 44.6 DIP，多出来的正是 `CheckGlyph` 的 `12 + 16` margin
+（`MenuFlyout_themeresources.xaml:483-487` 的 `Auto/*/Auto`）。样式侧读回
+`LayoutRoot 210.5x34 margin=4,2,4,2 padding=11,8,11,9 radius=4,4,4,4`。`MenuBar` 的下拉缩进 43 DIP
+不是样式写的：26.10.9 的 `MenuItem` 存了 Template 却从不构建，缩进归框架。
+

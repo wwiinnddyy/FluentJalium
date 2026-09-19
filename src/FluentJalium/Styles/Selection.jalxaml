@@ -84,7 +84,12 @@
         </Grid>
         <Popup Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" StaysOpen="False" Placement="Bottom" PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=ComboBox}}">
           <Border Name="PART_PopupBorder" Margin="0,-0.5,0,-1" HorizontalAlignment="Stretch" MinWidth="{TemplateBinding ActualWidth}" Background="{ThemeResource ComboBoxDropDownBackground}" BorderBrush="{ThemeResource ComboBoxDropDownBorderBrush}" BorderThickness="{ThemeResource ComboBoxDropdownBorderThickness}" Padding="{ThemeResource ComboBoxDropdownBorderPadding}" CornerRadius="{ThemeResource OverlayCornerRadius}">
-            <ScrollViewer Name="PART_ScrollViewer" Foreground="{ThemeResource ComboBoxDropDownForeground}" MaxHeight="{TemplateBinding MaxDropDownHeight}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Top"><ItemsPresenter Margin="{ThemeResource ComboBoxDropdownContentMargin}" /></ScrollViewer>
+            <!-- Upstream's bar is an overlay and costs the surface nothing; 26.10.9's Auto reserves 12 DIP of
+                 layout width on the right only, so an overflowing dropdown made the row column sit 25 DIP from
+                 the surface's left edge and 36.6 from its right (measured on the running Gallery,
+                 spike/VisualQA/out/pages/page-selection.png). Hidden keeps the wheel and the keys and gives the
+                 gutter back - the same substitution the pane menu host makes, and for the same reason. -->
+            <ScrollViewer Name="PART_ScrollViewer" Foreground="{ThemeResource ComboBoxDropDownForeground}" MaxHeight="{TemplateBinding MaxDropDownHeight}" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" VerticalAlignment="Top"><ItemsPresenter Margin="{ThemeResource ComboBoxDropdownContentMargin}" /></ScrollViewer>
           </Border>
         </Popup>
       </Grid>

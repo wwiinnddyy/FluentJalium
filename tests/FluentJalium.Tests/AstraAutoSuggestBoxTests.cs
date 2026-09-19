@@ -280,9 +280,15 @@ public sealed class AstraAutoSuggestBoxTests
             var box = Mounted();
             Open(box);
             var container = (Border)PopupPart("SuggestionsContainer");
+            var scroller = (ScrollViewer)PopupPart("PART_DropDownScrollViewer");
             Assert.Multiple(
                 () => Assert.Equal(box.ActualWidth, container.MinWidth),
-                () => Assert.Equal(box.ActualWidth, container.ActualWidth));
+                () => Assert.Equal(box.ActualWidth, container.ActualWidth),
+                // Auto reserves 12 DIP of layout width on the right only, so the list would sit closer to the
+                // surface's left edge than to its right. Hidden costs the surface nothing and still scrolls.
+                () => Assert.Equal(ScrollBarVisibility.Hidden, scroller.VerticalScrollBarVisibility),
+                () => Assert.True(scroller.ActualWidth > container.ActualWidth - 10,
+                    $"the bar took {container.ActualWidth - scroller.ActualWidth:0.#} DIP out of one side"));
         });
     }
 

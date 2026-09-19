@@ -57,7 +57,10 @@
           <TextBlock Text="FluentJalium  /  Gallery" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center" />
           <TextBlock x:Name="ThemeStatus" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="16,0,0,0" />
         </Grid>
-        <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <!-- Hidden, not Auto: 26.10.9's Auto reserves 12 DIP of layout width on the right only, which made
+             every sample card sit 25 DIP from the content area's left edge and 36.6 from its right
+             (spike/VisualQA/out/pages/page-selection.png). The wheel and the keys still scroll. -->
+        <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
           <!-- The constructor retains these pages and attaches only the current one. -->
           <Grid x:Name="PageHost" Margin="24,8,24,24" MaxWidth="1000" HorizontalAlignment="Stretch">
             <StackPanel x:Name="OverviewPage">
@@ -520,7 +523,7 @@
                  and the sibling below it is then placed on top of the overflow (spike/VisualQA/out/inputs.png,
                  spike/TextWrapProbe case E). The height here does not depend on that measure. -->
             <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" MaxHeight="96" Margin="0,10,0,0"
-                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                          VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
               <TextBlock x:Name="ParityStatus" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
             </ScrollViewer>
           </Grid>

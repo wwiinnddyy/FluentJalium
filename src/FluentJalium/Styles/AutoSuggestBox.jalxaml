@@ -45,21 +45,23 @@
           </Border>
           <Border Name="BottomEdge" Height="1" VerticalAlignment="Bottom" Margin="1,0,1,1" CornerRadius="0,0,3,3"
                   Background="{ThemeResource ControlStrongStrokeColorDefaultBrush}" IsHitTestVisible="False" />
-          <Popup Name="PART_Popup" Placement="Bottom">
+          <Popup Name="PART_Popup" Placement="Bottom"
+                 PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=AutoCompleteBox}}">
             <!-- Upstream's SuggestionsContainer is a Border with exactly these five rows on it, plus a
                  MaxHeight the control recomputes in code. AutoSuggestListMaxHeight is 374 upstream and is an
                  x:Double row this reader cannot parse, so it rides as a literal; the framework overwrites the
                  height of its own popup root at open time anyway (measured: 20 / 39.78 / 63.56 DIP for zero,
                  one and two rows), so this is a ceiling, not a size. -->
-            <!-- The runtime sizes this popup's own window to the control (measured: 260 DIP) but measures the
-                 surface inside it against infinity, so a short list painted a 148 DIP card and left 113 DIP of
-                 that window unpainted - the "big empty block on the right" the running Gallery showed.
-                 MinWidth is the only lever that reaches it, and it has to be an ElementName binding: the
-                 surface carries no TemplatedParent and no ancestor chain once the runtime moves it, both of
-                 which measured 0, while a literal would freeze a box the user can resize.
-                 Half honest: this lands where the runtime grafts the popup into the host window (read back
-                 260 there, both channels) and does nothing where the runtime gives the popup its own top-level
-                 window, which still paints 148 of its 260. See docs/astra/audits/right-gap.md. -->
+            <!-- The runtime stamps Width and MinWidth locally on this Popup (measured 260 = the control's own
+                 width) but measures the surface inside it against infinity, so HorizontalAlignment=Stretch is
+                 a no-op and only a MinWidth on the surface reaches the box. It has to be an ElementName
+                 binding: once the runtime moves the surface, TemplatedParent and the ancestor chain both read
+                 back 0 here, and a literal would freeze a box the user can resize.
+                 Correction to an earlier claim in this comment: the "surface paints 148 of its 260" reading
+                 came from a PrintWindow of a 455x140 px top-level window that turned out to be identical in
+                 every probe mode including the one where nothing is open, so it was never the suggestion
+                 popup. Whether the MinWidth lands on screen is UNMEASURED - see the note in
+                 docs/astra/audits/right-gap.md - and the in-process read-back is 260 on both channels. -->
             <Border Name="SuggestionsContainer" HorizontalAlignment="Stretch"
                     Background="{ThemeResource AutoSuggestBoxSuggestionsListBackground}"
                     BorderBrush="{ThemeResource AutoSuggestBoxSuggestionsListBorderBrush}"
@@ -68,7 +70,7 @@
                     MinWidth="{Binding ActualWidth, ElementName=OuterBorder}"
                     Padding="{ThemeResource AutoSuggestListMargin}" MaxHeight="374">
               <Grid Name="PART_DropDownBorder">
-                <ScrollViewer Name="PART_DropDownScrollViewer" Margin="{ThemeResource AutoSuggestListPadding}">
+                <ScrollViewer Name="PART_DropDownScrollViewer" VerticalScrollBarVisibility="Hidden" Margin="{ThemeResource AutoSuggestListPadding}">
                   <StackPanel Name="PART_DropDownItemsHost" />
                 </ScrollViewer>
               </Grid>

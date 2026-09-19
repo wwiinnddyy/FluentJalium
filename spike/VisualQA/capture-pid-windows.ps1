@@ -40,7 +40,7 @@ public static class VisualQaGrabMany {
     public struct Rect { public int Left, Top, Right, Bottom; }
     public static int Dpi;
 
-    public sealed class Found { public IntPtr Handle; public int Width; public int Height; }
+    public sealed class Found { public IntPtr Handle; public int Width; public int Height; public int Left; public int Top; }
 
     public static void BecomeDpiAware() { SetProcessDpiAwarenessContext(new IntPtr(-4)); }
 
@@ -53,7 +53,7 @@ public static class VisualQaGrabMany {
             Rect rect;
             if (!GetWindowRect(hwnd, out rect)) return true;
             if (rect.Right - rect.Left < 16 || rect.Bottom - rect.Top < 16) return true;
-            found.Add(new Found { Handle = hwnd, Width = rect.Right - rect.Left, Height = rect.Bottom - rect.Top });
+            found.Add(new Found { Handle = hwnd, Width = rect.Right - rect.Left, Height = rect.Bottom - rect.Top, Left = rect.Left, Top = rect.Top });
             return true;
         }, IntPtr.Zero);
         return found;
@@ -99,7 +99,7 @@ for ($attempt = 0; $attempt -lt $Attempts; $attempt++) {
         try {
             $painted = [VisualQaGrabMany]::NonBlack($bitmap)
             if ($painted -lt 100) { continue }
-            $target = "{0}-{1}x{2}-{3}.png" -f $Out, $window.Width, $window.Height, [VisualQaGrabMany]::Dpi
+            $target = "{0}-{1}x{2}-{3}+{4}+{5}.png" -f $Out, $window.Width, $window.Height, [VisualQaGrabMany]::Dpi, $window.Left, $window.Top
             $bitmap.Save($target, [System.Drawing.Imaging.ImageFormat]::Png)
             Write-Host "wrote $target painted=$painted"
             $written++

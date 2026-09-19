@@ -61,6 +61,30 @@ internal static class Program
 
     private static void Run(string mode, string[] arguments)
     {
+        if (mode == "reflect")
+        {
+            // The last question the right-gap batch left open is whether the runtime gives a popup's surface
+            // any width lever at all. Before calling the hole framework-owned, ask the type what it owns.
+            foreach (var type in new[] { typeof(AutoCompleteBox), typeof(Popup), typeof(ComboBox), typeof(NumberBox) })
+            {
+                Note($"== {type.FullName} : width / popup levers");
+                foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                             .OrderBy(static property => property.Name, StringComparer.Ordinal))
+                {
+                    if (property.Name.Contains("Width", StringComparison.Ordinal)
+                        || property.Name.Contains("Height", StringComparison.Ordinal)
+                        || property.Name.Contains("Popup", StringComparison.Ordinal)
+                        || property.Name.Contains("DropDown", StringComparison.Ordinal))
+                    {
+                        Note($"  {property.PropertyType.Name} {property.Name}"
+                             + $" get={property.CanRead} set={property.CanWrite} declaredBy={property.DeclaringType?.Name}");
+                    }
+                }
+            }
+
+            return;
+        }
+
         var panel = new StackPanel { Margin = new Thickness(24), Spacing = 10 };
         var window = new Window
         {
@@ -119,6 +143,63 @@ internal static class Program
             Pump(40, 2500);
             Note($"-- combo box open={combo.IsDropDownOpen} --");
             FindNamed(window, 0);
+        }
+        else if (mode == "flyout")
+        {
+            // A MenuFlyout is the one popup family this runtime actually puts on screen, so it is the only
+            // open surface whose left/right inset can be read off pixels instead of off a property.
+            var rename = new MenuFlyoutItem { Text = "Rename", KeyboardAcceleratorTextOverride = "F2" };
+            var archive = new MenuFlyoutItem { Text = "Archive" };
+            var receipts = new ToggleMenuFlyoutItem { Text = "Show read receipts", IsChecked = true };
+            var sub = new MenuFlyoutSubItem { Text = "Share with" };
+            sub.Items.Add(new MenuFlyoutItem { Text = "nested" });
+            var delete = new MenuFlyoutItem { Text = "Delete", IsEnabled = false };
+            var flyout = new MenuFlyout();
+            flyout.Items.Add(rename);
+            flyout.Items.Add(archive);
+            flyout.Items.Add(receipts);
+            flyout.Items.Add(new MenuFlyoutSeparator());
+            flyout.Items.Add(sub);
+            flyout.Items.Add(delete);
+            var anchor = new Button { Content = "anchor", Width = 260 };
+            panel.Children.Add(anchor);
+            Pump(10, 800);
+            window.Activate();
+            anchor.Focus();
+            try
+            {
+                flyout.ShowAt(anchor);
+            }
+            catch (Exception exception)
+            {
+                Note("  ShowAt threw " + exception.Message);
+            }
+
+            Pump(40, 2500);
+            Note($"-- flyout open={flyout.IsOpen} --");
+            FindNamed(window, 0);
+            Note("== flyout rows, read back in DIP ==");
+            foreach (var (label, row) in new (string, Control)[]
+                     {
+                         ("Rename+F2", rename), ("Archive", archive), ("Show read receipts", receipts),
+                         ("Share with", sub), ("Delete", delete),
+                     })
+            {
+                Report(label, row);
+            }
+
+            var presenter = FindByType(window, "MenuFlyoutPresenter", 0);
+            if (presenter is not null)
+            {
+                Note($"== presenter {presenter.GetType().Name} {presenter.ActualWidth:0.#}x{presenter.ActualHeight:0.#}"
+                     + $" padding={Property(presenter, "Padding")} radius={Property(presenter, "CornerRadius")}"
+                     + $" border={Property(presenter, "BorderThickness")} min={Property(presenter, "MinWidth")}");
+                Walk(presenter, 1);
+            }
+            else
+            {
+                Note("== presenter: not found under the window ==");
+            }
         }
 
         foreach (var (label, control) in new (string, Control)[]
@@ -181,6 +262,32 @@ internal static class Program
         }
     }
 
+    private static FrameworkElement? FindByType(DependencyObject node, string typeName, int depth)
+    {
+        if (depth > 14)
+        {
+            return null;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
+        {
+            var child = VisualTreeHelper.GetChild(node, index);
+            if (child is FrameworkElement { ActualWidth: > 0 } element
+                && element.GetType().Name.Contains(typeName, StringComparison.Ordinal))
+            {
+                return element;
+            }
+
+            var nested = FindByType(child, typeName, depth + 1);
+            if (nested is not null)
+            {
+                return nested;
+            }
+        }
+
+        return null;
+    }
+
     private static void Report(string label, Control control)
     {
         Note($"== {label} {control.GetType().Name} actual={control.ActualWidth:0.#}x{control.ActualHeight:0.#} "
@@ -207,7 +314,8 @@ internal static class Program
                 {
                     var indent = new string(' ', depth * 2);
                     Note($"  {indent}{type} \"{name}\" {element.ActualWidth:0.#}x{element.ActualHeight:0.#}"
-                         + $" margin={element.Margin} padding={Property(element, "Padding")} align={element.HorizontalAlignment}");
+                         + $" margin={element.Margin} padding={Property(element, "Padding")}"
+                         + $" radius={Property(element, "CornerRadius")} align={element.HorizontalAlignment}");
                 }
             }
 
