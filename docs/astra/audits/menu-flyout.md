@@ -22,12 +22,19 @@
    - 真指针悬停时框架自绘的那层填充可能盖在我们格子上——无指针，未测。
 7. **可达驱动**：`ContextMenu.Open(Point)`、`MenuFlyout.ShowAt/Hide`、`RaiseEvent(MouseDown…)`、自动化 peer（`MenuItemAutomationPeer`→ExpandCollapse；`MenuFlyoutItem`/子项/切换项都是 Invoke）。子菜单是 enter 驱动（`OnSubItemMouseEnter`），`OpenSubMenuAndFocusFirstItem` / `EnsureSubPopup` / `FocusFirstSubMenuItem` 可调用但都不展开，`MenuBarItem.OpenFromKeyboard` 等三个同理——无指针即无结论。
 8. **菜单族不读模板部件名**：`GetTemplateChild` / `PART_` 在整个菜单源码里零命中，子菜单弹窗由控件在代码里 `new Popup` 自建。因此本批的 `LayoutRoot` / `IconContent` / `SubItemChevron` 等名字是**上游对齐**而非功能契约（对比 Expander 的三个名字）。
+9. **（重影批更正）第 8 条只说对了一半**：不读名字不等于不画。`spike/FlyoutGhostProbe` 直接解 IL（`GetMethodBody().GetILAsByteArray()` 扫 `0x72` ldstr，`Module.ResolveString`）量到四个 flyout 类型各自 `OnRender` 里写死的字面量——
+   - `MenuFlyoutItem.OnRender`：`OneSurfaceHover, MenuFlyoutItemBackgroundHover, OneTextDisabled, TextDisabled, Segoe MDL2 Assets, OneTextSecondary, TextSecondary`；
+   - `ToggleMenuFlyoutItem.OnRender`：`✓`；`MenuFlyoutSubItem.OnRender`：`OneTextSecondary, TextSecondary`（且该类型 `sealed`）；`MenuFlyoutSeparator.OnRender`：`MenuFlyoutPresenterBorderBrush`。
+   也就是说标签、加速键文案、勾选标记、子项箭头、分隔线**全是控件自绘**，我们的模板再摆一份就是第二位画者——这正是用户报的 flyout 重影。`MenuBarItem` 同族同病（它自绘 `Title`，`spike/MenuBarGhostProbe` 量到 1431 亮像素对 603）。
+10. **但控件的画者读控件属性**：同一探针的 tint pass 给第 1 行与切换行本地写 `Foreground=#FF00FF`、`FontSize=20`，PrintWindow 抓回的弹窗里那两行标签就是品红、就是 20 号——所以 `Foreground`/`FontSize` 是活的，标签态可以留在样式触发器上。反之覆盖 `TextFillColorSecondaryBrush` 动不了加速键文案、勾选、箭头与分隔线：那几处用的是运行时自己调色板里的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，与 pass 4 的 33 个哨兵纹丝不动同构。
+11. **`MenuFlyoutItem.Icon` 是 `System.Object`**：控件不画图标（`bare` pass 里图标区是空的），槽位必须留在我们的模板里；`ContentPresenter` 正是承载任意内容对象的正确部件。
 
-## 1. 行去向表（上游 81 条主题行 + 分支外行 → 本实现 26 别名 + 8 Thickness）
+## 1. 行去向表（上游 81 条主题行 + 分支外行 → 本实现 16 别名 + 7 Thickness）
 
 | 上游组 | 上游条数 | 落到 | 未落地的原因 |
 | --- | --- | --- | --- |
-| Item / SubItem / Toggle 的 rest·hover·disabled | 26 | `ThemeResources/MenuFlyout.jalxaml` 26 条别名 | — |
+| Item / SubItem / Toggle 的 rest·hover·disabled | 26 | `ThemeResources/MenuFlyout.jalxaml` 16 条别名 | 另 11 条见下一行 |
+| 加速键文案 3×2 + chevron 3 + `MenuFlyoutItemChevronMargin` + `MenuFlyoutSeparatorBackground` | 11 | 重影批撤回 | 那几处像素是控件自绘（0.9），发布即承诺我们证不到的消费点 |
 | `*Pressed*` | 11 | 不发布 | flyout item 无按下 DP，无格可挂 |
 | `*SubMenuOpened*` | 2 | 不发布 | `IsSubMenuOpen` 是只读 CLR getter |
 | `*Reveal*` | 24 | 不发布 | 本运行时无 reveal 材质 |
@@ -52,22 +59,22 @@
 | `MenuFlyoutPresenter` | 框架 `MenuPopupScrollHost`（不可样式） | 弹层宿主由框架构造 |
 | `RadioMenuFlyoutItem` | `ToggleMenuFlyoutItem` 代替 | 类型缺失 |
 | `SplitMenuFlyoutItem` | 无 | 类型缺失 |
-| `FontIcon`（`CheckGlyph` E73E、chevron E974） | `Path` | 本运行时图标字体 glyph 不可靠（记忆：icon font defects） |
-| `Viewbox` 图标槽 | `Border` + `Icon={x:Null}` 格 | 无 `CheckPlaceholderStates` 可挂 |
-| `KeyboardAcceleratorTextVisibility` 状态组 | 文案格（空/null → Collapsed） | 状态由代码写，改由值驱动 |
+| `FontIcon`（`CheckGlyph` E73E、chevron E974） | 不画：控件 `OnRender` 自绘 | 重影批：摆 `Path` 就是第二位画者（0.9） |
+| `Viewbox` 图标槽 | `Border` + `Icon={x:Null}` 格 | 无 `CheckPlaceholderStates` 可挂；控件不画 `Icon`（0.11） |
+| `KeyboardAcceleratorTextVisibility` 状态组 | 不画：控件 `OnRender` 自绘 | 同上 |
 | `MenuItem` 可重模板 | 只上色 | 见 0.2 |
 | WinUI `MenuFlyoutItem` 行高（≈40） | 38 字面量 | 见 0.6 |
 
-## 3. 状态映射（WinUI VisualState → ControlTemplate.Triggers）
+## 3. 状态映射（WinUI VisualState → 本实现的格子）
 
 | 上游组/状态 | 本实现格子 | 写入的行 |
 | --- | --- | --- |
-| CommonStates / PointerOver | `IsMouseOver=True` | Background/Foreground/Chevron/Accelerator 的 `*PointerOver` |
+| CommonStates / PointerOver | 模板 `IsMouseOver=True` + 样式 `IsMouseOver=True` | `*BackgroundPointerOver`（表面）与 `*ForegroundPointerOver`（标签，走属性：0.10） |
 | CommonStates / Pressed | 无 | —（不发布） |
-| CommonStates / Disabled | `IsEnabled=False` | `*Disabled` 全套 |
-| CheckStates / Checked（Toggle） | `IsChecked=True` | `CheckGlyph.Opacity=1` |
+| CommonStates / Disabled | 模板 `IsEnabled=False` + 样式 `IsEnabled=False` | `*BackgroundDisabled` 与 `*ForegroundDisabled` |
+| CheckStates / Checked（Toggle） | `IsChecked=True` | 收起 `IconRoot`（上游 CheckedWithIcon 的"图标让位给标记"），标记本身由控件画 |
 | CheckPlaceholderStates / IconPlaceholder | `Icon=null`（反向） | 收起 `IconRoot` |
-| KeyboardAcceleratorTextVisibility / Visible | `KeyboardAcceleratorTextOverride=""` / `=null`（反向） | 收起文案块 |
+| KeyboardAcceleratorTextVisibility / Visible | 无 | —（文案由控件自绘，收起与否也是它的事） |
 | PaddingSizeStates / NarrowPadding | 无 | —（无状态） |
 | MenuBarItem CommonStates / PointerOver | `IsMouseOver=True` | `MenuBarItemBackgroundPointerOver` + `…BorderBrushPointerOver` |
 | MenuBarItem CommonStates / Pressed、Selected | 无 | —（无属性） |
@@ -75,16 +82,20 @@
 ## 4. 四类证据
 
 - **构建**：`dotnet build FluentJalium.slnx -c Release`（闸口脚本第一步），两本字典 + `Styles/Menus.jalxaml` 已登记进 `Themes/Manifest.txt`（30 本）。
-- **行为/资源**：`tests/FluentJalium.Tests/AstraMenuTests.cs` —— 别名同一性、Thickness 数值、未发布行、可重模板类型、`MenuItem` 存而不建、部件名、格子表与逐格行名、`ShowAt/Hide`、`ContextMenu.Open`、peer Invoke、Toggle 暴露 Invoke 而非 Toggle、勾选圈不透明度、禁用色、悬停行名。
-- **视觉**：同文件的像素用例改走**表面与描边**——`Menu` 的 `Background` 行、flyout 条目的静置填充行覆盖成哨兵后各自进像素（并断言框架灰 `#2C2C2E` 与品牌绿为 0），子项 chevron 有 Light↔Dark 差，分隔线与 chevron 覆盖后可见。**标签文字不进像素断言**：纯文字主体在这条离屏通路上写 0 像素（`PixelHarness.Build` 的既有注记），文字色只证到实例身份。悬停一格因此只断"行名 + 与静置行不是同一实例"，像素半边明说欠着。
+- **行为/资源**：`tests/FluentJalium.Tests/AstraMenuTests.cs`（菜单族 126 条断言全过）—— 别名同一性、Thickness 数值、未发布行（含撤回的 11 条）、可重模板类型、`MenuItem` 存而不建、**单画者契约**（`TextBlock`/`KeyboardAcceleratorTextBlock`/`CheckGlyph`/`CheckPlaceholder`/`SubItemChevron` 五个名字必须缺席）、格子表与逐格行名、标签态在样式触发器上、`ShowAt/Hide`、`ContextMenu.Open`、peer Invoke、Toggle 暴露 Invoke 而非 Toggle、勾选让图标收起、`MenuBarItem` 的 `ContentButton.Content` 为空且树里没有承载 Title 的 TextBlock。
+- **视觉**：两条通路分开记。
+  - 进程内 `PixelHarness`：`Menu` 的 `Background` 行、flyout 条目的静置填充行覆盖成哨兵后各自进像素（并断言框架灰 `#2C2C2E` 与品牌绿为 0），子项行有 Light↔Dark 差；新增一条**反向**断言——覆盖 `DividerStrokeColorDefaultBrush` 与 `TextFillColorSecondaryBrush` 之后，分隔线区与子项行的哨兵色都是 0，而控件自绘的灰字 `#6E6E73` 仍在，即"画者是它，色不是我们的"。
+  - 真上屏合成捕获：`spike/FlyoutGhostProbe` + `spike/VisualQA/capture-window.ps1`（PrintWindow + `PW_RENDERFULLCONTENT`，dpi=168）抓 `PopupWindow` 自己的顶层窗口。修前 `#FFFFFF` 标签层 1194 px 叠在框架的 `#F5F5F7` 1670 px 上；修后 shipped / stripped / bare 三个 pass 的 `#FFFFFF` 都是 **0**，框架层逐像素计数一致（`#F5F5F7x1659 #D6D6D7x556`），且同一 pass 连抓两次差异 0 px——排除交换链伪影。原图留在 `spike/VisualQA/out/probe-{flyout,stripped-a,fixed-a,bare-a}*.png`。
 - **硬件输入**：**本批为零**。全部驱动都在进程内（`ShowAt`、`Open(Point)`、`RaiseEvent`、peer），没有一条真指针/触摸/键盘路径被证明，`IsMouseOver` 也无法从外部写入。
 
 ## 5. Known Gaps
 
 1. `MenuItem` 不可重模板：高亮、勾选标记、子菜单箭头三处是框架自绘；本批只拿到 rest/disabled 两个颜色。
-2. 悬停与按下无像素证据：`IsMouseOver` 不可外部写，`IsPressed` 在 flyout item 上不存在；且 `MenuFlyoutItem.OnRender` 会自绘背景，真指针下我们的格子是否被盖住未知（任务 13）。
+2. 悬停与按下无像素证据：`IsMouseOver` 不可外部写，`IsPressed` 在 flyout item 上不存在；且 `MenuFlyoutItem.OnRender` 会自绘 hover 填充，真指针下它是否盖在我们的格子上、两层 hover 会不会叠深，未知（任务 13）。
 3. 子菜单/菜单栏展开未证：`OnSubItemMouseEnter` 与 `MenuBarItem.OpenFromKeyboard` 一类路径可调用但无可观察的展开状态。
 4. 弹层外壳归框架：`MenuFlyoutPresenter*` 两行只对 `ContextMenu` 的自绘表面兑现承诺，`MenuFlyout` 与 `ContextMenu` 外面那层宿主 Border 仍是框架色；`ContextMenu.MinWidth=140` 也不被宿主尊重。
 5. `RadioMenuFlyoutItem`、`SplitMenuFlyoutItem`、`MenuFlyoutPresenter` 无原生类型，其行不发布；`MenuFlyoutItemReveal*` 等 reveal 行等材质批。
 6. 38 高度字面量是对控件自量的补偿，非上游数值；上游 `MenuFlyoutThemeMinHeight`=32 未发布。
 7. 触摸/笔与混合 DPI 下的菜单未测；减动效对菜单过渡（0.083s）未资源键化。
+8. **控件自绘的那几处文字色拿不到**：加速键文案、勾选标记、子项箭头、分隔线走运行时调色板的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，覆盖同名上游行（0.10）与 pass 4 的 33 个哨兵一样不动像素。因此这 11 条上游行撤回而非发布，WinUI 的 `TextFillColorSecondary` 加速键色只能算"运行时自己也是这个灰"的巧合，不声称逐 token 一致。
+9. 标签的 hover/disabled 变色由样式触发器写 `Foreground` 达成，但**没有真指针证据**：证到的是"画者读 Foreground"（tint pass 的品红标签），不是"悬停时这一格会被写"。

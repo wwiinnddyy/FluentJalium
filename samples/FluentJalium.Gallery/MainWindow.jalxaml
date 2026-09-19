@@ -400,7 +400,7 @@
 
             <StackPanel x:Name="MenusPage">
               <TextBlock Text="Menus" Style="{StaticResource TitleTextBlockStyle}" />
-              <TextBlock Text="Two menu shapes in one runtime: the WPF-style Menu / MenuItem pair, which 26.10.9 paints itself, and the WinUI-named MenuBar, MenuFlyout and MenuFlyoutItem family, which takes a template like any other control." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Two menu shapes in one runtime: the WPF-style Menu / MenuItem pair, which 26.10.9 paints itself, and the WinUI-named MenuBar, MenuFlyout and MenuFlyoutItem family, which takes a template for its surface. Even there the row content is the control's own paint - label, accelerator text, check mark, chevron and rule - so Astra's skin stops at the surface and the icon slot, and presenting either of those twice is the ghost this page used to show." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
               <TextBlock Text="Bars" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel Margin="16">

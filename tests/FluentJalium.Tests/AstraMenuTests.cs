@@ -9,7 +9,6 @@ using Jalium.UI.Input;
 using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using Jalium.UI.Threading;
-using ShapePath = Jalium.UI.Shapes.Path;
 
 namespace FluentJalium.Tests;
 
@@ -27,6 +26,17 @@ namespace FluentJalium.Tests;
 /// menu belongs to the framework: it wraps the content in its own MenuPopupScrollHost with a hardcoded border,
 /// so the presenter rows are only promised to reach pixels through ContextMenu, which is a control of ours.
 /// </para>
+/// <para>
+/// The visual-defect batch narrowed what a flyout skin may own. Every row type here paints its own content in
+/// OnRender - label, accelerator text, check mark, submenu chevron, separator rule - so a template that
+/// presents any of them again draws the row twice, which is the ghost the user reported. The tests below now
+/// pin the opposite contract: the skin carries only the surface and the icon slot (the one thing 26.10.9 never
+/// paints), the label states ride on Style.Triggers because the tint pass measured that the control's painter
+/// reads this Foreground, and the eleven rows that described pixels we no longer own are withdrawn rather than
+/// kept as decoration. spike/FlyoutGhostProbe holds a real flyout open for an outside PrintWindow capture and
+/// is what turns those claims into pixels: 1194 pure-white label pixels over the framework's own text before,
+/// zero after, with the framework layer's colours unchanged to the pixel count.
+/// </para>
 /// </summary>
 [Collection(AstraThemeRuntimeCollection.Name)]
 public sealed class AstraMenuTests
@@ -41,6 +51,9 @@ public sealed class AstraMenuTests
     private static readonly Color FrameworkMenuSurface = Color.FromRgb(0x2C, 0x2C, 0x2E);
 
     private static readonly Color FrameworkMenuHighlight = Color.FromRgb(0x3A, 0x3A, 0x3C);
+
+    /// <summary>The grey 26.10.9 paints a flyout row's own text in under the light theme.</summary>
+    private static readonly Color FrameworkRowText = Color.FromRgb(0x6E, 0x6E, 0x73);
 
     private readonly AstraThemeRuntimeFixture _fixture;
 
@@ -59,17 +72,14 @@ public sealed class AstraMenuTests
     [Theory]
     [InlineData("MenuFlyoutPresenterBackground", "AcrylicInAppFillColorDefaultBrush")]
     [InlineData("MenuFlyoutPresenterBorderBrush", "SurfaceStrokeColorFlyoutBrush")]
-    [InlineData("MenuFlyoutSeparatorBackground", "DividerStrokeColorDefaultBrush")]
     [InlineData("MenuFlyoutItemBackground", "SubtleFillColorTransparentBrush")]
     [InlineData("MenuFlyoutItemBackgroundPointerOver", "SubtleFillColorSecondaryBrush")]
     [InlineData("MenuFlyoutItemForeground", "TextFillColorPrimaryBrush")]
     [InlineData("MenuFlyoutItemForegroundDisabled", "TextFillColorDisabledBrush")]
-    [InlineData("MenuFlyoutItemKeyboardAcceleratorTextForeground", "TextFillColorSecondaryBrush")]
     [InlineData("MenuFlyoutSubItemBackgroundPointerOver", "SubtleFillColorSecondaryBrush")]
     [InlineData("MenuFlyoutSubItemForeground", "TextFillColorPrimaryBrush")]
-    [InlineData("MenuFlyoutSubItemChevron", "TextFillColorSecondaryBrush")]
-    [InlineData("MenuFlyoutSubItemChevronDisabled", "TextFillColorDisabledBrush")]
-    [InlineData("ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground", "TextFillColorSecondaryBrush")]
+    [InlineData("MenuFlyoutSubItemForegroundPointerOver", "TextFillColorPrimaryBrush")]
+    [InlineData("MenuFlyoutSubItemForegroundDisabled", "TextFillColorDisabledBrush")]
     [InlineData("MenuBarBackground", "SubtleFillColorTransparentBrush")]
     [InlineData("MenuBarItemForeground", "TextFillColorPrimaryBrush")]
     [InlineData("MenuBarItemBackgroundPointerOver", "SubtleFillColorSecondaryBrush")]
@@ -85,7 +95,6 @@ public sealed class AstraMenuTests
     [InlineData("MenuFlyoutPresenterThemePadding", 0, 2, 0, 2)]
     [InlineData("MenuFlyoutItemThemePadding", 11, 8, 11, 9)]
     [InlineData("MenuFlyoutItemMargin", 4, 2, 4, 2)]
-    [InlineData("MenuFlyoutItemChevronMargin", 24, 0, 0, -1)]
     [InlineData("MenuFlyoutSeparatorThemePadding", -4, 1, -4, 1)]
     [InlineData("MenuBarItemButtonPadding", 10, 4, 10, 4)]
     [InlineData("MenuBarItemMargin", 4, 4, 4, 4)]
@@ -110,6 +119,19 @@ public sealed class AstraMenuTests
     [Theory]
     [InlineData("MenuFlyoutItemForegroundPressed")]
     [InlineData("MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed")]
+    // The eleven rows below went out with the ghost fix: the accelerator text, the chevron and the rule are
+    // the control's own paint, so keeping their rows would publish tokens no consumer reads.
+    [InlineData("MenuFlyoutItemKeyboardAcceleratorTextForeground")]
+    [InlineData("MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver")]
+    [InlineData("MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled")]
+    [InlineData("MenuFlyoutItemChevronMargin")]
+    [InlineData("MenuFlyoutSeparatorBackground")]
+    [InlineData("MenuFlyoutSubItemChevron")]
+    [InlineData("MenuFlyoutSubItemChevronPointerOver")]
+    [InlineData("MenuFlyoutSubItemChevronDisabled")]
+    [InlineData("ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground")]
+    [InlineData("ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver")]
+    [InlineData("ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled")]
     [InlineData("MenuFlyoutSubItemBackgroundPressed")]
     [InlineData("MenuFlyoutSubItemForegroundPressed")]
     [InlineData("MenuFlyoutSubItemChevronPressed")]
@@ -259,39 +281,37 @@ public sealed class AstraMenuTests
 
     // ---------- part names and cells ----------
 
+    /// <summary>
+    /// The single-painter contract. 26.10.9 draws a flyout row's label, accelerator text, check mark and
+    /// chevron in its own OnRender, so a part that presents any of them here is a second painter rather than
+    /// a style choice - it is the ghost. What the skin keeps is the surface and the icon slot, because the
+    /// control paints no icon at all (Icon is a plain System.Object on this runtime).
+    /// </summary>
     [Fact]
-    public void The_flyout_item_keeps_upstreams_five_names()
+    public void The_flyout_skin_carries_only_the_surface_and_the_icon_slot()
     {
         _fixture.Run(() =>
         {
             var item = Mount(new MenuFlyoutItem { Text = "item", Icon = new TextBlock { Text = "*" } }, 240, 38);
-
             Assert.IsType<Border>(Part(item, "LayoutRoot"));
             Assert.IsType<Border>(Part(item, "IconRoot"));
-            Assert.IsType<ContentPresenter>(Part(item, "IconContent"));
-            Assert.IsType<TextBlock>(Part(item, "TextBlock"));
-            Assert.IsType<TextBlock>(Part(item, "KeyboardAcceleratorTextBlock"));
-            Assert.Equal("item", ((TextBlock)Part(item, "TextBlock")).Text);
-        });
-    }
+            var icon = Assert.IsType<ContentPresenter>(Part(item, "IconContent"));
+            Assert.Equal("*", ((TextBlock)icon.Content!).Text);
 
-    [Fact]
-    public void The_toggle_and_the_sub_item_keep_their_own_names()
-    {
-        _fixture.Run(() =>
-        {
             var toggle = Mount(new ToggleMenuFlyoutItem { Text = "toggle" }, 240, 38);
-            Assert.IsType<ShapePath>(Part(toggle, "CheckGlyph"));
-            Assert.IsType<Border>(Part(toggle, "CheckPlaceholder"));
-
             var sub = Mount(new MenuFlyoutSubItem { Text = "sub" }, 240, 38);
-            Assert.IsType<ShapePath>(Part(sub, "SubItemChevron"));
-            Assert.IsType<ContentPresenter>(Part(sub, "IconContent"));
+            foreach (var row in new Control[] { item, toggle, sub })
+            {
+                foreach (var name in new[] { "TextBlock", "KeyboardAcceleratorTextBlock", "CheckGlyph", "CheckPlaceholder", "SubItemChevron" })
+                {
+                    Assert.Null(PixelHarness.Named(row, name));
+                }
+            }
         });
     }
 
     [Fact]
-    public void The_menu_bar_item_keeps_the_three_names_upstream_uses()
+    public void The_menu_bar_item_leaves_its_title_to_the_control_that_paints_it()
     {
         _fixture.Run(() =>
         {
@@ -302,17 +322,19 @@ public sealed class AstraMenuTests
 
             Assert.IsType<Grid>(Part(item, "ContentRoot"));
             Assert.IsType<Border>(Part(item, "Background"));
-            // The title rides on a real Button: upstream does the same so the item keeps its click and focus
-            // behaviour, and measured, that button picks up our own Button template's Surface part.
+            // Upstream's item keeps a real Button for click and focus behaviour, and this runtime's MenuBarItem
+            // paints its Title itself, so the button stays empty: with a label here spike/MenuBarGhostProbe
+            // measured 1431 bright pixels in the bar band against the 603 the control's own paint accounts for.
             var button = (Button)Part(item, "ContentButton");
-            Assert.Equal("view", button.Content as string);
+            Assert.Null(button.Content);
+            Assert.DoesNotContain("view", TextsIn(item));
             Assert.NotNull(PixelHarness.Named(button, "Surface"));
         });
     }
 
     [Theory]
-    [InlineData("DefaultMenuFlyoutItemStyle", new[] { "Icon=null", "KeyboardAcceleratorTextOverride=", "KeyboardAcceleratorTextOverride=null", "IsMouseOver=True", "IsEnabled=False" })]
-    [InlineData("DefaultToggleMenuFlyoutItemStyle", new[] { "Icon=null", "KeyboardAcceleratorTextOverride=", "KeyboardAcceleratorTextOverride=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False" })]
+    [InlineData("DefaultMenuFlyoutItemStyle", new[] { "Icon=null", "IsMouseOver=True", "IsEnabled=False" })]
+    [InlineData("DefaultToggleMenuFlyoutItemStyle", new[] { "Icon=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False" })]
     [InlineData("DefaultMenuFlyoutSubItemStyle", new[] { "Icon=null", "IsMouseOver=True", "IsEnabled=False" })]
     [InlineData("DefaultMenuBarItemStyle", new[] { "IsMouseOver=True" })]
     public void Each_item_style_carries_one_cell_per_reachable_state(string key, string[] expected)
@@ -329,9 +351,8 @@ public sealed class AstraMenuTests
     [InlineData("DefaultMenuFlyoutItemStyle", "IsEnabled=False", "Background", "MenuFlyoutItemBackgroundDisabled")]
     [InlineData("DefaultMenuFlyoutItemStyle", "IsEnabled=False", "Foreground", "MenuFlyoutItemForegroundDisabled")]
     [InlineData("DefaultMenuFlyoutSubItemStyle", "IsMouseOver=True", "Background", "MenuFlyoutSubItemBackgroundPointerOver")]
-    [InlineData("DefaultMenuFlyoutSubItemStyle", "IsMouseOver=True", "Stroke", "MenuFlyoutSubItemChevronPointerOver")]
-    [InlineData("DefaultMenuFlyoutSubItemStyle", "IsEnabled=False", "Stroke", "MenuFlyoutSubItemChevronDisabled")]
-    [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsChecked=True", "Opacity", null)]
+    [InlineData("DefaultMenuFlyoutSubItemStyle", "IsEnabled=False", "Background", "MenuFlyoutSubItemBackgroundDisabled")]
+    [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsChecked=True", "Visibility", null)]
     [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsMouseOver=True", "Background", "MenuFlyoutSubItemBackgroundPointerOver")]
     public void A_state_cell_writes_the_row_upstream_writes(string key, string condition, string property, string? row)
     {
@@ -344,6 +365,31 @@ public sealed class AstraMenuTests
             {
                 Assert.Equal(row, ResourceKey(setter!));
             }
+        });
+    }
+
+    /// <summary>
+    /// The label rows survive the ghost fix on the style rather than in the template, and only because the
+    /// control's own painter reads this Foreground: spike/FlyoutGhostProbe's tint pass handed two rows a
+    /// magenta Foreground and the captured popup came back with two magenta labels.
+    /// </summary>
+    [Theory]
+    [InlineData("DefaultMenuFlyoutItemStyle", "IsMouseOver=True", "MenuFlyoutItemForegroundPointerOver")]
+    [InlineData("DefaultMenuFlyoutItemStyle", "IsEnabled=False", "MenuFlyoutItemForegroundDisabled")]
+    [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsMouseOver=True", "MenuFlyoutItemForegroundPointerOver")]
+    [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsEnabled=False", "MenuFlyoutSubItemForegroundDisabled")]
+    [InlineData("DefaultMenuFlyoutSubItemStyle", "IsMouseOver=True", "MenuFlyoutSubItemForegroundPointerOver")]
+    [InlineData("DefaultMenuFlyoutSubItemStyle", "IsEnabled=False", "MenuFlyoutSubItemForegroundDisabled")]
+    public void A_label_state_reaches_the_painter_through_the_style(string key, string condition, string row)
+    {
+        _fixture.Run(() =>
+        {
+            var cells = FluentThemeManager.GetStyle(key).Triggers.Cast<object>().OfType<Trigger>().Select(static trigger => new Cell(
+                $"{trigger.Property?.Name ?? "UNRESOLVED"}={Form(trigger.Value)}",
+                trigger.Setters.Cast<object>().OfType<Setter>().ToArray())).ToList();
+            var setter = FindCell(cells, condition).Setters
+                .First(candidate => (candidate.Property?.Name ?? candidate.PropertyName) == "Foreground");
+            Assert.Equal(row, ResourceKey(setter));
         });
     }
 
@@ -421,22 +467,27 @@ public sealed class AstraMenuTests
         });
     }
 
+    /// <summary>
+    /// Upstream's CheckedWithIcon state hides the icon and shows the mark in the same column, and this runtime
+    /// paints the mark itself, so the cell our skin can carry is the icon's disappearance - asserted through
+    /// the same IsChecked door a click reaches.
+    /// </summary>
     [Fact]
-    public void Checking_a_toggle_raises_the_mark_and_unchecking_lowers_it()
+    public void Checking_a_toggle_takes_the_icon_out_of_the_mark_column()
     {
         _fixture.Run(() =>
         {
-            var toggle = Mount(new ToggleMenuFlyoutItem { Text = "toggle" }, 240, 38);
-            var mark = (ShapePath)Part(toggle, "CheckGlyph");
-            Assert.Equal(0d, mark.Opacity);
+            var toggle = Mount(new ToggleMenuFlyoutItem { Text = "toggle", Icon = new TextBlock { Text = "*" } }, 240, 38);
+            var slot = (Border)Part(toggle, "IconRoot");
+            Assert.Equal(Visibility.Visible, slot.Visibility);
 
             toggle.IsChecked = true;
             PixelHarness.Settle(20);
-            Assert.Equal(1d, mark.Opacity);
+            Assert.Equal(Visibility.Collapsed, slot.Visibility);
 
             toggle.IsChecked = false;
             PixelHarness.Settle(20);
-            Assert.Equal(0d, mark.Opacity);
+            Assert.Equal(Visibility.Visible, slot.Visibility);
         });
     }
 
@@ -573,29 +624,36 @@ public sealed class AstraMenuTests
         });
     }
 
+    /// <summary>
+    /// Both halves of the ghost fix in one pixel reading, and the second half is the honest one: the row's
+    /// text is the control's own paint, so it appears in a crop that holds no label of ours - and overriding
+    /// the palette rows that paint names does not move it, which is the same unreachable resolution
+    /// spike/MenuProbe pass 4 measured for the rest of the menu chrome. Our withdrawn separator row paints
+    /// nothing at all now, which is what leaves one line instead of two.
+    /// </summary>
     [Fact]
-    public void The_separator_and_the_chevron_paint_their_own_rows()
+    public void The_controls_paint_their_own_rule_and_text_and_our_rows_reach_neither()
     {
         _fixture.Run(() =>
         {
             var separator = new MenuFlyoutSeparator();
             PixelHarness.Build(separator, 240, 12);
             PixelHarness.Settle(20);
-            FluentThemeManager.OverrideBrush("DividerStrokeColorDefaultBrush", SeparatorSentinel);
 
             var sub = new MenuFlyoutSubItem { Text = "sub" };
             PixelHarness.Build(sub, 240, 38);
             PixelHarness.Settle(20);
+            FluentThemeManager.OverrideBrush("DividerStrokeColorDefaultBrush", SeparatorSentinel);
             FluentThemeManager.OverrideBrush("TextFillColorSecondaryBrush", ChevronSentinel);
             try
             {
                 var line = PixelHarness.Render(separator, 240, 12);
-                Assert.True(line.Count(SeparatorSentinel) > 40,
-                    $"the separator row did not reach pixels; top={line.Top(6)}");
+                Assert.Equal(0, line.Count(SeparatorSentinel));
 
-                var chevron = PixelHarness.Render(sub, 240, 38);
-                Assert.True(chevron.Count(ChevronSentinel) > 8,
-                    $"the sub-item chevron did not reach pixels; top={chevron.Top(6)}");
+                var text = PixelHarness.Render(sub, 240, 38);
+                Assert.Equal(0, text.Count(ChevronSentinel));
+                Assert.True(text.Count(FrameworkRowText) > 8,
+                    $"the control's own row text did not reach pixels; top={text.Top(6)}");
             }
             finally
             {
@@ -606,12 +664,12 @@ public sealed class AstraMenuTests
     }
 
     /// <summary>
-    /// The theme flip has to be asked of something that actually paints: a text-only subject writes no
-    /// pixels here, so the chevron - a stroked Path reading a row whose light and dark values differ - is
-    /// what carries the claim.
+    /// The theme flip has to be asked of something that actually paints, and a text-only subject writes no
+    /// pixels here. What carries the claim now is the row's own paint: 26.10.9 draws the sub-item's label and
+    /// chevron itself from palette rows whose light and dark values differ, so the two captures cannot match.
     /// </summary>
     [Fact]
-    public void The_sub_item_chevron_follows_the_theme()
+    public void The_sub_items_own_paint_follows_the_theme()
     {
         _fixture.Run(() =>
         {
@@ -643,6 +701,19 @@ public sealed class AstraMenuTests
 
     private static FrameworkElement Part(DependencyObject root, string name) =>
         PixelHarness.Named(root, name) ?? throw new InvalidOperationException($"No part named {name}.");
+
+    /// <summary>Every string a TextBlock in this subtree carries - what a skin must never hold for a control that paints its own text.</summary>
+    private static List<string> TextsIn(DependencyObject root)
+    {
+        var texts = new List<string>();
+        if (root is TextBlock text && text.Text is { Length: > 0 } value) texts.Add(value);
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            texts.AddRange(TextsIn(VisualTreeHelper.GetChild(root, index)));
+        }
+
+        return texts;
+    }
 
     private static int CountMenuItems(ItemsControl menu)
     {

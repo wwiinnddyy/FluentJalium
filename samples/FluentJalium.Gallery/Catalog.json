@@ -247,7 +247,7 @@
       "page": "menus",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
-      "gaps": [ "pressed has no state to watch and is not published", "the control measures its own row and draws in OnRender as well as hosting a template, so a real hover may show a framework fill; the 38 literal is what makes upstream's 11,8,11,9 padding fit at all", "the narrow-padding and check-placeholder state groups have no consumer here" ]
+      "gaps": [ "pressed has no state to watch and is not published", "the control measures its own row and draws in OnRender as well as hosting a template, so a real hover may show a framework fill; the 38 literal is what makes upstream's 11,8,11,9 padding fit at all", "the narrow-padding and check-placeholder state groups have no consumer here", "the label and the accelerator text are the control's own paint: the skin presents only the icon, so the three MenuFlyoutItemKeyboardAcceleratorTextForeground* rows are withdrawn and that text keeps the runtime's grey" ]
     },
     {
       "markup": "ToggleMenuFlyoutItem",
@@ -255,7 +255,7 @@
       "page": "menus",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
-      "gaps": [ "upstream answers the Toggle automation pattern; 26.10.9 answers Invoke, which is asserted rather than fixed", "the check mark is a Path rather than upstream's FontIcon glyph", "pressed is not published" ]
+      "gaps": [ "upstream answers the Toggle automation pattern; 26.10.9 answers Invoke, which is asserted rather than fixed", "the mark is the control's own OnRender glyph, so the skin only takes the icon out of that column when checked (upstream's CheckedWithIcon) and its three accelerator rows are withdrawn", "pressed is not published" ]
     },
     {
       "markup": "MenuFlyoutSubItem",
@@ -263,7 +263,7 @@
       "page": "menus",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
-      "gaps": [ "SubMenuOpened and pressed are not published: IsSubMenuOpen is a read-only CLR getter and the submenu opens on mouse enter, which nothing but a pointer can raise", "the submenu popup is built by the control in code, so no template part carries it - which also means no menu part name is a functional contract" ]
+      "gaps": [ "SubMenuOpened and pressed are not published: IsSubMenuOpen is a read-only CLR getter and the submenu opens on mouse enter, which nothing but a pointer can raise", "the submenu popup is built by the control in code, so no template part carries it - which also means no menu part name is a functional contract", "the chevron is the control's own paint, so its three rows and MenuFlyoutItemChevronMargin are withdrawn and the mark keeps the runtime's grey" ]
     },
     {
       "markup": "MenuFlyoutSeparator",
@@ -271,7 +271,7 @@
       "page": "menus",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
-      "gaps": [ "MenuFlyoutSeparatorHeight (1) is an x:Double row and rides as a literal" ]
+      "gaps": [ "MenuFlyoutSeparatorHeight (1) is an x:Double row and rides as a literal", "the rule is the control's own paint, so our template is a transparent spacer and MenuFlyoutSeparatorBackground is withdrawn" ]
     },
     {
       "markup": "AppBarButton",

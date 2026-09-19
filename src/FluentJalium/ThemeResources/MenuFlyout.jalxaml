@@ -33,12 +33,10 @@
   <Thickness x:Key="MenuFlyoutItemBorderThickness">0</Thickness>
   <Thickness x:Key="MenuFlyoutItemMargin">4,2,4,2</Thickness>
   <Thickness x:Key="MenuFlyoutItemThemePadding">11,8,11,9</Thickness>
-  <Thickness x:Key="MenuFlyoutItemChevronMargin">24,0,0,-1</Thickness>
   <Thickness x:Key="MenuFlyoutSubItemBorderThickness">0</Thickness>
   <Thickness x:Key="MenuFlyoutSeparatorThemePadding">-4,1,-4,1</Thickness>
   <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="AcrylicInAppFillColorDefaultBrush" />
   <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
-  <StaticResource x:Key="MenuFlyoutSeparatorBackground" ResourceKey="DividerStrokeColorDefaultBrush" />
   <StaticResource x:Key="MenuFlyoutItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
   <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
   <StaticResource x:Key="MenuFlyoutItemBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
@@ -46,9 +44,6 @@
   <StaticResource x:Key="MenuFlyoutItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
   <StaticResource x:Key="MenuFlyoutItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
   <StaticResource x:Key="MenuFlyoutItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
-  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
   <StaticResource x:Key="MenuFlyoutSubItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
   <StaticResource x:Key="MenuFlyoutSubItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
   <StaticResource x:Key="MenuFlyoutSubItemBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
@@ -56,10 +51,11 @@
   <StaticResource x:Key="MenuFlyoutSubItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
   <StaticResource x:Key="MenuFlyoutSubItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
   <StaticResource x:Key="MenuFlyoutSubItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
-  <StaticResource x:Key="MenuFlyoutSubItemChevron" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="MenuFlyoutSubItemChevronPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="MenuFlyoutSubItemChevronDisabled" ResourceKey="TextFillColorDisabledBrush" />
-  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
-  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+
+  <!-- Eleven upstream rows this dictionary used to publish are withdrawn here, not because WinUI has them
+       but because 26.10.9 owns the pixels they described: the keyboard-accelerator text, the submenu chevron
+       and the separator rule are all painted by the controls' own OnRender, from the runtime's palette
+       (TextSecondary / TextDisabled / MenuFlyoutPresenterBorderBrush), and MenuFlyoutItemChevronMargin
+       positioned a chevron that is no longer ours to place. Publishing them would be a row no consumer
+       reads; the gap is recorded in audits/menu-flyout.md instead. -->
 </ResourceDictionary>

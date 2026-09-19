@@ -610,3 +610,42 @@ pass 4 全量自绘普查）、`spike/TextWrapProbe`（pass 1 度量与排布）
 「单个 `TextBlock` + 固定高度滚动宿主」，让这条声明不再依赖那次度量（`MainWindow.jalxaml`、
 `MainWindow.jalxaml.cs` 各留原因注释）。**这是绕开，不是治好**：框架侧的度量/排布宽度差仍在，
 `TextWrapProbe` case E（先布局、后设文本）里甚至连重测都没发生（`DesiredSize` 停在 0x0）。
+
+## S0-q：控件的画者读属性、不读我们的行——重模板的边界是"谁画"，不是"谁命名部件"（flyout 重影批，2026-09-19）
+
+用户报"点开 flyout 里面又有重影"。这一批量到的不是新缺陷，而是 S0-p 那条结论的另一半：
+
+**1 · "没有部件名开关"不等于"不画"。** `spike/FlyoutGhostProbe` 解 `OnRender` 的 IL 字面量，四个 flyout
+类型全在自绘内容：`MenuFlyoutItem` = `OneSurfaceHover, MenuFlyoutItemBackgroundHover, OneTextDisabled,
+TextDisabled, Segoe MDL2 Assets, OneTextSecondary, TextSecondary`；`ToggleMenuFlyoutItem` = `✓`；
+`MenuFlyoutSubItem` = `OneTextSecondary, TextSecondary`（且 `sealed`，连"空重写双胞胎"这条路都堵死）；
+`MenuFlyoutSeparator` = `MenuFlyoutPresenterBorderBrush`。我们的模板又摆了一份标签、加速键、勾选、箭头、
+分隔线，于是每行两层。既然读不出开关，能做的只有**不重复画**。
+
+**2 · 判据只有合成窗口这一条。** 进程内 `RenderTargetBitmap` 裁剪读不出这两层谁画的（同一张裁剪图里
+shipped 与"空 OnRender 双胞胎"的亮像素计数一模一样），必须 `PrintWindow` + `PW_RENDERFULLCONTENT` 抓
+`PopupWindow` 自己的顶层窗口。为排除"这是交换链伪影"的反解释，同一 pass 连抓两次逐像素比对：**差异 0 px**，
+重影是确定性的，不是抓帧时机。
+
+**3 · 控件的画者读依赖属性，这一点让标签态活了下来。** tint pass 给第 1 行与切换行本地写
+`Foreground=#FF00FF`、`FontSize=20`，抓回来的弹窗里那两行标签就是品红、就是 20 号。所以标签的
+hover/disabled 变色不必放弃：从模板格子搬到 `Style.Triggers` 写 `Foreground` 即可，`MenuFlyout*Foreground*`
+行继续有消费点。
+
+**4 · 但画者不读我们发布的行。** 覆盖 `TextFillColorSecondaryBrush` 之后，加速键文案、勾选标记、子项箭头、
+分隔线的颜色纹丝不动（控件自绘的灰 `#6E6E73` 仍在原位）——与 S0-n 那条"33 个哨兵键装入后菜单像素不动"
+同构。结论：那 11 条上游行（加速键 3×2、chevron 3、`MenuFlyoutItemChevronMargin`、
+`MenuFlyoutSeparatorBackground`）**撤回发布**而不是留着当装饰，并把"这几处颜色拿不到"写进审计的 Known Gaps。
+
+**5 · 撤内容这一步先在探针里试，别改产品。** 本地 `Template` 值胜过样式 setter，所以 `stripped`（只留表面
++ 图标槽）与 `bare`（只留表面）两个 pass 用探针里的内联字典就能装出来，一次运行同时拿到"控件到底画了哪些
+格子、几何能不能用"的答案，再动 `Styles/Menus.jalxaml`。省掉一整轮"改产品→重建→重抓"的循环。
+
+**6 · `MenuFlyoutItem.Icon` 的类型是 `System.Object`。** 控件不画图标（`bare` 的图标区是空的），所以图标槽
+必须留在我们的模板里，`ContentPresenter` 正是承载任意内容对象的部件。探针早期用反射往 `Icon` 塞了一个
+`IconSource` 实例，图标位于是打出 `System.Object` 字样——那是探针的错，不是模板的错，记下来免得下次把它
+当成"图标渲染缺陷"。
+
+**7 · 数值。** 修前弹窗合成图里属于我们那层标签的 `#FFFFFF` 有 1194 px，压在框架自己的 `#F5F5F7` 1670 px 上；
+修后 shipped / stripped / bare 三个 pass 的 `#FFFFFF` 全为 **0**，框架层逐色计数（`#F5F5F7x1659`、
+`#D6D6D7x556`、`#242424x737`）与参照 pass 完全一致——即"只剩一位画者，且它画的东西没被改动"。
