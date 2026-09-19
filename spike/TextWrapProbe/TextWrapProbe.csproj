@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway text-measure probe. A wrapping TextBlock that reports one line of desired height and
+       paints two is what makes the Gallery's parity footer and the info bar's message overlap their
+       neighbours (spike/VisualQA/out/inputs.png, surfaces.png). This measures DesiredSize against the
+       arranged height for the same text under the same width constraint, in the containers the shell
+       and the template actually use, so the overlap is attributed to a specific pass. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TextWrapProbe</RootNamespace>
+    <AssemblyName>TextWrapProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

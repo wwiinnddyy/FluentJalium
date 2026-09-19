@@ -93,7 +93,7 @@
 | `IconStates/UserIconVisible` | **无**（没有图标槽，§5.2） |
 | `IconStates/NoIconVisible` | 静置（`IconArea` 默认 `Collapsed`） |
 | 可关闭组两态 | `Trigger IsClosable=False` → 关闭按钮 `Collapsed` |
-| `InfoBarVisible` / `InfoBarCollapsed` | 静置 / `Trigger IsOpen=False` → `ContentRoot` `Collapsed`（S5） |
+| `InfoBarVisible` / `InfoBarCollapsed` | 静置 / `Trigger IsOpen=False` → `RootBorder` `Collapsed`（S5） |
 | `ForegroundNotSet` / `ForegroundSet` | **无**：本运行时没有"该属性是否有本地值"这种条件 |
 | `BannerContent` / `NoBannerContent` | **无**：`Content` 槽固定在第二行 |
 
@@ -101,7 +101,7 @@
 
 - **构建**：`tools/Test-AstraGates.ps1` 串行通过。
 - **行为**：`AstraExpanderInfoBarTests` —— 原生模板无效而我们的有效（S2）、`PART_CloseButton` 一次点击恰好
-  触发一次 `CloseButtonClick` + `Closed` + `IsOpen=false`（S3）、`IsOpen=False` 后 `ContentRoot` 不再可见（S5）、
+  触发一次 `CloseButtonClick` + `Closed` + `IsOpen=false`（S3）、`IsOpen=False` 后 `RootBorder` 不再可见（S5）、
   三条严重度格各自点名底色/图标/前景行并改字形码点、`IsIconVisible`/`IsClosable` 各有一格、
   标题与消息部件的前景确实是 `InfoBarTitleForeground` 那个实例。
 - **视觉**：覆盖调色板键 `SystemFillColorCriticalBackgroundBrush` 为哨兵色后 Error 条像素 >3000 且不含 `#2D2D37`；
@@ -120,3 +120,46 @@
 7. 焦点不在控件上（`IsTabStop=False`，与上游一致），因此关闭按钮的可达性只由它自己的 Tab 停靠点保证，未做键盘遍历实测。
 8. 标题/消息为 `Wrap`；上游的 `WrapWholeWords` 在本运行时的枚举里没有对应项。
 9. 框架自绘路线的九条 `InfoBar*` 键（S6）本批故意不发布；若哪天要回退到自绘，它们必须带自己的像素证据回来。
+10. 本节第 6 段的普查只证明"哪些原生控件自带 `OnRender`、它们各自按名字要哪些部件"，没有证明除 `InfoBar` 之外
+    任何一条模板是否已经拿到让路所需的名字。`NumberBox`（要 `PART_LayoutRoot`）、`Slider`（要 `PART_Segments`）、
+    `ComboBox`（要 `PART_SelectionPresenter`）三条是**待量的重影候选**，不是已确认的缺陷。
+
+## 6. 视觉缺陷批的更正（2026-09-19，用户实测反馈"重影"）
+
+审计写对了，代码没照做：本节记录这条落差在屏幕上造成的真实缺陷，以及把它对齐的两处改动。探针 `spike/InfoBarGhostProbe`
+（pass 1–4，日志 `ghost-probe*.txt` 在树内）、`spike/TextWrapProbe`（pass 1）。
+
+**缺陷 1 · 整条信息条被画两遍。** `Styles/Surfaces.jalxaml` 的模板把根 `Border` 命名为上游的 `ContentRoot`，
+而运行时 `InfoBar.OnApplyTemplate` 找的名字是 `RootBorder`——这一点本轮用 IL 直接读出来了（`ldstr` 字面量：
+`RootBorder`、`PART_CloseButton`），不再依赖推测。名字没对上时基础类没找到它的部件，于是 `OnRender` 不让路，
+在我们模板之上又画一遍自己的图标、标题、消息和关闭叉号：`spike/VisualQA/out/before-fix-infobar-ghost.png`（改名前 surfaces 页的局部截图）里那两层错位文字。
+把部件改名成运行时要的名字即修复。像素侧的对照：
+
+| 量法 | 改名前 | 改名后 |
+|---|---|---|
+| 样式条（隐藏图标与关闭）捕获的颜色数 | 14 | **7** |
+| 其中基础类图标蓝 `#0A84FF` | 178 px | **0 px** |
+| 样式条 vs 另一条把 `OnRender` 覆写成空的同类 | 不同 | **逐像素相同**（7 色 / 936 ink） |
+
+第三行是关键对照：改名之后，"我们的模板"与"模板 + 基础类完全不画"两种情况捕获一致，说明模板里已经没有任何东西
+依赖基础类那一层。这个对照在改名前不成立（基础类多画 178 px 蓝）。
+
+**缺陷 2 · 消息换行后第二行画到条外面去。** `InfoBar.MeasureOverride` 返回的是基础类自己那套单行字面布局的高度，
+不是模板树要的：300 DIP 宽、消息两行的条，内部要 107.1，控件对外只报 69.8，于是第二行落在表面之下
+（`spike/TextWrapProbe` pass 1 case B）。`FluentInfoBar` 因此多一个 `MeasureOverride`：先让基础类量它自己那套，
+再用本次可用尺寸量模板根，取两者较大。上游不需要这一句，因为它的条完全由模板量出来。
+
+**两处偏离上游，都记在这里：**
+- 部件名：上游 `InfoBar.xaml:15` 用 `x:Name="ContentRoot"`，本库用 `RootBorder`。改名不是风格选择，是这个运行时
+  的 `OnApplyTemplate` 只认后者；认不到就不让路（缺陷 1）。
+- 度量：上游没有 `MeasureOverride`，本库的自有类型有。理由同上，是可测的行为缺口，不是提前抽象。
+
+**回归闸口**（三条都做过反向验证：把修复撤掉即失败，装回去即通过）：
+`A_templated_bar_leaves_the_base_class_nothing_to_paint`、
+`A_wrapped_message_grows_the_bar_instead_of_painting_below_it`，以及原有的
+`The_native_info_bar_ignores_a_template_and_ours_does_not`（部件名断言已跟着改名）。
+
+**仍未证明**：`InfoBar` 之外那些"自带 `OnRender`"的原生控件里，我们的模板是否都拿到了基础类让路所需的部件名。
+本轮普查（`ghost-probe4.txt` 第 C 段）给出的候选是 `NumberBox` 要 `PART_LayoutRoot` 而 `Styles/TextInput.jalxaml`
+没有这个名字；`Slider` 要 `PART_Segments`、`ComboBox` 要 `PART_SelectionPresenter`，本库都没有——三者是否真的因此
+多画一层，尚未按缺陷 1 那样量过，见 Known Gaps 第 10 条。

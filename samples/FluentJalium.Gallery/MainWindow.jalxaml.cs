@@ -44,6 +44,7 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
             [(FluentNavigationItem)SurfacesItem!] = (FrameworkElement)SurfacesPage!,
             [(FluentNavigationItem)MenusItem!] = (FrameworkElement)MenusPage!,
+            [(FluentNavigationItem)CommandBarItem!] = (FrameworkElement)CommandBarPage!,
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
         };
         _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
@@ -53,6 +54,7 @@ public partial class MainWindow : Window
         _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
         _pageIds[(FluentNavigationItem)SurfacesItem!] = "surfaces";
         _pageIds[(FluentNavigationItem)MenusItem!] = "menus";
+        _pageIds[(FluentNavigationItem)CommandBarItem!] = "command-bar";
         _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
 
         // Only the active page is in the visual tree and tab order. Reusing the same
@@ -64,6 +66,7 @@ public partial class MainWindow : Window
         WireSelection();
         WireSurfaces();
         WireMenus();
+        WireCommandBar();
         WireAppearance();
         SetAccessibleNames();
 
@@ -127,6 +130,58 @@ public partial class MainWindow : Window
         var dropDown = (FluentDropDownButton)DropDownMoreButton!;
         dropDown.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down opened; IsExpanded={dropDown.IsExpanded}.";
         dropDown.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down closed; IsExpanded={dropDown.IsExpanded}.";
+    }
+
+    private void WireCommandBar()
+    {
+        var bar = (CommandBar)SampleCommandBar!;
+        var save = new AppBarButton { Label = "Save", Icon = new SymbolIcon { Symbol = Symbol.Save } };
+        var bold = new AppBarToggleButton { Label = "Bold", Icon = new SymbolIcon { Symbol = Symbol.Bold } };
+        var share = new AppBarButton { Label = "Share", Icon = new SymbolIcon { Symbol = Symbol.Share } };
+        var disabled = new AppBarButton { Label = "Delete", Icon = new SymbolIcon { Symbol = Symbol.Delete }, IsEnabled = false };
+        var without = new AppBarButton { Label = "No icon" };
+        bar.PrimaryCommands.Add(save);
+        bar.PrimaryCommands.Add(bold);
+        bar.PrimaryCommands.Add(share);
+        bar.PrimaryCommands.Add(new AppBarSeparator());
+        bar.PrimaryCommands.Add(disabled);
+        bar.PrimaryCommands.Add(without);
+        bar.SecondaryCommands.Add(new AppBarButton { Label = "Properties" });
+        bar.SecondaryCommands.Add(new AppBarButton { Label = "Version history" });
+
+        save.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Save invoked - the fill under the label is AppBarButtonBackground, and the press that lights it is the IsPressed cell.";
+        share.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Share invoked through the same routed handler a click reaches.";
+        bold.IsChecked = true;
+        bold.Checked += (_, _) => ((TextBlock)CommandBarReadout!).Text = $"Bold checked: the accent fill is AppBarToggleButtonBackgroundChecked, which is the whole mark - upstream shows no glyph in a bar.";
+        bold.Unchecked += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Bold unchecked: the resting row is transparent, so the button reads as the bar again.";
+        disabled.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "A disabled bar button answered a click.";
+
+        ((Button)CommandBarOpenButton!).Click += (_, _) =>
+        {
+            bar.IsOpen = !bar.IsOpen;
+            ((TextBlock)CommandBarReadout!).Text = $"IsOpen={bar.IsOpen} - the overflow list is a popup the bar builds for itself, and its colour is the one row this batch had to withhold.";
+        };
+
+        var compact = false;
+        ((Button)CommandBarCompactButton!).Click += (_, _) =>
+        {
+            compact = !compact;
+            foreach (var element in bar.PrimaryCommands.OfType<AppBarButton>())
+            {
+                element.IsCompact = compact;
+            }
+
+            ((Button)CommandBarCompactButton!).Content = compact ? "Show the labels" : "Compact the buttons";
+            ((TextBlock)CommandBarReadout!).Text = compact
+                ? "IsCompact dropped every label - the one application-view state this runtime exposes as a property a cell can watch."
+                : "Labels back: the side-by-side layout upstream has is picked by the bar's DefaultLabelPosition, and the bar never builds a template of ours, so no label position but this one is reachable.";
+        };
+
+        ((Button)CommandBarClearButton!).Click += (_, _) =>
+        {
+            bold.IsChecked = false;
+            ((TextBlock)CommandBarReadout!).Text = "Check cleared: the accent fill left with it.";
+        };
     }
 
     private void WireMenus()
@@ -387,38 +442,40 @@ public partial class MainWindow : Window
     /// page with no type of its own says so instead of going quiet, and a missing catalog file says
     /// that too - an empty strip would otherwise look like "nothing restyled here".
     /// </summary>
+    /// <remarks>
+    /// Status and open gaps land in one TextBlock on purpose. Two stacked wrapping TextBlocks overlap
+    /// here: the first is measured at a wider constraint than it is eventually arranged at, so it asks
+    /// for one line and paints two, and the second is placed on top of the overflow. A single element
+    /// inside the footer's fixed-height scroll host cannot do that.
+    /// </remarks>
     private void ShowParity(FluentNavigationItem? item)
     {
         var status = (TextBlock)ParityStatus!;
-        var gaps = (TextBlock)ParityGaps!;
         if (item is null)
         {
             status.Text = string.Empty;
-            gaps.Text = string.Empty;
             return;
         }
 
         if (_catalog.Controls.Length == 0)
         {
             status.Text = "Catalog.json did not reach the output folder, so no parity claim on this page is checked.";
-            gaps.Text = string.Empty;
             return;
         }
 
         if (!_pageIds.TryGetValue(item, out var pageId))
         {
             status.Text = $"{item.Content} is not in the catalog.";
-            gaps.Text = string.Empty;
             return;
         }
 
         var onPage = _catalog.OnPage(pageId);
         var title = _catalog.Page(pageId)?.Title ?? pageId;
-        status.Text = onPage.Length == 0
+        var claim = onPage.Length == 0
             ? $"{title} · composes the {_catalog.Controls.Length} restyled types listed on their own pages"
             : $"{title} · {string.Join(", ", onPage.Select(control => $"{control.Name} {control.Parity}"))} · {onPage.Length} of {_catalog.Controls.Length} restyled types";
         var open = _catalog.GapsLine(pageId);
-        gaps.Text = open.Length == 0 ? string.Empty : $"Not claimed: {open}";
+        status.Text = open.Length == 0 ? claim : $"{claim}\nNot claimed: {open}";
     }
 
     private void ApplyAppearance()

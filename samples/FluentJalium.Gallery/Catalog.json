@@ -13,6 +13,7 @@
     { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
     { "id": "surfaces", "title": "Surfaces", "host": "SurfacesPage" },
     { "id": "menus", "title": "Menus", "host": "MenusPage" },
+    { "id": "command-bar", "title": "Command bar", "host": "CommandBarPage" },
     { "id": "settings", "title": "Settings", "host": "SettingsPage" }
   ],
   "controls": [
@@ -271,6 +272,58 @@
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
       "gaps": [ "MenuFlyoutSeparatorHeight (1) is an x:Double row and rides as a literal" ]
+    },
+    {
+      "markup": "AppBarButton",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "26.10.9 already ships an implicit style for this type and paints it from nine rows of its own, including a hard-coded accent purple for AppBarButtonForeground: ours replaces both, but only for a control built after the theme is installed",
+        "upstream's six Secondary/Overflow row families are not published, because the runtime exposes no overflow flag on a bar button, so a secondary command keeps its bar geometry",
+        "accelerator text, the highlight overlay and the eleven chevron rows have no dependency property behind them here",
+        "the side-by-side label layout is not reachable: CommandBarLabelPosition is Default/Collapsed on both sides and neither member moves anything on its own, while upstream picks it from the bar's DefaultLabelPosition - on a control that never builds a template",
+        "the hover leg has never been driven by a real pointer: IsMouseOver has no public setter here, so what is measured is a routed MouseDown/MouseUp leaving the flag set and the hover row reaching the surface (The_hover_row_reaches_the_surface_once_a_routed_press_leaves_the_pointer_over), not an enter-and-leave cycle"
+      ]
+    },
+    {
+      "markup": "AppBarToggleButton",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "checked is the accent fill and nothing else, which is upstream's answer inside the bar too: the check-glyph and highlight-overlay rows belong to the overflow layout, and no flag here selects it",
+        "AppBarToggleButtonBorderBrushChecked is a deviation - upstream's AccentControlElevationBorderBrush is an absolute gradient this pipeline cannot publish",
+        "the checked pair is reached by setting IsChecked and through the automation peer's Toggle pattern, not by a pointer click: this family has no keyboard or touch behaviour test of its own, and inherits whatever ToggleButton does",
+        "hover has the same limit as the button: no public IsMouseOver setter, so the leg is measured through a routed press pair and never through a pointer that moves"
+      ]
+    },
+    {
+      "markup": "AppBarSeparator",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "the framework gives this type no template and draws its own line in code from its own row, but does build ours, so two paths can paint the same pixel: our row is the one the capture reads, and a host build that draws without the template would show the framework's grey",
+        "no state cells: a separator has no hover, press or checked state here, and upstream gives it none either",
+        "the half-DIP corner radius on the line is a literal - upstream publishes it as an x:Double row this reader cannot parse"
+      ]
+    },
+    {
+      "markup": "CommandBar",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "surface and geometry only: the control stores a Template and never builds one, so its code-built StackPanel, its 40x32 ellipsis button and its overflow Popup stay host-drawn and follow just the three rows its code reads",
+        "the open state never displays: setting IsOpen moves that property only - the bar's own Popup stays closed in-process - so CommandBarBackgroundOpen, the ellipsis icon rows, the light-dismiss overlay and the overflow-presenter borders are withheld, and AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach pins why no row of that state can be promised to an app",
+        "a SplitButton placed in the bar keeps its non-app-bar style: upstream's SplitButtonInAppBarUnfocusedPointerOver and a CommandBar-scoped SplitButton style are still owed by this family",
+        "the bar's 48-tall closed height is a literal on the style; upstream's AppBarThemeMinHeight / AppBarThemeCompactHeight pair are x:Double rows this reader cannot parse, and no compact height is set at all"
+      ]
     }
   ]
 }

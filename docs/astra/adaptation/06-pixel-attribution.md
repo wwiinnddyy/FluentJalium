@@ -160,6 +160,23 @@ Dispatcher.CurrentDispatcher.InvokeAsync(() => frame.Continue = false)
 （`A_focused_text_box_widens_only_the_bottom_edge`、`A_focused_slider_raises_its_focus_ring`），
 并且 Slider 那条同时是 §"时机不是一帧"里 `Settle()` 的验收。
 
+## `--no-build` 不是"跳过重编"，是"跳过真相"（视觉缺陷批，2026-09-19）
+
+同一份树、同一批断言，两小时内出现两次假读数，都是 `dotnet test --no-build` 给的：
+
+| 读数 | 当时的判据 | 真相 |
+| --- | --- | --- |
+| 605 条里 1 条红：`AstraScrollHostTests.An_opaque_scroll_host_background_covers_its_own_bar` | "我新加的 300×200 宿主污染了共享窗口" | 二进制比源码旧 4 小时 37 分；重编后 605/605 全绿，那条单独跑、整批跑都不复现 |
+| 500 条里 2 条红：MenuBar 两行无消费点 + 目录 36/32 不符 | "CommandBar 批漏改两个闸口" | 同一份过期二进制在读当前 `Catalog.json`；重编后这两条也在 605 里绿了 |
+
+代价不是浪费时间，是**结论方向错**：第一条把注意力整个领到"测试互相污染"这条不存在的路径上，
+而真正的前提（源码 15:01/15:24 改过、dll 还是 10:54/10:58）一眼可见却没有被查。
+测试数从 605 掉到 500 本来就是最强的信号——用例不会因为换窗口大小而少 105 条。
+
+规则：任何闸口读数之前先比一次时间戳（源码 vs `bin/<cfg>` 里的 `FluentJalium*.dll`），或干脆不带
+`--no-build`。读数一旦用来支撑"某条主张不成立"，还要写下它是在哪次构建上取的——
+`tools/Test-AstraGates.ps1` 之所以把 restore→build→test 串成一条，理由就是这条。
+
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——

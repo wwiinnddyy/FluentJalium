@@ -31,6 +31,9 @@
         <fluent:FluentNavigationItem x:Name="SurfacesItem" Content="Surfaces" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Calendar" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="CommandBarItem" Content="Command bar" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="List" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
         <fluent:FluentNavigationItem x:Name="MenusItem" Content="Menus" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="More" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
@@ -428,6 +431,24 @@
               </Border>
             </StackPanel>
 
+            <StackPanel x:Name="CommandBarPage">
+              <TextBlock Text="Command bar" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="The one family in Astra that arrives with a theme already underneath it: 26.10.9 ships its own implicit styles for the three app-bar elements and paints its bar from nine rows of its own, so this page is mostly what a shadowed row buys - and one surface a shadow cannot reach." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="A bar with commands" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <CommandBar x:Name="SampleCommandBar" HorizontalAlignment="Left" />
+                  <WrapPanel Margin="0,12,0,0">
+                    <Button x:Name="CommandBarOpenButton" Content="Open the overflow" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="CommandBarCompactButton" Content="Compact the buttons" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="CommandBarClearButton" Content="Clear the check" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The icons, labels, 68 DIP width, 16 DIP content box and the accent fill of the checked toggle are ours: the framework's own skin measured 44 wide with a 10 pixel label, a 20 DIP icon box and a purple foreground. The bar's own surface and its overflow list are the honest gap - that control stores a Template and never builds one, so only the rows its code reads can be steered, and the overflow row was measured back out of the publication list because no pixel of it moved." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="CommandBarReadout" Text="Nothing invoked yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
             <StackPanel x:Name="SettingsPage">
               <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
               <TextBlock Text="Change the Gallery appearance while keeping control state." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
@@ -493,11 +514,15 @@
               <TextBlock x:Name="LiveOutput" Text="Ready. Choose a control to try it." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
             </StackPanel>
             <Button x:Name="ClearOutputButton" Grid.Column="1" Content="Clear" Style="{StaticResource SubtleButtonStyle}" VerticalAlignment="Top" Margin="12,0,0,0" />
-            <!-- Generated from Catalog.json, so the parity claim cannot outlive the styles it describes. -->
-            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,0">
+            <!-- Generated from Catalog.json, so the parity claim cannot outlive the styles it describes. One
+                 TextBlock rather than two siblings, and a fixed-height scroll host: a wrapping TextBlock that
+                 is measured at a wider constraint than it is arranged at reports fewer lines than it paints,
+                 and the sibling below it is then placed on top of the overflow (spike/VisualQA/out/inputs.png,
+                 spike/TextWrapProbe case E). The height here does not depend on that measure. -->
+            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" MaxHeight="96" Margin="0,10,0,0"
+                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
               <TextBlock x:Name="ParityStatus" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
-              <TextBlock x:Name="ParityGaps" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{StaticResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" Margin="0,2,0,0" />
-            </StackPanel>
+            </ScrollViewer>
           </Grid>
         </Border>
       </Grid>

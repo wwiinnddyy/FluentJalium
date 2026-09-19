@@ -18,10 +18,25 @@ namespace FluentJalium.Controls;
 /// the before-and-after tree (spike/ExpanderInfoBarProbe, docs/astra/adaptation/00 S0-m).
 /// </para>
 /// <para>
-/// What the base class still owns after that: <c>IsOpen</c> feeding its own measure, and the Click of a
-/// <see cref="Button"/> named <c>PART_CloseButton</c>, which raises <see cref="InfoBar.CloseButtonClick"/>
-/// and sets <c>IsOpen=false</c>. Nothing else in the template is wired by name, and the base does not
-/// collapse a templated bar when <c>IsOpen</c> turns false, so the style does that itself.
+/// Two more overrides, each for a second measured gap in the same base class:
+/// <list type="bullet">
+/// <item><description>the part name. <c>InfoBar.OnApplyTemplate</c> looks up <c>RootBorder</c> and
+/// <c>PART_CloseButton</c> by name (IL string literals, spike/InfoBarGhostProbe pass 2), and its
+/// <c>OnRender</c> only steps aside once the first is found. Upstream's template calls its root
+/// <c>ContentRoot</c>, so the shipping template uses the runtime's name instead: with the upstream name the
+/// base drew a second, offset copy of the icon, the title, the message and its own close mark on top of our
+/// template - the ghost in spike/VisualQA/out/surfaces.png. Renaming that one part made a styled bar and a
+/// bar whose <c>OnRender</c> is suppressed capture byte-identically (pass 3: 7 distinct colours, 936 ink
+/// pixels, both).</description></item>
+/// <item><description>the measure. <c>InfoBar.MeasureOverride</c> returns the height of the base class's own
+/// literal layout, not the template's: a bar whose message wraps to two lines measured 107.1 tall inside and
+/// 69.8 outside, so the second line painted below the surface (spike/TextWrapProbe pass 1 case B). Taking the
+/// larger of the two restores what upstream gets for free from a template-driven measure.</description></item>
+/// </list>
+/// What the base class still owns after all this: the Click of a <see cref="Button"/> named
+/// <c>PART_CloseButton</c>, which raises <see cref="InfoBar.CloseButtonClick"/> and sets <c>IsOpen=false</c>,
+/// and the collapse of a closed bar, which the style does itself because the base does not do it for a
+/// templated control.
 /// </para>
 /// </remarks>
 public class FluentInfoBar : InfoBar
@@ -36,6 +51,23 @@ public class FluentInfoBar : InfoBar
         UseTemplateContentManagement();
         ApplyDefaultStyle();
         Loaded += (_, _) => ApplyDefaultStyle();
+    }
+
+    /// <summary>Measures the base class's own geometry and the built template, and returns the larger of the two.</summary>
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var self = base.MeasureOverride(availableSize);
+        if (VisualChildrenCount == 0 || GetVisualChild(0) is not FrameworkElement root || root.Visibility == Visibility.Collapsed)
+        {
+            return self;
+        }
+
+        // The base class measures its own literal layout, not the tree it now hosts, so the template's
+        // DesiredSize is whatever an earlier pass left behind. Measuring the root under this pass's own
+        // constraint is what a template-driven control does for free, and it is the only way the wrapped
+        // second line is inside the height before it is painted below it.
+        root.Measure(availableSize);
+        return new Size(Math.Max(self.Width, root.DesiredSize.Width), Math.Max(self.Height, root.DesiredSize.Height));
     }
 
     private void ApplyDefaultStyle()

@@ -1,0 +1,91 @@
+=== 0. does the runtime have a compound-condition trigger at all? ===
+  MultiTrigger parse: ok
+  VisualStateManager parse (template built eagerly below): ok
+
+=== A. the three interaction cells ===
+  rest: root=#112233 (expect Rest)
+    (set IsMouseOver=True: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+  IsMouseOver=true: root=#112233 (expect Hover)
+    (set IsMouseOver=False: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+  IsPressed=true: root=#112233 (expect Pressed) isPressed=True
+  after mouse up: root=#112233 (expect Rest) isPressed=False
+  IsEnabled=false: root=#112233 (expect Disabled) labelVisible=True
+
+=== B. the app-bar-only conditions ===
+  IsCompact=true: root=#112233 (expect Compact) size=838.29x40 labelVisible=True
+  ArgumentException: Requested value 'LeftOnIcon' was not found.
+    labelPosition reads Default
+  LabelPosition=LeftOnIcon: root=#112233 (expect OnRight) size=838.29x44
+  tree in that state:
+      AppBarButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x44
+        Border 'Root' bg=#112233 68x44
+          StackPanel 68x44
+            ContentPresenter 'IconPresenter' 0x16
+            TextBlock 'LabelText' text="save" size=12 68x17.24
+  ok
+    labelPosition back to Default
+
+=== C. the checked series on the toggle ===
+  rest: root=#112233
+  IsChecked=true: root=#112233 (expect Checked) indicator=True
+    (set IsMouseOver=True: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+  checked AND hovered: root=#112233 (a compound state cannot be expressed by two single cells; see 0 above)
+    (set IsMouseOver=False: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+
+=== D. icon scaling ===
+  fixed-height presenter: icon=0x0
+  with a SymbolIcon: icon=16x16 presenter=no part tree:
+      AppBarButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x44
+        Border 'Root' bg=#112233 68x44
+          StackPanel 68x44
+            Viewbox 'IconHost' 16x16
+              ViewboxVisualHost 20x20
+                ContentPresenter 20x20
+                  SymbolIcon 20x20
+            TextBlock 'LabelText' text="viewbox" size=12 68x17.24
+
+=== E. the separator under our implicit style ===
+  separator tmpl=set fg=#48484A root=#112233 size=1x40
+    (set IsMouseOver=True: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+  hovered: root=#112233 (expect Hover) capture=1x40 #48484Ax32 #112233x6 #2C353Fx2
+    (set IsMouseOver=False: MissingFieldException: UIElement.IsMouseOverPropertyKey)
+
+=== F. what the bar itself measures ===
+  empty bar natural=420x48 actual=420x48
+  closed display mode=Compact isOpen=False bg=#2C2C2E border=#48484A
+  capture=420x48 #2C2C2Ex16512 #112233x3270 #3A3A3Cx352 #48484Ax24
+  open: actual=420x48 capture=420x48 #2C2C2Ex16512 #112233x3270 #3A3A3Cx352 #48484Ax24
+  open tree:
+    CommandBar bg=#2C2C2E fg=#F5F5F7 tmpl=null 420x48
+      StackPanel ∞x48
+        AppBarButton bg=#1C1C1E fg=#680081 tmpl=set 68x48
+          Border 'Root' bg=#112233 68x48
+            StackPanel 68x48
+              ContentPresenter 'IconPresenter' 0x16
+              TextBlock 'LabelText' text="one" size=12 68x17.24
+        AppBarSeparator bg=- fg=#48484A tmpl=set 1x32
+          Border 'Root' bg=#112233 1x32
+      Button bg=#FFFFFF fg=#FFFFFF tmpl=set 0x0 [hidden]
+        Grid 0x0 [hidden]
+          Border 'Surface' bg=#FFFFFF 0x0 [hidden]
+            ContentPresenter 0x0 [hidden]
+              TextBlock text="⋯" size=14 0x0 [hidden]
+          Border 'FocusOutline' bg=- 0x0 [hidden]
+            Border bg=- 0x0 [hidden]
+      Popup popup(open=False) 0x0
+
+=== G. rows the framework consumed before we shadowed anything, re-read now ===
+  AppBarButtonBackground = #1C1C1E type=SolidColorBrush
+  AppBarButtonBackgroundHover = #3A3A3C type=SolidColorBrush
+  AppBarButtonBackgroundPressed = #48484A type=SolidColorBrush
+  AppBarButtonForeground = #680081 type=SolidColorBrush
+  AppBarButtonForegroundDisabled = #673B71 type=SolidColorBrush
+  AppBarSeparatorForeground = #48484A type=SolidColorBrush
+  CommandBarBackground = #2C2C2E type=SolidColorBrush
+  CommandBarBorderBrush = #48484A type=SolidColorBrush
+  CommandBarOverflowBackground = #3A3A3C type=SolidColorBrush
+  AppBarButtonBackgroundChecked = - type=absent
+  AppBarToggleButtonBackgroundChecked = - type=absent
+  CommandBarBackgroundOpen = - type=absent
+
+  closing the window: ok

@@ -191,6 +191,32 @@ public sealed class AstraMenuTests
     }
 
     [Fact]
+    public void The_menu_lays_its_top_level_items_out_in_a_row()
+    {
+        // Supplying a template costs the panel that came with the framework's own: an ItemsPresenter with no
+        // ItemsPanel of its own falls back to ItemsControl's vertical one, which stacked File/Edit/View/Help
+        // into a column on the Menus page (spike/VisualQA/out/menus.png, before the setter). Upstream's
+        // nearest shape, MenuBar, is a row, so the row has to be restated with the template.
+        _fixture.Run(() =>
+        {
+            var menu = new Menu { Width = 420 };
+            menu.Items.Add(new MenuItem { Header = "file" });
+            menu.Items.Add(new MenuItem { Header = "edit" });
+            Mount(menu, 420, 40);
+
+            var first = (MenuItem)menu.Items[0];
+            var second = (MenuItem)menu.Items[1];
+            var firstAt = first.TranslatePoint(new Point(0, 0), menu);
+            var secondAt = second.TranslatePoint(new Point(0, 0), menu);
+
+            Assert.True(Math.Abs(secondAt.Y - firstAt.Y) < 1,
+                $"the items are on different rows: {firstAt.Y} against {secondAt.Y}.");
+            Assert.True(secondAt.X >= firstAt.X + first.ActualWidth - 1,
+                $"the second item does not follow the first to the right: {firstAt.X}+{first.ActualWidth} against {secondAt.X}.");
+        });
+    }
+
+    [Fact]
     public void A_menu_item_keeps_a_local_background_free_so_our_rows_own_its_colour()
     {
         // Measured: pass 4 saw the framework write a local Background on a press of its own item; with our

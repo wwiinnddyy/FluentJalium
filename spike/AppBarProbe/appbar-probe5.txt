@@ -1,0 +1,46 @@
+=== rows the shipping aliases resolve to, for reading the answers against ===
+  AppBarButtonBackground = #FFFFFF
+  AppBarButtonBackgroundPointerOver = #FFFFFF
+  AppBarButtonBackgroundPressed = #FFFFFF
+  AppBarButtonBackgroundDisabled = #FFFFFF
+  AppBarToggleButtonBackgroundChecked = #60CDFF
+  AppBarButtonInnerBorderMargin = 2,6,2,6
+  AppBarButtonInnerBorderCompactMargin = 2,6,2,22
+
+=== A. do the SHIPPING cells fire? (real Astra template, part read by name) ===
+  style=null tmpl=set root part=found
+  rest: root=#FFFFFF label=visible
+  mouseDown: isPressed=True root=#FFFFFF (expect the pressed row)
+  mouseUp: isPressed=False root=#FFFFFF (expect back to rest)
+  IsEnabled=false: root=#FFFFFF (expect the disabled row)
+  IsCompact=true: label=collapsed root=#FFFFFF size=68x40
+  compact back: label=visible
+  toggle rest: root=#FFFFFF
+  toggle IsChecked=true: root=#68CEFF (expect the accent checked row)
+  separator: RootGrid=Grid SeparatorRectangle=Rectangle fg=#FFFFFF
+  hover: MissingFieldException: UIElement.IsMouseOverPropertyKey
+  hover on: root=#FFFFFF (expect the pointer-over row)
+  hover off: MissingFieldException: UIElement.IsMouseOverPropertyKey
+
+=== B. does a cell beat a local value on the part it names? ===
+  literal-Background template: root=#112233 -> cell LOST to the local value
+  TemplateBinding-Background template: root=#FFFFFF -> cell wrote something else
+  back to rest: local=#112233 bound=#FFFFFF
+
+=== C. MultiTrigger: single condition, then both ===
+  rest: root=#FFFFFF
+  IsChecked only: root=#FFFFFF (expect #FF00FF)
+  IsChecked + IsEnabled=false: root=#FFFFFF (expect #FF8000 if MultiTrigger applies, #00FF00 if the later single cell wins, #FF00FF if MultiTrigger is inert)
+
+=== D. LabelPosition: what exists, and what does anything ===
+  type=CommandBarLabelPosition members=Default/Collapsed
+  baseline (Default): root=#FFFFFF label=visible size=68x40
+  Default: set=ok cell=#FFFFFF label=visible size=68x40
+  Collapsed: set=ok cell=#FFFFFF label=visible size=68x40
+
+=== E. VisualStateManager ===
+  type: absent from Jalium.UI.Controls
+  dictionary parse (a template may be lazy, so this alone is not the answer): ok
+LOADED threw XamlParseException: Property 'VisualStateGroups' not found on type 'Grid'
+
+  closing the window: ok

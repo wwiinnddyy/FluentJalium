@@ -23,6 +23,9 @@
 | S0-k 不改模板怎么驱动交互，样式格子排在谁下面 | **`IToggleProvider.Toggle()` 就是框架自己的 `OnClick→OnToggle`**；样式格子输给本地值，`{x:Null}` 在样式格子里也命中 | 按钮族循环先走自动化模式；状态要覆盖本地底色就得自有类型 |
 | S0-l 弹层打开态、部件名与"样式生效"怎么读 | **`FlyoutBase.IsOpen` 是只读 CLR 属性不是依赖属性**（打开态既绑不了也当不了格子条件）；**模板部件名是功能契约**（改名后照样建树照样上色，点了却没反应）；**隐式样式从不写进 `Style`**；星形列尊重子元素对齐 | `FlyoutOpen` 不声称；命名正反两向都断；生效判据改用模板对象身份；半区显式 `Stretch` |
 | S0-m 原生控件"不接受模板"是真不接受吗 | **不是：`UseTemplateContentManagement()` 是 `ContentControl` 的 protected 方法，Expander 构造里调了、InfoBar 没调**，所以 InfoBar 的 `Template` 既走样式也走本地值都不成树；派生类补一句即成。另外 `UIElement.RaiseEvent` 是 public，能合成 `MouseDown` 驱动控件自己装的处理器 | 遇到"模板无效"先量开关再决定自绘/自有类型；交互行为可走路由事件，但像素洁净度仍要真指针 |
+| S0-n 同一族的"能不能重模板"能外推吗 | **不能**：菜单族里 `Menu`/`ContextMenu`/`MenuFlyoutItem` 全家成树，`MenuItem` 存而不建（`OnRender` 自绘），`MenuBar` 无模板可装；`IsHighlighted`/`IsSubMenuOpen` 只是 CLR getter 不是 DP | 状态格只挂真 DP；逐类型量，不按基类外推 |
+| S0-o 行遮蔽与探针模板的边界 | **遮蔽与隐式样式覆盖都实测成立**（后合并者胜、只对之后建造的控件）；但 `XamlReader.Parse` 的临时模板里 `ControlTemplate.Triggers` 永不生效，`VisualStateManager` 类型根本不存在而单独 Parse 返回 ok | 状态普查只能用编译字典；"解析没抛"不算能力证据；`IsMouseOver` 写不进但路由按下会置真，hover 行可进像素 |
+| S0-p 屏幕上「重影」的第二位画者是谁 | **是基础类自己的 `OnRender`，而它让路的开关是模板部件名**：`InfoBar.OnApplyTemplate` 用 IL 字面量找 `RootBorder` / `PART_CloseButton`，找不到 `RootBorder` 就在我们的模板之上再画一遍图标、标题、消息和关闭叉；改名之后「上样式」与「把 `OnRender` 覆写成空」两种条逐像素相同（7 色 / 936 ink，改名前多 178 px 框架蓝）。普查：93 个导出控件自带 `OnRender`，`NumberBox`（`PART_LayoutRoot`）、`Slider`（`PART_Segments`）、`ComboBox`（`PART_SelectionPresenter`）的部件名仍有缺口 | 重模板之后要逐控件确认基础类已让路；部件名契约能用反射读 IL `ldstr` 机器取出来，不用猜，也不用私有字段反射 |
 
 ## S0-a：主题切换的真实驱动
 
@@ -493,3 +496,117 @@ pass 4 在只装哨兵的窗口里看到"点击后框架把 `Background` 写成�
 `MenuFlyoutSubItem.OpenSubMenuAndFocusFirstItem` / `EnsureSubPopup` / `FocusFirstSubMenuItem`、
 `MenuBarItem.OpenFromKeyboard` / `OpenMenuAndFocusFirstItem` / `FocusFirstMenuItem` 都能调用且抛不出东西，
 但 `IsSubMenuOpen` 依旧 false——子菜单是 mouse-enter 驱动的，没指针就没结论。
+
+## S0-o：行遮蔽可以是主方法，但临时模板量不出状态（命令栏批，2026-09-19）
+
+`spike/AppBarProbe` 五遍，`appbar-probe1..5.txt` 全留。审计：`audits/app-bar.md`。
+
+**1 · 这是第一批"现代 WPF 方法（改行名）本身就是主杠杆"的控件。**
+26.10.9 自己带 `AppBarButton` / `AppBarToggleButton` / `AppBarSeparator` 的隐式样式，并且用**它自己的 9 条行**
+画 `CommandBar`——其中 `AppBarButtonForeground` 是强调派生的紫 `#680081`。两条通道都实测到位（pass 3，
+按 `ReferenceEquals`）：我们后合并的同名行**赢下遮蔽**（只对合并之后建造的控件），我们的同 `TargetType`
+隐式样式**直接替掉**框架那份。所以这一族的颜色不依赖重模板，模板只为把几何从宿主的 44 宽/10px 标签/20 盒
+拿回上游的 68/12/16。
+> 结论用法：宿主已经用行名上色时，先量遮蔽，再决定要不要出模板——反过来说，只有行名不够（宿主几何不对）。
+
+**2 · `XamlReader.Parse` 出来的临时模板，`ControlTemplate.Triggers` 一律不生效。**
+pass 4 用探针模板量格子，四种写法（字面值部件 / `TemplateBinding` 部件 / 单条件 / `MultiTrigger`）
+**全部读回静置色**；同一个状态在已编译的 `.jalxaml` 样式里都能读回（pass 5 段 A、本批行为用例）。
+因此 pass 4 的两条结论当场作废：① "合成 MouseUp 不清 `IsPressed`"——真模板上实测清（pass 5，已进断言）；
+② `LabelPosition` 的"接受 Right/Hidden 但无事发生"——真枚举只有 `Default`/`Collapsed`（见 5）。
+**同一件事也使 pass 4 的 `MultiTrigger` 读数不可用**：本批不发布 9 条 checked 变体行，理由换成属性面证据
+（一格一个条件、无 overflow 标志），不再引用那条。
+> 结论用法：探针模板可以量**结构、类型面、像素**；量**状态**必须用编译字典，否则会得到"格子全灭"的假阴性。
+
+**3 · S0-d 的 VisualStateManager 结论补强成两条独立证据。**
+`Jalium.UI.Controls.VisualStateManager` 类型**在全部已加载程序集里不存在**；带
+`VisualStateManager.VisualStateGroups` 的模板装进已上屏窗口实例化时抛
+`XamlParseException: Property 'VisualStateGroups' not found on type 'Grid'`——而**同一份 markup 单独
+`XamlReader.Parse` 返回 ok**（模板惰性解析，pass 5 段 E）。
+> 结论用法："解析没抛"永远不等于"能用"；能力判据只能来自实例化上屏之后的读数。
+
+**4 · `IsMouseOver` 写不进去，但路由按下会自己把它置真，于是 hover 行能落到像素。**
+`UIElement.IsMouseOverPropertyKey` 既非 public 也不存在（pass 4/5 都是 `MissingFieldException`）。
+但一次 `RaiseEvent(MouseDown)` + `RaiseEvent(MouseUp)` 之后 `IsMouseOver=True`，根 `Border` 读到
+`#09000000`＝hover 行，而静置挂载读到 `#00FFFFFF`、按下读到 `#06000000`（三条都是可区分读数）。
+S0-n/菜单批那条"hover 只能断行名不同"因此**不适用于本族**：这里能断进行名对应的那层表面。
+仍欠的是"指针移动进/出"这条循环（任务 #13），不是这一格。
+
+**5 · 上游与本机在 label 枚举上是同一套，缺的是落点。**
+`CommandBarLabelPosition` 上游只有 `Default`/`Collapsed`（`controls2.idl:100`），本机一字不差；
+`CommandBarDefaultLabelPosition` 上游 `Bottom`/`Right`/`Collapsed`（:83），本机也一字不差。
+并排标签无处可挂的原因不是枚举缺值，而是它挂在 `CommandBar` 上而 bar **存下 `Template` 却从不实例化**
+（0.4，`MenuItem` 之后的第二例）。两个成员单独都不动标签、不动 padding（`LabelPosition_names_two_states_and_moves_neither`）。
+
+**6 · "框架没有模板"不等于"框架不画"。**
+`AppBarSeparator` 没有出厂模板（`OnRender` + `ResolveSeparatorBrush` 自绘），但会实例化我们给的那份——
+于是同一个像素有两条可能通路，我们的行是捕获读到的那条，另一条只能在真机上看（Known Gap 4）。
+
+**7 · 共享宿主窗口上的"整窗哨兵计数"单独不可判，只能做差分。**
+`The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach` 的第一版断言
+"覆盖 acrylic 令牌后，开放 bar 的整窗捕获里 0 个哨兵像素"——**同类内跑通过、全量套件里以 9088 个哨兵像素失败**，
+因为宿主窗口在类之间共享，别的类留开的 acrylic 弹层自己就把画面染绿。可用形态只有两种：
+① **同一覆盖下的两帧做差**（别的读者对两帧贡献相同，差值只剩被测主体的贡献）；② 读控件自己的状态对象
+（本例里是 `Popup.IsOpen`，它证明的是"那一面根本没显示"，比"显示了但不跟令牌"更窄也更硬）。
+> 结论用法：任何"没有像素动"的主张都必须自带差分或状态读数；单帧绝对计数在共享窗口里既不能证真也不能证伪。
+>
+> 边界（视觉缺陷批补）：这条只对**整窗捕获**（`PixelHarness.Host` / `Chrome`）成立。
+> `PixelHarness.Render` 走的是控件自己的裁剪，别的类留在宿主里的弹层进不了那帧——
+> "某条裁剪断言类内通过、全量失败"因此**不是**共享窗口的证据。本批真遇到一次这样的读数，
+> 归因是过期二进制（见 `06` 的 `--no-build` 一节），不是污染。
+
+## S0-p：重影的第二位画者是基础类的 `OnRender`，开关是部件名（视觉缺陷批，2026-09-19）
+
+来源：`spike/InfoBarGhostProbe`（pass 1 反射签名与像素归因、pass 2 IL `ldstr`、pass 3 改名前后对照、
+pass 4 全量自绘普查）、`spike/TextWrapProbe`（pass 1 度量与排布）、`spike/VisualQA/capture-pages.ps1`
+逐页截图。运行时 26.10.9。触发点是用户实测反馈：很多控件有重影，间距也不合 Fluent。
+
+**1 · 「改了模板没反应」和「模板生效了却被画两遍」是两件事。** 前面各批把原生控件的自绘读成「模板无效」
+（S0-h、S0-m、S0-n）。`InfoBar` 这一例把另一面摊开了：模板成树了、上色了、部件都在，基础类的 `OnRender`
+却一行没让，于是同一个标题在屏幕上出现两次、错位十几像素。截图里那不是残影，是两位画者。判据因此要拆成两条：
+成树只证明模板通道通，不证明自绘层已退出。
+
+**2 · 让路条件是一个部件名，而这个名字可以用反射从 IL 里读出来。** `InfoBar.OnApplyTemplate` 的 `ldstr`
+字面量只有两条：`RootBorder` 与 `PART_CloseButton`。前者是 `OnRender` 的让路开关（基础类把它存进私有
+`_rootBorder`），后者是 `CloseButtonClick` 的接线点。上游 `InfoBar.xaml:15` 的根叫 `ContentRoot`，
+所以照抄上游命名的模板永远拿不到让路。本库模板根因此改用运行时的名字，偏离记在 `audits/infobar.md` 第 6 段。
+读法：`GetMethodBody().GetILAsByteArray()` 扫 `0x72` 操作码，`Module.ResolveString(token)` 解出字面量。
+不需要私有反射、不改运行时行为，比试名字便宜，也比照抄上游诚实。同一读法一次给出了 `Expander`
+（`PART_HeaderBorder`/`PART_ContentBorder`/`PART_Chevron`）、`SplitButton`（`PrimaryButton`/`SecondaryButton`）、
+`NumberBox`、`Slider`、`ComboBox`、`AutoCompleteBox`、`NavigationView` 各自的部件契约。
+顺带纠正一次误判：先前用 ASCII 与 UTF-16 两种字节扫描都读不到 `RootBorder`，据此怀疑过这条契约是编的——
+`ldstr` 字面量存在 `#US` 堆里，按文件偶数偏移重排字节会整体错位，扫不到不等于不存在。IL 解码才是这条的正确量法。
+
+**3 · 像素判据用「与把 `OnRender` 覆写成空的同类逐像素相同」。** 只数颜色会误判：改名前后样式条都有蓝，
+因为我们自己的图标也是蓝。真正强的对照需要一个把基础类那一层彻底关掉的同类——`OnRender` 是 `InfoBar`
+自己声明的 `protected virtual`（`ContentControl`/`Control`/`UIElement` 都没声明），所以一行
+`protected override void OnRender(DrawingContext) { }` 就够。改名前：样式条 14 色、框架蓝 178 px；
+关掉那一层：7 色、0 px。改名后：两者都是 7 色、936 ink、top 色逐条相同。这条同时封掉「我们少画了」
+和「基础类多画了」两个方向，比「某色不该出现」强。
+
+**4 · 原生 `InfoBar.MeasureOverride` 只算它自己那套字面布局。** 300 DIP 宽、消息两行的条，内部
+`RootBorder` 要 107.1，控件对外只报 69.8；同一控件在宿主给固定高度时又被排成 200。所以断言必须打在
+`DesiredSize` 上，并且放在竖直 `StackPanel` 里——页面就是这种形状：给无限高度、取控件要的。
+撤掉 `FluentInfoBar.MeasureOverride` 里取较大者那句，这条断言立刻失败；装回去通过（反向验证已做）。
+同一缺口的第二个症状更隐蔽：先构造、后设 `Message` 的条，`Title` 的 `ActualHeight` 是 0。
+
+**5 · 自带 `OnRender` 的控件远不止 `InfoBar`。** 26.10.9 的 `Jalium.UI.Controls` 有 93 个导出类型声明了
+自己的 `OnRender`（pass 4 全表）。其中本库重模板或重上色的：`HyperlinkButton`、`TextBox`、`PasswordBox`、
+`NumberBox`、`AutoCompleteBox`、`Slider`、`Menu`、`MenuItem`、`MenuBar`、`MenuFlyoutPresenter`、
+`MenuFlyoutItem`、`MenuFlyoutSubItem`、`MenuFlyoutSeparator`、`ToggleMenuFlyoutItem`、`CommandBar`、
+`AppBarSeparator`、`ScrollViewer`、`TabControl`、`TabItem`、`InfoBar`。这份是**候选清单，不是缺陷清单**：
+只有 `InfoBar` 一例按第 3 条量过。`Button`/`ToggleButton`/`CheckBox`/`RadioButton`/`ComboBox`/`Expander`/
+`AppBarButton` 不在名单里（不声明 `OnRender`，绘制全在模板内）。
+
+**6 · 补模板会连带换掉条目面板。** `Menu` 的模板只有一个 `ItemsPresenter`、没有 `ItemsPanel` 设定，
+顶栏条目于是从框架默认的横排退回 `ItemsControl` 的竖排，`File/Edit/View/Help` 竖成一列
+（`spike/VisualQA/out/menus.png`）。补一条 `ItemsPanel` = 横向 `StackPanel` 即恢复，并由
+`AstraMenuTests.The_menu_lays_its_top_level_items_out_in_a_row` 钉住（撤掉 setter 即失败）。
+这与 S0-i 同源：模板替换的不只是外观，还包括模板没写的那部分默认行为。
+
+**7 · 换行文本的度量宽度与排布宽度不一致，会让相邻元素叠在一起。** Gallery 页脚的 parity 行与
+「Not claimed」行重叠：前者按更宽的尺寸量成一行、按实际宽度排成两行，后一个兄弟就被放在它溢出的第二行上。
+同样的容器形状在探针里（文本先设好、宽 600）不复现，在页面上稳定复现，因此根因尚未定位。本轮把页脚改成
+「单个 `TextBlock` + 固定高度滚动宿主」，让这条声明不再依赖那次度量（`MainWindow.jalxaml`、
+`MainWindow.jalxaml.cs` 各留原因注释）。**这是绕开，不是治好**：框架侧的度量/排布宽度差仍在，
+`TextWrapProbe` case E（先布局、后设文本）里甚至连重测都没发生（`DesiredSize` 停在 0x0）。

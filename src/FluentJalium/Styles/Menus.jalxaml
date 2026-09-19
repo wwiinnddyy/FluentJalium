@@ -255,6 +255,15 @@
     <Setter Property="BorderThickness" Value="{ThemeResource MenuBarItemBorderThickness}" />
     <Setter Property="MinHeight" Value="40" />
     <Setter Property="FontSize" Value="14" />
+    <!-- The items panel has to come with the template. 26.10.9 lays a Menu's top-level items out
+         horizontally from its own default panel; an ItemsPresenter with no ItemsPanel of its own falls
+         back to ItemsControl's vertical one, which stacked File/Edit/View/Help into a column
+         (spike/VisualQA/out/menus.png). Upstream's nearest shape, MenuBar, is a horizontal bar too. -->
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" />
+      </ItemsPanelTemplate>
+    </Setter>
     <Setter Property="Template">
       <ControlTemplate TargetType="Menu">
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"

@@ -1,0 +1,463 @@
+=== A. types in the shipping runtime whose name mentions the command-bar family ===
+  Jalium.UI.Controls.AppBarButton [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Controls.AppBarSeparator [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Controls.AppBarToggleButton [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Controls.CommandBar [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Automation.Peers.CommandBarAutomationPeer [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.CommandBarClosedDisplayMode [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.CommandBarDefaultLabelPosition [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.CommandBarFlyout [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.CommandBarLabelPosition [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.CommandBarOverflowButtonVisibility [Jalium.UI.Managed] public=True sealed=True
+  Jalium.UI.Controls.ICommandBarElement [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Controls.IconElement [Jalium.UI.Managed] public=True sealed=False
+  Jalium.UI.Markup.IconElementConverter [Jalium.UI.Xaml] public=True sealed=True
+  Jalium.UI.Controls.SymbolIcon [Jalium.UI.Managed] public=True sealed=False
+
+=== A2. what the theme facade itself styles, by name ===
+  GetStyle("CommandBar")=threw KeyNotFoundException: Resource key 'CommandBar' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBar")=threw KeyNotFoundException: Resource key 'AppBar' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBarButton")=threw KeyNotFoundException: Resource key 'AppBarButton' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBarToggleButton")=threw KeyNotFoundException: Resource key 'AppBarToggleButton' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBarSeparator")=threw KeyNotFoundException: Resource key 'AppBarSeparator' not found.
+    TryFindResource(type)=null
+  GetStyle("CommandBarOverflowPresenter")=threw KeyNotFoundException: Resource key 'CommandBarOverflowPresenter' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBarElementContainer")=threw KeyNotFoundException: Resource key 'AppBarElementContainer' not found.
+    TryFindResource(type)=null
+  GetStyle("AppBarElement")=threw KeyNotFoundException: Resource key 'AppBarElement' not found.
+    TryFindResource(type)=null
+
+=== B. state surface and declared members of each found type ===
+  AppBarButton : AppBarButton : Button : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: ()
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, Background:Brush<Control>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, BorderBrush:Brush<Control>, BorderThickness:Thickness<Control>, CacheMode:CacheMode<UIElement>, ClickMode:ClickMode<ButtonBase>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, Command:ICommand<ButtonBase>, CommandParameter:Object<ButtonBase>, CommandTarget:IInputElement<ButtonBase>, Content:Object<ContentControl>, ContentStringFormat:String<ContentControl>, ContentTemplate:DataTemplate<ContentControl>, ContentTemplateSelector:DataTemplateSelector<ContentControl>, ContentTransition:ContentTransition<ContentControl>, ContextMenu:ContextMenu<FrameworkElement>, CornerRadius:CornerRadius<Control>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, DynamicOverflowOrder:Int32<AppBarButton>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, FontFamily:FontFamily<Control>, FontSize:Double<Control>, FontStretch:FontStretch<Control>, FontStyle:FontStyle<Control>, FontWeight:FontWeight<Control>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<Control>, HasContent:Boolean<ContentControl>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, HorizontalContentAlignment:HorizontalAlignment<Control>, Icon:IconElement<AppBarButton>, InputScope:InputScope<FrameworkElement>, IsCancel:Boolean<Button>, IsCompact:Boolean<AppBarButton>, IsDefault:Boolean<Button>, IsDefaulted:Boolean<Button>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsPressed:Boolean<ButtonBase>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsTabStop:Boolean<Control>, IsVisible:Boolean<UIElement>, Label:String<AppBarButton>, LabelPosition:CommandBarLabelPosition<AppBarButton>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverridesDefaultStyle:Boolean<FrameworkElement>, Padding:Thickness<Control>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, TabIndex:Int32<Control>, Tag:Object<FrameworkElement>, Template:ControlTemplate<Control>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionMode:Nullable`1<ContentControl>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, VerticalContentAlignment:VerticalAlignment<Control>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: DynamicOverflowOrder, Icon, IsCompact, Label, LabelPosition
+    methods declared (incl. private): EnsureDefaultTemplateIfMissing, GetEffectiveStyle, MeasureOverride, OnPropertyChanged
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  AppBarSeparator : AppBarSeparator : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: ()
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, Background:Brush<Control>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, BorderBrush:Brush<Control>, BorderThickness:Thickness<Control>, CacheMode:CacheMode<UIElement>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, ContextMenu:ContextMenu<FrameworkElement>, CornerRadius:CornerRadius<Control>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, DynamicOverflowOrder:Int32<AppBarSeparator>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, FontFamily:FontFamily<Control>, FontSize:Double<Control>, FontStretch:FontStretch<Control>, FontStyle:FontStyle<Control>, FontWeight:FontWeight<Control>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<Control>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, HorizontalContentAlignment:HorizontalAlignment<Control>, InputScope:InputScope<FrameworkElement>, IsCompact:Boolean<AppBarSeparator>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsTabStop:Boolean<Control>, IsVisible:Boolean<UIElement>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverridesDefaultStyle:Boolean<FrameworkElement>, Padding:Thickness<Control>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, TabIndex:Int32<Control>, Tag:Object<FrameworkElement>, Template:ControlTemplate<Control>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, VerticalContentAlignment:VerticalAlignment<Control>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: DynamicOverflowOrder, IsCompact
+    methods declared (incl. private): MeasureOverride, OnCreateAutomationPeer, OnRender, ResolveSeparatorBrush
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  AppBarToggleButton : AppBarToggleButton : ToggleButton : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: ()
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, Background:Brush<Control>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, BorderBrush:Brush<Control>, BorderThickness:Thickness<Control>, CacheMode:CacheMode<UIElement>, ClickMode:ClickMode<ButtonBase>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, Command:ICommand<ButtonBase>, CommandParameter:Object<ButtonBase>, CommandTarget:IInputElement<ButtonBase>, Content:Object<ContentControl>, ContentStringFormat:String<ContentControl>, ContentTemplate:DataTemplate<ContentControl>, ContentTemplateSelector:DataTemplateSelector<ContentControl>, ContentTransition:ContentTransition<ContentControl>, ContextMenu:ContextMenu<FrameworkElement>, CornerRadius:CornerRadius<Control>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, DynamicOverflowOrder:Int32<AppBarToggleButton>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, FontFamily:FontFamily<Control>, FontSize:Double<Control>, FontStretch:FontStretch<Control>, FontStyle:FontStyle<Control>, FontWeight:FontWeight<Control>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<Control>, HasContent:Boolean<ContentControl>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, HorizontalContentAlignment:HorizontalAlignment<Control>, Icon:IconElement<AppBarToggleButton>, InputScope:InputScope<FrameworkElement>, IsChecked:Nullable`1<ToggleButton>, IsCompact:Boolean<AppBarToggleButton>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsPressed:Boolean<ButtonBase>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsTabStop:Boolean<Control>, IsThreeState:Boolean<ToggleButton>, IsVisible:Boolean<UIElement>, Label:String<AppBarToggleButton>, LabelPosition:CommandBarLabelPosition<AppBarToggleButton>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverridesDefaultStyle:Boolean<FrameworkElement>, Padding:Thickness<Control>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, TabIndex:Int32<Control>, Tag:Object<FrameworkElement>, Template:ControlTemplate<Control>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionMode:Nullable`1<ContentControl>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, VerticalContentAlignment:VerticalAlignment<Control>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: DynamicOverflowOrder, Icon, IsCompact, Label, LabelPosition
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBar : CommandBar : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: ()
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, Background:Brush<Control>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, BorderBrush:Brush<Control>, BorderThickness:Thickness<Control>, CacheMode:CacheMode<UIElement>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, ClosedDisplayMode:CommandBarClosedDisplayMode<CommandBar>, ContextMenu:ContextMenu<FrameworkElement>, CornerRadius:CornerRadius<Control>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, DefaultLabelPosition:CommandBarDefaultLabelPosition<CommandBar>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, FontFamily:FontFamily<Control>, FontSize:Double<Control>, FontStretch:FontStretch<Control>, FontStyle:FontStyle<Control>, FontWeight:FontWeight<Control>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<Control>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, HorizontalContentAlignment:HorizontalAlignment<Control>, InputScope:InputScope<FrameworkElement>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsOpen:Boolean<CommandBar>, IsSticky:Boolean<CommandBar>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsTabStop:Boolean<Control>, IsVisible:Boolean<UIElement>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverflowButtonVisibility:CommandBarOverflowButtonVisibility<CommandBar>, OverridesDefaultStyle:Boolean<FrameworkElement>, Padding:Thickness<Control>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, TabIndex:Int32<Control>, Tag:Object<FrameworkElement>, Template:ControlTemplate<Control>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, VerticalContentAlignment:VerticalAlignment<Control>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: ClosedDisplayMode, DefaultLabelPosition, IsOpen, IsSticky, OverflowButtonVisibility, PrimaryCommands, SecondaryCommands
+    methods declared (incl. private): ArrangeOverride, EnsureVisualTree, GetVisualChild, MeasureOverride, OnCreateAutomationPeer, OnMoreButtonClick, OnOverflowPopupClosed, OnPrimaryCommandsChanged, OnPropertyChanged, OnRender, OnSecondaryCommandsChanged, ResolveBackgroundBrush, ResolveBorderBrush, ResolveOverflowBackgroundBrush, ShouldShowMoreButton, UpdateMoreButtonVisibility, UpdateOverflowChrome, get_VisualChildrenCount
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarAutomationPeer : CommandBarAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject
+    ctors: (CommandBar)
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): GetAutomationControlTypeCore, GetClassNameCore
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarClosedDisplayMode : CommandBarClosedDisplayMode : Enum : ValueType
+    ctors: 
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarDefaultLabelPosition : CommandBarDefaultLabelPosition : Enum : ValueType
+    ctors: 
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarFlyout : CommandBarFlyout : FlyoutBase : DependencyObject : DispatcherObject
+    ctors: ()
+    DPs: Placement:FlyoutPlacementMode<FlyoutBase>
+    CLR props declared: AlwaysExpanded, PrimaryCommands, SecondaryCommands
+    methods declared (incl. private): CreatePresenter
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarLabelPosition : CommandBarLabelPosition : Enum : ValueType
+    ctors: 
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  CommandBarOverflowButtonVisibility : CommandBarOverflowButtonVisibility : Enum : ValueType
+    ctors: 
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  ICommandBarElement : ICommandBarElement
+    ctors: 
+    DPs: 
+    CLR props declared: DynamicOverflowOrder, IsCompact
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  IconElement : IconElement : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: 
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, CacheMode:CacheMode<UIElement>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, ContextMenu:ContextMenu<FrameworkElement>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<IconElement>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, InputScope:InputScope<FrameworkElement>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsVisible:Boolean<UIElement>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverridesDefaultStyle:Boolean<FrameworkElement>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, Tag:Object<FrameworkElement>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: Foreground
+    methods declared (incl. private): GetEffectiveForeground
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  IconElementConverter : IconElementConverter : TypeConverter
+    ctors: ()
+    DPs: 
+    CLR props declared: 
+    methods declared (incl. private): 
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+  SymbolIcon : SymbolIcon : IconElement : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    ctors: (), (Symbol)
+    DPs: ActualHeight:Double<FrameworkElement>, ActualWidth:Double<FrameworkElement>, AllowDrop:Boolean<UIElement>, AreAnyTouchesCaptured:Boolean<UIElement>, AreAnyTouchesCapturedWithin:Boolean<UIElement>, AreAnyTouchesDirectlyOver:Boolean<UIElement>, AreAnyTouchesOver:Boolean<UIElement>, BackdropEffect:IBackdropEffect<UIElement>, BindingGroup:BindingGroup<FrameworkElement>, BitmapEffect:BitmapEffect<UIElement>, BitmapEffectInput:BitmapEffectInput<UIElement>, CacheMode:CacheMode<UIElement>, Clip:Geometry<UIElement>, ClipToBounds:Boolean<UIElement>, ClipToBoundsEdges:ClipEdges<UIElement>, ContextMenu:ContextMenu<FrameworkElement>, Cursor:Cursor<FrameworkElement>, DataContext:Object<FrameworkElement>, Effect:Effect<UIElement>, FlowDirection:FlowDirection<FrameworkElement>, FocusVisualStyle:Style<FrameworkElement>, Focusable:Boolean<UIElement>, ForceCursor:Boolean<FrameworkElement>, Foreground:Brush<IconElement>, Height:Double<FrameworkElement>, HorizontalAlignment:HorizontalAlignment<FrameworkElement>, InputScope:InputScope<FrameworkElement>, IsEnabled:Boolean<UIElement>, IsFocused:Boolean<UIElement>, IsHitTestVisible:Boolean<UIElement>, IsKeyboardFocusWithin:Boolean<UIElement>, IsKeyboardFocused:Boolean<UIElement>, IsManipulationEnabled:Boolean<UIElement>, IsMouseCaptureWithin:Boolean<UIElement>, IsMouseCaptured:Boolean<UIElement>, IsMouseDirectlyOver:Boolean<UIElement>, IsMouseOver:Boolean<UIElement>, IsStylusCaptureWithin:Boolean<UIElement>, IsStylusCaptured:Boolean<UIElement>, IsStylusDirectlyOver:Boolean<UIElement>, IsStylusOver:Boolean<UIElement>, IsVisible:Boolean<UIElement>, Language:XmlLanguage<FrameworkElement>, LayoutTransform:Transform<FrameworkElement>, Margin:Thickness<FrameworkElement>, MaxHeight:Double<FrameworkElement>, MaxWidth:Double<FrameworkElement>, MinHeight:Double<FrameworkElement>, MinWidth:Double<FrameworkElement>, Name:String<FrameworkElement>, Opacity:Double<UIElement>, OpacityMask:Brush<UIElement>, OverridesDefaultStyle:Boolean<FrameworkElement>, RenderTransform:Transform<UIElement>, RenderTransformOrigin:Point<UIElement>, SnapsToDevicePixels:Boolean<UIElement>, Style:Style<FrameworkElement>, Symbol:Symbol<SymbolIcon>, Tag:Object<FrameworkElement>, ToolTip:Object<FrameworkElement>, TransitionDuration:Duration<UIElement>, TransitionProperty:TransitionPropertyCollection<UIElement>, TransitionTimingFunction:TransitionTimingFunction<UIElement>, Uid:String<UIElement>, UseLayoutRounding:Boolean<FrameworkElement>, VerticalAlignment:VerticalAlignment<FrameworkElement>, Visibility:Visibility<UIElement>, Width:Double<FrameworkElement>
+    CLR props declared: Symbol
+    methods declared (incl. private): MeasureOverride, OnRender
+    reads part names: overrides OnApplyTemplate=False, named-child helpers=[]
+
+=== template markup parse, one dictionary per type ===
+  AppBarButton: parsed
+  AppBarButton+items: parsed
+  AppBarSeparator: parsed
+  AppBarSeparator+items: parsed
+  AppBarToggleButton: parsed
+  AppBarToggleButton+items: parsed
+  CommandBar: parsed
+  CommandBar+items: parsed
+  CommandBarAutomationPeer: parsed
+  CommandBarAutomationPeer+items: parsed
+  CommandBarClosedDisplayMode: parsed
+  CommandBarClosedDisplayMode+items: parsed
+  CommandBarDefaultLabelPosition: parsed
+  CommandBarDefaultLabelPosition+items: parsed
+  CommandBarFlyout: parsed
+  CommandBarFlyout+items: parsed
+  CommandBarLabelPosition: parsed
+  CommandBarLabelPosition+items: parsed
+  CommandBarOverflowButtonVisibility: parsed
+  CommandBarOverflowButtonVisibility+items: parsed
+  ICommandBarElement: parsed
+  ICommandBarElement+items: parsed
+  IconElement: parsed
+  IconElement+items: parsed
+  IconElementConverter: parsed
+  IconElementConverter+items: parsed
+  SymbolIcon: parsed
+  SymbolIcon+items: parsed
+  AppBar: parsed
+  AppBar+items: parsed
+  CommandBarOverflowPresenter: parsed
+  CommandBarOverflowPresenter+items: parsed
+
+=== C. construction without a window ===
+  CommandBar: tmpl=null style=null actual=0x0 bg=- key=-
+  AppBarButton: tmpl=null style=null actual=0x0 bg=- key=-
+  AppBarToggleButton: tmpl=null style=null actual=0x0 bg=- key=-
+  AppBarSeparator: tmpl=null style=null actual=0x0 bg=- key=-
+
+=== D. mounted under the shipping theme: whose template, which brushes, what parts ===
+  CommandBar: tmpl=null style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+      CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x64
+        StackPanel 380x64
+          AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Grid 420x64
+              Border 'Root' bg=#001C1C1E 420x64
+                StackPanel 20x56
+                  ContentPresenter 'IconPresenter' 20x20
+                  TextBlock 'LabelText' text="" 0x0
+          AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Grid 420x64
+              Border 'Root' bg=#001C1C1E 420x64
+                Grid 412x56
+                  StackPanel 20x56
+                    ContentPresenter 'IconPresenter' 20x20
+                    TextBlock 'LabelText' text="" 0x0
+                  Rectangle 'CheckedIndicator' 0x0 [hidden]
+          AppBarSeparator bg=- fg=#FF48484A tmpl=null 420x64
+        Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+          Grid 40x32
+            Border 'Surface' bg=#00FFFFFF 40x32
+              ContentPresenter 15.27x19.78
+                TextBlock text="⋯" 15.27x19.78
+            Border 'FocusOutline' bg=- 38x30
+              Border bg=- 34x26
+        Popup popup(open=False) 0x0
+  AppBarButton: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+      AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Grid 420x64
+          Border 'Root' bg=#001C1C1E 420x64
+            StackPanel 20x56
+              ContentPresenter 'IconPresenter' 20x20
+              TextBlock 'LabelText' text="" 0x0
+  AppBarToggleButton: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+      AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Grid 420x64
+          Border 'Root' bg=#001C1C1E 420x64
+            Grid 412x56
+              StackPanel 20x56
+                ContentPresenter 'IconPresenter' 20x20
+                TextBlock 'LabelText' text="" 0x0
+              Rectangle 'CheckedIndicator' 0x0 [hidden]
+  AppBarSeparator: tmpl=null style=null actual=420x64 bg=- key=- fg=#FF48484A fgKey=#FF48484A
+      AppBarSeparator bg=- fg=#FF48484A tmpl=null 420x64
+
+=== E. do templates WE supply get built, per type? ===
+  CommandBar: assign(CommandBar)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+    sentinel built=False tree:
+      CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x64
+        StackPanel 380x64
+          AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Grid 420x64
+              Border 'Root' bg=#001C1C1E 420x64
+                StackPanel 20x56
+          AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Grid 420x64
+              Border 'Root' bg=#001C1C1E 420x64
+                Grid 412x56
+          AppBarSeparator bg=- fg=#FF48484A tmpl=null 420x64
+        Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+          Grid 40x32
+            Border 'Surface' bg=#00FFFFFF 40x32
+              ContentPresenter 15.27x19.78
+                TextBlock text="⋯" 15.27x19.78
+            Border 'FocusOutline' bg=- 38x30
+              Border bg=- 34x26
+        Popup popup(open=False) 0x0
+  AppBarButton: assign(AppBarButton)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+    sentinel built=True tree:
+      AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 0x0
+          StackPanel 0x0
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 0x0
+  AppBarToggleButton: assign(AppBarToggleButton)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+    sentinel built=True tree:
+      AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+  AppBarSeparator: assign(AppBarSeparator)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=- key=- fg=#FF48484A fgKey=#FF48484A
+    sentinel built=True tree:
+      AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+
+=== F. which upstream row names does the framework already declare? ===
+  6 of 150 are already in the resource space:
+    CommandBarBackground(SolidColorBrush)
+    AppBarButtonBackground(SolidColorBrush)
+    AppBarButtonBackgroundPressed(SolidColorBrush)
+    AppBarButtonForeground(SolidColorBrush)
+    AppBarButtonForegroundDisabled(SolidColorBrush)
+    AppBarSeparatorForeground(SolidColorBrush)
+
+=== G. interaction surface without a pointer ===
+  CommandBar: peer=CommandBarAutomationPeer: none
+  AppBarButton: peer=ButtonAutomationPeer: Invoke(ButtonAutomationPeer)
+  AppBarToggleButton: peer=ToggleButtonAutomationPeer: Invoke(ToggleButtonAutomationPeer), Toggle(ToggleButtonAutomationPeer)
+  AppBarSeparator: peer=GenericAutomationPeer: none
+  synthesized MouseDown on the app bar button: ok
+    clicks=0 isPressed=True bg=#001C1C1E key=#001C1C1E
+
+=== H. open/overflow surface ===
+  CommandBar.IsOpen = False
+  CommandBar.Open = null
+  CommandBar.ClosedDisplayMode = Compact
+  CommandBar.DefaultLabelPosition = Bottom
+  CommandBar.PrimaryCommands = System.Collections.ObjectModel.ObservableCollection`1[Jalium.UI.Controls.ICommandBarElement]
+  CommandBar.SecondaryCommands = System.Collections.ObjectModel.ObservableCollection`1[Jalium.UI.Controls.ICommandBarElement]
+  set IsOpen=true: ok
+  after: IsOpen=True
+    bar: tmpl=set style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+    CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x64
+      StackPanel 380x64
+        AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+        AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+        AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+      Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+        Grid 40x32
+          Border 'Surface' bg=#00FFFFFF 40x32
+            ContentPresenter 15.27x19.78
+              TextBlock text="⋯" 15.27x19.78
+          Border 'FocusOutline' bg=- 38x30
+            Border bg=- 34x26
+      Popup popup(open=True) 0x0
+
+  closing the window: ok
+
+=== D. mounted under the shipping theme: whose template, which brushes, what parts ===
+  CommandBar: tmpl=set style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+      CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x64
+        StackPanel 380x64
+          AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+          AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+          AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+        Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+          Grid 40x32
+            Border 'Surface' bg=#00FFFFFF 40x32
+              ContentPresenter 15.27x19.78
+                TextBlock text="⋯" 15.27x19.78
+            Border 'FocusOutline' bg=- 38x30
+              Border bg=- 34x26
+        Popup popup(open=False) 0x0
+  AppBarButton: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+      AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+  AppBarToggleButton: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+      AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+  AppBarSeparator: tmpl=set style=null actual=420x64 bg=- key=- fg=#FF48484A fgKey=#FF48484A
+      AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+
+=== E. do templates WE supply get built, per type? ===
+  CommandBar: assign(CommandBar)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+    sentinel built=True tree:
+      CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x64
+        StackPanel 380x64
+          AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+          AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+          AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+            Border 'ProbeRoot' bg=#FFFF00FF 420x64
+              StackPanel 420x64
+                ContentPresenter 'Content' 0x0
+                TextBlock 'TextLabel' text="probe-label" 80.2x64
+        Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+          Grid 40x32
+            Border 'Surface' bg=#00FFFFFF 40x32
+              ContentPresenter 15.27x19.78
+                TextBlock text="⋯" 15.27x19.78
+            Border 'FocusOutline' bg=- 38x30
+              Border bg=- 34x26
+        Popup popup(open=False) 0x0
+  AppBarButton: assign(AppBarButton)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+    sentinel built=True tree:
+      AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+  AppBarToggleButton: assign(AppBarToggleButton)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=#001C1C1E key=#001C1C1E fg=#FF680081 fgKey=#FF680081
+    sentinel built=True tree:
+      AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+  AppBarSeparator: assign(AppBarSeparator)=ok
+      after assign: tmpl=set style=null actual=420x64 bg=- key=- fg=#FF48484A fgKey=#FF48484A
+    sentinel built=True tree:
+      AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+        Border 'ProbeRoot' bg=#FFFF00FF 420x64
+          StackPanel 420x64
+            ContentPresenter 'Content' 0x0
+            TextBlock 'TextLabel' text="probe-label" 80.2x64
+
+=== F. which upstream row names does the framework already declare? ===
+  6 of 150 are already in the resource space:
+    CommandBarBackground(SolidColorBrush)
+    AppBarButtonBackground(SolidColorBrush)
+    AppBarButtonBackgroundPressed(SolidColorBrush)
+    AppBarButtonForeground(SolidColorBrush)
+    AppBarButtonForegroundDisabled(SolidColorBrush)
+    AppBarSeparatorForeground(SolidColorBrush)
+
+=== G. interaction surface without a pointer ===
+  CommandBar: peer=CommandBarAutomationPeer: none
+  AppBarButton: peer=ButtonAutomationPeer: Invoke(ButtonAutomationPeer)
+  AppBarToggleButton: peer=ToggleButtonAutomationPeer: Invoke(ToggleButtonAutomationPeer), Toggle(ToggleButtonAutomationPeer)
+  AppBarSeparator: peer=GenericAutomationPeer: none
+  synthesized MouseDown on the app bar button: ok
+    clicks=0 isPressed=True bg=#001C1C1E key=#001C1C1E
+
+=== H. open/overflow surface ===
+  CommandBar.IsOpen = False
+  CommandBar.Open = null
+  CommandBar.ClosedDisplayMode = Compact
+  CommandBar.DefaultLabelPosition = Bottom
+  CommandBar.PrimaryCommands = System.Collections.ObjectModel.ObservableCollection`1[Jalium.UI.Controls.ICommandBarElement]
+  CommandBar.SecondaryCommands = System.Collections.ObjectModel.ObservableCollection`1[Jalium.UI.Controls.ICommandBarElement]
+  set IsOpen=true: ok
+  after: IsOpen=True
+    bar: tmpl=set style=null actual=420x64 bg=#FF2C2C2E key=#FF2C2C2E fg=#FFF5F5F7 fgKey=#FFF5F5F7
+    CommandBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x64
+      StackPanel 380x64
+        AppBarButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+        AppBarToggleButton bg=#001C1C1E fg=#FF680081 tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+        AppBarSeparator bg=- fg=#FF48484A tmpl=set 420x64
+          Border 'ProbeRoot' bg=#FFFF00FF 420x64
+            StackPanel 420x64
+              ContentPresenter 'Content' 0x0
+              TextBlock 'TextLabel' text="probe-label" 80.2x64
+      Button bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 40x32
+        Grid 40x32
+          Border 'Surface' bg=#00FFFFFF 40x32
+            ContentPresenter 15.27x19.78
+              TextBlock text="⋯" 15.27x19.78
+          Border 'FocusOutline' bg=- 38x30
+            Border bg=- 34x26
+      Popup popup(open=True) 0x0
+
+  closing the window: ok

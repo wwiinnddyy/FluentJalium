@@ -42,6 +42,13 @@ public sealed class AstraExpanderInfoBarTests
     /// <summary>The severity fill the InfoBar draws itself when it is still painting itself.</summary>
     private static readonly Color FrameworkInfoBarFill = Color.FromRgb(0x2D, 0x2D, 0x37);
 
+    /// <summary>
+    /// The informational icon the same OnRender draws: a literal #0A84FF circle, read out of a capture of an
+    /// untemplated bar in spike/InfoBarGhostProbe pass 1 (310 pixels of it). It is not a palette row, so it
+    /// is a stable witness that the base class painted over a template that hid the icon.
+    /// </summary>
+    private static readonly Color FrameworkSeverityIconBlue = Color.FromRgb(0x0A, 0x84, 0xFF);
+
     private readonly AstraThemeRuntimeFixture _fixture;
 
     public AstraExpanderInfoBarTests(AstraThemeRuntimeFixture fixture)
@@ -374,11 +381,11 @@ public sealed class AstraExpanderInfoBarTests
             var ours = FluentThemeManager.GetStyle("DefaultFluentInfoBarStyle");
             var native = new InfoBar { Title = "title", Message = "message", Template = Template(ours) };
             PixelHarness.Build(native, 360, 60);
-            Assert.Null(PixelHarness.Named(native, "ContentRoot"));
+            Assert.Null(PixelHarness.Named(native, "RootBorder"));
             Assert.Null(PixelHarness.Named(native, "PART_CloseButton"));
 
             var bar = Mount(new FluentInfoBar { Title = "title", Message = "message" }, 360, 60);
-            Assert.IsType<Border>(Part(bar, "ContentRoot"));
+            Assert.IsType<Border>(Part(bar, "RootBorder"));
             Assert.IsType<Button>(Part(bar, "PART_CloseButton"));
         });
     }
@@ -405,8 +412,72 @@ public sealed class AstraExpanderInfoBarTests
 
             // Nothing but this cell collapses a templated bar: measured, the control only drops its own
             // measure and keeps the skin on screen at MinHeight.
-            var root = Part(bar, "ContentRoot");
+            var root = Part(bar, "RootBorder");
             Assert.False(Shown(root), "IsOpen=false left the bar visible: the style has to collapse it, the control does not.");
+        });
+    }
+
+    [Fact]
+    public void A_templated_bar_leaves_the_base_class_nothing_to_paint()
+    {
+        // The part name is the whole switch. InfoBar.OnApplyTemplate looks RootBorder up by name - an IL
+        // string literal, spike/InfoBarGhostProbe pass 2 - and its OnRender steps aside only once it has
+        // found one. With upstream's own name (ContentRoot) on that part the base kept drawing its own
+        // icon, title, message and close mark on top of our template: the ghost in
+        // spike/VisualQA/out/surfaces.png, and 178 pixels of its icon blue in a capture of a bar whose
+        // icon was hidden. After the rename the same capture holds none, and a styled bar measures
+        // byte-identically to one whose OnRender is overridden away (pass 3: 7 colours, 936 ink pixels).
+        _fixture.Run(() =>
+        {
+            var bar = Mount(new FluentInfoBar
+            {
+                Title = "Weekly digest ready",
+                Message = "Nine new items are waiting.",
+                Width = 360,
+                IsIconVisible = false,
+                IsClosable = false,
+            }, 360, 60);
+
+            Assert.IsType<Border>(Part(bar, "RootBorder"));
+
+            var capture = PixelHarness.Render(bar, 360, 60);
+            Assert.True(capture.PaintedPixels > 0, $"capture is empty: {capture.Top(6)}");
+            Assert.Equal(0, capture.Count(FrameworkSeverityIconBlue));
+        });
+    }
+
+    [Fact]
+    public void A_wrapped_message_grows_the_bar_instead_of_painting_below_it()
+    {
+        // The base class measures its own literal single-line layout, not the tree it now hosts: a bar whose
+        // message wraps measured 69.8 outside against 107.1 inside, so the second line painted below the
+        // surface (spike/TextWrapProbe pass 1 case B). FluentInfoBar.MeasureOverride takes the larger of the
+        // two, which is what a template-driven control gets for free.
+        _fixture.Run(() =>
+        {
+            var bar = new FluentInfoBar
+            {
+                Title = "Weekly digest ready",
+                Message = "Nine new items are waiting. Closing this bar raises CloseButtonClick, which is the base class's own event.",
+                Width = 300,
+                IsIconVisible = false,
+                IsClosable = false,
+            };
+
+            // A vertical panel, because that is the shape that exposes it: the page hands a bar an infinite
+            // height and takes whatever it asks for. Hosted at a fixed height the defect is arranged away.
+            var host = new StackPanel { Orientation = Orientation.Vertical };
+            host.Children.Add(bar);
+            Mount(host, 320, 240);
+
+            var root = Part(bar, "RootBorder");
+            var message = (TextBlock)Part(bar, "Message");
+
+            Assert.True(message.DesiredSize.Height > 30, $"the message did not wrap: {message.DesiredSize}.");
+            Assert.True(bar.DesiredSize.Height + 0.5 >= root.DesiredSize.Height,
+                $"the bar measures {bar.DesiredSize.Height} tall but its own template asks for {root.DesiredSize.Height}.");
+            Assert.True(bar.DesiredSize.Height > 48,
+                $"a two-line bar still measures only MinHeight: {bar.DesiredSize.Height}.");
         });
     }
 

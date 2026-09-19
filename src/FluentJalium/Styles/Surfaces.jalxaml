@@ -129,7 +129,7 @@
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Template">
       <ControlTemplate TargetType="controls:FluentInfoBar">
-        <Border Name="ContentRoot" Background="{ThemeResource InfoBarInformationalSeverityBackgroundBrush}"
+        <Border Name="RootBorder" Background="{ThemeResource InfoBarInformationalSeverityBackgroundBrush}"
                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="{TemplateBinding CornerRadius}" VerticalAlignment="Top">
           <Grid Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
@@ -183,19 +183,19 @@
         <ControlTemplate.Triggers>
           <!-- Upstream's SeverityLevels group: one setter block per severity, writing the same four parts. -->
           <Trigger Property="Severity" Value="Error">
-            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarErrorSeverityBackgroundBrush}" />
+            <Setter TargetName="RootBorder" Property="Background" Value="{ThemeResource InfoBarErrorSeverityBackgroundBrush}" />
             <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarErrorSeverityIconBackground}" />
             <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13D;" />
             <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarErrorSeverityIconForeground}" />
           </Trigger>
           <Trigger Property="Severity" Value="Warning">
-            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarWarningSeverityBackgroundBrush}" />
+            <Setter TargetName="RootBorder" Property="Background" Value="{ThemeResource InfoBarWarningSeverityBackgroundBrush}" />
             <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarWarningSeverityIconBackground}" />
             <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13C;" />
             <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarWarningSeverityIconForeground}" />
           </Trigger>
           <Trigger Property="Severity" Value="Success">
-            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarSuccessSeverityBackgroundBrush}" />
+            <Setter TargetName="RootBorder" Property="Background" Value="{ThemeResource InfoBarSuccessSeverityBackgroundBrush}" />
             <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarSuccessSeverityIconBackground}" />
             <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13E;" />
             <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarSuccessSeverityIconForeground}" />
@@ -206,7 +206,7 @@
           <Trigger Property="IsClosable" Value="False"><Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" /></Trigger>
           <!-- IsOpen=false is the control's own measure to honour and nothing else: measured on 26.10.9, a
                templated bar keeps painting at MinHeight unless this cell collapses it. -->
-          <Trigger Property="IsOpen" Value="False"><Setter TargetName="ContentRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+          <Trigger Property="IsOpen" Value="False"><Setter TargetName="RootBorder" Property="Visibility" Value="Collapsed" /></Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>

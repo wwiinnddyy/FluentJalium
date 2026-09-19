@@ -199,6 +199,19 @@ public class AstraResourceKeyTests
     /// is where the state surface was read). MenuBar's four pressed and selected rows wait for a MenuBarItem
     /// that has a state to carry them (audits/menu-flyout.md).
     /// </para>
+    /// <para>
+    /// The command-bar batch is the first to arrive with the framework's own rows underneath it: 26.10.9 ships
+    /// implicit styles for AppBarButton, AppBarToggleButton and AppBarSeparator and paints its CommandBar from
+    /// nine rows of its own, so a row we publish under one of those names is read twice - once by our template
+    /// and once by the host's - and passes the gate on the setter alone. Six of its names are the host's own
+    /// spelling rather than upstream's; five stay unpublished because we have no consumer for them, and one of
+    /// those, <c>CommandBarOverflowBackground</c>, was published in the first draft and then withdrawn: setting
+    /// the bar's <c>IsOpen</c> never shows its popup in-process, so no surface of that row is ever displayed and
+    /// no override could reach pixels. <c>AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach</c>
+    /// pins that reading - and the reason its first version had to be rewritten: a whole-host-window sentinel
+    /// count is not decidable on its own, since another class's open acrylic popup paints that same window
+    /// (audits/app-bar.md).
+    /// </para>
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/Button.jalxaml")]
@@ -219,6 +232,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/InfoBar.jalxaml")]
     [InlineData("ThemeResources/MenuFlyout.jalxaml")]
     [InlineData("ThemeResources/MenuBar.jalxaml")]
+    [InlineData("ThemeResources/AppBar.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

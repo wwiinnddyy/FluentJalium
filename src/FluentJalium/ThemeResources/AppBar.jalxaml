@@ -1,0 +1,105 @@
+<!-- WinUI 3 AppBarButton_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 60bcf2af4daf2ab40dd79709d3a0a7907f79b8c3, AppBarToggleButton_themeresources.xaml blob
+     2c3e6c5ad5aa3d6c4cd6fe1e3c8c5688b8e31f18, AppBarSeparator_themeresources.xaml blob
+     51801458b679a563d21471423f4ebb94f0b13ad0 and CommandBar_themeresources.xaml blob
+     f524c6d543ea735b7b4e833294891eec448b8b5f - the Light/Default alias rows of all four files, plus the
+     Thickness rows upstream declares outside its theme dictionaries.
+     Thirty-one alias rows and four Thickness rows; every one of them is read by Styles/AppBar.jalxaml. Upstream's
+     Light branch of these four files carries 86 alias rows (25 button, 51 toggle, 1 separator, 9 bar), thirty of
+     them are transcribed verbatim and fifty-six are named below with the measurement that excludes each group;
+     the 31st row is the host's own name.
+     This batch is the first whose rows are also the framework's own: 26.10.9 ships implicit styles for
+     AppBarButton, AppBarToggleButton and AppBarSeparator and paints its CommandBar from nine rows of its
+     own, and a row we publish under one of those names wins the collision for every control built after
+     the theme is installed (spike/AppBarProbe pass 3 read the brush back by ReferenceEquals). Six of the names
+     we publish are upstream's verbatim and double as the host's consumption points (CommandBarBackground,
+     AppBarButtonBackground, AppBarButtonBackgroundPressed, AppBarButtonForeground,
+     AppBarButtonForegroundDisabled, AppBarSeparatorForeground); one more - CommandBarBorderBrush - is the host's
+     spelling and the only non-upstream name published here, because the bar's own surface is the one part of the
+     CommandBar whose colour we can still reach: 26.10.9's CommandBar stores a Template and never builds one, so
+     it cannot be retemplated (pass 1, pass 3). CommandBarOverflowBackground was published with it and withdrawn:
+     setting the bar's IsOpen moves that property and nothing else - its own Popup stays closed in-process - so
+     there is no displayed surface an override of that row could ever reach, and a key we cannot show is a promise
+     we cannot keep. AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach
+     pins that reading, and records that the first version of the same claim ("the override moved no pixel") was
+     not decidable at all: it passed in its own class and failed in the full suite, because another class's open
+     acrylic popup paints the shared host window.
+     What upstream has and this dictionary does not, each with the measured reason:
+       * the toggle's nine *CheckedPointerOver / *CheckedPressed / *CheckedDisabled rows, its five
+         BackgroundHighLightOverlay rows and its eight CheckGlyphForeground rows, because a cell needs one
+         condition and 26.10.9 has no compound state to watch: IsChecked AND IsMouseOver cannot be expressed,
+         and upstream's checked-variant states are exactly that pair. The overflow check glyph also has no
+         state to reveal it, since the runtime exposes no overflow flag on an app bar button (pass 5's
+         MultiTrigger reading could not settle this either - a throwaway template's cells never fire at all on
+         this runtime, so only the compiled styles measure state - and audits/app-bar.md says so plainly).
+       * the twelve keyboard-accelerator-text rows of both families (four and eight), because these types carry
+         Icon, Label, LabelPosition, IsCompact and DynamicOverflowOrder and no accelerator text.
+       * the button's five SubItemChevronForeground rows and its four SubMenuOpened rows: these buttons have no
+         submenu and no Flyout property, so nothing would draw a chevron and no property names the opened state.
+       * the toggle's six OverflowLabelForeground rows, because no flag here selects the overflow layout the
+         label lives in.
+       * CommandBarBackgroundOpen, CommandBarBorderBrushOpen, CommandBarHighContrastBorder,
+         CommandBarEllipsisIconForegroundDisabled, CommandBarLightDismissOverlayBackground and the two
+         overflow-presenter rows, because the open surface, the ellipsis icon and the overflow presenter are all
+         drawn by code that reads its own rows, not by a template of ours (pass 4
+         left the bar's geometry, its 40x32 more button and its popup untouched by every row we can reach).
+       * AppBarThemeMinHeight, AppBarThemeCompactHeight, AppBarButtonContentHeight, AppBarSeparatorWidth and
+         the six x:Double chevron/metric rows, because this reader cannot parse an x:Double resource; they ride
+         as literals on the setters that need them.
+       * the twelve legacy *ThemeBrush rows of the toggle family (upstream's own dead Windows-Phone-8.1 set),
+         and every Overflow* margin, because no state here selects an overflow layout. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- ============ AppBarButton: upstream's Subtle button on the bar ============ -->
+  <StaticResource x:Key="AppBarButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="AppBarButtonBackgroundDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <!-- The framework's own row for this name carries an accent-derived purple on this build, which is why the
+       bar's buttons need our alias more than any other family here. -->
+  <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="AppBarButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="AppBarButtonBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarButtonBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarButtonBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+
+  <!-- ============ AppBarToggleButton: the same base, plus the accent checked pair ============ -->
+  <StaticResource x:Key="AppBarToggleButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBackgroundDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <StaticResource x:Key="AppBarToggleButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="AppBarToggleButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="AppBarToggleButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="AppBarToggleButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="AppBarToggleButtonBackgroundChecked" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="AppBarToggleButtonForegroundChecked" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <!-- Deviation: upstream points the checked border at AccentControlElevationBorderBrush, the same 3-DIP
+       absolute gradient the accent button's border could not carry (ThemeResources/Button.jalxaml), so the
+       alias keeps the name and takes the solid token the accent family already uses. -->
+  <StaticResource x:Key="AppBarToggleButtonBorderBrushChecked" ResourceKey="ControlStrokeColorOnAccentDefaultBrush" />
+
+  <!-- ============ AppBarSeparator ============ -->
+  <StaticResource x:Key="AppBarSeparatorForeground" ResourceKey="DividerStrokeColorDefaultBrush" />
+
+  <!-- ============ CommandBar: the rows 26.10.9's own painting reads ============ -->
+  <!-- Upstream's bar is transparent over the page and only turns to acrylic while open; the open surface has
+       no reachable consumption point here, so the closed value is the one that ships. -->
+  <StaticResource x:Key="CommandBarBackground" ResourceKey="ControlFillColorTransparentBrush" />
+  <!-- Host names, given upstream's open-state values: this is the border and the overflow the bar draws
+       itself, and an identity read-back proves the bar holds these exact objects. -->
+  <StaticResource x:Key="CommandBarBorderBrush" ResourceKey="CardStrokeColorDefaultSolidBrush" />
+  <StaticResource x:Key="CommandBarForeground" ResourceKey="TextFillColorPrimaryBrush" />
+
+  <!-- ============ geometry rows, read as {ThemeResource} by the templates ============ -->
+  <Thickness x:Key="AppBarButtonInnerBorderMargin">2,6,2,6</Thickness>
+  <Thickness x:Key="AppBarButtonInnerBorderCompactMargin">2,6,2,22</Thickness>
+  <Thickness x:Key="AppBarButtonTextLabelMargin">2,0,2,8</Thickness>
+  <Thickness x:Key="AppBarSeparatorMargin">2,8,2,8</Thickness>
+</ResourceDictionary>

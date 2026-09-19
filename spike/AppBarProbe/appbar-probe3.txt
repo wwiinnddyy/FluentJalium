@@ -1,0 +1,194 @@
+=== A. the framework's own app-bar rows in 26.10.9 ===
+  CommandBarBackground = #2C2C2E type=SolidColorBrush
+  CommandBarBorderBrush = #48484A type=SolidColorBrush
+  CommandBarOverflowBackground = #3A3A3C type=SolidColorBrush
+  AppBarButtonBackground = #1C1C1E type=SolidColorBrush
+  AppBarButtonBackgroundHover = #3A3A3C type=SolidColorBrush
+  AppBarButtonBackgroundPressed = #48484A type=SolidColorBrush
+  AppBarButtonForeground = #680081 type=SolidColorBrush
+  AppBarButtonForegroundDisabled = #673B71 type=SolidColorBrush
+  AppBarSeparatorForeground = #48484A type=SolidColorBrush
+
+=== A2. natural geometry of the framework's own skin ===
+  AppBarButton natural=44x56 actual=838.29x56 bg=#1C1C1E fg=#680081 padding=4,4,4,4 corner=10,10,10,10 border=0,0,0,0 font=14 sameRow=True
+      AppBarButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x56
+        Grid 838.29x56
+          Border 'Root' bg=#1C1C1E 838.29x56
+            StackPanel 33.38x48
+              ContentPresenter 'IconPresenter' 20x20
+              TextBlock 'LabelText' text="before" size=10 33.38x14.7
+  toggle actual=838.29x56
+      AppBarToggleButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x56
+        Grid 838.29x56
+          Border 'Root' bg=#1C1C1E 838.29x56
+            Grid 830.29x48
+              StackPanel 33.21x48
+                ContentPresenter 'IconPresenter' 20x20
+                TextBlock 'LabelText' text="toggle" size=10 33.21x14.7
+              Rectangle 'CheckedIndicator' fill=LinearGradientBrush 0x0 [hidden]
+  separator actual=40x56 fg=#48484A sameRow=True
+      AppBarSeparator bg=- fg=#48484A tmpl=null 40x56
+  bar actual=420x48 bg=#2C2C2E border=#48484A localBg=False sameRow=True borderSameRow=True
+      CommandBar bg=#2C2C2E fg=#F5F5F7 tmpl=null 420x48
+        StackPanel ∞x48
+        Button bg=#FFFFFF fg=#FFFFFF tmpl=set 0x0 [hidden]
+          Grid 0x0 [hidden]
+            Border 'Surface' bg=#FFFFFF 0x0 [hidden]
+              ContentPresenter 0x0 [hidden]
+                TextBlock text="⋯" size=14 0x0 [hidden]
+            Border 'FocusOutline' bg=- 0x0 [hidden]
+              Border bg=- 0x0 [hidden]
+        Popup popup(open=False) 0x0
+
+=== B. publish our own rows over the framework's, the way the Manifest does ===
+  CommandBarBackground = #202020
+  CommandBarBorderBrush = #000000
+  CommandBarOverflowBackground = #2C2C2C
+  AppBarButtonBackground = #FFFFFF
+  AppBarButtonBackgroundHover = #FFFFFF
+  AppBarButtonBackgroundPressed = #FFFFFF
+  AppBarButtonForeground = #FFFFFF
+  AppBarButtonForegroundDisabled = #FFFFFF
+  AppBarSeparatorForeground = #FFFFFF
+  button built BEFORE the merge: bg=#1C1C1E rootBorder=#1C1C1E
+  button built AFTER the merge: bg=#FFFFFF sameShadowRow=True rootBorder=#FFFFFF natural=44
+  bar after the merge: bg=#2C2C2E sameRow=False capture=420x48 #2C2C2Ex19740 #3A3A3Cx420
+  beforeBar capture=838x56 #000000x46928 afterBar capture=838x56 #000000x46928
+  separator: fg=#48484A sameRow=False capture=40x56 #000000x2140 #FFFFFFx100
+  toggle fg=#680081 bg=#1C1C1E capture=838x56 #000000x46928
+  unrelated Button background=#FFFFFF
+
+=== C. does an implicit Style of ours beat the framework's implicit Style? ===
+  new button: template is ours=True bg=#FF00FF root=#FF00FF actual=68x56
+      AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 68x56
+        Border 'Root' bg=#FF00FF 68x56
+          StackPanel 64x44
+            ContentPresenter 'IconPresenter' 20x16
+              SymbolIcon 20x16
+            TextBlock 'LabelText' text="implicit" size=12 60x17.24
+  button built before this merge: template ours too=False bg=#FFFFFF
+  ours capture=68x56 #FF00FFx3804 #000000x4
+
+=== D. a state cell of our template, without a pointer ===
+  disabled: root=#FF00FF capture=68x56 #FF00FFx3804 #000000x4 (lime means the cell fired)
+  re-enabled: root=#FF00FF capture=68x56 #FF00FFx3804 #000000x4
+
+=== E. the CommandBar surface with rows shadowed and commands in it ===
+  open: bg=#2C2C2E capture=420x48 #2C2C2Ex16818 #FF00FFx2976 #3A3A3Cx352 #F802F8x6
+    CommandBar bg=#2C2C2E fg=#F5F5F7 tmpl=null 420x48
+      StackPanel 380x48
+        AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 68x40
+          Border 'Root' bg=#FF00FF 68x48
+            StackPanel 64x36
+              ContentPresenter 'IconPresenter' 0x16
+              TextBlock 'LabelText' text="one" size=12 60x17.24
+      Button bg=#FFFFFF fg=#FFFFFF tmpl=set 40x32
+        Grid 40x32
+          Border 'Surface' bg=#FFFFFF 40x32
+            ContentPresenter 15.27x19.78
+              TextBlock text="⋯" size=14 15.27x19.78
+          Border 'FocusOutline' bg=- 38x30
+            Border bg=- 34x26
+      Popup popup(open=True) 0x0
+
+=== F. leak check: brand green must be absent everywhere ===
+  emerald in ours=False in bar=False
+
+  closing the window: ok
+
+=== A2. natural geometry of the framework's own skin ===
+  AppBarButton natural=44x56 actual=838.29x56 bg=#1C1C1E fg=#680081 padding=4,4,4,4 corner=10,10,10,10 border=0,0,0,0 font=14 sameRow=False
+      AppBarButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x56
+        Grid 838.29x56
+          Border 'Root' bg=#1C1C1E 838.29x56
+            StackPanel 33.38x48
+              ContentPresenter 'IconPresenter' 20x20
+              TextBlock 'LabelText' text="before" size=10 33.38x14.7
+  toggle actual=838.29x56
+      AppBarToggleButton bg=#1C1C1E fg=#680081 tmpl=set 838.29x56
+        Grid 838.29x56
+          Border 'Root' bg=#1C1C1E 838.29x56
+            Grid 830.29x48
+              StackPanel 33.21x48
+                ContentPresenter 'IconPresenter' 20x20
+                TextBlock 'LabelText' text="toggle" size=10 33.21x14.7
+              Rectangle 'CheckedIndicator' fill=LinearGradientBrush 0x0 [hidden]
+  separator actual=40x56 fg=#48484A sameRow=False
+      AppBarSeparator bg=- fg=#48484A tmpl=null 40x56
+  bar actual=420x48 bg=#2C2C2E border=#48484A localBg=False sameRow=False borderSameRow=False
+      CommandBar bg=#2C2C2E fg=#F5F5F7 tmpl=null 420x48
+        StackPanel 380x48
+          AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 68x40
+            Border 'Root' bg=#FF00FF 68x48
+              StackPanel 64x36
+                ContentPresenter 'IconPresenter' 0x16
+                TextBlock 'LabelText' text="one" size=12 60x17.24
+        Button bg=#FFFFFF fg=#FFFFFF tmpl=set 40x32
+          Grid 40x32
+            Border 'Surface' bg=#FFFFFF 40x32
+              ContentPresenter 15.27x19.78
+                TextBlock text="⋯" size=14 15.27x19.78
+            Border 'FocusOutline' bg=- 38x30
+              Border bg=- 34x26
+        Popup popup(open=False) 0x0
+
+=== B. publish our own rows over the framework's, the way the Manifest does ===
+  CommandBarBackground = #202020
+  CommandBarBorderBrush = #000000
+  CommandBarOverflowBackground = #2C2C2C
+  AppBarButtonBackground = #FFFFFF
+  AppBarButtonBackgroundHover = #FFFFFF
+  AppBarButtonBackgroundPressed = #FFFFFF
+  AppBarButtonForeground = #FFFFFF
+  AppBarButtonForegroundDisabled = #FFFFFF
+  AppBarSeparatorForeground = #FFFFFF
+  button built BEFORE the merge: bg=#FF00FF rootBorder=#FF00FF
+  button built AFTER the merge: bg=#FF00FF sameShadowRow=False rootBorder=#FF00FF natural=0
+  bar after the merge: bg=#202020 sameRow=True capture=420x48 #202020x16818 #FF00FFx2976 #1E1E1Ex352 #F701F7x6
+  beforeBar capture=838x56 #000000x46928 afterBar capture=zero-size
+  separator: fg=#FFFFFF sameRow=True capture=40x56 #000000x2140 #FFFFFFx100
+  toggle fg=#FFFFFF bg=#FFFFFF capture=838x56 #000000x46928
+  unrelated Button background=#FFFFFF
+
+=== C. does an implicit Style of ours beat the framework's implicit Style? ===
+  new button: template is ours=True bg=#FF00FF root=#FF00FF actual=0x0
+      AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 0x0
+        Border 'Root' bg=#FF00FF 0x0
+          StackPanel 0x0
+            ContentPresenter 'IconPresenter' 0x0
+              SymbolIcon 0x0
+            TextBlock 'LabelText' text="implicit" size=12 0x0
+  button built before this merge: template ours too=True bg=#FF00FF
+  ours capture=zero-size
+
+=== D. a state cell of our template, without a pointer ===
+  disabled: root=#FF00FF capture=zero-size (lime means the cell fired)
+  re-enabled: root=#FF00FF capture=zero-size
+
+=== E. the CommandBar surface with rows shadowed and commands in it ===
+  open: bg=#202020 capture=420x48 #202020x19740 #1E1E1Ex420
+    CommandBar bg=#202020 fg=#F5F5F7 tmpl=null 420x48
+      StackPanel 380x48
+        AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 68x40
+          Border 'Root' bg=#FF00FF 0x0
+            StackPanel 0x0
+              ContentPresenter 'IconPresenter' 0x0
+              TextBlock 'LabelText' text="one" size=12 0x0
+        AppBarButton bg=#FF00FF fg=#FFFFFF tmpl=set 0x0
+          Border 'Root' bg=#FF00FF 0x0
+            StackPanel 0x0
+              ContentPresenter 'IconPresenter' 0x0
+              TextBlock 'LabelText' text="one" size=12 0x0
+      Button bg=#FFFFFF fg=#FFFFFF tmpl=set 40x32
+        Grid 40x32
+          Border 'Surface' bg=#FFFFFF 40x32
+            ContentPresenter 15.27x19.78
+              TextBlock text="⋯" size=14 15.27x19.78
+          Border 'FocusOutline' bg=- 38x30
+            Border bg=- 34x26
+      Popup popup(open=True) 0x0
+
+=== F. leak check: brand green must be absent everywhere ===
+  emerald in ours=False in bar=False
+
+  closing the window: ok

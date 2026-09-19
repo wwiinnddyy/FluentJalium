@@ -1,0 +1,37 @@
+=== A. the six rows the framework already declares, under the shipping theme ===
+  CommandBarBackground = #2C2C2E key==CommandBarBackground type=SolidColorBrush
+  AppBarButtonBackground = #1C1C1E key==AppBarButtonBackground type=SolidColorBrush
+  AppBarButtonBackgroundPressed = #48484A key==AppBarButtonBackgroundPressed type=SolidColorBrush
+  AppBarButtonForeground = #680081 key==AppBarButtonForeground type=SolidColorBrush
+  AppBarButtonForegroundDisabled = #673B71 key==AppBarButtonForegroundDisabled type=SolidColorBrush
+  AppBarSeparatorForeground = #48484A key==AppBarSeparatorForeground type=SolidColorBrush
+
+=== B. which brush each control actually holds, by identity ===
+  CommandBar.Background = #2C2C2E key==CommandBarBackground sameAsCommandBarBackground=True local=False
+  plain AppBarButton.Background = #1C1C1E key==AppBarButtonBackground sameAsAppBarButtonBackground=True local=False
+  plain Foreground = #680081 key==AppBarButtonForeground sameAsAppBarButtonForeground=True
+  separator.Foreground = #48484A key==AppBarSeparatorForeground sameAsAppBarSeparatorForeground=True
+  plain root border = #1C1C1E key==AppBarButtonBackground labelPart=save iconPart=present
+  named root border = #1C1C1E key==AppBarButtonBackground labelPart=save iconPart=present
+  renamed root border = - key=- labelPart=no part iconPart=absent
+  styled root border = #0000FF key=#0000FF labelPart=save iconPart=present
+
+=== C. does overriding the row in our dictionary reach the code-built brush? ===
+LOADED threw KeyNotFoundException: Resource key 'AppBarButtonBackground' not found.
+
+  closing the window: ok
+
+=== B. which brush each control actually holds, by identity ===
+  CommandBar.Background = #2C2C2E key==CommandBarBackground sameAsCommandBarBackground=True local=False
+  plain AppBarButton.Background = #1C1C1E key==AppBarButtonBackground sameAsAppBarButtonBackground=True local=False
+  plain Foreground = #680081 key==AppBarButtonForeground sameAsAppBarButtonForeground=True
+  separator.Foreground = #48484A key==AppBarSeparatorForeground sameAsAppBarSeparatorForeground=True
+  plain root border = #1C1C1E key==AppBarButtonBackground labelPart=save iconPart=present
+  named root border = #1C1C1E key==AppBarButtonBackground labelPart=save iconPart=present
+  renamed root border = - key=- labelPart=no part iconPart=absent
+  styled root border = #0000FF key=#0000FF labelPart=save iconPart=present
+
+=== C. does overriding the row in our dictionary reach the code-built brush? ===
+LOADED threw KeyNotFoundException: Resource key 'AppBarButtonBackground' not found.
+
+  closing the window: ok
