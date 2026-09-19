@@ -1,0 +1,71 @@
+=== I. presence of the remaining WinUI menu types ===
+  MenuFlyoutSubItem: Jalium.UI.Controls.MenuFlyoutSubItem : MenuFlyoutSubItem < MenuFlyoutItem < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  SplitMenuFlyoutItem: ABSENT
+  MenuFlyoutSeparator: Jalium.UI.Controls.MenuFlyoutSeparator : MenuFlyoutSeparator < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  RadioMenuFlyoutItem: ABSENT
+  MenuBarItem: Jalium.UI.Controls.MenuBarItem : MenuBarItem < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  MenuPopupScrollHost: ABSENT
+  MenuScrollViewer: ABSENT
+  MenuBase: Jalium.UI.Controls.Primitives.MenuBase : MenuBase < ItemsControl < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+
+=== J. boot-time implicit styles: did they reach the controls? ===
+  --- Menu --- style=null template=set bg=#FF2C2C2E
+      Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x32
+        Border 'ProbeMenuSurface' bg=#FF2C2C2E border=#FF48484A 420x32
+          ItemsPresenter 420x28
+            StackPanel 420x28
+              MenuItem bg=- fg=#FFF5F5F7 tmpl=null role=SubmenuHeader hl=False pr=False sel=False submenu=False 420x32
+              MenuItem bg=- fg=#FFF5F5F7 tmpl=null role=SubmenuItem hl=False pr=False sel=False submenu=False 420x32
+  --- MenuItem in the menu --- style=null template=null bg=-
+      MenuItem bg=- fg=#FFF5F5F7 tmpl=null role=SubmenuHeader hl=False pr=False sel=False submenu=False 420x32
+  --- MenuItem in the menu --- style=null template=null bg=-
+      MenuItem bg=- fg=#FFF5F5F7 tmpl=null role=SubmenuItem hl=False pr=False sel=False submenu=False 420x32
+  MenuItem style read back: null
+  --- MenuBar --- style=null template=set bg=#FF2C2C2E
+      MenuBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=set 420x36
+        StackPanel 420x36
+          MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 46.83x36
+          MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 49.59x36
+  --- MenuBarItem --- style=null template=null bg=#00FFFFFF
+      MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 46.83x36
+
+=== K. open the flyout: are the item styles live inside it? ===
+  ShowAt: ok
+  IsOpen=True
+  --- MenuFlyoutItem --- style=null template=set bg=-
+      MenuFlyoutItem bg=- fg=#FFF5F5F7 tmpl=set 145.84x34
+        Border 'LayoutRoot' bg=- border=#FF48484A 145.84x34
+          StackPanel 123.84x17
+            ContentPresenter 'IconContent' content="Jalium.UI.Controls.TextBlock" 8.37x17
+              TextBlock text="*" op=1 8.37x17
+            TextBlock 'TextBlock' text="flyout item" op=1 74.88x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="" op=1 0x17
+  --- ToggleMenuFlyoutItem (checked) --- style=null template=set bg=-
+      ToggleMenuFlyoutItem bg=- fg=#FFF5F5F7 tmpl=set 145.84x34
+        Border 'LayoutRoot' bg=#00FFFFFF border=#FF48484A 145.84x34
+          StackPanel 123.84x17
+            TextBlock 'CheckGlyph' text="" op=1 16x17
+            TextBlock text="toggle item" op=1 79.84x17
+  --- ToggleMenuFlyoutItem (unchecked) --- style=null template=set bg=-
+      ToggleMenuFlyoutItem bg=- fg=#FFF5F5F7 tmpl=set 145.84x34
+        Border 'LayoutRoot' bg=#00FFFFFF border=#FF48484A 145.84x34
+          StackPanel 123.84x17
+            TextBlock 'CheckGlyph' text="" op=0 16x17
+            TextBlock text="toggle off" op=1 68.45x17
+  --- Separator --- style=null template=set bg=#FF48484A
+      Separator bg=#FF48484A fg=#FFF5F5F7 tmpl=set 145.84x1
+        Border 'ProbeSeparator' bg=- border=#FF48484A 145.84x10
+
+=== L. framework-owned state writes on a MenuItem ===
+  rest: bg=- highlighted=False pressed=False selected=False submenu=False role=SubmenuHeader
+  a style cell on IsHighlighted fires? (installed for the item): ok
+  after style install: bg=#FF00FF00
+  IsHighlighted setter reachable from outside? InvalidOperationException: 'IsHighlighted' is read-only and can only be changed with its DependencyPropertyKey. (DP field write)
+  after DP write attempt: bg=#FF00FF00 highlighted=False
+  click to open the submenu: ok
+  after click: bg=#FF3A3A3C highlighted=True pressed=True selected=True submenu=True
+
+=== M. keyboard surface (menu keys, if the runtime has them) ===
+  Key enum present: Jalium.UI.Input.Key
+  MenuItem key-ish methods: OnKeyDownHandler, OnIsKeyboardFocusedChanged
+  MenuBar key-ish methods: OnCreateAutomationPeer, get_ItemCollection, get_ParentMenuBar, set_ParentMenuBar, MeasureOverride, OnRender, ResolveForegroundBrush, ResolveBrush, OpenMenuAndFocusFirstItem, OnMouseDownHandler, OnMouseEnterHandler, OnMouseLeaveHandler, OnKeyDownHandler, OpenFromKeyboard, CloseFromKeyboard, FocusFirstMenuItem, OnItemsCollectionChanged, <FocusFirstMenuItem>b__33_0

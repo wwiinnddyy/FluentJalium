@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway Menu / MenuBar / MenuFlyout census. Not referenced by FluentJalium.slnx.
+       The stage-4 objective assumes the whole menu family is native and only ContentDialog needs an
+       own type; SplitButton already proved that assumption can be wrong in both directions, and the
+       Expander/InfoBar batch proved that "the template does not take" can be a single unopened switch.
+       So this probe reflects by simple name (nothing is typed against a guessed class), mounts what
+       exists, swaps a template into it, and tries to open a menu without OS input - all before any
+       markup is written. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>MenuProbe</RootNamespace>
+    <AssemblyName>MenuProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

@@ -43,6 +43,7 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
             [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
             [(FluentNavigationItem)SurfacesItem!] = (FrameworkElement)SurfacesPage!,
+            [(FluentNavigationItem)MenusItem!] = (FrameworkElement)MenusPage!,
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
         };
         _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
@@ -51,6 +52,7 @@ public partial class MainWindow : Window
         _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
         _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
         _pageIds[(FluentNavigationItem)SurfacesItem!] = "surfaces";
+        _pageIds[(FluentNavigationItem)MenusItem!] = "menus";
         _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
 
         // Only the active page is in the visual tree and tab order. Reusing the same
@@ -61,6 +63,7 @@ public partial class MainWindow : Window
         WireInputs();
         WireSelection();
         WireSurfaces();
+        WireMenus();
         WireAppearance();
         SetAccessibleNames();
 
@@ -124,6 +127,45 @@ public partial class MainWindow : Window
         var dropDown = (FluentDropDownButton)DropDownMoreButton!;
         dropDown.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down opened; IsExpanded={dropDown.IsExpanded}.";
         dropDown.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down closed; IsExpanded={dropDown.IsExpanded}.";
+    }
+
+    private void WireMenus()
+    {
+        foreach (var title in new[] { "View", "Help" })
+        {
+            ((MenuBar)SampleMenuBar!).Items.Add(new MenuBarItem { Title = title });
+        }
+
+        var menu = (Menu)SampleMenu!;
+        menu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler((sender, arguments) =>
+            ((TextBlock)MenuBarReadout!).Text =
+            $"{((MenuItem)arguments.OriginalSource!).Header} clicked - the label and the disabled colour are ours; the highlight and the check mark are the control's own drawing."));
+
+        var flyout = new MenuFlyout();
+        flyout.Items.Add(new MenuFlyoutItem
+        {
+            Text = "Rename",
+            Icon = new TextBlock { Text = "\uE713", FontFamily = new FontFamily("Segoe Fluent Icons"), FontSize = 14 },
+            KeyboardAcceleratorTextOverride = "F2",
+        });
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Archive", KeyboardAcceleratorTextOverride = "Ctrl+Shift+A" });
+        flyout.Items.Add(new ToggleMenuFlyoutItem { Text = "Show read receipts", IsChecked = true });
+        flyout.Items.Add(new MenuFlyoutSeparator());
+        var share = new MenuFlyoutSubItem { Text = "Share with" };
+        share.Items.Add(new MenuFlyoutItem { Text = "Team channel" });
+        share.Items.Add(new MenuFlyoutItem { Text = "Direct link" });
+        flyout.Items.Add(share);
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Delete", IsEnabled = false });
+        flyout.Closed += (_, _) => ((TextBlock)MenuReadout!).Text = "Flyout closed.";
+
+        ((Button)ShowFlyoutButton!).Click += (_, _) => flyout.ShowAt((Button)ShowFlyoutButton!);
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(new MenuItem { Header = "Copy path", Icon = new TextBlock { Text = "\uE8C8", FontFamily = new FontFamily("Segoe Fluent Icons"), FontSize = 14 } });
+        contextMenu.Items.Add(new MenuItem { Header = "Open containing folder" });
+        contextMenu.Items.Add(new Separator());
+        contextMenu.Items.Add(new MenuItem { Header = "Properties", IsEnabled = false });
+        ((Button)ShowContextMenuButton!).Click += (_, _) => contextMenu.Open(new Point(360, 320));
     }
 
     private void WireSurfaces()

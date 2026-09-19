@@ -12,6 +12,7 @@
     { "id": "selection", "title": "Selection", "host": "SelectionPage" },
     { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
     { "id": "surfaces", "title": "Surfaces", "host": "SurfacesPage" },
+    { "id": "menus", "title": "Menus", "host": "MenusPage" },
     { "id": "settings", "title": "Settings", "host": "SettingsPage" }
   ],
   "controls": [
@@ -198,6 +199,78 @@
       "parity": "own-type",
       "evidence": [ "docs/astra/audits/infobar.md", "tests/FluentJalium.Tests/AstraExpanderInfoBarTests.cs", "spike/ExpanderInfoBarProbe/Program.cs" ],
       "gaps": [ "the native InfoBar cannot be templated on 26.10.9: it never opts into template content management, so it paints its own hardcoded severity fill, icon and 32 DIP close rectangle - this type exists only to call that protected opt-in", "there is no icon slot, so upstream's UserIconVisible state is unreachable and IsIconVisible only shows or hides the severity mark", "InfoBarHyperlinkButtonForeground and InfoBarHyperlinkButtonMargin are not transcribed: the action slot takes a Button, and a template-internal implicit HyperlinkButton style is unproven here", "the bar always stacks title over message; upstream's horizontal InfoBarPanel rows are not transcribed", "the severity mark needs Segoe Fluent Icons to be installed", "IsOpen=false is collapsed by the style, because the control only drops its own measure, and no real pointer or touch is gated" ]
+    },
+    {
+      "markup": "Menu",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "the item highlight, check mark and submenu arrow inside a Menu are the framework's own drawing, because a MenuItem never builds a Template", "no pointer reaches the bar, so which colour a real hover paints inside a self-drawn MenuItem is unmeasured" ]
+    },
+    {
+      "markup": "MenuItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "colour only: the control stores a Template and never instantiates one, so it has no parts of ours and no state cell of ours", "IsHighlighted, IsPressed, IsSelected and IsSubmenuOpen are read-only dependency properties, and the self-painter's highlight fill is a framework colour" ]
+    },
+    {
+      "markup": "MenuBar",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "no Template: the bar hosts its own items, so only its surface and label colours are ours", "MenuBarHeight (40) is an x:Double row and rides as a literal" ]
+    },
+    {
+      "markup": "MenuBarItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "upstream's pressed and selected states are not published here, because Title is this control's only dependency property", "whether a click on the item's own ContentButton opens the bar's flyout is unmeasured: the code drives reach the handler and report no open state without a pointer" ]
+    },
+    {
+      "markup": "ContextMenu",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "the framework wraps an opened menu in its own scroll host with a hardcoded border, so the presenter rows reach the surface we template and not the chrome around it", "MinWidth 140 is ours; the host sizes the popup to its content" ]
+    },
+    {
+      "markup": "MenuFlyoutItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "pressed has no state to watch and is not published", "the control measures its own row and draws in OnRender as well as hosting a template, so a real hover may show a framework fill; the 38 literal is what makes upstream's 11,8,11,9 padding fit at all", "the narrow-padding and check-placeholder state groups have no consumer here" ]
+    },
+    {
+      "markup": "ToggleMenuFlyoutItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "upstream answers the Toggle automation pattern; 26.10.9 answers Invoke, which is asserted rather than fixed", "the check mark is a Path rather than upstream's FontIcon glyph", "pressed is not published" ]
+    },
+    {
+      "markup": "MenuFlyoutSubItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "SubMenuOpened and pressed are not published: IsSubMenuOpen is a read-only CLR getter and the submenu opens on mouse enter, which nothing but a pointer can raise", "the submenu popup is built by the control in code, so no template part carries it - which also means no menu part name is a functional contract" ]
+    },
+    {
+      "markup": "MenuFlyoutSeparator",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "MenuFlyoutSeparatorHeight (1) is an x:Double row and rides as a literal" ]
     }
   ]
 }

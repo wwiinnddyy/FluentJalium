@@ -10,7 +10,7 @@
   where they are asserted from a histogram - docs/astra/adaptation/06 records why a screenshot is not
   evidence in this runtime, so this script deliberately captures no image.
 
-  Pages come from Catalog.json: overview, buttons, inputs, selection, navigation, surfaces, settings.
+  Pages come from Catalog.json: overview, buttons, inputs, selection, navigation, surfaces, menus, settings.
 #>
 [CmdletBinding()]
 param(

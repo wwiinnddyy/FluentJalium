@@ -1,0 +1,263 @@
+=== 0. did the theme load, and are the new rows in it? ===
+  dictionaries=30 MenuFlyoutItemBackground=SolidColorBrush
+  MenuFlyoutPresenterBackground=SolidColorBrush MenuBarItemMargin=4,4,4,4
+
+=== Q. theme-supplied template and brush identity, before anything opens ===
+  Menu: tmpl=set bg==MenuFlyoutItemBackground border==MenuBarItemBorderBrush fg==MenuFlyoutItemForeground padding=0,0,0,0 margin=0,0,0,0 minH=40 desired=420x40 size=420x40 font=14
+  MenuItem (first, in the bar): tmpl=null bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=0 desired=60.25x32 size=420x32 font=14
+  MenuBar: tmpl=null bg==MenuFlyoutItemBackground border=- fg==MenuFlyoutItemForeground padding=0,0,0,0 margin=0,0,0,0 minH=40 desired=420x40 size=420x40 font=14
+  MenuBarItem: tmpl=set bg==MenuFlyoutItemBackground border==MenuBarItemBorderBrush fg==MenuFlyoutItemForeground padding=12,6,12,6 margin=4,4,4,4 minH=0 desired=62.07x40 size=54.07x32 font=14
+
+  Menu visual tree:
+      Menu bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 420x40
+        Border 'LayoutRoot' bg=#00FFFFFF 420x40
+          ItemsPresenter 420x40
+            StackPanel 420x40
+              MenuItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=null 420x32
+              MenuItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=null 420x32
+  MenuBar visual tree:
+      MenuBar bg=#00FFFFFF fg=#FFFFFFFF tmpl=null 420x40
+        StackPanel 420x40
+          MenuBarItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 54.07x32
+            Grid 'ContentRoot' 54.07x32
+              Border 'Background' bg=#00FFFFFF 54.07x32
+              Button 'ContentButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 52.07x32
+                Grid 52.07x32
+                  Border 'Surface' bg=#00FFFFFF 52.07x32
+                    ContentPresenter 32.07x19.78
+                  Border 'FocusOutline' bg=- 50.07x30
+                    Border bg=- 46.07x26
+
+=== R. the opened flyout: do our templates build, and are the part names there? ===
+  ShowAt: ok
+  flyout IsOpen=True
+    MenuFlyoutItem 'item': tmpl=set bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=194x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, KeyboardAcceleratorTextBlock
+      MenuFlyoutItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="item" 105.3x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="Ctrl+I" 34.7x13
+    MenuFlyoutItem 'icon': tmpl=set bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=96.27x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, KeyboardAcceleratorTextBlock
+      MenuFlyoutItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 16x16
+              ContentPresenter 'IconContent' 16x16
+                TextBlock text="#" 16x16
+            TextBlock 'TextBlock' text="icon" 136x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="" 0x0 [hidden]
+    MenuFlyoutItem 'no keys': tmpl=set bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=119.13x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, KeyboardAcceleratorTextBlock
+      MenuFlyoutItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="no keys" 164x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="" 0x0 [hidden]
+    MenuFlyoutSubItem 'sub': tmpl=set bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=92.05x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, SubItemChevron
+      MenuFlyoutSubItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="sub" 132x17
+            Path 'SubItemChevron' 8x8
+    ToggleMenuFlyoutItem 'toggle': tmpl=set bg=#00FFFFFF border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=111.7x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, KeyboardAcceleratorTextBlock, CheckGlyph, CheckPlaceholder
+      ToggleMenuFlyoutItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'CheckPlaceholder' bg=#00FFFFFF 28x17
+              Path 'CheckGlyph' 12x12
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="toggle" 136x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="" 0x0 [hidden]
+    MenuFlyoutItem 'disabled': tmpl=set bg==MenuFlyoutItemBackground border==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground padding=11,8,11,9 margin=0,0,0,0 minH=38 desired=124.46x38 size=194x38 font=14
+    parts: LayoutRoot, IconRoot, IconContent, TextBlock, KeyboardAcceleratorTextBlock
+      MenuFlyoutItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="disabled" 164x17
+            TextBlock 'KeyboardAcceleratorTextBlock' text="" 0x0 [hidden]
+    MenuFlyoutSeparator 'null': tmpl=set bg==MenuFlyoutSeparatorBackground border=- fg==MenuFlyoutPresenterBorderBrush padding=-4,1,-4,1 margin=0,4,0,4 minH=0 desired=0x17 size=194x9 font=14
+    parts: none
+      MenuFlyoutSeparator bg=#15FFFFFF fg=#33000000 tmpl=set 194x9
+        Border bg=#15FFFFFF 202x1
+
+=== S. value-driven cells: Icon, KeyboardAcceleratorTextOverride, IsChecked ===
+  icon slot: with icon IconRoot=visible, without=not visible
+  accelerator: with text=visible, without=not visible
+  toggle rest: CheckGlyph opacity=0
+  toggle IsChecked=true: opacity=1
+  toggle back to false: opacity=0
+  disabled item fg==MenuFlyoutItemForeground vs enabled fg==MenuFlyoutItemForeground
+  disabled inner TextBlock: =MenuFlyoutItemForegroundDisabled
+
+=== T. submenu without a pointer: what is reachable ===
+  OpenSubMenuAndFocusFirstItem()
+    invoke: ok
+    after: IsSubMenuOpen=null popups under the item=0
+      MenuFlyoutSubItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="sub" 132x17
+            Path 'SubItemChevron' 8x8
+  EnsureSubPopup()
+    invoke: ok
+    after: IsSubMenuOpen=null popups under the item=0
+      MenuFlyoutSubItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="sub" 132x17
+            Path 'SubItemChevron' 8x8
+  FocusFirstSubMenuItem()
+    invoke: ok
+    after: IsSubMenuOpen=null popups under the item=0
+      MenuFlyoutSubItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 194x38
+        Border 'LayoutRoot' bg=#00FFFFFF 186x34
+          Grid 164x17
+            Border 'IconRoot' bg=- 0x0 [hidden]
+              ContentPresenter 'IconContent' 0x0 [hidden]
+            TextBlock 'TextBlock' text="sub" 132x17
+            Path 'SubItemChevron' 8x8
+
+=== U. MenuBar: does the bar still open its item's flyout ===
+  MenuBarItem.OpenMenuAndFocusFirstItem: ok
+    bar item after: tmpl=set bg==MenuFlyoutItemBackground submenu open=null
+  MenuBarItem.OpenFromKeyboard: ok
+    bar item after: tmpl=set bg==MenuFlyoutItemBackground submenu open=null
+  MenuBarItem.FocusFirstMenuItem: ok
+    bar item after: tmpl=set bg==MenuFlyoutItemBackground submenu open=null
+  synthesized MouseDown on the bar item: ok
+  after: submenu open=null pressed=null bg==MenuFlyoutItemBackground
+  ContentButton of the bar item: found, tmpl=set
+
+  window (depth 5) with everything driven:
+    Window bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null 886.29x693.14
+      StackPanel 838.29x613.14
+        Button bg=#0FFFFFFF fg=#FFFFFFFF tmpl=set 140x32.78
+          Grid 140x32.78
+            Border 'Surface' bg=#0FFFFFFF 140x32.78
+              ContentPresenter 31.22x19.78
+            Border 'FocusOutline' bg=- 138x30.78
+              Border bg=- 134x26.78
+        Menu bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 420x40
+          Border 'LayoutRoot' bg=#00FFFFFF 420x40
+            ItemsPresenter 420x40
+              StackPanel 420x40
+        MenuBar bg=#00FFFFFF fg=#FFFFFFFF tmpl=null 420x40
+          StackPanel 420x40
+            MenuBarItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 54.07x32
+              Grid 'ContentRoot' 54.07x32
+        TextBlock text="anchor" 200x19.78
+      TitleBar bg=#FF202020 fg=#FFFFFFFF tmpl=set 886.29x32
+        Border 'PART_RootBorder' bg=#FF202020 886.29x32
+          DockPanel 886.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            ContentPresenter 'PART_RightWindowCommandsHost' 0x0 [hidden]
+            DockPanel 730.29x32
+              Grid 'PART_WindowIconHost' 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 6" 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' 0x0 [hidden]
+      AdornerLayer 886.29x693.14
+      OverlayLayer 886.29x693.14
+        DebugHudOverlay bg=#EB101016 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" 0x0 [hidden]
+              TextBlock text="FPS" 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" 0x0 [hidden]
+              TextBlock text="worst 0.0ms" 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF 0x0 [hidden]
+              Border bg=#C8FFA028 0x0 [hidden]
+              Border bg=#C864DC64 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+
+=== V. ContextMenu.Open on a point ===
+  Open: ok
+  IsOpen=True template=set bg==MenuFlyoutPresenterBackground
+    Window bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null 886.29x693.14
+      StackPanel 838.29x613.14
+        Button bg=#0FFFFFFF fg=#FFFFFFFF tmpl=set 140x32.78
+          Grid 140x32.78
+            Border 'Surface' bg=#0FFFFFFF 140x32.78
+              ContentPresenter 31.22x19.78
+            Border 'FocusOutline' bg=- 138x30.78
+              Border bg=- 134x26.78
+        Menu bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 420x40
+          Border 'LayoutRoot' bg=#00FFFFFF 420x40
+            ItemsPresenter 420x40
+              StackPanel 420x40
+        MenuBar bg=#00FFFFFF fg=#FFFFFFFF tmpl=null 420x40
+          StackPanel 420x40
+            MenuBarItem bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 54.07x32
+              Grid 'ContentRoot' 54.07x32
+        TextBlock text="anchor" 200x19.78
+      TitleBar bg=#FF202020 fg=#FFFFFFFF tmpl=set 886.29x32
+        Border 'PART_RootBorder' bg=#FF202020 886.29x32
+          DockPanel 886.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF 46x32
+            ContentPresenter 'PART_RightWindowCommandsHost' 0x0 [hidden]
+            DockPanel 730.29x32
+              Grid 'PART_WindowIconHost' 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 6" 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' 0x0 [hidden]
+      AdornerLayer 886.29x693.14
+      OverlayLayer 886.29x693.14
+        DebugHudOverlay bg=#EB101016 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" 0x0 [hidden]
+              TextBlock text="FPS" 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" 0x0 [hidden]
+              TextBlock text="worst 0.0ms" 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF 0x0 [hidden]
+              Border bg=#C8FFA028 0x0 [hidden]
+              Border bg=#C864DC64 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+        PopupRoot 62.86x38
+          Border bg=#FF2C2C2C 62.86x38
+            MenuPopupScrollHost bg=- fg=#FFF5F5F7 tmpl=null 60.86x32
+              RepeatButton bg=- fg=#FFFFFFFF tmpl=set 0x0 [hidden]
+              ScrollViewer bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 60.86x32
+              RepeatButton bg=- fg=#FFFFFFFF tmpl=set 0x0 [hidden]
+
+=== W. MenuItem's own state, driven through the control's handler ===
+  rest: bg==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground highlighted=False
+  synthesized MouseDown: ok
+  after: bg==MenuFlyoutItemBackground fg==MenuFlyoutItemForeground highlighted=False pressed=True
+  local value on Background? no
+  IsEnabled=false: fg==MenuFlyoutItemForegroundDisabled

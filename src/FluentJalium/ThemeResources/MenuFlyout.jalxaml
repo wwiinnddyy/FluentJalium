@@ -1,0 +1,65 @@
+<!-- WinUI 3 MenuFlyout_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 6f9f3fd322583d2d537dc30c439e62accf1efbd4, Light/Default branch (lines 171-251) plus the
+     theme-agnostic rows at 254-264 that this runtime can carry (Thickness only).
+     Twenty-six alias rows and eight Thickness rows, each one read by Styles/Menus.jalxaml - a row nobody
+     consumes is not published here, and AstraResourceKeyTests.A_row_with_no_consumer_is_not_published
+     pins that split. 74 of upstream's 81 themed rows are theme-symmetric aliases (only eight dead
+     pre-WinUI *ThemeBrush rows differ between Light and Dark), so the Light/Dark flip and the
+     high-contrast decision travel through the palette objects these aliases point at.
+     What upstream has and this dictionary does not, and why:
+       - the eleven *Pressed* rows (Item, SubItem, Toggle keyboard accelerator) and the two
+         *SubMenuOpened* rows: 26.10.9's MenuFlyoutItem exposes no press flag and no submenu-open
+         dependency property - IsHighlighted and IsSubMenuOpen there are read-only CLR getters, not
+         dependency properties - so no state cell could ever ask for them (spike/MenuProbe pass 5);
+       - the twenty-four *Reveal* rows: this runtime has no reveal material;
+       - MenuFlyoutItemPlaceholderThemeThickness, MenuFlyoutItemDoublePlaceholderThemeThickness,
+         MenuFlyoutItemThemePaddingNarrow: upstream drives those from the CheckPlaceholderStates and
+         PaddingSizeStates visual-state groups, and the runtime has no equivalent state to write a cell
+         against;
+       - MenuFlyoutItemTextTrimming (a TextTrimming resource this reader has never parsed),
+         MenuFlyoutSystemBackdrop (a backdrop object, deferred to the materials batch) and
+         MenuFlyoutLightDismissOverlayBackground (upstream reads it from native code by name, not from a
+         template, so publishing it here would promise a pixel change we cannot demonstrate);
+       - MenuFlyoutSeparatorHeight, MenuFlyoutThemeMinHeight, and the two SplitMenuFlyoutItem x:Double
+         rows: x:Double resources do not parse in this reader, so 1 and 32 ride as literals; the
+         SplitMenuFlyoutItem rows additionally have no consumer because the type is absent.
+     One value substitution: MenuFlyoutPresenterBackground aliases
+     AcrylicInAppFillColorDefaultBrush instead of upstream's DesktopAcrylicTransparentBrush, which this
+     palette does not carry - the same stand-in ThemeResources/FlyoutPresenter.jalxaml already uses for
+     the flyout surface, with the same reason (audits/menu-flyout.md). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="MenuFlyoutPresenterBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="MenuFlyoutPresenterThemePadding">0,2,0,2</Thickness>
+  <Thickness x:Key="MenuFlyoutItemBorderThickness">0</Thickness>
+  <Thickness x:Key="MenuFlyoutItemMargin">4,2,4,2</Thickness>
+  <Thickness x:Key="MenuFlyoutItemThemePadding">11,8,11,9</Thickness>
+  <Thickness x:Key="MenuFlyoutItemChevronMargin">24,0,0,-1</Thickness>
+  <Thickness x:Key="MenuFlyoutSubItemBorderThickness">0</Thickness>
+  <Thickness x:Key="MenuFlyoutSeparatorThemePadding">-4,1,-4,1</Thickness>
+  <StaticResource x:Key="MenuFlyoutPresenterBackground" ResourceKey="AcrylicInAppFillColorDefaultBrush" />
+  <StaticResource x:Key="MenuFlyoutPresenterBorderBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
+  <StaticResource x:Key="MenuFlyoutSeparatorBackground" ResourceKey="DividerStrokeColorDefaultBrush" />
+  <StaticResource x:Key="MenuFlyoutItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutItemBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutItemBackgroundBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="MenuFlyoutItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="MenuFlyoutItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemBackgroundBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemChevron" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemChevronPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="MenuFlyoutSubItemChevronDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ToggleMenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+</ResourceDictionary>

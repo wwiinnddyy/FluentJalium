@@ -1,0 +1,393 @@
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuItem: no writable string among [Header,Text,Title,Content] (props: Icon:Object,InputGestureText:String,IsCheckable:Boolean,IsChecked:Boolean,IsSubmenuOpen:Boolean,IsSelected:Boolean,Role:MenuItemRole,StaysOpenOnClick:Boolean,Command:ICommand,CommandParameter:Object,CommandTarget:IInputElement,IsHighlighted:Boolean,IsPressed:Boolean,IsSuspendingPopupAnimation:Boolean,ItemContainerTemplateSelector:ItemContainerTemplateSelector,UsesItemContainerTemplate:Boolean,HasItems:Boolean)
+  MenuBarItem.Title = File
+  MenuBarItem.Title = Edit
+  MenuFlyoutItem.Text = templated flyout item
+  MenuFlyoutItem.Text = plain flyout item
+=== A. before/after mount template assignment on MenuItem ===
+  early: assigned=True reads=ControlTemplate(ControlTemplate) height=32
+    MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+  late: reads=ControlTemplate(ControlTemplate) identity kept=True height=32
+    MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+
+=== B. ItemContainerStyle with a Template setter ===
+  container: template=null height=32 bg=#00FFFFFF
+      MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+  container: template=null height=32 bg=#00FFFFFF
+      MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+
+=== C. implicit style targeting MenuItem ===
+  installed implicit MenuItem style: ok
+  : template=ControlTemplate(ControlTemplate) bg=#00FFFFFF height=32
+      MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+  : template=ControlTemplate(ControlTemplate) bg=#00FFFFFF height=32
+      MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+  PlainItem: template=null bg=#00FFFFFF height=32
+      MenuItem 'PlainItem' bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+
+=== D. does a retemplated surface still open a submenu, and through whose parts? ===
+  surface tree before the click:
+    Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 420x32
+      Border 'ProbeSurfaceRoot' bg=#FF202020 border=#FFFF00FF 420x32
+        ItemsPresenter 'ItemsPresenter' 416x28
+          StackPanel 416x28
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=SubmenuHeader submenu=False highlighted=False pressed=False selected=False checked=False header="" 416x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=SubmenuItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 416x32
+  raised MouseDown on the submenu owner: ok
+  IsSubmenuOpen=True background=#FF3A3A3C
+  surface tree after the click:
+    Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 420x32
+      Border 'ProbeSurfaceRoot' bg=#FF202020 border=#FFFF00FF 420x32
+        ItemsPresenter 'ItemsPresenter' 416x28
+          StackPanel 416x28
+            MenuItem bg=#FF3A3A3C fg=#FFF5F5F7 tmpl=null role=SubmenuHeader submenu=True highlighted=True pressed=True selected=True checked=False header="" 416x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=SubmenuItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 416x32
+  window tree after the click (depth 6):
+    Window bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null 986.29x923.43
+      StackPanel 938.29x843.43
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem 'PlainItem' bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 420x32
+          Border 'ProbeSurfaceRoot' bg=#FF202020 border=#FFFF00FF 420x32
+            ItemsPresenter 'ItemsPresenter' 416x28
+              StackPanel 416x28
+                MenuItem bg=#FF3A3A3C fg=#FFF5F5F7 tmpl=null role=SubmenuHeader submenu=True highlighted=True pressed=True selected=True checked=False header="" 416x32
+                MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=SubmenuItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 416x32
+        MenuBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x36
+          StackPanel 420x36
+            MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 46.83x36
+            MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 49.59x36
+        Button bg=#0FFFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 160x32.78
+          Grid 160x32.78
+            Border 'Surface' bg=#0FFFFFFF border=#12FFFFFF 160x32.78
+              ContentPresenter content="flyout host" 74.09x19.78
+                TextBlock text="flyout host" fg=#FFFFFFFF 74.09x19.78
+            Border 'FocusOutline' bg=- border=#FFFFFFFF 158x30.78
+              Border bg=- border=#B3000000 154x26.78
+      TitleBar bg=#FF202020 fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 986.29x32
+        Border 'PART_RootBorder' bg=#FF202020 border=#FF48484A 986.29x32
+          DockPanel 986.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+            ContentPresenter 'PART_RightWindowCommandsHost' content="" 0x0 [hidden]
+            DockPanel 830.29x32
+              Grid 'PART_WindowIconHost' 20x20
+                Image 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 3" fg=#FFFFFFFF 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' content="" 0x0 [hidden]
+      AdornerLayer 986.29x923.43
+      OverlayLayer 986.29x923.43
+        DebugHudOverlay bg=#EB101016 border=#5064A0DC 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" fg=#FF50FF50 0x0 [hidden]
+              TextBlock text="FPS" fg=#DCAAB4BE 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" fg=#C88C919B 0x0 [hidden]
+              TextBlock text="worst 0.0ms" fg=#C88C919B 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" fg=#F5F0F0F0 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF border=#FF48484A 0x0 [hidden]
+              Border bg=#C8FFA028 border=#FF48484A 0x0 [hidden]
+              Border bg=#C864DC64 border=#FF48484A 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B 0x0 [hidden]
+        PopupRoot 60x42
+          Border bg=#FF2C2C2E border=#FF48484A 60x42
+            MenuPopupScrollHost bg=- fg=#FFF5F5F7 tmpl=null 50x32
+              RepeatButton bg=- fg=#FFDCDCDC tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                Border 'PART_ButtonRoot' bg=#00FFFFFF border=#00FFFFFF 0x0 [hidden]
+              ScrollViewer bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 50x32
+                StackPanel 50x32
+                ScrollBar bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 0x0 [hidden]
+                ScrollBar bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 0x0 [hidden]
+              RepeatButton bg=- fg=#FFDCDCDC tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                Border 'PART_ButtonRoot' bg=#00FFFFFF border=#00FFFFFF 0x0 [hidden]
+
+=== E. MenuBar items: what does the bar build, and does a template reach an item? ===
+    MenuBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x36
+      StackPanel 420x36
+        MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 46.83x36
+        MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 49.59x36
+  MenuBarItem: template=null height=36
+  SetTemplate: ok
+  after assigning our template: reads=ControlTemplate(ControlTemplate)
+      MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 46.83x36
+        Border 'ProbeBarRoot' bg=#FFFFFF00 border=#FF48484A 46.83x36
+          ContentPresenter content="" 0x0
+  click the bar item: ok
+  its IsSubmenuOpen=null
+      MenuBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x36
+        StackPanel 420x36
+          MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 46.83x36
+            Border 'ProbeBarRoot' bg=#FFFFFF00 border=#FF48484A 46.83x36
+              ContentPresenter content="" 0x0
+          MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 49.59x36
+
+=== F. MenuFlyout with a templated item, opened through ShowAt ===
+  ShowAt: ok
+  IsOpen=True
+  flyoutItem template reads=ControlTemplate(ControlTemplate) height=34
+      MenuFlyoutItem bg=- fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 300x34
+        Border 'ProbeFlyoutRoot' bg=#FFFF00FF border=#FF48484A 300x34
+          StackPanel 289x34
+            ContentPresenter content="templated flyout item" 147.82x19.78
+              TextBlock text="templated flyout item" fg=#FFFFFFFF 147.82x19.78
+            TextBlock text="" fg=#FFFFFFFF 0x34
+  separator template reads=ControlTemplate(ControlTemplate) height=1
+      Separator bg=#FF48484A fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 300x1
+        Border 'ProbeSeparatorRoot' bg=#FF00FFFF border=#FF48484A 300x10
+  window while open (depth 7):
+    Window bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null 986.29x923.43
+      StackPanel 938.29x843.43
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem 'PlainItem' bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+            MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+        Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 420x32
+          Border 'ProbeSurfaceRoot' bg=#FF202020 border=#FFFF00FF 420x32
+            ItemsPresenter 'ItemsPresenter' 416x28
+              StackPanel 416x28
+                MenuItem bg=#FF3A3A3C fg=#FFF5F5F7 tmpl=null role=SubmenuHeader submenu=True highlighted=True pressed=True selected=True checked=False header="" 416x32
+                MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null role=SubmenuItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 416x32
+        MenuBar bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x36
+          StackPanel 420x36
+            MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) 46.83x36
+              Border 'ProbeBarRoot' bg=#FFFFFF00 border=#FF48484A 46.83x36
+                ContentPresenter content="" 0x0
+            MenuBarItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 49.59x36
+        Button bg=#0FFFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 160x32.78
+          Grid 160x32.78
+            Border 'Surface' bg=#0FFFFFFF border=#12FFFFFF 160x32.78
+              ContentPresenter content="flyout host" 74.09x19.78
+                TextBlock text="flyout host" fg=#FFFFFFFF 74.09x19.78
+            Border 'FocusOutline' bg=- border=#FFFFFFFF 158x30.78
+              Border bg=- border=#B3000000 154x26.78
+      TitleBar bg=#FF202020 fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 986.29x32
+        Border 'PART_RootBorder' bg=#FF202020 border=#FF48484A 986.29x32
+          DockPanel 986.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+                  Path 'path' 16x16
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+                  Path 'path' 16x16
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=ControlTemplate(ControlTemplate) 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF border=#FF48484A 46x32
+                Grid 16x16
+                  Path 'path' 16x16
+            ContentPresenter 'PART_RightWindowCommandsHost' content="" 0x0 [hidden]
+            DockPanel 830.29x32
+              Grid 'PART_WindowIconHost' 20x20
+                Image 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 3" fg=#FFFFFFFF 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' content="" 0x0 [hidden]
+      AdornerLayer 986.29x923.43
+      OverlayLayer 986.29x923.43
+        DebugHudOverlay bg=#EB101016 border=#5064A0DC 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" fg=#FF50FF50 0x0 [hidden]
+              TextBlock text="FPS" fg=#DCAAB4BE 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" fg=#C88C919B 0x0 [hidden]
+              TextBlock text="worst 0.0ms" fg=#C88C919B 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" fg=#F5F0F0F0 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF border=#FF48484A 0x0 [hidden]
+              Border bg=#C8FFA028 border=#FF48484A 0x0 [hidden]
+              Border bg=#C864DC64 border=#FF48484A 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B 0x0 [hidden]
+        PopupRoot 60x42
+          Border bg=#FF2C2C2E border=#FF48484A 60x42
+            MenuPopupScrollHost bg=- fg=#FFF5F5F7 tmpl=null 50x32
+              RepeatButton bg=- fg=#FFDCDCDC tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                Border 'PART_ButtonRoot' bg=#00FFFFFF border=#00FFFFFF 0x0 [hidden]
+                  Path 'PART_Arrow' 0x0 [hidden]
+              ScrollViewer bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 50x32
+                StackPanel 50x32
+                  MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=SubmenuItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+                ScrollBar bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 0x0 [hidden]
+                  RepeatButton bg=#00FFFFFF fg=#C5FFFFFF tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                  Track 0x0 [hidden]
+                  RepeatButton bg=#00FFFFFF fg=#C5FFFFFF tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                ScrollBar bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 0x0 [hidden]
+                  RepeatButton bg=#00FFFFFF fg=#C5FFFFFF tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                  Track 0x0 [hidden]
+                  RepeatButton bg=#00FFFFFF fg=#C5FFFFFF tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+              RepeatButton bg=- fg=#FFDCDCDC tmpl=ControlTemplate(ControlTemplate) 0x0 [hidden]
+                Border 'PART_ButtonRoot' bg=#00FFFFFF border=#00FFFFFF 0x0 [hidden]
+                  Path 'PART_Arrow' 0x0 [hidden]
+  Hide: ok
+
+=== G. app-level sentinel with the upstream key name: does a self-drawn item see it? ===
+  ok <= install MenuBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBorderBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBorderThickness
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemBackgroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemBackgroundSelected
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemForeground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemForegroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuBarItemForegroundSelected
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemBackgroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemBackgroundPressed
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemBackgroundSelected
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemForeground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemPointerOverForeground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemSelectedForeground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemSeparatorBorderBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuItemGlyphBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterBorderBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterBorderThemeThickness
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterItemBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterItemBackgroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutPresenterItemBackgroundSelected
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutItemBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutItemBackgroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutItemForeground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutItemForegroundPointerOver
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutItemForegroundSelected
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install MenuFlyoutSubItemChevron
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install FlyoutPresenterBackground
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install FlyoutBorderThemeBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+  ok <= install ControlFillColorDefaultBrush
+    before Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E
+    after  Menu:#FF2C2C2E MenuItem:#00FFFFFF Bar:#FF2C2C2E  (nothing moved)
+    remove: ok
+
+=== H. control-local background as the only guaranteed lever ===
+  set MenuItem.Background locally: ok
+  read back: #FFFF00FF height=32
+      Menu bg=#FF2C2C2E fg=#FFF5F5F7 tmpl=null 420x32
+        StackPanel 420x32
+          MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+          MenuItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=ControlTemplate(ControlTemplate) role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32
+          MenuItem 'PlainItem' bg=#FFFF00FF fg=#FFF5F5F7 tmpl=null role=TopLevelItem submenu=False highlighted=False pressed=False selected=False checked=False header="" 50x32

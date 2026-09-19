@@ -14,6 +14,8 @@ ThemeResources/SplitButton.jalxaml
 ThemeResources/DropDownButton.jalxaml
 ThemeResources/Expander.jalxaml
 ThemeResources/InfoBar.jalxaml
+ThemeResources/MenuFlyout.jalxaml
+ThemeResources/MenuBar.jalxaml
 ThemeResources/CheckBox.jalxaml
 ThemeResources/RadioButton.jalxaml
 ThemeResources/TextBox.jalxaml
@@ -28,3 +30,4 @@ Styles/AutoSuggestBox.jalxaml
 Styles/Selection.jalxaml
 Styles/Navigation.jalxaml
 Styles/Surfaces.jalxaml
+Styles/Menus.jalxaml

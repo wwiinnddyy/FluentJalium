@@ -190,6 +190,15 @@ public class AstraResourceKeyTests
     /// sixteen plus eight layout rows are transcribed, and the hyperlink pair stays out with it until a
     /// template-internal implicit style is shown to resolve at all (audits/expander.md, audits/infobar.md).
     /// </para>
+    /// <para>
+    /// The menu family is the largest deferral so far and it is measured, not counted: upstream's 81 themed rows
+    /// become twenty-six, because eleven pressed rows and two submenu-opened rows have no dependency property
+    /// behind them on a flyout item, twenty-four are reveal material this runtime has no equivalent of, and the
+    /// placeholder, narrow-padding and text-trimming rows belong to visual-state groups the runtime never writes
+    /// (AstraMenuTests.A_row_with_no_consumer_is_not_published keeps that split honest, and spike/MenuProbe pass 5
+    /// is where the state surface was read). MenuBar's four pressed and selected rows wait for a MenuBarItem
+    /// that has a state to carry them (audits/menu-flyout.md).
+    /// </para>
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/Button.jalxaml")]
@@ -208,6 +217,8 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/DropDownButton.jalxaml")]
     [InlineData("ThemeResources/Expander.jalxaml")]
     [InlineData("ThemeResources/InfoBar.jalxaml")]
+    [InlineData("ThemeResources/MenuFlyout.jalxaml")]
+    [InlineData("ThemeResources/MenuBar.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

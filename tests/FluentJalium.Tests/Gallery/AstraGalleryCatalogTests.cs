@@ -43,7 +43,6 @@ public class AstraGalleryCatalogTests
         ["Jalium.UI.Window"] = "Never restyled by a style: the shell is reached through the title-bar hooks and the backdrop choice, audited in audits/window-shell.md.",
         ["Jalium.UI.Controls.ListBox"] = "Owed by the list batch: host and container are restyled together; the container path itself is measured in adaptation/09.",
         ["Jalium.UI.Controls.ListBoxItem"] = "Owed by the list batch: its upstream ListItem key list is not transcribed yet.",
-        ["Jalium.UI.Controls.MenuFlyoutItem"] = "Owed by the stage-4 menu family: the split button's sample flyout is the first place the Gallery opens a menu, and the item rows are not transcribed yet (audits/splitbutton.md).",
     };
 
     [Fact]

@@ -449,3 +449,47 @@ Invoke 主半区 → 控件 raise 一次 `Click`；把它们改名成 `…Z` 后
 `InfoBarForeground` 在框架自带主题里确实存在并可被 `TryFindResource` 命中（pass 2 O 段逐条读出），
 各自另有硬编码回退色（Informational 底色是 `#2D2D37`）。走模板路线后本批**不发布**这 9 条：
 没有东西再读它们，发布等于承诺"覆盖能到像素"却无人消费。
+
+## S0-n：能不能重模板是分类型的，控件还会自己量自己画（菜单族批，2026-09-19）
+
+`spike/MenuProbe` 六遍、`menu-probe6.txt` 用**出厂主题**（`Styles/Menus.jalxaml` 与两本新字典本身）复测。
+
+**1 · 同一个运行时里，一半菜单能重模板、另一半不能。**
+建窗之前装好隐式样式之后：`Menu`、`ContextMenu`、`MenuFlyoutItem`、`ToggleMenuFlyoutItem`、
+`MenuFlyoutSubItem`、`MenuFlyoutSeparator`、`MenuBarItem` 全部实例化我们的模板，且解析出的画刷
+与调色板对象**同一实例**（用 `ReferenceEquals` 认定，而不是比颜色）；
+`MenuItem` 存下 `Template` 却**永不实例化**——它自绘（`OnRender` + `ResolveBackgroundBrush` /
+`ResolveMenuBrush` + `DrawCheckMark` + `DrawSubmenuArrow`）。所以 `MenuItem` 只能拿一条只上色的样式，
+高亮/勾选/箭头三处仍是框架色。`MenuBar` 无模板可装（它的项由框架自己宿主），同样只上色。
+> 结论用法：**不要按"基类"外推能否重模板**，`MenuItem` 与 `MenuFlyoutItem` 是同一族里的两个世界。
+
+**2 · pass 4 的一条结论被 pass 6 更正。**
+pass 4 在只装哨兵的窗口里看到"点击后框架把 `Background` 写成本地值 `#FF3A3A3C`"；装上出厂主题后复测，
+合成 MouseDown 使 `IsPressed=True` 而 `Background` **仍是我们的行实例、无本地值**。
+即：自绘控件在样式到位时不会被本地值盖掉，先前那条"框架本地值危险"不成立于本批配置。
+
+**3 · `MenuFlyoutItem` 自己度量、还顺便自绘。**
+`MeasureOverride` 用文本宽度算宽、用一个常量封顶高（26.10.9 实测 34），并且 `OnRender` 仍画背景。
+后果有两条：上游 `11,8,11,9` padding + `4,2,4,2` margin + 17 高的标签在 34 的盒子里被压成 13（文字被挤扁），
+因此条目样式里带一条 **38 的 `MinHeight` 字面量**（4+17+17，正好是上游那些行应有的几何）；
+以及真指针 hover 下框架自绘层是否盖过我们的格子**未知且无法在无指针下证明**（任务 #13）。
+`MinHeight=32` 放在条目上会挤压、放在表面上无事，因此它只属于 `ContextMenu`（presenter 角色）。
+
+**4 · 菜单族完全不读模板部件名。**
+`GetTemplateChild` / `PART_` 在整族源码里零命中，子菜单弹窗由控件 `new Popup` 自建。
+于是 `LayoutRoot` / `IconContent` / `CheckGlyph` / `SubItemChevron` 这些名字是上游对齐，
+**不是**功能契约——这与 Expander 的三个名字（改名即失效）相反，两件事都不许互相外推。
+
+**5 · 状态可达性再收窄：CLR getter 不是 DP。**
+`MenuFlyoutItem.IsHighlighted`、`MenuFlyoutSubItem.IsSubMenuOpen` 只有 CLR getter，
+`SetValue` 路都没有（属性根本不是 DP），因此上游 11 条 `*Pressed*`、2 条 `*SubMenuOpened*` 无处可挂，本次不发布。
+可挂的三格是 `IsMouseOver`、`IsEnabled=False`、`IsChecked`（Toggle），全部有断言。
+`MenuBarItem` 自有 DP 只有 `Title`，上游第四个状态字面就叫 `Selected` 而无对应属性，四条 pressed/selected 行同样不发布。
+
+**6 · 展开类动作在进程内可调用但不可观察。**
+`MenuFlyout.ShowAt/Hide` 真开真关（`IsOpen` 可读）；`ContextMenu.Open(Point)` 真开（`IsOpen=True`），
+但弹层外面那层 `MenuPopupScrollHost` Border 是框架硬编码色，我们的 `MenuFlyoutPresenter*` 两行
+只对 `ContextMenu` 自绘的那层表面兑现承诺；`ContextMenu.MinWidth=140` 不被宿主尊重（实测 62.86 宽）。
+`MenuFlyoutSubItem.OpenSubMenuAndFocusFirstItem` / `EnsureSubPopup` / `FocusFirstSubMenuItem`、
+`MenuBarItem.OpenFromKeyboard` / `OpenMenuAndFocusFirstItem` / `FocusFirstMenuItem` 都能调用且抛不出东西，
+但 `IsSubMenuOpen` 依旧 false——子菜单是 mouse-enter 驱动的，没指针就没结论。

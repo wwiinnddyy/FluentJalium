@@ -31,6 +31,9 @@
         <fluent:FluentNavigationItem x:Name="SurfacesItem" Content="Surfaces" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Calendar" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MenusItem" Content="Menus" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="More" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
       </fluent:FluentNavigationView.MenuItems>
       <fluent:FluentNavigationView.FooterMenuItems>
         <fluent:FluentNavigationItem x:Name="SettingsItem" Content="Settings" Style="{StaticResource FluentNavigationItemStyle}">
@@ -388,6 +391,39 @@
                   </fluent:FluentInfoBar>
                   <TextBlock Text="Every fill here is an upstream row: the four severity backgrounds alias the system fill colours, so severity, icon disc, border and both text colours follow the theme. The icon is a 16 DIP disc carrying the upstream glyph and the close button is a Path rather than a SymbolIcon." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                   <TextBlock x:Name="InfoBarReadout" Text="Nothing closed yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="MenusPage">
+              <TextBlock Text="Menus" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Two menu shapes in one runtime: the WPF-style Menu / MenuItem pair, which 26.10.9 paints itself, and the WinUI-named MenuBar, MenuFlyout and MenuFlyoutItem family, which takes a template like any other control." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Bars" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Menu x:Name="SampleMenu" HorizontalAlignment="Left">
+                    <MenuItem Header="File">
+                      <MenuItem Header="New tab" IsCheckable="True" />
+                      <MenuItem Header="Close window" />
+                    </MenuItem>
+                    <MenuItem Header="Edit">
+                      <MenuItem Header="Copy" IsEnabled="False" />
+                    </MenuItem>
+                  </Menu>
+                  <MenuBar x:Name="SampleMenuBar" Margin="0,12,0,0" />
+                  <TextBlock Text="Both bars read MenuBar's rows for their surface and label. The items inside the first one are the honest gap: a MenuItem stores a Template and never builds one, so its colours come from a style while its highlight, check mark and submenu arrow stay the framework's own drawing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="MenuBarReadout" Text="No bar item opened yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Flyout and context menu" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="ShowFlyoutButton" Content="Open the flyout" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="ShowContextMenuButton" Content="Open the context menu" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The flyout is built in code because 26.10.9 gives a plain Button no Flyout property: MenuFlyout.ShowAt(target) is the door. Its items carry every state this runtime can reach - hover, disable, checked - and no others, so the pressed and submenu-opened rows upstream publishes are not published here either." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="MenuReadout" Text="Nothing chosen yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
             </StackPanel>
