@@ -29,7 +29,7 @@
 | 六个画刷别名（Foreground/Background/SmokeFill/TopOverlay/BorderBrush/SeparatorBorderBrush） | 6 | `ThemeResources/ContentDialog.jalxaml` 同名别名，逐字指向上游目标行 | — |
 | 四条 Thickness（BorderWidth/TitleMargin/Padding/SeparatorThickness） | 4 | 同名发布，值与上游一致（`1`/`0,0,0,12`/`24`/`0,0,0,1`） | — |
 | MinWidth / MaxWidth / MinHeight / MaxHeight（`x:Double`） | 4 | **不发布**，值以字面量落在 `DialogSurface` | 本读取器解析不了 `x:Double` 行（adaptation/00）；且控件会用自己的本地值盖掉卡片上限（0.4），发布名字等于承诺一个拉不住的手柄 |
-| ButtonSpacing（`GridLength`） | 1 | **不发布**，8 DIP 字面量在列定义上 | `GridLength` 行同样解析不了 |
+| ButtonSpacing（`GridLength`） | 1 | **不发布**，8 DIP 字面量在列定义上 | 更正（2026-09-20，阶段 4 第五段）：`GridLength` 行本身能解析，`<GridLength x:Key=…>8</GridLength>` 读回 `GridLength = 8`；进不去的是**落点**——`ColumnDefinition.Width="{ThemeResource …}"` 被静默丢弃，五列全停在类型默认的 `*`（spike/TeachingTipProbe mode tail D2），因为 ColumnDefinition 不在视觉树里，动态查找没有继承上下文。结论不变，理由换成量到的那个；完整记录见 `audits/teachingtip.md` §5 与 `adaptation/00` S1-b |
 
 High Contrast 分支（上游 22-36）不转录：本运行时无公开高对比入口（`ThemeVariant` 只有 `{Dark, Light}`），高对比是我们门面里的逐键重映射，不声称上游对齐。
 

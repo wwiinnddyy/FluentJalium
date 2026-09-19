@@ -1,0 +1,7 @@
+theme dictionaries=36 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== H. reaching the host window from inside a control ===
+  FrameworkElement.Parent: FluentTeachingTip < Grid < StackPanel < Window
+  Application.Current.MainWindow: Window
+  same instance as the shown window: True
+  tip is inside MainWindow.Content: True

@@ -1,0 +1,50 @@
+theme dictionaries=34 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== A. primitives a TeachingTip template would need (by simple name, across the loaded UI assemblies) ===
+  Polygon = Jalium.UI.Shapes.Polygon : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Polyline = Jalium.UI.Shapes.Polyline : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Path = Jalium.UI.Shapes.Path : Shape | public=True abstract=False | own DPs[Data] | parameterless ctor=yes
+  Line = Jalium.UI.Shapes.Line : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Rectangle = Jalium.UI.Shapes.Rectangle : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Ellipse = Jalium.UI.Shapes.Ellipse : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Shape = Jalium.UI.Shapes.Shape : FrameworkElement | public=True abstract=True | own DPs[Fill,Stroke,StrokeThickness] | parameterless ctor=none
+  Popup = Jalium.UI.Controls.Primitives.Popup : FrameworkElement | public=True abstract=False | own DPs[IsOpen,Child,Placement,PlacementTarget,HorizontalOffset,VerticalOffset,AllowsTransparency] | parameterless ctor=yes
+  PopupRoot = Jalium.UI.Controls.Primitives.PopupRoot : Decorator | public=False abstract=False | own DPs[] | parameterless ctor=none
+  ContentControl = Jalium.UI.Controls.ContentControl : Control | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Grid = Jalium.UI.Controls.Grid : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  StackPanel = Jalium.UI.Controls.StackPanel : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  ScrollViewer = Jalium.UI.Controls.ScrollViewer : ContentControl | public=True abstract=False | own DPs[HorizontalOffset,VerticalOffset] | parameterless ctor=yes
+  TextBlock = Jalium.UI.Controls.TextBlock : FrameworkElement | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Border = Jalium.UI.Controls.Border : Decorator | public=True abstract=False | own DPs[CornerRadius] | parameterless ctor=yes
+  Button = Jalium.UI.Controls.Button : ButtonBase | public=True abstract=False | own DPs[] | parameterless ctor=yes
+
+=== B. resource row types through XamlReader.Parse (the route Astra's dictionaries take) ===
+    one row per parse: a dictionary that throws once loses every row in it, which is what S0-b's
+    'x:Double is unreachable' reading hid - through this loader it is not dropped, it is fatal.
+  GridLength: GridLength = 8
+  x:Double: parse THREW XamlParseException: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+  x:Int32: parse THREW XamlParseException: Cannot resolve type 'Int32' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+  Thickness: Thickness = 0,12,0,0
+  CornerRadius: CornerRadius = 8,8,8,8
+  SolidColorBrush: SolidColorBrush = SolidColorBrush(#0DFFFFFF)
+  StaticResource alias: SolidColorBrush = SolidColorBrush(#FFFFFFFF)
+  FontFamily: FontFamily = 
+  GridLength star: GridLength = *
+  through the theme pipeline for comparison: OverlayCornerRadius=8,8,8,8 TextFillColorPrimaryBrush=SolidColorBrush(#FFFFFFFF)
+
+=== C. can a ContentControl-derived type host a Popup inside its template? ===
+  template assigned: True; measured desired 200,60
+  after pump: tip 200x60, visual children 1
+  tree:
+    popup-shaped: Popup 200x60
+    total nodes walked=45
+
+  now opening the popup that the template holds:
+    found Jalium.UI.Controls.Primitives.Popup
+    set IsOpen=true -> ok
+    IsOpen reads True
+    PopupCard 140x44, ancestors: Border < PopupRoot < OverlayLayer
+  tree:
+    popup-shaped: Popup 200x60
+    popup-shaped: PopupRoot 140x44
+    total nodes walked=47

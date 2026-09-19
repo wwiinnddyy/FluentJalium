@@ -485,6 +485,64 @@ presenter 类型存在但不可样式、它在树里却不画我们的色、本�
 `MenuBarItem` 下拉依旧开不起来（`IsSubmenuOpen` 不是它的属性，合成 MouseDown 后条目仍挂在 `Window` 根下），
 只有 `Menu` 的子菜单开得动。
 
+**阶段 4 第五段（TeachingTip 起自有类型；Card 查无此控件，2026-09-20）**：这一段的开工前提是三条"未证"，
+全部先量后写（`spike/TeachingTipProbe` modes `all`/`tail`/`place`/`tip`/`room`/`parent`，原始输出
+`adaptation/s1b-teachingtip-host-raw.txt`）：
+
+(1) **模板内 `Popup` 这条路成立，代价是卡片不在宿主树里。** 调过 `UseTemplateContentManagement()` 的
+`ContentControl` 能把 `<Popup Name="PART_Popup">` 建起来并实化整张卡片（`Container 320x168.12` /
+`ContentRootGrid 304x152.12` / 按钮 `130x32.78` / `TailPolygon 9x21`），**但带 `PlacementTarget` 的弹层落在自己
+的顶层 `PopupWindow` 里**（父链 `Border < PopupRoot < PopupWindow`）——判据必须从 `popup.Child` 往下走，
+从宿主窗口往下读一条也读不到；不带 target 时才 graft 进宿主 `OverlayLayer`。收起时全套件读 `0x0`，
+那是静息形状而不是失败。
+(2) **放置只有六个把手，不是上游的十八个。** `PlacementMode` 12 值里没有任何 per-edge / per-corner，
+`Relative` 把子元素原点钉在目标左上角（偏移 `0,0` 读回 `-0.29,-0.29`、`50,50` 精确、`-120,-50` 精确），
+四条边值各把子元素推到 `y=目标高` / `y=-子高` / `x=-子宽` / `x=目标宽` ⇒ 控件写 `EffectivePlacement` +
+两个偏移算术，模板格子读属性搬尾巴。自动朝向与回退序照 ModernWpf `TeachingTip.cs:643-682`。
+尾巴"在哪条边就清哪条边"的描边走**不带 TargetName 的格子写控件 `BorderThickness` + 卡片 `TemplateBinding`**
+（实测 `Right` 读回 `0,1,1,1`）；格子也赢过具名部件的标记属性（D3 三项全改）。
+(3) **`GridLength` 行能解析，进不去的是落点。** `8` 与 `*` 都读回原值，但
+`ColumnDefinition.Width="{ThemeResource …}"` **被静默丢弃**（五列全停在默认 `*`）——`ColumnDefinition` 不在
+渲染树里，动态查找没有继承上下文，于是 `8|10|*|10|8` 只能写字面量；`ContentDialog` 批那条"ButtonSpacing 也
+解析不了"的**理由**当场换成这条（结论不变，旧理由是错的）。顺带把 S0-b 那句"x:Double 进不去"改准：它是
+**整份字典解析失败**，不是一行被丢。
+(4) **推翻本批自己的一条主张。** 首版 `FluentTeachingTip` 带一个返回 `new Size()` 的 `MeasureOverride`，
+理由写"实测占掉 320x168 布局"——那行读数其实是卡片在**自己那个 `PopupWindow`** 里的实现尺寸。同一支探针在
+有 / 无 override 两种 build 下逐列相同（`desired 0x0`、压在下面的邻居 `y=20`，收起 / 打开 / 带 target 再打开
+三档都是）⇒ override 是死代码，已删；那条 fact 同时被证明**当时没有牙**，改成读邻居落点、只当"模板根必须
+还是 Popup"的形状闸口（`adaptation/00` 新 **S1-b·6**）。
+(5) **结构闸口把"找自己所在窗口"逼上逻辑树。** `AstraGateTests` 全文本禁产品代码走渲染树（连注释里写出那个
+API 名字都判红），改用 `FrameworkElement.Parent`：挂载链 `FluentTeachingTip < Grid < StackPanel < Window`。
+`Application.Current.MainWindow` 一并量到并**拒绝**——它给整个应用只点名一个窗口（S1-b·7）。
+
+落点：`Controls/Popup/FluentTeachingTip.cs`（自有类型 + 两个枚举 + 16 个 DP + 4 个事件）、
+`ThemeResources/TeachingTip.jalxaml`（**上游 50 个行名发 21 条**：5 别名 + 16 `Thickness`，逐条有消费点，
+其余 **29 条逐名配反向断言**）、`Styles/TeachingTip.jalxaml`（命名样式 + 隐式样式 + 内联模板，
+**16 格触发器 / 54 个 setter**，逐格数自 grep 而非估算）、`Themes/Manifest.txt` 34→**36** 份、
+新测 `AstraTeachingTipTests` **73 条**、`audits/teachingtip.md`（§1 行名数更正为 20+30、§3 表逐行改成实测落点、
+§5 缺口 8→12 条、新增 §6 Card 改判）、`adaptation/00` 新 **S1-b**、`adaptation/s1b-teachingtip-host-raw.txt`、
+`audits/content-dialog.md` 与 `Styles/ContentDialog.jalxaml` 的旧理由更正、Gallery Surfaces 页两张新卡
+（Teaching tip：有 target / 换边 / 无 target / 尾巴开关 / 按钮开关 + 读数条；Cards：三档底色配方）、
+`Catalog.json` 新 `FluentJalium.Controls.FluentTeachingTip` 行（parity `own-type`，9 条 gap）。
+**Card 改判**：WinUI 3 全仓没有 `Card` 运行时类 / 模板 / 主题字典（`class Card` 与 `runtimeclass Card` 均 0 命中），
+Gallery 的卡片是手搓 `Border` + `CardStrokeColorDefaultBrush` + 一档 `CardBackgroundFillColor*`，ModernWpf 也没有
+Card ⇒ 本段交付**令牌 + 配方**（`Styles/Common.jalxaml` 的 `CardBorderStyle` 早就是那份配方），不起空类型。
+
+四类证据：构建 = 串行闸口 **747/747 全绿、0 警告、0 skip**、调色板三档 checked=True（Light/Dark 各 83 源色
+101 刷，HC 101 映射 + 3 条上游键因调色板无对应而按住）；行为 = 5 条别名身份 + 16 条几何值 + 29 条"不发即名"
++ 部件树 + 逐朝向尾格子 + 无 target + 尾可见性 + 标题/副标题/内容三态 + 单按钮幸存 + 关闭键与动作键的契约差
+（只有 `CloseButtonClick` 之后 `IsOpen` 变假）+ 命令转发 + 打开/关闭事件与 `PART_Popup.IsOpen` 同向 +
+四条"尾巴贴在目标边上"的几何不变量 + 放不下就换边 + Auto/Center 语义 + 零占位仍实化 + `8|10|*|10|8` 带 +
+尺寸盒 + 自动化 peer 调用；视觉 = 一条弹层像素（给 `SolidBackgroundFillColorTertiaryBrush` 打洋红哨兵，
+在卡片中心读回 `#FF00FF` 且品牌绿 0 命中）；硬件输入 = **仍为零**（任务 13），按钮走
+`ButtonAutomationPeer`/`IInvokeProvider`，放置走 `TranslatePoint` 读回。
+
+不声称：不声称点外关闭、图标、hero、右上角关闭、顶部高光、入场动画、`ThemeShadow`、窄窗口缩放与十八向贴边
+（§5.9-5.12 各有一条理由）；不声称真指针 / 触摸 / 键盘下的打开与关闭；不声称卡片在宿主窗口里可被像素采样
+（它在自己的 `PopupWindow`，那条洋红断言是从 `popup.Child` 那棵子树上采的）；不声称 `EffectivePlacement`
+有上游那样的连续跟随——`LayoutUpdated` 只在目标挂过的时候接，滚动容器里的重排未测。
+Gallery 侧 8 页全部上屏并优雅关闭、无残留进程；新卡片本身在折叠线以下，**未目视**。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

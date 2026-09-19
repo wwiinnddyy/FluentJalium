@@ -233,6 +233,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/MenuFlyout.jalxaml")]
     [InlineData("ThemeResources/MenuBar.jalxaml")]
     [InlineData("ThemeResources/AppBar.jalxaml")]
+    [InlineData("ThemeResources/TeachingTip.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

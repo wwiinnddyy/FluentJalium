@@ -273,6 +273,94 @@ public partial class MainWindow : Window
         {
             button.Click += (_, _) => _ = ShowDialogAsync(shapes);
         }
+
+        WireTeachingTip();
+    }
+
+    /// <summary>
+    /// The tip is on the page rather than built on the click, because that is the shape the control exists for:
+    /// it points at an element that is already in the tree. The one thing it cannot do here is name that element
+    /// in markup - {x:Bind} is dropped silently on this runtime - so the target is assigned from code.
+    /// </summary>
+    private void WireTeachingTip()
+    {
+        var tip = (FluentTeachingTip)SampleTeachingTip!;
+        var anchor = (Button)TipShowButton!;
+        var readout = (TextBlock)TipReadout!;
+        var target = anchor;
+        var reason = "Nothing has happened yet.";
+        tip.Target = target;
+
+        anchor.Click += (_, _) =>
+        {
+            tip.Target = target;
+            reason = $"Opened at the {tip.PreferredPlacement} side.";
+            tip.IsOpen = !tip.IsOpen;
+        };
+
+        ((Button)TipSideButton!).Click += (_, _) =>
+        {
+            tip.PreferredPlacement = tip.PreferredPlacement switch
+            {
+                FluentTeachingTipPlacementMode.Top => FluentTeachingTipPlacementMode.Right,
+                FluentTeachingTipPlacementMode.Right => FluentTeachingTipPlacementMode.Bottom,
+                FluentTeachingTipPlacementMode.Bottom => FluentTeachingTipPlacementMode.Left,
+                _ => FluentTeachingTipPlacementMode.Top,
+            };
+            reason = $"Preferred side is {tip.PreferredPlacement}.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason + $" The control put it on {tip.EffectivePlacement}.";
+            }
+        };
+
+        ((Button)TipNoTargetButton!).Click += (_, _) =>
+        {
+            target = target is null ? anchor : null!;
+            tip.Target = target;
+            reason = target is null
+                ? "No target: the tail is gone and Auto falls to Bottom."
+                : "Targeted again.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        ((ToggleButton)TipTailToggle!).Click += (_, _) =>
+        {
+            tip.TailVisibility = ((ToggleButton)TipTailToggle!).IsChecked == true
+                ? FluentTeachingTipTailVisibility.Auto
+                : FluentTeachingTipTailVisibility.Collapsed;
+            reason = $"TailVisibility is {tip.TailVisibility}.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        ((ToggleButton)TipButtonsToggle!).Click += (_, _) =>
+        {
+            var both = ((ToggleButton)TipButtonsToggle!).IsChecked == true;
+            tip.ActionButtonContent = both ? "Got it" : null;
+            tip.CloseButtonContent = both ? "Dismiss" : null;
+            reason = both ? "Both buttons are back." : "No button content: the row collapses.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        tip.Opened += (_, _) => readout.Text = reason + $" Card on {tip.EffectivePlacement}, " +
+            $"{(tip.Target is null ? "no target" : "target " + tip.Target.GetType().Name)}.";
+        tip.Closed += (_, _) => readout.Text = "Closed. " + reason;
+        tip.ActionButtonClick += (_, _) =>
+        {
+            // Upstream's action button announces itself and leaves the card open; closing here is this page's choice.
+            reason = "ActionButtonClick fired and the page closed the tip.";
+            tip.IsOpen = false;
+        };
+        tip.CloseButtonClick += (_, _) => reason = "CloseButtonClick fired; the control set IsOpen=false.";
     }
 
     /// <summary>

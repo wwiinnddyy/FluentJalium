@@ -1,0 +1,15 @@
+theme dictionaries=36 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== F. FluentTeachingTip built by its own style ===
+
+  closed: style=assigned template=True effective=Top border=1,1,1,0 tip 658.29x160 children=1
+    named nodes: PART_Popup:Popup 658.29x160, PART_RootBorder:Border 706.29x32, PART_CloseButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_MaximizeButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_MinimizeButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_RightWindowCommandsHost:ContentPresenter 0x0, PART_WindowIconHost:Grid 20x20, PART_TitleText:TextBlock 127.56x19.78, PART_LeftWindowCommandsHost:ContentPresenter 0x0
+    popup IsOpen=False offsets=-160,-40 child=Border
+    the popup's own child holds Container:Border 0x0, TailOcclusionGrid:Grid 0x0, ContentRootGrid:Grid 0x0, TitlesStackPanel:StackPanel 0x0, TitleTextBlock:TextBlock 0x0, SubtitleTextBlock:TextBlock 0x0, MainContentPresenter:ContentPresenter 0x0, ButtonPanel:Grid 0x0, PART_ActionButton:Button 0x0, Surface:Border 0x0, FocusOutline:Border 0x0, PART_CloseButton:Button 0x0, Surface:Border 0x0, FocusOutline:Border 0x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, ThumbBorder:Border 0x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, ThumbBorder:Border 0x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, TailPolygon:Polygon 0x0
+    ancestors of that child: Border
+
+  open: style=assigned template=True effective=Right border=0,1,1,1 tip 658.29x160 children=1
+    named nodes: PART_Popup:Popup 658.29x160, PART_RootBorder:Border 706.29x32, PART_CloseButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_MaximizeButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_MinimizeButton:TitleBarButton 46x32, PART_RootBorder:Border 46x32, path:Path 16x16, PART_RightWindowCommandsHost:ContentPresenter 0x0, PART_WindowIconHost:Grid 20x20, PART_TitleText:TextBlock 127.56x19.78, PART_LeftWindowCommandsHost:ContentPresenter 0x0
+    popup IsOpen=True offsets=100,-64.060546875 child=Border
+    the popup's own child holds Container:Border 320x168.12, TailOcclusionGrid:Grid 320x168.12, ContentRootGrid:Grid 304x152.12, TitlesStackPanel:StackPanel 268x39.56, TitleTextBlock:TextBlock 268x19.78, SubtitleTextBlock:TextBlock 268x19.78, MainContentPresenter:ContentPresenter 152.43x19.78, ButtonPanel:Grid 268x44.78, PART_ActionButton:Button 130x32.78, Surface:Border 130x32.78, FocusOutline:Border 128x30.78, PART_CloseButton:Button 130x32.78, Surface:Border 130x32.78, FocusOutline:Border 128x30.78, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, ThumbBorder:Border 0x12, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, ThumbBorder:Border 12x0, PART_ButtonRoot:Border 0x0, PART_Arrow:Path 0x0, TailPolygon:Polygon 9x21
+    ancestors of that child: Border < PopupRoot < PopupWindow

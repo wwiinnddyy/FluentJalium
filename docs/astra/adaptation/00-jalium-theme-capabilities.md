@@ -993,3 +993,61 @@ setter 和所有 trigger 之上，所以样式改不动它。能改的是我们�
 xunit 共享宿主里 0×0，`PixelHarness.PixelAt` 直接抛"has no layout to sample"。所以那条角上的像素断言
 改成钉复制契约（宿主读得到的那一层），弧留给真帧。**没有把测不到的东西伪装成测到**。
 推广：以后凡是要在像素上断言弹层几何的，先量宿主能不能给尺寸，再决定判据放哪一层。
+
+## S1-b：模板里的 `Popup` 有自己的顶层窗口——卡片读得到，它在你树上占的位置读不到（TeachingTip 批，2026-09-20）
+
+测量：`spike/TeachingTipProbe`（modes `all` / `tail` / `place` / `tip` / `room` / `parent`，原始输出
+`docs/astra/adaptation/s1b-teachingtip-host-raw.txt`）。判据：`tests/FluentJalium.Tests/AstraTeachingTipTests.cs`
+**73 条**。上游：`controls/dev/TeachingTip/TeachingTip.xaml`（blob `50cc6d2d6cb7648df90e21faa0cc9e6aa816a9bd`）
+与 `TeachingTip.cpp`；方法照 ModernWpf 的 `TeachingTip.cs:643-682` 那条自动朝向 + 回退序。
+
+**1 · 自有类型 + 模板内 `Popup` 这条路走得通，但卡片不在宿主树里。** 一个调用
+`ContentControl.UseTemplateContentManagement()`（S0-m 那把锁）的类型，能在它的 `ControlTemplate` 里放
+`<Popup Name="PART_Popup">` 并让它在 `IsOpen=true` 后建出整棵卡片：`Container 320x168.12`、
+`ContentRootGrid 304x152.12`、两颗按钮 `130x32.78`、`TailPolygon 9x21`。**但父链是
+`Border < PopupRoot < PopupWindow`**——带 `PlacementTarget` 的弹层落在自己的顶层窗口里，不是宿主窗口的
+`OverlayLayer`（不带 target 时才 graft 进 `OverlayLayer`，mode C 与 mode F 的差别就在这一处）。后果是判据必须换
+查找起点：**名字要从 `popup.Child` 往下走**，从宿主窗口往下走一条也读不到，而按 `IsOpen` 收起的那一侧全部读
+`0x0`——"部件在树里但没尺寸"是这条路的静息形状，不是失败。
+
+**2 · `Placement=Relative` 的锚点是目标的左上角，偏移是加法 DIP。** 一张 120x50 的卡片对着 100x40 的目标：
+偏移 `0,0` 读回 `-0.29,-0.29`、`50,50` 读回 `50,50`、`-120,-50` 读回 `-120.29,-50`（那 0.29 是描边，与弹层无关）。
+四条边值各自把子元素推到 `y=目标高` / `y=-子高` / `x=-子宽` / `x=目标宽`，`Center` 居中。而
+`PlacementMode` 全部 12 个值里**没有**上游那 18 个 per-edge / per-corner（`LeftEdgeTopEdge` 一族一个都不在），
+所以 `FluentTeachingTipPlacementMode` 只有六个值，且"贴哪条边"完全由两个偏移算术决定。这不是偷懒，是基座不给更多把手。
+
+**3 · 行类型清单，外加一条对 S0-b 的更正。** `GridLength` 解析成功（`8` 与 `*` 都读回原值），
+`Thickness` / `CornerRadius` / `SolidColorBrush` / `StaticResource` 别名 / `FontFamily` 同样能过；
+`x:Double` 与 `x:Int32` **不是被丢掉，是整份字典炸掉**（`XamlParseException: Cannot resolve type 'Double'`）——
+S0-b 那句"x:Double 进不去"读起来像一行一个结果，实际是一行毁一份，这个区别决定了转录清单为什么必须逐行试。
+另一半：**`ColumnDefinition.Width` 上写 `{ThemeResource}` 被静默丢弃**，五列全停在类型默认的 `*`
+（mode tail D2），因为 `ColumnDefinition` 不在视觉树里、动态资源查找没有继承上下文。所以
+`8|10|*|10|8` 那五条带只能写字面量，`ContentDialog` 批"`ButtonSpacing` 进不去"的理由也一并换成这条
+（结论不变，旧理由错了）。
+
+**4 · 谁赢：格子 > 标记属性，无 `TargetName` 的格子 > 样式 setter。** 触发器写具名部件的属性时把标记上那份
+盖掉（D3：`Points`、`Grid.Row`、`Grid.Column` 三项全被改），所以"每个朝向一套尾几何"在模板里是可行的。
+反过来，想让放格子写的描边到得了卡片，只能走控件自己：不带 `TargetName` 的格子写 `BorderThickness`，卡片用
+`{TemplateBinding BorderThickness}` 带走——实测 `Right` 放置读回 `0,1,1,1`。上游那把
+`TeachingTipContentBorderThickness<Placement>`（尾在哪条边就清哪条边）因此原样成立。
+
+**5 · `Polygon` 是能用的尾部件。** `Points` 是 `Jalium.UI.Shapes.Polygon` 自己声明的依赖属性（所以格子写得动），
+`Fill` / `Stroke` / `StrokeThickness` 从 `Shape` 继承，参数构造可公开 new。三角缺口 = 卡片底色 + 描边同色，
+与上游同一个做法。
+
+**6 · 本批推翻了自己的一条主张：控件"占了多少布局"不能从别的窗口里某个部件的尺寸推出来。**
+第一版 `FluentTeachingTip` 带一个返回 `new Size()` 的 `MeasureOverride`，理由写的是"实测 320x168 的布局被占了"，
+证据就是 mode F 那行 `Container:Border 320x168.12`。那是**卡片在它自己的 `PopupWindow` 里的实现尺寸**，
+不是页面布局。同一支探针在两种 build（有 / 无那个 override）下逐列相同：`tip desired 0x0`、
+压在下面的邻居 `y=20`（收起、打开、带 target 再打开三档都是）——模板根的 `Popup` 对宿主贡献 0x0，
+override 是死代码，已删除。同时 `A_tip_holds_no_layout_room_and_still_realizes_its_card` 那两条断言
+在两种 build 下都通过，说明它当时**没有牙**：现在它测的是邻居的落点而不是本元素的槽位，作用是钉住
+"模板根必须还是 Popup"，不再声称证明了什么修复。推广两条：① 量"占位"只能读同一块面板里邻居的坐标；
+② `ActualWidth` 是面板给的槽位，拉伸元素在 Grid 里读 820x620 而 DesiredSize 是 0——两者都不是"占了多少"。
+
+**7 · 结构闸口把"找自己所在窗口"逼上了逻辑树。** 放置的回退判定要拿卡片和目标所在的窗口边界比，而
+`AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection` 按 AGENTS.md 禁了产品代码里的渲染树走查
+（那条闸口是**全文本匹配**，连注释里写出那个 API 的名字都会判红）。可用的是
+`FrameworkElement.Parent`：挂载后的链是 `FluentTeachingTip < Grid < StackPanel < Window`（mode parent），
+`FindWindow()` 因此走逻辑父链。顺带量到并被**拒绝**的另一条：`Application.Current.MainWindow` 确实指向上屏那个
+窗口，但它给整个应用只点名一个窗口，第二窗口场景会拿错的边界去裁卡片——所以用它不是省事，是换一个会错的答案。

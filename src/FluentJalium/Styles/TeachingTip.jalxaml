@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Astra FluentTeachingTip style. WinUI 3 TeachingTip.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob edcd4dba11ce2e28e2538724d42c9172749843ba: the DefaultTeachingTipStyle's fourteen setters (4-14), its
+     template (15-357), the 5x5 tail grid (283-311), the card (312-352) and the tail polygon (353).
+     Shape is upstream's. Three things are not, and each is a measurement rather than a choice:
+     - The popup. Upstream builds one in code (TeachingTip.h:103,176,282); ModernWpf writes one into its
+       template (TeachingTip.xaml:412); so does this, because spike/TeachingTipProbe mode popup proved a
+       ContentControl that opts into template content management does build a Popup and that the child inside an
+       opened one realizes with a size (140x44 under OverlayLayer > PopupRoot).
+     - The states. Markup VisualStateManager throws on this runtime, so upstream's nine groups become cells and
+       triggers here, as in every batch since. Cells rest on the general case and the specific writers come last
+       because the later writer wins on a shared target (adaptation/00 S0-u).
+     - The bands. Upstream reads its two GridLength rows with {StaticResource}; this runtime drops a
+       {ThemeResource} written on a ColumnDefinition.Width in silence (all five columns came back "*"), so the
+       8,10,*,10,8 bands are literals, and so are the five x:Double rows this template needs, which this reader cannot parse at all. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="DefaultFluentTeachingTipStyle" TargetType="controls:FluentTeachingTip">
+    <Setter Property="Background" Value="{ThemeResource TeachingTipBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TeachingTipBorderBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource TeachingTipForegroundBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessUntargeted}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="ActionButtonStyle" Value="{StaticResource DefaultButtonStyle}" />
+    <Setter Property="CloseButtonStyle" Value="{StaticResource DefaultButtonStyle}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FluentTeachingTip">
+        <Popup Name="PART_Popup" Placement="Relative" AllowsTransparency="True">
+          <!-- Container keeps the popup's own box out of the card's way, exactly as upstream's does. -->
+          <Border Name="Container" Background="Transparent" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Grid Name="TailOcclusionGrid" HorizontalAlignment="Left" VerticalAlignment="Top" MinWidth="320" MaxWidth="336" MinHeight="40" MaxHeight="520">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="8" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="8" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="8" />
+              </Grid.RowDefinitions>
+              <!-- Resting geometry is upstream's Top state: the card above its target with the tail hanging from
+                   the bottom edge. The control writes EffectivePlacement before it opens the popup, so a state
+                   is always current - and a tail is never on the edge the card is not pointing from. The border
+                   of that edge is the one the tail sits on, which is why each placement cell writes the
+                   control's own BorderThickness and lets the binding below carry it: upstream's C++ writes that
+                   same property, and a cell with no TargetName outranks a style setter here (S0-u, and the same
+                   route the ContentDialog default button takes). -->
+              <Grid Name="ContentRootGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="3" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" IsTabStop="False">
+                  <StackPanel Margin="{ThemeResource TeachingTipContentMargin}">
+                    <StackPanel Name="TitlesStackPanel" Margin="{ThemeResource TeachingTipTitleStackPanelMarginWithFooterCloseButton}">
+                      <TextBlock Name="TitleTextBlock" Text="{TemplateBinding Title}" Foreground="{ThemeResource TeachingTipTitleForegroundBrush}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                      <TextBlock Name="SubtitleTextBlock" Text="{TemplateBinding Subtitle}" Foreground="{ThemeResource TeachingTipSubtitleForegroundBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ContentPresenter Name="MainContentPresenter" Content="{TemplateBinding Content}" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" Margin="{ThemeResource TeachingTipMainContentPresentMargin}" />
+                    <Grid Name="ButtonPanel" Margin="{ThemeResource TeachingTipButtonPanelMargin}">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <Button Name="PART_ActionButton" Grid.Column="0" HorizontalAlignment="Stretch" Margin="{ThemeResource TeachingTipLeftButtonMargin}" Content="{TemplateBinding ActionButtonContent}" Style="{TemplateBinding ActionButtonStyle}" Command="{TemplateBinding ActionButtonCommand}" CommandParameter="{TemplateBinding ActionButtonCommandParameter}" />
+                      <Button Name="PART_CloseButton" Grid.Column="1" HorizontalAlignment="Stretch" Margin="{ThemeResource TeachingTipRightButtonMargin}" Content="{TemplateBinding CloseButtonContent}" Style="{TemplateBinding CloseButtonStyle}" Command="{TemplateBinding CloseButtonCommand}" CommandParameter="{TemplateBinding CloseButtonCommandParameter}" />
+                    </Grid>
+                  </StackPanel>
+                </ScrollViewer>
+              </Grid>
+              <Polygon Name="TailPolygon" Grid.Row="4" Grid.Column="2" Points="0,0 10,10 20,0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="{ThemeResource TeachingTipTailPolygonMarginTop}" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" />
+            </Grid>
+          </Border>
+        </Popup>
+        <ControlTemplate.Triggers>
+          <!-- TitleBlockStates / SubtitleBlockStates: upstream rests both text blocks collapsed and opens them
+               from a state the C++ picks on whether the value is set. Same outcome inverted - the resting
+               markup is the visible case - because a cell can only be written by a value a trigger names, and
+               an empty string is as absent as a null to upstream's check. -->
+          <Trigger Property="Title" Value="{x:Null}">
+            <Setter TargetName="TitleTextBlock" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="Title" Value="">
+            <Setter TargetName="TitleTextBlock" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="Subtitle" Value="{x:Null}">
+            <Setter TargetName="SubtitleTextBlock" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="Subtitle" Value="">
+            <Setter TargetName="SubtitleTextBlock" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <!-- ContentStates: upstream's two states differ only in this margin. -->
+          <Trigger Property="Content" Value="{x:Null}">
+            <Setter TargetName="MainContentPresenter" Property="Margin" Value="{ThemeResource TeachingTipMainContentAbsentMargin}" />
+          </Trigger>
+          <!-- ButtonsStates, over the AllVisible resting markup: a lone button takes both columns and the
+               panel's own margin, which is what upstream writes onto the survivor. -->
+          <Trigger Property="ActionButtonContent" Value="{x:Null}">
+            <Setter TargetName="PART_ActionButton" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="PART_CloseButton" Property="Grid.ColumnSpan" Value="2" />
+            <Setter TargetName="PART_CloseButton" Property="Margin" Value="{ThemeResource TeachingTipButtonPanelMargin}" />
+          </Trigger>
+          <Trigger Property="CloseButtonContent" Value="{x:Null}">
+            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="PART_ActionButton" Property="Grid.ColumnSpan" Value="2" />
+            <Setter TargetName="PART_ActionButton" Property="Margin" Value="{ThemeResource TeachingTipButtonPanelMargin}" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="ActionButtonContent" Value="{x:Null}" />
+              <Condition Property="CloseButtonContent" Value="{x:Null}" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="ButtonPanel" Property="Visibility" Value="Collapsed" />
+          </MultiTrigger>
+          <!-- PlacementStates. The geometry per side is upstream's own, including the pairing of a row named
+               for the placement with the tail margin of the same name. -->
+          <Trigger Property="EffectivePlacement" Value="Top">
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessTop}" />
+            <Setter TargetName="TailPolygon" Property="Grid.Row" Value="4" />
+            <Setter TargetName="TailPolygon" Property="Grid.Column" Value="2" />
+            <Setter TargetName="TailPolygon" Property="Points" Value="0,0 10,10 20,0" />
+            <Setter TargetName="TailPolygon" Property="HorizontalAlignment" Value="Center" />
+            <Setter TargetName="TailPolygon" Property="VerticalAlignment" Value="Bottom" />
+            <Setter TargetName="TailPolygon" Property="Margin" Value="{ThemeResource TeachingTipTailPolygonMarginTop}" />
+          </Trigger>
+          <Trigger Property="EffectivePlacement" Value="Bottom">
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessBottom}" />
+            <Setter TargetName="TailPolygon" Property="Grid.Row" Value="0" />
+            <Setter TargetName="TailPolygon" Property="Grid.Column" Value="2" />
+            <Setter TargetName="TailPolygon" Property="Points" Value="0,10 10,0 20,10" />
+            <Setter TargetName="TailPolygon" Property="HorizontalAlignment" Value="Center" />
+            <Setter TargetName="TailPolygon" Property="VerticalAlignment" Value="Top" />
+            <Setter TargetName="TailPolygon" Property="Margin" Value="{ThemeResource TeachingTipTailPolygonMarginBottom}" />
+          </Trigger>
+          <Trigger Property="EffectivePlacement" Value="Left">
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessLeft}" />
+            <Setter TargetName="TailPolygon" Property="Grid.Row" Value="2" />
+            <Setter TargetName="TailPolygon" Property="Grid.Column" Value="4" />
+            <Setter TargetName="TailPolygon" Property="Points" Value="0,0 10,10 0,20" />
+            <Setter TargetName="TailPolygon" Property="HorizontalAlignment" Value="Right" />
+            <Setter TargetName="TailPolygon" Property="VerticalAlignment" Value="Center" />
+            <Setter TargetName="TailPolygon" Property="Margin" Value="{ThemeResource TeachingTipTailPolygonMarginLeft}" />
+          </Trigger>
+          <Trigger Property="EffectivePlacement" Value="Right">
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessRight}" />
+            <Setter TargetName="TailPolygon" Property="Grid.Row" Value="2" />
+            <Setter TargetName="TailPolygon" Property="Grid.Column" Value="0" />
+            <Setter TargetName="TailPolygon" Property="Points" Value="10,0 0,10 10,20" />
+            <Setter TargetName="TailPolygon" Property="HorizontalAlignment" Value="Left" />
+            <Setter TargetName="TailPolygon" Property="VerticalAlignment" Value="Center" />
+            <Setter TargetName="TailPolygon" Property="Margin" Value="{ThemeResource TeachingTipTailPolygonMarginRight}" />
+          </Trigger>
+          <!-- Center is upstream's own Top geometry with the card dropped onto the target, so only the border
+               row differs from the Top cell. -->
+          <Trigger Property="EffectivePlacement" Value="Center">
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessTop}" />
+          </Trigger>
+          <!-- TailVisibility then Untargeted, in that order: upstream's Collapsed state and its Untargeted one
+               write the same property, and the no-target case wins because a tail with nothing to point at is a
+               drawing error rather than a preference. -->
+          <Trigger Property="TailVisibility" Value="Collapsed">
+            <Setter TargetName="TailPolygon" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="Target" Value="{x:Null}">
+            <Setter TargetName="TailPolygon" Property="Visibility" Value="Collapsed" />
+            <Setter Property="BorderThickness" Value="{ThemeResource TeachingTipContentBorderThicknessUntargeted}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="controls:FluentTeachingTip" BasedOn="{StaticResource DefaultFluentTeachingTipStyle}" />
+</ResourceDictionary>

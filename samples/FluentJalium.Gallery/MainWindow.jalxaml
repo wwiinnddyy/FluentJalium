@@ -413,6 +413,39 @@
                   <TextBlock x:Name="DialogReadout" Text="Nothing shown yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Teaching tip" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="TipShowButton" Content="Show the tip" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="TipSideButton" Content="Point from the right" Margin="0,0,8,8" />
+                    <Button x:Name="TipNoTargetButton" Content="Point at nothing" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="TipTailToggle" Content="Tail" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="TipButtonsToggle" Content="Both buttons" IsChecked="True" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentTeachingTip x:Name="SampleTeachingTip" Title="You can press Enter here" Subtitle="The tip belongs to the button beside it." Content="Upstream draws this card in code; Astra writes it as a template over a Popup, and the control only decides which edge the tail sits on." ActionButtonContent="Got it" CloseButtonContent="Dismiss" />
+                  <TextBlock Text="The card is 320 DIP wide at rest and capped at 336 like upstream's, and the 8 DIP band the tail grid reserves outside it is what lets the control put the tail's point exactly on the anchor's edge: a tip placed above its target sits its container's height away, not that height minus eight. The border loses whichever edge the tail sits on, so the seam under the triangle is the fill rather than a hairline crossing it. Preferred sides that would push the card out of the window fall back to one that fits, and the tail moves with the result." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="TipReadout" Text="Not shown." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Cards" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="WinUI 3 has no Card control - no runtime class, no template, no theme dictionary - and its Gallery composes cards from a Border, the stroke row and a background tier. That recipe is what this page already uses for every card on it, so the three tiers below are the same three rows the rest of the page paints with." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <WrapPanel Margin="0,12,0,0">
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160" Margin="0,0,8,8">
+                      <TextBlock Text="Default" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160" Margin="0,0,8,8">
+                      <TextBlock Text="Secondary" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                    <Border Background="{ThemeResource CardBackgroundFillColorTertiaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160">
+                      <TextBlock Text="Tertiary" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                  </WrapPanel>
+                  <TextBlock Text="CardBorderStyle carries the recipe: the default fill, the stroke row at 1 DIP, ControlCornerRadius and 16 DIP of padding. Upstream's sample card rounds at 8 and its tiles at 4; this page keeps 4 on its section containers, so the corner claim is deliberately the tile row rather than the CardPage row." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="MenusPage">

@@ -1,0 +1,19 @@
+theme dictionaries=36 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== A. primitives a TeachingTip template would need (by simple name, across the loaded UI assemblies) ===
+  Polygon = Jalium.UI.Shapes.Polygon : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Polyline = Jalium.UI.Shapes.Polyline : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Path = Jalium.UI.Shapes.Path : Shape | public=True abstract=False | own DPs[Data] | parameterless ctor=yes
+  Line = Jalium.UI.Shapes.Line : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Rectangle = Jalium.UI.Shapes.Rectangle : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Ellipse = Jalium.UI.Shapes.Ellipse : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Shape = Jalium.UI.Shapes.Shape : FrameworkElement | public=True abstract=True | own DPs[Fill,Stroke,StrokeThickness] | parameterless ctor=none
+  Popup = Jalium.UI.Controls.Primitives.Popup : FrameworkElement | public=True abstract=False | own DPs[IsOpen,Child,Placement,PlacementTarget,HorizontalOffset,VerticalOffset,AllowsTransparency,StaysOpen] | parameterless ctor=yes
+  PopupRoot = Jalium.UI.Controls.Primitives.PopupRoot : Decorator | public=False abstract=False | own DPs[] | parameterless ctor=none
+  ContentControl = Jalium.UI.Controls.ContentControl : Control | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Grid = Jalium.UI.Controls.Grid : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  StackPanel = Jalium.UI.Controls.StackPanel : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  ScrollViewer = Jalium.UI.Controls.ScrollViewer : ContentControl | public=True abstract=False | own DPs[HorizontalOffset,VerticalOffset] | parameterless ctor=yes
+  TextBlock = Jalium.UI.Controls.TextBlock : FrameworkElement | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Border = Jalium.UI.Controls.Border : Decorator | public=True abstract=False | own DPs[CornerRadius] | parameterless ctor=yes
+  Button = Jalium.UI.Controls.Button : ButtonBase | public=True abstract=False | own DPs[] | parameterless ctor=yes

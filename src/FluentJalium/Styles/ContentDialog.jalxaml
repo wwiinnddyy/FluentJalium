@@ -17,8 +17,10 @@
      9cd8150fff8c216319e2d5515b538cfab5b397d5 @19e3bdc3ccf3361393d623d3a5d2667cb8f33229): smoke layer, then a
      centred card with the token corner radius, a 24 DIP gutter, 320/548/184/756 as its size box, a top-overlay
      strip with the separator hairline holding a 20 SemiBold title over the body, and a command row of five
-     columns */8/*/8/*. The four numbers and the 8 DIP gap are literals because x:Double and GridLength rows do
-     not parse in this reader (adaptation/00).
+     columns */8/*/8/*. The four numbers are literals because an x:Double row is fatal to this reader, and the
+     8 DIP gap because a ColumnDefinition has no inheritance context for a {ThemeResource} to resolve against -
+     a GridLength row parses fine on its own, which is the correction spike/TeachingTipProbe mode tail recorded
+     against the first draft of this comment (adaptation/00 S1-b).
      Upstream drives all of this from six VisualStateManager groups; markup VSM throws on this runtime, so each
      state is a cell, with the AllVisible geometry as the resting markup. Cells are ordered general-to-specific
      because the later writer wins on a shared target here (S0-u), and only the levers the runtime actually

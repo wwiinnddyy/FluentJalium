@@ -1,0 +1,66 @@
+<!-- WinUI 3 TeachingTip_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 50cc6d2d6cb7648df90e21faa0cc9e6aa816a9bd. Keys are upstream's, spelled as upstream spells them.
+     Upstream keeps three ThemeDictionaries branches with the same twenty names plus thirty rows outside them -
+     fifty row names in all; this file publishes twenty-one of those fifty and every one is read by
+     Styles/TeachingTip.jalxaml. What was left out and why is in the comment at the bottom, and the row-by-row
+     branch comparison is docs/astra/audits/teachingtip.md §1. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Surfaces. TeachingTipBackgroundBrush is a solid tertiary fill upstream (NOT the acrylic that
+       TeachingTipTransientBackground asks for); this runtime cannot composite acrylic into a popup, so the
+       palette carries that key as upstream's own FallbackColor solid. No corner-radius row exists upstream: the
+       template reads OverlayCornerRadius (TeachingTip.xaml:9), and this file publishes neither because
+       Metrics.jalxaml already carries it. -->
+  <StaticResource x:Key="TeachingTipBorderBrush" ResourceKey="SurfaceStrokeColorDefaultBrush" />
+  <StaticResource x:Key="TeachingTipBackgroundBrush" ResourceKey="SolidBackgroundFillColorTertiaryBrush" />
+  <!-- Text. Title and subtitle are the same primary text brush upstream; only the runtime's own size and
+       weight rows tell them apart, and those are typography rows, not TeachingTip ones. -->
+  <StaticResource x:Key="TeachingTipForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TeachingTipTitleForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TeachingTipSubtitleForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- Panel geometry, transcribed with upstream's values. -->
+  <Thickness x:Key="TeachingTipButtonPanelMargin">0,12,0,0</Thickness>
+  <Thickness x:Key="TeachingTipRightButtonMargin">4,12,0,0</Thickness>
+  <Thickness x:Key="TeachingTipLeftButtonMargin">0,12,4,0</Thickness>
+  <Thickness x:Key="TeachingTipMainContentPresentMargin">0,12,0,0</Thickness>
+  <Thickness x:Key="TeachingTipMainContentAbsentMargin">0,0,0,0</Thickness>
+  <Thickness x:Key="TeachingTipTitleStackPanelMarginWithFooterCloseButton">0,0,0,0</Thickness>
+  <!-- The card's border loses whichever edge its tail sits on, so that side is drawn 0 thick. Each row is named
+       for the placement rather than for the edge it clears: Top means "the card is above the target", so its
+       tail hangs from the bottom and the Bottom component is the one that is 0. -->
+  <Thickness x:Key="TeachingTipContentBorderThicknessTop">1,1,1,0</Thickness>
+  <Thickness x:Key="TeachingTipContentBorderThicknessBottom">1,0,1,1</Thickness>
+  <Thickness x:Key="TeachingTipContentBorderThicknessLeft">1,1,0,1</Thickness>
+  <Thickness x:Key="TeachingTipContentBorderThicknessRight">0,1,1,1</Thickness>
+  <Thickness x:Key="TeachingTipContentBorderThicknessUntargeted">1,1,1,1</Thickness>
+  <!-- The tail overlaps its edge by exactly the border, which is what these four -1 rows are for. -->
+  <Thickness x:Key="TeachingTipTailPolygonMarginTop">0,-1,0,0</Thickness>
+  <Thickness x:Key="TeachingTipTailPolygonMarginBottom">0,0,0,-1</Thickness>
+  <Thickness x:Key="TeachingTipTailPolygonMarginLeft">-1,0,0,0</Thickness>
+  <Thickness x:Key="TeachingTipTailPolygonMarginRight">0,0,-1,0</Thickness>
+  <Thickness x:Key="TeachingTipContentMargin">12</Thickness>
+  <!-- Twenty-nine of upstream's fifty row names are deliberately not here, and none of it is a count:
+       TeachingTipTransientBackground (the light-dismiss fill swap) - this type has no light dismiss yet, so a
+       row nobody reads is a row an app could override for no pixels (audits §5.9);
+       TeachingTipTopHighlightBrush and TeachingTipTopHighlightOffsetForBorder (the 1 DIP sheen across the
+       card's top edge) - upstream draws that in C++, and this runtime's Border rounds its fill but never clips
+       its child, so a full-width hairline would put square corners outside the card's own r=8 arc. That is the
+       corner defect this batch exists to remove, so the sheen waits for a clipping surface (audits §5.11);
+       the thirteen TeachingTipAlternateCloseButton* rows - the header close button they style is not shipped
+       either (audits §5.4); their two size rows are x:Double ones, counted with the eight below;
+       TeachingTipIconPresenterMarginWithIcon / Without and TeachingTipTitleStackPanelMarginWithHeaderCloseButton
+       - no icon and no header close button, so no state could ask for them.
+       Upstream's eight x:Double rows (MinHeight 40, MaxHeight 520, MinWidth 320, MaxWidth 336,
+       AlternateCloseButtonSize 40, AlternateCloseButtonGlyphSize 16, TopHighlightHeight 1,
+       TeachingTipBorderThickness 1) cannot be rows at all: spike/TeachingTipProbe mode rows reads an x:Double
+       (and an x:Int32) row back as a fatal XamlParseException("Cannot resolve type 'Double'...") that aborts the
+       whole dictionary - the sharper form of what S0-b recorded as "unreachable". They ride as literals in
+       Styles/TeachingTip.jalxaml.
+       The two GridLength rows (TeachingTipTailShortSideLength 8, TeachingTipTailMargin 10) are the interesting
+       failure. A GridLength row itself parses fine - it was the one row type besides brushes and thicknesses
+       that survived the same probe - but upstream's own markup reads them with {StaticResource}, and a
+       {ThemeResource} written on a ColumnDefinition.Width is dropped in silence: all five columns of a template
+       grid came back "*" (the type's own default) with nothing in between. A ColumnDefinition is not in the
+       visual tree, so a dynamic lookup has nowhere to inherit from. audits/content-dialog.md line 32 said a
+       GridLength row "cannot be parsed either", which is the wrong reason for the right outcome, and
+       Styles/ContentDialog.jalxaml line 20 repeats it; both are corrected against this measurement. -->
+</ResourceDictionary>
