@@ -709,3 +709,73 @@ hover/disabled 变色不必放弃：从模板格子搬到 `Style.Triggers` 写 `
   方向的假阳性都抓不住。
 - 任务"过渡终值落帧审计"（原 #22）随之关闭：19 处 `TransitionProperty` 不需要逐点重测，因为被怀疑的
   机制本身不存在；这些站点仍然只有属性/栅格证据，那是另一件没做完的事，不是这里的一条边界。
+
+## S0-s：控件自己量出来的高度只有 `Height` 够得着，弹层窗口会被宿主窗口裁掉（间距全量复核批，2026-09-19）
+
+**1 · 分隔线：样式改得动属性，改不动盒子。** `MenuFlyoutSeparator` 在本运行时量到 **9 DIP 高**，上游是 **3**
+（1 高的线 + 它自己 `-4,1,-4,1` 的 padding）。先按上游补 `Margin=0`（框架给这个类型的是 `0,4,0,4`）——属性读回
+确实变成 `0,0,0,0`，`actual` 仍然是 9。换成 `Height=3` 才落到 3。这与 S0-n 那条"`MenuFlyoutItem` 自己度量
+并且自己画"是同一件事的另一半：**度量走代码的那一侧，样式里只有直接约束尺寸的属性够得着**，padding / margin
+只是给它让路。两侧都有读回：属性侧是新用例 `The_flyout_rows_measure_upstreams_heights`（条目 38 / `LayoutRoot`
+34 / 分隔线 3 / 线盒 1 且 margin `-4,1,-4,1`），像素侧是弹层自己那张 PrintWindow（`spike/VisualQA/out/`
+`flyout-400x356-168.png`，线仍在 y≈122.3..124.6 DIP 横穿整行——把行压到 3 没有把框架画的那根线挤出去）。
+
+**2 · 弹层窗口的尺寸受宿主窗口剩余空间限制。** 为了让采集器"优先抓到弹窗"，把探针宿主窗口从 760x620 改成
+240x140，flyout 的顶层窗口跟着从 400x356 px 缩到 400x219 px，也就是只剩 125 DIP、三行——读起来像"条目丢了"，
+实际是被裁。**"把宿主缩小好让弹窗最大"是个陷阱。** 正确做法是宿主保持够高，改用
+`spike/VisualQA/capture-pid-windows.ps1`：它把该进程的**每个**顶层窗口分别落盘（文件名带 WxH 与 dpi），
+弹窗和宿主各一张，不用猜哪个最大。
+
+**3 · 弹层根节点在进程内栅格化是全黑。** `RenderTargetBitmap.Render(popupRoot)` 量到 219x199 的纯黑位图
+（`flyout-shipped.bmp` 逐行扫过：0 个非黑像素）。这是 S0-j 那条不对称的同一族，这次落在 MenuFlyout 的
+presenter 上——所以弹层里"线还在不在"这种问题只能出进程问，仓内 harness 会一致地回答"什么都没有"。
+
+**4 · 读探针日志要在进程退出之后。** 一次 `--hold` 的运行还没写文件时，读到的是**上一遍**留下的那份，
+据此得出的"Height=3 没起作用"是假的，下一遍才看见 3。凡是"改了就跑就读"的循环，先确认文件 mtime 晚于本次
+启动，或者让进程自己打一行结束标记。
+
+**5 · Gallery 的窗口约 17 s 才枚举得到。** `capture-all-pages.ps1` 第一遍 9 页里 command-bar 与 settings
+两页十次 attempt 全空；把 settle 从 9 s 抬到 17 s 之后 9/9 命中，而且都是 attempt0。单独启动同一页 25 s 后
+窗口句柄与标题都在，所以这不是页面缺陷，是采集器的等待预算不够——与第 5 条 S0-r 更正里的空帧闸口是两件
+不同的事：一个是"窗口还没出现"，一个是"帧还没画"。
+
+## S0-t：弹层表面的宽度只有 `MinWidth` 够得着，而够得着的那条绑定要看弹层被接到哪一棵树上（右侧空隙批，2026-09-19）
+
+用户读数："下拉框或者说一些控件，它的右边是空了很大一块的，明显这个空隙不存在……它长度和左边的空隙是不对齐的。"
+把它量成一个数：`spike/RightGapProbe` 把嫌疑控件按同一宽度摆在已上屏窗口上，进程外 PrintWindow 抓该进程的
+**每个**顶层窗口，再按 DIP 逐行扫非背景像素。
+
+**1 · 框架给 `Popup` 本身写了本地 `Width`，但用无穷大度量它的子节点。** 260 DIP 的 `AutoCompleteBox` 打开建议
+列表，弹窗自己的顶层窗口是 **260x80 DIP**，画出来的卡片只到 **148 DIP**——右边 113 DIP 是纯 `#000000`，
+左边贴到 0。这就是"右边多了一块、和左边的空隙不对齐"。`HorizontalAlignment=Stretch` 在无穷大量度下没有
+意义（加上之后帧逐像素不变，`painted=19082` 两遍完全相同）；能碰到盒子的是 `MinWidth`。
+
+**2 · 弹层子节点丢了 TemplatedParent 和祖先链，`ElementName` 还在。** 同一个属性、三种写法，读回是三件事：
+
+| 写法 | 落在哪个元素 | 读回 |
+| --- | --- | --- |
+| `{TemplateBinding ActualWidth}` | ComboBox `PART_PopupBorder` | **260**（`localValue=UnsetValue`，即值来自绑定） |
+| `{TemplateBinding ActualWidth}` / `{RelativeSource AncestorType=AutoCompleteBox\|Popup}` | AutoCompleteBox `SuggestionsContainer` | **0** |
+| `{Binding ActualWidth, ElementName=OuterBorder}` | 同上 | **260** |
+| 字面量 `MinWidth="260"` | 同上 | **260**（证明属性本身没被读丢掉，丢的是绑定） |
+
+差别不在控件、在**弹层被接到哪一棵树**：ComboBox 的下拉被 graft 进宿主窗口的 overlay 层（探针从 `window`
+往下走就能撞见 `PART_PopupBorder 260x117.3`），`AutoCompleteBox` 的建议列表有自己的顶层窗口，从宿主往下走
+**根本找不到** `SuggestionsContainer`。所以"绑定不解析"和"读不到"是同一个根因的两种表现。
+
+**3 · 两条通道可以给出相反的答案，这次是采集范围不同、不是其中一条在撒谎。** 属性侧（harness 里
+`The_suggestions_surface_spans_the_box_instead_of_its_longest_row`）`ElementName` 版本读到 260；像素侧
+（真窗口的 PrintWindow）仍然是 148。合理解释是：harness 的弹层走 overlay 那条路，绑定解析得了；真窗口的
+独立弹窗顶层解析不了。**结论按控件分开记，不许合并成"已修"**——见 `audits/right-gap.md` 的 Known Gaps。
+
+**4 · `ContentPresenter.TextWrapping` 是个死属性，而生成的 `TextBlock` 默认是 `Wrap`。** 先按直觉给
+`PART_Label` 写 `TextWrapping="NoWrap"`，用例照旧失败：`Expected NoWrap, Actual Wrap`，行高从 36 涨到
+**55.34 DIP**。这与 S0-n 那条"控件自己画"不同族——属性根本没进类型解析，和 `AstraPixelTests` 里
+"the attribute is accepted by the reader and then goes nowhere"是同一条。够得着的写法是把隐式
+`TextBlock` 样式放进 `ContentPresenter.Resources`（ToolTip 批为了反向的理由用的就是这条路）。改完
+`A_long_pane_label_stays_on_one_line` 三项一起过：`NoWrap` / 行高 36 / 文本盒 <30。
+
+顺带一条没修的：`NumberBox` 无 Header 时量到 **39 DIP**（`OuterBorder` 31 + `HeaderContentPresenter`
+的 `0,0,0,8` 本地 margin），上游是 32——上游那个 presenter 默认 `Collapsed`、由代码在 Header 存在时才打开，
+而 `NumberBox` 在这里是原生类型，样式里给不出"Header 非空"这种触发条件。记在 `audits/right-gap.md`。
+

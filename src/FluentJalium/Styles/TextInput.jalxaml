@@ -174,8 +174,12 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
           </Grid.RowDefinitions>
-          <!-- Upstream defers this presenter and collapses it until a Header exists; there is no defer here, so
-               an empty header keeps the Auto row at zero height on its own. -->
+          <!-- Upstream defers this presenter and keeps it Collapsed until a Header exists, so an empty header
+               costs nothing. There is no defer here and the 0,0,0,8 is a local margin on the element, which a
+               null Content does not cancel: a headerless NumberBox measures 39 tall (31 box + 8) against
+               upstream's 32. Pinned as Known Gap 2 in docs/astra/audits/right-gap.md rather than papered over
+               with a literal height, because the extra 8 is the header's own gap and hiding it would break the
+               case that has a header. -->
           <ContentPresenter Name="HeaderContentPresenter" Grid.Row="0" Content="{TemplateBinding Header}"
                             Foreground="{ThemeResource TextControlHeaderForeground}" Margin="{ThemeResource TextBoxTopHeaderMargin}"
                             FontSize="{TemplateBinding FontSize}" FontWeight="Normal" VerticalAlignment="Top" />

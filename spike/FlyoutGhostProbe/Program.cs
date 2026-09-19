@@ -113,6 +113,9 @@ internal static class Program
         var window = new Window
         {
             Content = root,
+            // Tall on purpose, and spike/VisualQA/capture-pid-windows.ps1 grabs every window of this process:
+            // a 240x140 host left the popup only 125 DIP of room and the flyout got clipped to three rows,
+            // which reads like a missing row rather than what it is.
             Width = 760,
             Height = 620,
             Background = new SolidColorBrush(Color.FromRgb(0x20, 0x20, 0x20)),
@@ -189,6 +192,7 @@ internal static class Program
 
         Note($"  presenter: {presenter.GetType().Name} \"{Name(presenter)}\" {Size(presenter)}");
         Dump(string.Empty, presenter, 0);
+        Rows(flyout);
 
         var textNodes = new List<TextBlock>();
         Collect(presenter, textNodes);
@@ -225,6 +229,41 @@ internal static class Program
         Note($"  render {width}x{height} bright(label-ish)={bright} distinct={histogram.Count}");
         Note("      top: " + string.Join("  ", top.Select(e => $"#{e.Key:X6}x{e.Value}")));
         WriteBitmap(buffer, width, height, Path.Combine(AppContext.BaseDirectory, $"flyout-{label}.bmp"));
+    }
+
+    /// <summary>
+    /// The row-by-row geometry reading the spacing question needs: an opened flyout's height is the sum of its
+    /// rows, so a row that is 6 DIP fatter than upstream's spec is a visible gap in every menu. ActualHeight
+    /// alone cannot say who made the row that size, so each row also reports the properties that could: the
+    /// min/max/height floors, the margin, the padding, and whether the value is a local one (a local value
+    /// outranks our style setter, which is how a framework default can beat a transcribed row).
+    /// </summary>
+    private static void Rows(MenuFlyout flyout)
+    {
+        Note("  row geometry (DIP):");
+        foreach (var row in flyout.Items.OfType<FrameworkElement>())
+        {
+            // The 21:40 run of this same code never returned and never wrote its log, so each row prints as it
+            // is read: if the probe hangs again, the last line on stdout names the row it hung on.
+            Console.Out.Write($"    row {row.GetType().Name} ");
+            Console.Out.Flush();
+            var height = row.ActualHeight;
+            var width = row.ActualWidth;
+            var desired = row.DesiredSize;
+            var minHeight = row.MinHeight;
+            var maxHeight = row.MaxHeight;
+            var margin = row.Margin;
+            var padding = row is Control control ? control.Padding.ToString() : "n/a";
+            var localMin = row.ReadLocalValue(FrameworkElement.MinHeightProperty).ToString();
+            var localMargin = row.ReadLocalValue(FrameworkElement.MarginProperty).ToString();
+            var localHeight = row.ReadLocalValue(FrameworkElement.HeightProperty).ToString();
+            Note($"    {row.GetType().Name,-22} actual={width:0.#}x{height:0.#} desired={desired.Width:0.#}x{desired.Height:0.#}"
+                 + $" min={minHeight} max={maxHeight} height={row.Height} margin={margin} padding={padding}");
+            Note($"      local values: MinHeight={localMin} Margin={localMargin} Height={localHeight}");
+        }
+
+        Console.Out.WriteLine("rows done");
+        Console.Out.Flush();
     }
 
     private static MenuFlyoutItem Item<TSilent>(bool silent, string text, string? accelerator = null, bool disabled = false, bool icon = false)

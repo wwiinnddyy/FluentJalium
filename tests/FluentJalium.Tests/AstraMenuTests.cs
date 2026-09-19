@@ -212,6 +212,39 @@ public sealed class AstraMenuTests
         });
     }
 
+    /// <summary>
+    /// The row heights a flyout is made of, read off a realized stack instead of off a comment. An item is
+    /// upstream's 38: the 11,8,11,9 padding around a 17-tall label is 34, and the 4,2,4,2 item margin adds the
+    /// rest - which is why the style carries a 38 floor rather than the 32 row upstream names, because
+    /// 26.10.9 measures the item itself and 32 would squeeze that label to 13 (spike/FlyoutGhostProbe).
+    /// The separator is upstream's 3, and that one needs the assertion more than the item does: left alone the
+    /// runtime measures this type 9 tall, and only a Height reaching the element brings it back to the rule
+    /// plus its own 1,1 padding. spike/VisualQA/out/flyout-400x356-168.png is the same flyout's own window
+    /// printed from outside, where the rule still spans the row at y=122.3..124.6 DIP.
+    /// </summary>
+    [Fact]
+    public void The_flyout_rows_measure_upstreams_heights()
+    {
+        _fixture.Run(() =>
+        {
+            var item = new MenuFlyoutItem { Text = "run" };
+            var separator = new MenuFlyoutSeparator();
+            var stack = new StackPanel { Width = 240 };
+            stack.Children.Add(item);
+            stack.Children.Add(separator);
+            Mount(stack, 240, 60);
+
+            Assert.Equal(38d, item.ActualHeight);
+            Assert.Equal(34d, ((Border)Part(item, "LayoutRoot")).ActualHeight);
+
+            Assert.Equal(3d, separator.ActualHeight);
+            Assert.Equal(new Thickness(0), separator.Margin);
+            var rule = (Border)VisualTreeHelper.GetChild(separator, 0);
+            Assert.Equal(1d, rule.ActualHeight);
+            Assert.Equal(new Thickness(-4, 1, -4, 1), rule.Margin);
+        });
+    }
+
     [Fact]
     public void The_menu_lays_its_top_level_items_out_in_a_row()
     {

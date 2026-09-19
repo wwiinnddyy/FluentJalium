@@ -51,10 +51,21 @@
                  x:Double row this reader cannot parse, so it rides as a literal; the framework overwrites the
                  height of its own popup root at open time anyway (measured: 20 / 39.78 / 63.56 DIP for zero,
                  one and two rows), so this is a ceiling, not a size. -->
-            <Border Name="SuggestionsContainer" Background="{ThemeResource AutoSuggestBoxSuggestionsListBackground}"
+            <!-- The runtime sizes this popup's own window to the control (measured: 260 DIP) but measures the
+                 surface inside it against infinity, so a short list painted a 148 DIP card and left 113 DIP of
+                 that window unpainted - the "big empty block on the right" the running Gallery showed.
+                 MinWidth is the only lever that reaches it, and it has to be an ElementName binding: the
+                 surface carries no TemplatedParent and no ancestor chain once the runtime moves it, both of
+                 which measured 0, while a literal would freeze a box the user can resize.
+                 Half honest: this lands where the runtime grafts the popup into the host window (read back
+                 260 there, both channels) and does nothing where the runtime gives the popup its own top-level
+                 window, which still paints 148 of its 260. See docs/astra/audits/right-gap.md. -->
+            <Border Name="SuggestionsContainer" HorizontalAlignment="Stretch"
+                    Background="{ThemeResource AutoSuggestBoxSuggestionsListBackground}"
                     BorderBrush="{ThemeResource AutoSuggestBoxSuggestionsListBorderBrush}"
                     BorderThickness="{ThemeResource AutoSuggestListBorderThemeThickness}"
                     CornerRadius="{ThemeResource OverlayCornerRadius}"
+                    MinWidth="{Binding ActualWidth, ElementName=OuterBorder}"
                     Padding="{ThemeResource AutoSuggestListMargin}" MaxHeight="374">
               <Grid Name="PART_DropDownBorder">
                 <ScrollViewer Name="PART_DropDownScrollViewer" Margin="{ThemeResource AutoSuggestListPadding}">

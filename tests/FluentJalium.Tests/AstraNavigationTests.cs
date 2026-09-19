@@ -101,4 +101,31 @@ public sealed class AstraNavigationTests
             Assert.Equal(48d, pane.Width, 0.01);
         });
     }
+
+    /// <summary>
+    /// A pane label is one line, full stop. Upstream gets that from a TextBlock default it never has to name
+    /// (and restates on the header style, NavigationView_themeresources.xaml:891 / :1062 / :1085); here the
+    /// attribute on a ContentPresenter is accepted by the reader and goes nowhere, so the only place the
+    /// promise can live is the text element the presenter builds. A long label is what makes the difference
+    /// observable: a wrapped line would grow the row past the 36 DIP the pill is sized against.
+    /// </summary>
+    [Fact]
+    public void A_long_pane_label_stays_on_one_line()
+    {
+        _fixture.Run(() =>
+        {
+            var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
+            var item = new FluentNavigationItem { Content = "Teaching tip, dialogs and everything else in this pane" };
+            view.MenuItems.Add(item);
+            PixelHarness.Build(view, 400, 420);
+            PixelHarness.Settle();
+
+            var label = PixelHarness.Named(view, "PART_Label")!;
+            var text = PixelHarness.Descendant<TextBlock>(label)!;
+            Assert.Multiple(
+                () => Assert.Equal(TextWrapping.NoWrap, text.TextWrapping),
+                () => Assert.Equal(36d, item.ActualHeight, 0.01),
+                () => Assert.True(text.ActualHeight < 30d, $"the label took {text.ActualHeight:0.#} DIP, more than one line"));
+        });
+    }
 }

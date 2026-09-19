@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Right-gap probe: the user's reading of the running Gallery is that several controls carry a wider empty
+       band on their right than the inset their text starts at on the left. That is a picture question, so this
+       lays the suspect controls out once, at one width, on a shown window, and holds for an outside capture.
+       It also prints each control's own geometry so a pixel reading can be tied to a property reading. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RightGapProbe</RootNamespace>
+    <AssemblyName>RightGapProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

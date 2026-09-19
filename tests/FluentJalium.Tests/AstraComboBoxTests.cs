@@ -397,7 +397,12 @@ public sealed class AstraComboBoxTests
                 () => Assert.Equal(new Thickness(0), Get(popupBorder, "Padding")),
                 () => Assert.Same(Res("ComboBoxDropDownForeground"), Get(scroller, "Foreground")),
                 () => Assert.Equal(504d, Get(scroller, "MaxHeight")),
-                () => Assert.Equal(new Thickness(0, -0.5, 0, -1), Get(popupBorder, "Margin")));
+                () => Assert.Equal(new Thickness(0, -0.5, 0, -1), Get(popupBorder, "Margin")),
+                // The hole the running Gallery showed: the runtime sizes the popup's own window to the combo
+                // but measures the surface inside it against infinity, so a short item list painted a narrow
+                // card and left the rest of that window unpainted.
+                () => Assert.Equal(combo.ActualWidth, popupBorder.MinWidth),
+                () => Assert.Equal(combo.ActualWidth, popupBorder.ActualWidth));
 
             var presenter = PixelHarness.Descendant<ItemsPresenter>(popupBorder)
                 ?? throw new InvalidOperationException("The dropdown has no items presenter to place.");

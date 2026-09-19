@@ -1,0 +1,58 @@
+upstream Thickness rows: 334   ours: 61   matching value: 56
+
+== value differs (0) ==
+
+== upstream rows we do not publish (53) ==
+AppBarButtonContentViewboxCompactMargin	[(0.0, 12.0, 0.0, 12.0)]	AppBarButton_themeresources.xaml
+AppBarButtonContentViewboxMargin	[(12.0, 16.0, 0.0, 10.0)]	AppBarButton_themeresources.xaml
+AppBarButtonInnerBorderOverflowMargin	[(4.0, 0.0, 4.0, 0.0)]	AppBarButton_themeresources.xaml
+AppBarButtonOverflowTextLabelPadding	[(0.0, 5.0, 0.0, 8.0)]	AppBarButton_themeresources.xaml
+AppBarButtonOverflowTextTouchMargin	[(0.0, 9.0, 0.0, 12.0)]	AppBarButton_themeresources.xaml
+AppBarButtonSecondarySubItemChevronMargin	[(0.0, 0.0, 16.0, 0.0)]	AppBarButton_themeresources.xaml
+AppBarButtonSubItemChevronLabelOnRightMargin	[(-7.0, 20.0, 12.0, 0.0)]	AppBarButton_themeresources.xaml
+AppBarButtonSubItemChevronMargin	[(-23.0, 20.0, 12.0, 0.0)]	AppBarButton_themeresources.xaml
+AppBarButtonTextLabelOnRightMargin	[(8.0, 16.0, 12.0, 10.0)]	AppBarButton_themeresources.xaml
+AppBarOverflowSeparatorMargin	[(0.0, 4.0, 0.0, 4.0)]	AppBarSeparator_themeresources.xaml
+CheckBoxFocusVisualMargin	[(-7.0, -3.0, -7.0, -3.0)]	CheckBox_themeresources.xaml
+ComboBoxHeaderThemeMargin	[(0.0, 0.0, 0.0, 4.0)]	ComboBox_themeresources.xaml
+ComboBoxItemThemeGameControllerPadding	[(11.0, 11.0, 11.0, 13.0)]	ComboBox_themeresources.xaml
+ComboBoxItemThemeTouchPadding	[(11.0, 11.0, 11.0, 13.0)]	ComboBox_themeresources.xaml
+ComboBoxPopupBorderThemeThickness	[(2.0, 2.0, 2.0, 2.0)]	ComboBox_themeresources.xaml
+ComboBoxTopHeaderMargin	[(0.0, 0.0, 0.0, 8.0)]	ComboBox_themeresources.xaml
+ContentDialogButton1HostMargin	[(0.0, 0.0, 4.0, 0.0)]	Deprecated_themeresources.xaml
+ContentDialogButton2HostMargin	[(0.0, 0.0, 0.0, 0.0)]	Deprecated_themeresources.xaml
+ContentDialogCommandSpaceMargin	[(0.0, 24.0, 0.0, 0.0)]	Deprecated_themeresources.xaml
+ContentDialogContentMargin	[(0.0, 0.0, 0.0, 0.0)]	Deprecated_themeresources.xaml
+ContentDialogContentScrollViewerMargin	[(0.0, 0.0, 0.0, 0.0)]	Deprecated_themeresources.xaml
+DateTimeFlyoutBorderPadding	[(0.0, 0.0, 0.0, 0.0)]	Common_themeresources.xaml
+ExpanderBorderThickness	[(1.0, 1.0, 1.0, 1.0)]	Deprecated_themeresources.xaml
+ExpanderContentUpBorderThickness	[(1.0, 1.0, 1.0, 0.0)]	Expander_themeresources.xaml
+ExpanderDropdownDownBorderThickness	[(1.0, 0.0, 1.0, 1.0)]	Deprecated_themeresources.xaml
+ExpanderDropdownUpBorderThickness	[(1.0, 1.0, 1.0, 0.0)]	Deprecated_themeresources.xaml
+FlyoutBorderThemePadding	[(0.0, 0.0, 0.0, 0.0)]	Deprecated_themeresources.xaml
+FlyoutContentPadding	[(16.0, 15.0, 16.0, 17.0)]	FlyoutPresenter_themeresources.xaml
+InfoBarActionButtonPadding	[(8.0, 0.0, 8.0, 1.0)]	Deprecated_themeresources.xaml
+InfoBarActionHorizontalOrientationMargin	[(16.0, 8.0, 0.0, 0.0)]	InfoBar_themeresources.xaml
+InfoBarHyperlinkButtonMargin	[(-12.0, 0.0, 0.0, 0.0)]	InfoBar_themeresources.xaml
+InfoBarHyperlinkButtonPadding	[(0.0, 0.0, 0.0, 1.0)]	Deprecated_themeresources.xaml
+InfoBarMessageHorizontalOrientationMargin	[(12.0, 14.0, 0.0, 0.0)]	InfoBar_themeresources.xaml
+InfoBarPanelHorizontalOrientationPadding	[(0.0, 0.0, 0.0, 0.0)]	InfoBar_themeresources.xaml
+InfoBarTitleHorizontalOrientationMargin	[(0.0, 14.0, 0.0, 0.0)]	InfoBar_themeresources.xaml
+MediaTransportControlsMargin	[(12.0, 12.0, 12.0, 12.0)]	MediaTransportControls_themeresources.xaml
+MediaTransportControlsProgressSliderCompactMargin	[(12.0, -1.0, 8.0, 1.0)]	MediaTransportControls_themeresources.xaml
+MediaTransportControlsProgressSliderMargin	[(7.0, 2.0, 7.0, 1.0)]	MediaTransportControls_themeresources.xaml
+MediaTransportControlsTitleSafeBounds	[(48.0, 0.0, 48.0, 27.0)]	MediaTransportControls_themeresources.xaml
+MenuFlyoutItemCheckGlyphMargin	[(12.0, 11.0, 0.0, 13.0)]	Deprecated_themeresources.xaml
+MenuFlyoutItemChevronMargin	[(24.0, 0.0, 0.0, -1.0)]	MenuFlyout_themeresources.xaml
+MenuFlyoutItemDoublePlaceholderThemeThickness	[(56.0, 0.0, 0.0, 0.0)]	MenuFlyout_themeresources.xaml
+MenuFlyoutItemPlaceholderThemeThickness	[(28.0, 0.0, 0.0, 0.0)]	MenuFlyout_themeresources.xaml
+MenuFlyoutItemRevealBorderThickness	[(1.0, 1.0, 1.0, 1.0)]	MenuFlyout_themeresources.xaml
+MenuFlyoutItemThemePaddingNarrow	[(11.0, 4.0, 11.0, 5.0)]	MenuFlyout_themeresources.xaml
+MenuFlyoutScrollerMargin	[(0.0, 4.0, 0.0, 4.0)]	Deprecated_themeresources.xaml
+MenuFlyoutSubItemRevealBorderThickness	[(1.0, 1.0, 1.0, 1.0)]	MenuFlyout_themeresources.xaml
+NumberBoxPopupIndicatorMargin	[(0.0, 0.0, 8.0, 0.0)]	NumberBox_themeresources.xaml
+SliderHeaderThemeMargin	[(0.0, 0.0, 0.0, 4.0)]	Slider_themeresources.xaml
+SliderTopHeaderMargin	[(0.0, 0.0, 0.0, 4.0)]	Slider_themeresources.xaml
+TextBoxInnerButtonMargin	[(0.0, 4.0, 4.0, 4.0)]	TextBox_themeresources.xaml
+ToggleMenuFlyoutItemRevealBorderThickness	[(1.0, 1.0, 1.0, 1.0)]	MenuFlyout_themeresources.xaml
+ToolTipBorderThemePadding	[(8.0, 5.0, 8.0, 7.0)]	Deprecated_themeresources.xaml

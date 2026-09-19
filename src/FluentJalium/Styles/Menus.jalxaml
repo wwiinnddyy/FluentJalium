@@ -189,6 +189,12 @@
   <!-- ============ MenuFlyoutSeparator ============ -->
   <Style TargetType="MenuFlyoutSeparator">
     <Setter Property="Padding" Value="{ThemeResource MenuFlyoutSeparatorThemePadding}" />
+    <!-- 26.10.9 measures this type to 9 tall no matter what the template asks for (the probe reads
+         actual=218.5x9 with the margin zeroed and with the 1-tall box), while upstream's row is the 1-tall rule
+         plus its own -4,1,-4,1 padding = 3. Height is the only lever that reaches that measure, so the row
+         carries it and the flyout's separator gap becomes upstream's 3 DIP. -->
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Height" Value="3" />
     <Setter Property="IsTabStop" Value="False" />
     <Setter Property="Template">
       <ControlTemplate TargetType="MenuFlyoutSeparator">

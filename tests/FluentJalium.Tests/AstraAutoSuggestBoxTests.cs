@@ -267,6 +267,26 @@ public sealed class AstraAutoSuggestBoxTests
     }
 
     /// <summary>
+    /// The right-hand hole the running Gallery showed: the runtime sizes the popup's own window to the control
+    /// (260 here) while the surface inside it only ever asked for its content's width (148 measured on screen),
+    /// so the dropdown painted a card and left the rest of its window unpainted. The surface now carries the
+    /// control's width as a floor, which is what upstream's list does.
+    /// </summary>
+    [Fact]
+    public void The_suggestions_surface_spans_the_box_instead_of_its_longest_row()
+    {
+        _fixture.Run(() =>
+        {
+            var box = Mounted();
+            Open(box);
+            var container = (Border)PopupPart("SuggestionsContainer");
+            Assert.Multiple(
+                () => Assert.Equal(box.ActualWidth, container.MinWidth),
+                () => Assert.Equal(box.ActualWidth, container.ActualWidth));
+        });
+    }
+
+    /// <summary>
     /// Typing filters and opens, and the containers land in the panel our template provides. This is the
     /// read-back that proves the popup part names are the contract: with no child on PART_Popup the
     /// framework opens an empty 20 DIP root, and with an ItemsControl of that name it never populates.
