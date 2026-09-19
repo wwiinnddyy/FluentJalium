@@ -653,6 +653,13 @@ public sealed class AstraAppBarTests
             Assert.Equal(16d, ((Viewbox)Part(button, "ContentViewbox")).Height, 1);
             Assert.Equal(64d, Part(button, "ContentRoot").MinHeight, 1);
 
+            // The highlight fades over upstream's 83 ms. This batch once deleted that fade on a
+            // composited-frame reading that turned out to be a grab of an undrawn surface, so the declaration
+            // is pinned as a reading rather than trusted to a comment (adaptation/00 S0-r).
+            var highlight = (Border)Part(button, "AppBarButtonInnerBorder");
+            Assert.Equal("Background, BorderBrush", highlight.TransitionProperty);
+            Assert.Equal(TimeSpan.FromMilliseconds(83), highlight.TransitionDuration);
+
             var separator = Mount(new AppBarSeparator { Height = 64 }, 8, 64);
             Assert.IsType<Grid>(Part(separator, "RootGrid"));
             Assert.IsType<Jalium.UI.Shapes.Rectangle>(Part(separator, "SeparatorRectangle"));

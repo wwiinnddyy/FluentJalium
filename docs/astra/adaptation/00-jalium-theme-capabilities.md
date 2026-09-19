@@ -650,29 +650,62 @@ hover/disabled 变色不必放弃：从模板格子搬到 `Style.Triggers` 写 `
 修后 shipped / stripped / bare 三个 pass 的 `#FFFFFF` 全为 **0**，框架层逐色计数（`#F5F5F7x1659`、
 `#D6D6D7x556`、`#242424x737`）与参照 pass 完全一致——即"只剩一位画者，且它画的东西没被改动"。
 
-## S0-r：嵌套层的笔刷过渡进不了合成帧——同一属性、同一格子，PrintWindow 读得到与读不到（间距批，2026-09-19）
+## S0-r：撤回——"嵌套层的笔刷过渡进不了合成帧"是采集器读到的空帧（间距批，2026-09-19；同日更正）
 
-触发点：把命令栏条目改成上游的三层形状（`Root` 无填充 / `AppBarButtonInnerBorder` 高亮 / `ContentRoot` 管高度）
-之后，Gallery 里那个默认勾选的 `AppBarToggleButton` 只剩黑字没有蓝底。四类证据在这里第一次互相矛盾，所以逐条量：
+结论先行：**这条边界不成立**。命令栏高亮层的 83ms 笔刷过渡已按上游恢复。下面是原始读数、推翻它的
+两个实验，以及真正值得记下来的那条底座事实。
 
-**1 · 属性侧是对的。** 离屏 harness 里 `((Border)Part(toggle,"AppBarButtonInnerBorder")).Background` 的颜色
+### 原始读数（间距批当天记下的，保留以免被后来者再踩一遍）
+
+触发点：把命令栏条目改成上游的三层形状（`Root` 无填充 / `AppBarButtonInnerBorder` 高亮 / `ContentRoot`
+管高度）之后，Gallery 里那个默认勾选的 `AppBarToggleButton` 看起来只剩黑字没有蓝底。
+
+**1 · 属性侧是对的。** 离屏 harness 里 `((Border)Part(toggle,"AppBarButtonInnerBorder")).Background`
 等于被哨兵改写后的 `AccentFillColorDefaultBrush`；格子命中、目标名解析、行取值都没问题。
 
 **2 · 离屏栅格也是对的。** 三条通路各自断言 `Count(SentinelMagenta) > 1000` 全绿：裸控件 `Render`、栏内
-`Render`、栏内**先上屏后置 `IsChecked`** 再 `Chrome`。也就是说，只读离屏 harness 会得出"没问题"的结论——
-这条与 S0-j 的"捕获通路不对称"同源，只是这次不对称的是**过渡层**。
+`Render`、栏内**先上屏后置 `IsChecked`** 再 `Chrome`。
 
-**3 · 真窗口的合成捕获读不到。** `spike/VisualQA/capture-pages.ps1`（PrintWindow + `PW_RENDERFULLCONTENT`，
-dpi=168）里 Bold 格子 100x150 区域：`#60CDFF` 计数 **0**，格子颜色与栏底 `#323232` 完全相同。
+**3 · 当时那次真窗口捕获读到 0。** `spike/VisualQA/capture-pages.ps1` 里 Bold 格子 100x150 区域
+`#60CDFF` 计数 **0**；把那条嵌套 `Border` 的 `TransitionProperty` 删掉重建，同一坐标变成 **7786/9108 px**。
+当时据此写下"带笔刷过渡的嵌套层，其终值不落进合成帧"。
 
-**4 · A/B 只差一个属性。** 其余代码不动，只把那条嵌套 `Border` 上的
-`TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"` 删掉重建，同一页同一坐标
-`#60CDFF` 变成 **7786 px**。改回原形状（高亮层作为模板根、同样带过渡）时填充是在的——旧提交里的
-`command-bar.png` 就是证据。所以边界不是"嵌套不能画"，而是"**带笔刷过渡的嵌套层，其终值不落进合成帧**"。
+### 推翻它的两个实验
 
-**5 · 本批的处理。** 两个 bar 按钮的高亮层去掉过渡，留下原因注释：让填充在，而不是让 83ms 的淡入在。
-上游那 83ms 是 `BrushTransition`，属于观感细节；填充消失是错色。
+**4 · 17 格判别矩阵（`spike/TransitionProbe`，一次运行、三次抓帧、逐格唯一色、PrintWindow 客户端区）。**
+每格只比相邻格差一个变量：模板根 vs 嵌套、有过渡 vs 无、83ms vs 0、加载时写 vs 上屏后写、
+`{ThemeResource}` vs 字面、TemplateBinding 与格子双写同一个属性、裸视觉树 vs 模板内、笔刷过渡 vs
+`Width` 过渡、属性列表 `"Background, BorderBrush"`（带空格/不带）以及**命令栏三层形状的完整复刻**。
+17 格在三次抓帧里全部落帧，数值逐次一模一样：90x90 DIP 格 = 24649 px（157.5² 扣掉边缘），
+`Width` 过渡格从 30 写到 90 也拿到 24649 px，命令栏形状格 18968 px（78x86 内缩矩形）。
+所以"嵌套 + 过渡"、"两个属性名的列表"、"列表里那个空格"、"`{ThemeResource}` 笔刷"、"TemplateBinding
+与格子同时喂同一个属性"——没有一个能挡住终值进帧。
 
-**6 · 待查，不在本批下结论。** 同样的写法还散在别处（`Styles/Common.jalxaml` 三处、`Menus.jalxaml:291`、
-`Surfaces.jalxaml:45/62`、`Navigation.jalxaml:21/69`、`Inputs.jalxaml:27/34`）。这些是不是同一症状，需要
-逐个用真窗口捕获量，不能从这一条外推——已开任务"过渡终值落帧审计"。
+**5 · 原现场的 A/B 重做，这次带空帧闸口（`spike/VisualQA/grab-page.ps1` + `count-colors.ps1`）。**
+同一个 Gallery 页 `--page command-bar`，只改 `AppBar.jalxaml` 的那一个属性，两遍都等到"帧里确实画了东西"
+（非黑像素 >1000）再计数：
+
+| 构建 | `#60CDFF` | 栏底 `#323232` | 抓到可用帧前重试次数 |
+|---|---|---|---|
+| 无过渡（间距批提交态） | 8832 px | 958227 px | 15 |
+| 有过渡（上游 83ms 恢复后） | 8832 px | 958227 px | 7 |
+
+**逐像素相同。**过渡不改帧，改的是那次读数的可信度。
+
+### 真正要记住的底座事实
+
+- **PrintWindow 能在窗口已经摆好、也在出帧的情况下返回没画过的帧。** 上面两行"重试次数"就是它的表现：
+  15 次和 7 次抓到的都是没内容或几乎没内容的帧。空帧会让"某个颜色 0 px"和"这个控件没画"**完全同形**——
+  这才是当初那条结论的来源。任何外部抓帧必须先过"这帧画了没有"的闸口（`grab-page.ps1` 用非黑像素数），
+  再谈颜色计数；`capture-pages.ps1` 只有 `WaitForInputIdle` 这道闸，而它超时时是 `continue`（连文件都不写），
+  报的"never went idle"其实说的是采集失败，不是页面在动。
+- **仓内 harness 三条通路是同一台栅格器。** `PixelHarness.Render`、`Host`、`Chrome` 都走
+  `RenderTargetBitmap.Render`——包括 `Chrome(窗口)`，它并不是屏幕。过渡直接把终值写进依赖属性
+  （见 adaptation/12），所以栅格器**永远**看得到终值，也就**永远不可能**发现"帧没跟上"。凡是要问合成帧，
+  只能出进程抓。
+- **格子只在生产形状下生效。** 矩阵第一版把九个模板放进字典里当 keyed `ControlTemplate`，属性读回全是静止色——
+  这就是已记录的 keyed 模板 `Trigger.Property` 缺陷（audits/slider.md），一度被误读成"过渡又没落帧"。
+  矩阵因此改成 keyed `Style` + 内联模板，与生产文件同形。**属性读回和像素读回必须成对出现**，否则两个
+  方向的假阳性都抓不住。
+- 任务"过渡终值落帧审计"（原 #22）随之关闭：19 处 `TransitionProperty` 不需要逐点重测，因为被怀疑的
+  机制本身不存在；这些站点仍然只有属性/栅格证据，那是另一件没做完的事，不是这里的一条边界。

@@ -113,13 +113,20 @@
 `A_checked_fill_written_after_the_bar_is_live_reaches_the_shown_window`（先上屏、后置勾选）；
 `The_template_carries_the_part_names_upstream_uses` 改成三层类型断言。视觉半边是
 `spike/VisualQA/out/command-bar.png`（PrintWindow，dpi=168）：Bold 格子内 `#60CDFF` 7786 px，图标在标签之上，
-条目带 64 高。
+条目带 64 高。这张图出自还没有空帧闸口的 `capture-pages.ps1`，它下面的 S0-r 更正就是它带来的。
 
-**这一批也量出一条基座缺陷**：嵌套在高亮层上的 `TransitionProperty="Background, BorderBrush"` 让状态笔刷的
-终值进不了真窗口的合成帧——属性、离屏栅格、上屏 `Chrome` 三条通路都说填充在，PrintWindow 读到 0 px；
-删掉该属性后同一坐标变 7786 px。因此两个 bar 按钮的高亮层不带过渡（观感让位于错色），细节与待查清单见
-`adaptation/00` 的 S0-r。
+**这一批当时据此写下的一条"基座缺陷"在同一天被自己的实验推翻**：把高亮层上的
+`TransitionProperty="Background, BorderBrush"` 当成 PrintWindow 读到 0 px 的原因，那两次捕获其实都落在
+还没画过的帧上。`spike/TransitionProbe` 的 17 格判别矩阵（模板根 vs 嵌套、有 vs 无过渡、83ms vs 0、
+加载时写 vs 上屏后写、`{ThemeResource}` vs 字面、TemplateBinding 与格子双写同一属性、模板外 vs 模板内、
+笔刷过渡 vs `Width` 过渡、属性列表带空格 vs 不带，外加本三层形状的完整复刻）三次抓帧 17/17 全部落帧；
+把过渡加回这份模板、改用带空帧闸口的 `spike/VisualQA/grab-page.ps1` 重捕同一页，`#60CDFF` 与无过渡时
+逐像素相同（8832 px；抓到可用帧前重试 7 次 vs 15 次）。过渡因此留在样式里，与上游一致。原始读数、
+推翻它的两个实验与"为什么属性/离屏三条通路全绿而屏幕读 0"都记在 `adaptation/00` 的 S0-r 更正节。
 
-9. 上面那条"过渡终值不落帧"没有自动化判据：harness 的 `Chrome` 与 `Render` 都读不到这个差异，只有真窗口
-PrintWindow 能。本批把它写成三条互补断言（属性 / 离屏 / 上屏）加一张捕获，防的是"属性对但屏幕没有"这类
-分歧再次被当成通过，而不是防这条缺陷本身复发——那需要任务 #13 的真窗口像素通路（任务 #22）。
+9. 这条更正留下的真缺口是**判据本身**：harness 的 `Render`/`Host`/`Chrome` 是同一条 `RenderTargetBitmap`
+   通路（`Chrome(窗口)` 也不是屏幕），所以它们既看不到"帧没跟上属性"，也就永远证不了合成帧；要问合成帧
+   只能出进程抓，而外部抓帧必须先过"这一帧画了没有"的闸口（非黑像素计数），否则"某色 0 px"与"整帧空白"
+   同形——这正是本批第一条结论的来源。三条互补断言（属性 / 离屏 / 带闸口的外部捕获脚本）留在测试与
+   `spike/TransitionProbe`、`spike/VisualQA/grab-page.ps1` 里，防的是分歧再次被当成通过；真指针输入的
+   像素通路仍欠（任务 #13）。

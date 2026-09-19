@@ -1,0 +1,83 @@
+EXPECT	01 root+trans	#FF0001
+EXPECT	02 root none	#7F0001
+EXPECT	03 nested+trans	#FE00FE
+EXPECT	04 nested none	#0300FF
+EXPECT	05 nested zero	#B400B4
+EXPECT	06 nested after	#00B4B4
+EXPECT	07 nested themed	#60CDFF
+EXPECT	08 nested width	#7F7F01
+EXPECT	09 bound+cell	#FF0101
+EXPECT	13 single+border	#01FF01
+EXPECT	14 two names	#0101FF
+EXPECT	15 no space	#EE00EE
+EXPECT	16 root two names	#00EEEE
+EXPECT	17 appbar shape	#C86400
+EXPECT	10 loose border	#FF7F01
+EXPECT	11 stock button pre	#0FFF5F
+EXPECT	12 stock button post	#5F0FFF
+NOTE	accent row	#60CDFF
+HOLD	525ms	(wall 16317ms)	pump gave 3 frames
+READ	settle 400ms	532ms	(wall 16323ms)
+  01 root+trans	#FF0001
+  02 root none	#7F0001
+  03 nested+trans	#FE00FE
+  04 nested none	#0300FF
+  05 nested zero	#B400B4
+  06 nested after	#1E1E1F
+  07 nested themed	#60CDFF
+  08 nested width	#7F7F01
+  09 bound+cell	#FF0101
+  13 single+border	#01FF01
+  14 two names	#0101FF
+  15 no space	#EE00EE
+  16 root two names	#00EEEE
+  17 appbar shape	#C86400
+  10 loose border	#1E1E1F
+  11 stock button pre	#0FFF5F
+  12 stock button post	#1E1E1F
+CENSUS
+  01 root+trans	part=ok	size=90x90	names=Style/template :: Fill
+  02 root none	part=ok	size=90x90	names=Style/template :: Fill
+  03 nested+trans	part=ok	size=90x90	names=Fill
+  04 nested none	part=ok	size=90x90	names=Fill
+  05 nested zero	part=ok	size=90x90	names=Fill
+  06 nested after	part=ok	size=90x90	names=Fill
+  07 nested themed	part=ok	size=90x90	names=Fill
+  08 nested width	part=ok	size=30x90	names=Fill
+  09 bound+cell	part=ok	size=90x90	names=Fill
+  13 single+border	part=ok	size=90x90	names=Fill
+  14 two names	part=ok	size=90x90	names=Fill
+  15 no space	part=ok	size=90x90	names=Fill
+  16 root two names	part=ok	size=90x90	names=Style/template :: Fill
+  17 appbar shape	part=ok	size=86x78	names=Fill,ContentRoot,LabelText
+  10 loose border	part=ok	size=106x106	names=ToggleButton,Fill,ToggleButton,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Grid,Fill,ToggleButton,Fill,ToggleButton,Root,Fill,ContentRoot,LabelText,Border,Button,Grid,Surface,ContentPresenter,FocusOutline,Border,Button,Grid,Surface,ContentPresenter,FocusOutline,Border
+  11 stock button pre	part=ok	size=90x90	names=Surface,ContentPresenter,FocusOutline,Border
+  12 stock button post	part=ok	size=90x90	names=Surface,ContentPresenter,FocusOutline,Border
+HOLD	1202ms	(wall 16994ms)	pump gave 12 frames
+PHASE	ready	1260ms	(wall 17052ms)	nudge=1	frames=6
+HOLD	7573ms	(wall 23364ms)	pump gave 29 frames
+PHASE	capture1	8525ms	(wall 24316ms)	nudge=0	frames=0
+HOLD	8530ms	(wall 24321ms)	pump gave 1 frames
+PHASE	capture2	8659ms	(wall 24450ms)	nudge=1	frames=6
+HOLD	8667ms	(wall 24459ms)	pump gave 1 frames
+PHASE	capture3	8720ms	(wall 24511ms)	nudge=0	frames=6
+READ	after-captures	8723ms	(wall 24515ms)
+  01 root+trans	#FF0001
+  02 root none	#7F0001
+  03 nested+trans	#FE00FE
+  04 nested none	#0300FF
+  05 nested zero	#B400B4
+  06 nested after	#00B4B4
+  07 nested themed	#60CDFF
+  08 nested width	#7F7F01
+  09 bound+cell	#FF0101
+  13 single+border	#01FF01
+  14 two names	#0101FF
+  15 no space	#EE00EE
+  16 root two names	#00EEEE
+  17 appbar shape	#C86400
+  10 loose border	#FF7F01
+  11 stock button pre	#0FFF5F
+  12 stock button post	#5F0FFF
+HOLD	23534ms	(wall 39326ms)	pump gave 18 frames
+EXIT at 39726ms

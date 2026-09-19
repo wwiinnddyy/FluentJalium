@@ -59,16 +59,16 @@
              AppBarThemeMinHeight=64 - an x:Double this reader cannot parse, so 64 rides here as a literal.
              The old shape put the highlight on the whole cell and vertically centred the icon, which is what
              made the bar measure 40 and the labels sit where WinUI's do not.
-             Upstream also fades the highlight brush over 0.083s. That fade is off on both bar buttons here on
-             purpose: with it on, a checked toggle inside a CommandBar kept its accent in the property and in the
-             offscreen rasteriser but painted nothing in a composited window - 0 pixels of #60CDFF against 7786
-             with the attribute removed, same build otherwise - while the same transition on the old root Border
-             did reach the frame. What is given up is the fade on a nested highlight, not the fill.
-             adaptation/00 S0-r, audits/app-bar.md. -->
+             Upstream also fades the highlight brush over 0.083s, and that fade is here. An earlier pass of
+             this batch removed it on the measurement that a checked toggle painted no accent in a composited
+             window with the attribute and 9108 pixels without it; both numbers came from grabs of a surface
+             that had not drawn yet, and the same page measured with a blank-frame gate gives 8832 pixels of
+             #60CDFF either way. adaptation/00 S0-r carries the correction, audits/app-bar.md the method. -->
         <Grid Name="Root" Background="Transparent">
           <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
                   Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"
                   />
           <Grid Name="ContentRoot" MinHeight="64">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -130,6 +130,7 @@
           <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
                   Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"
                   />
           <Grid Name="ContentRoot" MinHeight="64">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
