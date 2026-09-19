@@ -1,0 +1,40 @@
+<!-- WinUI 3 Expander_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 270447141f6f1a39ad7c3e570f0ac8ed3ccb0a8e, Light/Default branch (lines 5-26).
+     Fifteen alias rows plus the six Thickness rows this template reads, transcribed so an app restyles an
+     expander by upstream's names and never by ours. Each alias resolves to the palette object the kernel
+     re-tints in place, so the Light/Dark flip and the high-contrast decision travel through it.
+     What upstream has and this dictionary does not: the five *Pressed* rows, because the Expander exposes no
+     press flag for a cell to watch - of those five, four alias the same instances as their resting row, so
+     the only distinguishable pressed pixel here would have been the chevron disc; ExpanderContentUpBorderThickness, because
+     ExpandDirection is not honoured - 26.10.9's Expander rotates PART_Chevron by a fixed +90 degrees and
+     shows PART_ContentBorder below the header whatever the property says (spike/ExpanderInfoBarProbe), so a
+     row nobody can reach is a row we do not publish. The horizontal-content rows of upstream's header
+     ToggleButton style, and its ExpanderHeaderUpStyle, are style internals rather than public rows and are
+     carried as literals in Styles/Surfaces.jalxaml. ExpanderMinHeight, ExpanderChevronButtonSize and
+     ExpanderChevronGlyphSize are x:Double rows, which this runtime's reader cannot parse, so 48, 32 and 12
+     ride as literals in the template that needs them, and the two ExpanderChevron*Glyph x:String rows have no
+     consumer at all because the chevron here is a Path the framework rotates, not a font glyph
+     (audits/expander.md). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="ExpanderHeaderBorderThickness">1</Thickness>
+  <Thickness x:Key="ExpanderChevronBorderThickness">0</Thickness>
+  <Thickness x:Key="ExpanderHeaderPadding">16,0,0,0</Thickness>
+  <Thickness x:Key="ExpanderChevronMargin">20,0,8,0</Thickness>
+  <Thickness x:Key="ExpanderContentPadding">16</Thickness>
+  <Thickness x:Key="ExpanderContentDownBorderThickness">1,0,1,1</Thickness>
+  <StaticResource x:Key="ExpanderHeaderBackground" ResourceKey="CardBackgroundFillColorDefaultBrush" />
+  <StaticResource x:Key="ExpanderHeaderForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ExpanderHeaderForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ExpanderHeaderBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ExpanderHeaderBorderPointerOverBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ExpanderHeaderDisabledForeground" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ExpanderHeaderDisabledBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ExpanderChevronBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ExpanderChevronPointerOverBackground" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ExpanderChevronForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ExpanderChevronPointerOverForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ExpanderChevronBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ExpanderChevronBorderPointerOverBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ExpanderContentBackground" ResourceKey="CardBackgroundFillColorSecondaryBrush" />
+  <StaticResource x:Key="ExpanderContentBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+</ResourceDictionary>

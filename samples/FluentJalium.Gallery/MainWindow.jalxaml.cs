@@ -42,6 +42,7 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)InputsItem!] = (FrameworkElement)InputsPage!,
             [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
             [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
+            [(FluentNavigationItem)SurfacesItem!] = (FrameworkElement)SurfacesPage!,
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
         };
         _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
@@ -49,6 +50,7 @@ public partial class MainWindow : Window
         _pageIds[(FluentNavigationItem)InputsItem!] = "inputs";
         _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
         _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
+        _pageIds[(FluentNavigationItem)SurfacesItem!] = "surfaces";
         _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
 
         // Only the active page is in the visual tree and tab order. Reusing the same
@@ -58,6 +60,7 @@ public partial class MainWindow : Window
         WireButtons();
         WireInputs();
         WireSelection();
+        WireSurfaces();
         WireAppearance();
         SetAccessibleNames();
 
@@ -121,6 +124,48 @@ public partial class MainWindow : Window
         var dropDown = (FluentDropDownButton)DropDownMoreButton!;
         dropDown.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down opened; IsExpanded={dropDown.IsExpanded}.";
         dropDown.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down closed; IsExpanded={dropDown.IsExpanded}.";
+    }
+
+    private void WireSurfaces()
+    {
+        var expander = (Expander)SampleExpander!;
+        expander.Expanded += (_, _) => ((TextBlock)ExpanderReadout!).Text =
+            "Expanded. The control wrote the content part's visibility and rotated its chevron; this page drives neither.";
+        expander.Collapsed += (_, _) => ((TextBlock)ExpanderReadout!).Text = "Collapsed.";
+
+        var bar = (FluentInfoBar)SampleInfoBar!;
+        bar.CloseButtonClick += (_, _) =>
+        {
+            ((TextBlock)InfoBarReadout!).Text =
+                "CloseButtonClick came from the base class, which also set IsOpen=false; the style collapses the bar.";
+            Report("Info bar closed.");
+        };
+
+        foreach (var (button, severity) in new[]
+                 {
+                     ((Button)SeverityInformationalButton!, InfoBarSeverity.Informational),
+                     ((Button)SeveritySuccessButton!, InfoBarSeverity.Success),
+                     ((Button)SeverityWarningButton!, InfoBarSeverity.Warning),
+                     ((Button)SeverityErrorButton!, InfoBarSeverity.Error),
+                 })
+        {
+            button.Click += (_, _) =>
+            {
+                bar.Severity = severity;
+                bar.IsOpen = true;
+                ((TextBlock)InfoBarReadout!).Text = $"Severity {severity}: the fill is upstream's severity row.";
+            };
+        }
+
+        ((Button)ShowInfoBarButton!).Click += (_, _) =>
+        {
+            bar.IsOpen = true;
+            ((TextBlock)InfoBarReadout!).Text = "IsOpen=true again.";
+        };
+        ((ToggleButton)InfoBarClosableToggle!).Click += (_, _) =>
+            bar.IsClosable = ((ToggleButton)InfoBarClosableToggle!).IsChecked == true;
+        ((ToggleButton)InfoBarIconToggle!).Click += (_, _) =>
+            bar.IsIconVisible = ((ToggleButton)InfoBarIconToggle!).IsChecked == true;
     }
 
     private void WireInputs()

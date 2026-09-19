@@ -11,6 +11,7 @@
     { "id": "inputs", "title": "Inputs", "host": "InputsPage" },
     { "id": "selection", "title": "Selection", "host": "SelectionPage" },
     { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
+    { "id": "surfaces", "title": "Surfaces", "host": "SurfacesPage" },
     { "id": "settings", "title": "Settings", "host": "SettingsPage" }
   ],
   "controls": [
@@ -181,6 +182,22 @@
       "parity": "own-type",
       "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
       "gaps": [ "no expandable children, icon sources beyond SymbolIcon", "selection indicator motion unmeasured" ]
+    },
+    {
+      "markup": "Expander",
+      "source": "Styles/Surfaces.jalxaml",
+      "page": "surfaces",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/expander.md", "tests/FluentJalium.Tests/AstraExpanderInfoBarTests.cs", "spike/ExpanderInfoBarProbe/Program.cs" ],
+      "gaps": [ "the Pressed header state has no driver: the control exposes no press flag, so upstream's five Pressed rows stay unpublished", "ExpandDirection is ignored by the control, which always rotates the chevron by +90 and shows the body below, so ExpanderContentUpBorderThickness is not transcribed", "the chevron is a Path rather than the AnimatedIcon upstream animates, and the resting mark points right", "hover pixels and the real pointer and touch paths are not gated" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentInfoBar",
+      "source": "Styles/Surfaces.jalxaml",
+      "page": "surfaces",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/infobar.md", "tests/FluentJalium.Tests/AstraExpanderInfoBarTests.cs", "spike/ExpanderInfoBarProbe/Program.cs" ],
+      "gaps": [ "the native InfoBar cannot be templated on 26.10.9: it never opts into template content management, so it paints its own hardcoded severity fill, icon and 32 DIP close rectangle - this type exists only to call that protected opt-in", "there is no icon slot, so upstream's UserIconVisible state is unreachable and IsIconVisible only shows or hides the severity mark", "InfoBarHyperlinkButtonForeground and InfoBarHyperlinkButtonMargin are not transcribed: the action slot takes a Button, and a template-internal implicit HyperlinkButton style is unproven here", "the bar always stacks title over message; upstream's horizontal InfoBarPanel rows are not transcribed", "the severity mark needs Segoe Fluent Icons to be installed", "IsOpen=false is collapsed by the style, because the control only drops its own measure, and no real pointer or touch is gated" ]
     }
   ]
 }

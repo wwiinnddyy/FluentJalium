@@ -1,0 +1,44 @@
+<!-- WinUI 3 InfoBar_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 1056af57d0340a7e9aa2d5f9e2f2f177b841897c, Light/Default branch (lines 5-21).
+     Sixteen alias rows plus the eight Thickness rows this template reads, transcribed so an app restyles an
+     info bar by upstream's names and never by ours. Each alias resolves to the palette object the kernel
+     re-tints in place, so the Light/Dark flip and the high-contrast decision travel through it.
+     Not here, because nothing reachable consumes them: the four horizontal-orientation margins and
+     InfoBarPanelHorizontalOrientationPadding, which belong to upstream's InfoBarPanel - a panel that wraps
+     title, message and action onto one line when there is room, while this template always stacks them
+     vertically; and the InfoBarHyperlinkButtonForeground / InfoBarHyperlinkButtonMargin pair, which needs a
+     style inside the action slot for a HyperlinkButton to pick up, and template-internal implicit styles are
+     unproven here. Both sets come back with the batch that makes them reachable, and a gate test pins that
+     they are not published in the meantime (audits/infobar.md).
+     InfoBarBorderThickness is 2 in upstream's High Contrast branch and 1 elsewhere; the kernel swaps colours
+     for high contrast, not thickness, so one value is published and the difference is a recorded deviation.
+     InfoBarMinHeight, InfoBarCloseButtonSize, InfoBarCloseButtonGlyphSize, InfoBarIconFontSize and the two
+     font-size rows are x:Double, the two font-weight rows are FontWeight and the five glyph rows are
+     x:String - none of those elements parse in this runtime - so 48, 38, 16, 16, 14, SemiBold and Normal
+     ride as literals in the style that needs them, and the icon and close-button marks are drawn rather than
+     typed (audits/infobar.md). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
+  <Thickness x:Key="InfoBarContentRootPadding">16,0,0,0</Thickness>
+  <Thickness x:Key="InfoBarIconMargin">0,16,14,16</Thickness>
+  <Thickness x:Key="InfoBarPanelMargin">0,0,16,0</Thickness>
+  <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,14,0,18</Thickness>
+  <Thickness x:Key="InfoBarTitleVerticalOrientationMargin">0,14,0,0</Thickness>
+  <Thickness x:Key="InfoBarMessageVerticalOrientationMargin">0,4,0,0</Thickness>
+  <Thickness x:Key="InfoBarActionVerticalOrientationMargin">0,12,0,0</Thickness>
+  <StaticResource x:Key="InfoBarErrorSeverityBackgroundBrush" ResourceKey="SystemFillColorCriticalBackgroundBrush" />
+  <StaticResource x:Key="InfoBarWarningSeverityBackgroundBrush" ResourceKey="SystemFillColorCautionBackgroundBrush" />
+  <StaticResource x:Key="InfoBarSuccessSeverityBackgroundBrush" ResourceKey="SystemFillColorSuccessBackgroundBrush" />
+  <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="SystemFillColorAttentionBackgroundBrush" />
+  <StaticResource x:Key="InfoBarErrorSeverityIconBackground" ResourceKey="SystemFillColorCriticalBrush" />
+  <StaticResource x:Key="InfoBarWarningSeverityIconBackground" ResourceKey="SystemFillColorCautionBrush" />
+  <StaticResource x:Key="InfoBarSuccessSeverityIconBackground" ResourceKey="SystemFillColorSuccessBrush" />
+  <StaticResource x:Key="InfoBarInformationalSeverityIconBackground" ResourceKey="SystemFillColorAttentionBrush" />
+  <StaticResource x:Key="InfoBarErrorSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+  <StaticResource x:Key="InfoBarWarningSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+  <StaticResource x:Key="InfoBarSuccessSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+  <StaticResource x:Key="InfoBarInformationalSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+  <StaticResource x:Key="InfoBarTitleForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="InfoBarMessageForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+</ResourceDictionary>

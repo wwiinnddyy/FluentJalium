@@ -1,0 +1,215 @@
+<!-- Astra surface styles: the expander and the info bar. Both live outside the button family because both
+     are driven by a framework contract rather than by our own state machine: the Expander's parts are read
+     by name (spike/ExpanderInfoBarProbe measures that PART_ContentBorder's visibility and PART_Chevron's
+     rotation are written by the control, and that its click handler is installed on PART_HeaderBorder), and
+     FluentInfoBar exists only because 26.10.9's InfoBar never opts into template content management, so its
+     Template is inert and it paints itself from hardcoded geometry (docs/astra/adaptation/00 S0-m).
+     Keep the two names the Expander reads, and keep the close button a Button named PART_CloseButton: the
+     base class wires Click to CloseButtonClick + IsOpen=false for that one name, and nothing else. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="ExpanderStyle" TargetType="Expander">
+    <!-- Upstream sets IsTabStop=False because its header is a ToggleButton that takes focus instead. Here the
+         header stays a plain Border - the control installs its own MouseDown toggle on PART_HeaderBorder, so a
+         ToggleButton in that spot would toggle twice - and the Expander is the focusable element, so the ring
+         and the tab stop both belong to it. -->
+    <Setter Property="Background" Value="{ThemeResource ExpanderContentBackground}" />
+    <Setter Property="HeaderBackground" Value="{ThemeResource ExpanderHeaderBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource ExpanderHeaderForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ExpanderContentBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ExpanderContentDownBorderThickness}" />
+    <Setter Property="Padding" Value="{ThemeResource ExpanderContentPadding}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="FontSize" Value="14" />
+    <!-- ExpanderMinHeight is 48 upstream and an x:Double row, so it rides as a literal on both halves. -->
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Expander">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <!-- PART_HeaderBorder is where the framework hangs its left-button toggle, so it must stay a plain
+               Border: measured, a control whose header part is absent never expands on click, and a
+               ToggleButton in that spot answers both its own click and the framework's handler. -->
+          <Border Name="PART_HeaderBorder" Grid.Row="0" Background="{TemplateBinding HeaderBackground}"
+                  BorderBrush="{ThemeResource ExpanderHeaderBorderBrush}"
+                  BorderThickness="{ThemeResource ExpanderHeaderBorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}" Padding="{ThemeResource ExpanderHeaderPadding}"
+                  MinHeight="48" HorizontalAlignment="Stretch"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <ContentPresenter Name="PART_HeaderContent" Content="{TemplateBinding Header}"
+                                Foreground="{TemplateBinding Foreground}"
+                                HorizontalAlignment="Left" VerticalAlignment="Center" />
+              <!-- Upstream's ExpanderChevronButtonSize / ExpanderChevronGlyphSize are x:Double rows, so 32 and
+                   12 ride as literals, and the chevron is a Path rather than the AnimatedIcon with a font-glyph
+                   fallback this runtime has no equivalent of. -->
+              <Border Name="ChevronBorder" Grid.Column="1" Width="32" Height="32"
+                      Margin="{ThemeResource ExpanderChevronMargin}" CornerRadius="{ThemeResource ControlCornerRadius}"
+                      Background="{ThemeResource ExpanderChevronBackground}"
+                      BorderBrush="{ThemeResource ExpanderChevronBorderBrush}"
+                      BorderThickness="{ThemeResource ExpanderChevronBorderThickness}"
+                      TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                <!-- The control rotates this Path by a fixed +90 degrees about its centre when it expands, so
+                     the resting mark points right and the expanded mark points down. WinUI rotates an
+                     AnimatedIcon by 180 degrees between up and down; see audits/expander.md. -->
+                <Path Name="PART_Chevron" Width="12" Height="12" Stretch="Uniform"
+                      Data="M 1.5,0 L 6.5,5 L 1.5,10" Stroke="{ThemeResource ExpanderChevronForeground}"
+                      StrokeThickness="1.25" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      TransitionProperty="Stroke" TransitionDuration="0:0:0.083" />
+              </Border>
+            </Grid>
+          </Border>
+          <!-- Visibility is the control's to write: it starts collapsed here and the framework flips it, with
+               its own animation, when IsExpanded changes. -->
+          <Border Name="PART_ContentBorder" Grid.Row="1" Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{ThemeResource ExpanderContentDownBorderThickness}"
+                  CornerRadius="0,0,4,4" Padding="{TemplateBinding Padding}" MinHeight="48"
+                  Visibility="Collapsed" HorizontalAlignment="Stretch">
+            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Foreground="{TemplateBinding Foreground}" />
+          </Border>
+          <Border Name="FocusOutline" Grid.RowSpan="2" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
+          <!-- Upstream filters the header's corners with a converter so the seam between header and content is
+               square; the cell below is the same shape written as a value. -->
+          <Trigger Property="IsExpanded" Value="True"><Setter TargetName="PART_HeaderBorder" Property="CornerRadius" Value="4,4,0,0" /></Trigger>
+          <!-- The header, not the whole control, is what the pointer is over upstream, so each state names the
+               part it watches. audits/expander.md records that this runtime's evaluation of a named-source
+               condition has no pixel evidence yet. -->
+          <Trigger Property="IsMouseOver" SourceName="PART_HeaderBorder" Value="True">
+            <Setter Property="Foreground" Value="{ThemeResource ExpanderHeaderForegroundPointerOver}" />
+            <Setter TargetName="PART_HeaderBorder" Property="BorderBrush" Value="{ThemeResource ExpanderHeaderBorderPointerOverBrush}" />
+            <Setter TargetName="PART_Chevron" Property="Stroke" Value="{ThemeResource ExpanderChevronPointerOverForeground}" />
+            <Setter TargetName="ChevronBorder" Property="Background" Value="{ThemeResource ExpanderChevronPointerOverBackground}" />
+            <Setter TargetName="ChevronBorder" Property="BorderBrush" Value="{ThemeResource ExpanderChevronBorderPointerOverBrush}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter Property="Foreground" Value="{ThemeResource ExpanderHeaderDisabledForeground}" />
+            <Setter TargetName="PART_HeaderBorder" Property="BorderBrush" Value="{ThemeResource ExpanderHeaderDisabledBorderBrush}" />
+            <Setter TargetName="PART_Chevron" Property="Stroke" Value="{ThemeResource ExpanderHeaderDisabledForeground}" />
+            <Setter TargetName="ChevronBorder" Property="BorderBrush" Value="{ThemeResource ExpanderHeaderDisabledBorderBrush}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="Expander" BasedOn="{StaticResource ExpanderStyle}" />
+
+  <Style x:Key="DefaultFluentInfoBarStyle" TargetType="controls:FluentInfoBar">
+    <Setter Property="IsTabStop" Value="False" />
+    <!-- Upstream's comment on this row is load-bearing: the inner grid paints TemplateBinding Background so a
+         local Background wins over the severity colour, which is why the resting value is Transparent. -->
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{ThemeResource InfoBarBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource InfoBarBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FluentInfoBar">
+        <Border Name="ContentRoot" Background="{ThemeResource InfoBarInformationalSeverityBackgroundBrush}"
+                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}" VerticalAlignment="Top">
+          <Grid Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                MinHeight="48" Padding="{ThemeResource InfoBarContentRootPadding}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!-- Upstream draws the icon as two Segoe Fluent Icons glyphs - a filled circle (F136) under a mark
+                 (F13F / F13D / F13C / F13E). The circle becomes an Ellipse here because the glyph is a shape we
+                 can drive from a token, and the mark stays a glyph so its codepoints stay upstream's. -->
+            <Grid Name="IconArea" Visibility="Collapsed" VerticalAlignment="Top" Margin="{ThemeResource InfoBarIconMargin}">
+              <Ellipse Name="IconBackground" Width="16" Height="16" VerticalAlignment="Top"
+                       Fill="{ThemeResource InfoBarInformationalSeverityIconBackground}" />
+              <TextBlock Name="IconGlyph" Width="16" Height="16" Text="&#xF13F;" FontFamily="Segoe Fluent Icons"
+                         FontSize="16" TextAlignment="Center" VerticalAlignment="Top"
+                         Foreground="{ThemeResource InfoBarInformationalSeverityIconForeground}" />
+            </Grid>
+            <StackPanel Name="Panel" Grid.Column="1" VerticalAlignment="Top"
+                        Margin="{ThemeResource InfoBarPanelMargin}"
+                        Padding="{ThemeResource InfoBarPanelVerticalOrientationPadding}">
+              <TextBlock Name="Title" Text="{TemplateBinding Title}" FontWeight="SemiBold" FontSize="14"
+                         TextWrapping="Wrap"
+                         Margin="{ThemeResource InfoBarTitleVerticalOrientationMargin}"
+                         Foreground="{ThemeResource InfoBarTitleForeground}" />
+              <TextBlock Name="Message" Text="{TemplateBinding Message}" FontSize="14" TextWrapping="Wrap"
+                         Margin="{ThemeResource InfoBarMessageVerticalOrientationMargin}"
+                         Foreground="{ThemeResource InfoBarMessageForeground}" />
+              <ContentPresenter Name="ActionArea" Content="{TemplateBinding ActionButton}" VerticalAlignment="Top"
+                                Margin="{ThemeResource InfoBarActionVerticalOrientationMargin}" />
+            </StackPanel>
+            <ContentPresenter Grid.Column="1" Grid.Row="1" Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="Center" />
+            <!-- PART_CloseButton is the one name the base class listens to: its Click handler raises
+                 CloseButtonClick and sets IsOpen=false (measured, spike/ExpanderInfoBarProbe pass 3).
+                 InfoBarCloseButtonSize is 38 and InfoBarCloseButtonGlyphSize 16, both x:Double rows, so they
+                 ride as literals. Upstream restyles this button from the AppBarButton* rows, which the
+                 CommandBar batch has not transcribed, so the subtle variant is the stand-in. -->
+            <Button Name="PART_CloseButton" Grid.Column="2" Width="38" Height="38" VerticalAlignment="Top"
+                    Margin="5" IsTabStop="False" Style="{StaticResource SubtleButtonStyle}">
+              <Path Width="16" Height="16" Stretch="Uniform" Data="M 0,0 L 10,10 M 10,0 L 0,10"
+                    Stroke="{ThemeResource TextFillColorPrimaryBrush}" StrokeThickness="1.5" />
+            </Button>
+          </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+          <!-- Upstream's SeverityLevels group: one setter block per severity, writing the same four parts. -->
+          <Trigger Property="Severity" Value="Error">
+            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarErrorSeverityBackgroundBrush}" />
+            <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarErrorSeverityIconBackground}" />
+            <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13D;" />
+            <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarErrorSeverityIconForeground}" />
+          </Trigger>
+          <Trigger Property="Severity" Value="Warning">
+            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarWarningSeverityBackgroundBrush}" />
+            <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarWarningSeverityIconBackground}" />
+            <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13C;" />
+            <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarWarningSeverityIconForeground}" />
+          </Trigger>
+          <Trigger Property="Severity" Value="Success">
+            <Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource InfoBarSuccessSeverityBackgroundBrush}" />
+            <Setter TargetName="IconBackground" Property="Fill" Value="{ThemeResource InfoBarSuccessSeverityIconBackground}" />
+            <Setter TargetName="IconGlyph" Property="Text" Value="&#xF13E;" />
+            <Setter TargetName="IconGlyph" Property="Foreground" Value="{ThemeResource InfoBarSuccessSeverityIconForeground}" />
+          </Trigger>
+          <!-- IconStates: upstream picks StandardIconVisible / UserIconVisible / NoIconVisible from whether an
+               Icon was supplied; this control has no icon slot, so IsIconVisible alone decides. -->
+          <Trigger Property="IsIconVisible" Value="True"><Setter TargetName="IconArea" Property="Visibility" Value="Visible" /></Trigger>
+          <Trigger Property="IsClosable" Value="False"><Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" /></Trigger>
+          <!-- IsOpen=false is the control's own measure to honour and nothing else: measured on 26.10.9, a
+               templated bar keeps painting at MinHeight unless this cell collapses it. -->
+          <Trigger Property="IsOpen" Value="False"><Setter TargetName="ContentRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="controls:FluentInfoBar" BasedOn="{StaticResource DefaultFluentInfoBarStyle}" />
+</ResourceDictionary>

@@ -28,6 +28,9 @@
         <fluent:FluentNavigationItem x:Name="NavigationItem" Content="Navigation" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="GlobalNavButton" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="SurfacesItem" Content="Surfaces" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Calendar" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
       </fluent:FluentNavigationView.MenuItems>
       <fluent:FluentNavigationView.FooterMenuItems>
         <fluent:FluentNavigationItem x:Name="SettingsItem" Content="Settings" Style="{StaticResource FluentNavigationItemStyle}">
@@ -347,6 +350,45 @@
                   </StackPanel>
                   <Button x:Name="TogglePaneButton" Content="Toggle pane" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
                 </fluent:FluentSettingsRow>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="SurfacesPage">
+              <TextBlock Text="Surfaces" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Two containers whose look comes from the theme kernel: an expander the control operates for you, and an info bar that had to become an own type before any of its colours could be themed." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Expander" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Expander x:Name="SampleExpander" Header="Weekly digest" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                      <TextBlock Text="The body is any content at all. The control writes the content part's visibility and rotates the chevron, so nothing on this page animates either of them." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                      <CheckBox x:Name="ExpanderBodyCheck" Content="State inside the body survives a collapse" Margin="0,8,0,0" />
+                    </StackPanel>
+                  </Expander>
+                  <TextBlock Text="Click the header, or Tab to the expander and press Space. The expander itself is the focusable element: the framework installs its own click handler on the header part, so a toggle button in that slot would answer one click twice." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="ExpanderReadout" Text="Collapsed." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Info bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="SeverityInformationalButton" Content="Informational" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeveritySuccessButton" Content="Success" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeverityWarningButton" Content="Warning" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeverityErrorButton" Content="Error" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="ShowInfoBarButton" Content="Show again" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="InfoBarClosableToggle" Content="Closable" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="InfoBarIconToggle" Content="Icon" IsChecked="True" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentInfoBar x:Name="SampleInfoBar" Margin="0,12,0,0" Title="Weekly digest ready" Message="Nine new items are waiting. Closing this bar raises CloseButtonClick, which is the base class's own event." Severity="Informational">
+                    <fluent:FluentInfoBar.ActionButton>
+                      <Button Content="Open" Style="{StaticResource SubtleButtonStyle}" />
+                    </fluent:FluentInfoBar.ActionButton>
+                  </fluent:FluentInfoBar>
+                  <TextBlock Text="Every fill here is an upstream row: the four severity backgrounds alias the system fill colours, so severity, icon disc, border and both text colours follow the theme. The icon is a 16 DIP disc carrying the upstream glyph and the close button is a Path rather than a SymbolIcon." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="InfoBarReadout" Text="Nothing closed yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
               </Border>
             </StackPanel>
 

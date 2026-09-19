@@ -181,6 +181,15 @@ public class AstraResourceKeyTests
     /// <c>AstraSplitButtonTests.A_row_with_no_consumer_is_not_published</c> pins that split so the deferral
     /// cannot quietly become a gap.
     /// </para>
+    /// <para>
+    /// The first stage-4 pair joined the same way, with the row list in hand. Upstream publishes twenty alias
+    /// rows for an expander; fifteen are transcribed because the Expander exposes no press flag for a cell to
+    /// watch - and <c>AstraGateTests.Style_setters_name_properties_the_controls_actually_have</c> is what proved
+    /// that, refusing <c>Expander.IsPressed</c> outright - while four of those five pressed rows alias the same
+    /// instances as their resting row anyway. Upstream publishes seventeen rows per theme branch for an info bar;
+    /// sixteen plus eight layout rows are transcribed, and the hyperlink pair stays out with it until a
+    /// template-internal implicit style is shown to resolve at all (audits/expander.md, audits/infobar.md).
+    /// </para>
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/Button.jalxaml")]
@@ -197,6 +206,8 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/Slider.jalxaml")]
     [InlineData("ThemeResources/SplitButton.jalxaml")]
     [InlineData("ThemeResources/DropDownButton.jalxaml")]
+    [InlineData("ThemeResources/Expander.jalxaml")]
+    [InlineData("ThemeResources/InfoBar.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

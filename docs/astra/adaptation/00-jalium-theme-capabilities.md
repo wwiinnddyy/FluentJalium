@@ -22,6 +22,7 @@
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 | S0-k 不改模板怎么驱动交互，样式格子排在谁下面 | **`IToggleProvider.Toggle()` 就是框架自己的 `OnClick→OnToggle`**；样式格子输给本地值，`{x:Null}` 在样式格子里也命中 | 按钮族循环先走自动化模式；状态要覆盖本地底色就得自有类型 |
 | S0-l 弹层打开态、部件名与"样式生效"怎么读 | **`FlyoutBase.IsOpen` 是只读 CLR 属性不是依赖属性**（打开态既绑不了也当不了格子条件）；**模板部件名是功能契约**（改名后照样建树照样上色，点了却没反应）；**隐式样式从不写进 `Style`**；星形列尊重子元素对齐 | `FlyoutOpen` 不声称；命名正反两向都断；生效判据改用模板对象身份；半区显式 `Stretch` |
+| S0-m 原生控件"不接受模板"是真不接受吗 | **不是：`UseTemplateContentManagement()` 是 `ContentControl` 的 protected 方法，Expander 构造里调了、InfoBar 没调**，所以 InfoBar 的 `Template` 既走样式也走本地值都不成树；派生类补一句即成。另外 `UIElement.RaiseEvent` 是 public，能合成 `MouseDown` 驱动控件自己装的处理器 | 遇到"模板无效"先量开关再决定自绘/自有类型；交互行为可走路由事件，但像素洁净度仍要真指针 |
 
 ## S0-a：主题切换的真实驱动
 
@@ -402,3 +403,49 @@ Invoke 主半区 → 控件 raise 一次 `Click`；把它们改名成 `…Z` 后
 - **没有 `Flyout` 时框架自己禁用次半区**（挂载实例的次半区读回 `ControlFillColorDisabledBrush`，探针 C）。
   这不是缺陷（与 WinUI 语义一致），但意味着我们的禁用格子会被框架的启用状态驱动，
   写样例时"没弹层的 SplitButton 右侧是禁用色"是正常现象，不是样式没生效。
+
+## S0-m：一处开关、三处名字、一处公开事件口（Expander / InfoBar 批，2026-09-19）
+
+来源：`spike/ExpanderInfoBarProbe`（同一探针跑三遍：部件名契约 → 开关可及性 → 子类实测）、
+`spike/SurfaceProbe`（阶段 4 表面普查）。运行时 26.10.9。
+
+**1 · "原生控件没有模板通道"通常只是没开 `UseTemplateContentManagement()`。**
+`InfoBar` 挂载后 `Template==null`、可视子节点 0；把同一个 `ControlTemplate` 作为本地值赋上去，树里仍然只有
+`ContentPresenter` 呈现的内容——而同一个赋值在 `Expander` 上立刻成树（pass 2 M1、pass 3 Q）。
+差别不在解析，而在这个类型没调用模板通道开关：`Expander` 构造函数调了，`InfoBar` 没调。
+该开关是 **`ContentControl` 的 `protected` 方法**（反射签名实测），因此派生类构造里一句
+`UseTemplateContentManagement()` 就够，不需要私有反射、不需要伪造自绘类型：模板成树之后，
+基础类自己的 `OnRender` 一进门就检查有没有找到名为 `RootBorder` 的部件，找到即让路（pass 3 Q + 像素侧不含框架硬编码底色）。
+推论：**以后遇到"这个原生控件不吃模板"，第一件要量的事是它有没有开这个开关**，
+而不是直接接受"它只能自绘"——`01-jalium-control-census.md` 里那批"自绘"结论因此要重读一遍（任务 #8）。
+
+**2 · `Expander` 的部件名是功能契约，且头部件不能是可点击控件。**
+控件在 `OnApplyTemplate` 里按名字取三样：`PART_HeaderBorder` 上 `AddHandler(MouseDownEvent, …)`、
+`PART_ContentBorder` 的 `Visibility` 由它写、`PART_Chevron` 必须是 `Shapes.Path`（它按 `Path` 强转，
+放 `TextBlock` 字形会静默失效），旋转角固定 **+90°**、不随 `ExpandDirection` 变。
+改名模板照样构建、照样布局、照样上色，只是永不展开——正反两向都由测试钉住。
+因为点击处理器就挂在 `PART_HeaderBorder` 这个元素上，头**不能**再放 `ToggleButton`：
+一次点击会被框架与自己各答一次（与阶段 2 的 `SplitButton.Command` 双执行同一形状）。
+焦点与键盘（Space/Enter）由控件自身承担，所以焦点环属于 `Expander` 而非头部件。
+
+**3 · 带模板之后 `IsOpen=false` 不收起任何东西。**
+原生 InfoBar 只在自己的度量里响应 `IsOpen`；有模板后控件仍按 `MinHeight` 占位、照样可见（pass 3 Q3）。
+上游靠 `InfoBarCollapsed` 状态写 `ContentRoot`，因此这格必须由我们的模板自己写，并有断言把关。
+
+**4 · `UIElement.RaiseEvent` 是 public，`MouseButtonEventArgs` 无需输入设备即可构造。**
+签名 `(MouseDevice, int, MouseButton)`，配合 `Mouse.PrimaryDevice` 就能合成一个左键 `MouseDown`，
+走的是控件真装的那个处理器（比自动化 Invoke 模式更接近真实点击）。
+这让"禁用不响应""一次点击恰好翻一次"这类判断成为可断言的行为测试；但它**不是硬件输入**——
+指针没动过，hover/press 像素与触摸路径仍欠（任务 #13）。
+
+**5 · "样式格子里点的属性名根本不存在"由闸口抓出，而不是靠人眼。**
+`AstraGateTests.Style_setters_name_properties_the_controls_actually_have` 会解析每格点名的属性，
+它直接拒绝 `Expander.IsPressed`：`Expander` 没有这个属性，那一格永远不会触发。
+结果是上游 5 条 `*Pressed*` 行本次不发布（其中 4 条与静置行别名同一实例，本来也无像素差）——
+承诺一个读不到的键，比推迟它更糟。
+
+**6 · 框架自绘路线另有 9 条键名。**
+`InfoBarInformational/Success/Warning/ErrorBackground`、`InfoBarInfo/Success/Warning/ErrorBrush`、
+`InfoBarForeground` 在框架自带主题里确实存在并可被 `TryFindResource` 命中（pass 2 O 段逐条读出），
+各自另有硬编码回退色（Informational 底色是 `#2D2D37`）。走模板路线后本批**不发布**这 9 条：
+没有东西再读它们，发布等于承诺"覆盖能到像素"却无人消费。

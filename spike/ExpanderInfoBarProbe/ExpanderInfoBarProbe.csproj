@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway Expander / InfoBar probe. Not referenced by FluentJalium.slnx.
+       Expander ships a code-built template whose parts are named RootBorder / PART_HeaderBorder /
+       PART_Chevron / PART_HeaderContent / PART_ContentBorder, and InfoBar ships no template at all
+       (Template == null, empty tree), so the stage-4 markup has to answer the SplitButton lesson
+       again: which names does the framework wire behaviour to, and which of the state work does it
+       do for us. Answers that before any template is written. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ExpanderInfoBarProbe</RootNamespace>
+    <AssemblyName>ExpanderInfoBarProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>
