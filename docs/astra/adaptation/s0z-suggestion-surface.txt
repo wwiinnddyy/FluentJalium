@@ -307,7 +307,9 @@ holding for a capture
 holding for the picker capture
 
 
-########## 上屏帧宽度复核（spike/VisualQA/scan-line.ps1，帧本身在 .gitignore 的 spike/RightGapProbe/out/ 下，不入库）##########
+########## 上屏帧宽度复核（spike/VisualQA/scan-line.ps1，帧本身不入库）##########
+（2026-09-20 更正：这一行原先写"帧在 .gitignore 的 spike/RightGapProbe/out/ 下"，那是错的——git check-ignore
+对 spike/*/out/ 与 *.png 都空返回，仓库的忽略表根本没有这两条；帧不入库只是因为没人 git add。）
 帧：spike/RightGapProbe/out/after/suggest10-a-surface-1225x1330-168+220+220.png
 （修字面量之后、`--open suggest10` 输入 a 的 AutoCompleteBox；窗口 1225x1330 px，dpi 168，盒子 440 DIP）
   扫描区间 From=120 To=1100

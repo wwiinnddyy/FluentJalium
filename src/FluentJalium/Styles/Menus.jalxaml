@@ -255,10 +255,22 @@
          32-tall floor cannot fit upstream's 8+9 padding around a 17-tall text line and the label is squeezed. -->
     <Setter Property="MinHeight" Value="32" />
     <Setter Property="FontSize" Value="14" />
+    <!-- This setter is not for our own template - it is for the Border the framework builds OUTSIDE it.
+         Measured (spike/FlyoutSurfaceProbe, modes radius + sweep): ContextMenu.Open grafts
+         PopupRoot > Border > MenuPopupScrollHost into the window's overlay, and that Border takes this
+         control's Background / BorderBrush / CornerRadius as local values - which is why the two presenter rows
+         reach pixels here and nowhere else. The copy reads what the control was TOLD to take, not any effective
+         value: with no setter here the surface stayed at the framework's own 14,14,14,14 LOCAL, while an explicit
+         0 does reach it - so a control that asks for nothing gets a corner it never asked for. Writing 3 on the
+         control moved the surface to 3 live, and clearing it re-copied this row. Upstream's flyout surface is
+         OverlayCornerRadius: MenuFlyout_themeresources.xaml:285 with the key at 8 (CornerRadius_themeresources.xaml:6),
+         and MenuFlyout's own surface already wears 8 from the framework, which we cannot and need not reach.
+         Raw log: docs/astra/adaptation/s1a-menu-surface-raw.txt; contract: adaptation/00 S1-a. -->
+    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="ContextMenu">
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{ThemeResource OverlayCornerRadius}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}">
           <ItemsPresenter />
         </Border>

@@ -217,7 +217,9 @@
 
 用户报告：输入补全的下拉框明显偏小，跟其他下拉框、flyout 比都小。原始日志
 `adaptation/s0z-suggestion-surface.txt`（probe `RightGapProbe --open listheight / clamp / itemstyle / suggest10`
-+ `spike/RightGapProbe/out/` 的 PrintWindow 帧；那批帧在 `.gitignore` 的 `spike/RightGapProbe/out/` 下因此不入库，
++ `spike/RightGapProbe/out/` 的 PrintWindow 帧；那批帧没有入库，**但不是被 `.gitignore` 挡住的**（2026-09-20 用
+`git check-ignore` 复测：`spike/*/out/`、`*.png` 都不在忽略表里，那句"在 gitignore 下"是这一栏先前写错的，
+本批更正），不入库只是因为没人 `git add`——所以逐行读数抄进日志才是能传下去的那份：
 宽度那两条的逐行色区间已原样抄进同一份日志的"上屏帧宽度复核"一节）。
 
 ### 6.1 先撤回一条还没写进代码的错判

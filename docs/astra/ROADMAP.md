@@ -438,6 +438,53 @@ dpi=168——差的 1 px 是边框，不是"右边空一块"。
 不改语义，Gallery 单项目重编 **0 警告 0 错误**；`tools/Test-AstraGallerySmoke.ps1 -Page inputs` 出窗口并在
 8.3 秒内干净关闭、无残留进程。
 
+**视觉缺陷批第十二段（"有的控件圆角好像都不对"，2026-09-20）**：用户第二次报的那半句"圆角不对"这次变成数。
+`spike/FlyoutSurfaceProbe`（`tree`/`radius`/`sweep`/`context`/`context14`，原始输出
+`adaptation/s1a-menu-surface-raw.txt`）量出四层：
+
+(1) **`ContextMenu` 的卡片角是 14、不是上游的 8，一条 setter 改掉。** 框架在 `ContextMenu.Open` 时**在我们模板
+之外再造一层 `Border`**，把控件的 `Background`/`BorderBrush`/`BorderThickness`/`CornerRadius` 抄成它的本地值——
+`MenuFlyoutPresenter*` 那几格正是经这一次复制才落到像素。抄的条件是"控件**被告知**的值"而不是"任何有效值"：
+控件没被写过 → 表面留在框架自带的 14；显式写 0 → 表面 0（所以 0 是真实请求、不是"未设置"哨兵）；往那层
+`Border` 自己身上写不是出路（清掉之后掉到 0，它背后没有样式）；`MenuFlyout`/`FlyoutBase`/`Popup`/`PopupRoot`
+整条链都没有半径属性，只有 `ContextMenu` 有 ⇒ **样式 setter 是这张表面唯一听我们的入口**。同一条 `radius` 模式
+改前读 **14,14,14,14 LOCAL**、改后读 **8,8,8,8 LOCAL**，且清掉本地值后回到 8 而不是 14——改的只有那一格。
+上游证据：`MenuFlyout_themeresources.xaml:285` 用 `OverlayCornerRadius`，键值 8 在
+`CornerRadius_themeresources.xaml:6`；ModernWpf `MenuFlyout.xaml:20` 同键，其 WPF `ContextMenu.xaml:37` 硬编码
+8；菜单表面没有 `KeepInteriorCornersSquare`。
+(2) **全族半径表收齐，没有一格还留在 14**：`Menu` 子菜单卡 8（同一条复制通路）、`MenuFlyout` 卡 8（框架自己写的）、
+`ComboBox` 下拉卡 8、`AutoCompleteBox` 建议卡 8（这两张是我们的模板）、条目 4（与上游同值）。
+(3) **gap 11 那笔"presenter 与 scroll host 谁是谁"的账结了**：`MenuFlyoutPresenter` 在 26.10.9 上是
+`internal sealed : Control`，自己不声明任何依赖属性，按类型键与按名字键查隐式样式都是 `null` → 样式改不动它、
+C# 里点名直接 CS0122；但它打开时带 `radius=8,8,8,8 LOCAL` + `bt=1,1,1,1 LOCAL`、`Background`/`BorderBrush`
+**为 null**，弹层还在自己那层顶层 `PopupWindow` 里 ⇒ 半径本来就和上游一致、卡片色完全归框架。`ContextMenu`
+那棵树里**根本没有 presenter**，所以 §0.5 原来那条"外壳是 `MenuPopupScrollHost`"改写成两种表面分别记账。
+(4) **弧用真上屏帧对照**：同一张 130 px（=74.27 DIP×1.75）宽、同一条左边 x=350..479 的卡片，只差半径——
+**弧深**在 8 那一档两次重采都是 9~10 行、14 那一档 17 行；控件显式写 0 时弧消失。**"顶行咬进几 px"这一格被撤下
+当论据**：同一个 `context` 模式重采一次就从 12 px 变到 9 px（两帧弹窗落点差 0.67 DIP），所以本批只取弧深这
+一档稳定的量。弧的绝对尺寸也不等于 半径×1.75（8 DIP 应 14 px、量到 9~10；14 DIP 应 24.5、量到 17），两档短
+同一个系数 ⇒ 比值干净、绝对值不干净，帧只证"变了"，半径数值以读回为准。是渲染器把弧画短还是测法吃掉像素，
+需要跨 DPI 对照才能分开，本机给不了 ⇒ **未解释**，进不声称清单。
+
+落点：`Styles/Menus.jalxaml`（一条 setter + 注释写清复制契约）、`AstraMenuTests` 104→**110**、
+`audits/menu-flyout.md`（§0.5 更正、新 §0.12/0.13、§2 该行改写、新 §4c 半径表与三帧、§5.3/5.4/5.5 更正、
+**§5.11 结清**、新 §5.12/5.13）、`adaptation/00` 新 **S1-a**、`adaptation/s1a-menu-surface-raw.txt`、
+新工具 `spike/VisualQA/corner-edge.ps1`（按"非底色列"读外沿弧，自动定位卡片）、
+`spike/VisualQA/corner-stair.ps1`（严格填充色那一档）、`spike/FlyoutSurfaceProbe`（探针 + `capture-context.ps1`），
+Catalog `ContextMenu` 行 gaps 2→3 条，**含一条公开撤回**：原写"presenter 行只落进我们模板的表面、外面那层宿主
+碰不到"，实测正好相反——像素恰恰只经外面那层复制才出现，我们模板里的 `LayoutRoot` 在它里面。
+四类证据：构建 = 串行闸口 **673/673 全绿、0 skip**、调色板三档 checked=True（667→673 就是新那六条）；
+行为 = +6 条（样式那格读回 `OverlayCornerRadius`、抄出来的 `Border` 戴我们的行与上游半径、子菜单表面、
+presenter 类型存在但不可样式、它在树里却不画我们的色、本地写 3 就走 3 且 `BorderThickness` 同理）；
+视觉 = 上面那两帧（原图 `spike/FlyoutSurfaceProbe/out-*.png` 没有入库——顺带更正一处旧说法：这些探针帧路径
+**不在 `.gitignore` 里**（`git check-ignore` 空返回），不入库只是因为没人 `git add`，`audits/autosuggestbox.md` §6
+与 `adaptation/s0z` 那句"被 gitignore 挡住"是错的，本批一并改），逐行数已抄进原始文件），而
+**原本要写的那条"角上第一个填充列"单点像素断言没有留下**：同一个 `Open()` 在探针自己 show 的窗口里给
+74.27x70 的表面，在共享 xunit 宿主里给 0×0，`PixelHarness.PixelAt` 直接抛"has no layout to sample"——
+这条宿主限制写进了 §4c 与用例注释，没有把测不到的东西伪装成测到；硬件输入 = **仍为零**，本批还复测量到
+`MenuBarItem` 下拉依旧开不起来（`IsSubmenuOpen` 不是它的属性，合成 MouseDown 后条目仍挂在 `Window` 根下），
+只有 `Menu` 的子菜单开得动。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）
@@ -454,6 +501,15 @@ dpi=168——差的 1 px 是边框，不是"右边空一块"。
   只读运行时自己调色板的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，覆盖同名上游行不动像素；
   这 11 条上游行因此撤回发布。标签走 `Foreground` 是活的，但**标签 hover 变色没有真指针证据**（Task #13），
   两层 hover 填充会不会叠深同样未知。
+- 不声称弹层圆角的**绝对尺寸**有像素证据：第十二段那几帧只证明"半径改了角就变了"（弧深 8→9~10 行、
+  14→17 行、0→弧消失），而弧的量在 dpi 168 下比 `半径×1.75` 短同一个系数（8 DIP 应 14 px、量到 9~10）。
+  该系数**未解释、未定性**：可能是渲染器的弧本身短，也可能是"第一个非底色列"这条测法吃掉了边界像素。
+  同一次复测还量到**顶行咬入这一格自己就有 3 px 抖动**（同一模式重采 12 → 9，弹窗落点差 0.67 DIP），
+  所以它已经退出论据、只留数。要分清需要跨 DPI 或跨已知半径的对照，本批没有，故只声称比值不声称绝对值；
+  半径数值一律以属性读回为准。这条限制适用于本项目**每一个**圆角，不只是菜单。
+- 不声称 `MenuFlyout` 的卡片色可换：它的表面 `MenuFlyoutPresenter` 是 `internal sealed`、`Background` 读回 `null`、
+  弹层在自己顶层 `PopupWindow` 里，帧上那颗 `#FF2C2C2E` 灰由框架给；我们发布的 `MenuFlyoutPresenter*` 三行
+  只在 `ContextMenu` 那层复制 `Border` 上兑现（`Menu` 子菜单同一条通路）。
 - 不声称 Gallery 页脚的度量/排布宽度差已治好：本批只把 parity 条改成单元素 + 固定高度滚动宿主绕开它，
   框架侧"换行文本按更宽尺寸量、按实际宽度排"的行为仍在（`spike/TextWrapProbe` case E）。
 - 不声称间距已逐控件与上游量化：目视逐页看过，把 padding/margin/MinHeight 对到上游数值并配断言的只有

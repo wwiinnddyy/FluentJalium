@@ -1,0 +1,236 @@
+s1a - flyout surface identity and corner radius, raw probe output
+================================================================================================
+Rig: spike/FlyoutSurfaceProbe (not in the solution; net10.0-windows, Jalium.UI.Desktop 26.10.9,
+ProjectReference to FluentJalium so it reads OUR styles). Runtime authority 26.10.9.
+Modes: tree | flyout | context | context14 | bar | radius | sweep | presenter.
+Every `radius=` below is the *effective* value and ` LOCAL` marks a local (non-inherited) value,
+which is how the framework's own copy onto a popup surface is told apart from a template value.
+Frames: PrintWindow of the probe's own shown window, dpi 168 (175%), so 1 DIP = 1.75 px.
+
+Two runs of mode `radius` bracket the fix: 05:11 = before (the ContextMenu style wrote no radius),
+05:39 = after (one setter, `<Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />`).
+Everything else is the post-fix tree except where a line says otherwise.
+
+------------------------------------------------------------------------------------------------
+A. what MenuFlyoutPresenter actually is on 26.10.9 (mode tree / radius, identical in both runs)
+------------------------------------------------------------------------------------------------
+  Jalium.UI.Controls.MenuFlyoutPresenter : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object
+  accessibility: IsPublic=False IsNestedPublic=False attributes=Sealed, BeforeFieldInit
+  ctors: (MenuFlyout) public
+  own DPs: none declared
+  implicit style by type key: null
+  implicit style by name key: null
+  Template declared on: Control
+
+  -> internal sealed: naming the type from C# is CS0122, and there is no implicit style for it, so it
+     cannot be styled from our markup either. It is still the real MenuFlyout surface (see B1).
+
+------------------------------------------------------------------------------------------------
+B1. MenuFlyout.ShowAt - the surface it lives on (mode tree)
+------------------------------------------------------------------------------------------------
+  ShowAt: ok
+  IsOpen=True
+  climbed 6 parents to PopupWindow (window content root reached: False)
+  ancestors: StackPanel < ScrollViewer < MenuPopupScrollHost < MenuFlyoutPresenter < PopupRoot < PopupWindow
+    PopupWindow 0x0
+      PopupRoot 194.86x165
+        MenuFlyoutPresenter 194.86x165 bg=- bb=- bt=1,1,1,1 LOCAL radius=8,8,8,8 LOCAL tmpl=null style=null
+          MenuPopupScrollHost 184.86x155
+  PopupRoots under the host window: PopupRoot=0 Popup=0 MenuPopupScrollHost=0 MenuFlyoutPresenter=0
+
+  -> the presenter arrives with radius 8 and a 1-thick edge as LOCAL values written by the framework,
+     with Background and BorderBrush null: it paints no card of ours. Its popup is a top-level
+     PopupWindow, not grafted into the host window, so nothing we put on the host reaches it.
+     8 is upstream's OverlayCornerRadius, so the MenuFlyout corner is already right without us.
+
+------------------------------------------------------------------------------------------------
+A2. mount a hand-built presenter inside our own tree (mode tree)
+------------------------------------------------------------------------------------------------
+  mounted:  size=240x120
+  MenuFlyoutPresenter 240x120 bg=- bb=- bt=1,1,1,1 LOCAL radius=8,8,8,8 LOCAL tmpl=null style=null
+    MenuPopupScrollHost 230x110
+      ScrollViewer 230x74 ...
+        MenuFlyoutItem 230x38 radius=4,4,4,4   Border 'LayoutRoot' 222x34 margin=4,2,4,2
+        ToggleMenuFlyoutItem 230x38 radius=4,4,4,4
+        MenuFlyoutSubItem 230x38 radius=4,4,4,4
+        MenuFlyoutSeparator 230x3   Border 238x1 margin=-4,1,-4,1
+
+  -> mounting one by reflection works and the framework builds the whole interior (scroll host, items,
+     separators) with our item styles applied - the LOCAL radius/edge stamping happens in the type's own
+     code, not in a style lookup. But style: null and bg/bb null: it is still not a surface we can paint,
+     and reflection into framework internals is out of bounds for product code. Recorded, not used.
+
+------------------------------------------------------------------------------------------------
+B3. MenuBarItem dropdown by synthesized MouseDown (mode tree) - still not openable
+------------------------------------------------------------------------------------------------
+  MouseDown: ok
+  IsSubmenuOpen=null
+  climbed 4 parents to Window (window content root reached: False)
+  ancestors: StackPanel < MenuBar < StackPanel < Window
+    Window 886.29x693.14
+      StackPanel 838.29x613.14 margin=24,24,24,24 LOCAL
+        Button 160x32.78 radius=4,4,4,4
+        MenuBar 420x40 bg==MenuFlyoutItemBackground
+          MenuBarItem 54.07x32 radius=4,4,4,4
+            Grid 'ContentRoot'
+              Border 'Background' 54.07x32 radius=4,4,4,4
+              Button 'ContentButton' 20x32
+
+  -> IsSubmenuOpen is not a property on MenuBarItem and a synthesized MouseDown leaves the item under the
+     Window root: the bar's dropdown still needs a real pointer. Hardware-input evidence for the bar stays
+     at zero (gap, see audits/menu-flyout.md 5.12). The submenu surface that a real click produces is read
+     in D below (the 95.17x42 PopupRoot).
+
+------------------------------------------------------------------------------------------------
+C. who writes the popup radius - the same mode, before and after the one-setter fix
+------------------------------------------------------------------------------------------------
+pre-fix (05:11, DefaultContextMenuStyle had no CornerRadius setter):
+  Jalium.UI.Controls.ContextMenu: Control.CornerRadiusProperty:CornerRadius
+  Jalium.UI.Controls.MenuFlyout: no radius-shaped DP on the chain
+  Jalium.UI.Controls.Primitives.FlyoutBase: no radius-shaped DP on the chain
+  Jalium.UI.Controls.Primitives.Popup: no radius-shaped DP on the chain
+  Jalium.UI.Controls.Primitives.PopupRoot: no radius-shaped DP on the chain
+  Jalium.UI.Controls.MenuFlyoutPresenter: Control.CornerRadiusProperty:CornerRadius
+  Open: ok
+  surface Border Border: radius=14,14,14,14 LOCAL bg==MenuFlyoutPresenterBackground LOCAL bb==MenuFlyoutPresenterBorderBrush LOCAL
+  ancestors: PopupRoot < OverlayLayer < Window
+  set ContextMenu.CornerRadius=3 -> ok
+    surface now reads radius=3,3,3,3 LOCAL
+    after clearing: radius=14,14,14,14 LOCAL
+  set Border.CornerRadius=3 -> ok
+    surface now reads radius=3,3,3,3 LOCAL
+    after clearing: radius=0,0,0,0
+
+post-fix (05:39, with `<Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />`):
+  Open: ok
+  surface Border Border: radius=8,8,8,8 LOCAL bg==MenuFlyoutPresenterBackground LOCAL bb==MenuFlyoutPresenterBorderBrush LOCAL
+  ancestors: PopupRoot < OverlayLayer < Window
+  set ContextMenu.CornerRadius=3 -> ok
+    surface now reads radius=3,3,3,3 LOCAL
+    after clearing: radius=8,8,8,8 LOCAL
+  set ContextMenu.CornerRadius=0 (explicit) -> ok
+    surface now reads radius=0,0,0,0 LOCAL, control effective=0,0,0,0 LOCAL
+  set Border.CornerRadius=3 -> ok
+    surface now reads radius=3,3,3,3 LOCAL
+    after clearing: radius=0,0,0,0
+  set Border.CornerRadius=0 (explicit) -> ok
+    surface now reads radius=0,0,0,0 LOCAL, control effective=8,8,8,8
+
+  The fix is the difference between these two blocks: the only line that changed on its own is the radius
+  the surface wears at open - 14 before, 8 after - and clearing a local value now returns 8 (our style
+  value) where it returned 14 before. Nothing else in the rig moved.
+
+  Contract that fits every reading (the mechanism inside the framework is not readable from here):
+    - ContextMenu is the only menu type on the chain that has a CornerRadius at all; MenuFlyout, FlyoutBase,
+      Popup and PopupRoot have none, so a style setter on the control is the only input this surface takes.
+    - The framework stamps the popup's outer Border with Background / BorderBrush / BorderThickness /
+      CornerRadius as LOCAL values, and re-stamps it live when the control's value changes (3 moved it,
+      clearing moved it back to the style value).
+    - The stamp is a *copy of a value the control was told to take*, not of "any effective value": an unset
+      control left the surface on the framework's own 14 pre-fix, while an explicit 0 on the control does
+      reach the surface (0,0,0,0 LOCAL). So 0 is a real request, and "no request at all" is what falls back
+      to 14. That is why the only way to get upstream's 8 is to write it on the control.
+    - Writing the radius on the Border itself is not a route: clearing it drops the surface to 0, because
+      the Border's own default is 0 and there is no style behind it.
+
+------------------------------------------------------------------------------------------------
+D. the radius every opened surface actually wears (mode sweep, post-fix)
+------------------------------------------------------------------------------------------------
+control-level values as our styles leave them (a fresh control, implicit style not yet applied):
+  ContextMenu: radius=0,0,0,0 from default/style bg=-
+  Menu: radius=0,0,0,0 from default/style bg==MenuFlyoutItemBackground
+  MenuBar: radius=0,0,0,0 from default/style bg==MenuFlyoutItemBackground
+  MenuBarItem: radius=4,4,4,4 from default/style bg==MenuFlyoutItemBackground
+  ToolTip: radius=0,0,0,0 from default/style bg=-
+  ComboBox: radius=4,4,4,4 from default/style bg=#0FFFFFFF
+  AutoCompleteBox: radius=4,4,4,4 from default/style bg=#0FFFFFFF
+  Button: radius=4,4,4,4 from default/style bg=#0FFFFFFF
+
+opened surfaces:
+  ContextMenu.Open: ok
+    ContextMenu: Border radius=8,8,8,8 LOCAL bg==MenuFlyoutPresenterBackground LOCAL size=74.27x70
+  MenuFlyout.ShowAt: ok
+    MenuFlyout: MenuFlyoutPresenter radius=8,8,8,8 LOCAL bg=- size=194.86x165
+  ComboBox.IsDropDownOpen=true: ok
+    ComboBox: Border radius=7,7,7,7 bg=#0FFFFFFF size=208x40      <- the closed box's own surface, not the drop-down
+    AutoCompleteBox: nothing to read (surface not found in the tree)
+  ToolTip PlacementTarget=host: ok / ToolTip IsOpen=true: ok      <- opens in process once unparented; no card radius row
+  MenuItem submenu (synth MouseDown on the item): ok / submenu open=True
+
+every PopupRoot still grafted into the host window (count=4):
+  PopupRoot 200x80.06
+    Border 'PART_PopupBorder' 200x81.56 bg==MenuFlyoutPresenterBackground bb==MenuFlyoutPresenterBorderBrush bt=1,1,1,1 radius=8,8,8,8 margin=0,-0.5,0,-1
+      ScrollViewer 'PART_ScrollViewer' 198x79.56            <- our ComboBox drop-down card: 8, from our template
+  PopupRoot 200x41.78
+    Border 'SuggestionsContainer' 200x41.78 bg==MenuFlyoutPresenterBackground bb==MenuFlyoutPresenterBorderBrush bt=1,1,1,1 radius=8,8,8,8
+      Grid 'PART_DropDownBorder' 198x35.78
+        ScrollViewer 'PART_DropDownScrollViewer' 200x35.78 margin=-1,0,-1,0   <- the framework's local margin, s0z
+                                              <- our AutoCompleteBox suggestion card: 8, from our template
+  PopupRoot 200x20
+    Grid 'PART_DropDownBorder' 200x14 margin=0,6,0,0        <- a drop-down with no card row at all
+      Rectangle 200x14
+  PopupRoot 95.17x42
+    Border 95.17x42 bg==MenuFlyoutPresenterBackground LOCAL bb==MenuFlyoutPresenterBorderBrush LOCAL bt=1,1,1,1 LOCAL radius=8,8,8,8 LOCAL
+      MenuPopupScrollHost 85.17x32                          <- a Menu submenu: the same copy mechanism, 8
+
+  Table for the record (upstream: flyout surfaces OverlayCornerRadius 8, items ControlCornerRadius 4):
+    ContextMenu surface      8 (LOCAL, copied from our setter)   was 14 before the fix
+    Menu submenu surface     8 (LOCAL, copied - a ContextMenu underneath)
+    MenuFlyout surface       8 (LOCAL, the framework's own; unreachable by us, and already right)
+    ComboBox drop-down card  8 (our template)
+    AutoCompleteBox card     8 (our template)
+    menu items               4
+  Nothing in the menu family is left off 8 now, and no surface in it is left at 14.
+
+------------------------------------------------------------------------------------------------
+E. corner of the same card at 8 and at 14, read out of real frames (spike/VisualQA/corner-edge.ps1)
+------------------------------------------------------------------------------------------------
+spike/FlyoutSurfaceProbe/capture-context.ps1 -Mode context / -Mode context14 holds the menu open and
+PrintWindows the probe's own window; context14 opens the menu and then sets the control back to 14
+(the pre-fix state) so the frames differ in exactly one input. Read-backs of the two modes:
+
+  context     : surface ... radius=8,8,8,8 LOCAL   (flyout-surface-context.txt)
+  context14   : overriding the control radius back to 14 (the pre-fix state): ok
+                surface now: 74.27x70 at 200,200.818 radius=14,14,14,14 LOCAL   (flyout-surface-context14.txt)
+
+Three runs, same card, same place in the window. `inset` = how far the first non-background column of that
+row sits from the body's left edge; the background (#1C1C1E) is what makes the OUTER edge of the card
+legible, stroke and anti-aliasing included:
+
+  out/out-context-...png      radius 8   card top=352 left=350 right=479 width=130 px
+    dy=0 inset=12  dy=1 inset=8  dy=2 inset=6  dy=3 inset=5  dy=4 inset=4  dy=5 inset=3
+    dy=6 inset=2   dy=8 inset=1   dy=10 inset=0
+  out/context-...png          radius 8, RE-CAPTURE of the same mode
+    dy=0 inset=9   dy=1 inset=7   dy=2 inset=6  dy=3 inset=4  dy=4 inset=3  dy=6 inset=2
+    dy=7 inset=1   dy=9 inset=0
+  out/out-context14-...png    radius 14
+    dy=0 inset=14  dy=1 inset=12  dy=2 inset=10 dy=3 inset=9  dy=4 inset=8  dy=5 inset=7
+    dy=6 inset=6   dy=7 inset=5   dy=8 inset=4  dy=10 inset=3 dy=11 inset=2 dy=14 inset=1
+    dy=17 inset=0
+
+  What that says, and what it does not:
+    - The 130 px body (74.27 DIP x 1.75) and the body edges (350..479) are identical in all three, so
+      nothing but the corner moved.
+    - The stable statistic is the DEPTH of the arc: 9-10 rows at radius 8 in both captures of that mode,
+      17 rows at radius 14. The corner really is about twice as deep when the surface carries 14.
+    - The top row's inset is NOT stable: re-capturing mode `context` with the same radius 8 moved it from
+      12 to 9 - a 3 px swing. The popup lands at 201.486 DIP in one run and 200.818 in another (see the two
+      read-back lines), and the first non-background column of row 0 depends on where the edge falls inside
+      a pixel. So the "12 against 14" reading is inside its own noise and is not used as evidence anywhere;
+      it is printed here because it was measured, not because it means something.
+    - Absolute radius calibration is also not available from these frames: 8 DIP at 175% should be a 14 px
+      arc and the depth reads 9-10, while 14 DIP should be 24.5 and it reads 17. Both are short of
+      radius x 1.75, so the frames are a difference-proof and not a ruler; the value the surface carries is
+      proven by row C's read-back. Whether the renderer draws arcs short, or this measure of "first
+      non-background column" eats a couple of pixels, needs a cross-DPI or cross-radius control that this
+      machine (one monitor, 175%) cannot give. Recorded as an open question, not resolved here.
+
+
+------------------------------------------------------------------------------------------------
+F. the test-host limit this batch ran into (mode context inside xunit)
+------------------------------------------------------------------------------------------------
+The shared xunit host cannot give a grafted popup a size: the same Open() that yields a 74.27x70 surface
+in a window the probe shows itself yields a 0x0 surface under PixelHarness, so PixelAt throws "has no
+layout to sample". The corner test in AstraMenuTests therefore asserts the copy contract (which is what a
+host can observe) and the arc is evidenced from frames above. Recorded instead of quietly dropped: an
+assertion about a pixel this harness cannot reach is not available yet.

@@ -258,7 +258,7 @@
       "page": "menus",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
-      "gaps": [ "the framework wraps an opened menu in its own scroll host with a hardcoded border, so the presenter rows reach the surface we template and not the chrome around it", "MinWidth 140 is ours; the host sizes the popup to its content" ]
+      "gaps": [ "retracted and replaced (2026-09-20): the chrome around an opened menu is not untouched framework paint - the framework builds a Border outside our template and copies Background, BorderBrush, BorderThickness and CornerRadius onto it from the control as local values, which is the only way the MenuFlyoutPresenter rows reach this surface's pixels; the style therefore has to write the radius on the control, and until this batch did, the card carried the framework's own 14 instead of upstream's OverlayCornerRadius 8", "the copied card paints the aliased acrylic row as a flat solid colour - no backdrop is wired behind it (materials batch)", "MinWidth 140 is ours; the host sizes the popup to its content (measured: 74.27 DIP for two short labels)" ]
     },
     {
       "markup": "MenuFlyoutItem",

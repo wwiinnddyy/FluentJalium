@@ -7,7 +7,7 @@
 - `controls/dev/CommonStyles/RadioMenuFlyoutItem_themeresources.xaml`，blob `078fadf4058d7c6b269b335350a075d6c079ab03`（只有样式，无主题分支）
 - `_perf2026` 变体已核对：把 Storyboard 机械改写成 Setter，键集合逐字节相同，因此不作为第二份对照。
 
-运行时：NuGet Jalium.UI **26.10.9**。测量：`spike/MenuProbe`（pass 1-6，原始日志 `menu-probe1..6.txt` 全部留在原处）。
+运行时：NuGet Jalium.UI **26.10.9**。测量：`spike/MenuProbe`（pass 1-6，原始日志 `menu-probe1..6.txt` 全部留在原处）、`spike/FlyoutSurfaceProbe`（表面身份与半径，2026-09-20，原始输出 `adaptation/s1a-menu-surface-raw.txt`）。
 
 ## 0. 先量后写：pass 1-6 量到的事实
 
@@ -18,6 +18,7 @@
 3. **状态杠杆**：`MenuItem` 的 `IsHighlighted` / `IsPressed` / `IsSelected` / `IsSubmenuOpen` 是只读 DP（外部 `SetValue` 抛 “read-only … DependencyPropertyKey”），但进程内合成的 MouseDown 能驱动它们；`MenuFlyoutItem` / `MenuFlyoutSubItem` 只暴露 CLR getter（`IsHighlighted` / `IsSubMenuOpen`），**没有 DP**，所以按下与子菜单展开两格无处可挂。
 4. **菜单外观不读任何上游资源名**：以 `MenuBackground`、`MenuFlyoutPresenterBackground` 等 33 个应用级哨兵键装入后，框架自带的菜单/弹层像素纹丝不动。因此颜色一致性只能靠我们自己的消费点，和其余批次一样。
 5. **弹层外壳是框架的**：`MenuFlyout` 打开后内容落在 `OverlayLayer > PopupRoot`，其下是框架的 `MenuPopupScrollHost`（两个 `RepeatButton` 箭头 + `ScrollViewer`），那层 Border（`#FF2C2C2E` / `#FF48484A`）我们碰不到；`ContextMenu` 打开后同样被包进这层宿主。
+   **更正（2026-09-20 复测，`spike/FlyoutSurfaceProbe`）**：这条把两件事混成一件了。`(a)` `ContextMenu` 的那层外壳**不是** `MenuPopupScrollHost`，而是框架在我们模板之外新建的一个 `Border`，且它**吃得到我们的行**——`Background`/`BorderBrush`/`BorderThickness`/`CornerRadius` 四项由控件抄成它的本地值，`MenuFlyoutPresenter*` 那几格正是经这一次复制才落到像素（详见 0.12）。`(b)` `MenuFlyout` 打开后根本不在宿主的 `OverlayLayer` 里，它在自己顶层 `PopupWindow` 里，表面是 `MenuFlyoutPresenter`（0.13）。"碰不到"只剩 `(b)` 那一半。
 6. **`MenuFlyoutItem` 自量自绘**：它的 `MeasureOverride` 用文本宽度算宽、用常量封顶高（26.10.9 实测 34），并且 `OnRender` 仍会自绘背景。所以：
    - 上游 `11,8,11,9` 内边距 + 4,2,4,2 外边距 + 17 高的文字（合计 38）在 34 的盒子里被压成 13，文字被挤；样式里那条 **38 字面量**是为了让上游行装得下，属于宿主替换而非上游数值。
    - 真指针悬停时框架自绘的那层填充可能盖在我们格子上——无指针，未测。
@@ -29,6 +30,8 @@
    也就是说标签、加速键文案、勾选标记、子项箭头、分隔线**全是控件自绘**，我们的模板再摆一份就是第二位画者——这正是用户报的 flyout 重影。`MenuBarItem` 同族同病（它自绘 `Title`，`spike/MenuBarGhostProbe` 量到 1431 亮像素对 603）。
 10. **但控件的画者读控件属性**：同一探针的 tint pass 给第 1 行与切换行本地写 `Foreground=#FF00FF`、`FontSize=20`，PrintWindow 抓回的弹窗里那两行标签就是品红、就是 20 号——所以 `Foreground`/`FontSize` 是活的，标签态可以留在样式触发器上。反之覆盖 `TextFillColorSecondaryBrush` 动不了加速键文案、勾选、箭头与分隔线：那几处用的是运行时自己调色板里的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，与 pass 4 的 33 个哨兵纹丝不动同构。
 11. **`MenuFlyoutItem.Icon` 是 `System.Object`**：控件不画图标（`bare` pass 里图标区是空的），槽位必须留在我们的模板里；`ContentPresenter` 正是承载任意内容对象的正确部件。
+12. **`ContextMenu` 的表面是框架抄出来的一层 `Border`，抄的是"控件被告知的值"**：`PopupRoot > Border > MenuPopupScrollHost > ScrollViewer > 条目`，那层 `Border` 的 `Background`/`BorderBrush`/`BorderThickness`/`CornerRadius` 都是本地值，由控件在打开时抄过去，而且**抄是活的**（开起来后把控件半径改成 3，表面立刻读 3；清掉本地值又回到样式给的 8）。抄的条件量清了：控件显式写 0 → 表面 0（所以 0 是真实请求，不是"未设置"哨兵）；控件从未被告知任何值 → 表面留在框架自带的 **14**；往那层 `Border` 自己身上写不是出路（清掉之后掉到 0，它背后没有样式）。`MenuFlyout`/`FlyoutBase`/`Popup`/`PopupRoot` 整条链上都没有半径属性，只有 `ContextMenu` 有 → **样式 setter 是这张表面唯一能听我们的入口**。
+13. **`MenuFlyoutPresenter` 是 `internal sealed : Control`，自带 8 但不画卡片**：公开构造器唯一签名 `(MenuFlyout)`、自己不声明任何依赖属性、按类型键与按名字键查隐式样式都是 `null` → 样式改不动它，C# 里点名直接 CS0122。它打开时读回 `radius=8,8,8,8 LOCAL`、`bt=1,1,1,1 LOCAL`、`Background`/`BorderBrush` **为 null**——半径已经和上游一致（不需要我们），卡片色则完全归框架。反射把它挂进我们的树里能长出完整的内部（`MenuPopupScrollHost`、条目 r=4、分隔线 margin `-4,1,-4,1`），证明那些本地值是类型自己写的、不是样式查找的结果；产品代码不做反射，这条只用于量边界。
 
 ## 1. 行去向表（上游 81 条主题行 + 分支外行 → 本实现 16 别名 + 7 Thickness）
 
@@ -57,7 +60,7 @@
 
 | WinUI | 本实现 | 原因 |
 | --- | --- | --- |
-| `MenuFlyoutPresenter` | 框架 `MenuPopupScrollHost`（不可样式） | 弹层宿主由框架构造 |
+| `MenuFlyoutPresenter` | `ContextMenu`：框架抄出来的那层 `Border`（吃我们的行，0.12）；`MenuFlyout`：真正的 `MenuFlyoutPresenter`，`internal sealed`、无隐式样式、`Background` 为 null | 2026-09-20 复测：原记"框架 `MenuPopupScrollHost`（不可样式）"把两种表面混成一种，`MenuPopupScrollHost` 是抄出来的 `Border` 的孩子 |
 | `RadioMenuFlyoutItem` | `ToggleMenuFlyoutItem` 代替 | 类型缺失 |
 | `SplitMenuFlyoutItem` | 无 | 类型缺失 |
 | `FontIcon`（`CheckGlyph` E73E、chevron E974） | 不画：控件 `OnRender` 自绘 | 重影批：摆 `Path` 就是第二位画者（0.9） |
@@ -83,8 +86,9 @@
 ## 4. 四类证据
 
 - **构建**：`dotnet build FluentJalium.slnx -c Release`（闸口脚本第一步），两本字典 + `Styles/Menus.jalxaml` 已登记进 `Themes/Manifest.txt`（30 本）。
-- **行为/资源**：`tests/FluentJalium.Tests/AstraMenuTests.cs`（菜单族 **104** 条断言全过）—— 别名同一性、Thickness 数值、未发布行（含撤回的 11 条）、可重模板类型、`MenuItem` 存而不建、**单画者契约**（`TextBlock`/`KeyboardAcceleratorTextBlock`/`CheckGlyph`/`CheckPlaceholder`/`SubItemChevron` 五个名字必须缺席）、格子表与逐格行名、标签态在样式触发器上、`ShowAt/Hide`、`ContextMenu.Open`、peer Invoke、Toggle 暴露 Invoke 而非 Toggle、勾选让图标收起、`MenuBarItem` 的 `ContentButton.Content` 为空且树里没有承载 Title 的 TextBlock。间距复核批加一条 `The_flyout_rows_measure_upstreams_heights`：条目 38、`LayoutRoot` 34、分隔线 3、线盒 1 且 margin `-4,1,-4,1`。
+- **行为/资源**：`tests/FluentJalium.Tests/AstraMenuTests.cs`（菜单族 **110** 条断言全过）—— 别名同一性、Thickness 数值、未发布行（含撤回的 11 条）、可重模板类型、`MenuItem` 存而不建、**单画者契约**（`TextBlock`/`KeyboardAcceleratorTextBlock`/`CheckGlyph`/`CheckPlaceholder`/`SubItemChevron` 五个名字必须缺席）、格子表与逐格行名、标签态在样式触发器上、`ShowAt/Hide`、`ContextMenu.Open`、peer Invoke、Toggle 暴露 Invoke 而非 Toggle、勾选让图标收起、`MenuBarItem` 的 `ContentButton.Content` 为空且树里没有承载 Title 的 TextBlock。间距复核批加一条 `The_flyout_rows_measure_upstreams_heights`：条目 38、`LayoutRoot` 34、分隔线 3、线盒 1 且 margin `-4,1,-4,1`。
   - 计数更正：上一版这里写的是"90→126 条"。按 `dotnet test --filter FullyQualifiedName~AstraMenuTests` 实测，本批之前该类是 103 条（`[Fact]` 18 + `[InlineData]` 85），加这条是 104。126 是当时数错了，不是有 23 条被删。
+  - **表面身份复测批（2026-09-20）+6 条 → 110**：`The_context_menu_style_writes_upstreams_radius_on_the_row_the_framework_copies`（样式那格读回 `OverlayCornerRadius`）、`A_context_menu_surface_is_the_frameworks_border_wearing_our_rows_and_upstreams_radius`（爬到那层 `Border`：行名 + 半径 + `bt=1` 全在）、`A_submenu_surface_wears_upstreams_radius_from_the_framework_itself`（`Menu` 子菜单同一条通路）、`The_flyout_presenter_type_is_real_internal_and_unstyleable_from_our_markup`（类型在、`IsPublic=False`、`sealed`、无隐式样式）、`A_flyouts_presenter_is_in_the_tree_but_paints_nothing_of_ours`（它在树里而 `Background` 为 null）、`The_copied_surface_takes_the_radius_and_the_edge_it_is_told_to_take`（本地写 3 就走 3、`BorderThickness` 同理）。
 - **视觉**：两条通路分开记。
   - 进程内 `PixelHarness`：`Menu` 的 `Background` 行、flyout 条目的静置填充行覆盖成哨兵后各自进像素（并断言框架灰 `#2C2C2E` 与品牌绿为 0），子项行有 Light↔Dark 差；新增一条**反向**断言——覆盖 `DividerStrokeColorDefaultBrush` 与 `TextFillColorSecondaryBrush` 之后，分隔线区与子项行的哨兵色都是 0，而控件自绘的灰字 `#6E6E73` 仍在，即"画者是它，色不是我们的"。
   - 真上屏合成捕获：`spike/FlyoutGhostProbe` + `spike/VisualQA/capture-window.ps1`（PrintWindow + `PW_RENDERFULLCONTENT`，dpi=168）抓 `PopupWindow` 自己的顶层窗口。修前 `#FFFFFF` 标签层 1194 px 叠在框架的 `#F5F5F7` 1670 px 上；修后 shipped / stripped / bare 三个 pass 的 `#FFFFFF` 都是 **0**，框架层逐像素计数一致（`#F5F5F7x1659 #D6D6D7x556`），且同一 pass 连抓两次差异 0 px——排除交换链伪影。原图留在 `spike/VisualQA/out/probe-{flyout,stripped-a,fixed-a,bare-a}*.png`。
@@ -102,16 +106,46 @@
 的剩余空间裁掉**。这条写进 Known Gaps 之外也写进 `adaptation/00` S0-s，因为它会让下一个人把"条目不见了"读成
 模板缺陷。
 
+### 4c. 半径复测批：一张卡片的两个角（2026-09-20）
+
+用户那句"有的控件圆角好像都不对"这次变成了数。全族打开后的表面半径（`spike/FlyoutSurfaceProbe -Mode sweep`，
+上游 = 飞出表面 `OverlayCornerRadius` 8、条目 `ControlCornerRadius` 4）：
+
+| 表面 | 修前 | 修后 | 谁写的 |
+| --- | --- | --- | --- |
+| `ContextMenu` 卡片 | **14** | **8** | 框架从我们样式的 setter 抄过去（0.12） |
+| `Menu` 子菜单卡片 | 8 | 8 | 同一条复制通路 |
+| `MenuFlyout` 卡片 | 8 | 8 | 框架自己写的，我们改不动也不需要改（0.13） |
+| `ComboBox` 下拉卡 | 8 | 8 | 我们的模板 `PART_PopupBorder` |
+| `AutoCompleteBox` 建议卡 | 8 | 8 | 我们的模板 `SuggestionsContainer` |
+| 菜单条目 | 4 | 4 | 我们的模板（与上游同值） |
+
+角本身用真上屏帧对照（`capture-context.ps1 -Mode context` / `-Mode context14`，读数由新工具
+`spike/VisualQA/corner-edge.ps1` 按"第一个非底色列"取外沿，底色 `#1C1C1E`）。三帧同一张卡片、同一条左边
+x=350..479、宽 130 px = 74.27 DIP×1.75，只差半径：**弧深**在 8 的那一档两次重采都是 9~10 行，14 那一档是
+17 行；控件显式写 0 时弧消失。**顶行咬入不作论据**：同一个 `context` 模式重采一次就从 12 px 变到 9 px
+（弹窗落点两帧差 0.67 DIP，顶行第一个非底色列正好被这件事挪动），写出来是因为量过，不是因为可信。
+弧的绝对尺寸也不等于 半径×1.75（8 DIP 应 14 px 弧、量到 9~10；14 DIP 应 24.5、量到 17），两档都短同一个系数，
+所以这两帧是"变化证明"、不是尺子；半径数值以读回为准。是渲染器把弧画短、还是这条测法吃掉几个像素，需要一次
+跨 DPI 或跨已知半径的对照才能分开，本机一台 175% 显示器给不了——记成上游开放问题（见 5.12），它会挪动
+全项目每一个圆角。
+
+进程内那条"角上第一个填充列"的像素断言这次**没留下**：同一个 `Open()` 在探针自己 show 的窗口里给 74.27x70 的
+表面，在 xunit 共享宿主里给 0×0，`PixelHarness.PixelAt` 直接抛"has no layout to sample"。改成钉复制契约（宿主读
+得到那一层），弧的证据写在帧里——测不到的东西不伪装成测到。
+
 ## 5. Known Gaps
 
 1. `MenuItem` 不可重模板：高亮、勾选标记、子菜单箭头三处是框架自绘；本批只拿到 rest/disabled 两个颜色。
 2. 悬停与按下无像素证据：`IsMouseOver` 不可外部写，`IsPressed` 在 flyout item 上不存在；且 `MenuFlyoutItem.OnRender` 会自绘 hover 填充，真指针下它是否盖在我们的格子上、两层 hover 会不会叠深，未知（任务 13）。
-3. 子菜单/菜单栏展开未证：`OnSubItemMouseEnter` 与 `MenuBarItem.OpenFromKeyboard` 一类路径可调用但无可观察的展开状态。
-4. 弹层外壳归框架：`MenuFlyoutPresenter*` 两行只对 `ContextMenu` 的自绘表面兑现承诺，`MenuFlyout` 与 `ContextMenu` 外面那层宿主 Border 仍是框架色；`ContextMenu.MinWidth=140` 也不被宿主尊重。
-5. `RadioMenuFlyoutItem`、`SplitMenuFlyoutItem` 无原生类型，其行不发布；`MenuFlyoutItemReveal*` 等 reveal 行等材质批。**更正（2026-09-19 复测）**：这一条原先还把 `MenuFlyoutPresenter` 算进"无原生类型"，那条不成立（见 §0.1 的更正），所以"`MenuFlyoutPresenter*` 行无处可挂"这个理由要换——行不发布现在的真实理由是：没有任何已证的消费者能拿到那个类型（它只有 `MenuFlyoutPresenter(MenuFlyout)` 一个公开构造器），而不是"类型不存在"。
+3. 子菜单/菜单栏展开未证：`OnSubItemMouseEnter` 与 `MenuBarItem.OpenFromKeyboard` 一类路径可调用但无可观察的展开状态。**2026-09-20 复测仍然成立**：`IsSubmenuOpen` 不是 `MenuBarItem` 的属性（读回 `null`），进程内合成 MouseDown 之后条目仍挂在 `Window` 根下（父链 `StackPanel < MenuBar < StackPanel < Window`），弹窗没有实例化。`Menu` 的**子菜单**倒是能开（`MenuItem` 上合成 MouseDown → `submenu open=True`，其表面见 4c），所以缺的只有菜单栏那一条。
+4. 弹层外壳归框架：**`ContextMenu` 那一半已经收回来**（2026-09-20 复测）。它的卡片是框架抄出来的 `Border`，`MenuFlyoutPresenterBackground` / `…BorderBrush` / `…BorderThemeThickness` / 半径四格都是从控件抄过去的本地值（0.12），所以那三行对 `ContextMenu` 是**逐像素兑现**的，不再是"只对自绘表面兑现"。**剩下一半仍归框架**：`MenuFlyout` 的表面是 `MenuFlyoutPresenter`，`Background`/`BorderBrush` 为 null、卡片色由它自己的 `PopupWindow` 提供（`#FF2C2C2E` / `#FF48484A`），我们没有任何通路；`ContextMenu.MinWidth=140` 也不被那层宿主尊重（表面实测 74.27 宽装两条短标签）。
+5. `RadioMenuFlyoutItem`、`SplitMenuFlyoutItem` 无原生类型，其行不发布；`MenuFlyoutItemReveal*` 等 reveal 行等材质批。**更正（2026-09-19 复测）**：这一条原先还把 `MenuFlyoutPresenter` 算进"无原生类型"，那条不成立（见 §0.1 的更正），所以"`MenuFlyoutPresenter*` 行无处可挂"这个理由要换——行不发布现在的真实理由是：没有任何已证的消费者能拿到那个类型（它只有 `MenuFlyoutPresenter(MenuFlyout)` 一个公开构造器），而不是"类型不存在"。**2026-09-20 再更正**：这三行其实有已证的消费者——`ContextMenu` 的那层复制（0.12）。所以"无处可挂"也不成立了，真实的理由是：它是**运行时自己那层表面的属性**，而我们的 `MenuFlyout` 路径拿不到它（0.13）。
 6. 38 高度字面量是对控件自量的补偿，非上游数值；上游 `MenuFlyoutThemeMinHeight`=32 未发布。
 7. 触摸/笔与混合 DPI 下的菜单未测；减动效对菜单过渡（0.083s）未资源键化。
 8. **控件自绘的那几处文字色拿不到**：加速键文案、勾选标记、子项箭头、分隔线走运行时调色板的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，覆盖同名上游行（0.10）与 pass 4 的 33 个哨兵一样不动像素。因此这 11 条上游行撤回而非发布，WinUI 的 `TextFillColorSecondary` 加速键色只能算"运行时自己也是这个灰"的巧合，不声称逐 token 一致。
 9. 标签的 hover/disabled 变色由样式触发器写 `Foreground` 达成，但**没有真指针证据**：证到的是"画者读 Foreground"（tint pass 的品红标签），不是"悬停时这一格会被写"。
 10. 分隔线那 3 DIP 是**压出来的**，不是上游那条自然度量：上游是 1 高的 `Rectangle` 加它自己 1,1 的 padding；本运行时的 `MenuFlyoutSeparator` 把自己量到 9 高，样式里 `Margin=0` 改得动属性（读回 `0,0,0,0`）却改不动盒子，只有 `Height=3` 够得着（`adaptation/00` S0-s 1）。代价是这条 `Height` 会盖住框架将来的度量变化，所以行高进了断言而不是注释。同一类型也没有 `Background` 行（规则色归框架），因此这一处只有几何是我们说了算。
-11. **`MenuPopupScrollHost` 与原生 `MenuFlyoutPresenter` 的关系重新变成未结问题**（2026-09-19 复测带出来的）：§0.5 说弹层外面那层宿主是框架的 `MenuPopupScrollHost`，而 `MenuFlyoutPresenter` 是一个真实存在的 `Control`。两条都可能是真的（宿主包着 presenter），也可能 `MenuPopupScrollHost` 只是那层 Border 的名字而 presenter 才是表面本身。要分开只需要一次：`MenuFlyout.ShowAt` 之后从上屏的 `OverlayLayer > PopupRoot` 往下打整棵视觉树，看 `MenuFlyoutPresenter` 有没有实例出现、它的 `Background`/`CornerRadius` 是谁写的。**这一条也直接决定 `MenuBar` 下拉的半径欠账**（`MenuBarItem` 自己 `new MenuFlyout()`，见 `adaptation/00` 下一节的记录），所以它排在下一批。
+11. **已结（2026-09-20，`spike/FlyoutSurfaceProbe -Mode tree/sweep`）**：`MenuPopupScrollHost` 与 `MenuFlyoutPresenter` 的关系结清了——**两条都是真的，且分属两种表面**。`MenuFlyout` 的是 `PopupWindow > PopupRoot > MenuFlyoutPresenter > MenuPopupScrollHost`（presenter 在上面，是宿主 `Control`）；`ContextMenu` 的是 `PopupRoot > Border > MenuPopupScrollHost > ScrollViewer`，那里**根本没有 presenter**，外壳是一个普通 `Border`，四格由控件抄过去（0.12）。`MenuBar` 的下拉半径欠账同时收掉：`Menu` 的子菜单走 `ContextMenu` 那条复制通路，读回 `radius=8,8,8,8 LOCAL`（0.13 与 4c）。
+12. **弧的量比它自己的名义半径短，且顶行那一格不稳**（4c 的三帧）：`CornerRadius=8` 在 dpi 168 下应给 14 px 的弧，弧深度量到 9~10；`=14` 应给 24.5，量到 17。同一张卡片的宽度方向逐数吻合 1.75 倍，所以不是采集器缩放错了。另外**顶行咬入在同一个模式重采之间就有 3 px 抖动**（12 → 9，弹窗落点差 0.67 DIP），因此本批只用"弧深"这一档稳定的量做对比。两档半径短同一个系数 ⇒ 比值可信、绝对值不可信，帧因此只证"变了"。**未解释，且不只影响菜单**：如果这个系数成立，全项目每一个圆角都比名义值小，会影响与 WinUI 的 1:1 判定；要定性需要一次跨 DPI 或跨已知半径的对照，本机给不了，所以不在这里下结论。
+13. **`ContextMenu` 的卡片没有我们那份亚克力**：那层复制 `Border` 的 `Background` 抄到的是 `{ThemeResource MenuFlyoutPresenterBackground}`，帧上读出 `#FF2C2C2C`——与 4b 里 `MenuFlyout` 弹窗的框架灰同一支。也就是说 `ContextMenu` 现在**画的是卡片色，但不是 acrylic**（背衬在本运行时未接）。与 5.4 的"卡片色归框架"是同一件事的两面：一个拿不到我们的行，一个拿到了却没有材质。材质批（任务 8）欠。

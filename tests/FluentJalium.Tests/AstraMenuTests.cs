@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Windows.Input;
 using FluentJalium.Themes;
 using FluentJalium.Tests.Pixel;
@@ -548,6 +549,183 @@ public sealed class AstraMenuTests
         });
     }
 
+    // ---------- surface identity recheck (spike/FlyoutSurfaceProbe, 2026-09-20) ----------
+
+    /// <summary>
+    /// The style-level half of the radius fix: upstream asks its flyout surface for
+    /// <c>OverlayCornerRadius</c> (<c>MenuFlyout_themeresources.xaml:285</c>, key at 8 in
+    /// <c>CornerRadius_themeresources.xaml:6</c>), and on this host that row only reaches the visible card
+    /// through the control's own <c>CornerRadius</c> - the framework copies it onto the Border it builds.
+    /// </summary>
+    [Fact]
+    public void The_context_menu_style_writes_upstreams_radius_on_the_row_the_framework_copies()
+    {
+        _fixture.Run(() =>
+        {
+            var setter = FluentThemeManager.GetStyle("DefaultContextMenuStyle").Setters.Cast<object>().OfType<Setter>()
+                .First(static candidate => (candidate.Property?.Name ?? candidate.PropertyName) == "CornerRadius");
+            Assert.Equal("OverlayCornerRadius", ResourceKey(setter));
+            Assert.Equal(new CornerRadius(8), (CornerRadius)TryRes("OverlayCornerRadius")!);
+        });
+    }
+
+    /// <summary>
+    /// The contract that makes the setter above more than decoration: <c>ContextMenu.Open</c> grafts
+    /// PopupRoot &gt; Border &gt; MenuPopupScrollHost into the host window's overlay, and that Border - which is
+    /// not in any template of ours - wears our two presenter rows and our radius as <em>local</em> values.
+    /// Before the setter existed the same read came back 14,14,14,14 while the control read 0,0,0,0.
+    /// </summary>
+    [Fact]
+    public void A_context_menu_surface_is_the_frameworks_border_wearing_our_rows_and_upstreams_radius()
+    {
+        _fixture.Run(() =>
+        {
+            var menu = new ContextMenu();
+            menu.Items.Add(new MenuItem { Header = "cut" });
+            menu.Items.Add(new MenuItem { Header = "copy" });
+            menu.Open(new Point(120, 120));
+            PixelHarness.Settle(40);
+            try
+            {
+                var surface = SurfaceOf(menu.Items[0] as DependencyObject);
+                Assert.True(menu.CornerRadius == surface.CornerRadius,
+                    $"the framework did not copy the control's radius: control={menu.CornerRadius} surface={surface.CornerRadius}");
+                Assert.Equal((CornerRadius)TryRes("OverlayCornerRadius")!, surface.CornerRadius);
+                Assert.Same(Res("MenuFlyoutPresenterBackground"), surface.Background);
+                Assert.Same(Res("MenuFlyoutPresenterBorderBrush"), surface.BorderBrush);
+                Assert.Equal(new Thickness(1), surface.BorderThickness);
+                Assert.Multiple(
+                    () => Assert.NotEqual(DependencyProperty.UnsetValue, surface.ReadLocalValue(Border.CornerRadiusProperty)),
+                    () => Assert.NotEqual(DependencyProperty.UnsetValue, surface.ReadLocalValue(Border.BackgroundProperty)),
+                    () => Assert.NotNull(HostOf(surface)));
+            }
+            finally
+            {
+                menu.IsOpen = false;
+            }
+        });
+    }
+
+    /// <summary>
+    /// Same question for the other menu surface that can be opened without a pointer: a <see cref="Menu"/>'s
+    /// submenu. It wears 8 without being told to - the framework's own default for that path - which is why the
+    /// ContextMenu setter is a fix for one surface and not a global cure.
+    /// </summary>
+    [Fact]
+    public void A_submenu_surface_wears_upstreams_radius_from_the_framework_itself()
+    {
+        _fixture.Run(() =>
+        {
+            var top = new MenuItem { Header = "edit" };
+            top.Items.Add(new MenuItem { Header = "copy" });
+            var menu = new Menu();
+            menu.Items.Add(top);
+            Mount(menu, 320, 40);
+            RaiseMouseDown(top);
+            PixelHarness.Settle(30);
+            Assert.Equal("True", Read(top, "IsSubmenuOpen"));
+
+            var nested = top.Items[0] as DependencyObject ?? throw new InvalidOperationException("no submenu container");
+            var surface = SurfaceOf(nested);
+            Assert.Equal(new CornerRadius(8), surface.CornerRadius);
+            Assert.Same(Res("MenuFlyoutPresenterBackground"), surface.Background);
+        });
+    }
+
+    /// <summary>
+    /// What <c>MenuFlyoutPresenter</c> actually is on 26.10.9 - the reading that reopens the census' claim.
+    /// The type exists and really is the MenuFlyout's surface (see the next test), but it is internal and sealed
+    /// with a single <c>(MenuFlyout)</c> constructor and no DP of its own, so no markup of ours can name it and
+    /// no implicit style can reach it: <c>TryFindResource</c> answers null for both the type key and the name key.
+    /// </summary>
+    [Fact]
+    public void The_flyout_presenter_type_is_real_internal_and_unstyleable_from_our_markup()
+    {
+        _fixture.Run(() =>
+        {
+            var type = typeof(MenuFlyout).Assembly.GetType("Jalium.UI.Controls.MenuFlyoutPresenter");
+            Assert.NotNull(type);
+            Assert.False(type!.IsPublic);
+            Assert.True(type.IsSealed);
+            Assert.Equal(nameof(Control), type.BaseType?.Name);
+            Assert.Empty(type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                .Where(static field => field.FieldType == typeof(DependencyProperty)));
+            var constructor = Assert.Single(type.GetConstructors(BindingFlags.Instance | BindingFlags.Public));
+            Assert.Equal(nameof(MenuFlyout), constructor.GetParameters()[0].ParameterType.Name);
+            Assert.Null(Application.Current!.TryFindResource(type));
+            Assert.Null(TryRes("MenuFlyoutPresenter"));
+        });
+    }
+
+    /// <summary>
+    /// The other half of §5.11: <c>MenuFlyout.ShowAt</c> does put a presenter in the tree - as the PopupRoot's
+    /// only child, in a <c>PopupWindow</c> of its own rather than in the host's overlay - and it arrives with
+    /// radius 8 and border 1 written locally, but with <strong>no</strong> Background and no BorderBrush. So the
+    /// two presenter rows we publish are promised to one surface (ContextMenu) and not to this one, and its card
+    /// colour belongs to the framework's popup window.
+    /// </summary>
+    [Fact]
+    public void A_flyouts_presenter_is_in_the_tree_but_paints_nothing_of_ours()
+    {
+        _fixture.Run(() =>
+        {
+            var anchor = new Button { Content = "host", Width = 140 };
+            PixelHarness.Build(anchor, 140, 32);
+            var flyout = new MenuFlyout();
+            flyout.Items.Add(new MenuFlyoutItem { Text = "cut" });
+            flyout.ShowAt(anchor);
+            PixelHarness.Settle(40);
+            try
+            {
+                Assert.Equal("True", Read(flyout, "IsOpen"));
+                var presenter = PresenterOf(flyout.Items[0] as DependencyObject);
+                Assert.Equal(new CornerRadius(8), (CornerRadius)ReadDP(presenter, "CornerRadius")!);
+                Assert.NotEqual(DependencyProperty.UnsetValue, presenter.ReadLocalValue(Control.CornerRadiusProperty));
+                Assert.Equal(new Thickness(1), (Thickness)ReadDP(presenter, "BorderThickness")!);
+                Assert.Null(((Control)presenter).Background);
+                Assert.Null(((Control)presenter).BorderBrush);
+                Assert.NotNull(HostOf((FrameworkElement)presenter));
+            }
+            finally
+            {
+                flyout.Hide();
+            }
+        });
+    }
+
+    /// <summary>
+    /// The surface's geometry contract, as far as the shared host lets it be read: the popup Border realizes at
+    /// 0x0 inside the test window (measured - the same open call gives 74.27x70 in a window the probe shows
+    /// itself), so the arc cannot be sampled from here and the corner staircase is evidenced by
+    /// <c>spike/FlyoutSurfaceProbe</c> frames instead. What does not depend on that layout is the copy contract:
+    /// the framework writes our radius and our 1 DIP edge onto the Border it builds, not onto ours.
+    /// </summary>
+    [Fact]
+    public void The_copied_surface_takes_the_radius_and_the_edge_it_is_told_to_take()
+    {
+        _fixture.Run(() =>
+        {
+            var menu = new ContextMenu();
+            menu.Items.Add(new MenuItem { Header = "cut" });
+            menu.Open(new Point(120, 120));
+            PixelHarness.Settle(40);
+            try
+            {
+                var surface = SurfaceOf(menu.Items[0] as DependencyObject);
+                Assert.Equal(new CornerRadius(8), surface.CornerRadius);
+                Assert.Equal(new Thickness(1), surface.BorderThickness);
+                Assert.Equal((CornerRadius)TryRes("OverlayCornerRadius")!, menu.CornerRadius);
+                menu.CornerRadius = new CornerRadius(3);
+                PixelHarness.Settle(10);
+                Assert.Equal(new CornerRadius(3), surface.CornerRadius);
+            }
+            finally
+            {
+                menu.IsOpen = false;
+            }
+        });
+    }
+
     [Fact]
     public void A_menu_keeps_hosting_its_items_under_our_template()
     {
@@ -734,6 +912,74 @@ public sealed class AstraMenuTests
 
     private static FrameworkElement Part(DependencyObject root, string name) =>
         PixelHarness.Named(root, name) ?? throw new InvalidOperationException($"No part named {name}.");
+
+    /// <summary>
+    /// The card a popped-up menu paints: climb out of the item until the first Border, which on this host is the
+    /// one the framework builds for the popup rather than anything our template owns.
+    /// </summary>
+    private static Border SurfaceOf(DependencyObject? inside)
+    {
+        var current = inside;
+        for (var hops = 0; hops < 24 && current is not null; hops++)
+        {
+            if (current is Border border && border.Background is not null)
+            {
+                return border;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        throw new InvalidOperationException("no surfaced Border above the menu item - the popup is not in this tree");
+    }
+
+    /// <summary>The same climb for the flyout path, where the painter is the framework's internal presenter type.</summary>
+    private static DependencyObject PresenterOf(DependencyObject? inside)
+    {
+        var current = inside;
+        for (var hops = 0; hops < 24 && current is not null; hops++)
+        {
+            if (current.GetType().Name == "MenuFlyoutPresenter")
+            {
+                return current;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        throw new InvalidOperationException("no MenuFlyoutPresenter above the flyout item - the surface is not what was measured");
+    }
+
+    /// <summary>The framework's own scroll host, the node that sits between a menu surface and its rows.</summary>
+    private static DependencyObject? HostOf(DependencyObject root)
+    {
+        if (root.GetType().Name == "MenuPopupScrollHost")
+        {
+            return root;
+        }
+
+        if (root is not Visual visual)
+        {
+            return null;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(visual); index++)
+        {
+            if (HostOf(VisualTreeHelper.GetChild(visual, index)) is { } match)
+            {
+                return match;
+            }
+        }
+
+        return null;
+    }
+
+    private static object? ReadDP(DependencyObject node, string name)
+    {
+        var property = DependencyProperty.FromName(node.GetType(), name)
+            ?? throw new InvalidOperationException($"{node.GetType().Name} has no {name} property.");
+        return node.GetValue(property);
+    }
 
     /// <summary>Every string a TextBlock in this subtree carries - what a skin must never hold for a control that paints its own text.</summary>
     private static List<string> TextsIn(DependencyObject root)

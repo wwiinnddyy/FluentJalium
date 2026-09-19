@@ -938,3 +938,58 @@ setter 和所有 trigger 之上，所以样式改不动它。能改的是我们�
 推广：**给圆角表面做重模板时，逐角读回像素，且把"内表面与外表面同色"当成额外风险**——前一批 `MenuBar`
 下拉、`AutoSuggestBox` 建议行的圆角缺陷都是同一形状，只是这次有断言守着。判据在
 `AstraContentDialogTests.The_two_inner_surfaces_leave_the_cards_round_corners_alone`。
+
+## S1-a：弹层表面的圆角是框架抄过去的本地值——控件不开口，它就留在自己的 14（菜单半径批，2026-09-20）
+
+测量：`spike/FlyoutSurfaceProbe`（`tree` / `radius` / `sweep` / `context` / `context14`，原始输出
+`docs/astra/adaptation/s1a-menu-surface-raw.txt`，两帧落在 `spike/FlyoutSurfaceProbe/out-*.png`——**它们不是被
+`.gitignore` 挡住的**（`git check-ignore` 对这些路径空返回），只是没有 `git add`，所以逐行数抄进原始文件才是
+传得下去的那一份）。判据：`tests/FluentJalium.Tests/AstraMenuTests.cs` 末尾六条。
+
+**1 · `ContextMenu.Open` 会在我们模板外面再造一层 `Border`，并把控件的四个属性写成它的本地值。**
+树形：`PopupRoot > Border(bg LOCAL, bb LOCAL, bt=1 LOCAL, radius LOCAL) > MenuPopupScrollHost > ScrollViewer > 条目`。
+写的正是 `MenuFlyoutPresenterBackground` / `MenuFlyoutPresenterBorderBrush` / `BorderThemeThickness` /
+`CornerRadius` 那几格——**上游 presenter 的这几行在这个运行时只经这一次复制才落到像素**。复制是活的：
+开起来之后改控件的 `CornerRadius=3`，表面立刻读 3；清掉本地值，又回到样式给的 8。
+
+**2 · 复制的条件是"控件被告知的值"，不是"任何有效值"——没被告知就留在框架自带的 14。**
+同一条 `radius` 模式，改前改后各跑一次，只有两行自己变了：
+
+| | 表面开起来读 | 清掉本地值后读 |
+|---|---|---|
+| 修前（样式没写半径） | **14,14,14,14 LOCAL** | 14,14,14,14 |
+| 修后（`CornerRadius={ThemeResource OverlayCornerRadius}`） | **8,8,8,8 LOCAL** | 8,8,8,8 |
+
+而"显式写 0"会把表面带到 0——所以 0 是一个真实请求，不是"未设置"的哨兵；真正未设置才吃框架的 14。
+上游飞出的表面是 `OverlayCornerRadius`=8（`MenuFlyout_themeresources.xaml:285` + `CornerRadius_themeresources.xaml:6`），
+于是缺陷读法确定为：**样式不写这一格，右键菜单就是 14 度角，且没有任何别的路径能改它**
+（`MenuFlyout` / `FlyoutBase` / `Popup` / `PopupRoot` 整条链上都没有半径形状的属性，只有 `ContextMenu` 有）。
+往 `Border` 自己身上写不是出路：清掉之后表面读 0，因为那层 `Border` 自己没有任何样式兜着。
+
+**3 · `MenuFlyout` 的表面改不动，但也已经是对的。** `MenuFlyoutPresenter` 在 26.10.9 上是
+`internal sealed : Control`，公开构造函数唯一签名 `(MenuFlyout)`，**自己没有声明任何依赖属性**，
+按类型键与按名字键查隐式样式都读回 `null` → C# 里点名它编译期就报 CS0122，标记里也没有样式能吃住它。
+但它带着框架自己写的 `radius=8,8,8,8 LOCAL` + `bt=1,1,1,1 LOCAL`，同时 `Background`/`BorderBrush` 是
+`null`：**它不画我们那张卡片**。而且它的弹层是独立的 `PopupWindow`（父链
+`... < MenuFlyoutPresenter < PopupRoot < PopupWindow`），不 graft 进宿主窗口，宿主树里一条也读不到。
+所以"上游菜单卡片色"这一格归框架，我们给的 `MenuFlyout` 表面无色——记成缺口，不用相邻证据替代。
+
+**4 · 反射挂一个手搓的 presenter 能量出"这些本地值是类型自己写的"。** 挂进我们树里的
+`MenuFlyoutPresenter` 照样长出 `MenuPopupScrollHost`、`ScrollViewer`、条目（`MenuFlyoutItem` r=4、
+`LayoutRoot` margin 4,2,4,2）、分隔线（`Border 238x1 margin=-4,1,-4,1`），我们的条目样式全吃到；
+`style: null` 而 `radius/bt` 仍是 LOCAL → **它不是样式查找的结果**。这条只是量边界：产品代码不反射
+框架私有成员（AGENTS.md），记录、不使用。
+
+**5 · 弧的帧对照能证明"变大了/变小了"，不能当尺子；顶行那一格连自己都不稳。** 同一张 130 px（=74.27 DIP×1.75）
+宽的卡片、同一条左边（x=350..479），只差半径：**弧深**在 8 那一档两次重采都是 9~10 行、14 那一档 17 行；控件
+显式写 0 时弧消失。但"顶行咬进几 px"同一个 `context` 模式重采一次就从 12 变到 9（两帧弹窗落点差 0.67 DIP），
+所以那一格不是论据，本批只取弧深这一档稳定的量。弧的绝对尺寸也不等于 半径×1.75：8 DIP 应是 14 px 弧、
+量到 9~10，14 DIP 应是 24.5、量到 17——**两档都短同一个系数**，所以比值干净、绝对值不干净。结论按证据分级：
+半径数值以读回为准（第 2 条），弧的形状以帧为准且只证变化。是渲染器把弧画短、还是"第一个非底色列"这条测法
+吃掉几个像素，需要跨 DPI 或跨已知半径的对照才能分开，一台 175% 显示器给不了——留成上游开放问题，
+它会挪动全项目每一个圆角，不只是菜单。
+
+**6 · 共享测试宿主给不了 graft 弹层尺寸。** 同一个 `Open()`，探针自己 show 的窗口里表面 74.27x70，
+xunit 共享宿主里 0×0，`PixelHarness.PixelAt` 直接抛"has no layout to sample"。所以那条角上的像素断言
+改成钉复制契约（宿主读得到的那一层），弧留给真帧。**没有把测不到的东西伪装成测到**。
+推广：以后凡是要在像素上断言弹层几何的，先量宿主能不能给尺寸，再决定判据放哪一层。
