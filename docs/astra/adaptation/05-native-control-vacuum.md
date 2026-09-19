@@ -81,6 +81,7 @@
 ## D. Jalium 无同名原生类型（28）
 
 补样式解决不了：要么自有类型，要么明确放弃。名单里含 ModernWpf 的工程目录名（非控件），保留不筛。
+**这份名单已过期**：`MenuFlyout`、`MenuFlyoutPresenter`、`FlyoutBase` 三条是假阴性，见下面 F 节的复测。
 
 'AnnotatedScrollBar' 'AutoSuggestBox' 'BreadcrumbBar' 'CommandBarFlyout' 'DropDownButton' 'Flyout' 'GridView' 'Hyperlink' 'InfoBadge' 'ItemContainer' 'ItemsView' 'LayoutPanel' 'MenuFlyout' 'NavigationBackButton' 'Page' 'PagerControl' 'PersonPicture' 'ProgressRing' 'RadioButtons' 'RadioMenuItem' 'RatingControl' 'Repeater' 'SelectorBar' 'SplitView' 'TabView' 'TeachingTip' 'TwoPaneView' 'WrapPanel'
 
@@ -90,6 +91,29 @@
 这也是把 Gallery 当成唯一回归面的原因。
 
 'CalendarDayButton' 'CalendarButton' 'RangeSlider' 'DiffViewer' 'HeaderedItemsControl' 'DataGridColumnHeader' 'PropertyGrid' 'MarkdownListPresenter' 'MarkdownHeadingPresenter' 'MarkdownQuotePresenter' 'Split' 'NavigationViewItemHeader' 'TabItem' 'PieChart' 'TreeSelectorItem' 'AppBarButton' 'ChartTooltip' 'Terminal' 'RibbonSplitMenuItem' 'MarkdownTableCellPresenter' 'RibbonQuickAccessToolBar' 'Sparkline' 'RibbonApplicationMenuItem' 'RibbonTab' 'SankeyDiagram' 'SwipeControl' 'MenuFlyoutSeparator' 'MarkdownTablePresenter' 'HexEditor' 'StickyNoteControl' 'RibbonGalleryItem' 'DatePickerTextBox' 'FlowDocumentPageViewer' 'TransitioningContentControl' 'RibbonMenuButton' 'NavigationViewItem' 'BarChart' 'RibbonToggleButton' 'RazorItemsHost' 'DockLayout' 'NavigationViewItemSeparator' 'RibbonMenuItem' 'TreeDataGridRow' 'GaugeChart' 'MarkdownDiagramPresenter' 'MarkdownCodePresenter' 'RibbonContextualTabGroup' 'JsonTreeViewer' 'RibbonGallery' 'DataGridCell' 'RibbonSeparator' 'TreeMap' 'MarkdownImagePresenter' 'MarkdownFootnotePresenter' 'ChartLegend' 'DevToolsWindow' 'AppBarToggleButton' 'CalendarItem' 'DataGridCellsPresenter' 'FlowDocumentReader' 'EditControl' 'DockTabPanel' 'DocumentViewer' 'QRCode' 'MenuFlyoutSubItem' 'RibbonComboBox' 'TitleBarButton' 'GridViewColumnHeader' 'MarkdownListItemPresenter' 'RibbonButton' 'TreeDataGrid' 'Markdown' 'DockItem' 'TreeSelector' 'RibbonApplicationMenu' 'RibbonCheckBox' 'RibbonTextBox' 'ScatterPlot' 'LineChart' 'StatusBarItem' 'MarkdownParagraphPresenter' 'MenuBarItem' 'GanttChart' 'ToggleMenuFlyoutItem' 'NetworkGraph' 'RibbonApplicationSplitMenuItem' 'FlowchartDiagram' 'CameraView' 'MenuFlyoutItem' 'RibbonGalleryCategory' 'AppBarSeparator' 'ToastNotificationItem' 'Control' 'CandlestickChart' 'RibbonSplitButton' 'MapView' 'FlowDocumentScrollViewer' 'Heatmap' 'DataGridRowHeader' 'MarkdownRulePresenter' 'MermaidDiagram' 'DataGridRow' 'DataGridColumnHeadersPresenter' 'RibbonGroup' 'Ribbon'
+
+## F. 2026-09-19 对着 26.10.9 复测：本文件 §D 的名单已经不可信
+
+`Report-Control-Vacuum.ps1` 的名单是**按名字匹配**的快照，而且和 S0-v/S0-p 记录过的老毛病一样把"造不出实例"
+和"类型不存在"混成一格。`spike/ControlCensus` 的 `OutstandingNames` pass 改成按 `Type.Name` 全程序集找、
+找到之后打印基链、公开构造器、`Style`/`Template` 读回，跑出来的结果（原始日志 `s0y-outstanding-names.txt`）：
+
+- **§D 里至少三条是假阴性**：`MenuFlyout`（`MenuFlyout : FlyoutBase`，菜单批就是用它 `ShowAt` 开的弹层）、
+  `MenuFlyoutPresenter`（`: Control`，唯一公开构造器 `MenuFlyoutPresenter(MenuFlyout)` → 无参构造不存在，
+  `Activator.CreateInstance` 抛 `MissingMethodException`）、`FlyoutBase`（在 `Jalium.UI.Controls.Primitives`，
+  §D 只查了 `Jalium.UI.Controls` 的名字）。**结论改法**：以后"缺什么类型"只按 `Type.Name` 全程序集量，
+  并把"存在但构造器不友好"单独记一档。
+- **确认为真缺（这些才允许起自有类型）**：`TeachingTip`、`Card`、`CardAction`、`CardGroup`、`CardElement`、
+  `Divider`、`InfoBadge`、`RatingControl`、`ProgressRing`、`TabView`、`BreadcrumbBar`、`RadioButtons`、
+  `PipsPager`、`Flyout`、`FlyoutPresenter`、`MenuScroller`、`MenuScrollViewer`、`RadioMenuFlyoutItem`、
+  `SplitMenuFlyoutItem`。阶段 4 剩下的 `TeachingTip`/`Card` 与阶段 5、6 里挂着"(自有)"的名单，现在有了
+  实测依据而不是名单推断。
+- **`UseTemplateContentManagement` 是 `void`**（S0-m 那把锁）：所以它**只能被调用、不能被读回**，
+  `Expander`/`NavigationView` 挂载读回都是 `style=False factoryTemplate=False`。这再次坐实 `adaptation/01`
+  的更正——"零默认样式 ≠ 零默认外观"，而"这把锁开了没有"在属性面上永远没有读数，只能看像素。
+
+这份复测**证明不了**：类型存在之后模板/行为是否够用（要逐个控件探针）、`MenuFlyoutPresenter` 到底是不是
+`MenuFlyout` 那层表面（见 `audits/menu-flyout.md` §5.11）。
 
 ## 这份清单证明不了什么
 

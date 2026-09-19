@@ -12,7 +12,8 @@
 ## 0. 先量后写：pass 1-6 量到的事实
 
 1. **整族都是原生类型**：`Menu : MenuBase : ItemsControl`、`MenuItem : HeaderedItemsControl`、`MenuBar`、`MenuBarItem`（自有 DP 只有 `Title`，`Items` 是普通 CLR 列表）、`ContextMenu : MenuBase`（9 个自有 DP，含可写的 `IsOpen`/`Placement`/`StaysOpen`）、`MenuFlyout : FlyoutBase`、`MenuFlyoutItem`、`ToggleMenuFlyoutItem`（+`IsChecked`）、`MenuFlyoutSubItem`、`MenuFlyoutSeparator`、`Separator`、`CommandBar` 家族。
-   **缺**：`RadioMenuFlyoutItem`、`SplitMenuFlyoutItem`、`MenuFlyoutPresenter`、`MenuScroller`、`MenuScrollViewer`、`Flyout`。
+   **缺**：`RadioMenuFlyoutItem`、`SplitMenuFlyoutItem`、`MenuScroller`、`MenuScrollViewer`、`Flyout`、`FlyoutPresenter`、`CardElement`。
+   **更正（26.10.9 复测，2026-09-19，日志 `adaptation/s0y-outstanding-names.txt`）**：这一行原本还把 `MenuFlyoutPresenter` 算成缺失，**那是错的**——`Jalium.UI.Controls.MenuFlyoutPresenter : Control` 确实在，只是它唯一的公开构造器是 `MenuFlyoutPresenter(MenuFlyout)`，没有无参构造器，所以 `Activator.CreateInstance` 抛 `MissingMethodException`，当时按"造不出来 = 没有类型"记了。它是不是框架给 `MenuFlyout` 用的那层表面（第 3 节把它记成"框架 `MenuPopupScrollHost`，不可样式"）因此**重新变成未结问题**，见 §5 第 9 条。
 2. **能否重模板是分类型的**（pass 4 把样式装在建窗之前重装一遍才敢下结论）：`Menu`、`ContextMenu`、`MenuFlyoutItem`、`ToggleMenuFlyoutItem`、`MenuFlyoutSubItem`、`MenuFlyoutSeparator`、`MenuBarItem` 都会实例化装好的模板；**`MenuItem` 存下 `Template` 但从不实例化**——它靠 `OnRender` + `ResolveBackgroundBrush` / `ResolveMenuBrush` / `DrawCheckMark` / `DrawSubmenuArrow` 自绘。
 3. **状态杠杆**：`MenuItem` 的 `IsHighlighted` / `IsPressed` / `IsSelected` / `IsSubmenuOpen` 是只读 DP（外部 `SetValue` 抛 “read-only … DependencyPropertyKey”），但进程内合成的 MouseDown 能驱动它们；`MenuFlyoutItem` / `MenuFlyoutSubItem` 只暴露 CLR getter（`IsHighlighted` / `IsSubMenuOpen`），**没有 DP**，所以按下与子菜单展开两格无处可挂。
 4. **菜单外观不读任何上游资源名**：以 `MenuBackground`、`MenuFlyoutPresenterBackground` 等 33 个应用级哨兵键装入后，框架自带的菜单/弹层像素纹丝不动。因此颜色一致性只能靠我们自己的消费点，和其余批次一样。
@@ -107,9 +108,10 @@
 2. 悬停与按下无像素证据：`IsMouseOver` 不可外部写，`IsPressed` 在 flyout item 上不存在；且 `MenuFlyoutItem.OnRender` 会自绘 hover 填充，真指针下它是否盖在我们的格子上、两层 hover 会不会叠深，未知（任务 13）。
 3. 子菜单/菜单栏展开未证：`OnSubItemMouseEnter` 与 `MenuBarItem.OpenFromKeyboard` 一类路径可调用但无可观察的展开状态。
 4. 弹层外壳归框架：`MenuFlyoutPresenter*` 两行只对 `ContextMenu` 的自绘表面兑现承诺，`MenuFlyout` 与 `ContextMenu` 外面那层宿主 Border 仍是框架色；`ContextMenu.MinWidth=140` 也不被宿主尊重。
-5. `RadioMenuFlyoutItem`、`SplitMenuFlyoutItem`、`MenuFlyoutPresenter` 无原生类型，其行不发布；`MenuFlyoutItemReveal*` 等 reveal 行等材质批。
+5. `RadioMenuFlyoutItem`、`SplitMenuFlyoutItem` 无原生类型，其行不发布；`MenuFlyoutItemReveal*` 等 reveal 行等材质批。**更正（2026-09-19 复测）**：这一条原先还把 `MenuFlyoutPresenter` 算进"无原生类型"，那条不成立（见 §0.1 的更正），所以"`MenuFlyoutPresenter*` 行无处可挂"这个理由要换——行不发布现在的真实理由是：没有任何已证的消费者能拿到那个类型（它只有 `MenuFlyoutPresenter(MenuFlyout)` 一个公开构造器），而不是"类型不存在"。
 6. 38 高度字面量是对控件自量的补偿，非上游数值；上游 `MenuFlyoutThemeMinHeight`=32 未发布。
 7. 触摸/笔与混合 DPI 下的菜单未测；减动效对菜单过渡（0.083s）未资源键化。
 8. **控件自绘的那几处文字色拿不到**：加速键文案、勾选标记、子项箭头、分隔线走运行时调色板的 `TextSecondary`/`TextDisabled`/`MenuFlyoutPresenterBorderBrush`，覆盖同名上游行（0.10）与 pass 4 的 33 个哨兵一样不动像素。因此这 11 条上游行撤回而非发布，WinUI 的 `TextFillColorSecondary` 加速键色只能算"运行时自己也是这个灰"的巧合，不声称逐 token 一致。
 9. 标签的 hover/disabled 变色由样式触发器写 `Foreground` 达成，但**没有真指针证据**：证到的是"画者读 Foreground"（tint pass 的品红标签），不是"悬停时这一格会被写"。
 10. 分隔线那 3 DIP 是**压出来的**，不是上游那条自然度量：上游是 1 高的 `Rectangle` 加它自己 1,1 的 padding；本运行时的 `MenuFlyoutSeparator` 把自己量到 9 高，样式里 `Margin=0` 改得动属性（读回 `0,0,0,0`）却改不动盒子，只有 `Height=3` 够得着（`adaptation/00` S0-s 1）。代价是这条 `Height` 会盖住框架将来的度量变化，所以行高进了断言而不是注释。同一类型也没有 `Background` 行（规则色归框架），因此这一处只有几何是我们说了算。
+11. **`MenuPopupScrollHost` 与原生 `MenuFlyoutPresenter` 的关系重新变成未结问题**（2026-09-19 复测带出来的）：§0.5 说弹层外面那层宿主是框架的 `MenuPopupScrollHost`，而 `MenuFlyoutPresenter` 是一个真实存在的 `Control`。两条都可能是真的（宿主包着 presenter），也可能 `MenuPopupScrollHost` 只是那层 Border 的名字而 presenter 才是表面本身。要分开只需要一次：`MenuFlyout.ShowAt` 之后从上屏的 `OverlayLayer > PopupRoot` 往下打整棵视觉树，看 `MenuFlyoutPresenter` 有没有实例出现、它的 `Background`/`CornerRadius` 是谁写的。**这一条也直接决定 `MenuBar` 下拉的半径欠账**（`MenuBarItem` 自己 `new MenuFlyout()`，见 `adaptation/00` 下一节的记录），所以它排在下一批。

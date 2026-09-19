@@ -385,6 +385,20 @@ Button 批）。闸口首跑还当场抓到**一条闸口自身的缺陷**：`Th
 `ContentDialogOverlayHost` 是否自带第二层烟幕属性面读不到（不暴露 `Background`），需要上屏帧才能结，
 这正是用户报的"重影"那一类，暂不声称已排除。
 
+**普查复测批（不占控件名额，2026-09-19）**：下一格开工前先问"我们那份名单还成立吗"。`adaptation/05` §D 是按
+**名字匹配**的快照，而 `spike/ControlCensus` 新 `OutstandingNames` pass 按 `Type.Name` 全程序集找 + 打基链 +
+打公开构造器，当场量出三条假阴性：**`MenuFlyout` 在**（`: FlyoutBase`，菜单批就是用它 `ShowAt` 开的弹层）、
+**`MenuFlyoutPresenter` 在**（`: Control`，唯一公开构造器 `MenuFlyoutPresenter(MenuFlyout)`，所以无参
+`Activator.CreateInstance` 抛 `MissingMethodException`——"造不出"被记成了"不存在"）、**`FlyoutBase` 在**
+（`Jalium.UI.Controls.Primitives`，而 §D 只查 `Jalium.UI.Controls`）。同时 19 个名字**确认为真缺**，阶段 4 剩下的
+`TeachingTip`/`Card` 与阶段 5、6 挂着"(自有)"的名单从此有实测依据。还量回一条 S0-m 的边界：
+`UseTemplateContentManagement` 返回 **void**，所以那把锁**只能调用不能读回**，`Expander`/`NavigationView`
+挂载读回都是 `style=False factoryTemplate=False`——"锁开没开"在属性面永远没有读数。三份文档按实测更正
+（`adaptation/05` 新增 F 节 + §D 顶部标过期、`audits/menu-flyout.md` §0.1 与 §5.5 更正、§5.11 新记一条未结：
+`MenuFlyoutPresenter` 到底是不是 `MenuFlyout` 那层表面，它同时是 `MenuBar` 下拉半径欠账的入口）。日志
+`adaptation/s0y-outstanding-names.txt`。四类证据：**构建 = 只动 spike 与文档，闸口不构建 spike，因此本条不声称跑过闸口**
+（上一格提交的闸口 666/666 仍成立，产品程序集未变）；行为 / 视觉 / 硬件输入 = **各 0 条**，本条只是名单复测。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

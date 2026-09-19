@@ -33,6 +33,7 @@ internal static class Program
         ProbeThemeStyleResolution();
         ProbeImplicitStyle(application);
         FluentSurfaces();
+        OutstandingNames();
 
         foreach (var line in Lines) Console.WriteLine(line);
         return 0;
@@ -226,6 +227,89 @@ internal static class Program
         Note("FLUENT", $"ThemeManager.ApplyTypography: {string.Join(" | ", typeof(ThemeManager).GetMethods().Where(static method => method.Name == "ApplyTypography").Select(static method => "(" + string.Join(",", method.GetParameters().Select(static parameter => parameter.ParameterType.Name)) + ")"))}");
         Note("FLUENT", $"fonts now: display={ThemeManager.CurrentDisplayFontFamily} body={ThemeManager.CurrentBodyFontFamily} mono={ThemeManager.CurrentMonospaceFontFamily} bodySize={ThemeManager.CurrentBodyFontSize}");
         Note("FLUENT", $"SystemAccentResolver settable: {typeof(ThemeManager).GetProperty("SystemAccentResolver")?.GetSetMethod() is not null}");
+    }
+
+    /// <summary>
+    /// Re-measures the names the stage plan still owes, because adaptation/05 section D is a dated snapshot
+    /// that already contradicts measured fact (it lists MenuFlyout as absent, and the menu batch drove it with
+    /// ShowAt). For each name: is there a type at all, what does it inherit, and if it is a Control, does it
+    /// open ContentControl's template lock (S0-m) and does a constructed instance carry a factory Template or
+    /// Style. Reference-only reflection; nothing here ships.
+    /// </summary>
+    private static void OutstandingNames()
+    {
+        var names = new[]
+        {
+            "TeachingTip", "Card", "CardAction", "CardGroup", "Divider", "Expander",
+            "InfoBadge", "RatingControl", "ProgressRing", "TabView", "BreadcrumbBar",
+            "RadioButtons", "PipsPager", "MenuFlyout", "MenuFlyoutPresenter", "NavigationView",
+            "Flyout", "FlyoutBase", "FlyoutPresenter", "MenuScroller", "MenuScrollViewer",
+            "RadioMenuFlyoutItem", "SplitMenuFlyoutItem", "ToggleMenuFlyoutItem", "MenuFlyoutSubItem",
+            "InfoBar", "CardElement",
+        };
+        var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(static assembly => SafeTypes(assembly)).ToArray();
+        foreach (var name in names)
+        {
+            Type? type = null;
+            foreach (var candidate in types)
+            {
+                if (candidate.Name == name)
+                {
+                    type = candidate;
+                    break;
+                }
+            }
+
+            if (type is null)
+            {
+                Note("OUTSTANDING", $"{name}: no type with this name");
+                continue;
+            }
+
+            var chain = new List<string>();
+            for (var baseType = type.BaseType; baseType is not null && baseType != typeof(ValueType); baseType = baseType.BaseType)
+            {
+                chain.Add(baseType.Name);
+            }
+
+            var control = typeof(Jalium.UI.Controls.Control).IsAssignableFrom(type);
+            var detail = control ? DescribeInstance(type) : "not a Control";
+            Note("OUTSTANDING", $"{name}: {type.FullName} : {string.Join(" : ", chain)} | {detail}");
+        }
+    }
+
+    private static string DescribeInstance(Type type)
+    {
+        try
+        {
+            var instance = Activator.CreateInstance(type);
+            var style = type.GetProperty("Style")?.GetValue(instance);
+            var template = type.GetProperty("Template")?.GetValue(instance);
+            var lockMethod = type.GetMethod("UseTemplateContentManagement",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            object? locked = null;
+            if (lockMethod is not null)
+            {
+                try
+                {
+                    locked = lockMethod.Invoke(lockMethod.IsStatic ? null : instance, null);
+                }
+                catch (Exception exception)
+                {
+                    locked = $"threw {exception.InnerException?.GetType().Name ?? exception.GetType().Name}";
+                }
+            }
+
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Length;
+            return $"style={style is not null} factoryTemplate={template is not null} " +
+                $"templateLock={(lockMethod is null ? "no such method" : $"{lockMethod.ReturnType.Name}:{locked?.ToString() ?? "null-or-void"}")} declaredProperties={properties}";
+        }
+        catch (Exception exception)
+        {
+            var constructors = string.Join(", ", type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Select(static ctor => $"{(ctor.IsPublic ? "public" : "nonpublic")}({string.Join(",", ctor.GetParameters().Select(static parameter => parameter.ParameterType.Name))})"));
+            return $"ctor threw {(exception.InnerException ?? exception).GetType().Name}: {constructors}";
+        }
     }
 
     private static IEnumerable<Type> SafeTypes(Assembly assembly)
