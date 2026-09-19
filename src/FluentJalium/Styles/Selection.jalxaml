@@ -130,7 +130,15 @@
            not in the item padding: the highlight and the pill stop 5 DIP short of the dropdown border while the
            text keeps its own 11. A literal here because upstream's literal is a literal, not a row. -->
       <Grid Margin="5,2,5,2">
-        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}" />
+        <!-- The row's own fill comes from a token, not from TemplateBinding Background. Upstream binds the
+             property and nothing else can go wrong there; here the same container type is reused by
+             AutoCompleteBox for its suggestion list, and that control writes a LinearGradientBrush of accent
+             greens straight onto the item as a LOCAL value (measured: item Background local=LinearGradientBrush,
+             the open list's crop carries #1D733C..#2B804A over ~450 px per stop). A local value outranks every
+             setter and every trigger, so binding it put brand green in a Fluent flyout - the one colour the
+             pixel gate exists to keep out. The nine cells below still write the same tokens the binding would
+             have resolved to, so the combo's own rows are unchanged. -->
+        <Border Name="LayoutRoot" Background="{ThemeResource ComboBoxItemBackground}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}" />
         <Border Name="Pill" Width="3" Height="16" CornerRadius="{ThemeResource ComboBoxItemPillCornerRadius}" Margin="1,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{ThemeResource ComboBoxItemPillFillBrush}" Opacity="0" IsHitTestVisible="False" />
         <!-- Upstream's ComboBoxItem ContentPresenter sets no TextWrapping at all
              (ComboBox_themeresources.xaml:764), so a long item stays on one line; this runtime's generated

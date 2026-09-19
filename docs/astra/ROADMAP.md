@@ -295,6 +295,43 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 视觉 = 另一个进程的树读回独立确认 39 → 32（与闸口不同通道）；硬件输入 = **仍为零**。
 一条采集器纪律顺带量到：新用例最初把下拉留在打开态，下一个走 overlay 的用例就读到了它的条目
 （`ComboBoxItemBackground` 断成 PointerOver 色）——**开过 overlay 的用例必须先关掉再落断言**。
+
+**视觉缺陷批第九段（"圆角不对"查到一个真缺陷，但它不在圆角上，2026-09-20）**：用户第二次报的是
+`flyout` 那一类控件"圆角好像都不对"。先立一条基座事实再看控件：`spike/RightGapProbe --open corner` 用三张
+已知颜色的图量出 **`Border` 会磨圆自己的填充但不裁剪子元素**（r=12 白表面 (0,0)/(2,2) 读到蓝底、(4,4) 起读到白；
+塞进一个 60x60 红子元素后 (0,0) 到 (30,30) 全红，`Clip` 读回空；r=0 对照组全红，排除采样器）。
+含义是**样式里的半径 token 赢不过一个铺到角的内容**，于是"圆角不对"必须逐表面量几何而不是查 token。
+`--open flyout` 全树读回：`ComboBox` 下拉表面 r=8 而行让开 5,2,5,2 + 0,4（弧在 x=5 处只吃 y≈1.1 DIP）、
+`MenuFlyout` 行 4,2,4,2 + 行自身 r=4、`Expander` 靠 `IsExpanded` 那格把头部下圆角改方 — **三处安全**；
+`ComboBox` 的 `PART_ToggleButton` 读回 `radius=10` 看着可疑，但它的模板只有 `Grid + Path`、没有跟这个半径
+的填充或描边 → 惰属性。唯一"内容会盖住圆弧"的是 `SuggestionsContainer`（r=8、padding `0,2,0,2`、内层
+`Margin=-1,0,-1,0`，行左右零内缩）。
+**顺着它量到的缺陷不是圆角，是品牌绿。** `PixelHarness` 加单点读回 `PixelAt` 之后，打开的建议列表裁剪直方图
+是 `#F9F9F9x2020` 后面紧跟 `#1D733Cx450 #2B804Ax450 #1E743Dx420 #2A7F49x420 …`，中点 (130,20) = `#247A43`：
+框架把它的条目容器（类型就是 `ComboBoxItem`）的 `Background` 写成**本地 `LinearGradientBrush`**（accent 绿对角
+渐变、`CornerRadius=3`），而本地值排在 setter 与所有 trigger 之上——AutoSuggestBox 批记下的"框架本地值"账单
+在这里第一次被量出**具体是什么颜色**，而答案是每条像素闸口专门要挡住的那个绿。
+修法只有一条路能让样式说话：**模板不去读那个属性**。`Selection.jalxaml` 里 `ComboBoxItem` 的 `LayoutRoot`
+从 `{TemplateBinding Background}` 换成 `{ThemeResource ComboBoxItemBackground}`；九个状态格子本来就往
+`LayoutRoot` 写 token，所以 ComboBox 自己的行一格没变（`AstraComboBoxTests` 全绿）。修后同一测量：
+中点 `#F9F9F9`、直方图 `#F9F9F9x10012 #DDDDDDx302 #F6F6F6x254 #000000x42`、绿通道占优像素 **0**、
+四个角仍读回未上色（圆弧没被盖住）。代价写在模板注释里：消费者给 `ComboBoxItem.Background` 设的本地值
+不再进像素，上游会进——这正是阶段 2 起手必修那句"模板根 Border 不吃本地 Background"搬到条目容器上。
+同一批把阶段 4/5/6 的另一个前提结清：**全量类型清单**（`--open types`，3 157 行原始输出
+`adaptation/s0v-runtime-type-inventory-raw.txt`，`Jalium.UI.Controls.*` 960 个）——`ContentDialog`、
+`ProgressBar`、`SymbolIcon`、`GridView`、`DataGrid`、`TreeDataGrid`、`ListView`、`ListBox`、`TreeView`、
+`NavigationView`、`ToggleSwitch`、`TitleBar`、`CommandBarFlyout` 都是原生已有，而 `TeachingTip`、`Card`、
+`InfoBadge`、`ProgressRing`、`RatingControl`、`PipsPager`、`TabView`、`BreadcrumbBar`、`Divider`、
+`BitmapIcon`、`AutoSuggestBox` 确实没有；**并且运行时根本没有 `FlyoutPresenter` 也没有
+`MenuFlyoutPresenter` 这两个类型**——"给 flyout 表面写一个样式"在这个基座上是不可执行的任务，表面要么是我们
+在别的模板里画的那层，要么是框架自绘（S0-u·3、S0-n 那两条都是这一条的下游）。写成 `adaptation/00`
+**S0-v / S0-w** 两节 + 审计 `audits/corner-radius.md`。四类证据：构建 = 新增 3 条用例编译进闸口；
+行为 = 修前后同一条属性读回（宽高不变、本地渐变仍在）；视觉 = `RenderTargetBitmap` 单点 + 直方图两通道一致，
+**但它按属性重画，所以本段没有一条上屏帧主张**；硬件输入 = **仍为零**。
+仍欠：建议行"选中"到底是框架哪个状态（只量到过滤后自动选中的第一行）；`SuggestionsContainer` 的行左右零内缩
+本批没改（现在行不画不透明底色所以盖不住圆角，一旦某格写上不透明底色缺陷会回来，真解是阶段 5 做
+`ListBoxItem` 时给行带 `Margin` + r=4）；`MenuBar` 下拉与 `ContentDialog` 的半径没测。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

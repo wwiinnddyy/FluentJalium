@@ -163,6 +163,36 @@ internal static class PixelHarness
     }
 
     /// <summary>
+    /// One pixel of a visual where it already sits, as the same #RRGGBB key <see cref="Sample"/> counts with.
+    /// A histogram cannot answer a geometry question: "did the rounded corner keep its child out" is about
+    /// which colour sits at (0,0), not how many of each colour the crop holds. Coordinates are DIP pixels in
+    /// the crop's own space, top-left origin.
+    /// </summary>
+    internal static uint PixelAt(FrameworkElement element, int x, int y)
+    {
+        var width = (int)element.ActualWidth;
+        var height = (int)element.ActualHeight;
+        if (width <= 0 || height <= 0)
+        {
+            throw new InvalidOperationException($"{Describe(element)} has no layout to sample.");
+        }
+
+        if (x < 0 || y < 0 || x >= width || y >= height)
+        {
+            throw new ArgumentOutOfRangeException(nameof(x), $"({x},{y}) is outside {width}x{height}.");
+        }
+
+        var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormat.Bgr32);
+        bitmap.Render(element);
+        var buffer = new byte[width * height * 4];
+        bitmap.CopyPixels(buffer, width * 4, 0);
+        var offset = (y * width + x) * 4;
+        return (uint)(buffer[offset + 2] << 16 | buffer[offset + 1] << 8 | buffer[offset]);
+    }
+
+    internal static string Hex(uint key) => $"#{key:X6}";
+
+    /// <summary>
     /// The one shown host window, for a claim about the chrome it builds itself. Callers must not
     /// resize or replace its content as a side effect of measuring the shell.
     /// </summary>

@@ -826,3 +826,67 @@ presenter 上——所以弹层里"线还在不在"这种问题只能出进程�
 顺带一条采集器纪律：这条用例一开始把下拉留在打开态，下一个走 overlay 的用例就读到了它的条目
 （`ComboBoxItemBackground` 断成 PointerOver 色）。**开过 overlay 的用例必须在断言前关掉再落断言。**
 
+
+## S0-v：路线图上标"自有"的控件，有三分之一运行时本来就有（全量类型清单，2026-09-20）
+
+SplitButton 批那次探针已经当场否过一条假设（`ContentDialog`/`Expander`/`InfoBar`/`Menu` 全族/`CommandBar`
+原生都有，见 `ROADMAP.md` 阶段 2 收尾那段），但那是**顺手量到的**，覆盖不全。这一节是把整张表补齐，
+因为"只有证明的行为缺口才起自有类型"这句纪律要能执行，得先有一张完整的清单：运行时到底自带哪些类型？
+凭记忆答会答错，所以从**已加载的程序集**里写出来，而不是从文档、也不是从旁边的源码树。
+原始输出：`docs/astra/adaptation/s0v-runtime-type-inventory-raw.txt`（`spike/RightGapProbe --open types`，
+3 157 行；`Jalium.UI.Managed` 3 014 个公开类型、`Jalium.UI.Xaml` 138、`Jalium.UI.Desktop` 2，
+其中 `Jalium.UI.Controls.*` 命名空间 960 个）。
+
+按名字逐个复核，本路线图标"(自有)"的那几格里**已经有**的：
+
+| 图上写的 | 运行时 | 结论 |
+| --- | --- | --- |
+| `ContentDialog`(自有) | `Jalium.UI.Controls.ContentDialog` 在，`ContentDialogButton/Result/Placement/Closing/Closed/Opened` 全在 | **改判：原生重模板**。反射确认 `Template` 可写（declaredBy=Control）、`Title`/`TitleTemplate`、三个 `*ButtonText`、`IsPrimaryButtonEnabled`、三个 `*ButtonStyle`、`DefaultButton`、三个 `*ButtonCommand` |
+| `ProgressBar` | 在 | 阶段 6 那格不用起类型 |
+| `SymbolIcon` | 在 | 同上 |
+| `GridView` / `DataGrid` / `TreeDataGrid` / `ListView` / `ListBox` / `TreeView` / `NavigationView` / `ToggleSwitch` / `TitleBar` | 都在 | 阶段 5 整批是补样式，不是补类型 |
+| — | `CommandBarFlyout` 在 | 命令栏批当时按"没有"处理过，回头要复核 |
+
+**确实没有**、因此自有类型站得住的：`TeachingTip`、`Card`/`InfoCard`、`InfoBadge`、`ProgressRing`、
+`RatingControl`、`PipsPager`、`TabView`、`BreadcrumbBar`、`Divider`、`BitmapIcon`、`AutoSuggestBox`
+（只有 `AutoCompleteBox`，本库已经用它做宿主替换）。
+
+还有一条与弹层直接相关：**运行时没有 `FlyoutPresenter`，也没有 `MenuFlyoutPresenter` 这两个类型**。
+所以"给 flyout 表面写一个样式"在这个基座上不可能——表面要么是我们自己在别的控件模板里画的那层
+（`ContextMenu` 的 `LayoutRoot`、`PART_PopupBorder`、`SuggestionsContainer`），要么是框架自己画的
+（`MenuBar` 的下拉、`MenuFlyout` 的宿主层）。S0-u·3、S0-n 那两条"弹层开不上屏 / 缩进归框架"都是这同一条
+的下游表现。
+
+## S0-w：圆角表面不裁剪子元素——圆角对不对，一半不在样式里（弹层圆角批，2026-09-20）
+
+**1 · `Border` 会把自己的填充磨圆，但不会裁剪压在上面的子元素。** 三张已知颜色的图（`spike/RightGapProbe
+--open corner`，原始输出 `docs/astra/adaptation/s0w-corner-probe-raw.txt`）：蓝底上放
+`CornerRadius=12` 的白 Border，(0,0)、(2,2) 读到蓝、(4,4) 起读到白——**填充是圆的**；同样的白表面里塞一个
+60x60 的红色子 Border，(0,0) 到 (30,30) 全读红，`Clip` 读回空——**子元素不裁**；半径 0 的对照组全读红，
+排除采样器本身。闸口用例 `AstraFlyoutCornerTests.A_rounded_border_rounds_its_fill_but_never_clips_its_child`
+在 harness 里读到同样六个像素，两条通路一致。
+
+这条基座事实决定了"圆角不对"这句抱怨怎么查：**样式里的半径token赢不过一个铺到角的内容**。WinUI 靠
+`Border` 裁剪兜住的东西，这里只能靠表面自己把行让开圆弧。于是逐个表面复核几何：
+`ComboBox` 的 `PART_PopupBorder`(r=8) 里条目带 `Margin=5,2,5,2` + `ItemsPresenter` 的 0,4，行离边 5 DIP、
+离顶 6 DIP，r=8 的弧在 x=5 处只吃掉 y≈1.1 DIP，**安全**；`MenuFlyout` 行同理（4,2,4,2 + r=4 的行）安全；
+`Expander` 靠 `IsExpanded=True` 那格把头部的下圆角改方（S0-m 已落），安全；
+`AutoCompleteBox` 的 `SuggestionsContainer`(r=8) padding 是 `0,2,0,2`、内层 `Margin=-1,0,-1,0`，
+行左右**没有让开**。
+
+**2 · 建议列表真正上屏的缺陷不是圆角，是品牌绿。** 量 `SuggestionsContainer` 的裁剪（harness `Chrome` +
+新加的 `PixelAt` 单点读回）：修前直方图 `#F9F9F9x2020` 之后紧跟 `#1D733Cx450 #2B804Ax450 #1E743Dx420
+#2A7F49x420 …`——一条**accent 绿的对角渐变**铺在弹层里，中点 (130,20) 读 `#247A43`；条目类型读回来是
+`ComboBoxItem`，`Background` 是**框架写的本地值**（`local=LinearGradientBrush`，半径 3）。本地值排在
+setter 和所有 trigger 之上，所以样式改不动它。能改的是我们的模板**不去绑定它**：`Selection.jalxaml` 里
+`ComboBoxItem` 的 `LayoutRoot` 从 `{TemplateBinding Background}` 换成 `{ThemeResource ComboBoxItemBackground}`，
+九个状态格子本来就在往 `LayoutRoot` 写 token，所以 ComboBox 自己的行一格都没变。
+修后同一条测量：中点 `#F9F9F9`，直方图 `#F9F9F9x10012 #DDDDDDx302 #F6F6F6x254 #000000x42`，
+**绿通道占优的像素为 0**，四个角仍读回未上色（圆角活着）。
+`An_item_takes_our_text_row_but_keeps_the_frameworks_own_fill` 继续钉住"属性还归框架"，
+新增的 `A_suggestion_row_pays_our_token_instead_of_the_frameworks_accent_gradient` 钉住"像素归我们"。
+
+**3 · 度量工具的边界。** 单点像素读回只有 `RenderTargetBitmap` 这条路能给，而它按当前属性值重画，
+结构上看不见"落后于属性的那一帧"（`gui-verification-without-pixels`）。所以本节的断言全部是
+"属性/合成图"这一类（裁剪、颜色、几何），**没有一条声称上屏帧**；建议列表的真上屏宽度仍是 S0-u·3 记着的
+未测项。

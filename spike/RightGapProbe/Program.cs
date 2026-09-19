@@ -7,6 +7,7 @@ using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Markup;
 using Jalium.UI.Interop;
 using Jalium.UI.Media;
+using Jalium.UI.Media.Imaging;
 using Jalium.UI.Threading;
 
 namespace RightGapProbe;
@@ -61,11 +62,41 @@ internal static class Program
 
     private static void Run(string mode, string[] arguments)
     {
+        if (mode == "types")
+        {
+            // "Add a custom control only for a demonstrated behavior gap" needs the inventory first: which
+            // types does the runtime actually own? Written out of the loaded assemblies rather than from
+            // memory, so the claim "there is no dialog here" is a reading and not a guess.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()
+                         .Where(static candidate => candidate.GetName().Name?.StartsWith("Jalium", StringComparison.Ordinal) == true)
+                         .OrderBy(static candidate => candidate.GetName().Name, StringComparer.Ordinal))
+            {
+                Type[] types;
+                try
+                {
+                    types = assembly.GetExportedTypes();
+                }
+                catch (Exception exception)
+                {
+                    Note($"== {assembly.GetName().Name}: unreadable ({exception.GetType().Name})");
+                    continue;
+                }
+
+                Note($"== {assembly.GetName().Name}: {types.Length} exported types");
+                foreach (var type in types.OrderBy(static candidate => candidate.FullName, StringComparer.Ordinal))
+                {
+                    Note("  " + type.FullName);
+                }
+            }
+
+            return;
+        }
+
         if (mode == "reflect")
         {
             // The last question the right-gap batch left open is whether the runtime gives a popup's surface
             // any width lever at all. Before calling the hole framework-owned, ask the type what it owns.
-            foreach (var type in new[] { typeof(AutoCompleteBox), typeof(Popup), typeof(ComboBox), typeof(NumberBox) })
+            foreach (var type in new[] { typeof(AutoCompleteBox), typeof(Popup), typeof(ComboBox), typeof(NumberBox), typeof(ContentDialog) })
             {
                 Note($"== {type.FullName} : width / popup levers");
                 foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -74,12 +105,64 @@ internal static class Program
                     if (property.Name.Contains("Width", StringComparison.Ordinal)
                         || property.Name.Contains("Height", StringComparison.Ordinal)
                         || property.Name.Contains("Popup", StringComparison.Ordinal)
-                        || property.Name.Contains("DropDown", StringComparison.Ordinal))
+                        || property.Name.Contains("DropDown", StringComparison.Ordinal)
+                        || property.Name.Contains("Template", StringComparison.Ordinal)
+                        || property.Name.Contains("Button", StringComparison.Ordinal)
+                        || property.Name.Contains("Title", StringComparison.Ordinal)
+                        || property.Name.Contains("Placement", StringComparison.Ordinal))
                     {
                         Note($"  {property.PropertyType.Name} {property.Name}"
                              + $" get={property.CanRead} set={property.CanWrite} declaredBy={property.DeclaringType?.Name}");
                     }
                 }
+            }
+
+            return;
+        }
+
+        if (mode == "corner")
+        {
+            // The second half of the corner complaint. Two faults look identical on screen: the radius token
+            // a surface wears is wrong, or the surface rounds its own fill but never clips the square child
+            // drawn on top of it - in which case every popup whose content reaches the corner shows a square
+            // notch no matter what radius the style asks for. A known third-colour backdrop separates the
+            // three answers: blue = clipped, white = rounded fill only, red = the child overflows the corner.
+            foreach ((string label, int radius, bool square) in new[]
+                     {
+                         ("radius 12, square child", 12, true),
+                         ("radius 12, no child", 12, false),
+                         ("radius 0, square child (control)", 0, true),
+                     })
+            {
+                var surface = new Border
+                {
+                    Width = 60,
+                    Height = 60,
+                    CornerRadius = new CornerRadius(radius),
+                    Background = new SolidColorBrush(Color.FromRgb(0xFF, 0xFF, 0xFF)),
+                    Child = square
+                        ? new Border { Width = 60, Height = 60, Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0x00)) }
+                        : null,
+                };
+                var backdrop = new Border
+                {
+                    Width = 60,
+                    Height = 60,
+                    Background = new SolidColorBrush(Color.FromRgb(0x00, 0x00, 0xFF)),
+                    Child = surface,
+                };
+
+                var shot = new Window { Content = backdrop, Width = 240, Height = 240 };
+                shot.Show();
+                Pump(20, 1500);
+                Note($"== {label}: surface {surface.ActualWidth}x{surface.ActualHeight} Clip={Property(surface, "Clip")}");
+                foreach ((int x, int y) in new[] { (0, 0), (1, 1), (2, 2), (4, 4), (12, 0), (30, 1), (30, 30) })
+                {
+                    Note($"    ({x},{y}) {PixelAt(backdrop, x, y)}");
+                }
+
+                shot.Close();
+                Pump(5, 800);
             }
 
             return;
@@ -327,6 +410,27 @@ internal static class Program
     {
         var value = target.GetType().GetProperty(name)?.GetValue(target);
         return value?.ToString() ?? "-";
+    }
+
+    /// <summary>
+    /// One pixel of a re-rasterized subtree, in #RRGGBB. Legitimate for a claim about the drawing pipeline
+    /// (does a rounded surface clip its child) because the rasterizer rebuilds from current property values;
+    /// it says nothing about a frame that already reached the compositor.
+    /// </summary>
+    private static string PixelAt(Visual target, int x, int y)
+    {
+        var host = (FrameworkElement)target;
+        var width = (int)Math.Ceiling(host.ActualWidth);
+        var height = (int)Math.Ceiling(host.ActualHeight);
+        if (width <= 0 || height <= 0) return "unlaid";
+        if (x >= width || y >= height) return "outside";
+
+        var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormat.Bgr32);
+        bitmap.Render(target);
+        var buffer = new byte[width * height * 4];
+        bitmap.CopyPixels(buffer, width * 4, 0);
+        var offset = (y * width + x) * 4;
+        return $"#{buffer[offset + 2]:X2}{buffer[offset + 1]:X2}{buffer[offset]:X2}";
     }
 
     private static void Hold(int seconds)
