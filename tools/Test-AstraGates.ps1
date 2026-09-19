@@ -8,6 +8,10 @@
   Builds must not run in parallel: concurrent project builds lock shared Jalium obj files.
   Stale testhost and Gallery processes hold FluentJalium*.dll in the output folders, which
   makes the next build fail with MSB3021/MSB3027 and read like a compile error.
+
+  Only processes whose executable lives under this repository are stopped, and that is deliberate:
+  `testhost.exe` is the name every .NET test run on this machine uses, so stopping one by name can
+  kill a build belonging to a project this script has no business touching.
 #>
 [CmdletBinding()]
 param(
@@ -19,9 +23,14 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 
 foreach ($name in 'testhost', 'FluentJalium.Gallery', 'FluentJalium.Tests') {
-    Get-Process -Name $name -ErrorAction SilentlyContinue | Stop-Process -Force
-    if (Get-Process -Name $name -ErrorAction SilentlyContinue) {
-        Write-Error "Process '$name' is still holding output files; close it manually."
+    Get-Process -Name $name -ErrorAction SilentlyContinue | Where-Object {
+        $_.Path -and $_.Path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)
+    } | Stop-Process -Force
+    $held = Get-Process -Name $name -ErrorAction SilentlyContinue | Where-Object {
+        $_.Path -and $_.Path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)
+    }
+    if ($held) {
+        Write-Error "Process '$name' (pid $($held.Id -join ', ')) is still holding output files; close it manually."
     }
 }
 
