@@ -263,6 +263,42 @@ public partial class MainWindow : Window
             bar.IsClosable = ((ToggleButton)InfoBarClosableToggle!).IsChecked == true;
         ((ToggleButton)InfoBarIconToggle!).Click += (_, _) =>
             bar.IsIconVisible = ((ToggleButton)InfoBarIconToggle!).IsChecked == true;
+
+        foreach (var (button, shapes) in new[]
+                 {
+                     ((Button)DialogThreeButton!, 3),
+                     ((Button)DialogTwoButton!, 2),
+                     ((Button)DialogOneButton!, 1),
+                 })
+        {
+            button.Click += (_, _) => _ = ShowDialogAsync(shapes);
+        }
+    }
+
+    /// <summary>
+    /// Builds the dialog on the click instead of placing one on the page: the control hosts a shown dialog in the
+    /// window's overlay layer and throws if the instance is already in a tree, which is also why the gate opens
+    /// one through ShowAsync rather than mounting it (docs/astra/audits/content-dialog.md).
+    /// </summary>
+    private async Task ShowDialogAsync(int shapes)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Publish this draft?",
+            Content = "Once it is public, readers and search engines can see the version as of now.",
+            PrimaryButtonText = shapes >= 2 ? "Publish" : null,
+            SecondaryButtonText = shapes == 3 ? "Save draft" : null,
+            CloseButtonText = "Cancel",
+            FullSizeDesired = ((ToggleButton)DialogFullSizeToggle!).IsChecked == true,
+        };
+        if (((ToggleButton)DialogDefaultToggle!).IsChecked == true)
+        {
+            dialog.DefaultButton = ContentDialogButton.Primary;
+        }
+
+        var result = await dialog.ShowAsync();
+        ((TextBlock)DialogReadout!).Text = $"ShowAsync completed with {result}; the click that ended it came from the template's own part.";
+        Report($"Dialog closed: {result}.");
     }
 
     private void WireInputs()

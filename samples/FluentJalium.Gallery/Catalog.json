@@ -188,6 +188,23 @@
       "gaps": [ "no expandable children, icon sources beyond SymbolIcon", "selection indicator motion unmeasured" ]
     },
     {
+      "markup": "ContentDialog",
+      "source": "Styles/ContentDialog.jalxaml",
+      "page": "surfaces",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/content-dialog.md", "tests/FluentJalium.Tests/AstraContentDialogTests.cs", "spike/RightGapProbe/Program.cs" ],
+      "gaps": [
+        "26.10.9 ships ContentDialog natively, so the plan's own-type column is void (adaptation/00 S0-v); the dialog is opened by ShowAsync on this card rather than placed on it, because the control hosts a shown dialog in the window's own overlay layer and refuses one already in a tree",
+        "upstream's six VisualStateManager groups become ten cells, because markup VisualStateManager throws on this runtime; the open and close transitions and their scale and fade animations are not carried at all",
+        "ContentDialogMinWidth, MaxWidth, MinHeight, MaxHeight and the ButtonSpacing GridLength ride as literals in the template because this reader cannot parse those rows, and the control maps the app's own size box onto the card on top of that",
+        "a two-button row is two thirds with the spare third at an end, not upstream's two halves, and one button is a third rather than a right-hand half: a template cell cannot write a named ColumnDefinition's Width (measured in both value shapes) and UniformGrid does not reflow when a child collapses",
+        "the title's 20 SemiBold rides on a default TitleTemplate, because a FontSize on the title host is dropped on the text element the framework generates; the cost is that a non-string Title needs the app's own template",
+        "whether the framework's overlay host paints a smoke layer of its own behind the template's cannot be read - it exposes no Background property - so a doubled dim is neither claimed nor excluded",
+        "the title strip and the command row each carry a literal half of the card's 8 DIP arc, because a border on this runtime rounds what it fills and never clips a child - so an app that changes ContentDialog.CornerRadius moves the surface and not the two bands inside it",
+        "no hardware-input evidence: the three buttons' hover, press, keyboard and touch pixels are the button batch's, and this card's captures read a card built inside the shown host"
+      ]
+    },
+    {
       "markup": "Expander",
       "source": "Styles/Surfaces.jalxaml",
       "page": "surfaces",

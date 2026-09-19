@@ -168,6 +168,153 @@ internal static class Program
             return;
         }
 
+        if (mode == "dialog")
+        {
+            // The plan said "ContentDialog (own type)"; the inventory (S0-v) says the runtime ships one. Before
+            // either claim is written down, ask the mounted control the three questions this repo decides every
+            // control batch by: is there a template to displace, which part names does the control's own code
+            // read, and which palette rows does the framework's template consume. All through reflection, so the
+            // probe keeps compiling against a member list nobody has verified.
+            var dialogType = typeof(ContentDialog);
+            Note("== declared members");
+            foreach (var property in dialogType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                         .Where(candidate => candidate.DeclaringType == dialogType)
+                         .OrderBy(static candidate => candidate.Name, StringComparer.Ordinal))
+            {
+                Note($"  prop {property.PropertyType.Name} {property.Name} set={property.CanWrite}");
+            }
+
+            foreach (var method in dialogType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static)
+                         .Where(candidate => candidate.DeclaringType == dialogType)
+                         .OrderBy(static candidate => candidate.Name, StringComparer.Ordinal))
+            {
+                Note($"  method {method.ReturnType.Name} {method.Name}({string.Join(", ", method.GetParameters().Select(static p => p.ParameterType.Name))})");
+            }
+
+            foreach (var dialogEvent in dialogType.GetEvents(BindingFlags.Public | BindingFlags.Instance)
+                         .Where(candidate => candidate.DeclaringType == dialogType)
+                         .OrderBy(static candidate => candidate.Name, StringComparer.Ordinal))
+            {
+                Note($"  event {dialogEvent.EventHandlerType?.Name} {dialogEvent.Name}");
+            }
+
+            var fresh = new ContentDialog();
+            Note($"-- fresh: Style={(fresh.Style is null ? "null" : "set")} Template={(fresh.Template is null ? "null" : "set")}");
+
+            var shell = new Window
+            {
+                Content = new ContentPresenter(),
+                Width = 700,
+                Height = 600,
+                Background = new SolidColorBrush(Color.FromRgb(0x20, 0x20, 0x20)),
+            };
+            shell.Show();
+            Pump(20, 1500);
+
+            var mounted = new ContentDialog
+            {
+                Title = "Publish this draft?",
+                Content = "Once it is public, readers see the version as of now.",
+                PrimaryButtonText = "Publish",
+                SecondaryButtonText = "Save draft",
+                CloseButtonText = "Cancel",
+            };
+            Note($"-- mounted (our theme applied): Style={(mounted.Style is null ? "null" : "set")} Template={(mounted.Template is null ? "null" : "set")}");
+
+            // The framework builds a default template at mount, not at construction, so the read that decides
+            // "re-template or own type" has to happen after the control is in a shown tree.
+            ((ContentPresenter)shell.Content!).Content = mounted;
+            shell.UpdateLayout();
+            Pump(20, 1500);
+            Note($"-- in tree: Style={(mounted.Style is null ? "null" : "set")} Template={(mounted.Template is null ? "null" : "set")} " +
+                 $"size={mounted.ActualWidth}x{mounted.ActualHeight}");
+            Walk(mounted, 0);
+
+            // VisualTreeXaml is public on ControlTemplate here, so the framework's own template can be read
+            // rather than guessed - that is where the part names and the {ThemeResource} rows it consumes live.
+            Note($"-- template reads {mounted.Template?.GetType().FullName ?? "null"}");
+            var visualTree = mounted.Template is null ? null : typeof(ControlTemplate).GetProperty("VisualTreeXaml")?.GetValue(mounted.Template);
+            Note(visualTree is null ? "-- VisualTreeXaml: unreadable" : "-- VisualTreeXaml:\n" + visualTree);
+
+            Hold(2);
+            shell.Close();
+            return;
+        }
+
+        if (mode == "shown")
+        {
+            // Every ContentDialog reading taken so far was taken on a merely mounted control, which measured:
+            // Visibility=Collapsed and 0x0. That is not a dialog, and a claim about a card's size box, a
+            // generated text element or a click handler cannot be settled on it. This opens one for real.
+            var shell = new Window
+            {
+                Content = new Grid(),
+                Width = 900,
+                Height = 700,
+                Background = new SolidColorBrush(Color.FromRgb(0x20, 0x20, 0x20)),
+            };
+            shell.Show();
+            Pump(20, 1500);
+
+            var dialog = new ContentDialog
+            {
+                Title = "Publish this draft?",
+                Content = "Once it is public, readers see the version as of now.",
+                PrimaryButtonText = "Publish",
+                SecondaryButtonText = "Save draft",
+                CloseButtonText = "Cancel",
+            };
+            Note("-- A: detached, before ShowAsync (no tree to read)");
+
+            var opened = 0;
+            var closed = 0;
+            var clicks = 0;
+            dialog.Opened += (_, _) => opened++;
+            dialog.Closed += (_, _) => closed++;
+            dialog.PrimaryButtonClick += (_, _) => clicks++;
+            var operation = dialog.ShowAsync();
+            Pump(40, 2500);
+            Note($"-- B: ShowAsync on a detached dialog (completed={operation.IsCompleted} fault={operation.Exception?.Message ?? "none"})");
+            DumpDialog(dialog, shell);
+            Note("   tree:");
+            Walk(dialog, 1);
+
+            if (ByName(dialog, "PART_PrimaryButton") is Button primary)
+            {
+                Note($"   primary: content={primary.Content} enabled={primary.IsEnabled} style={primary.Style?.GetType().Name}");
+                ((Jalium.UI.Automation.Provider.IInvokeProvider)new Jalium.UI.Automation.Peers.ButtonAutomationPeer(primary)).Invoke();
+                Pump(40, 2500);
+                Note($"-- C: after invoking the primary button. opened={opened} closed={closed} clicks={clicks} " +
+                     $"completed={operation.IsCompleted} result={TaskResult(operation)} vis={dialog.Visibility}");
+                DumpDialog(dialog, shell);
+            }
+            else
+            {
+                Note($"-- C: no PART_PrimaryButton in the built tree (opened={opened} closed={closed})");
+            }
+
+            var capped = new ContentDialog
+            {
+                Title = "Cap check",
+                Content = "body",
+                CloseButtonText = "Cancel",
+                MaxWidth = 548,
+                MinWidth = 320,
+            };
+            var second = capped.ShowAsync();
+            Pump(40, 2500);
+            Note($"-- D: a dialog whose OWN MaxWidth is 548 (completed={second.IsCompleted})");
+            DumpDialog(capped, shell);
+            capped.Hide();
+            Pump(10, 800);
+            Note("-- E: after Hide()");
+            DumpDialog(capped, shell);
+
+            shell.Close();
+            Pump(4, 400);
+            return;
+        }
+
         var panel = new StackPanel { Margin = new Thickness(24), Spacing = 10 };
         var window = new Window
         {
@@ -306,6 +453,124 @@ internal static class Program
         panel.Children.Add(new TextBlock { Text = label, FontSize = 11, Foreground = new SolidColorBrush(Color.FromRgb(0x9A, 0x9A, 0x9A)) });
         panel.Children.Add(control);
     }
+
+    /// <summary>The four readings a dialog batch needs, in one line each, on whatever state it is in.</summary>
+    private static void DumpDialog(ContentDialog dialog, Window shell)
+    {
+        var parent = VisualTreeHelper.GetParent(dialog);
+        Note($"   dialog vis={dialog.Visibility} actual={dialog.ActualWidth:0.#}x{dialog.ActualHeight:0.#} " +
+             $"parent={parent?.GetType().Name ?? "none"} inWindow={BelongsTo(dialog, shell, 0)}");
+        if (parent is not null)
+        {
+            // The host the framework puts a shown dialog into paints behind it, so a smoke layer inside our own
+            // template can be a second dim pass nobody asked for. That is the double-image defect class, so it
+            // gets read rather than assumed.
+            Note($"   host {parent.GetType().Name}: bg={Property(parent, "Background")} opacity={Property(parent, "Opacity")} " +
+                 $"children={VisualTreeHelper.GetChildrenCount(parent)} radius={Property(parent, "CornerRadius")}");
+        }
+
+        Note($"   dialog box localMax={dialog.ReadLocalValue(FrameworkElement.MaxWidthProperty)} max={dialog.MaxWidth}");
+
+        var card = ByName(dialog, "PART_DialogCard");
+        if (card is null)
+        {
+            Note("   card: PART_DialogCard not in the built tree");
+            return;
+        }
+
+        Note($"   card {card.ActualWidth:0.#}x{card.ActualHeight:0.#} min={card.MinWidth} max={card.MaxWidth} " +
+             $"minH={card.MinHeight} maxH={card.MaxHeight} localMax={card.ReadLocalValue(FrameworkElement.MaxWidthProperty)} " +
+             $"localMin={card.ReadLocalValue(FrameworkElement.MinWidthProperty)} radius={Property(card, "CornerRadius")} align={card.HorizontalAlignment}");
+
+        if (ByName(dialog, "DialogSurface") is { } surface)
+        {
+            Note($"   surface {surface.ActualWidth:0.#}x{surface.ActualHeight:0.#} min={surface.MinWidth} max={surface.MaxWidth} " +
+                 $"minH={surface.MinHeight} maxH={surface.MaxHeight} localMax={surface.ReadLocalValue(FrameworkElement.MaxWidthProperty)} " +
+                 $"radius={Property(surface, "CornerRadius")} bg={Property(surface, "Background")} border={Property(surface, "BorderThickness")}");
+        }
+        else
+        {
+            Note("   surface: DialogSurface not in the built tree");
+        }
+
+        var title = ByName(dialog, "PART_TitleHost");
+        var text = title is null ? null : FirstText(title, 0);
+        Note($"   title host={title?.GetType().Name ?? "null"} hostSize={(title is null ? "-" : Property(title, "FontSize"))} " +
+             $"hostWeight={(title is null ? "-" : Property(title, "FontWeight"))} " +
+             (text is null
+                 ? "text=none"
+                 : $"text=\"{text.Text}\" size={text.FontSize} weight={text.FontWeight} localSize={text.ReadLocalValue(TextBlock.FontSizeProperty)} " +
+                   $"localWeight={text.ReadLocalValue(TextBlock.FontWeightProperty)} style={(text.Style is null ? "null" : "set")} wrapping={text.TextWrapping}"));
+    }
+
+    private static FrameworkElement? ByName(DependencyObject node, string name)
+    {
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
+        {
+            if (VisualTreeHelper.GetChild(node, index) is not FrameworkElement child)
+            {
+                continue;
+            }
+
+            if (child.Name == name)
+            {
+                return child;
+            }
+
+            if (ByName(child, name) is { } deeper)
+            {
+                return deeper;
+            }
+        }
+
+        return null;
+    }
+
+    private static TextBlock? FirstText(DependencyObject node, int depth)
+    {
+        if (depth > 8)
+        {
+            return null;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
+        {
+            var child = VisualTreeHelper.GetChild(node, index);
+            if (child is TextBlock text)
+            {
+                return text;
+            }
+
+            if (child is not null && FirstText(child, depth + 1) is { } deeper)
+            {
+                return deeper;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool BelongsTo(DependencyObject node, Window shell, int depth)
+    {
+        if (depth > 20)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(shell); index++)
+        {
+            var child = VisualTreeHelper.GetChild(shell, index);
+            if (ReferenceEquals(child, node) || (child is not null && BelongsTo(child, shell, depth + 1)))
+            {
+                return true;
+            }
+        }
+
+        return ReferenceEquals(node, shell);
+    }
+
+    private static string TaskResult(Task task) =>
+        task.IsCompletedSuccessfully ? task.GetType().GetProperty("Result")?.GetValue(task)?.ToString() ?? "-" : "not completed";
 
     private static readonly string[] Interesting =
     [

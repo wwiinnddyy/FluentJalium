@@ -1,0 +1,195 @@
+<!-- Astra ContentDialog style. 26.10.9 ships Jalium.UI.Controls.ContentDialog with a code-built template
+     (spike/RightGapProbe, dialog and shown modes: a fresh instance has Style=null and Template=null, and the
+     template only appears once the control is in a shown tree), so this is a native re-template and not a new
+     type - the plan said "own type" and docs/astra/adaptation/00 S0-v corrects that on the inventory. The
+     control's own member surface is complete for the job: Title/TitleTemplate, the three *ButtonText with their
+     *ButtonStyle and *ButtonCommand, IsPrimary/SecondaryButtonEnabled, DefaultButton, FullSizeDesired, ShowAsync
+     (optionally with a ContentDialogPlacement, and throwing if the dialog is already in a tree), Hide, and the
+     Opened/Closing/Closed plus the three *ButtonClick events.
+     Part names come off the framework's own built tree, not off upstream: PART_Root, PART_Overlay,
+     PART_DialogCard, PART_TitleHost, PART_ContentScrollViewer, PART_ButtonPanel, PART_PrimaryButton,
+     PART_SecondaryButton, PART_CloseButton. They are kept because a renamed part is a behaviour risk this repo
+     has measured elsewhere (Expander, AutoCompleteBox), and because the control demonstrably drives its own
+     result pipeline through them: invoking the PART_PrimaryButton of this template raises PrimaryButtonClick,
+     fires Closed, closes the dialog and completes ShowAsync as Primary - all four in one read-back, in
+     AstraContentDialogTests.
+     Shape and numbers are upstream's (ContentDialog_themeresources.xaml blob
+     9cd8150fff8c216319e2d5515b538cfab5b397d5 @19e3bdc3ccf3361393d623d3a5d2667cb8f33229): smoke layer, then a
+     centred card with the token corner radius, a 24 DIP gutter, 320/548/184/756 as its size box, a top-overlay
+     strip with the separator hairline holding a 20 SemiBold title over the body, and a command row of five
+     columns */8/*/8/*. The four numbers and the 8 DIP gap are literals because x:Double and GridLength rows do
+     not parse in this reader (adaptation/00).
+     Upstream drives all of this from six VisualStateManager groups; markup VSM throws on this runtime, so each
+     state is a cell, with the AllVisible geometry as the resting markup. Cells are ordered general-to-specific
+     because the later writer wins on a shared target here (S0-u), and only the levers the runtime actually
+     exposes are written - see the ButtonsVisibilityStates comment below for what was measured away. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="DefaultContentDialogStyle" TargetType="ContentDialog">
+    <Setter Property="Foreground" Value="{ThemeResource ContentDialogForeground}" />
+    <Setter Property="Background" Value="{ThemeResource ContentDialogBackground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ContentDialogBorderWidth}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ContentDialogBorderBrush}" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="PrimaryButtonStyle" Value="{StaticResource DefaultButtonStyle}" />
+    <Setter Property="SecondaryButtonStyle" Value="{StaticResource DefaultButtonStyle}" />
+    <Setter Property="CloseButtonStyle" Value="{StaticResource DefaultButtonStyle}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />
+    <!-- The title's typography, as a default template rather than as a font on the host. Measured on a shown
+         dialog (spike/RightGapProbe, shown mode): FontWeight="SemiBold" on the title ContentControl reaches the
+         text element the presenter generates, FontSize="20" does not - the generated text reads size=14 while
+         carrying the weight, the same one-sided local write the NumberBox batch met on a generated Foreground.
+         A TextBlock this dictionary builds carries its own local values, which nothing overwrites, and putting
+         it on TitleTemplate keeps upstream's contract: an app that supplies its own TitleTemplate replaces this
+         one, and a non-string Title needs that template because this default renders Text, not a host. -->
+    <Setter Property="TitleTemplate">
+      <DataTemplate>
+        <TextBlock Text="{Binding}" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" />
+      </DataTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ContentDialog">
+        <Grid Name="PART_Root">
+          <Border Name="PART_Overlay" Background="{ThemeResource ContentDialogSmokeFill}" />
+          <!-- Two elements, not one, because the control owns the width: measured on a shown dialog
+               (spike/RightGapProbe, shown mode) the framework writes MaxWidth = host width - 48 as a LOCAL
+               value onto whatever is named PART_DialogCard, which outranks every cell and dropped upstream's
+               548 cap entirely. The wrapper therefore takes the name and the framework's 24 DIP gutter, and the
+               surface inside it carries upstream's size box and every painted row - a cap the control cannot
+               reach because the control only knows the part name. -->
+          <Border Name="PART_DialogCard" Margin="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Name="DialogSurface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" MinWidth="320" MaxWidth="548" MinHeight="184" MaxHeight="756" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollViewer Name="PART_ContentScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled" IsTabStop="False">
+                  <!-- The strip's fill, inset, hairline and corner-free edge all belong to a Border, not to a
+                       Grid: a Panel here has a Background but no Padding, BorderThickness or BorderBrush, and an
+                       attribute the type does not carry is dropped in silence (adaptation/00 S0-t, and the same
+                       class the title font below belongs to).
+                       The top corners are the strip's own because this runtime's Border rounds its fill and never
+                       clips its child (S0-w): measured on a shown card, a square strip put #FFFFFF at (1,1),
+                       (2,1) and (1,2) - all of them outside the card's r=8 arc, where WinUI's clipping surface
+                       would have shown the smoke. Rounding the strip by the card's radius moves those three pixels
+                       off the strip; the bottom corners stay square because the command row underneath paints the
+                       card's own fill, so an arc there would only chip the surface. -->
+                  <Border Name="TitleStrip" CornerRadius="8,8,0,0" Background="{ThemeResource ContentDialogTopOverlay}" Padding="{ThemeResource ContentDialogPadding}" BorderThickness="{ThemeResource ContentDialogSeparatorThickness}" BorderBrush="{ThemeResource ContentDialogSeparatorBorderBrush}">
+                    <Grid>
+                      <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                      </Grid.RowDefinitions>
+                      <!-- A ContentControl and not a ContentPresenter, for one reason: FontSize and FontWeight are
+                           properties it actually has, and both are inherited down to the text element the inner
+                           presenter generates. An implicit TextBlock style in ContentPresenter.Resources was tried
+                           first and read back style=null / 14 / Normal on a shown dialog, so it is a dead cell here
+                           (see the title test for the read-back). Upstream's own title is a ContentControl too. -->
+                      <ContentControl Name="PART_TitleHost" Content="{TemplateBinding Title}" ContentTemplate="{TemplateBinding TitleTemplate}" FontSize="20" FontWeight="SemiBold" Margin="{ThemeResource ContentDialogTitleMargin}" HorizontalAlignment="Left" VerticalAlignment="Top" Focusable="False">
+                        <ContentControl.Template>
+                          <ControlTemplate TargetType="ContentControl">
+                            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                          </ControlTemplate>
+                        </ContentControl.Template>
+                      </ContentControl>
+                      <ContentPresenter Name="PART_ContentPresenter" Grid.Row="1" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
+                    </Grid>
+                  </Border>
+                </ScrollViewer>
+                <!-- Same reasoning as the strip: without its own radius the command row's square corners read
+                     #F3F3F3 at (1,h-2) and (2,h-2) - the card's own fill sitting outside the r=8 arc, which is a
+                     square nub against the smoke. It is invisible only against the fill it matches, not against
+                     the dim behind the card. -->
+                <Border Name="PART_ButtonArea" Grid.Row="1" Background="{TemplateBinding Background}" Padding="{ThemeResource ContentDialogPadding}" CornerRadius="0,0,8,8">
+                  <Grid Name="PART_ButtonPanel" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Name="PrimaryColumn" Width="*" />
+                      <ColumnDefinition Name="FirstSpacer" Width="8" />
+                      <ColumnDefinition Name="SecondaryColumn" Width="*" />
+                      <ColumnDefinition Name="SecondSpacer" Width="8" />
+                      <ColumnDefinition Name="CloseColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Name="PART_PrimaryButton" Content="{TemplateBinding PrimaryButtonText}" IsEnabled="{TemplateBinding IsPrimaryButtonEnabled}" Style="{TemplateBinding PrimaryButtonStyle}" IsTabStop="False" HorizontalAlignment="Stretch" />
+                    <Button Name="PART_SecondaryButton" Grid.Column="2" Content="{TemplateBinding SecondaryButtonText}" IsEnabled="{TemplateBinding IsSecondaryButtonEnabled}" Style="{TemplateBinding SecondaryButtonStyle}" IsTabStop="False" HorizontalAlignment="Stretch" />
+                    <Button Name="PART_CloseButton" Grid.Column="4" Content="{TemplateBinding CloseButtonText}" Style="{TemplateBinding CloseButtonStyle}" IsTabStop="False" HorizontalAlignment="Stretch" />
+                  </Grid>
+                </Border>
+              </Grid>
+            </Border>
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <!-- FullSizeDesired is the one upstream state this runtime can read straight off a property:
+               DialogSizingStates/FullDialogSizing stretches the card instead of centring it. Both layers of the
+               card take the cell because the framework caps only the outer one (see the comment above). -->
+          <Trigger Property="FullSizeDesired" Value="True">
+            <Setter TargetName="PART_DialogCard" Property="VerticalAlignment" Value="Stretch" />
+            <Setter TargetName="PART_DialogCard" Property="HorizontalAlignment" Value="Stretch" />
+            <Setter TargetName="DialogSurface" Property="VerticalAlignment" Value="Stretch" />
+            <Setter TargetName="DialogSurface" Property="HorizontalAlignment" Value="Stretch" />
+          </Trigger>
+          <!-- DefaultButtonStates: upstream swaps the default button's style for AccentButtonStyle. Written onto
+               the button that way never lands here - the button's Style is a local value (the TemplateBinding
+               writes it as one) and a cell sits below a local value. The same cell with no TargetName writes the
+               control's own *ButtonStyle, which the binding then carries, and a template trigger does outrank the
+               style setter that provides the resting value. -->
+          <Trigger Property="DefaultButton" Value="Primary">
+            <Setter Property="PrimaryButtonStyle" Value="{StaticResource AccentButtonStyle}" />
+          </Trigger>
+          <Trigger Property="DefaultButton" Value="Secondary">
+            <Setter Property="SecondaryButtonStyle" Value="{StaticResource AccentButtonStyle}" />
+          </Trigger>
+          <Trigger Property="DefaultButton" Value="Close">
+            <Setter Property="CloseButtonStyle" Value="{StaticResource AccentButtonStyle}" />
+          </Trigger>
+          <!-- ButtonsVisibilityStates, over an AllVisible resting markup. What the runtime allows is narrower
+               than upstream's state group, and every line below is a measurement rather than a guess
+               (docs/astra/audits/content-dialog.md):
+               - a cell CAN write Visibility and Grid.Column on a named element, and CAN write an untargeted
+                 setter onto the templated parent (that is how the default button gets its accent above);
+               - a cell CANNOT write a named ColumnDefinition's Width. Both value shapes were tried - "0" (stored
+                 as a Double) and "0*" (a real GridLength) - and all five columns read back *,8,*,8,* in all
+                 eight text combinations, so no column setter is written here at all. UniformGrid was measured
+                 as the alternative and does not reflow when a child collapses (35.9/34.8/35.4, then
+                 35.9/35.4 with the middle gone), so the two-button row keeps upstream's 8 DIP gap between the
+                 survivors and puts the unused third at an end rather than in the middle: secondary-null moves
+                 the primary into its column, and the lone-button pairs move the survivor to the last column,
+                 which is where upstream puts a single button too. -->
+          <Trigger Property="PrimaryButtonText" Value="{x:Null}">
+            <Setter TargetName="PART_PrimaryButton" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <Trigger Property="SecondaryButtonText" Value="{x:Null}">
+            <Setter TargetName="PART_SecondaryButton" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="PART_PrimaryButton" Property="Grid.Column" Value="2" />
+          </Trigger>
+          <Trigger Property="CloseButtonText" Value="{x:Null}">
+            <Setter TargetName="PART_CloseButton" Property="Visibility" Value="Collapsed" />
+          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="PrimaryButtonText" Value="{x:Null}" />
+              <Condition Property="CloseButtonText" Value="{x:Null}" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="PART_SecondaryButton" Property="Grid.Column" Value="4" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="SecondaryButtonText" Value="{x:Null}" />
+              <Condition Property="CloseButtonText" Value="{x:Null}" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="PART_PrimaryButton" Property="Grid.Column" Value="4" />
+          </MultiTrigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="PrimaryButtonText" Value="{x:Null}" />
+              <Condition Property="SecondaryButtonText" Value="{x:Null}" />
+              <Condition Property="CloseButtonText" Value="{x:Null}" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="PART_ButtonArea" Property="Visibility" Value="Collapsed" />
+          </MultiTrigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="ContentDialog" BasedOn="{StaticResource DefaultContentDialogStyle}" />
+</ResourceDictionary>

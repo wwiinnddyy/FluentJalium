@@ -890,3 +890,51 @@ setter 和所有 trigger 之上，所以样式改不动它。能改的是我们�
 结构上看不见"落后于属性的那一帧"（`gui-verification-without-pixels`）。所以本节的断言全部是
 "属性/合成图"这一类（裁剪、颜色、几何），**没有一条声称上屏帧**；建议列表的真上屏宽度仍是 S0-u·3 记着的
 未测项。
+
+## S0-x：模态宿主自己写尺寸盒，格子只认元素不认列（ContentDialog 批，2026-09-19）
+
+测量：`spike/RightGapProbe`（`dialog` + `shown`，日志 `right-gap-shown.txt`）与
+`tests/FluentJalium.Tests/AstraContentDialogTests.cs`（37 条）。结论分三条，都是基座级：
+
+**1 · "放进树里"不等于"打开"，量错状态会一次废掉整批断言。** 挂载未打开的 `ContentDialog` 是
+`Visibility=Collapsed`、`0×0`。本批第一版全部读这棵树，于是同时得到四个假象：卡片尺寸盒"没有本地值"、
+标题"没有样式"、像素"什么都没画"、按钮"点了没反应"。真打开（`ShowAsync()`）后同一批读数全部改写：
+卡片带着本地 `MaxWidth`、按钮样式换得动、事件与结果齐全。`ShowAsync()` 对**已挂载**的实例同步抛
+`InvalidOperationException("Popup-hosted ContentDialog must not already be attached to the visual tree.")`，
+并把控件搬进窗口的 `ContentDialogOverlayHost`——所以对话框类的出口必须包含"真开一次"，
+`PixelHarness.Place/Render` 这条路对它根本不通（本批改用 `Chrome` 就地裁剪）。
+
+**2 · 模态宿主按部件名写本地值，模板的槽位要给两层。** 控件把自身 Min/Max 映射到名为 `PART_DialogCard`
+的元素并用"宿主宽 − 48"封顶：宿主 886.3 → `card.MaxWidth` 本地值 838.2857…；应用写 `MaxWidth=548` →
+本地值 548；`MinWidth=320` 同样直达。本地值在所有格子之上，所以上游 `ContentDialogMaxWidth`（548）那条
+**默认**上限没法以字面量放在这个名字上。解法是拆两层：`PART_DialogCard` 只接名字与 24 DIP 外边距，
+`DialogSurface` 承载上游尺寸盒与所有填充行——控件只认名字，写不到第二层。推广：**凡框架自己建过模板的
+控件，重模板时都要预期它会按名字回写本地值**；判断方法是"读回 `ReadLocalValue`"，不是"看模板里写了什么"。
+
+**3 · 格子的可达面测出来了：元素写得住、列写不住、`TemplateBinding` 写不住；不带 `TargetName` 能写模板父级。**
+八种按钮文本组合的列读回全是 `*,8,*,8,*`：`Value="0"` 在格子里被存成 `Double(0)`、`Value="0*"` 是真
+`GridLength`，两种形状都改不动 `ColumnDefinition.Width`。同一批格子里，元素上的 `Visibility`、`Grid.Column`、
+`VerticalAlignment` 全部生效；按钮的 `Style` 因为是 `TemplateBinding` 写出的本地值而无效（`local=set` 不变）。
+改写到父级属性（`<Setter Property="PrimaryButtonStyle">` 无 `TargetName`）就通：`buttonStyleChanged=True`、
+`dialog.PrimaryButtonStyle` 即格子里那个实例、`DefaultButton=None` 后还原。另测：`UniformGrid` 折叠子元素后
+**不回收**其格子（`35.9/34.8/35.4` → 折叠中间仍是 `35.9/35.4`），所以它不是"按可见项数均分"的替代品。
+推广：上游用 VisualState 改列宽/改样式的那类状态，在本运行时要么改写成"写元素 + 写父级属性"，
+要么就是真做不到——按 Known Gap 记，不要留一条永不生效的格子当交代。
+
+**4 · 生成的文本元素选择性吃继承：字重进得去、字号进不去。** `PART_TitleHost`（`ContentControl`）上写
+`FontSize=20 FontWeight=SemiBold`，生成的 `TextBlock` 读回 `weight=SemiBold size=14 localSize=UnsetValue`；
+`ContentPresenter.Resources` 里的隐式 `TextBlock` 样式在此读回 `style=null`（与 `ComboBoxItem` 那条 NoWrap
+不是同一作用域）。唯一量到的通路是**样式级 `TitleTemplate`** 里放一个自建的 `TextBlock`（自建本地值，
+`size=20 weight=SemiBold localSize=20`）。代价：`Title` 传非字符串对象时需要应用自己给模板。
+推广：文本属性要么落在我们建的那个元素上，要么就承认落不到——`ContentPresenter` 与生成元素之间
+没有第三条路。
+
+**5 · 圆角要靠每层内表面自带半径，`Border` 从不裁剪子元素——这条这次是像素断言抓到的，不是看出来的。**
+`DialogSurface` 有 r=8，但卡片不会裁剪它的子树：任何填到卡片边缘的方形 `Border` 都会把弧覆盖成方角。
+标题条 `TitleStrip`（`ContentDialogTopOverlay` = `#FFFFFF`，与卡片 `#F3F3F3` 不同色）直接把 (1,1)、(2,1)、
+(1,2) 三格刷成自己的颜色；命令行 `PART_ButtonArea`（`Background={TemplateBinding Background}`，即卡片同色）
+把 (1,h-2)、(2,h-2) 三格画成 `#F3F3F3`——在表面上完全看不见，只有弧外那格露出方形「耳」，所以**同色不等于
+无罪**。解法不是裁剪（本运行时的 `Border` 做不到），是每层内表面自带对应半径：`8,8,0,0` 与 `0,0,8,8`。
+推广：**给圆角表面做重模板时，逐角读回像素，且把"内表面与外表面同色"当成额外风险**——前一批 `MenuBar`
+下拉、`AutoSuggestBox` 建议行的圆角缺陷都是同一形状，只是这次有断言守着。判据在
+`AstraContentDialogTests.The_two_inner_surfaces_leave_the_cards_round_corners_alone`。

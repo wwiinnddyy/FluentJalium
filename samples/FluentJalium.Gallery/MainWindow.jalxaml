@@ -399,6 +399,20 @@
                   <TextBlock x:Name="InfoBarReadout" Text="Nothing closed yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Content dialog" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="DialogThreeButton" Content="Three buttons" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="DialogTwoButton" Content="Two buttons" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="DialogOneButton" Content="Only Cancel" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="DialogDefaultToggle" Content="Default is primary" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="DialogFullSizeToggle" Content="Full size" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="This card holds no dialog element on purpose: 26.10.9 hosts a shown ContentDialog in the window's own overlay layer and refuses to open one that is already placed in a tree, so the dialog is built on the click. Under the Astra template it is a smoke layer, a 24 DIP gutter, a card capped at 548 with the overlay corner radius, and a 20 SemiBold title over the body. The control owns the card's width and maps the app's own MaxWidth onto it, so the template's cap is the resting value rather than a limit an app cannot pass. The title strip and the command row each carry their own half of that 8 DIP arc: a border here rounds what it fills and never clips a child, so a square band running to the card's edge paints the corner back on." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="DialogReadout" Text="Nothing shown yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="MenusPage">

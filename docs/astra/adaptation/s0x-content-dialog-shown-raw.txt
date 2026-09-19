@@ -1,0 +1,35 @@
+-- A: detached, before ShowAsync (no tree to read)
+-- B: ShowAsync on a detached dialog (completed=False fault=none)
+   dialog vis=Visible actual=886.3x693.1 parent=ContentDialogOverlayHost inWindow=True
+   host ContentDialogOverlayHost: bg=- opacity=1 children=1 radius=-
+   dialog box localMax={DependencyProperty.UnsetValue} max=∞
+   card 394.1x191 min=0 max=838.2857142857143 minH=0 maxH=∞ localMax=838.2857142857143 localMin={DependencyProperty.UnsetValue} radius=0,0,0,0 align=Center
+   surface 394.1x191 min=320 max=548 minH=184 maxH=756 localMax={DependencyProperty.UnsetValue} radius=8,8,8,8 bg=SolidColorBrush(#FF202020) border=1,1,1,1
+   title host=ContentControl hostSize=20 hostWeight=SemiBold text="Publish this draft?" size=20 weight=SemiBold localSize=20 localWeight=SemiBold style=null wrapping=Wrap
+   tree:
+    Grid "PART_Root" 886.3x693.1 margin=0,0,0,0 padding=- radius=- align=Stretch
+      Border "PART_Overlay" 886.3x693.1 margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+      Border "PART_DialogCard" 394.1x191 margin=24,24,24,24 padding=0,0,0,0 radius=0,0,0,0 align=Center
+        Border "DialogSurface" 394.1x191 margin=0,0,0,0 padding=0,0,0,0 radius=8,8,8,8 align=Center
+            ScrollViewer "PART_ContentScrollViewer" 392.1x108.2 margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+            Border "PART_ButtonArea" 392.1x80.8 margin=0,0,0,0 padding=24,24,24,24 radius=0,0,0,0 align=Stretch
+   primary: content=Publish enabled=True style=Style
+-- C: after invoking the primary button. opened=1 closed=1 clicks=1 completed=True result=Primary vis=Collapsed
+   dialog vis=Collapsed actual=886.3x693.1 parent=none inWindow=True
+   dialog box localMax={DependencyProperty.UnsetValue} max=∞
+   card 394.1x191 min=0 max=838.2857142857143 minH=0 maxH=∞ localMax=838.2857142857143 localMin={DependencyProperty.UnsetValue} radius=0,0,0,0 align=Center
+   surface 394.1x191 min=320 max=548 minH=184 maxH=756 localMax={DependencyProperty.UnsetValue} radius=8,8,8,8 bg=SolidColorBrush(#FF202020) border=1,1,1,1
+   title host=ContentControl hostSize=20 hostWeight=SemiBold text="Publish this draft?" size=20 weight=SemiBold localSize=20 localWeight=SemiBold style=null wrapping=Wrap
+-- D: a dialog whose OWN MaxWidth is 548 (completed=False)
+   dialog vis=Visible actual=886.3x693.1 parent=ContentDialogOverlayHost inWindow=True
+   host ContentDialogOverlayHost: bg=- opacity=1 children=1 radius=-
+   dialog box localMax=548 max=548
+   card 320x191 min=320 max=548 minH=0 maxH=∞ localMax=548 localMin=320 radius=0,0,0,0 align=Center
+   surface 320x191 min=320 max=548 minH=184 maxH=756 localMax={DependencyProperty.UnsetValue} radius=8,8,8,8 bg=SolidColorBrush(#FF202020) border=1,1,1,1
+   title host=ContentControl hostSize=20 hostWeight=SemiBold text="Cap check" size=20 weight=SemiBold localSize=20 localWeight=SemiBold style=null wrapping=Wrap
+-- E: after Hide()
+   dialog vis=Collapsed actual=886.3x693.1 parent=none inWindow=True
+   dialog box localMax=548 max=548
+   card 320x191 min=320 max=548 minH=0 maxH=∞ localMax=548 localMin=320 radius=0,0,0,0 align=Center
+   surface 320x191 min=320 max=548 minH=184 maxH=756 localMax={DependencyProperty.UnsetValue} radius=8,8,8,8 bg=SolidColorBrush(#FF202020) border=1,1,1,1
+   title host=ContentControl hostSize=20 hostWeight=SemiBold text="Cap check" size=20 weight=SemiBold localSize=20 localWeight=SemiBold style=null wrapping=Wrap

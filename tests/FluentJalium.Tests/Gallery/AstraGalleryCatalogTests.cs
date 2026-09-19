@@ -161,7 +161,9 @@ public class AstraGalleryCatalogTests
 
     /// <summary>
     /// The Gallery reads the catalog out of its own output folder, so the file that ships has to be the
-    /// file that is gated.
+    /// file that is gated. Only the sibling folder of <i>this</i> run is compared: the test assembly's own
+    /// path names the configuration the build produced, and a copy under the other configuration belongs to
+    /// a different build - a Debug gate used to fail on a week-old Release folder nobody was shipping.
     /// </summary>
     [Fact]
     public void The_gallery_project_carries_the_catalog_it_reads()
@@ -170,9 +172,15 @@ public class AstraGalleryCatalogTests
         Assert.Contains("Catalog.json", project, StringComparison.Ordinal);
         Assert.Contains("CopyToOutputDirectory", project, StringComparison.Ordinal);
 
+        var configuration = new DirectoryInfo(Path.GetDirectoryName(
+            typeof(AstraGalleryCatalogTests).Assembly.Location)!).Parent!.Name;
+        var galleryBin = Path.Combine(RepositoryRoot(), "samples", "FluentJalium.Gallery", "bin", configuration);
+        var copies = Directory.EnumerateFiles(galleryBin, "Catalog.json", SearchOption.AllDirectories).ToArray();
+        Assert.False(copies.Length == 0,
+            $"no Catalog.json under {galleryBin}: the gallery project stopped copying the file it reads at runtime.");
+
         var source = Read(CatalogPath);
-        foreach (var path in Directory.EnumerateFiles(Path.Combine(RepositoryRoot(), "samples", "FluentJalium.Gallery", "bin"),
-                     "Catalog.json", SearchOption.AllDirectories))
+        foreach (var path in copies)
         {
             Assert.Equal(source, File.ReadAllText(path));
         }

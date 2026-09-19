@@ -330,7 +330,60 @@ Gallery 不只是演示，它是**这套架构唯一的回归面**：没有 Gene
 **但它按属性重画，所以本段没有一条上屏帧主张**；硬件输入 = **仍为零**。
 仍欠：建议行"选中"到底是框架哪个状态（只量到过滤后自动选中的第一行）；`SuggestionsContainer` 的行左右零内缩
 本批没改（现在行不画不透明底色所以盖不住圆角，一旦某格写上不透明底色缺陷会回来，真解是阶段 5 做
-`ListBoxItem` 时给行带 `Margin` + r=4）；`MenuBar` 下拉与 `ContentDialog` 的半径没测。
+`ListBoxItem` 时给行带 `Margin` + r=4）；`MenuBar` 下拉的半径没测。本段当时对 `ContentDialog` 只读了
+`DialogSurface.CornerRadius=8` 这一条属性就收口——**那条收口是错的**，第十段按像素逐角复测后在里面发现两处
+方角缺陷并修掉（见下）。教训一并写进 S0-x.5：圆角只能逐角读像素，读外层属性不算检查过。
+
+**视觉缺陷批第十段 / 阶段 4 第四段（ContentDialog：量一个对话框要先把它打开，2026-09-19）**：
+路线图上这一格写的是"ContentDialog(自有)"，S0-v 的类型清单把它改判成原生重模板——原生类型成员面完整，
+`spike/RightGapProbe` 的 `dialog` pass 量到它有框架在挂载时代码建好的树（`PART_Root`/`PART_Overlay`/
+`PART_DialogCard`/`PART_TitleHost`/`PART_ContentScrollViewer`/`PART_ButtonPanel` + 三个按钮）。
+**这一段最值钱的读数不是样式，而是"什么状态才算量过它"**：挂载未打开的实例是
+`Visibility=Collapsed`、`0×0`，本批第一版 15 条断言全读那棵空树，于是"卡片没有本地尺寸值""标题没有样式"
+"像素画不出""点了没反应"四条假象同时出现——`ShowAsync()` 真开一次之后四条全部改写。
+控件把对话框搬进窗口的 `ContentDialogOverlayHost`，并且**拒绝**打开已经在树里的实例（同步抛
+`must not already be attached to the visual tree`），所以 Gallery 的 Surfaces 页面上没有 `<ContentDialog>`
+元素：卡片给三个按钮（三/两/一个）+ 两个开关（默认按钮、full size），点击时才 new。
+量到的三条基座写进 `adaptation/00` **S0-x**：
+(1) **模态宿主按部件名回写本地值**——控件把自身 Min/Max 映射到 `PART_DialogCard` 并用"宿主宽 − 48"封顶
+（宿主 886.3 → `card.MaxWidth` 本地 838.2857…；应用写 `MaxWidth=548` → 本地就是 548），本地值在所有格子之上，
+所以 548 那条默认上限放不住：卡片拆成两层，`PART_DialogCard` 只接名字与 24 DIP 外边距，
+`DialogSurface` 承上游尺寸盒（320/548/184/756）与全部填充行，实测 `surface.max=548 localMax=UnsetValue`、
+`radius=8,8,8,8`；
+(2) **格子的可达面测清了**：八种文本组合下五列恒为 `*,8,*,8,*`——`Value="0"`（存成 `Double`）和
+`Value="0*"`（真 `GridLength`）都写不动具名 `ColumnDefinition.Width`，而元素上的 `Visibility`/`Grid.Column`/
+对齐都写得住；`UniformGrid` 折叠子元素后**不回收**格子（`35.9/34.8/35.4` → `35.9/35.4`），不是替代品；
+按钮的 `Style` 是 `TemplateBinding` 写出的本地值，格子压不过——改写成不带 `TargetName` 的格子去写控件自身的
+`PrimaryButtonStyle` 就通（`buttonStyleChanged=True`、拿到的正是格子里那个 `AccentButtonStyle` 实例、
+`DefaultButton=None` 后还原）；
+(3) **生成的文本元素选择性吃继承**：`PART_TitleHost` 上 `FontWeight=SemiBold` 进得去、`FontSize=20` 进不去
+（读回 `size=14 localSize=UnsetValue`），`ContentPresenter.Resources` 的隐式 `TextBlock` 样式在此是惰的
+（`style=null`，与 `ComboBoxItem` 那条 NoWrap 不同作用域）——20/SemiBold 最终落在**样式级默认
+`TitleTemplate`** 自建的 `TextBlock` 上（`size=20 weight=SemiBold localSize=20`），代价是非字符串 `Title`
+需要应用自给模板。
+行为面把部件名这条契约从"注释里的希望"变成读数：Invoke 我们模板里的 `PART_PrimaryButton` →
+`PrimaryButtonClick` 与 `Closed` 各一次、`ShowAsync` 以 `Primary` 完成、`Visibility` 回 `Collapsed`；
+禁用该按钮后一次点击都不发。视觉面两条：哨兵换掉 `SolidBackgroundFillColorBaseBrush` 后卡片画哨兵
+（>5 000 px、品牌绿 0 px，注意裁剪里上部条带占更大面积）与 Light/Dark 各开一张卡 `Top(3)` 直方图不同、
+两张都画满。`ContentDialog` 的半径这条**量出一个真缺陷并已修**：`DialogSurface` r=8 而卡片不裁剪子元素，
+于是两张填到卡片边缘的方形 `Border` 把弧盖掉了——`TitleStrip` 让 (1,1)/(2,1)/(1,2) 读成自己的 `#FFFFFF`，
+`PART_ButtonArea` 让 (1,h-2)/(2,h-2) 读成卡片的 `#F3F3F3`（同色，所以在表面上完全隐形，只有弧外那格露出方形
+"耳"）。解法是每层内表面自带半径 `8,8,0,0` / `0,0,8,8`，改后同一区读回完整弧的斜坡；基座结论写进
+S0-x.5：**同色不等于无罪，圆角表面要逐角读像素**。落点：`ThemeResources/ContentDialog.jalxaml` +
+`Styles/ContentDialog.jalxaml`（进 Manifest）、`audits/content-dialog.md`、`AstraContentDialogTests` 38 条、
+Catalog 行 + Surfaces 页卡片、原始日志 `adaptation/s0x-content-dialog-shown-raw.txt`。四类证据：构建 = 两份字典 + 38 条编译进闸口，串行闸口 **666/666 全绿 0 警告错误 0 skip**、调色板三档 checked=True；
+行为 = 38 条（含八格几何表与四角）；视觉 = 两条 `Chrome` 裁剪，**含文本的弹窗
+裁剪不总收敛**，因此稳定性只挂在哨兵那条，另加四角单点读数；硬件输入 = **仍为零**（按钮的悬停/按下沿用
+Button 批）。闸口首跑还当场抓到**一条闸口自身的缺陷**：`The_gallery_project_carries_the_catalog_it_reads`
+把 `samples/FluentJalium.Gallery/bin/**` 下**所有配置**的 catalog 副本都拿来与源文件比对，于是一次 Debug
+串行闸口被另一配置留下的一份旧副本判红（`expected ContentDialog / actual Expander`）。这不是产品回归而是
+判据写错——它比对的不是"这次构建发出去的那份"。已改成按测试程序集自身路径推出的配置只比对该配置的副本，
+并补一条"该配置下必须有副本"的反空过断言（否则目录不再被复制也会静默全绿）。
+仍欠（全部记在 `audits/content-dialog.md` §5）：两按钮不是上游的两半而是"两个 1/3 + 一端空 1/3"、
+单按钮是 1/3 而非右侧半宽（真解要么给列宽接一个转换器，要么按 AGENTS.md 起自有面板类型——先证明这条差异
+值得多一个类型）；`MaxLines=2` 的标题封顶未落地（本运行时是否支持没量）；开合动画为 0；
+`ContentDialogOverlayHost` 是否自带第二层烟幕属性面读不到（不暴露 `Background`），需要上屏帧才能结，
+这正是用户报的"重影"那一类，暂不声称已排除。
 
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
