@@ -79,11 +79,17 @@
 
 ## 5 · Known Gaps
 
-1. **`AutoCompleteBox` 建议列表的宽度只在 harness 一侧有证据。** `ElementName` 绑定在 harness（弹层被 graft
-   进宿主 overlay）里读到 260；真上屏那一侧**没有证据**——本批原本用来反证的 148/260 后来作废（§7·1）。
-   探针里 `IsDropDownOpen=true` / `Text` setter 都不能把 `ComboBox`、`AutoCompleteBox` 的弹层送上屏
-   （整屏截图里两个控件都是闭合的，见 §7·3），所以样式侧够不够得着仍未判定。
-   `{TemplateBinding}` 与两种 `RelativeSource` 在 graft 之后实测 0，字面量会冻住一个用户可拖宽的盒子。
+1. ~~**`AutoCompleteBox` 建议列表的宽度只在 harness 一侧有证据。**~~ **已结（2026-09-20 复测批）。**
+   两条当时的判断都被推翻：
+   *弹层上不了屏* —— `RightGapProbe --open suggest10` 用赋值 `Text` 就能开，PrintWindow 帧里建议列表在屏
+   （`spike/RightGapProbe/out/suggest10-a-surface-*.png`）；当时量到"两个控件都闭合"是因为探针的
+   `ItemFilter` 形参顺序写反了（本运行时是 `Func<string, object, bool>`，**文本在前、项在后**），
+   于是零命中、弹层根本不该开——那条不是通路问题，是探针 bug。
+   *宽度没有真上屏证据* —— 同一张帧里按颜色游程量边：卡片 `#2C2C2C` 跨 x=217..982（766 px），
+   输入框 `#222222` 跨 x=218..982（765 px），dpi=168 → 两者同为 440 DIP。`ElementName` 绑定到了屏幕。
+   顺带把这块的高度也量了：上限原本挂在卡片上少 6 DIP，改挂到列表后卡片到 380 DIP，
+   见 `autosuggestbox.md` §6。
+   `{TemplateBinding}` 与两种 `RelativeSource` 在 graft 之后实测 0 那条仍然有效，字面量仍会冻住可拖宽的盒子。
 2. ~~**`NumberBox` 无 Header 时高 39 而不是 32。**~~ **已结（2026-09-20 追批）。**
    `HeaderContentPresenter` 的 `0,0,0,8` 是本地 margin，Content 为空也照扣（读回：presenter `0x0 margin=0,0,0,8`，
    `OuterBorder` 31，控件 39）。上游那个 presenter 默认 `Collapsed`、由代码在 Header 存在时才打开。

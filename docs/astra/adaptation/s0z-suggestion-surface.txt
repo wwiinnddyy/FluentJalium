@@ -1,0 +1,332 @@
+s0z 建议列表表面复测原始日志（probe RightGapProbe，Jalium.UI 26.10.9，dpi=168，窗口 420x680 / 700x760）
+  运行：--open listheight | clamp | itemstyle | suggest10（后者配 spike/RightGapProbe/capture-suggest10.ps1 出帧）
+  滚动条子树（RepeatButton / Track / Thumb / PART_Arrow）已滤掉，它们全部量 0x0。
+
+########## --open listheight ##########
+== A: AutoCompleteBox, 24 matching rows, text=I, MaxDropDownHeight as our style leaves it = 200 ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=50.285714285714285 left=50.285714285714285 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+== B: same box, MaxDropDownHeight set to 374 (upstream's AutoSuggestListMaxHeight) = 374 ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=50.285714285714285 left=50.285714285714285 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+== C: same box, MaxDropDownHeight set to 120, the second point of the curve ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=50.285714285714285 left=50.285714285714285 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+   screen: 2560x1600 px, work area 1476x64 px | window top=50.285714285714285 left=50.285714285714285 size=406.3x673.1 box=260x32
+== C2: same box, MaxDropDownHeight set to 700, above what the 24 rows need ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=50.285714285714285 left=50.285714285714285 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+== C3: back to 374 ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=50.285714285714285 left=50.285714285714285 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+== D: ComboBox, same 24 rows, open=False, MaxDropDownHeight=504 ==
+   rows: realized=0 summed=0 first=none
+     up: Border "PART_PopupBorder" 0x0 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=False actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "PART_PopupBorder" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,-0.5,0,-1 padding=0,0,0,0 radius=8,8,8,8 align=Stretch
+      ScrollViewer "PART_ScrollViewer" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+        ItemsPresenter "" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,4,0,4 padding=- radius=- align=Stretch
+== E: MenuFlyout, same 24 rows, open=False ==
+== flyout row 0 MenuFlyoutItem actual=0x0 padding=0,0,0,0 margin=0,0,0,0
+   row "Item 00" 119x38 padding=11,8,11,9 radius=4,4,4,4
+   row "Item 01" 119x38 padding=11,8,11,9 radius=4,4,4,4
+   row "Item 02" 119x38 padding=11,8,11,9 radius=4,4,4,4
+   flyout rows realized=24 summed=912
+
+########## --open clamp ##########
+== box at y=20 of a 700 DIP window, 24 matching rows ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x693.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x693.1 minH=- maxH=- h=693.1 vis=Visible top=176 left=176 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+          StackPanel "PART_DropDownItemsHost" 260x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+== same control at y=560 of the same window, same 24 rows ==
+   rows: realized=24 summed=858.7 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x380 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x380 minH=- maxH=- h=380 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x693.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x693.1 minH=- maxH=- h=693.1 vis=Visible top=176 left=176 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x380 w=- minW=260 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x374 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+          StackPanel "PART_DropDownItemsHost" 260x374 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+
+########## --open itemstyle ##########
+== declared ComboBoxItems (markup): rows=0 
+== declared, from the popup child: rows=3 ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Balanced | ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Focused | ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Relaxed
+   first row subtree:
+    ComboBoxItem "" 258x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+      Grid "" 248x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+        Border "LayoutRoot" 248x31.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+        Border "Pill" 3x16 w=- minW=- maxW=- h=- maxH=- margin=1,0,0,0 padding=0,0,0,0 radius=1.5,1.5,1.5,1.5 align=Left
+        ContentPresenter "ContentPresenter" 226x19.8 w=- minW=- maxW=- h=- maxH=- margin=11,5,11,7 padding=- radius=- align=Stretch
+          TextBlock "" 226x19.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=- align=Stretch
+== generated containers (strings): rows=0 
+== generated, from the popup child: rows=3 ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Balanced | ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Focused | ComboBoxItem 258x35.8 minH=32 localMinH=- pad=11,5,11,7 r=3,3,3,3 font=14 content=Relaxed
+   first row subtree:
+    ComboBoxItem "" 258x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+      Grid "" 248x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+        Border "LayoutRoot" 248x31.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+        Border "Pill" 3x16 w=- minW=- maxW=- h=- maxH=- margin=1,0,0,0 padding=0,0,0,0 radius=1.5,1.5,1.5,1.5 align=Left
+        ContentPresenter "ContentPresenter" 226x19.8 w=- minW=- maxW=- h=- maxH=- margin=11,5,11,7 padding=- radius=- align=Stretch
+          TextBlock "" 226x19.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=- align=Stretch
+== suggestion rows: rows=1 ComboBoxItem 260x35.8 minH=28 localMinH=28 pad=11,5,11,7 r=3,3,3,3 font=14 content=Balanced
+   first row subtree:
+    ComboBoxItem "" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+      Grid "" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+        Border "LayoutRoot" 250x31.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+        Border "Pill" 3x16 w=- minW=- maxW=- h=- maxH=- margin=1,0,0,0 padding=0,0,0,0 radius=1.5,1.5,1.5,1.5 align=Left
+        ContentPresenter "ContentPresenter" 228x19.8 w=- minW=- maxW=- h=- maxH=- margin=11,5,11,7 padding=- radius=- align=Stretch
+          TextBlock "" 228x19.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=- align=Stretch
+   rows: realized=1 summed=35.8 first=ComboBoxItem 260x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 260x41.8 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 260x41.8 minH=- maxH=- h=41.8 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 406.3x673.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 406.3x673.1 minH=- maxH=- h=673.1 vis=Visible top=25.142857142857142 left=25.142857142857142 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=260x32 width=260 minWidth=260 maxWidth=260 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 260x41.8 w=- minW=0 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 258x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+          StackPanel "PART_DropDownItemsHost" 260x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+   before repair: minH=28 style=null
+   after Style=ours: minH=28 size=260x35.8 r=3,3,3,3 pill=Border
+== suggestion rows from declared containers: rows=0 
+== every painted element under PopupRoot, offsets in DIP vs the window ==
+    PopupRoot "" 260x41.8 at unreadable localPad=?no such dp localMinH=- localMargin=- text=- font=-
+      Border "SuggestionsContainer" 260x41.8 at unreadable localPad=- localMinH=- localMargin=- text=- font=-
+        Grid "PART_DropDownBorder" 258x35.8 at unreadable localPad=?no such dp localMinH=- localMargin=- text=- font=-
+          ScrollViewer "PART_DropDownScrollViewer" 260x35.8 at unreadable localPad=- localMinH=- localMargin=- text=Jalium.UI.Controls.StackPanel font=Microsoft YaHei UI
+            StackPanel "PART_DropDownItemsHost" 260x35.8 at unreadable localPad=?no such dp localMinH=- localMargin=- text=- font=-
+              ComboBoxItem "" 260x35.8 at unreadable localPad=- localMinH=28 localMargin=- text=Balanced font=Microsoft YaHei UI
+                Grid "" 250x31.8 at unreadable localPad=?no such dp localMinH=- localMargin=- text=- font=-
+                  Border "LayoutRoot" 250x31.8 at unreadable localPad=- localMinH=- localMargin=- text=- font=-
+                  Border "Pill" 3x16 at unreadable localPad=- localMinH=- localMargin=- text=- font=-
+                  ContentPresenter "ContentPresenter" 228x19.8 at unreadable localPad=?no such dp localMinH=- localMargin=- text=Balanced font=-
+                    TextBlock "" 228x19.8 at unreadable localPad=- localMinH=- localMargin=- text=Balanced font=Microsoft YaHei UI
+
+########## --open suggest10 ##########
+== Gallery-shaped fruit box, text="a" == box=440x32
+   rows: realized=2 summed=71.6 first=ComboBoxItem 440x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "SuggestionsContainer" 440x77.6 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 440x77.6 minH=- maxH=- h=77.6 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 686.3x753.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 686.3x753.1 minH=- maxH=- h=753.1 vis=Visible top=125.71428571428571 left=125.71428571428571 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=440x32 width=440 minWidth=440 maxWidth=440 height=- placement=Bottom child=Border
+    Border "SuggestionsContainer" 440x77.6 w=- minW=440 maxW=- h=- maxH=- margin=0,0,0,0 padding=0,2,0,2 radius=8,8,8,8 align=Stretch
+      Grid "PART_DropDownBorder" 438x71.6 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+        ScrollViewer "PART_DropDownScrollViewer" 440x71.6 w=- minW=- maxW=- h=- maxH=- margin=-1,0,-1,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+          StackPanel "PART_DropDownItemsHost" 440x71.6 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+            ComboBoxItem "" 440x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 430x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 440x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 430x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+holding for a capture
+== same card, the picker dropped instead, items=10 ==
+   rows: realized=10 summed=357.8 first=ComboBoxItem 438x35.8 padding=11,5,11,7 radius=3,3,3,3 margin=0,0,0,0 font=14 style=null
+     up: Border "PART_PopupBorder" 440x367.8 minH=- maxH=- h=- vis=Visible top=- left=- bg=SolidColorBrush(#FF2C2C2C)
+     up: PopupRoot "" 440x366.3 minH=- maxH=- h=366.3 vis=Visible top=- left=- bg=-
+     up: OverlayLayer "" 686.3x753.1 minH=- maxH=- h=- vis=Visible top=- left=- bg=-
+     up: Window "" 686.3x753.1 minH=- maxH=- h=753.1 vis=Visible top=125.71428571428571 left=125.71428571428571 bg=SolidColorBrush(#FF202020)
+== popup surface dump: suggest ==
+   Popup "PART_Popup" open=True actual=440x32 width=440 minWidth=440 maxWidth=440 height=- placement=Bottom child=Border
+    Border "PART_PopupBorder" 440x367.8 w=- minW=- maxW=- h=- maxH=- margin=0,-0.5,0,-1 padding=0,0,0,0 radius=8,8,8,8 align=Stretch
+      ScrollViewer "PART_ScrollViewer" 438x365.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+        ItemsPresenter "" 438x357.8 w=- minW=- maxW=- h=- maxH=- margin=0,4,0,4 padding=- radius=- align=Stretch
+          StackPanel "" 438x357.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+            ComboBoxItem "" 438x35.8 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=11,5,11,7 radius=3,3,3,3 align=Stretch
+              Grid "" 428x31.8 w=- minW=- maxW=- h=- maxH=- margin=5,2,5,2 padding=- radius=- align=Stretch
+              Border "" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+              Border "" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+              Border "" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+              Border "" 0x0 w=- minW=- maxW=- h=- maxH=- margin=0,0,0,0 padding=0,0,0,0 radius=0,0,0,0 align=Stretch
+holding for the picker capture
+
+
+########## 上屏帧宽度复核（spike/VisualQA/scan-line.ps1，帧本身在 .gitignore 的 spike/RightGapProbe/out/ 下，不入库）##########
+帧：spike/RightGapProbe/out/after/suggest10-a-surface-1225x1330-168+220+220.png
+（修字面量之后、`--open suggest10` 输入 a 的 AutoCompleteBox；窗口 1225x1330 px，dpi 168，盒子 440 DIP）
+  扫描区间 From=120 To=1100
+
+y=200 —— 控件本体那一行
+  120..179 #202020
+  183..214 #2D2D2D
+  218..233 #222222
+  237..982 #222222
+  986..1017 #2D2D2D
+  1021..1100 #202020
+  → 盒子填充横跨 x=218..982 = 765 px（218 那一格是框自己的 1 px 边）
+
+y=240 —— 卡片上边框那一条
+  217..236 #2C2C2E
+  240..982 #2C2C2C
+y=300 —— 卡片第一行
+  120..179 #202020 / 183..214 #2D2D2D / 217..982 #2C2C2C / 985..1017 #2D2D2D / 1021..1100 #202020
+y=340 —— 卡片第二行：同上，217..982 #2C2C2C
+  → 卡片填充横跨 x=217..982 = 766 px = 440 DIP
+
+结论：卡片与盒子同为 440 DIP，左右各对齐到同一批像素列（差 1 px 是框的那条边，不是"右边空一块"）。

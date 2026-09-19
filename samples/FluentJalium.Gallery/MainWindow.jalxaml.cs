@@ -286,8 +286,8 @@ public partial class MainWindow : Window
         {
             Title = "Publish this draft?",
             Content = "Once it is public, readers and search engines can see the version as of now.",
-            PrimaryButtonText = shapes >= 2 ? "Publish" : null,
-            SecondaryButtonText = shapes == 3 ? "Save draft" : null,
+            PrimaryButtonText = shapes >= 2 ? "Publish" : null!,
+            SecondaryButtonText = shapes == 3 ? "Save draft" : null!,
             CloseButtonText = "Cancel",
             FullSizeDesired = ((ToggleButton)DialogFullSizeToggle!).IsChecked == true,
         };

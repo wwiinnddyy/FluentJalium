@@ -24,16 +24,22 @@
   <!-- Upstream's own name swap, kept verbatim because it is what the pixels are made of:
        AutoSuggestListMargin is applied as Padding on the container Border and AutoSuggestListPadding
        is applied as Margin on the list. Reading the names instead of the rows moves 2 DIP of gap from
-       inside the border to outside it. -->
+       inside the border to outside it.
+       Measured caveat, because this row is the one place the host overrules us: setting it to 0,0,0,0
+       leaves the drop-down scroll host at -1,0,-1,0 anyway (probed: the template setter reads 0,0,0,0
+       while the realized element's Margin still reads -1,0,-1,0), so the control stamps that inset on its
+       own part after the template is applied. The rows therefore sit 1 DIP past the card's inner edge on
+       each side no matter what this row says - which matches upstream, whose -1 exists to cancel a
+       ListView border this host has never had. -->
   <Thickness x:Key="AutoSuggestListMargin">0,2,0,2</Thickness>
   <Thickness x:Key="AutoSuggestListPadding">-1,0,-1,0</Thickness>
   <!-- Not transcribed, all 14 remaining rows of the 19 this control declares upstream, each with the
        reason the host type gives:
        AutoSuggestListMaxHeight (x:Double 374) - a live row upstream: the suggestions list carries it as
-         MaxHeight. This reader cannot parse an x:Double resource, so the value rides as a literal on the
-         container instead. Placement deviation: upstream caps SuggestionsList, we cap
-         SuggestionsContainer, so our list gives up 6 DIP - the 4 of container padding and the 2 of border
-         the row does not have to fit under upstream.
+         MaxHeight. This reader cannot parse an x:Double resource, so the value rides as a literal on
+         PART_DropDownScrollViewer, the element that plays the list's role here. It used to ride on
+         SuggestionsContainer, which cost 6 DIP of surface because the card's own padding and border came
+         off the ceiling instead of sitting outside it.
        AutoSuggestBoxIconFontSize (x:Double 12) - no query glyph to size on this host (see below).
        AutoSuggestBoxLightDismissOverlayBackground - upstream binds it to a Rectangle the control creates
          in code and appends to LayoutRoot. AutoCompleteBox has no light-dismiss overlay, so no element.

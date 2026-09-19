@@ -197,8 +197,10 @@
    `KeepInteriorCornersSquare` 只在代码里生效，本运行时无对应面。
 6. 不声称占位符有颜色行：`PlaceholderText` 属性在、文本由框架的 `TextBoxContentHost` 画，
    没有可指向的元素，所以 `TextControlPlaceholderForeground*` 仍不抄（与 TextBox/NumberBox 批一致）。
-7. 不声称建议列表的高度上限与上游逐位一致：`AutoSuggestListMaxHeight` 以字面量落在容器上而不是
-   列表上，因此我们的列表比上游少 6 DIP（4 padding + 2 border，§1）。
+7. ~~不声称建议列表的高度上限与上游逐位一致~~ **2026-09-20 结清**：`AutoSuggestListMaxHeight` 的
+   字面量原本挂在卡片上，比上游少 6 DIP；现在挂在 `PART_DropDownScrollViewer`（上游挂 `SuggestionsList`
+   的那一层），实测卡片到 380 DIP，与上游"列表 374 + 卡片 4 padding + 2 border"逐位一致（§6.2）。
+   仍不声称的是**逐位**之外的部分：值本身是字面量而不是行（本读取器解析不了 x:Double）。
 8. 不声称上游的两份字典合并了：本批从 `7cd762eb` 抄行；`39e8d87f` 的状态重写形式没有搬，
    因为本运行时的标记层没有 `VisualState.Setters`（`adaptation/00`）。
 9. 不声称高对比逐键一致：AutoSuggestBox 没有独立 HC 分支（它继承文本框与 flyout 的），
@@ -210,3 +212,54 @@
     所以该裁剪既不逐位稳定也不干净（§4 视觉）。哨兵用例只断"我们的面到了像素"。
 13. 不声称 `ItemsSource` 换成对象集合时的显示：`TextMemberPath` 属性在，但条目由框架的
     `ComboBoxItem` 承载，本批只用字符串集合取证。
+
+## 6. 复测批：建议列表"偏小"（2026-09-20，不占控件名额）
+
+用户报告：输入补全的下拉框明显偏小，跟其他下拉框、flyout 比都小。原始日志
+`adaptation/s0z-suggestion-surface.txt`（probe `RightGapProbe --open listheight / clamp / itemstyle / suggest10`
++ `spike/RightGapProbe/out/` 的 PrintWindow 帧；那批帧在 `.gitignore` 的 `spike/RightGapProbe/out/` 下因此不入库，
+宽度那两条的逐行色区间已原样抄进同一份日志的"上屏帧宽度复核"一节）。
+
+### 6.1 先撤回一条还没写进代码的错判
+
+上一轮读到一个 `MaxDropDownHeight = 200`，就把它当成"控件自己在管上限、标记里的 374 抬不动它"。
+这次按"改属性看响应"重测，那条**不成立**：真实首开（pass A）时 `MaxDropDownHeight` 仍是框架默认的 200，
+表面已经量到 374（改字面量之前）／380（改之后）；把它设成 120 或 700，表面一动不动（B/C/C2/C3 四趟同值）。
+所以对这个控件，`MaxDropDownHeight` 是**惰性的**，能管住高度的只有我们自己写在标记里的那个字面量。
+顺带量到 `ComboBox.MaxDropDownHeight` 默认 504 且**真的**管得住（同窗口同 24 行，下拉表面 506）——
+"惰性"只是 AutoCompleteBox 这一侧的性质，不是这一运行时的通则。
+
+### 6.2 量到的三个事实，与其中一个是缺陷
+
+| 轴 | 建议列表 | 同构建的 ComboBox | 结论 |
+| --- | --- | --- | --- |
+| 宽度 | 表面 440 DIP = 框 440 DIP；帧里卡片 `#2C2C2C` 落在 x=217..982（766 px）、框填充 `#222222` 落在 x=218..982（765 px，差的 1 px 是框自己那条边），dpi 168 | 440 | 一致；右侧重影不在这块 |
+| 高度上限 | 卡片 374（旧）→ **380**（新） | 506 | 上游 `AutoSuggestListMaxHeight`=374 是**列表**的行，旧写法把它挂在卡片上，被卡片自己的 4 padding + 2 border 吃掉 6 DIP |
+| 行 | `ComboBoxItem` 35.8，padding 11,5,11,7，r=3，内缩 5,2,5,2 | 同 | 一致 |
+
+缺陷就是中间那一格，已改：字面量从 `SuggestionsContainer` 移到 `PART_DropDownScrollViewer`
+（它才是本宿主里"列表"的那一层）。改后实测 `PopupRoot.Height` 与卡片同为 **380**，即上游那张卡片的实际高度；
+`AstraAutoSuggestBoxTests` 里"上限在列表、卡片不带 MaxHeight"两条进断言。
+
+### 6.3 "偏小"里剩下的部分不是缺陷
+
+`--open suggest10` 用 Gallery 那一模一样的 10 个水果、`MaxWidth=440`、默认过滤器复现：输入 `a` 只命中
+Apple / Apricot 两行，于是表面就是 2 行 = 77.6 DIP。同一条数据在 ComboBox 里全展开是 10 行 = 367.8。
+差的是**命中行数**，不是控件的尺寸；上游 AutoSuggestBox 的默认匹配同样是前缀。
+另量到一条宿主契约：`PopupRoot.Height` 由框架按内容写在它自己的根上（1 行时 41.78、2 行 77.6、封顶 380），
+所以"看起来小"永远来自行数，不来自上限。
+
+### 6.4 复测新量到的宿主占有，进 Known Gaps（见下 14–16）
+
+14. 不声称建议行拿到了我们的 `ComboBoxItem` 样式的全部属性：同一次运行里，ComboBox 的条目
+    （声明的与生成的都一样）读 `MinHeight=32`，建议行读 **28**，且 `ReadLocalValue(MinHeight)` 有值——
+    框架在容器上盖了本地值，样式压不过（与 §0.6 的底色同一类）。今天没有像素后果（两种都是 35.8 高），
+    但它是一条我们说不清的差异，已按现状钉进 `An_item_takes_our_text_row_but_keeps_the_frameworks_own_fill`。
+15. 不声称建议列表左缘干净：PrintWindow 帧里第一行左缘有一个空心圆、第二行左缘有一个被截断的弧形象，
+    后者落在卡片边界**之外**。弹层子树里没有任何元素能对上这两个记号（`PART_DropDownScrollViewer` 之下只有
+    LayoutRoot / Pill / ContentPresenter / TextBlock，滚动条量 0×0），所以它们是控件自绘的，标记够不着。
+    要清掉它，只有把 AutoSuggestBox 起成自有类型（阶段 3 原计划），这一条是那条决定目前最硬的证据。
+16. 不声称 `AutoSuggestListPadding` 到了像素：把它改成 `0,0,0,0` 之后，已实现的
+    `PART_DropDownScrollViewer.Margin` 仍读 `-1,0,-1,0`（模板 setter 读 0，元素读 -1），
+    即这一运行时把该内缩自己盖在部件上。行因此永远比卡片内框左右各宽 1 DIP。
+    该行按上游值 `-1,0,-1,0` 保留（改它没有效果，改成别的值只会让断言与屏幕更脱节）。

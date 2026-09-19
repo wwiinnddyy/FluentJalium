@@ -76,7 +76,52 @@ public sealed class AstraAutoSuggestBoxTests
             Assert.Equal(32d, box.MinHeight);
             Assert.Equal(64d, box.MinWidth);
             Open(box);
-            Assert.Equal(374d, (PopupPart("SuggestionsContainer") as Border)!.MaxHeight);
+            // The ceiling is upstream's number on upstream's element: the list, not the card. On the card it
+            // also ate the card's own 4 DIP of padding and 2 of border, which is why the surface used to stop
+            // at 374 instead of the 380 upstream paints.
+            Assert.Equal(374d, ((ScrollViewer)PopupPart("PART_DropDownScrollViewer")).MaxHeight);
+            Assert.Equal(double.PositiveInfinity, (PopupPart("SuggestionsContainer") as Border)!.MaxHeight);
+        });
+    }
+
+    /// <summary>
+    /// The complaint this settles: the suggestion dropdown looked small next to the other popups. Three
+    /// measurements answer it. Its width was never the problem - the card is as wide as the box, asserted
+    /// below, and the capture agrees (766 px of card against 766 px of box at dpi 168). The control's own
+    /// <c>MaxDropDownHeight</c> is not the cap either: it defaults to 200 here and the surface reaches 380
+    /// with it left at 200 (probe right-gap-listheight.txt, pass A), so no style setter can raise or lower
+    /// what the list paints. What was wrong is where our 374 literal sat: on the card, so the card's own
+    /// 4 DIP of padding and 2 of border came off the ceiling instead of outside it, and a long result set
+    /// stopped 6 DIP short of the surface upstream paints.
+    /// The harness cannot show the 380 itself: in the shared host the drop-down realizes exactly one
+    /// container however many frames settle (measured, eight rounds), so the ceiling is asserted as the
+    /// property that binds it and the 380 reading lives in the probe log.
+    /// </summary>
+    [Fact]
+    public void A_long_result_set_is_capped_by_the_list_and_not_by_the_card()
+    {
+        _fixture.Run(() =>
+        {
+            var box = Mounted();
+            box.ItemsSource = Enumerable.Range(0, 24).Select(static index => $"Item {index:00}").ToArray();
+            box.Text = "I";
+            PixelHarness.Settle();
+
+            var container = (Border)PopupPart("SuggestionsContainer");
+            var scroller = (ScrollViewer)PopupPart("PART_DropDownScrollViewer");
+            var host = PopupPart("PART_DropDownItemsHost");
+            Assert.Multiple(
+                () => Assert.True(box.IsDropDownOpen, "the dropdown did not open on a filtering edit"),
+                () => Assert.Equal(200d, box.MaxDropDownHeight),
+                // The ceiling is on the list, and the card carries none of its own: with 374 on the card the
+                // list could never fill it.
+                () => Assert.Equal(374d, scroller.MaxHeight),
+                () => Assert.Equal(double.PositiveInfinity, container.MaxHeight),
+                // Surface = what the realized rows ask for, plus the card's 4 of padding and 2 of border.
+                () => Assert.Equal(host.ActualHeight + 6, container.ActualHeight),
+                () => Assert.True(container.ActualHeight <= 380,
+                    $"the surface passed the ceiling upstream paints: {container.ActualHeight:0.#}"),
+                () => Assert.Equal(box.ActualWidth, container.ActualWidth));
         });
     }
 
@@ -354,6 +399,11 @@ public sealed class AstraAutoSuggestBoxTests
             var background = DependencyProperty.FromName(item.GetType(), "Background")!;
             Assert.NotEqual(DependencyProperty.UnsetValue, item.ReadLocalValue(background));
             Assert.NotSame(Res("ComboBoxItemBackground"), item.Background);
+            // Third property of the same kind, measured against a combo box's own rows in the same build: our
+            // implicit ComboBoxItem style gives a row MinHeight 32 (declared and generated containers both
+            // read 32 there), while a suggestion row carries the control's own local 28, which no setter can
+            // outrank. It has no pixel consequence today because the row measures 35.8 either way.
+            Assert.Equal(28d, item.MinHeight);
         });
     }
 

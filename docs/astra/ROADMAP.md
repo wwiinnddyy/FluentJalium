@@ -399,6 +399,45 @@ Button 批）。闸口首跑还当场抓到**一条闸口自身的缺陷**：`Th
 `adaptation/s0y-outstanding-names.txt`。四类证据：**构建 = 只动 spike 与文档，闸口不构建 spike，因此本条不声称跑过闸口**
 （上一格提交的闸口 666/666 仍成立，产品程序集未变）；行为 / 视觉 / 硬件输入 = **各 0 条**，本条只是名单复测。
 
+**视觉缺陷批第十一段（"输入补全的下拉框明显偏小"，2026-09-20）**：用户第四次报问题，这次点到 `AutoSuggestBox`
+的建议列表——"和其他下拉框、flyout 控件比都偏小"。先把它拆成三条能量、且互不相干的轴，再逐轴给数：
+(1) **宽度不是缺陷。** 真上屏帧（`spike/RightGapProbe/out/`，`spike/VisualQA/scan-line.ps1` 逐行读色区间）：
+440 DIP 的盒子里列表卡片 `#2C2C2C` 落在 x=217..982（766 px），控件本体 `#222222` 落在 x=218..982（765 px），
+dpi=168——差的 1 px 是边框，不是"右边空一块"。
+(2) **高度上限是一条真缺陷，已改。** `AutoSuggestListMaxHeight` 的 374 字面量原本落在**卡片**
+（`SuggestionsContainer`）上，而卡片自己带 4 padding + 2 border，于是列表只有 368，比上游少 6 DIP
+（旧 gap 7 记的就是这个）。上游那个 374 挂在 `SuggestionsList` 上、卡片在它之外再加厚，所以字面量移回
+`PART_DropDownScrollViewer`（本宿主里"列表"的那一层）。改后 `PopupRoot.Height` 与卡片同为 **380** = 374+4+2。
+(3) **行数不是缺陷，是数据。** Gallery 那 10 个水果按前缀过滤，输入 "a" 只剩 2 条，而弹层根高按内容钉
+（实测 41.78 / 77.6 / 380 三档），"看着小"来自条目少而不是被压扁。
+
+**本段公开撤回上一段的一条结论**：那次写的"`MaxDropDownHeight=200` 封顶了列表"不成立——探针里的 `ItemFilter`
+参数写反了（本运行时是 `(text, item)`，WinUI 是 `(item, text)`），于是零命中、弹层根本没开，读到的"200"是
+**闭合控件自己的高**。重测后量到 `AutoCompleteBox.MaxDropDownHeight` 在本运行时**是惰的**（默认 200，改 120/374/700
+表面都不动），而 `ComboBox.MaxDropDownHeight` 默认 504 **确实生效**（24 行量到 506）。这条签名差异同时作废
+`right-gap.md` 里"探针里 `IsDropDownOpen=true` / `Text` setter 都送不上屏"那条 gap：弹层能开，之前的"闭合"读数
+是过滤器的假象，已在该文档结清，顺带把"建议列表宽度只在 harness 一侧有证据"一并了结。
+三条样式够不到的新账进 `audits/autosuggestbox.md` §6.4（gap 14–16）：条目容器带框架本地 `MinHeight=28`
+（combo 条目从我们的样式读 32，所以建议条目肉眼可见地比下拉条目矮）；`AutoSuggestListPadding` 的 `-1,0,-1,0`
+由框架盖在实化的 `ScrollViewer` 上，把行改成 `0,0,0,0` 也压不过（本批这样改过一次，验证无效后回滚）；
+以及打开的列表左缘有一圈环加一个 "(" 形标记，**整棵子树里没有任何元素能解释它**——这是这一格最终要起自有
+`AutoSuggestBox` 类型最硬的一条证据。落点：`Styles/AutoSuggestBox.jalxaml`（字面量移层 + 注释里两条作废读数
+改写）、`ThemeResources/AutoSuggestBox.jalxaml`（padding 回滚并记录实测）、`AstraAutoSuggestBoxTests` 31→32 条、
+`audits/autosuggestbox.md` §6、`audits/right-gap.md` gap 1 结清、`adaptation/s0z-suggestion-surface.txt`
+（4 个 pass 的原始日志）、Catalog 该行 gaps 6→9 条、`spike/RightGapProbe` 新增 `listheight`/`clamp`/`itemstyle`/
+`suggest10` 四个 pass 与 `capture-suggest10.ps1`、`spike/VisualQA/scan-line.ps1`。四类证据：构建 = 串行闸口
+**667/667 全绿、0 skip**、调色板三档 checked=True（666→667 就是新那条尺寸用例）；行为 = 新增 1 条
+（上限落在列表不在卡片：`MaxDropDownHeight=200`、`scroller.MaxHeight=374`、`container.MaxHeight=∞`、
+卡片高 = 列表高 + 6 且 ≤380、宽与盒相等）+ 1 条旧用例按新落点改判 + 条目 `MinHeight=28` 钉住；
+视觉 = 上屏帧那条 766/765 px，**行高 380 只在探针日志里**——共享测试宿主即使把 host 拉到 460、
+先 `Focus()` 再赋值、泵 8 轮，弹层仍只实化 **1 个**容器，这条宿主限制写进了新用例注释而不是假装测过；
+硬件输入 = **仍为零**（弹层由赋值 `Text` 打开，没有真指针或触摸）。
+闸口首跑还带进两条不属于本批的编译警告：`MainWindow.jalxaml.cs:289-290` 对 `PrimaryButtonText` /
+`SecondaryButtonText` 赋 `null`（框架把这两个属性标成非空 `string`，而"没有按钮"正是靠 `null` 表达，
+`AstraContentDialogTests` 里就钉着 `PrimaryButtonText=null` 那几格）。已在调用点用 `null!` 消注解差、
+不改语义，Gallery 单项目重编 **0 警告 0 错误**；`tools/Test-AstraGallerySmoke.ps1 -Page inputs` 出窗口并在
+8.3 秒内干净关闭、无残留进程。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）
