@@ -1,7 +1,8 @@
 <!-- WinUI Button and ToggleButton state resources @19e3bdc3c (MIT).
      Jalium ButtonBase retains native command, keyboard and pointer semantics.
      Elevation uses a solid stroke adapter, not the upstream gradient stroke. -->
-<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
   <Style x:Key="CardBorderStyle" TargetType="Border">
     <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
     <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
@@ -121,10 +122,196 @@
       <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource HyperlinkButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource HyperlinkButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource HyperlinkButtonBorderBrushDisabled}" /></Trigger>
     </Style.Triggers>
   </Style>
+  <!-- ============ SplitButton (WinUI SplitButton.xaml blob 0be293a87cd5d944267906e159fbcc4d1d85911b) ====
+       Upstream paints the two halves from sibling PrimaryBackgroundGrid / SecondaryBackgroundGrid nodes and
+       drives every one of its fourteen states from internal flags (PrimaryPointerOver, SecondaryPressed,
+       FlyoutOpen, Checked...). This runtime has no such flags: 26.10.9's SplitButton declares only
+       Command/CommandParameter/Flyout, has no IsDropDownOpen (spike/SplitButtonProbe section F), and
+       FlyoutBase.IsOpen is a get-only CLR property rather than a dependency property (section J), so neither
+       a binding nor a state cell can read the open state. The adaptation therefore moves each half's fill
+       onto the half's own surface and lets the native Button's IsMouseOver/IsPressed/IsEnabled drive it,
+       which keeps the per-half states the flags existed for - hovered and pressed halves stay independent,
+       which a control-level IsMouseOver cell could not do - and drops the two background grids.
+       FlyoutOpen/TouchPressed and the twelve Checked rows have no driver here and are not claimed: the
+       Checked rows stay untranscribed until a ToggleSplitButton exists, FlyoutOpen until something
+       observable arrives. What the framework does require is proven, not assumed: the halves must be named
+       PrimaryButton and SecondaryButton, because only then does invoking the secondary open the flyout and
+       only then does the control raise Click (probe section I, tested in both directions). -->
+  <Style x:Key="SplitButtonPrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ButtonLayoutStyle}">
+    <Setter Property="Background" Value="{ThemeResource SplitButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource SplitButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrush}" />
+    <!-- Upstream draws the ring as two half-borders (1,1,0,1 and 0,1,1,1) so the shared edge stays the
+         divider line; those sides are literals there too, so they are literals here. -->
+    <Setter Property="BorderThickness" Value="1,1,0,1" />
+    <Setter Property="CornerRadius" Value="4,0,0,4" />
+    <Setter Property="Padding" Value="{ThemeResource SplitButtonPadding}" />
+    <Setter Property="IsTabStop" Value="False" />
+    <!-- Upstream stretches both halves into their columns; the shared layout style aligns a button Left /
+         Center, which would size this half to its text and leave the rest of the control unpainted. -->
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Stretch" />
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource SplitButtonForegroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource SplitButtonForegroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource SplitButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="SplitButtonSecondaryButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource SplitButtonBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,1,1" />
+    <Setter Property="CornerRadius" Value="0,4,4,0" />
+    <Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="0,0,12,0" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" /><Setter Property="VerticalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Right" /><Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="IsTabStop" Value="False" />
+    <!-- Upstream puts an AnimatedIcon with a FontIcon fallback here; this runtime has no AnimatedIcon, so
+         the glyph is drawn as the same chevron the combo box uses (audits/button.md gap 4). -->
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Button">
+        <Grid Background="Transparent">
+          <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+            <Path Name="Chevron" Data="M 0,1.5 L 5,6.5 L 10,1.5" Width="12" Height="12" Stretch="Uniform"
+                  Stroke="{ThemeResource SplitButtonForegroundSecondary}" StrokeThickness="1.25"
+                  HorizontalAlignment="Right" VerticalAlignment="Center" />
+          </Border>
+          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
+          <!-- The chevron is a part, so a style cell cannot reach it; upstream writes the same three values
+               from its SecondaryPointerOver / SecondaryPressed / Disabled state setters. -->
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource SplitButtonForegroundPointerOver}" /></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource SplitButtonForegroundSecondaryPressed}" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource SplitButtonForegroundDisabled}" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource SplitButtonBackgroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrushDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="SplitButtonStyle" TargetType="SplitButton">
+    <Setter Property="Background" Value="{ThemeResource SplitButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource SplitButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource SplitButtonBorderThemeThickness}" />
+    <Setter Property="Padding" Value="{ThemeResource SplitButtonPadding}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <!-- SplitButtonPrimaryButtonSize / SplitButtonSecondaryButtonSize are 35 upstream and x:Double, which
+         this reader cannot parse, so both ride as literals. -->
+    <Setter Property="Template">
+      <ControlTemplate TargetType="SplitButton">
+        <Grid Background="Transparent">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="35" />
+            <ColumnDefinition Width="1" />
+            <ColumnDefinition Width="35" />
+          </Grid.ColumnDefinitions>
+          <!-- Command deliberately is NOT carried onto the half: 26.10.9's SplitButton executes its own
+               Command when the primary half is activated, so upstream's binding would run it twice
+               (AstraSplitButtonTests.The_primary_half_carries_the_content_and_the_command). -->
+          <Button Name="PrimaryButton" Grid.Column="0" Style="{StaticResource SplitButtonPrimaryButtonStyle}"
+                  Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                  ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                  FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}"
+                  Foreground="{TemplateBinding Foreground}"
+                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          <Border Name="Divider" Grid.Column="1" Background="{ThemeResource SplitButtonBorderBrushDivider}" />
+          <Button Name="SecondaryButton" Grid.Column="2" Style="{StaticResource SplitButtonSecondaryButtonStyle}" />
+          <!-- Focus lands on the control, not on either half (both are IsTabStop=False), so the ring belongs
+               to the root rather than to a half's own layout style. Upstream asks the system to draw it with
+               FocusVisualMargin=-1; this runtime has no system ring, so it is self-drawn like the rest of
+               the family. -->
+          <Border Name="FocusOutline" Grid.ColumnSpan="3" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- WinUI DropDownButton_themeresources.xaml blob c1e68023c2f729b36e83b7fc6b91ed7e0d2e97fe carries three
+       chevron rows and DropDownButton.xaml blob aa07b40c6f40b28c347ab25fd73a8ba36524505f paints its surface
+       from the Button* rows, so this style reads Button* for the surface and DropDownButton* only for the
+       chevron, exactly as upstream does. Upstream has four states here (Normal, PointerOver, Pressed,
+       Disabled) and no expanded state, so IsExpanded on the own type drives no visual and claims none.
+       The target type is FluentJalium's own because 26.10.9 ships no DropDownButton at all
+       (spike/SplitButtonProbe section A scans 3129 exported names); plain Button has no Flyout property and
+       SplitButton always paints a primary half, so the gap is the control, not the paint. -->
+  <Style x:Key="DefaultDropDownButtonStyle" TargetType="controls:FluentDropDownButton" BasedOn="{StaticResource ButtonLayoutStyle}">
+    <Setter Property="Background" Value="{ThemeResource ButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource ButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ButtonBorderThemeThickness}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FluentDropDownButton">
+        <Grid Background="Transparent">
+          <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <ContentPresenter Grid.Column="0" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentStringFormat="{TemplateBinding ContentStringFormat}" Foreground="{TemplateBinding Foreground}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+              <Path Grid.Column="1" Name="Chevron" Data="M 0,1.5 L 5,6.5 L 10,1.5" Width="12" Height="12" Stretch="Uniform"
+                    Stroke="{ThemeResource DropDownButtonForegroundSecondary}" StrokeThickness="1.25"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,0,0" />
+            </Grid>
+          </Border>
+          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
+                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
+            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+          </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource DropDownButtonForegroundSecondaryPointerOver}" /></Trigger>
+          <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource DropDownButtonForegroundSecondaryPressed}" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource ButtonForegroundDisabled}" /></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="{ThemeResource ButtonBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource ButtonForegroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderBrushPointerOver}" /></Trigger>
+      <Trigger Property="IsPressed" Value="True"><Setter Property="Background" Value="{ThemeResource ButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource ButtonForegroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderBrushPressed}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Background" Value="{ThemeResource ButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource ButtonForegroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderBrushDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+
   <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />
   <Style TargetType="RepeatButton" BasedOn="{StaticResource DefaultRepeatButtonStyle}" />
   <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}" />
   <Style TargetType="HyperlinkButton" BasedOn="{StaticResource DefaultHyperlinkButtonStyle}" />
+  <Style TargetType="SplitButton" BasedOn="{StaticResource SplitButtonStyle}" />
+  <Style TargetType="controls:FluentDropDownButton" BasedOn="{StaticResource DefaultDropDownButtonStyle}" />
 
   <!-- WinUI 3 DefaultScrollViewerStyle @19e3bdc3c, blob 800d5040a5e73c28b75c5c5d2f4af40c7a48256b. Only the
        setters this runtime has and can verify are here: IsTabStop, Padding, BorderThickness,

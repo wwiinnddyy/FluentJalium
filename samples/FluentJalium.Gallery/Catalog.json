@@ -20,7 +20,7 @@
       "page": "buttons",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
-      "gaps": [ "press, keyboard and touch activation are not gated", "text colour never reaches the capture path", "Compound, Split and DropDown variants are not built" ]
+      "gaps": [ "press, keyboard and touch activation are not gated", "text colour never reaches the capture path", "the Compound variant is not built" ]
     },
     {
       "markup": "ToggleButton",
@@ -45,6 +45,22 @@
       "parity": "audited",
       "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
       "gaps": [ "navigation of NavigateUri is untested", "the link text colour cannot be asserted in pixels" ]
+    },
+    {
+      "markup": "SplitButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/splitbutton.md", "tests/FluentJalium.Tests/AstraSplitButtonTests.cs" ],
+      "gaps": [ "FlyoutOpen, TouchPressed and the nine Checked states have no driver: the control exposes no open flag and FlyoutBase.IsOpen is not a dependency property", "the two background grids upstream paints are gone; each half paints itself", "the flyout and click wiring depends on the halves being named PrimaryButton and SecondaryButton, which is tested both ways rather than trusted", "no AnimatedIcon, so the chevron is the combo box's Path glyph", "no real pointer or touch reaches either half" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentDropDownButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/splitbutton.md", "tests/FluentJalium.Tests/AstraSplitButtonTests.cs", "spike/SplitButtonProbe/Program.cs" ],
+      "gaps": [ "WinUI's DropDownButton derives from ButtonBase and adds IsExpanded, Flyout, Command and Click; this one derives from Jalium's Button, so the type name is upstream's and the base is the host's", "no Expanded and Collapsed routed events", "IsExpanded drives no visual, exactly as upstream's four states do not either", "the chevron is a Path, not the AnimatedIcon upstream animates" ]
     },
     {
       "markup": "ScrollViewer",

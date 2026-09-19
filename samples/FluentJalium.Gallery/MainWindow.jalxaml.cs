@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private bool _loaded;
     private int _buttonCount;
     private int _repeatCount;
+    private int _splitCount;
     private string? _startPageId;
 
     private FluentNavigationView Navigation => (FluentNavigationView)NavigationRoot!;
@@ -111,6 +112,15 @@ public partial class MainWindow : Window
         // Set in code, not markup: IsChecked='{x:Null}' parses without error and yields false, so a
         // three-state sample written the WinUI way would sit in off while looking tri-state on screen.
         ((ToggleButton)MixedToggleButton!).IsChecked = null;
+
+        var split = (SplitButton)SplitActionButton!;
+        split.Click += (_, _) => ((TextBlock)SplitReadout!).Text = $"Split primary action ran {++_splitCount} time(s).";
+        split.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = "Split flyout opened - the left half did not run.";
+        split.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = "Split flyout closed.";
+
+        var dropDown = (FluentDropDownButton)DropDownMoreButton!;
+        dropDown.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down opened; IsExpanded={dropDown.IsExpanded}.";
+        dropDown.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down closed; IsExpanded={dropDown.IsExpanded}.";
     }
 
     private void WireInputs()

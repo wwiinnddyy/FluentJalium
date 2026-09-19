@@ -21,6 +21,7 @@
 | S0-j 弹层能不能断像素 | **能断"某色存在"，不能断"画面干净"**：裁剪含框架渐变的条目，`Stable` 与品牌绿闸口在此失效 | 弹层像素只作存在性证据，洁净度留给自有类型 |
 | S0-f `ThemeColors` 可否桥接 | **71 个 public 静态 `Color`，零 public setter**；四种公开写入口全部无效 | 天花板只限读这张表的自绘代码，见 `01-jalium-control-census.md` |
 | S0-k 不改模板怎么驱动交互，样式格子排在谁下面 | **`IToggleProvider.Toggle()` 就是框架自己的 `OnClick→OnToggle`**；样式格子输给本地值，`{x:Null}` 在样式格子里也命中 | 按钮族循环先走自动化模式；状态要覆盖本地底色就得自有类型 |
+| S0-l 弹层打开态、部件名与"样式生效"怎么读 | **`FlyoutBase.IsOpen` 是只读 CLR 属性不是依赖属性**（打开态既绑不了也当不了格子条件）；**模板部件名是功能契约**（改名后照样建树照样上色，点了却没反应）；**隐式样式从不写进 `Style`**；星形列尊重子元素对齐 | `FlyoutOpen` 不声称；命名正反两向都断；生效判据改用模板对象身份；半区显式 `Stretch` |
 
 ## S0-a：主题切换的真实驱动
 
@@ -359,3 +360,45 @@ Popup 'PART_Popup' (Placement=Bottom)      ← 框架写本地 Width，等于控
 凡是"某状态看起来对不对"的主张，先问它有没有**可区分的像素**；没有，就只能给探针 + 读回，
 并且必须把这条写进不声称清单，免得后来者把那条代理信号当证据。
 
+## S0-l：一处名字、一处只读属性、一处对齐（SplitButton / DropDownButton 批，2026-09-19）
+
+这一批没有新增任何"能做什么"，它量到的是**四条读不出来的东西**，每条都会让一套看起来完整的闸口失效。
+
+**1 · 弹层的打开态在本运行时不可读，所以 `FlyoutOpen` 画不出来。**
+`SplitButton` 只声明 `Command`/`CommandParameter`/`Flyout`，**没有** `IsDropDownOpen`，
+`CreateAutomationPeer()` 返回空；`FlyoutBase` 一侧有 `ShowAt(FrameworkElement)`、`Hide()`、
+`Opened/Closed` 事件，但 `IsOpen` 是**只读 CLR 属性**，`DependencyProperty.FromName` 取不到它（探针 F/J）。
+本运行时的格子条件只能读被模板控件自身的属性，绑定也只能走依赖属性，于是上游那 15 个状态里
+`FlyoutOpen` 与 `TouchPressed` 两个**没有任何驱动**。我们既没有伪造一个 `IsFlyoutOpen` 自有类型，
+也没有反射私有字段（`AGENTS.md` 明令禁止），而是把它写进缺口：菜单打开时整体压暗这件事，本库现在做不到。
+
+**2 · 模板部件名是功能契约，结构和像素都抓不到它坏掉。**
+自建模板里两个半区叫 `PrimaryButton`/`SecondaryButton` 时：Invoke 次半区 → `Flyout.IsOpen=true`，
+Invoke 主半区 → 控件 raise 一次 `Click`；把它们改名成 `…Z` 后，**建树成功、上色正常、布局不变**，
+但 Invoke 之后 `IsOpen=false`、`Click` 一次都没有（探针 I）。也就是说这类破坏能同时骗过
+"模板结构对不对"和"像素像不像 WinUI"两类断言。闸口因此必须**正反两向**都测
+（`The_named_halves_drive_the_flyout_and_the_click_and_the_renamed_ones_do_not`）。
+推论：以后凡是"框架靠名字接线"的控件（`Expander`、`ContentDialog`、`CommandBar`），
+模板落地第一件事是量出它认哪些名字。
+
+**3 · 隐式样式不写进 `FrameworkElement.Style`。**
+挂上主题之后 `Button`、`ToggleButton`、`HyperlinkButton`、`SplitButton` 的 `Style` **全是 null**，
+而 `TryFindResource(该类型)` 拿得到样式，像素也确实是我们令牌的颜色（探针 K）。
+所以"`control.Style` 非空"不是生效证据，任何这样写的断言都是假阳性；
+本批改用**模板对象身份**（`Assert.Same(Template(ours), control.Template)`）作为读法。
+
+**4 · 星形列尊重子元素对齐，共享布局样式的 `Left` 会把面缩掉。**
+`ButtonLayoutStyle` 给按钮族设了 `HorizontalAlignment=Left`（上游按钮的默认值），
+把它当半区样式用时，`Width="*"` 列里那一半只拿到内容宽：**220×36 的控件上主半区实测 53.09×34.78**，
+剩下 131px 宽（4832 像素）在捕获里是空的——而 `Stable` 是真的稳定，所以这不是时序问题。
+修法是半区显式 `Stretch`/`Stretch`（上游 227 行也是这么写的），
+并由 `Both_halves_stretch_into_their_columns` 与休息底色阈值（>5000 px）一起把关。
+推论：凡在 `*` 列里承载可换色面的模板，都要显式声明对齐。
+
+另外两条属于"框架替我们做了事，照抄上游就会错"：
+
+- **命令会被执行两次**。上游把 `Command` 绑到主半区（`SplitButton.xaml` 227 行），因为 WinUI 的
+  `SplitButton` 自己不执行命令；本运行时会，于是一次 Invoke 实测 `Execute` 两次。模板因此**不**绑命令。
+- **没有 `Flyout` 时框架自己禁用次半区**（挂载实例的次半区读回 `ControlFillColorDisabledBrush`，探针 C）。
+  这不是缺陷（与 WinUI 语义一致），但意味着我们的禁用格子会被框架的启用状态驱动，
+  写样例时"没弹层的 SplitButton 右侧是禁用色"是正常现象，不是样式没生效。

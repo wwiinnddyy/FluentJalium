@@ -17,7 +17,7 @@
 `CheckBox`/`RadioButton`/`ToggleSwitch` 的**基类**，不是按钮样式。
 所以 Button 批的样式清单以这一份为准：**Default、Accent、Subtle** 三个 +
 `RepeatButton`/`ToggleButton`/`HyperlinkButton` 三个控件自己的样式；
-"SplitButton/DropDownButton" 仍是自有类型的开端（本运行时没有这两个类型）。
+"SplitButton/DropDownButton" 已结清（收尾批，`audits/splitbutton.md`）：`SplitButton` 本运行时**有原生类型**，走的是原生重模板；只有 `DropDownButton` 需要自有类型，`ToggleSplitButton` 至今没有，因此 13 条 `*Checked*` 行随之推迟。
 
 ## 上游 `DefaultButtonStyle` 的形状
 

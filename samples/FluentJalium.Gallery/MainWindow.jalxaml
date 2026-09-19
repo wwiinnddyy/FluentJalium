@@ -136,6 +136,32 @@
                   <TextBlock x:Name="RepeatReadout" Text="Hold the repeat button to see it fire." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Split and drop-down" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <SplitButton x:Name="SplitActionButton" Content="Split" Margin="0,0,8,8">
+                      <SplitButton.Flyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem Text="First" />
+                          <MenuFlyoutItem Text="Second" />
+                        </MenuFlyout>
+                      </SplitButton.Flyout>
+                    </SplitButton>
+                    <fluent:FluentDropDownButton x:Name="DropDownMoreButton" Content="More" Margin="0,0,8,8">
+                      <fluent:FluentDropDownButton.Flyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem Text="One" />
+                          <MenuFlyoutItem Text="Two" />
+                        </MenuFlyout>
+                      </fluent:FluentDropDownButton.Flyout>
+                    </fluent:FluentDropDownButton>
+                    <SplitButton Content="Disabled split" IsEnabled="False" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The split button is native, restyled from upstream's SplitButton* rows; the drop-down is an Astra-owned type, because 26.10.9 ships no DropDownButton to retemplate. On a split button only the left half is the action: the divider and the right chevron belong to the flyout, and a split button with no flyout has its right half disabled by the framework. Neither control's open state reaches the paint here - upstream asks its own internal flags for that and this runtime keeps them private." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="SplitReadout" Text="Left half acts, right half opens." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="Keyboard" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,8" />
               <TextBlock Text="Use Tab to move between buttons and Space or Enter to activate the focused action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
             </StackPanel>

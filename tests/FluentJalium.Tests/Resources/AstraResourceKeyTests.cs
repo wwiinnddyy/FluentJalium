@@ -170,8 +170,17 @@ public class AstraResourceKeyTests
     /// cells skipped, one border-thickness row upstream declares but leaves borrowed -
     /// docs/astra/audits/togglebutton.md). <c>TitleBar.jalxaml</c> and <c>FlyoutPresenter.jalxaml</c>
     /// deliberately stay out: their readers are the framework's own window-chrome and popup styles, not a
-    /// template of ours, so an app-level alias moves pixels there without any consumption site in this
-    /// assembly (docs/astra/audits/window-shell.md, flyout-presenter.md).
+    /// template of ours, so an app-level alias can move pixels there with no consumption site in this
+    /// assembly to check (docs/astra/audits/window-shell.md, flyout-presenter.md).
+    /// <para>
+    /// The SplitButton batch joined with the whole row list in hand rather than after the fact: upstream
+    /// publishes thirty rows for a split button and seventeen of them are transcribed here, because the other
+    /// fourteen have no state on this runtime that could ever ask for them (the thirteen <c>*Checked*</c>
+    /// rows belong to a ToggleSplitButton that 26.10.9 does not ship, and
+    /// <c>SplitButtonInAppBarUnfocusedPointerOver</c> belongs to the CommandBar variant).
+    /// <c>AstraSplitButtonTests.A_row_with_no_consumer_is_not_published</c> pins that split so the deferral
+    /// cannot quietly become a gap.
+    /// </para>
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/Button.jalxaml")]
@@ -186,6 +195,8 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/NumberBox.jalxaml")]
     [InlineData("ThemeResources/Metrics.jalxaml")]
     [InlineData("ThemeResources/Slider.jalxaml")]
+    [InlineData("ThemeResources/SplitButton.jalxaml")]
+    [InlineData("ThemeResources/DropDownButton.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();
