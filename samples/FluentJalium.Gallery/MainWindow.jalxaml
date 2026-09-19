@@ -257,7 +257,7 @@
                   <TextBlock Text="Tick marks and a disabled slider" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
                   <Slider Minimum="0" Maximum="100" Value="30" TickPlacement="BottomRight" TickFrequency="10" Margin="0,8,0,0" />
                   <Slider IsEnabled="False" Minimum="0" Maximum="100" Value="60" Margin="0,12,0,0" />
-                  <TextBlock Text="The first slider above carries no Style attribute, so it is the implicit Slider style doing the work."
+                  <TextBlock Text="The first slider above carries no Style attribute, so it is the implicit Slider style doing the work: the thumb body is upstream 18x18 with its ring 2 wider on every side, and the track is inset by half a thumb because this framework moves the thumb by its left edge, which leaves the ring 2 DIP past the control at maximum."
                              Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
                 </StackPanel>
               </Border>
@@ -443,7 +443,7 @@
                     <Button x:Name="CommandBarCompactButton" Content="Compact the buttons" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
                     <Button x:Name="CommandBarClearButton" Content="Clear the check" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
                   </WrapPanel>
-                  <TextBlock Text="The icons, labels, 68 DIP width, 16 DIP content box and the accent fill of the checked toggle are ours: the framework's own skin measured 44 wide with a 10 pixel label, a 20 DIP icon box and a purple foreground. The bar's own surface and its overflow list are the honest gap - that control stores a Template and never builds one, so only the rows its code reads can be steered, and the overflow row was measured back out of the publication list because no pixel of it moved." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock Text="The icons, labels, 68 DIP width, the 64 DIP cell with its icon 16 below the top edge, the highlight inset 2,6,2,6 and the accent fill of the checked toggle are ours: the framework's own skin measured 44 wide with a 10 pixel label, a 20 DIP icon box and a purple foreground. That highlight carries no brush fade on purpose - a nested transitioning border kept its accent in every property and offscreen read yet painted nothing in the composited window. The bar's own surface and its overflow list are the honest gap - that control stores a Template and never builds one, so only the rows its code reads can be steered, and the overflow row was measured back out of the publication list because no pixel of it moved." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                   <TextBlock x:Name="CommandBarReadout" Text="Nothing invoked yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>

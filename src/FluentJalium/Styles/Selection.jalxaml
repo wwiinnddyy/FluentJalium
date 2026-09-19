@@ -121,7 +121,10 @@
     <Setter Property="MinHeight" Value="32" /><Setter Property="FontSize" Value="14" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" /><Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template"><ControlTemplate TargetType="ComboBoxItem">
-      <Grid>
+      <!-- Upstream carries the row inset on the template root (ComboBox_themeresources.xaml:614, Margin="5,2,5,2"),
+           not in the item padding: the highlight and the pill stop 5 DIP short of the dropdown border while the
+           text keeps its own 11. A literal here because upstream's literal is a literal, not a row. -->
+      <Grid Margin="5,2,5,2">
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}" Padding="{TemplateBinding Padding}" />
         <Border Name="Pill" Width="3" Height="16" CornerRadius="{ThemeResource ComboBoxItemPillCornerRadius}" Margin="1,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Background="{ThemeResource ComboBoxItemPillFillBrush}" Opacity="0" IsHitTestVisible="False" />
         <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="Wrap" />

@@ -175,3 +175,16 @@ StaysOpenOnEdit, Text`，外加 `Selector`（`SelectedIndex/SelectedItem/IsSelec
 10. 不声称 Gallery Selection 页的 ComboBox 已被像素证明：那四个新卡片只是被构造，没进可视树，
     模板未应用；冒烟能给的只有 Overview 那一个既存 ComboBox 的"带新模板上屏不炸"。逐页渲染到像素
     仍是 E4（`adaptation/10`）。
+
+
+## 7. 间距批（2026-09-19）：条目行内缩 5,2,5,2
+
+上游 `ComboBox_themeresources.xaml:614` 把行内缩写在**模板根** `LayoutRoot` 的 `Margin="5,2,5,2"` 上，
+不在条目的 `Padding` 里——`ComboBoxItemThemePadding`（`11,5,11,7`，:335/:606）管的是文字到行的距离，
+那 5 管的是行到下拉边框的距离。本实现原来只有后者，所以悬停/选中的高亮一直铺到弹窗描边。
+现在补上同一条字面量（上游它就是字面量，不是行，因此不新发键），药丸随根一起内缩，与上游一致。
+
+判据不是"标记里有这条属性"，而是排布尺寸：`AstraComboBoxTests` 在打开的下拉里读回
+高亮 `ActualWidth = 条目 ActualWidth − 10`、`ActualHeight = 条目 ActualHeight − 4`。
+另记一笔未治：条目样式上的 `MinHeight=32` 与 `FontSize=14` 是自加的（上游 `DefaultComboBoxItemStyle`
+:602–610 两条都没有，32 是它的 padding 与字号自然量出来的高度），留着是因为去掉后本运行时的行高要另量。

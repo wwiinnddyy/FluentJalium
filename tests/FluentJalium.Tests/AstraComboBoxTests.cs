@@ -406,7 +406,12 @@ public sealed class AstraComboBoxTests
             Assert.Multiple(
                 () => Assert.Equal(new Thickness(0, 4), Get(presenter, "Margin")),
                 () => Assert.Same(Res("ComboBoxItemBackground"), Get(Part(item, "LayoutRoot"), "Background")),
-                () => Assert.Equal(new Thickness(11, 5, 11, 7), item.Padding));
+                () => Assert.Equal(new Thickness(11, 5, 11, 7), item.Padding),
+                // Upstream insets the whole row from the dropdown edge (ComboBox_themeresources.xaml:614,
+                // Margin="5,2,5,2" on the template root), so the highlight stops 5 short of the border and the
+                // 11 padding lives inside that. Read off the arranged surface, not off the markup.
+                () => Assert.Equal(Math.Round(item.ActualWidth - 10), Math.Round(Part(item, "LayoutRoot").ActualWidth)),
+                () => Assert.Equal(Math.Round(item.ActualHeight - 4), Math.Round(Part(item, "LayoutRoot").ActualHeight)));
         });
     }
 

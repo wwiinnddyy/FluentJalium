@@ -119,3 +119,30 @@ IsSnapToTickEnabled, TrackMode, SegmentGap, TrackBrush, ThumbBrush`，
 - 不声称竖排滑块的拖动与刻度条像素：竖排只测到 `RightTickBar` 可见、`PART_SelectionRange` 4×51。
 - 不声称 Gallery 的 Inputs 页画对了：页面上新增了三行滑块（隐式样式、带刻度、禁用），
   本批没有做页面级进程内渲染测量。
+
+
+## 8. 间距批（2026-09-19）：拇指、刻度与三段带
+
+上游 `Slider_themeresources.xaml`（`controls/dev/CommonStyles/`，@19e3bdc3c）第 166–173 行是这批的判据：
+`SliderHorizontalThumbWidth/Height` 与 `SliderVerticalThumbWidth/Height` 都是 **18**，
+`SliderInnerThumbWidth/Height` 是 **12**，拇指模板的环是 `Border Margin="-2"`（:198，即环 = 拇指 +4），
+刻度条与轨道之间是 **4**（`TopTickBar` `VerticalAlignment=Bottom Margin="0,0,0,4"` :413、
+`BottomTickBar` `VerticalAlignment=Top Margin="0,4,0,0"` :415、竖 :431/:433），
+而轨道所在的行是 `SliderPreContentMargin` 14 / Auto / `SliderPostContentMargin` 14（:164–165、:406–408）。
+
+本批前的实现三处都不对：拇指 16×20（竖 20×16）、环 20×20 只横向 -2、刻度间隙 2，并且轨道与刻度条都自加了
+**8 DIP 横向内缩**——上游没有这个内缩。现在横竖两份模板都改成 14/Auto/Auto-4-14 的三段带、拇指 18×18、
+环 `Margin="-2"`（无显式尺寸，随父格 +4）、内芯 12、刻度间隙 4。
+
+**框架侧的一条实测契约**：`PART_Thumb.Margin.Left` 与 `PART_SelectionRange.ActualWidth` 逐值相等，
+220 宽的控件上行程是 **0/51/102/153/204**——把拇指从 16 换成 18、把轨道内缩从 8 换成 9，这两个数**不变**。
+也就是说框架给拇指留的是字面量 16，不看我们给的轨道宽度。因此内缩取"半个拇指"（9）时拇指**中心**恰好跟着
+填充末端走，而 18 的盒在最大值处右边缘到 222、环到 224，即**超出控件 2 DIP**；上游是靠 14 的前后段吸收这个
+悬出，本运行时的行程公式不吃段宽。没有把拇指缩回 16 去掩盖它——那会让拇指与上游差 2 DIP 而换来一个数字好看。
+断言：`The_value_fill_and_the_thumb_follow_the_value`（行程表 + 18×18 + 悬出量 `InRange(0, 2.5)`）、
+`A_tick_placement_shows_only_the_bars_the_orientation_calls_for`（刻度条宽 202、`Margin=9,0,9,4`）。
+
+仍不声称：拇指悬出 2 DIP 在真窗口里是否被相邻控件裁掉——Inputs 页这次捕获成功（`spike/VisualQA/out/inputs.png`，
+PrintWindow，dpi=168），但三条 Slider 都在折叠线以下：整页扫 880 列宽找不到一段 ≥120 px 的强调色轨道，
+所以滑块的视觉半边本批**没有**像素证据，只有上面的排布读数；留给任务 #13 的滚动/直挂通路。`SliderFocus` 的落点仍与上游的
+`FocusVisualMargin="-14,-6,-14,-6"` 不同形（我们是模板内一圈描边）。

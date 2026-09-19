@@ -206,8 +206,10 @@ public sealed class AstraSliderTests
             Assert.Multiple(
                 () => Assert.Equal(Visibility.Visible, (Visibility)Get(bar, "Visibility")),
                 () => Assert.Equal(Visibility.Visible, (Visibility)Get(Part(both, "BottomTickBar"), "Visibility")),
-                () => Assert.Equal(204d, bar.ActualWidth, 3),
+                () => Assert.Equal(202d, bar.ActualWidth, 3),
                 () => Assert.Equal(4d, bar.ActualHeight, 3),
+                // Upstream's tick bar keeps a 4 gap to the track and follows its inset; a 2 here was the deviation.
+                () => Assert.Equal(new Thickness(9, 0, 9, 4), bar.Margin),
                 () => Assert.Same(Res("SliderTickBarFill"), Get(bar, "Fill")));
 
             var above = Mount(new Slider { Value = 50, TickFrequency = 10 }, "TickPlacement", "TopLeft");
@@ -224,9 +226,12 @@ public sealed class AstraSliderTests
 
     /// <summary>
     /// The framework drives the parts our template paints: it writes PART_Thumb's Margin and sizes
-    /// PART_SelectionRange to the value (measured: 0, 51, 102, 153, 204 along a 204 DIP track). That is why
-    /// those two names are a contract with Jalium rather than upstream's HorizontalThumb /
-    /// HorizontalDecreaseRect, and it is the value-following claim without a capture.
+    /// PART_SelectionRange to the value. Measured on a 220 control the travel is 0, 51, 102, 153, 204 both with
+    /// a 16-wide thumb and an 8 inset and with an 18-wide thumb and a 9 inset: the framework reserves a literal
+    /// 16 and ignores the track it was given, so the travel is the control width minus 16 either way. The track
+    /// therefore carries half a thumb of inset - the value that makes the thumb's centre land on the end of the
+    /// fill - and the 18 body reaches 2 DIP past the control box at maximum, which audits/slider.md keeps as a
+    /// gap rather than shrinking the thumb back to 16 to hide it.
     /// </summary>
     [Fact]
     public void The_value_fill_and_the_thumb_follow_the_value()
@@ -238,12 +243,18 @@ public sealed class AstraSliderTests
             foreach (var value in new[] { 0d, 25d, 50d, 75d, 100d })
             {
                 var slider = Mount(new Slider { Minimum = 0, Maximum = 100, Value = value });
-                fills.Add(Math.Round(Part(slider, "PART_SelectionRange").ActualWidth));
-                thumbs.Add(Math.Round(Part(slider, "PART_Thumb").Margin.Left));
+                fills.Add(Part(slider, "PART_SelectionRange").ActualWidth);
+                thumbs.Add(Part(slider, "PART_Thumb").Margin.Left);
             }
 
             Assert.Equal([0d, 51d, 102d, 153d, 204d], fills);
             Assert.Equal(fills, thumbs);
+
+            var last = Mount(new Slider { Minimum = 0, Maximum = 100, Value = 100 });
+            var thumb = Part(last, "PART_Thumb");
+            Assert.Equal(18d, thumb.Width, 1);
+            Assert.Equal(18d, thumb.Height, 1);
+            Assert.InRange(thumb.Margin.Left + thumb.Width - last.ActualWidth, 0d, 2.5d);
         });
     }
 

@@ -127,7 +127,8 @@
       "page": "inputs",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/slider.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSliderTests.cs" ],
-      "gaps": [ "20 of the 23 upstream alias rows have a consumer; the two header rows and the inline tick-bar row are left out because this runtime has no Slider header and no Inline member in either tick enum", "the thumb ring stroke takes a solid token because upstream's gradient cannot ride the in-place retint model", "no real pointer or touch drives hover or press: those cells are named and read back, never clicked", "the thumb squeeze is markup only - no animation frame was captured", "High Contrast per-control rows are not ported, so the palette-level remap only approximates them" ]
+      "gaps": [ "20 of the 23 upstream alias rows have a consumer; the two header rows and the inline tick-bar row are left out because this runtime has no Slider header and no Inline member in either tick enum", "the thumb ring stroke takes a solid token because upstream's gradient cannot ride the in-place retint model", "no real pointer or touch drives hover or press: those cells are named and read back, never clicked", "the thumb squeeze is markup only - no animation frame was captured", "High Contrast per-control rows are not ported, so the palette-level remap only approximates them",
+      "the framework reserves a literal 16 for the thumb travel (measured: 204 of a 220 control with both a 16 and an 18 body), so with upstream's 18 the ring reaches 2 DIP past the control at maximum; the track inset is half a thumb because this framework moves the thumb by its left edge" ]
     },
     {
       "markup": "CheckBox",
@@ -159,7 +160,8 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/combobox.md", "tests/FluentJalium.Tests/AstraComboBoxTests.cs", "tests/FluentJalium.Tests/AstraItemHostTests.cs" ],
-      "gaps": [ "the nine item border-brush rows are inert upstream too, because the item style sets no BorderThickness", "no SelectedUnfocused state is reachable, so those three rows are not transcribed", "no InputMode states, so the touch and controller paddings are not transcribed" ]
+      "gaps": [ "the nine item border-brush rows are inert upstream too, because the item style sets no BorderThickness", "no SelectedUnfocused state is reachable, so those three rows are not transcribed", "no InputMode states, so the touch and controller paddings are not transcribed",
+      "the 5,2,5,2 row inset rides as a literal because upstream's is a literal on the template root, and the 32 MinHeight is ours - upstream sets none and gets the same height from its padding" ]
     },
     {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",
@@ -284,7 +286,8 @@
         "upstream's six Secondary/Overflow row families are not published, because the runtime exposes no overflow flag on a bar button, so a secondary command keeps its bar geometry",
         "accelerator text, the highlight overlay and the eleven chevron rows have no dependency property behind them here",
         "the side-by-side label layout is not reachable: CommandBarLabelPosition is Default/Collapsed on both sides and neither member moves anything on its own, while upstream picks it from the bar's DefaultLabelPosition - on a control that never builds a template",
-        "the hover leg has never been driven by a real pointer: IsMouseOver has no public setter here, so what is measured is a routed MouseDown/MouseUp leaving the flag set and the hover row reaching the surface (The_hover_row_reaches_the_surface_once_a_routed_press_leaves_the_pointer_over), not an enter-and-leave cycle"
+        "the hover leg has never been driven by a real pointer: IsMouseOver has no public setter here, so what is measured is a routed MouseDown/MouseUp leaving the flag set and the hover row reaching the surface (The_hover_row_reaches_the_surface_once_a_routed_press_leaves_the_pointer_over), not an enter-and-leave cycle",
+      "the highlight carries no brush fade: a nested Border with TransitionProperty keeps its state brush in the property, the offscreen rasteriser and the shown-window read, yet paints nothing in the composited window - 0 pixels of the accent against 7786 once the attribute is removed (adaptation/00 S0-r)"
       ]
     },
     {
@@ -297,7 +300,8 @@
         "checked is the accent fill and nothing else, which is upstream's answer inside the bar too: the check-glyph and highlight-overlay rows belong to the overflow layout, and no flag here selects it",
         "AppBarToggleButtonBorderBrushChecked is a deviation - upstream's AccentControlElevationBorderBrush is an absolute gradient this pipeline cannot publish",
         "the checked pair is reached by setting IsChecked and through the automation peer's Toggle pattern, not by a pointer click: this family has no keyboard or touch behaviour test of its own, and inherits whatever ToggleButton does",
-        "hover has the same limit as the button: no public IsMouseOver setter, so the leg is measured through a routed press pair and never through a pointer that moves"
+        "hover has the same limit as the button: no public IsMouseOver setter, so the leg is measured through a routed press pair and never through a pointer that moves",
+      "same fade trade as the button: the nested highlight is transition-free so the checked accent actually lands in the composited frame"
       ]
     },
     {
@@ -309,7 +313,8 @@
       "gaps": [
         "the framework gives this type no template and draws its own line in code from its own row, but does build ours, so two paths can paint the same pixel: our row is the one the capture reads, and a host build that draws without the template would show the framework's grey",
         "no state cells: a separator has no hover, press or checked state here, and upstream gives it none either",
-        "the half-DIP corner radius on the line is a literal - upstream publishes it as an x:Double row this reader cannot parse"
+        "the half-DIP corner radius on the line is a literal - upstream publishes it as an x:Double row this reader cannot parse",
+      "the rule has no height of its own, as upstream: the 2,8,2,8 is the rectangle's margin and the bar's row is what sizes it"
       ]
     },
     {

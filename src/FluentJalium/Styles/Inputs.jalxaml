@@ -151,29 +151,40 @@
     <Setter Property="Template">
       <ControlTemplate TargetType="Slider">
           <Border Name="SliderContainer" Background="{ThemeResource SliderContainerBackground}" Padding="{TemplateBinding Padding}">
+            <!-- Three bands like upstream's: SliderPreContentMargin (14), the Auto track band,
+                 SliderPostContentMargin (14), all x:Double rows this reader cannot parse so the 14 rides here,
+                 and each tick bar sits at the far edge of its own band with upstream's 4 gap to the track
+                 (Slider_themeresources.xaml:413, :415). The track is inset by half the thumb body (9 of 18)
+                 because this framework moves the thumb by its left edge, not its centre - measured, the travel
+                 equals the track width, so that inset is what keeps the thumb on the fill end and inside the
+                 control at both ends. -->
             <Grid>
-              <TickBar Name="TopTickBar" Visibility="Collapsed" Placement="Top" Height="4" Margin="8,2,8,0"
-                       VerticalAlignment="Top" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
-                       Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
-                       TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
-              <TickBar Name="BottomTickBar" Visibility="Collapsed" Placement="Bottom" Height="4" Margin="8,0,8,2"
+              <Grid.RowDefinitions>
+                <RowDefinition Height="14" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="14" />
+              </Grid.RowDefinitions>
+              <TickBar Name="TopTickBar" Grid.Row="0" Visibility="Collapsed" Placement="Top" Height="4" Margin="9,0,9,4"
                        VerticalAlignment="Bottom" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
                        Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                        TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
-              <Border Name="PART_Track" Height="4" Margin="8,0" VerticalAlignment="Center"
+              <TickBar Name="BottomTickBar" Grid.Row="2" Visibility="Collapsed" Placement="Bottom" Height="4" Margin="9,4,9,0"
+                       VerticalAlignment="Top" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                       Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                       TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+              <Border Name="PART_Track" Grid.Row="1" Height="4" Margin="9,0" VerticalAlignment="Center"
                       CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Background}" />
-              <Border Name="PART_SelectionRange" Height="4" Margin="8,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+              <Border Name="PART_SelectionRange" Grid.Row="1" Height="4" Margin="9,0" VerticalAlignment="Center" HorizontalAlignment="Left"
                       CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Foreground}" />
-              <Grid Name="PART_Thumb" Width="16" Height="20" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Border Width="20" Height="20" Margin="-2,0" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
+              <Grid Name="PART_Thumb" Grid.Row="0" Grid.RowSpan="3" Width="18" Height="18" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Border Margin="-2" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
                         Background="{ThemeResource SliderOuterThumbBackground}"
-                        BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1"
-                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                        BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1">
                   <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
                            Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
                 </Border>
               </Grid>
-              <Border Name="SliderFocus" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
+              <Border Name="SliderFocus" Grid.RowSpan="3" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
                       IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
             </Grid>
           </Border>
@@ -234,29 +245,35 @@
         <Setter Property="Template">
           <ControlTemplate TargetType="Slider">
               <Border Name="SliderContainer" Background="{ThemeResource SliderContainerBackground}" Padding="{TemplateBinding Padding}">
+                <!-- The same three bands turned 90 degrees: 14 / Auto / 14 columns, the tick bars at the far edge
+                     of their band 4 short of the track, and the track inset by half the 18-tall thumb body. -->
                 <Grid>
-                  <TickBar Name="LeftTickBar" Visibility="Collapsed" Placement="Left" Width="4" Margin="2,8,0,8"
-                           HorizontalAlignment="Left" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
-                           Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
-                           TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
-                  <TickBar Name="RightTickBar" Visibility="Collapsed" Placement="Right" Width="4" Margin="0,8,2,8"
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="14" />
+                  </Grid.ColumnDefinitions>
+                  <TickBar Name="LeftTickBar" Grid.Column="0" Visibility="Collapsed" Placement="Left" Width="4" Margin="0,9,4,9"
                            HorizontalAlignment="Right" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
                            Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
                            TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
-                  <Border Name="PART_Track" Width="4" Margin="0,8" HorizontalAlignment="Center"
+                  <TickBar Name="RightTickBar" Grid.Column="2" Visibility="Collapsed" Placement="Right" Width="4" Margin="4,9,0,9"
+                           HorizontalAlignment="Left" Fill="{ThemeResource SliderTickBarFill}" IsHitTestVisible="False"
+                           Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}"
+                           TickFrequency="{TemplateBinding TickFrequency}" IsDirectionReversed="{TemplateBinding IsDirectionReversed}" />
+                  <Border Name="PART_Track" Grid.Column="1" Width="4" Margin="0,9" HorizontalAlignment="Center"
                           CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Background}" />
-                  <Border Name="PART_SelectionRange" Width="4" Margin="0,8" HorizontalAlignment="Center" VerticalAlignment="Top"
+                  <Border Name="PART_SelectionRange" Grid.Column="1" Width="4" Margin="0,9" HorizontalAlignment="Center" VerticalAlignment="Top"
                           CornerRadius="{ThemeResource SliderTrackCornerRadius}" Background="{TemplateBinding Foreground}" />
-                  <Grid Name="PART_Thumb" Width="20" Height="16" HorizontalAlignment="Center" VerticalAlignment="Top">
-                    <Border Width="20" Height="20" Margin="0,-2" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
+                  <Grid Name="PART_Thumb" Grid.Column="0" Grid.ColumnSpan="3" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Border Margin="-2" CornerRadius="{ThemeResource SliderThumbCornerRadius}"
                             Background="{ThemeResource SliderOuterThumbBackground}"
-                            BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1"
-                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                            BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1">
                       <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
                                Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
                     </Border>
                   </Grid>
-                  <Border Name="SliderFocus" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
+                  <Border Name="SliderFocus" Grid.ColumnSpan="3" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
                           IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
                 </Grid>
               </Border>

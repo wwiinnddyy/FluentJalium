@@ -87,5 +87,39 @@
 4. `AppBarSeparator` 有两条画线路径：框架在 `OnRender` 里读自己的行自绘，同时会建我们的模板；捕获读到的是我们那条色，但"宿主某版本只自绘不建模板"时屏幕会是框架灰——无法从外部证明不会发生。
 5. 悬停只到"路由按下之后 `IsMouseOver=True` 且 hover 行进像素"，真指针的进入/离开循环未测；按下同样是合成事件，非硬件输入（任务 13）。
 6. `SplitButton` 在 bar 里仍用非 app-bar 样式：`SplitButtonCommandBarStyle` 与 `SplitButtonInAppBarUnfocusedPointerOver` 本批欠着。
-7. 4 条 `Thickness` 之外的度量全是字面量（68 宽、40 高、48 bar 高、0.5 圆角、12/16 字号与图标盒），因为 `x:Double` 资源本 reader 解析不了。
+7. 4 条 `Thickness` 之外的度量全是字面量（68 宽、64/48 内容带高、48 bar 高、0.5 圆角、12/16 字号与图标盒），因为 `x:Double` 资源本 reader 解析不了。`AppBarThemeMinHeight`=64 与 `AppBarThemeCompactHeight`=48 是 `x:Double` 行，只能以字面量落在 `ContentRoot.MinHeight` 上。
 8. 本批把"临时模板的格子永不生效"（0.6）记成方法约束：任何状态结论都必须来自已编译字典或反射类型面，`XamlReader.Parse` 的探针模板只能读结构与像素。这条同时使 pass 4 关于 `MultiTrigger` "能解析但从未观察到生效" 的读数**不能**当作"复合状态写不出来"的证据——本批按属性面（只读 DP/无对应属性）判定，而不是按那条读数。
+
+## 6. 间距批（2026-09-19）：把条目改成上游的三层形状
+
+用户反馈"间距不合 Fluent"之后，命令栏是第一批量出来的偏差。上游 `AppBarButton_themeresources.xaml`
+（`controls/dev/CommonStyles/`，@19e3bdc3c）第 351–369 行的形状是三层：`Root` 网格无填充、
+`AppBarButtonInnerBorder` 是带 `Margin=AppBarButtonInnerBorderMargin`（2,6,2,6）的独立高亮层、
+`ContentRoot` 网格带 `MinHeight={ThemeResource AppBarThemeMinHeight}`（64），图标 `Viewbox` 只有
+`Height=16` 且带 `AppBarButtonContentViewboxCollapsedMargin`（0,16,0,2），标签在第二行。
+
+| 上游 | 本批前 | 本批后 |
+| --- | --- | --- |
+| `ContentRoot.MinHeight` = 64（`AppBarThemeMinHeight`） | 样式 setter `MinHeight=40` | `ContentRoot.MinHeight="64"`（字面量，x:Double 行读不出） |
+| 高亮层 `Margin` 2,6,2,6（与内容同级的兄弟 Border） | 把 2,6,2,6 当 `Root.Padding`，高亮铺满整格 | 同名兄弟层，`Margin` 走已发布行 |
+| `Viewbox` Height 16 + Margin 0,16,0,2 | `Width=16 Height=16`、垂直居中 | Height 16 + `AppBarButtonContentViewboxCollapsedMargin`（新增发布行） |
+| Compact：`AppBarButtonInnerBorder.Margin` → 2,6,2,22；`LabelCollapsed`：`ContentRoot.MinHeight` → 48 | 只改 `Root.Padding` | 一个 `IsCompact` 格子同时写 `Margin` 与 `MinHeight`（本运行时只有一个属性） |
+| `AppBarSeparator`：`Padding`=2,8,2,8 落在矩形 `Margin` 上，控件无高度 | `Margin` 落在控件上 + 自造 `MinHeight=40` | 与上游同：`Padding` setter + 矩形 `Margin={TemplateBinding Padding}`，撤掉 `MinHeight` |
+| `AppBarToggleButtonTextLabelMargin`（2,0,2,8） | 复用按钮同名行 | 值一致，仍只发布按钮那条名（记为键名债） |
+
+证据：`AstraAppBarTests` 新增 `The_bar_geometry_is_the_cells_upstream_writes`（图标槽 0,16,0,2、高亮 2,6,2,6、
+标签 2,0,2,8、`ContentRoot.MinHeight` 64→48、分隔线矩形 2,8,2,8 且样式里没有 `MinHeight` setter）、
+`A_checked_toggle_inside_the_bar_sends_its_accent_into_the_pixels`（栏内离屏 + 上屏 `Chrome` 两条通路）、
+`A_checked_fill_written_after_the_bar_is_live_reaches_the_shown_window`（先上屏、后置勾选）；
+`The_template_carries_the_part_names_upstream_uses` 改成三层类型断言。视觉半边是
+`spike/VisualQA/out/command-bar.png`（PrintWindow，dpi=168）：Bold 格子内 `#60CDFF` 7786 px，图标在标签之上，
+条目带 64 高。
+
+**这一批也量出一条基座缺陷**：嵌套在高亮层上的 `TransitionProperty="Background, BorderBrush"` 让状态笔刷的
+终值进不了真窗口的合成帧——属性、离屏栅格、上屏 `Chrome` 三条通路都说填充在，PrintWindow 读到 0 px；
+删掉该属性后同一坐标变 7786 px。因此两个 bar 按钮的高亮层不带过渡（观感让位于错色），细节与待查清单见
+`adaptation/00` 的 S0-r。
+
+9. 上面那条"过渡终值不落帧"没有自动化判据：harness 的 `Chrome` 与 `Render` 都读不到这个差异，只有真窗口
+PrintWindow 能。本批把它写成三条互补断言（属性 / 离屏 / 上屏）加一张捕获，防的是"属性对但屏幕没有"这类
+分歧再次被当成通过，而不是防这条缺陷本身复发——那需要任务 #13 的真窗口像素通路（任务 #22）。

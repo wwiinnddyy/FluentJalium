@@ -649,3 +649,30 @@ hover/disabled 变色不必放弃：从模板格子搬到 `Style.Triggers` 写 `
 **7 · 数值。** 修前弹窗合成图里属于我们那层标签的 `#FFFFFF` 有 1194 px，压在框架自己的 `#F5F5F7` 1670 px 上；
 修后 shipped / stripped / bare 三个 pass 的 `#FFFFFF` 全为 **0**，框架层逐色计数（`#F5F5F7x1659`、
 `#D6D6D7x556`、`#242424x737`）与参照 pass 完全一致——即"只剩一位画者，且它画的东西没被改动"。
+
+## S0-r：嵌套层的笔刷过渡进不了合成帧——同一属性、同一格子，PrintWindow 读得到与读不到（间距批，2026-09-19）
+
+触发点：把命令栏条目改成上游的三层形状（`Root` 无填充 / `AppBarButtonInnerBorder` 高亮 / `ContentRoot` 管高度）
+之后，Gallery 里那个默认勾选的 `AppBarToggleButton` 只剩黑字没有蓝底。四类证据在这里第一次互相矛盾，所以逐条量：
+
+**1 · 属性侧是对的。** 离屏 harness 里 `((Border)Part(toggle,"AppBarButtonInnerBorder")).Background` 的颜色
+等于被哨兵改写后的 `AccentFillColorDefaultBrush`；格子命中、目标名解析、行取值都没问题。
+
+**2 · 离屏栅格也是对的。** 三条通路各自断言 `Count(SentinelMagenta) > 1000` 全绿：裸控件 `Render`、栏内
+`Render`、栏内**先上屏后置 `IsChecked`** 再 `Chrome`。也就是说，只读离屏 harness 会得出"没问题"的结论——
+这条与 S0-j 的"捕获通路不对称"同源，只是这次不对称的是**过渡层**。
+
+**3 · 真窗口的合成捕获读不到。** `spike/VisualQA/capture-pages.ps1`（PrintWindow + `PW_RENDERFULLCONTENT`，
+dpi=168）里 Bold 格子 100x150 区域：`#60CDFF` 计数 **0**，格子颜色与栏底 `#323232` 完全相同。
+
+**4 · A/B 只差一个属性。** 其余代码不动，只把那条嵌套 `Border` 上的
+`TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"` 删掉重建，同一页同一坐标
+`#60CDFF` 变成 **7786 px**。改回原形状（高亮层作为模板根、同样带过渡）时填充是在的——旧提交里的
+`command-bar.png` 就是证据。所以边界不是"嵌套不能画"，而是"**带笔刷过渡的嵌套层，其终值不落进合成帧**"。
+
+**5 · 本批的处理。** 两个 bar 按钮的高亮层去掉过渡，留下原因注释：让填充在，而不是让 83ms 的淡入在。
+上游那 83ms 是 `BrushTransition`，属于观感细节；填充消失是错色。
+
+**6 · 待查，不在本批下结论。** 同样的写法还散在别处（`Styles/Common.jalxaml` 三处、`Menus.jalxaml:291`、
+`Surfaces.jalxaml:45/62`、`Navigation.jalxaml:21/69`、`Inputs.jalxaml:27/34`）。这些是不是同一症状，需要
+逐个用真窗口捕获量，不能从这一条外推——已开任务"过渡终值落帧审计"。

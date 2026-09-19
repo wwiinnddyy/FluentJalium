@@ -49,46 +49,64 @@
     <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
     <!-- Upstream's 68 is a literal on the style, not a row, in the file this transcription came from. -->
     <Setter Property="Width" Value="68" />
-    <Setter Property="MinHeight" Value="40" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="AppBarButton">
-        <Border Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                Padding="{ThemeResource AppBarButtonInnerBorderMargin}"
-                TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
-          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <!-- Upstream's ContentViewbox is a 16-tall box that scales the IconElement down rather than
-                 clipping it, and it stays in the layout with or without an icon, which is what holds the
-                 40-tall closed geometry the bar measures. -->
-            <Viewbox Name="ContentViewbox" Width="16" Height="16" HorizontalAlignment="Center">
-              <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
-            </Viewbox>
-            <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
-                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
-                       Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
-          </StackPanel>
-        </Border>
+        <!-- Upstream splits this into three elements and the split is the spacing: Root carries no fill,
+             AppBarButtonInnerBorder is the highlight and sits 2,6,2,6 inside the cell (so the hover rect has a
+             visible gap to its neighbours), and ContentRoot holds the geometry from the row
+             AppBarThemeMinHeight=64 - an x:Double this reader cannot parse, so 64 rides here as a literal.
+             The old shape put the highlight on the whole cell and vertically centred the icon, which is what
+             made the bar measure 40 and the labels sit where WinUI's do not.
+             Upstream also fades the highlight brush over 0.083s. That fade is off on both bar buttons here on
+             purpose: with it on, a checked toggle inside a CommandBar kept its accent in the property and in the
+             offscreen rasteriser but painted nothing in a composited window - 0 pixels of #60CDFF against 7786
+             with the attribute removed, same build otherwise - while the same transition on the old root Border
+             did reach the frame. What is given up is the fade on a nested highlight, not the fill.
+             adaptation/00 S0-r, audits/app-bar.md. -->
+        <Grid Name="Root" Background="Transparent">
+          <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
+                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  />
+          <Grid Name="ContentRoot" MinHeight="64">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+              <!-- Upstream's ContentViewbox is Height-only (AppBarButtonContentHeight=16) with the collapsed
+                   margin 0,16,0,2, so the glyph box starts 16 below the cell top and the label follows it. -->
+              <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
+                       Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
+              </Viewbox>
+              <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
+                         FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
+                         Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
+            </StackPanel>
+          </Grid>
+        </Grid>
         <ControlTemplate.Triggers>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPointerOver}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPointerOver}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundPointerOver}" />
           </Trigger>
           <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPressed}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPressed}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundPressed}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarButtonBackgroundDisabled}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushDisabled}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundDisabled}" />
           </Trigger>
+          <!-- Upstream's Compact writes the inner border margin, and its LabelCollapsed writes the same 48
+               (AppBarThemeCompactHeight) onto ContentRoot while hiding the label; IsCompact is one property
+               here, so one cell does both. -->
           <Trigger Property="IsCompact" Value="True">
             <Setter TargetName="LabelText" Property="Visibility" Value="Collapsed" />
-            <Setter TargetName="Root" Property="Padding" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Margin" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="ContentRoot" Property="MinHeight" Value="48" />
           </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
@@ -104,50 +122,56 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
     <Setter Property="Width" Value="68" />
-    <Setter Property="MinHeight" Value="40" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate TargetType="AppBarToggleButton">
-        <Border Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                Padding="{ThemeResource AppBarButtonInnerBorderMargin}"
-                TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
-          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Viewbox Name="ContentViewbox" Width="16" Height="16" HorizontalAlignment="Center">
-              <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
-            </Viewbox>
-            <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
-                       FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
-                       Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
-          </StackPanel>
-        </Border>
+        <Grid Name="Root" Background="Transparent">
+          <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
+                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  />
+          <Grid Name="ContentRoot" MinHeight="64">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+              <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
+                       Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
+              </Viewbox>
+              <!-- Upstream declares this margin as AppBarToggleButtonTextLabelMargin; same 2,0,2,8 value, and
+                   this implementation reads the button row so only one of the two names is published. -->
+              <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
+                         FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
+                         Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
+            </StackPanel>
+          </Grid>
+        </Grid>
         <ControlTemplate.Triggers>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPointerOver}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPointerOver}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundPointerOver}" />
           </Trigger>
           <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPressed}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPressed}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundPressed}" />
           </Trigger>
           <!-- Upstream reveals no glyph in the bar: the accent fill is the checked mark, and the overflow
                glyph belongs to the list layout this runtime cannot select. -->
           <Trigger Property="IsChecked" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundChecked}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushChecked}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundChecked}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushChecked}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundChecked}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundDisabled}" />
-            <Setter TargetName="Root" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushDisabled}" />
             <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundDisabled}" />
           </Trigger>
           <Trigger Property="IsCompact" Value="True">
             <Setter TargetName="LabelText" Property="Visibility" Value="Collapsed" />
-            <Setter TargetName="Root" Property="Padding" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Margin" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="ContentRoot" Property="MinHeight" Value="48" />
           </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
@@ -158,14 +182,16 @@
   <!-- ============ AppBarSeparator ============ -->
   <Style x:Key="DefaultAppBarSeparatorStyle" TargetType="AppBarSeparator">
     <Setter Property="Foreground" Value="{ThemeResource AppBarSeparatorForeground}" />
-    <Setter Property="Margin" Value="{ThemeResource AppBarSeparatorMargin}" />
-    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="Padding" Value="{ThemeResource AppBarSeparatorMargin}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="AppBarSeparator">
         <!-- Upstream's RootGrid carries a 1-wide rectangle filled from Foreground, with the half-device
-             corner radius the row list publishes as an unparsable double and so rides here as a literal. -->
+             corner radius the row list publishes as an unparsable double and so rides here as a literal. The
+             2,8,2,8 is the rectangle's margin, not the control's, and there is no MinHeight: the bar's row
+             height is what makes the rule 48 tall inside a 64 cell. -->
         <Grid Name="RootGrid">
           <Rectangle Name="SeparatorRectangle" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                     Margin="{TemplateBinding Padding}"
                      RadiusX="0.5" RadiusY="0.5" Fill="{TemplateBinding Foreground}" />
         </Grid>
       </ControlTemplate>

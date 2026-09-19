@@ -100,6 +100,10 @@
   <!-- ============ geometry rows, read as {ThemeResource} by the templates ============ -->
   <Thickness x:Key="AppBarButtonInnerBorderMargin">2,6,2,6</Thickness>
   <Thickness x:Key="AppBarButtonInnerBorderCompactMargin">2,6,2,22</Thickness>
+  <!-- The bar layout's icon slot: 16 above, 2 below, so the glyph box starts below the cell top instead of
+       centring in it. The LabelOnRight variant (AppBarButtonContentViewboxMargin) stays unpublished because
+       no state here selects that layout. -->
+  <Thickness x:Key="AppBarButtonContentViewboxCollapsedMargin">0,16,0,2</Thickness>
   <Thickness x:Key="AppBarButtonTextLabelMargin">2,0,2,8</Thickness>
   <Thickness x:Key="AppBarSeparatorMargin">2,8,2,8</Thickness>
 </ResourceDictionary>

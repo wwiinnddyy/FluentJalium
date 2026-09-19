@@ -102,6 +102,7 @@ public sealed class AstraAppBarTests
     [Theory]
     [InlineData("AppBarButtonInnerBorderMargin", 2, 6, 2, 6)]
     [InlineData("AppBarButtonInnerBorderCompactMargin", 2, 6, 2, 22)]
+    [InlineData("AppBarButtonContentViewboxCollapsedMargin", 0, 16, 0, 2)]
     [InlineData("AppBarButtonTextLabelMargin", 2, 0, 2, 8)]
     [InlineData("AppBarSeparatorMargin", 2, 8, 2, 8)]
     public void An_app_bar_geometry_row_carries_upstreams_value(string key, double left, double top, double right, double bottom)
@@ -197,7 +198,7 @@ public sealed class AstraAppBarTests
                 "AppBarToggleButton" => new AppBarToggleButton { Label = "one" },
                 _ => new AppBarSeparator(),
             };
-            Mount(element, 68, 40);
+            Mount(element, 68, 64);
 
             // An implicit style never lands in FrameworkElement.Style on this runtime, so the template object
             // is the readable proof - and here it is also the proof that ours beat the framework's own.
@@ -357,11 +358,13 @@ public sealed class AstraAppBarTests
                 Assert.Contains(keys, static key => key.Contains("Foreground", StringComparison.Ordinal) || key.Contains("BorderBrush", StringComparison.Ordinal));
             }
 
-            // Compact is the pair upstream's ApplicationViewStates select: the label leaves and the inner
-            // border takes the 2,6,2,22 margin, which is the only geometry row the cell can write.
+            // Compact is the pair upstream's ApplicationViewStates select: the label leaves, the inner border
+            // takes the 2,6,2,22 margin, and the content band drops to 48 - upstream's LabelCollapsed writes
+            // AppBarThemeCompactHeight onto ContentRoot.MinHeight, and IsCompact is one property on this runtime.
             var compact = FindCell(cells, "IsCompact=True").Setters;
             Assert.Contains(compact, static setter => (setter.Property?.Name ?? setter.PropertyName) == "Visibility");
-            Assert.Contains(compact, static setter => (setter.Property?.Name ?? setter.PropertyName) == "Padding");
+            Assert.Contains(compact, static setter => (setter.Property?.Name ?? setter.PropertyName) == "Margin");
+            Assert.Contains(compact, static setter => (setter.Property?.Name ?? setter.PropertyName) == "MinHeight");
 
             var toggle = TemplateCells(Template(FluentThemeManager.GetStyle("DefaultAppBarToggleButtonStyle")));
             var checkedKeys = FindCell(toggle, "IsChecked=True").Setters
@@ -379,9 +382,9 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var button = Mount(new AppBarButton { Label = "save" }, 68, 40);
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
             PixelHarness.Settle(60);
-            var root = (Border)Part(button, "Root");
+            var root = (Border)Part(button, "AppBarButtonInnerBorder");
             // The root carries upstream's 83ms brush transition, so the resting state is read as a colour; the
             // identity claim lives on the label, which has no transition, and on the rows themselves.
             Assert.Equal(ColorOf(Res("AppBarButtonBackground")), ColorOf(root.Background));
@@ -422,10 +425,10 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var button = Mount(new AppBarButton { Label = "save", IsEnabled = false }, 68, 40);
+            var button = Mount(new AppBarButton { Label = "save", IsEnabled = false }, 68, 64);
             PixelHarness.Settle(40);
 
-            Assert.Equal(ColorOf(Res("SubtleFillColorDisabledBrush")), ColorOf(((Border)Part(button, "Root")).Background));
+            Assert.Equal(ColorOf(Res("SubtleFillColorDisabledBrush")), ColorOf(((Border)Part(button, "AppBarButtonInnerBorder")).Background));
             Assert.Same(Res("TextFillColorDisabledBrush"), ((TextBlock)Part(button, "LabelText")).Foreground);
         });
     }
@@ -440,20 +443,20 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var untouched = Mount(new AppBarToggleButton { Label = "bold" }, 68, 40);
+            var untouched = Mount(new AppBarToggleButton { Label = "bold" }, 68, 64);
             PixelHarness.Settle(60);
-            Assert.Equal(ColorOf(Res("SubtleFillColorTransparentBrush")), ColorOf(((Border)Part(untouched, "Root")).Background));
+            Assert.Equal(ColorOf(Res("SubtleFillColorTransparentBrush")), ColorOf(((Border)Part(untouched, "AppBarButtonInnerBorder")).Background));
 
-            var toggle = Mount(new AppBarToggleButton { Label = "bold" }, 68, 40);
+            var toggle = Mount(new AppBarToggleButton { Label = "bold" }, 68, 64);
             toggle.IsChecked = true;
             PixelHarness.Settle(60);
 
-            Assert.Equal(ColorOf(Res("AccentFillColorDefaultBrush")), ColorOf(((Border)Part(toggle, "Root")).Background));
+            Assert.Equal(ColorOf(Res("AccentFillColorDefaultBrush")), ColorOf(((Border)Part(toggle, "AppBarButtonInnerBorder")).Background));
             Assert.Same(Res("TextOnAccentFillColorPrimaryBrush"), ((TextBlock)Part(toggle, "LabelText")).Foreground);
 
             toggle.IsChecked = false;
             PixelHarness.Settle(60);
-            Assert.NotEqual(ColorOf(Res("AccentFillColorDefaultBrush")), ColorOf(((Border)Part(toggle, "Root")).Background));
+            Assert.NotEqual(ColorOf(Res("AccentFillColorDefaultBrush")), ColorOf(((Border)Part(toggle, "AppBarButtonInnerBorder")).Background));
         });
     }
 
@@ -462,17 +465,17 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var button = Mount(new AppBarButton { Label = "save" }, 68, 40);
-            var root = (Border)Part(button, "Root");
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
+            var root = (Border)Part(button, "AppBarButtonInnerBorder");
             var label = (TextBlock)Part(button, "LabelText");
-            Assert.Equal(new Thickness(2, 6, 2, 6), root.Padding);
+            Assert.Equal(new Thickness(2, 6, 2, 6), root.Margin);
             Assert.True(Shown(label));
 
             button.IsCompact = true;
             PixelHarness.Settle(40);
 
             Assert.False(Shown(label), "IsCompact left the label in.");
-            Assert.Equal(new Thickness(2, 6, 2, 22), root.Padding);
+            Assert.Equal(new Thickness(2, 6, 2, 22), root.Margin);
 
             button.IsCompact = false;
             PixelHarness.Settle(40);
@@ -503,15 +506,15 @@ public sealed class AstraAppBarTests
                     static cell => cell.Condition.StartsWith("LabelPosition", StringComparison.Ordinal));
             }
 
-            var button = Mount(new AppBarButton { Label = "save" }, 68, 40);
-            var root = (Border)Part(button, "Root");
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
+            var root = (Border)Part(button, "AppBarButtonInnerBorder");
             var resting = ColorOf(root.Background);
             foreach (var name in Enum.GetNames<CommandBarLabelPosition>())
             {
                 button.LabelPosition = Enum.Parse<CommandBarLabelPosition>(name);
                 PixelHarness.Settle(60);
                 Assert.True(Shown((TextBlock)Part(button, "LabelText")), $"LabelPosition.{name} took the label out on its own.");
-                Assert.Equal(new Thickness(2, 6, 2, 6), root.Padding);
+                Assert.Equal(new Thickness(2, 6, 2, 6), root.Margin);
                 Assert.Equal(resting, ColorOf(root.Background));
             }
         });
@@ -529,14 +532,14 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var untouched = Mount(new AppBarButton { Label = "save" }, 68, 40);
+            var untouched = Mount(new AppBarButton { Label = "save" }, 68, 64);
             PixelHarness.Settle(60);
             Assert.False(untouched.IsMouseOver, "a control nobody touched arrived hovered.");
-            Assert.Equal(ColorOf(Res("SubtleFillColorTransparentBrush")), ColorOf(((Border)Part(untouched, "Root")).Background));
+            Assert.Equal(ColorOf(Res("SubtleFillColorTransparentBrush")), ColorOf(((Border)Part(untouched, "AppBarButtonInnerBorder")).Background));
 
-            var button = Mount(new AppBarButton { Label = "save" }, 68, 40);
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
             PixelHarness.Settle(60);
-            var root = (Border)Part(button, "Root");
+            var root = (Border)Part(button, "AppBarButtonInnerBorder");
             Assert.NotSame(Res("AppBarButtonBackground"), Res("AppBarButtonBackgroundPointerOver"));
 
             RaiseMouse(button, UIElement.MouseDownEvent);
@@ -557,7 +560,7 @@ public sealed class AstraAppBarTests
         _fixture.Run(() =>
         {
             var runs = 0;
-            var button = Mount(new AppBarButton { Label = "save", Command = new DelegateCommand(() => runs++) }, 68, 40);
+            var button = Mount(new AppBarButton { Label = "save", Command = new DelegateCommand(() => runs++) }, 68, 64);
 
             RaiseMouse(button, UIElement.MouseDownEvent);
             RaiseMouse(button, UIElement.MouseUpEvent);
@@ -574,7 +577,7 @@ public sealed class AstraAppBarTests
         _fixture.Run(() =>
         {
             var runs = 0;
-            var button = Mount(new AppBarButton { Label = "save", Command = new DelegateCommand(() => runs++) }, 68, 40);
+            var button = Mount(new AppBarButton { Label = "save", Command = new DelegateCommand(() => runs++) }, 68, 64);
             ((IInvokeProvider)new ButtonAutomationPeer(button)).Invoke();
             PixelHarness.Settle(40);
             Assert.Equal(1, runs);
@@ -582,7 +585,7 @@ public sealed class AstraAppBarTests
             // The inverse of the flyout item, which answers Invoke and has no Toggle at all: this peer offers
             // a real IToggleProvider, and what it returns for Invoke is itself, which is not an invokable
             // pattern. Measured rather than assumed, and the difference is recorded in audits/app-bar.md.
-            var toggle = Mount(new AppBarToggleButton { Label = "bold" }, 68, 40);
+            var toggle = Mount(new AppBarToggleButton { Label = "bold" }, 68, 64);
             var peer = new ToggleButtonAutomationPeer(toggle);
             Assert.IsAssignableFrom<IToggleProvider>(peer.GetPattern(PatternInterface.Toggle));
             Assert.False(peer.GetPattern(PatternInterface.Invoke) is IInvokeProvider,
@@ -612,7 +615,7 @@ public sealed class AstraAppBarTests
                 Command = new DelegateCommand(() => runs++),
                 Template = (ControlTemplate)dictionary["RenamedAppBarButtonTemplate"]!,
             };
-            Mount(button, 68, 40);
+            Mount(button, 68, 64);
 
             Assert.Null(PixelHarness.Named(button, "Root"));
             Assert.Null(PixelHarness.Named(button, "LabelText"));
@@ -636,18 +639,60 @@ public sealed class AstraAppBarTests
     {
         _fixture.Run(() =>
         {
-            var button = Mount(new AppBarButton { Label = "save" }, 68, 40);
-            Assert.IsType<Border>(Part(button, "Root"));
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
+            // Upstream splits the cell into three elements and the split is the spacing: Root carries no fill,
+            // AppBarButtonInnerBorder is the highlight inset inside it, ContentRoot owns the height.
+            Assert.IsType<Grid>(Part(button, "Root"));
+            Assert.IsType<Border>(Part(button, "AppBarButtonInnerBorder"));
+            Assert.IsType<Grid>(Part(button, "ContentRoot"));
             Assert.IsType<Viewbox>(Part(button, "ContentViewbox"));
             Assert.IsType<ContentPresenter>(Part(button, "Content"));
             Assert.IsType<TextBlock>(Part(button, "LabelText"));
             Assert.Equal("save", ((TextBlock)Part(button, "LabelText")).Text);
             Assert.Equal(12d, ((TextBlock)Part(button, "LabelText")).FontSize, 1);
             Assert.Equal(16d, ((Viewbox)Part(button, "ContentViewbox")).Height, 1);
+            Assert.Equal(64d, Part(button, "ContentRoot").MinHeight, 1);
 
-            var separator = Mount(new AppBarSeparator { Height = 40 }, 40, 40);
+            var separator = Mount(new AppBarSeparator { Height = 64 }, 8, 64);
             Assert.IsType<Grid>(Part(separator, "RootGrid"));
             Assert.IsType<Jalium.UI.Shapes.Rectangle>(Part(separator, "SeparatorRectangle"));
+        });
+    }
+
+    /// <summary>
+    /// The geometry the bar measures, read off the parts that carry it: the icon slot starts 16 below the cell
+    /// top rather than centring in it, the highlight stops 6 short of the cell edges, and the label keeps its
+    /// own 8 below. Compact is the state that moves both the inset and the band.
+    /// </summary>
+    [Fact]
+    public void The_bar_geometry_is_the_cells_upstream_writes()
+    {
+        _fixture.Run(() =>
+        {
+            var button = Mount(new AppBarButton { Label = "save" }, 68, 64);
+            var box = Part(button, "ContentViewbox");
+            var highlight = Part(button, "AppBarButtonInnerBorder");
+            var label = Part(button, "LabelText");
+            Assert.Multiple(
+                () => Assert.Equal(new Thickness(0, 16, 0, 2), box.Margin),
+                () => Assert.Equal(new Thickness(2, 6, 2, 6), highlight.Margin),
+                () => Assert.Equal(new Thickness(2, 0, 2, 8), label.Margin),
+                () => Assert.Equal(68d, button.ActualWidth, 1),
+                () => Assert.True(button.ActualHeight >= 64, $"the cell measured {button.ActualHeight}."));
+
+            button.IsCompact = true;
+            PixelHarness.Settle(60);
+            Assert.Multiple(
+                () => Assert.Equal(new Thickness(2, 6, 2, 22), highlight.Margin),
+                () => Assert.Equal(48d, Part(button, "ContentRoot").MinHeight, 1),
+                () => Assert.Equal(Visibility.Collapsed, label.Visibility));
+
+            var separator = Mount(new AppBarSeparator { Height = 64 }, 8, 64);
+            Assert.Equal(new Thickness(2, 8, 2, 8), Part(separator, "SeparatorRectangle").Margin);
+            // Upstream gives the separator no height of its own: the bar's row is what makes the rule 48 inside
+            // a 64 cell, so a MinHeight setter here would be our invention again.
+            Assert.DoesNotContain(FluentThemeManager.GetStyle("DefaultAppBarSeparatorStyle")!.Setters
+                .OfType<Setter>(), static setter => setter.Property?.Name == "MinHeight");
         });
     }
 
@@ -671,6 +716,12 @@ public sealed class AstraAppBarTests
             Assert.Equal(68d, first.ActualWidth, 1);
             Assert.Equal(68d, second.ActualWidth, 1);
             Assert.True(bar.ActualHeight >= 48, $"the bar collapsed to {bar.ActualHeight}.");
+
+            // The highlight is a sibling of the content band, so it only reads as Fluent if it really arranges
+            // inside the bar - a Gallery capture of the checked toggle showed no fill, which this measures.
+            var highlight = Part(second, "AppBarButtonInnerBorder");
+            Assert.True(highlight.ActualWidth > 40 && highlight.ActualHeight > 30,
+                $"the highlight arranged {highlight.ActualWidth}x{highlight.ActualHeight} in a {second.ActualWidth}x{second.ActualHeight} cell.");
         });
     }
 
@@ -703,13 +754,84 @@ public sealed class AstraAppBarTests
             try
             {
                 var toggle = new AppBarToggleButton { Label = "bold", IsChecked = true };
-                PixelHarness.Build(toggle, 68, 40);
+                PixelHarness.Build(toggle, 68, 64);
                 PixelHarness.Settle(60);
 
-                var sample = PixelHarness.Render(toggle, 68, 40);
+                var sample = PixelHarness.Render(toggle, 68, 64);
                 Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
                 Assert.True(sample.Count(SentinelMagenta) > 1_000,
                     $"the checked row did not reach pixels; top={sample.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The same claim one level up. The Gallery hosts its buttons inside a CommandBar, and a capture of that
+    /// page showed the checked cell with its black label and no accent fill, so "the row reached the property"
+    /// and "the row reached the pixels" are separate claims when the bar arranges the cell.
+    /// </summary>
+    [Fact]
+    public void A_checked_toggle_inside_the_bar_sends_its_accent_into_the_pixels()
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", SentinelMagenta);
+            try
+            {
+                var bar = new CommandBar { Width = 420 };
+                bar.PrimaryCommands.Add(new AppBarButton { Label = "one" });
+                bar.PrimaryCommands.Add(new AppBarToggleButton { Label = "two", IsChecked = true });
+                var sample = PixelHarness.Render(bar, 420, 64);
+                Assert.True(sample.Stable, $"capture never settled: {sample.Top(6)}");
+                Assert.True(sample.Count(SentinelMagenta) > 1_000,
+                    $"the checked row did not reach pixels inside the bar; top={sample.Top(6)}");
+
+                var window = PixelHarness.HostWindow();
+                var shownBar = new CommandBar { Width = 420 };
+                shownBar.PrimaryCommands.Add(new AppBarToggleButton { Label = "two", IsChecked = true });
+                PixelHarness.Host(shownBar, 420, 96);
+                PixelHarness.Settle(60);
+                var shown = PixelHarness.Chrome(window);
+                Assert.True(shown.Count(SentinelMagenta) > 1_000,
+                    $"the checked fill reached the offscreen rasteriser but not the shown window; top={shown.Top(6)}");
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", null);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The Gallery writes IsChecked on a bar that is already live, which is a different path from mounting a
+    /// checked control: the brush has to change on a visual that has already been composited once. The
+    /// offscreen rasteriser settles either way, so this reads the shown window and says which half works.
+    /// </summary>
+    [Fact]
+    public void A_checked_fill_written_after_the_bar_is_live_reaches_the_shown_window()
+    {
+        _fixture.Run(() =>
+        {
+            var window = PixelHarness.HostWindow();
+            var bar = new CommandBar { Width = 420 };
+            var toggle = new AppBarToggleButton { Label = "two" };
+            bar.PrimaryCommands.Add(toggle);
+            PixelHarness.Host(bar, 420, 96);
+            PixelHarness.Settle(60);
+
+            FluentThemeManager.OverrideBrush("AccentFillColorDefaultBrush", SentinelMagenta);
+            try
+            {
+                toggle.IsChecked = true;
+                PixelHarness.Settle(120);
+                var shown = PixelHarness.Chrome(window);
+                Assert.Equal(SentinelMagenta, ColorOf(((Border)Part(toggle, "AppBarButtonInnerBorder")).Background!));
+                Assert.True(shown.Count(SentinelMagenta) > 1_000,
+                    $"the property carries the accent but the shown window does not; top={shown.Top(6)}");
             }
             finally
             {
@@ -750,9 +872,9 @@ public sealed class AstraAppBarTests
         {
             var factory = new Func<AppBarToggleButton>(() => new AppBarToggleButton { Label = "bold", IsChecked = true });
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(factory(), 68, 40);
+            var light = PixelHarness.Render(factory(), 68, 64);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(factory(), 68, 40);
+            var dark = PixelHarness.Render(factory(), 68, 64);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
             Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
