@@ -974,7 +974,7 @@ public sealed class AstraAppBarTests
     /// A transitioning property can hold an interpolated brush instance for the length of the transition, so the
     /// colour is the stable reading; object identity is asserted on rows and on properties that do not animate.
     /// </summary>
-    private static Color ColorOf(Brush brush) => Assert.IsType<SolidColorBrush>(brush).Color;
+    private static Color ColorOf(Brush? brush) => Assert.IsType<SolidColorBrush>(brush).Color;
 
     private static ControlTemplate Template(Style style) =>
         (style.Setters.Cast<object>().OfType<Setter>()

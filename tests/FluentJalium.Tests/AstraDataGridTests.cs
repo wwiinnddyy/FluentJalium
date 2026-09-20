@@ -415,7 +415,7 @@ public sealed class AstraDataGridTests : IDisposable
                 // #FFAEAEB2 locally, and the cell keeps the resting brush our style set.
                 () => Assert.NotSame(Brush("DataGridRowForegroundDisabled"), cell.Foreground),
                 () => Assert.NotSame(Brush("DataGridRowForegroundDisabled"), grid.Foreground),
-                () => Assert.Equal(Color.FromRgb(0xAE, 0xAE, 0xB2), ((SolidColorBrush)grid.Foreground).Color));
+                () => Assert.Equal(Color.FromRgb(0xAE, 0xAE, 0xB2), Assert.IsType<SolidColorBrush>(grid.Foreground).Color));
             grid.IsEnabled = true;
             PixelHarness.Settle(20);
         });
@@ -593,8 +593,13 @@ public sealed class AstraDataGridTests : IDisposable
     private static IReadOnlyList<T> All<T>(DependencyObject root) where T : DependencyObject
     {
         var found = new List<T>();
-        void Walk(DependencyObject node)
+        void Walk(DependencyObject? node)
         {
+            if (node is null)
+            {
+                return;
+            }
+
             if (node is T match)
             {
                 found.Add(match);

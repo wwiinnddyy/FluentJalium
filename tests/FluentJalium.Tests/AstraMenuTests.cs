@@ -240,7 +240,7 @@ public sealed class AstraMenuTests
 
             Assert.Equal(3d, separator.ActualHeight);
             Assert.Equal(new Thickness(0), separator.Margin);
-            var rule = (Border)VisualTreeHelper.GetChild(separator, 0);
+            var rule = Assert.IsType<Border>(VisualTreeHelper.GetChild(separator, 0));
             Assert.Equal(1d, rule.ActualHeight);
             Assert.Equal(new Thickness(-4, 1, -4, 1), rule.Margin);
         });
@@ -659,8 +659,8 @@ public sealed class AstraMenuTests
             Assert.False(type!.IsPublic);
             Assert.True(type.IsSealed);
             Assert.Equal(nameof(Control), type.BaseType?.Name);
-            Assert.Empty(type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                .Where(static field => field.FieldType == typeof(DependencyProperty)));
+            Assert.DoesNotContain(type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly),
+                static field => field.FieldType == typeof(DependencyProperty));
             var constructor = Assert.Single(type.GetConstructors(BindingFlags.Instance | BindingFlags.Public));
             Assert.Equal(nameof(MenuFlyout), constructor.GetParameters()[0].ParameterType.Name);
             Assert.Null(Application.Current!.TryFindResource(type));
@@ -962,8 +962,13 @@ public sealed class AstraMenuTests
     }
 
     /// <summary>The framework's own scroll host, the node that sits between a menu surface and its rows.</summary>
-    private static DependencyObject? HostOf(DependencyObject root)
+    private static DependencyObject? HostOf(DependencyObject? root)
     {
+        if (root is null)
+        {
+            return null;
+        }
+
         if (root.GetType().Name == "MenuPopupScrollHost")
         {
             return root;
@@ -993,9 +998,14 @@ public sealed class AstraMenuTests
     }
 
     /// <summary>Every string a TextBlock in this subtree carries - what a skin must never hold for a control that paints its own text.</summary>
-    private static List<string> TextsIn(DependencyObject root)
+    private static List<string> TextsIn(DependencyObject? root)
     {
         var texts = new List<string>();
+        if (root is null)
+        {
+            return texts;
+        }
+
         if (root is TextBlock text && text.Text is { Length: > 0 } value) texts.Add(value);
         for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
         {

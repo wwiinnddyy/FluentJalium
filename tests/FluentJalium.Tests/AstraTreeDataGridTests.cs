@@ -273,8 +273,13 @@ public sealed class AstraTreeDataGridTests : IDisposable
             var selected = All<TreeDataGridRow>(grid).First(row => row.IsSelected);
             var capture = PixelHarness.Render(selected, (int)selected.ActualWidth, (int)selected.ActualHeight);
             var carriers = new List<string>();
-            void Walk(DependencyObject node)
+            void Walk(DependencyObject? node)
             {
+                if (node is null)
+                {
+                    return;
+                }
+
                 if (node is Control or Border or Panel)
                 {
                     var brush = Prop(node, "Background") as LinearGradientBrush;
@@ -392,8 +397,13 @@ public sealed class AstraTreeDataGridTests : IDisposable
     private static IReadOnlyList<T> All<T>(DependencyObject root) where T : DependencyObject
     {
         var found = new List<T>();
-        void Walk(DependencyObject node)
+        void Walk(DependencyObject? node)
         {
+            if (node is null)
+            {
+                return;
+            }
+
             if (node is T match)
             {
                 found.Add(match);

@@ -445,7 +445,7 @@ public sealed class AstraTabViewTests : IDisposable
             Assert.Multiple(
                 () => Assert.Equal(9, view.SelectedIndex),
                 () => Assert.Null(view.SelectedItem),
-                () => Assert.False(view.TabItems.Any(static tab => tab.IsSelected)));
+                () => Assert.DoesNotContain(view.TabItems, static tab => tab.IsSelected));
         });
     }
 

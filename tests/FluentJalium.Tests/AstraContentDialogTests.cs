@@ -195,7 +195,7 @@ public sealed class AstraContentDialogTests : IDisposable
             var card = (Border)Part(dialog, "PART_DialogCard");
 
             Assert.Equal(420d, card.MaxWidth);
-            Assert.Equal(420d, (double)card.ReadLocalValue(FrameworkElement.MaxWidthProperty));
+            Assert.Equal(420d, Assert.IsType<double>(card.ReadLocalValue(FrameworkElement.MaxWidthProperty)));
         });
     }
 
@@ -214,12 +214,13 @@ public sealed class AstraContentDialogTests : IDisposable
             // TitleTemplate. They cannot sit on the presenter instead: a ContentPresenter has no FontSize, and a
             // FontSize set on the ContentControl host is dropped on the floor by the text element the framework
             // generates for it (measured: weight=SemiBold survived, size stayed 14).
-            var titleText = PixelHarness.Descendant<TextBlock>(title);
+            var titleText = PixelHarness.Descendant<TextBlock>(title)
+                ?? throw new InvalidOperationException("the title template built no text element.");
 
             Assert.Multiple(
                 () => Assert.Equal("Publish this draft?", title.Content),
                 () => Assert.Equal(new Thickness(0, 0, 0, 12), title.Margin),
-                () => Assert.Equal(20d, titleText!.FontSize),
+                () => Assert.Equal(20d, titleText.FontSize),
                 () => Assert.Equal(FontWeights.SemiBold, titleText.FontWeight),
                 () => Assert.Equal("Once it is public, readers see it as of now.", body.Content),
                 () => Assert.Same(Res("ContentDialogTopOverlay"), strip.Background),
@@ -590,10 +591,13 @@ public sealed class AstraContentDialogTests : IDisposable
         {
             Title = "Publish this draft?",
             Content = "Once it is public, readers see it as of now.",
-            PrimaryButtonText = primary,
-            SecondaryButtonText = secondary,
-            CloseButtonText = close,
         };
+        // A null text is load-bearing: the command row's cells key on PrimaryButtonText={x:Null}
+        // (Styles/ContentDialog.jalxaml), which is how a button leaves the row. The CLR properties are annotated
+        // non-null, so these nulls go straight to the dependency properties they write.
+        dialog.SetValue(ContentDialog.PrimaryButtonTextProperty, primary);
+        dialog.SetValue(ContentDialog.SecondaryButtonTextProperty, secondary);
+        dialog.SetValue(ContentDialog.CloseButtonTextProperty, close);
         if (maxWidth is not null)
         {
             dialog.MaxWidth = maxWidth.Value;
