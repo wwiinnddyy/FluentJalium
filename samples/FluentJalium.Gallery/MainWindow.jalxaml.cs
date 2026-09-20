@@ -448,6 +448,9 @@ public partial class MainWindow : Window
         // themselves), and a readout that listed nothing would claim the framework does something it does not.
         var overflow = (ListBox)SampleOverflowList!;
         overflow.SelectionChanged += (_, _) => Report($"Overflow list last change: {Describe(overflow.SelectedItem)}.");
+
+        var view = (ListView)SampleListView!;
+        view.SelectionChanged += (_, _) => Report($"List view selection: {Describe(view.SelectedItem)}.");
     }
 
     private void WireAppearance()

@@ -1118,3 +1118,73 @@ ItemsPresenter`）：不带任何属性时左隙 1、右隙 13；`VerticalScroll
 的 setter 实测都落到容器上（读回 34、4,4,4,4、12,9,12,12），换成我们的树之后 `Content` 与 `TextBlock`
 都还在（"Item 1" 原样上屏），条目宽 = 呈现器宽、左右隙各 1。
 
+
+## S1-d：`ListView : ListBox`、`ListViewItem : ListBoxItem`，而 WinUI 的 `GridView` 在这个运行时不存在（阶段 5 第二段，2026-09-20）
+
+工具 `spike/ListViewProbe`（10 个模式：types/mount/retmpl/itemstyle/states/gutter/grid/cells/bar/panel），
+原始输出 `adaptation/s1d-listview-host-raw.txt`（含样式落地后复测的那一趟）。下面每条都是量出来的，不是从 WPF 或 WinUI 推的。
+
+**1 · 列表族是继承出来的，不是并列出来的。** `ListView : ListBox : Selector : ItemsControl : Control : FrameworkElement`，
+`ListViewItem : ListBoxItem : ContentControl : Control`。`ListView` 唯一的自有 DP 是 `View`（WPF 的列视图），
+`ListViewItem` **一个成员都不声明**（`DeclaredOnly` 的 DP 与属性都是空集）。两条直接后果：
+① 我们给 `ListBox` 发的隐式条目样式**不会**落到 `ListViewItem` 上（实测静置 padding 仍是原生 10,5,10,5、
+`MinHeight=30`，而 ListBoxItem 那套是 12,9,12,12）——隐式键按**精确类型**取，不沿基类走；
+② 条目可用的状态面与 `ListBoxItem` 一字不差（`IsSelected`/`IsMouseOver`/`IsEnabled`/`IsFocused` 四条 DP，
+`IsPointerOver`/`IsSelectionActive`/`IsHighlighted`/`CheckMode`/`ShowsCheckHint`/`IsDragging`/`SemanticState` 全没有），
+所以 S1-c 那张六格状态矩阵可以整体复用，不必再猜一次。
+
+**2 · 宿主能接我们的模板，跟 ListBox 一样不需要解锁调用。** 赋 `Border 'LayoutRoot' > ScrollViewer 'ScrollViewer' >
+ItemsPresenter` 之后容器照出（4/4），`ItemsPresenter` 改名照出（4/4），换成没有 `ItemsPresenter` 的普通
+`StackPanel` 就 0 个——S1-c 第 2 条"条目宿主契约是类型不是名字"在派生宿主上原样成立。
+
+**3 · 容器的部件名同样不是功能契约，而且比 ListBox 更干净。** 四种自造条目模板（保留 `PART_BackgroundBorder` +
+`PART_CellsPanel` / 两个都改名 / 去掉 cells 面板 / 只留 presenter）里，**内容全都照常渲染**（"Item 1" 在四种树下都读得到），
+`container.IsSelected` 在我们模板下也照常随 `SelectedIndex` 变 True。关键的一条：出厂模板选中时
+`PART_BackgroundBorder` 读到的 `#99680081`，在四种自造模板下**一次都没有再出现**——那支刷是出厂模板自己的格子画的，
+不是框架按部件名写进去的。所以列表条目这一层没有任何"必须叫这个名字"的部件；唯一的硬要求还是**有一个
+`ContentPresenter`**。
+
+**4 · 隐式类型键这一条在 `ListViewItem` 上一字不差地复现。** 应用级合入 `<Style TargetType="ListViewItem">`
+→ 生成容器当场吃（padding 10,5,10,5 → 12,9,12,12、Background → 标记色 `#FFFF00FF`），容器自己的 `Style`
+**仍读 null**；移除字典后活容器回落。`ItemContainerStyle` 出厂读 null，且（S1-c 第 3 条）它会压过隐式键——
+所以 `ListView` 样式同样**不写** `ItemContainerStyle`，并钉成断言。
+
+**5 · 12 DIP 右槽在第二个列表面上复现得一模一样，overlay 那条修法同样管用；顺手把"S0-u 会不会盖住行"这条结清了。**
+出厂 `ListView`：左 1 / 右 13（5 条与 50 条都一样）；我们的模板关 overlay：0 / 12；开 overlay：**0 / 0**。
+`ScrollBar` 元素在开 overlay 后报 **40x200**，看上去像"条盖住了行右侧 40 DIP"，走到子树才看清带填充的那层是
+`Border 'ThumbBorder' 2x40`，刷是 `#8BFFFFFF`——40 是**命中区**，画出来的是 2 DIP 细条（正是 WinUI 的 overlay 形），
+行仍然是整 300 DIP。同样的读数在**已经发货的 ListBox 宿主**上一字不差地出现，所以这是底座的性质而不是某个模板的性质；
+`AstraListViewTests` 与 `AstraListBoxTests` 各钉一条，防的就是有人拿"条宽 40"当理由把 overlay 关掉。
+
+**6 · 虚拟化、`ScrollIntoView`、`SelectionMode` 三档都从基类带过来。** 1000 项只实现一屏（`<30` 个容器）；
+`SelectionMode ∈ {Single, Multiple, Extended}`。但排他只在控件自己的选择路径里：`Single` 模式下**直接写第二行的
+`IsSelected=true`，两行会同时亮**（实测读回 2）。本批因此所有状态主张都走 `SelectedIndex`，并把这条边界原样钉住。
+
+**7 · 宿主级 disable 走不到条目的 disable 格。** `list.IsEnabled=false` 之后容器自己的 `IsEnabled` 确实变 false
+（继承到了），但模板里 `IsEnabled=False` 那格的 `Opacity` 仍读 **1**；把 `IsEnabled=false` 直接写在行上，0.3 立刻落下来。
+两条都进断言（一真一现状），写成现状而不是"已支持"。
+
+**8 · WinUI 的 `GridView` 没有对应类型：`GridView` 是 WPF 的列视图。** `Jalium.UI.Controls.GridView : ViewBase :
+DependencyObject`，`is Control=False`、`is ItemsControl=False`，`Activator.CreateInstance` 出来**不能**当内容塞进面板
+（`InvalidCastException: Unable to cast GridView to FrameworkElement`），自有 DP 是一族列头相关
+（`ColumnCollection`、`ColumnHeaderContainerStyle`、`AllowsColumnReorder`…），而 **`GridViewItem` 未导出**。
+本运行时的 `ListView` 也没留任何 WinUI 列表行为面：`IsItemClickEnabled`、`ItemClick`、`ShowSelectionChecks`、
+`MultiSelect`、`IsSwipeEnabled`、`ItemContainerTransitions`、`GroupStyleSource`、`ContainerContentChanging`、
+`ChoosingItemContainer`、`RecyclingRatio`、`ShowsScrollingPlaceholders`、`ItemWidth`/`ItemHeight`、`SemanticZoom`、
+`ItemsRepeater`、`ItemsView`、`ListViewItemPresenter` 逐条打点全是 `-`。
+唯一可行的卡片路线是换 ItemsPanel，而且实测真能换：`ItemsPanel` 是 `ItemsPanelTemplate` 类型的可写属性，
+喂 `WrapPanel` 之后 6 条行在 300 DIP 里排成 4+2（第二行 y=32.78）。但这是"能排成网格"，**不是 WinUI 的
+`GridView`**——卡片自己的选中描边、`ItemWidth`、语义缩放、点击语义都没有承载面，要 1:1 就得起自有类型。
+
+**9 · 上游 `ListViewItemPresenter` 是 C++ 的，几何读数因此只有一半可读。** 参考树里能读到的只有
+`ListViewItemSelectedBorderThemeThickness=4`（`ListViewItem_themeresources.xaml:11`）与
+`ListViewItemSelectionIndicatorCornerRadius=1.5`（:60）加上四条 `SelectionIndicator*Brush`；
+药丸的**长度**在那个 presenter 内部，本树没有。所以我们的实现发 4 与 1.5、把长度记成自加的 16 并在审计里标明。
+另一个可对照的读数在隔壁：`NavigationView` 的指示条是**可读的 XAML**
+（`NavigationView_themeresources.xaml:602` 的 `Rectangle x:Name="SelectionIndicator"` 吃
+`NavigationViewSelectionIndicator{Width,Height,Radius}` 三行），NavigationView 批可以照它抄，ListView 批不能。
+
+**10 · 本运行时不导出 `ListView*` 宿主级主题行，而且 `FluentThemeManager.GetStyle` 对不存在的键是抛 `KeyNotFoundException`，不是返回 null。** 整棵参考树 grep 不到 `ListViewBackground` / `ListViewStyle`
+（宿主外壳在闭源 dxaml/generic.xaml），所以宿主样式只能吃已发的 `ListBox*` 行且**不自造名**；
+而探针里 `GetStyle("DefaultListViewStyle")` 在未发货前抛异常这件事，对本仓库所有测试是一个契约：
+读 keyed 样式做"未发布"断言时不能走 `GetStyle`，要走 `Application.Current.TryFindResource`（缺失返回 null）。

@@ -1,0 +1,69 @@
+theme dictionaries=38
+our ListBox styles are live: ListBoxStyle=True
+
+=== I. the overlay scrollbar geometry on an overflowing list ===
+  (the F ledger says the rows keep the full 300 DIP with the overlay switch on, yet a bar reports 40 DIP wide - this says what that element actually is.)
+  ListView, our template + overlay: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 40x194 vis=Visible op=1 brush=-
+          RepeatButton '' 40x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x40 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 2x40 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 40x154 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x154 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.5 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 0x0 vis=Visible op=1 brush=-
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    first row 300x31.78
+  shipped ListBox style: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 40x194 vis=Visible op=1 brush=-
+          RepeatButton '' 40x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x40 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 2x40 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 40x154 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x154 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.7375604956268222 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 0x0 vis=Visible op=1 brush=-
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    first row 300x40.78

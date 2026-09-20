@@ -1,0 +1,71 @@
+<!-- WinUI 3 ListViewItem_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob b292e8fa9aa1f6024d16b8a5eb452e4427d45bda. Its ThemeDictionaries are Default (4-79), High Contrast
+     (80-155) and Light (156-231); each branch carries the SAME 76 row names plus two flags, and the file also
+     holds three styles (DefaultListViewItemStyle 234, ListViewItemExpanded 261,
+     ListPickerFlyoutPresenterItemStyle ~640). This file publishes the 20 rows a template of ours can actually
+     read; every withheld row is named with its reason at the bottom, and the row-by-row comparison is
+     docs/astra/audits/listview.md §1.
+
+     There is no ListView-level row to transcribe: grep over the reference commit finds no "ListViewBackground",
+     no "ListViewStyle" key and no controls/dev/ListView directory - the host chrome ships in the closed
+     dxaml/generic.xaml, and the open tree only carries the ITEM rows. The host style therefore reuses the
+     ListBox* rows published by ThemeResources/ListBox.jalxaml, which is also what the runtime's own type shape
+     says (spike/ListViewProbe mode A: ListView : ListBox : Selector : ItemsControl, and ListViewItem :
+     ListBoxItem with zero own members). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The row surface. Upstream writes these eight onto one Rectangle named BorderBackground that rests at
+       Opacity 0 (ListViewItem_themeresources.xaml:536), so the resting row paints nothing: a selected ListView
+       row is a subtle fill, not the accent block a ListBox row is. That difference is the reason this
+       dictionary is not a copy of ListBox.jalxaml. -->
+  <StaticResource x:Key="ListViewItemBorderBackground" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ListViewItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundSelected" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundSelectedPointerOver" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundSelectedPressed" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ListViewItemBackgroundSelectedDisabled" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <!-- Six foreground rows, and upstream aliases every one of them at the same primary text token: a selected
+     ListView row keeps the text colour it has at rest, which is the other half of why the selection is a fill
+     plus a pill rather than an accent block. -->
+  <StaticResource x:Key="ListViewItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListViewItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListViewItemForegroundPressed" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListViewItemForegroundSelected" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListViewItemForegroundSelectedPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListViewItemForegroundSelectedPressed" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- The selection indicator: the four rows upstream feeds to ListViewItemPresenter's
+     SelectionIndicator* properties (DefaultListViewItemStyle's presenter, line 256, reads all four). -->
+  <StaticResource x:Key="ListViewItemSelectionIndicatorBrush" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ListViewItemSelectionIndicatorPointerOverBrush" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ListViewItemSelectionIndicatorPressedBrush" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ListViewItemSelectionIndicatorDisabledBrush" ResourceKey="AccentFillColorDisabledBrush" />
+  <!-- Geometry. CornerRadius rows are publishable on this reader (the Thickness and CornerRadius families work);
+     the two that decide the row's own shape are 4 and 1.5, and both are read. -->
+  <CornerRadius x:Key="ListViewItemCornerRadius">4</CornerRadius>
+  <CornerRadius x:Key="ListViewItemSelectionIndicatorCornerRadius">1.5</CornerRadius>
+  <!-- Fourteen upstream rows are withheld because this reader cannot hold their type, and the value goes onto the
+     template as a literal with a comment instead: the eleven x:Double rows ListViewItemContentOffsetX -40.5,
+     ListViewItemDisabledThemeOpacity 0.3, ListViewItemDragThemeOpacity 0.80, ListViewItemReorderThemeOpacity
+     0.80, ListViewItemReorderTargetThemeOpacity 0.50, ListViewItemReorderTargetThemeScale 0.95,
+     ListViewItemReorderHintThemeOffset 10.0, ListViewItemSelectedBorderThemeThickness 4, ListViewItemMinWidth 88,
+     ListViewItemMinHeight 40, the two x:Boolean flags ListViewItemSelectionCheckMarkVisualEnabled and
+     ListViewItemSelectionIndicatorVisualEnabled, and the ListViewItemCheckMode enum row.
+     ListViewItemCompactSelectedBorderThemeThickness is a Thickness and COULD be published; it is not, because
+     compact is an InputMode state this runtime has no signal for - the same omission ComboBoxItem records.
+     Four focus rows are withheld for the same reason ListBox.jalxaml's audit gives: ListViewItemFocusVisualPrimary
+     Brush, ListViewItemFocusVisualSecondaryBrush, ListViewItemFocusBorderBrush and
+     ListViewItemFocusSecondaryBorderBrush have no part to paint on this host (mode A: no UseSystemFocusVisuals
+     slot in the stock tree, and AstraGateTests keeps us from faking an appearance).
+     Sixteen check rows are withheld because the container has no check surface at all: mode A read no CheckMode,
+     no IsMultiSelectCheckBoxVisible, no ShowsCheckHint on ListViewItem and mode B read no MultiSelectSquare part
+     in the shipped tree, so ListViewItemCheckBrush, ListViewItemCheckBoxBrush, ListViewItemCheckPressedBrush,
+     ListViewItemCheckDisabledBrush and the twelve ListViewItemCheckBox*Brush rows would promise an override that
+     cannot reach a pixel. Five drag / reorder / multi-arrange / placeholder rows go the same way
+     (ListViewItemDragBackground, ListViewItemDragForeground, ListViewItemPlaceholderBackground,
+     ListViewItemMultiArrangeOverlayTextBorder, ListViewItemMultiArrangeOverlayTextBackground): this runtime
+     exports no drag-drop surface on a list. The fifteen legacy *ThemeBrush rows (ListViewItemCheckHintThemeBrush
+     through ListViewItemSelectedPointerOverBorderThemeBrush) are dead upstream too - the same Windows 8.1
+     residue the ListBox audit names - and AstraListViewTests.A_dead_or_unreachable_upstream_row_is_not_published
+     names each one that is withheld here. -->
+</ResourceDictionary>

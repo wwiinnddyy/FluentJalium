@@ -1,0 +1,435 @@
+S1-d raw probe output - ListView host, ListViewItem container, GridView shape
+Sources: spike/ListViewProbe (Jalium.UI 26.10.9 NuGet, FluentJalium project reference), run 2026-09-20.
+WinUI reference: ../microsoft-ui-xaml commit 19e3bdc3ccf3361393d623d3a5d2667cb8f33229.
+Nothing below is edited or reordered; "threw" lines are the runtime's own words.
+
+Pass 1 = modes A-J with NO Astra list styles for ListView shipped (the stock host).
+Pass 2 = mode B again after Styles/ListViews.jalxaml and ThemeResources/ListView.jalxaml landed, so the
+         difference between the two blocks below is the effect of our own styles.
+
+######## PASS 1, modes types/mount/retmpl/itemstyle/states/gutter/grid/cells/bar/panel ########
+theme dictionaries=38
+our ListBox styles are live: ListBoxStyle=True
+
+=== A. exported list types, base chains and property surfaces ===
+  ListView: Jalium.UI.Controls.ListView abstract=False base=ListView : ListBox : Selector : ItemsControl : Control : FrameworkElement
+  ListViewBase: NOT EXPORTED by Jalium.UI.Managed
+  ListViewItem: Jalium.UI.Controls.ListViewItem abstract=False base=ListViewItem : ListBoxItem : ContentControl : Control : FrameworkElement : UIElement
+  GridView: Jalium.UI.Controls.GridView abstract=False base=GridView : ViewBase : DependencyObject : DispatcherObject : Object
+  GridViewItem: NOT EXPORTED by Jalium.UI.Managed
+  SemanticZoom: NOT EXPORTED by Jalium.UI.Managed
+  ListViewItemPresenter: NOT EXPORTED by Jalium.UI.Managed
+  GroupStyle: Jalium.UI.Controls.GroupStyle abstract=False base=GroupStyle : Object
+  ItemsRepeater: NOT EXPORTED by Jalium.UI.Managed
+  ItemsView: NOT EXPORTED by Jalium.UI.Managed
+  WrapPanel: Jalium.UI.Controls.WrapPanel abstract=False base=WrapPanel : Panel : FrameworkElement : UIElement : Visual : DependencyObject
+  VirtualizingStackPanel: Jalium.UI.Controls.VirtualizingStackPanel abstract=False base=VirtualizingStackPanel : VirtualizingPanel : Panel : FrameworkElement : UIElement : Visual
+  Selector: Jalium.UI.Controls.Primitives.Selector abstract=True base=Selector : ItemsControl : Control : FrameworkElement : UIElement : Visual
+  ListBox: Jalium.UI.Controls.ListBox abstract=False base=ListBox : Selector : ItemsControl : Control : FrameworkElement : UIElement
+  TreeView: Jalium.UI.Controls.TreeView abstract=False base=TreeView : ItemsControl : Control : FrameworkElement : UIElement : Visual
+  TreeViewItem: Jalium.UI.Controls.TreeViewItem abstract=False base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement
+  ListView own DPs: View
+  ListViewItem own DPs: 
+  ListView public properties: 1: View
+  ListViewItem public properties: none declared
+
+  WinUI ListView/GridView members this runtime does or does not carry:
+    IsItemClickEnabled: property=- dp=- event=-
+    ItemClick: property=- dp=- event=-
+    ShowSelectionChecks: property=- dp=- event=-
+    MultiSelect: property=- dp=- event=-
+    IsMultiSelectButtonEnabled: property=- dp=- event=-
+    IsSwipeEnabled: property=- dp=- event=-
+    IsItemSwipeEnabled: property=- dp=- event=-
+    ItemContainerTransitions: property=- dp=- event=-
+    GroupStyleSource: property=- dp=- event=-
+    IsGroupItem: property=- dp=- event=-
+    Group: property=- dp=- event=-
+    ContainerContentChanging: property=- dp=- event=-
+    ChoosingItemContainer: property=- dp=- event=-
+    RecyclingRatio: property=- dp=- event=-
+    IsVirtualizing: property=- dp=- event=-
+    VirtualizationMode: property=- dp=- event=-
+    SelectionMode: property=SelectionMode dp=SelectionMode event=-
+    SelectionDisabledvis: property=- dp=- event=-
+    ShowsScrollingPlaceholders: property=- dp=- event=-
+    IsFocusEngagementEnabled: property=- dp=- event=-
+    IsTabStop: property=Boolean dp=IsTabStop event=-
+    CornerRadius: property=CornerRadius dp=CornerRadius event=-
+    Padding: property=Thickness dp=Padding event=-
+    MaxSelectedItemCount: property=- dp=- event=-
+    ItemHeight: property=- dp=- event=-
+    ItemWidth: property=- dp=- event=-
+    IsItemClick: property=- dp=- event=-
+    ContinuumNavigationTransitionInfo: property=- dp=- event=-
+
+=== B. a mounted ListView: tree, parts, container reads, the stock selected brush ===
+  base=ListView : ListBox : Selector : ItemsControl : Control : FrameworkElement
+  Style=null Template=ControlTemplate
+  own theme-style key: threw KeyNotFoundException: Resource key 'DefaultListViewStyle' not found.
+
+    ListView 300x220
+      Grid 300x220
+        Border 'PART_OuterBorder' 300x220
+          Grid 298x218
+            Grid 'PART_ColumnHeadersBorder' 0x0
+              StackPanel 'PART_ColumnHeadersHost' 0x0
+              Rectangle 0x0
+            ScrollViewer 298x218
+              ItemsPresenter 286x218
+                VirtualizingStackPanel 286x218
+                  ListViewItem 286x31.78
+                    Grid 286x31.78
+                      Border 'PART_BackgroundBorder' 286x31.78
+                        StackPanel 'PART_CellsPanel' 264x19.78
+                          ContentPresenter 44.75x19.78
+                            TextBlock 44.75x19.78
+                  ListViewItem 286x31.78
+                    Grid 286x31.78
+                      Border 'PART_BackgroundBorder' 286x31.78
+                        StackPanel 'PART_CellsPanel' 264x19.78
+                          ContentPresenter 44.75x19.78
+                            TextBlock 44.75x19.78
+                  ListViewItem 286x31.78
+                    Grid 286x31.78
+                      Border 'PART_BackgroundBorder' 286x31.78
+                        StackPanel 'PART_CellsPanel' 264x19.78
+                          ContentPresenter 44.75x19.78
+                            TextBlock 44.75x19.78
+                  ListViewItem 286x31.78
+                    Grid 286x31.78
+                      Border 'PART_BackgroundBorder' 286x31.78
+                        StackPanel 'PART_CellsPanel' 264x19.78
+                          ContentPresenter 44.75x19.78
+                            TextBlock 44.75x19.78
+                  ListViewItem 286x31.78
+                    Grid 286x31.78
+                      Border 'PART_BackgroundBorder' 286x31.78
+                        StackPanel 'PART_CellsPanel' 264x19.78
+                          ContentPresenter 44.75x19.78
+                            TextBlock 44.75x19.78
+              ScrollBar 0x0
+                RepeatButton 0x0
+                  Border 'PART_ButtonRoot' 0x0
+                    Path 'PART_Arrow' 0x0
+                Track 0x0
+                  RepeatButton 0x0
+                    Border 0x0
+                  Thumb 0x12
+                    Border 'ThumbBorder' 0x12
+                  RepeatButton 0x0
+                    Border 0x0
+                RepeatButton 0x0
+                  Border 'PART_ButtonRoot' 0x0
+                    Path 'PART_Arrow' 0x0
+              ScrollBar 0x0
+                RepeatButton 0x0
+                  Border 'PART_ButtonRoot' 0x0
+                    Path 'PART_Arrow' 0x0
+                Track 0x0
+                  RepeatButton 0x0
+                    Border 0x0
+                  Thumb 12x0
+                    Border 'ThumbBorder' 12x0
+                  RepeatButton 0x0
+                    Border 0x0
+                RepeatButton 0x0
+                  Border 'PART_ButtonRoot' 0x0
+                    Path 'PART_Arrow' 0x0
+  container: ListViewItem style=null size=286x31.78 padding=10,5,10,5 background=SolidColorBrush(#00FFFFFF) min-height=30
+  container template parts: Border:PART_BackgroundBorder, StackPanel:PART_CellsPanel
+  content host: ContentPresenter
+    set SelectedIndex=0 -> 0
+  selected row reads: SelectedIndex=0 parts=[ListViewItem.=#00FFFFFF; Border.PART_BackgroundBorder=#99680081;]
+  accent in effect: #FF60CDFF
+
+=== C. our template on a ListView: lock, item-host contract, panel knob ===
+  assign ours: ok
+  after assign: containers=4 layoutRoot=1 scrollViewer=1 itemsPresenter=1
+  row size now: 300x31.78
+  assign renamed ItemsPresenter: ok
+  containers with the host renamed: 4
+  assign a template with no item host: ok
+  containers without an ItemsPresenter: 0
+  ItemsPanel knob: ItemsPanel present, type=ItemsPanelTemplate, current=ItemsPanelTemplate
+  assign a StackPanel ItemsPanelTemplate (mode J does the WrapPanel case): ok, containers=0 panelInTree=StackPanel
+
+=== D. an application-level implicit ListViewItem style on generated containers ===
+  resting padding before: 10,5,10,5
+  merge into application resources: ok
+  container after merge: Style=null padding=12,9,12,12 background=SolidColorBrush(#FFFF00FF)
+  ItemContainerStyle on the list: null
+  container after removal: padding=10,5,10,5 background=SolidColorBrush(#00FFFFFF)
+
+=== E. which upstream ListViewItem state signals exist on this container ===
+  IsSelected: dp=True clr=Boolean read=False
+  IsMouseOver: dp=True clr=Boolean read=False
+  IsEnabled: dp=True clr=Boolean read=True
+  IsFocused: dp=True clr=Boolean read=False
+  missing from the above list: IsPointerOver, IsSelectionActive, IsHighlighted, CheckMode, IsMultiSelectCheckBoxVisible, ShowsCheckHint, IsDragging, IsReorderHint, IsDragSource, IsDropTarget, IsGhosting, SemanticState, IsExpanded
+    set IsSelected=True -> True
+  writable from a trigger? IsSelected set: container.IsSelected=True list.SelectedIndex=-1
+  SelectionMode values on the list: Single/Multiple/Extended
+  set SelectionMode=Single: selected-index=1 selected-items=System.Collections.Generic.List`1[System.Object]
+  set SelectionMode=Multiple: selected-index=1 selected-items=System.Collections.Generic.List`1[System.Object]
+  set SelectionMode=Extended: selected-index=1 selected-items=System.Collections.Generic.List`1[System.Object]
+
+=== F. the 12 DIP gutter on a stock list and on our own template ===
+  stock ListView, 5 items: host=300x220 item=286x31.78 left=1 right=13 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  our template + overlay, 5 items: host=300x220 item=300x31.78 left=0 right=0 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  our template, overlay off, 5 items: host=300x220 item=288x31.78 left=0 right=12 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  stock ListView, 50 items: host=300x220 item=286x31.78 left=1 right=13 bars=[ScrollBar 12x218 vis=Visible ScrollBar 0x0 vis=Collapsed]
+  our template + overlay, 50 items: host=300x220 item=300x31.78 left=0 right=0 bars=[ScrollBar 40x220 vis=Visible ScrollBar 0x0 vis=Collapsed]
+  our template, overlay off, 50 items: host=300x220 item=288x31.78 left=0 right=12 bars=[ScrollBar 12x220 vis=Visible ScrollBar 0x0 vis=Collapsed]
+
+=== G. GridView / GridViewItem: is either a styleable control here ===
+  GridView type: Jalium.UI.Controls.GridView base=GridView : ViewBase : DependencyObject : DispatcherObject : Object
+  GridViewItem type: NOT EXPORTED
+  is Control=False is ItemsControl=False is ListViewBase=ListBox assignable=False
+  GridView own DPs: AllowsColumnReorder, ColumnCollection, ColumnHeaderContainerStyle, ColumnHeaderContextMenu, ColumnHeaderStringFormat, ColumnHeaderTemplate, ColumnHeaderTemplateSelector, ColumnHeaderToolTip
+  construct: InvalidCastException: Unable to cast object of type 'Jalium.UI.Controls.GridView' to type 'Jalium.UI.FrameworkElement'.
+  Style/Template: Style=null Template=null
+
+    GridView
+  containers: no GridViewItem type; ListViewItem-in-tree=0
+  item panel in tree: 
+  gutter: no container to measure
+
+=== H. ListViewItem template parts: what has to keep its name for content and selection to work ===
+  --- variant: parts kept, no trigger
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: renamed
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.OtherBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: no cells panel
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: presenter only
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF;
+    unmerge: ok
+
+=== I. the overlay scrollbar geometry on an overflowing list ===
+  (the F ledger says the rows keep the full 300 DIP with the overlay switch on, yet a bar reports 40 DIP wide - this says what that element actually is.)
+  ListView, our template + overlay: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+      thumb 40x40 margin=0,0,0,0
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.7423266217201165 width=NaN margin=0,0,0,0 hit=True
+      thumb 40x0 margin=0,0,0,0
+    first row 300x31.78
+  shipped ListBox style: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+      thumb 40x40 margin=0,0,0,0
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.7375604956268222 width=NaN margin=0,0,0,0 hit=True
+      thumb 40x0 margin=0,0,0,0
+    first row 300x40.78
+
+=== J. an ItemsPanel swap on a ListView, and what ListView.View is ===
+  panel before: Grid '' 300x200 | Grid '' 298x198 | Grid 'PART_ColumnHeadersBorder' 0x0 | StackPanel 'PART_ColumnHeadersHost' 0x0 | VirtualizingStackPanel '' 286x198 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78 | Grid '' 286x31.78 | StackPanel 'PART_CellsPanel' 264x19.78
+  parse an ItemsPanelTemplate with a WrapPanel: ItemsPanelTemplate
+  assign ItemsPanel: ok
+  panel after: Grid '' 300x200 | Grid '' 298x198 | Grid 'PART_ColumnHeadersBorder' 0x0 | StackPanel 'PART_ColumnHeadersHost' 0x0 | WrapPanel '' 286x198 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78 | Grid '' 66.75x31.78 | StackPanel 'PART_CellsPanel' 44.75x19.78
+  rows after: [0 66.75x31.78@1,1] [1 66.75x31.78@67.75,1] [2 66.75x31.78@134.49,1] [3 66.75x31.78@201.24,1] [4 66.75x31.78@1,32.78] [5 66.75x31.78@67.75,32.78]
+  ListView.View: type=ViewBase current=null
+  stock header parts on a fresh list: Grid 'PART_ColumnHeadersBorder' size=0x0; StackPanel 'PART_ColumnHeadersHost' size=0x0;
+
+######## PASS 1b, mode bar (the 40 DIP question, full subtree) ########
+theme dictionaries=38
+our ListBox styles are live: ListBoxStyle=True
+
+=== I. the overlay scrollbar geometry on an overflowing list ===
+  (the F ledger says the rows keep the full 300 DIP with the overlay switch on, yet a bar reports 40 DIP wide - this says what that element actually is.)
+  ListView, our template + overlay: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 40x194 vis=Visible op=1 brush=-
+          RepeatButton '' 40x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x40 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 2x40 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 40x154 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x154 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.5 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 0x0 vis=Visible op=1 brush=-
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    first row 300x31.78
+  shipped ListBox style: host=300x200
+    ScrollBar '' 40x200 vis=Visible opacity=1 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 40x194 vis=Visible op=1 brush=-
+          RepeatButton '' 40x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x40 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 2x40 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 40x154 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 40x154 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    ScrollBar '' 0x0 vis=Collapsed opacity=0.7375604956268222 width=NaN margin=0,0,0,0 hit=True
+
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+        Track '' 0x0 vis=Visible op=1 brush=-
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+          Thumb '' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+            Border 'ThumbBorder' 40x0 vis=Visible op=1 brush=#8BFFFFFF
+          RepeatButton '' 0x0 vis=Visible op=0 brush=#00FFFFFF
+            Border '' 0x0 vis=Visible op=1 brush=#00FFFFFF
+        RepeatButton '' 0x0 vis=Collapsed op=0 brush=#00FFFFFF
+          Border 'PART_ButtonRoot' 0x0 vis=Visible op=1 brush=#00FFFFFF
+            Path 'PART_Arrow' 0x0 vis=Visible op=1 brush=#FFD2D2D2
+    first row 300x40.78
+
+######## PASS 1c, mode cells (container part-name contract) ########
+theme dictionaries=38
+our ListBox styles are live: ListBoxStyle=True
+
+=== H. ListViewItem template parts: what has to keep its name for content and selection to work ===
+  --- variant: parts kept, no trigger
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: renamed
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.OtherBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: no cells panel
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: presenter only
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF;
+    unmerge: ok
+
+######## PASS 2, mode mount, with our ListView styles live ########
+theme dictionaries=40
+our ListBox styles are live: ListBoxStyle=True
+
+=== B. a mounted ListView: tree, parts, container reads, the stock selected brush ===
+  base=ListView : ListBox : Selector : ItemsControl : Control : FrameworkElement
+  Style=null Template=ControlTemplate
+  own theme-style key: Style
+
+    ListView 300x220
+      Border 'LayoutRoot' 300x220
+        ScrollViewer 'ScrollViewer' 300x220
+          ItemsPresenter 'ItemsPresenter' 300x220
+            VirtualizingStackPanel 300x220
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 0x40
+                Border 'ThumbBorder' 0x40
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 40x0
+                Border 'ThumbBorder' 40x0
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+  container: ListViewItem style=null size=300x40 padding=16,0,12,0 background=SolidColorBrush(#00FFFFFF) min-height=40
+  container template parts: Border:ContentBorder, Border:BorderBackground, Border:SelectionIndicator, ContentPresenter:ContentPresenter
+  content host: ContentPresenter
+    set SelectedIndex=0 -> 0
+  selected row reads: SelectedIndex=0 parts=[ListViewItem.=#00FFFFFF; Border.ContentBorder=#00FFFFFF; Border.BorderBackground=#0FFFFFFF; Border.SelectionIndicator=#FF60CDFF;]
+  accent in effect: #FF60CDFF

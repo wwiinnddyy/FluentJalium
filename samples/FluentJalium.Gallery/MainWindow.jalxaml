@@ -343,6 +343,17 @@
                 <ListBoxItem Content="Archived" />
               </ListBox>
               <TextBlock Text="Hover, press and the drag-select gesture are not claimed: the row states here are driven by selection in a test, never by a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="List view" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- The same row surface again, with WinUI's selection shape instead of the list's: a subtle fill plus
+                   a 4 DIP accent pill, and upstream's 40 DIP row with 16,0,12,0 padding rather than the runtime's
+                   30 DIP row at 10,5,10,5 (spike/ListViewProbe mode B). -->
+              <ListView x:Name="SampleListView" Height="176">
+                <ListViewItem Content="Quarterly review" />
+                <ListViewItem Content="Design sync" IsSelected="True" />
+                <ListViewItem Content="Ship train" />
+                <ListViewItem Content="Retro" IsEnabled="False" />
+              </ListView>
+              <TextBlock Text="The pill is 4 DIP wide and 1.5 rounded by upstream's own rows; its 16 DIP length is ours, because upstream keeps that number in a C++ presenter this reference does not carry. Disabling the list would not dim these rows - only a row-level IsEnabled reaches the cell." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
             </StackPanel>
 
             <StackPanel x:Name="NavigationPage">

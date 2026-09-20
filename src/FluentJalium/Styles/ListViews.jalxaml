@@ -1,0 +1,134 @@
+<!-- WinUI 3 ListViewItem_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     b292e8fa9aa1f6024d16b8a5eb452e4427d45bda: DefaultListViewItemStyle 234-259 (setter list 235-251, template
+     252-258) and the XAML twin ListViewItemExpanded 261-~630, whose CommonStates block (287-346) is the state
+     matrix transcribed below. The runtime contracts come from spike/ListViewProbe
+     (docs/astra/adaptation/s1d-listview-host-raw.txt); the row mapping and what was left out is
+     docs/astra/audits/listview.md.
+
+     Upstream's own template draws the row through ListViewItemPresenter, a C++ control whose internals are not in
+     this tree. ModernWpf 1.0 (../ModernWpf, commit 23555a6c) faces the same wall in WPF and copies the shape with
+     ordinary parts instead (ModernWpf/Styles/ListViewItem.xaml: one Border root, a ContentPresenter, no indicator);
+     this file copies the shape the same way but keeps upstream's indicator, because the pill is what a WinUI 3
+     selected row looks like. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. Upstream ships no ListView-level template in the open reference tree (see the dictionary header),
+     so the host takes the ListBox rows and the ListBox shape - which is also what the runtime is: mode A read
+     ListView : ListBox : Selector : ItemsControl : Control. What the stock host has and this one drops is named in
+     the comment on the template below. -->
+  <Style x:Key="DefaultListViewStyle" TargetType="ListView">
+    <Setter Property="Foreground" Value="{ThemeResource ListBoxForeground}" />
+    <Setter Property="Background" Value="{ThemeResource ListBoxBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ListBoxBorder}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ListBoxBorderThemeThickness}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListView">
+      <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+        <!-- Same literal scroll switches as the shipped ListBox host, for the same measured reason: an attached-name
+             setter never reaches the part on this reader (adaptation/00 S1-c 10), and IsOverlayScrollBarEnabled is
+             the one that removes the 12 DIP right gutter - spike/ListViewProbe mode F read 1/13 on the stock host
+             at both 5 and 50 items, 0/12 here with the switch off and 0/0 with it on.
+             Mode I closed the question the ListBox batch left open about that switch: with overlay on the bar element
+             reports 40 DIP wide, but the part that carries a fill is Border 'ThumbBorder' at 2x40 #8BFFFFFF, so the
+             40 is the hit area and the painted thumb is the thin WinUI one. The same reading came off the shipped
+             ListBox host, so this is a base fact about the runtime, not a property of either template.
+             The stock host also carries Grid 'PART_ColumnHeadersBorder' > StackPanel 'PART_ColumnHeadersHost' for
+             WPF-style columns; they measure 0x0 with ListView.View null (mode J) and there is no WinUI counterpart
+             for them, so this template does not reserve a header surface. That is a real loss of function for
+             anyone who sets View, and audits/listview.md §5 records it as a gap rather than pretending the two
+             frameworks share a column model. -->
+        <ScrollViewer Name="ScrollViewer" Focusable="False" Padding="{TemplateBinding Padding}"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      IsOverlayScrollBarEnabled="True">
+          <ItemsPresenter Name="ItemsPresenter" />
+        </ScrollViewer>
+      </Border>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="ListView" BasedOn="{StaticResource DefaultListViewStyle}" />
+
+  <!-- The item. The cell matrix is the same six signals the ListBox item proved usable (IsMouseOver,
+       IsMouseCaptureWithin, IsSelected, IsEnabled and the two selected combinations), because mode A read
+       ListViewItem as `ListViewItem : ListBoxItem` with ZERO declared members of its own, and mode E read the same
+       four DPs - IsSelected, IsMouseOver, IsEnabled, IsFocused - and none of WinUI's IsPointerOver,
+       IsSelectionActive, IsHighlighted or CheckMode.
+       Mode H is the reason the parts below are ours and not the runtime's: renaming PART_BackgroundBorder or
+       dropping PART_CellsPanel changes nothing at all - the content still renders in all four template variants
+       tried, and the #99680081 that mode B read on a selected STOCK row never reappears on our template, because
+       it was the stock template's own trigger, not the framework writing a brush into a part it looks up by name.
+       The one thing a template does have to carry is a ContentPresenter, and mode H confirmed the selection signal
+       itself arrives: container.IsSelected read True after the list's SelectedIndex was set, with our template on. -->
+  <Style x:Key="DefaultListViewItemStyle" TargetType="ListViewItem">
+    <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}" />
+    <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <!-- Literal, not a row: upstream's own setter says 16,0,12,0 (DefaultListViewItemStyle, line 241) and there is
+         no ListViewItemPadding row in the reference commit to copy - ModernWpf invented that key, and Astra's rule
+         is not to publish a name upstream never had (the Metrics.jalxaml clean-up removed two such self-invented
+         rows for exactly this reason). Same for MinWidth 88 / MinHeight 40, whose upstream rows are x:Double and
+         this reader cannot parse one: the runtime's own resting values measured 10,5,10,5 padding and MinHeight 30
+         (mode B), so all four numbers below are the upstream ones replacing the runtime's. -->
+    <Setter Property="Padding" Value="16,0,12,0" />
+    <Setter Property="MinWidth" Value="88" />
+    <Setter Property="MinHeight" Value="40" />
+    <!-- Upstream stretches the content of a ListView row (line 242) where it left-aligns a ListBox row; the
+         difference survives here. -->
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListViewItem">
+      <!-- One root, and the row radius is a published row (ListViewItemCornerRadius = 4). The state fill is its own
+           Border rather than the item's Background so that whatever an application or the framework writes on the
+           container cannot leak into the highlight - the same isolation the shipped ListBox item uses, and the one
+           the ComboBox item audit documents as a local-value hazard. -->
+      <Border Name="ContentBorder" CornerRadius="{ThemeResource ListViewItemCornerRadius}" Background="{TemplateBinding Background}">
+        <Grid>
+          <!-- Resting Opacity 0, exactly as upstream's BorderBackground rectangle is declared (line 536, with the
+               ListViewItemBorderBackground row as its resting Fill): only the cells below ever bring it in. The
+               three selected rows are subtle fills, so no alpha rides on this part - unlike ListBox, whose
+               selected rows are an accent at 0.6 / 0.8 / 0.9 (audits/listbox.md §5.3). -->
+          <Border Name="BorderBackground" CornerRadius="{ThemeResource ListViewItemCornerRadius}"
+                  Background="{ThemeResource ListViewItemBorderBackground}" Opacity="0" IsHitTestVisible="False" />
+          <!-- The indicator. Width 4 and the 1.5 radius are upstream's (ListViewItemSelectedBorderThemeThickness,
+               line 11, is 4; ListViewItemSelectionIndicatorCornerRadius, line 60, is 1.5); the presenter that turns
+               them into a drawn pill is C++ and not in this tree, so its 16 DIP height is ours and is recorded as
+               ours in audits/listview.md §5.2. -->
+          <Border Name="SelectionIndicator" Width="4" Height="16" HorizontalAlignment="Left" VerticalAlignment="Center"
+                  Margin="0,0,0,0" CornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
+                  Background="{ThemeResource ListViewItemSelectionIndicatorBrush}" Opacity="0" IsHitTestVisible="False" />
+          <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+            <!-- Upstream sets TextWrapping="NoWrap" on this presenter; the attribute is a dead cell on this host,
+                 so the promise goes onto the text element the presenter builds (the same workaround the shipped
+                 ListBox item and the ComboBox item carry). -->
+            <ContentPresenter.Resources>
+              <Style TargetType="TextBlock">
+                <Setter Property="TextWrapping" Value="NoWrap" />
+              </Style>
+            </ContentPresenter.Resources>
+          </ContentPresenter>
+        </Grid>
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundPointerOver}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListViewItemForegroundPointerOver}" /></Trigger>
+        <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundPressed}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListViewItemForegroundPressed}" /></Trigger>
+        <Trigger Property="IsSelected" Value="True"><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundSelected}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListViewItemForegroundSelected}" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundSelectedPointerOver}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /><Setter TargetName="SelectionIndicator" Property="Background" Value="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListViewItemForegroundSelectedPointerOver}" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseCaptureWithin" Value="True" /></MultiTrigger.Conditions><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundSelectedPressed}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /><Setter TargetName="SelectionIndicator" Property="Background" Value="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListViewItemForegroundSelectedPressed}" /></MultiTrigger>
+        <!-- Upstream's Disabled state dims the whole row by ListViewItemDisabledThemeOpacity (0.3) rather than
+             switching the text to a disabled brush; there is no ListViewItemForegroundDisabled row to write, so the
+             literal is the copy and it is the one place this batch writes the template root. -->
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ContentBorder" Property="Opacity" Value="0.3" /><Setter TargetName="SelectionIndicator" Property="Background" Value="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}" /></Trigger>
+        <!-- Selected and disabled is its own cell upstream (ListViewItemPresenter's SelectedDisabledBackground,
+           line 256), and it sits after the plain disabled cell so it wins on the properties the two share: on this
+           runtime the later writer takes the value, the same order dependency the ToggleButton batch measured. -->
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter TargetName="BorderBackground" Property="Opacity" Value="1" /><Setter TargetName="BorderBackground" Property="Background" Value="{ThemeResource ListViewItemBackgroundSelectedDisabled}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /><Setter TargetName="SelectionIndicator" Property="Background" Value="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}" /></MultiTrigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <!-- Implicit by type, and NOT ItemContainerStyle: mode D reproduced the ListBox finding exactly - a merged
+       application-scope style keyed on typeof(ListViewItem) reaches the generated containers on the spot (padding
+       10,5,10,5 to 12,9,12,12, background to the marker) while the container's own Style property stays null, and
+       removing the dictionary reverts the live containers. Naming it on the host style would outrank that. -->
+  <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}" />
+</ResourceDictionary>

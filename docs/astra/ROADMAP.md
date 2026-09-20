@@ -600,6 +600,58 @@ Light↔Dark 顶色不同）；硬件输入 = **仍为零**（任务 13），本
 不声称 `SelectedItems` 可用（实测写 `SelectedIndex` 之后仍读空，故多条选择的断言全部改读容器自己的 `IsSelected`）；
 不声称 ListView / GridView / TreeView / DataGrid 沾了这批的光——它们各自的模板与条目类型还要各自量。
 
+**阶段 5 第二段（ListView + ListViewItem，WinUI 的 GridView 被量掉，2026-09-20）**：接着列表族往下走，还是先量后写。
+`spike/ListViewProbe`（10 模式：types/mount/retmpl/itemstyle/states/gutter/grid/cells/bar/panel，原始输出
+`adaptation/s1d-listview-host-raw.txt`，含样式落地后复测的那一趟）先推翻两条前提，再量出六件承重的事：
+
+(1) **列表族是继承出来的**：`ListView : ListBox : Selector : ItemsControl : Control`，`ListViewItem : ListBoxItem`
+且**自己一个成员都不声明**，唯一的自有 DP 是 `View`。所以 S1-c 那张六格状态矩阵与"宿主契约是类型不是名字"
+"条目样式只走隐式类型键（容器 `Style` 恒 null）"三条在派生宿主上原样成立，本批是**复用**不是重做。
+(2) **WinUI 的 GridView 在这个运行时不存在**：`Jalium.UI.Controls.GridView` 是 WPF 那个"给 ListView 装列"的
+`ViewBase : DependencyObject`，`is Control=False`、构造出来不能当内容（实测 `InvalidCastException`），
+`GridViewItem` 未导出；WinUI 列表行为面逐条打点全是缺（`IsItemClickEnabled`/`ShowSelectionChecks`/`MultiSelect`/
+`ItemContainerTransitions`/`ItemWidth`/`SemanticZoom`/`ItemsRepeater`/`ListViewItemPresenter` 等 16 条）。
+唯一能走的卡片路线是换 ItemsPanel，实测真能走（`WrapPanel` 下 6 行排成 4+2，第二行 y=32.78），但那只是"能排成网格"，
+**不是 WinUI 的 `GridView`**——本批不交、也不声称。(3) **上游根本没有 `ListView*` 宿主级主题行**：整棵参考树 grep 不到
+`ListViewBackground`/`ListViewStyle`，也没有 `controls/dev/ListView/` 目录（宿主外壳在闭源 dxaml/generic.xaml），
+所以宿主吃已发的 `ListBox*` 行且**不自造名**（两条 `Assert.Null` 钉住没造名，一条像素断言钉住"一次覆写同时动两个宿主"）。
+(4) **容器的部件名连内容契约都不是**：四种自造条目模板（保留 / 改名 / 去掉 `PART_CellsPanel` / 只留 presenter）里内容
+全照常渲染，`IsSelected` 也照常随 `SelectedIndex` 变 True；更关键的是出厂模板选中时那支 `#99680081` 在我们模板下
+**一次都没再出现**——它是出厂模板自己的格子画的，不是框架按名字写进部件的。唯一硬要求仍是有个 `ContentPresenter`。
+(5) **WinUI 的 ListView 选中行不是强调色块**：上游 8 条底色行与 6 条字色行**全部**落在 subtle/text 令牌上，强调色只在
+左边那根药丸里（`SelectionIndicator*Brush`）。照抄 ListBox 那套强调色底色就是把两个控件画成一个控件，所以
+`A_selected_row_is_a_subtle_fill_and_not_an_accent_block` 与"药丸像素数落在 20~400 之间"两条把形钉住。
+可读到的只有宽 4 与半径 1.5，**药丸长度 16 是我们定的**（上游藏在 C++ 的 `ListViewItemPresenter` 里），
+已按自加值记进 §5.2；隔壁 `NavigationView` 的指示条反而是可读 XAML（`NavigationViewSelectionIndicator{Width,Height,Radius}`
+三行，`NavigationView_themeresources.xaml:602`），留给 NavigationView 批抄。
+(6) **"条宽 40"这条老疑问结清了**：开 overlay 之后 `ScrollBar` 元素报 40x200，看着像条盖住行右侧 40 DIP，
+走到子树才看清带填充的是 `Border 'ThumbBorder' 2x40 #8BFFFFFF`——40 是命中区，画出来是 WinUI 那根 2 DIP 细条；
+**已发货的 ListBox 宿主读数一字不差**，所以这是底座性质。两个测试类各钉一条，防的就是有人拿"40 太宽"当理由把 overlay 关掉。
+
+产物：`ThemeResources/ListView.jalxaml`（上游 76 行 + 2 flag 里发 **20 行**：8 底色 + 6 字色 + 4 指示器 + 2 半径；
+其余 58 条逐名给理由——14 条 x:Double/x:Boolean/枚举本 reader 读不动故以字面量进模板、4 条焦点无承载面、
+16 条勾选面无驱动、5 条拖放/占位、15 条上游自己也死的 8.1 世代 `*ThemeBrush`），`Styles/ListViews.jalxaml`
+（宿主 + 条目两张模板、两条隐式样式、**七格**触发器，第七格 `IsSelected + IsEnabled=False` 是反向消费闸口当场抓出来的：
+`ListViewItemBackgroundSelectedDisabled` 发了却没人读，`Transcribed_control_rows_are_read_by_a_template` 红了一条），
+`Themes/Manifest.txt` 两行（字典 38 → 40）、`audits/listview.md`（§0 前提、§1 家族表、§3 七格映射、§5 八条差异、§6 不声称）、
+`adaptation/00` 新 **S1-d**（10 条）、`AstraListViewTests`（**23 个方法 / 65 条断言事实**）、
+`AstraResourceKeyTests` 消费闸口扩到本字典、Catalog 新增两行（各 4-5 条 gap）、Gallery `selection` 页加一条 ListView
+（含一行自加的禁用行）与两句边界说明。
+
+四类证据分开记：构建 = 串行闸口 **859/859 全绿、0 skip、本批 0 新增警告**（18 条落在 Menu/AppBar/ContentDialog 三个
+既有文件上），调色板三档 checked=True 且 83 源色 / 101 刷未变；行为 = 宿主与条目的模板对象身份读回、出厂部件名换血
+（`PART_OuterBorder`、`PART_ColumnHeadersBorder` 消失，`LayoutRoot`/`ContentBorder`/`BorderBackground`/`SelectionIndicator` 出现）、
+padding 与行高换成上游 16,0,12,0 与 40（原生 10,5,10,5 与 30）、`SelectedIndex` 带动容器 `IsSelected`、选中抬起底色与药丸、
+`SelectedDisabled` 那格、逐模式多选与"直接写容器会留两行亮"、1000 项只实现一屏、长文本不换行、WrapPanel 排成 4+2、
+行隙静置与溢出时同为 0/0、overlay 命中区 40 而 `ThumbBorder` 画 2；视觉 = 4 条（共享行一次覆写同时动两个宿主、
+药丸上屏且像素数落在"是药丸不是色块"的区间、框架紫 0 命中、Light↔Dark 顶色不同）；上屏 = `selection,menus,overview`
+三页 mount 后优雅关闭、无残留进程，新加的 ListView 在折叠线以下**未目视**；硬件输入 = **仍为零**（任务 13）。
+
+不声称：不声称 `GridView` 已交付（§0）；不声称药丸长度与上游一致；不声称宿主级 disable 会把行压暗——实测
+`IsEnabled` 继承到了容器、而那一格仍读 Opacity 1，只有行级 disable 落 0.3，两条按现状各钉一条；不声称 `ListView.View`
+的列头可用（我们的模板没有列头面，设了 View 就丢）；不声称悬停 / 按下 / 拖选 / 键鼠导航有真实输入证据；不声称焦点框；
+不声称 TreeView / DataGrid / TabView / NavigationView 沾了这批的光。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

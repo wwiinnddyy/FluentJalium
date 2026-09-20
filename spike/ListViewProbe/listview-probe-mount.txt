@@ -1,0 +1,82 @@
+theme dictionaries=40
+our ListBox styles are live: ListBoxStyle=True
+
+=== B. a mounted ListView: tree, parts, container reads, the stock selected brush ===
+  base=ListView : ListBox : Selector : ItemsControl : Control : FrameworkElement
+  Style=null Template=ControlTemplate
+  own theme-style key: Style
+
+    ListView 300x220
+      Border 'LayoutRoot' 300x220
+        ScrollViewer 'ScrollViewer' 300x220
+          ItemsPresenter 'ItemsPresenter' 300x220
+            VirtualizingStackPanel 300x220
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+              ListViewItem 300x40
+                Border 'ContentBorder' 300x40
+                  Grid 300x40
+                    Border 'BorderBackground' 300x40
+                    Border 'SelectionIndicator' 4x16
+                    ContentPresenter 'ContentPresenter' 272x19.78
+                      TextBlock 272x19.78
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 0x40
+                Border 'ThumbBorder' 0x40
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 40x0
+                Border 'ThumbBorder' 40x0
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+  container: ListViewItem style=null size=300x40 padding=16,0,12,0 background=SolidColorBrush(#00FFFFFF) min-height=40
+  container template parts: Border:ContentBorder, Border:BorderBackground, Border:SelectionIndicator, ContentPresenter:ContentPresenter
+  content host: ContentPresenter
+    set SelectedIndex=0 -> 0
+  selected row reads: SelectedIndex=0 parts=[ListViewItem.=#00FFFFFF; Border.ContentBorder=#00FFFFFF; Border.BorderBackground=#0FFFFFFF; Border.SelectionIndicator=#FF60CDFF;]
+  accent in effect: #FF60CDFF

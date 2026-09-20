@@ -180,6 +180,22 @@
       "gaps": [ "the row style ships under the implicit type key, so a container's own Style property stays null - every assertion here reads the effect, not the assignment", "upstream's SelectedUnfocused state has no signal on this type (no IsSelectionActive, no IsHighlighted), so it merges onto the Selected row as upstream's own values do", "the 0.6 / 0.8 / 0.9 accent alphas ride on the highlight part's Opacity rather than in the rows, because the palette layer that would carry them is generated", "the fifteen legacy *ThemeBrush rows are not published - they are dead in upstream itself", "no focus visual is claimed: the stock template shows none inside its own tree, and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
     },
     {
+      "markup": "ListView",
+      "source": "Styles/ListViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listview.md", "tests/FluentJalium.Tests/AstraListViewTests.cs", "spike/ListViewProbe/Program.cs" ],
+      "gaps": [ "the reference commit publishes no ListView-level theme rows at all (no ListViewBackground, no ListViewStyle key, no controls/dev/ListView directory - the host chrome is in the closed dxaml generic.xaml), so the host reads the ListBox rows and one override of ListBoxBackground moves both list surfaces", "ListView.View - the WPF column view this runtime exposes as its only own dependency property - has no header surface in our template, so a list carrying a View loses its column headers; the stock PART_ColumnHeadersBorder measured 0x0 with the View null", "the grid surface the objective names is not here: Jalium's GridView is the WPF column View (ViewBase, not a Control) and no GridViewItem type is exported, so the card layout is an ItemsPanel swap on this host and the WrapPanel fact is as far as the claim goes", "no real pointer or touch evidence for hover, press and drag-select" ]
+    },
+    {
+      "markup": "ListViewItem",
+      "source": "Styles/ListViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listview.md", "tests/FluentJalium.Tests/AstraListViewTests.cs", "spike/ListViewProbe/Program.cs" ],
+      "gaps": [ "the indicator pill's 16 DIP height is ours: upstream keeps the geometry in the C++ ListViewItemPresenter, which is not in the reference tree, while its 4 DIP width and 1.5 radius are read from rows", "a disabled host does not re-run the row's disabled cell - IsEnabled reaches the generated container (asserted) yet the row keeps Opacity 1, so the 0.3 dim only appears when the row itself is disabled", "upstream's SelectedUnfocused, Selecting, MultiSelect and reorder states have no signal on this container, so 21 of its rows (focus, check, drag, placeholder, multi-arrange) are withheld rather than published unread", "the row style ships under the implicit type key, so a container's own Style stays null and every assertion here reads an effect rather than an assignment", "no focus visual is claimed: the stock template shows none inside its own tree and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
+    },
+    {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",

@@ -1,0 +1,32 @@
+theme dictionaries=38
+our ListBox styles are live: ListBoxStyle=True
+
+=== H. ListViewItem template parts: what has to keep its name for content and selection to work ===
+  --- variant: parts kept, no trigger
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: renamed
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.OtherBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: no cells panel
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF; Border.PART_BackgroundBorder=#00FFFFFF;
+    unmerge: ok
+  --- variant: presenter only
+    merge: ok
+    select row 0: set SelectedIndex=0 -> 0
+    container IsSelected after the list selects it: True
+    container: 286x30 text=Item 1/null
+    brushes after select: ListViewItem.=#00FFFFFF; Grid.=#00FFFFFF;
+    unmerge: ok
