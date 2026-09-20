@@ -1,0 +1,225 @@
+<!-- WinUI 3 TabView.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT): DefaultTabViewStyle lines 5-53,
+     TabViewListView style 54-131, TabScrollViewerStyle 133-172, TabViewCloseButtonStyle 174-226,
+     TabViewButtonStyle 228-290, TabViewItem style 292-599. The types are own because neither half of the
+     runtime's tab pair builds a template: spike/TabViewStyle sections C-G, docs/astra/adaptation/00 S1-h.
+     Row-by-row resource mapping and everything left out is docs/astra/audits/tab-view.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- The + button, upstream's TabViewButtonStyle. Its template paints through the ContentPresenter the same way
+       upstream does (TabView.xaml:242), and the glyph colour rides the button's own Foreground - a ContentPresenter
+       declares no Foreground, so writing one here would be the dead-cell class this repo gates
+       (adaptation/00 S1-f). FontSize 12, Width 32 and Height 24 are TabViewItemAddButton{FontSize,Width,Height},
+       which are x:Double rows this reader cannot publish, so they are literals here with their upstream names. -->
+  <Style x:Key="TabViewButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource TabViewButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource TabViewButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TabViewButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TabViewButtonBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="24" />
+    <!-- MinHeight is not upstream's row, it is this runtime's: a Button whose Height this style sets still
+         measured 36 tall until the minimum was pinned, and the 12 DIP it added pushed the whole tab from 32 to 44. -->
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Template"><ControlTemplate TargetType="Button">
+      <!-- Upstream paints its buttons with the ContentPresenter itself (TabView.xaml:191, :242). That presenter is
+           a pure content host on this runtime: it declares no Background, no BorderBrush, no BorderThickness, no
+           CornerRadius and no VerticalContentAlignment, so every one of those rows would be a dead write - the
+           third form of the same silence this repo now gates three times over (adaptation/00 S1-f, S1-g, S1-h).
+           The paint therefore moves to a Border and the presenter keeps only content and centring. -->
+      <Border Name="ContentRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource TabViewButtonBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource TabViewButtonForegroundPointerOver}" /><Setter TargetName="ContentRoot" Property="BorderBrush" Value="{ThemeResource TabViewButtonBorderBrushPointerOver}" /></Trigger>
+          <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource TabViewButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource TabViewButtonForegroundPressed}" /><Setter TargetName="ContentRoot" Property="BorderBrush" Value="{ThemeResource TabViewButtonBorderBrushPressed}" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource TabViewButtonBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource TabViewButtonForegroundDisabled}" /><Setter TargetName="ContentRoot" Property="BorderBrush" Value="{ThemeResource TabViewButtonBorderBrushDisabled}" /></Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <!-- The per-tab close button, upstream's TabViewCloseButtonStyle (TabView.xaml:174-226): a 32x24 hit area with a
+       12-point E711 mark and the same three cells. Its four item-state rows are written on the item's template,
+       because that is where upstream writes them. -->
+  <Style x:Key="TabViewCloseButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource TabViewItemHeaderCloseButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderCloseButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="Button">
+      <!-- Upstream paints its buttons with the ContentPresenter itself (TabView.xaml:191, :242). That presenter is
+           a pure content host on this runtime: it declares no Background, no BorderBrush, no BorderThickness, no
+           CornerRadius and no VerticalContentAlignment, so every one of those rows would be a dead write - the
+           third form of the same silence this repo now gates three times over (adaptation/00 S1-f, S1-g, S1-h).
+           The paint therefore moves to a Border and the presenter keeps only content and centring. -->
+      <Border Name="ContentRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource TabViewItemHeaderCloseButtonBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderCloseButtonForegroundPointerOver}" /><Setter TargetName="ContentRoot" Property="BorderBrush" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderBrushPointerOver}" /></Trigger>
+          <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="ContentRoot" Property="Background" Value="{ThemeResource TabViewItemHeaderCloseButtonBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderCloseButtonForegroundPressed}" /><Setter TargetName="ContentRoot" Property="BorderBrush" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderBrushPressed}" /></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource TabViewButtonForegroundDisabled}" /></Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <!-- The host. Upstream's tree is Grid > [TabContainerGrid (four columns: header, strip, add button, footer) with
+       two 1 DIP bottom lines, TabContentPresenter]; the column names and part names are kept, and the strip is a
+       horizontally scrollable row whose containers the view itself places - the runtime gives an own type no
+       ItemsPresenter contract to lean on. -->
+  <Style x:Key="DefaultFluentTabViewStyle" TargetType="controls:FluentTabView">
+    <Setter Property="Background" Value="{ThemeResource TabViewBackground}" />
+    <Setter Property="Padding" Value="{ThemeResource TabViewHeaderPadding}" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Template"><ControlTemplate TargetType="controls:FluentTabView">
+      <Grid Name="LayoutRoot">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Name="TabContainerGrid" Background="{TemplateBinding Background}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="2" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <!-- The line under the strip is drawn in two pieces, one either side of the tabs, and each tab draws its
+               own piece: the selected tab collapses its line so its body reads as continuous with the content
+               below it. Height 1 is upstream's literal; TabViewShadowDepth (x:Double 16) has no consumer here. -->
+          <Border Name="LeftBottomBorderLine" Grid.Column="0" Background="{ThemeResource TabViewBorderBrush}" Height="1" VerticalAlignment="Bottom" />
+          <ContentPresenter Name="LeftContentPresenter" Grid.Column="0" Content="{TemplateBinding TabStripHeader}" VerticalAlignment="Bottom" />
+          <ScrollViewer Name="TabScrollHost" Grid.Column="1" Focusable="False" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" IsOverlayScrollBarEnabled="True">
+            <!-- A StackPanel declares no Padding (adaptation/00 S1-g), so the strip's own inset is a Margin and the
+                 view's Padding row keeps its meaning one level out. -->
+            <StackPanel Name="TabListView" Orientation="Horizontal" Margin="{TemplateBinding Padding}" />
+          </ScrollViewer>
+          <Border Name="AddButtonContainer" Grid.Column="2" Padding="{ThemeResource TabViewItemAddButtonContainerPadding}" VerticalAlignment="Bottom">
+            <Button Name="AddButton" Content="&#xE710;" Style="{StaticResource TabViewButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center" ToolTip="New tab" />
+          </Border>
+          <ContentPresenter Name="RightContentPresenter" Grid.Column="3" Content="{TemplateBinding TabStripFooter}" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" />
+          <Border Name="RightBottomBorderLine" Grid.Column="2" Grid.ColumnSpan="2" Background="{ThemeResource TabViewBorderBrush}" Height="1" VerticalAlignment="Bottom" />
+        </Grid>
+        <ContentPresenter Name="TabContentPresenter" Grid.Row="1" Content="{TemplateBinding SelectedContent}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsAddButtonVisible" Value="False"><Setter TargetName="AddButton" Property="Visibility" Value="Collapsed" /></Trigger>
+        <Trigger Property="IsAddButtonVisible" Value="True"><Setter TargetName="AddButton" Property="Visibility" Value="Visible" /></Trigger>
+        <!-- Upstream's SingleBottomBorderLine state (TabView.xaml:20-27) spans the left line over all four columns
+             and drops the right one, and TabView.cpp moves it on and off from inside its layout pass. The two
+             always-on lines above are upstream's default state; the switch is not reproduced here and is named in
+             audits/tab-view.md §7. -->
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="controls:FluentTabView" BasedOn="{StaticResource DefaultFluentTabViewStyle}" />
+
+  <!-- The tab. Upstream's LayoutRoot is a three-column Grid (left arc / tab / right arc) whose middle column holds
+       TabContainer, and it carries Padding - which a Grid here cannot hold, so the inset sits on the Border that
+       upstream also pads (TabView.xaml:505, Padding=TabViewItemHeaderPadding). The x:Double rows
+       TabViewItemMinHeight 32, TabViewItemMaxWidth 240 and TabViewItemHeaderFontSize 12 are literals below. -->
+  <Style x:Key="DefaultFluentTabViewItemStyle" TargetType="controls:FluentTabViewItem">
+    <Setter Property="Background" Value="{ThemeResource TabViewItemHeaderBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TabViewItemBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TabViewItemBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />
+    <Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForeground}" />
+    <Setter Property="MinHeight" Value="32" />
+    <!-- TabViewItemHeaderFontSize (x:Double 12) as a literal. It goes on the control, not on the header
+         presenter: a FontSize written on the presenter never reached the text element it generates. -->
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="MaxWidth" Value="240" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="IsTabStop" Value="True" />
+    <Setter Property="Template"><ControlTemplate TargetType="controls:FluentTabViewItem">
+      <Grid Name="LayoutRoot">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border Name="BottomBorderLine" Grid.ColumnSpan="3" Background="{ThemeResource TabViewBorderBrush}" Height="1" VerticalAlignment="Bottom" />
+        <!-- The selected tab's fill: upstream builds a Path from TabViewItemTemplateSettings.TabGeometry, whose
+             shape is a top-rounded rectangle with a 4 DIP hook curving out at each bottom corner
+             (TabViewItem.cpp:98-122). This draws the same rectangle and the same two hooks as separate elements:
+             a Border extended 4 DIP each side under two 4x4 arc Paths whose data is upstream's literal. Where the
+             hook genuinely differs - the fill is square for the first pixel column instead of curved - is
+             audits/tab-view.md §7. -->
+        <Border Name="SelectedBackgroundSurface" Grid.ColumnSpan="3" Margin="-4,0,-4,0" Background="{ThemeResource TabViewItemHeaderBackgroundSelected}" CornerRadius="{TemplateBinding TopCornerRadius}" Visibility="Collapsed" />
+        <Path Name="LeftRadiusRenderArc" Grid.Column="0" Fill="{ThemeResource TabViewBorderBrush}" VerticalAlignment="Bottom" Margin="-4,0,0,0" Height="4" Width="4" Visibility="Collapsed" Data="M4 0C4 1.19469 3.47624 2.26706 2.64582 3H0C1.65685 3 3 1.65685 3 0H4Z" />
+        <Path Name="RightRadiusRenderArc" Grid.Column="2" Fill="{ThemeResource TabViewBorderBrush}" VerticalAlignment="Bottom" Margin="0,0,-4,0" Height="4" Width="4" Visibility="Collapsed" Data="M0 0C0 1.19469 0.523755 2.26706 1.35418 3H4C2.34315 3 1 1.65685 1 0H0Z" />
+        <Border Name="TabSeparator" Grid.Column="1" HorizontalAlignment="Right" Width="1" Background="{ThemeResource TabViewItemSeparator}" Margin="{ThemeResource TabViewItemSeparatorMargin}" />
+        <Grid Name="TabContainerHost" Grid.Column="1">
+          <Border Name="TabContainer" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding TopCornerRadius}" Padding="{ThemeResource TabViewItemHeaderPadding}">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <!-- The icon column: a 16x16 box, collapsed by the NoIcon state upstream and by the HasIcon row
+                   here. A ContentControl, not a ContentPresenter, because the icon glyph's colour is one of the
+                   ten rows this template writes and only a Control declares a Foreground. -->
+              <Border Name="IconBox" MaxWidth="16" MaxHeight="16" Margin="{ThemeResource TabViewItemHeaderIconMargin}">
+                <ContentControl Name="IconHost" Content="{TemplateBinding Icon}" Foreground="{ThemeResource TabViewItemIconForeground}" IsTabStop="False" />
+              </Border>
+              <ContentPresenter Name="HeaderPresenter" Grid.Column="1" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                <!-- Upstream's header never wraps (TabView.xaml:505-541 gives it one line and clips it); the
+                     promise goes on the TextBlock the presenter builds, since a presenter has no such member. -->
+                <ContentPresenter.Resources>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="TextWrapping" Value="NoWrap" />
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                  </Style>
+                </ContentPresenter.Resources>
+              </ContentPresenter>
+              <Button Name="CloseButton" Grid.Column="2" Content="&#xE711;" Margin="{ThemeResource TabViewItemHeaderCloseMargin}" Style="{StaticResource TabViewCloseButtonStyle}" IsTabStop="False" ToolTip="Close tab" />
+            </Grid>
+          </Border>
+        </Grid>
+      </Grid>
+      <ControlTemplate.Triggers>
+        <!-- PointerOver (TabView.xaml:315-323) and Pressed (325-333): the fill steps, the text and icon follow,
+             the separator fades out, and the close button takes the header-state brushes. -->
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="TabContainer" Property="Background" Value="{ThemeResource TabViewItemHeaderBackgroundPointerOver}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForegroundPointerOver}" /><Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundPointerOver}" /><Setter TargetName="CloseButton" Property="Background" Value="{ThemeResource TabViewItemHeaderPointerOverCloseButtonBackground}" /><Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource TabViewItemHeaderPointerOverCloseButtonForeground}" /><Setter TargetName="TabSeparator" Property="Opacity" Value="0" /></Trigger>
+        <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="TabContainer" Property="Background" Value="{ThemeResource TabViewItemHeaderBackgroundPressed}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForegroundPressed}" /><Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundPressed}" /><Setter TargetName="CloseButton" Property="Background" Value="{ThemeResource TabViewItemHeaderPressedCloseButtonBackground}" /><Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource TabViewItemHeaderPressedCloseButtonForeground}" /><Setter TargetName="TabSeparator" Property="Opacity" Value="0" /></Trigger>
+        <!-- Selected (335-352): the line under this tab goes, the arcs and the fill come, the Border pulls 1 DIP
+             wider on each side and up 1 over the line, its own border draws on three sides with the 4-DIP fade,
+             and the label goes primary and SemiBold. -->
+        <Trigger Property="IsSelected" Value="True"><Setter TargetName="BottomBorderLine" Property="Visibility" Value="Collapsed" /><Setter TargetName="LeftRadiusRenderArc" Property="Visibility" Value="Visible" /><Setter TargetName="RightRadiusRenderArc" Property="Visibility" Value="Visible" /><Setter TargetName="SelectedBackgroundSurface" Property="Visibility" Value="Visible" /><Setter TargetName="TabContainer" Property="Margin" Value="{ThemeResource TabViewSelectedItemHeaderMargin}" /><Setter TargetName="TabContainer" Property="BorderBrush" Value="{ThemeResource TabViewSelectedItemBorderBrush}" /><Setter TargetName="TabContainer" Property="BorderThickness" Value="{ThemeResource TabViewSelectedItemBorderThickness}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForegroundSelected}" /><Setter Property="FontWeight" Value="SemiBold" /><Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundSelected}" /><Setter TargetName="CloseButton" Property="Background" Value="{ThemeResource TabViewItemHeaderSelectedCloseButtonBackground}" /><Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource TabViewItemHeaderSelectedCloseButtonForeground}" /><Setter TargetName="CloseButton" Property="BorderBrush" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderBrushSelected}" /><Setter TargetName="TabSeparator" Property="Opacity" Value="0" /><Setter TargetName="LayoutRoot" Property="Background" Value="Transparent" /></Trigger>
+        <!-- The two selected-hover cells are the selected shape with the pressed or hovered fill under it, which
+             is what upstream's PointerOverSelected / PressedSelected states write (354-391). -->
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="SelectedBackgroundSurface" Property="Background" Value="{ThemeResource TabViewItemHeaderBackgroundPointerOver}" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseCaptureWithin" Value="True" /></MultiTrigger.Conditions><Setter TargetName="SelectedBackgroundSurface" Property="Background" Value="{ThemeResource TabViewItemHeaderBackgroundPressed}" /></MultiTrigger>
+        <!-- DisabledStates (393-404). Upstream's disabled fill is the transparent layer again, so a disabled tab
+             differs from a resting one only in its text and icon. -->
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="TabContainer" Property="Background" Value="{ThemeResource TabViewItemHeaderBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForegroundDisabled}" /><Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundDisabled}" /><Setter TargetName="CloseButton" Property="Background" Value="{ThemeResource TabViewItemHeaderDisabledCloseButtonBackground}" /><Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource TabViewItemHeaderDisabledCloseButtonForeground}" /><Setter TargetName="CloseButton" Property="BorderBrush" Value="{ThemeResource TabViewItemHeaderCloseButtonBorderBrushDisabled}" /><Setter TargetName="TabSeparator" Property="Opacity" Value="0" /></Trigger>
+        <!-- IconStates (475-480): NoIcon collapses the 16-DIP box, which also drops the column to zero wide. -->
+        <Trigger Property="HasIcon" Value="False"><Setter TargetName="IconBox" Property="Visibility" Value="Collapsed" /></Trigger>
+        <!-- CloseIconStates (492-503): the two paddings differ only on the right, 4 with a close button and 8
+             without, and upstream writes whichever state the tab is in rather than relying on the default. -->
+        <Trigger Property="IsClosable" Value="True"><Setter TargetName="TabContainer" Property="Padding" Value="{ThemeResource TabViewItemHeaderPaddingWithCloseButton}" /></Trigger>
+        <Trigger Property="IsClosable" Value="False"><Setter TargetName="CloseButton" Property="Visibility" Value="Collapsed" /><Setter TargetName="TabContainer" Property="Padding" Value="{ThemeResource TabViewItemHeaderPaddingWithoutCloseButton}" /></Trigger>
+        <!-- The bottom line steps 2 DIP short on whichever side the selected tab is (511-524), so the two tabs
+             beside a selected one leave the corner hooks room. -->
+        <Trigger Property="IsLeftOfSelected" Value="True"><Setter TargetName="BottomBorderLine" Property="Margin" Value="0,0,2,0" /></Trigger>
+        <Trigger Property="IsRightOfSelected" Value="True"><Setter TargetName="BottomBorderLine" Property="Margin" Value="2,0,0,0" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="controls:FluentTabViewItem" BasedOn="{StaticResource DefaultFluentTabViewItemStyle}" />
+</ResourceDictionary>

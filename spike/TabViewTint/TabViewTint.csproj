@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway TabView pass 2: which levers on the runtime's native tab pair reach pixels.
+       Pass 1 (spike/TabViewProbe) measured that TabControl and TabItem accept an assigned ControlTemplate,
+       record it as set, and then never build from it - the realized tree is identical with and without, and
+       neither probe part appears. It also measured that TabItem declares HoverBackground / SelectedBackground /
+       IndicatorBrush / IndicatorHeight and TabControl declares TabStripBackground / TabStripBorderBrush /
+       TabStripHeight, and that both types override OnRender. This pass therefore asks the only question that
+       decides the shape of the batch: can those declared state properties be driven to pixels by us, or are they
+       read from the framework's own palette the way the menu family's are? Nothing is typed against a guessed
+       class: every property is written by name through reflection. Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TabViewTint</RootNamespace>
+    <AssemblyName>TabViewTint</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

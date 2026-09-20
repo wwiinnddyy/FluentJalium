@@ -404,6 +404,36 @@
                   <Button x:Name="TogglePaneButton" Content="Toggle pane" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
                 </fluent:FluentSettingsRow>
               </Border>
+              <TextBlock Text="Tab view" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <ToggleButton x:Name="TabViewAddToggle" Content="Add button" IsChecked="True" Margin="0,0,8,8" />
+                    <Button x:Name="TabViewSelectFirstButton" Content="Select first" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentTabView x:Name="SampleTabView" Margin="-16,12,-16,0" Height="190" SelectedIndex="0" IsAddButtonVisible="True">
+                    <fluent:FluentTabView.TabItems>
+                      <fluent:FluentTabViewItem Header="Document">
+                        <TextBlock Text="The line under the strip stops at a selected tab: its own piece collapses, the two neighbours shorten by 2 DIPs, and the 4 DIP corner hooks are drawn in the line's colour so the tab reads as grown out of the surface below." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="Icon">
+                        <fluent:FluentTabViewItem.Icon>
+                          <TextBlock Text="&#xE8A5;" FontFamily="Segoe Fluent Icons" FontSize="16" />
+                        </fluent:FluentTabViewItem.Icon>
+                        <TextBlock Text="An icon column is 16 DIPs and disappears entirely when a tab has no icon, so the header's left inset stays where the text is." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="No close" IsClosable="False">
+                        <TextBlock Text="Without a close button the header takes the 8 DIP right inset back." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="Disabled" IsEnabled="False">
+                        <TextBlock Text="A disabled tab keeps the resting fill and loses only its label." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                    </fluent:FluentTabView.TabItems>
+                  </fluent:FluentTabView>
+                  <TextBlock x:Name="TabViewReadout" Text="Document selected." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="Clicking a tab selects it and Ctrl+Tab moves the selection; the arrow keys only move focus, because upstream sets SingleSelectionFollowsFocus=False on the strip. Closing a tab raises TabCloseRequested and removes nothing until this page asks for it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="SurfacesPage">

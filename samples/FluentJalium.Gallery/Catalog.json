@@ -402,6 +402,46 @@
         "a SplitButton placed in the bar keeps its non-app-bar style: upstream's SplitButtonInAppBarUnfocusedPointerOver and a CommandBar-scoped SplitButton style are still owed by this family",
         "the bar's 48-tall closed height is a literal on the style; upstream's AppBarThemeMinHeight / AppBarThemeCompactHeight pair are x:Double rows this reader cannot parse, and no compact height is set at all"
       ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentTabView",
+      "source": "Styles/TabView.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/tab-view.md",
+        "tests/FluentJalium.Tests/AstraTabViewTests.cs",
+        "spike/TabViewStyle/tab-style1.txt",
+        "spike/TabViewTint/tint-2.txt"
+      ],
+      "gaps": [
+        "Own type, not the runtime's TabControl: a TabControl handed a template - through a style setter or a local value - builds no tree at all, its realized tree is unchanged, and its strip's measure collapses to 0 wide (spike/TabViewStyle sections D-G, adaptation/00 S1-h). A ContentControl subclass on the same route does build (section I), which is what this type and its item are.",
+        "No drag, no drop and no reorder: upstream's CanDragTabs, CanReorderTabs and AllowDropTabs with their eleven drag and reorder VisualStates, the TabItemDragStarting/TabItemDropDetected/TabItemsReorderEnded events and the TabDragVisualContainer part are absent here.",
+        "No overflow scroll buttons: the strip scrolls, but the two RepeatButtons upstream hangs on TabScrollViewerStyle (TabView.xaml:133-172) and their twelve TabViewScrollButton* rows are withheld rather than published unread.",
+        "No TabWidthMode: upstream's Equal/SizeToContent/Compact group and its per-tab width arithmetic are not implemented, so a strip wider than the window scrolls instead of shrinking its tabs.",
+        "The selected tab's fill is a Border rather than upstream's code-built Path: the two 4 DIP corner hooks are drawn as separate arc Paths and the fill stays square where upstream's geometry curves out (TabViewItem.cpp:98-122).",
+        "The host's SingleBottomBorderLine and NoBottomBorderLine states are not switched: both line pieces are always drawn, which is upstream's default state, and the code that decides between them is not reproduced.",
+        "No TabStripHeaderTemplate/TabStripFooterTemplate and no TabItemTemplate or selector: the two strip slots take an element, not a data template.",
+        "The Ctrl+Tab, Ctrl+Shift+Tab and Delete accelerators are handled inside the control with no KeyboardAcceleratorTextVisible surface, so no key breadcrumb is drawn anywhere."
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentTabViewItem",
+      "source": "Styles/TabView.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/tab-view.md",
+        "tests/FluentJalium.Tests/AstraTabViewTests.cs",
+        "spike/TabViewStyle/tab-style1.txt",
+        "spike/TabViewTint/tint-2.txt"
+      ],
+      "gaps": [
+        "The item's template holds no presenter for Content - the view's body presenter owns it - so the strip shows Header and the page shows Content, one parent each.",
+        "Upstream builds the selected tab's outline in code from TabViewItemTemplateSettings.TabGeometry; TopCornerRadius here is the item's own read-only row over the same value the TopCornerRadiusFilterConverter produces.",
+        "No ToolTipTitle/ToolTipText rows and no TabViewTemplateSettings surface; a long header trims to an ellipsis at the 240 DIP maximum.",
+        "No automation peer of its own: the tab is a HeaderedContentControl, so an inspector sees a text control rather than a SelectionItem, and this runtime cannot synthesize a KeyEventArgs to prove the keyboard path end to end (spike/TabViewProbe section C)."
+      ]
     }
   ]
 }

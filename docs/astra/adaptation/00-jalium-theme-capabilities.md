@@ -1412,3 +1412,67 @@ S1-f 已经量到控件级 `Foreground` 是本运行时唯一通路，生成的�
 **9 · 这批没做的。** 属性名合法但 `{ThemeResource}` 资源名不存在的情况（资源键闸口管）；`Style`/`Setter` 这些
 非 `DependencyObject` 标记类型上的属性名拼错（闸口的类型过滤把它们排除在外）；真指针输入（#13）一条都没有；
 `ContentRootGrid` 那类"格子里名字对了但部件不存在"的组合仍由 S1-f 那道闸口负责。
+
+## S1-h：模板能不能建，取决于类型链上有没有 `ContentControl`——原生 tab 族两条通路都不建，第三种静默是 `ContentPresenter` 不画笔（阶段 5 第四段，2026-09-20）
+
+原始读数：`spike/TabViewProbe/`（pass 1 类型普查 `tab-probe1.txt`、上游行清单 `upstream-keys.txt`）、
+`spike/TabViewTint/`（pass 2 逐杠杆着色 `tint-1.txt`、`tint-2.txt`）、`spike/TabViewStyle/`（pass 3 模板到达通路
+`tab-style1.txt`）。消费方：`Controls/Navigation/FluentTabView.cs`、`FluentTabViewItem.cs`、
+`Styles/TabView.jalxaml`、`ThemeResources/TabView.jalxaml`、`docs/astra/audits/tab-view.md`；
+效果闸口：`AstraTabViewTests`（16 条事实）。
+
+**1 · "能不能重模板"是有位置的，位置在类型链上。** 反射读 `UseTemplateContentManagement` 的声明类型：它是
+`ContentControl` 上的 `protected` 成员。链上有 `ContentControl` 的（`TabItem : HeaderedContentControl :
+ContentControl`、`ListBoxItem`、`ContentControl` 本身）子类够得着；链上没有的（`TabControl : Selector :
+ItemsControl : Control`、`ListBox`、`ItemsControl`）任何子类都够不着。注意这条**不是**"够得着就能建"的充分条件，
+见第 2 条。同时它也解释了为什么 `ListBox` 能被样式重模板而 `TabControl` 不能：`ItemsControl` 系的模板走的是另一套
+内部展开（`Control.ExpandTemplateContent`/`ClearTemplateContent` 都是 private），而 `ContentControl` 系要先被
+那个开关放行。
+
+**2 · 同一个窗口里两条通路、一个阳性对照，原生 tab 族两处都不建。** pass 3 用 `ListBox` 证明探针看得见建起来的
+模板（样式 setter → 部件 `ProbeListRoot`/`ProbeListItems` 都在树里、54600 像素着色），然后：
+`TabControl` 喂样式 setter → 部件全无、模板根 magenta **0 像素**、 realized 树与不喂时逐行相同；
+`TabControl` 喂本地值 → 同上；`TabItem` 喂样式 setter → 同上；
+**`TabItem` 的子类在构造函数里自己开开关** → 仍然不建（部件 absent、lime 0 像素，482×36 整块由它自己的
+`OnRender` 画，选中时 `#3A3A3C`、还带 964 像素的 `#1E793F` 指示条）。
+同一段里 `ContentControl` 的子类开同一个开关 → 三个部件全在、9640 像素着色。
+所以"原生 tab 族不能重模板"不是偏好，是三条通路全测过之后的读数。
+
+**3 · 要模板反而更坏。** 给 `TabControl` 写上 `Template` 之后，它自己的条 measure 成 `StackPanel 0x0`、
+页签宽 0，却仍在画（section D/F 两组读数；没有 `Template` 时同一宿主量到 `420x36`）。失败模式不是"退回原样"，
+而是"退回一个塌陷的原样"。
+
+**4 · 第三种静默：`ContentPresenter` 在这里是纯内容宿主。** 上游两个按钮样式的模板根就是
+`ContentPresenter`，并在它身上写 `Background`/`BorderBrush`/`BorderThickness`/`CornerRadius`/
+`VerticalContentAlignment`（`TabView.xaml:191`、`:242`）。照搬过来被结构闸口逐条点出
+（"ContentPresenter 'ContentPresenter' has no Background" ×5、`has no BorderBrush` ×5）。
+这与 S1-f（格子的 `Foreground`）、S1-g（元素属性）是同一族的第三种：前两次读的是名字存不存在，
+这次要记的是**这个类型的 presenter 根本没有画笔层**。修法同族：笔挪到 `Border ContentRoot`，
+presenter 只留内容与居中；`Foreground` 仍然写在按钮自己身上，靠继承到达它生成的字形。
+
+**5 · 两条会咬人的度量读数。**
+(1) **`Button` 的默认 `MinHeight` 是 36。** 按钮样式已经写了 `Height=24`，两个按钮仍量到 36，
+于是整页签从上游的 32 顶到 44（断言 `Assert.Equal(32d, …)` 读出 44）。补 `MinHeight=0` 之后回到 24/32。
+上游不需要这一行，它的 `Button` 没有这个默认最小值——**"上游没有的行"有时正是这个运行时的坑**。
+(2) **`FontSize` 写在 `ContentPresenter` 上到不了它生成的 `TextBlock`**：标签量到 19.78（14 的字高），
+挪到条目样式（`Control` 真有这个成员）之后量到 17.24。
+
+**6 · `AutomationProperties` 不能作为前缀属性写进 `.jalxaml`。** 闸口原文
+"names a prefix type AutomationProperties the runtime does not export"。本仓既有做法是在代码里
+`AutomationProperties.SetName(...)`（`FluentNavigationItem`、`FluentNavigationView` 都是），模板里只留 `ToolTip`。
+
+**7 · 判据仍然是"读数先红一次"。** 本段所有断言都读实化元素自己的成员，而且这套判据在同一批里当场抓到自己两条
+空读数：pass 3 首跑的 `Named()` 按**类型名**匹配部件，于是 `ListBox` 阳性对照被报成"部件不存在"，而同一次运行
+两行下面的树打印里 `Border 'ProbeListRoot'` 明明在——改成读 `FrameworkElement.Name` 之后才与像素、树一致。
+规则和 S1-g 第 5 条同一条：**断言先要在缺陷还在的时候红过一次，且必须点名接收者的类型。**
+
+**8 · 源生成器先写属性、后挂子元素，所以"值必须落在稍后才填的集合里"这种校验必炸。**
+`FluentTabView.SelectedIndex` 第一版两界都抛异常，`<FluentTabView SelectedIndex="0">` 加三段
+`<FluentTabViewItem>` 的 markup 就在 `InitializeComponent` 里抛了
+`ArgumentOutOfRangeException`（`FluentJalium_Gallery_MainWindow.g.cs:2486`，
+`spike/TabViewStyle/crash-navigation-page.txt`）——属性那行在前，`TabItems.Add` 在后，
+写下的索引当场"越界"。这条与 S1-e 第 4 条（隐式样式必须在容器生成之前并入）同族：**markup 的执行顺序
+不是声明顺序的直觉**，凡"属性引用另一个成员稍后才会有的状态"都要写成"先接受、集合变了再落地"。
+改法与账单在 `audits/tab-view.md` §5 第 6 条。
+**推论给后面每一批：这类崩溃测试工程一条都看不见**——同一棵树上 40 条 TabView 事实与 977 条全套全绿，
+只有把那一页真的挂上屏（`tools/Test-AstraGallerySmoke.ps1 -Page navigation`）才炸得出来。

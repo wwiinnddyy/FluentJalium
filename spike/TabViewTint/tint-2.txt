@@ -1,0 +1,123 @@
+  set TabStripPlacement=Bottom: ok (type Dock, values Left,Top,Right,Bottom)
+=== A. per-item fills: which box paints, and does it follow selection? ===
+  A rest (index 0 selected): 420x120
+    red      exact=2040   within96=2040   box=0..59x0..33
+    lime     exact=2160   within96=2160   box=60..119x0..35
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=43560  box=0..419x0..119
+    surface  exact=42910  within96=43560  box=0..419x0..119
+  item fills read back: [0]=#FFFF0000 sel=True  [1]=#FF00FF00 sel=False  [2]=#FF0000FF sel=False
+  A after SelectedIndex=1: 420x120
+    red      exact=2160   within96=2160   box=0..59x0..35
+    lime     exact=2040   within96=2040   box=60..119x0..33
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=43560  box=0..419x0..119
+    surface  exact=42910  within96=43560  box=0..419x0..119
+  item fills read back: [0]=#FFFF0000 sel=False  [1]=#FF00FF00 sel=True  [2]=#FF0000FF sel=False
+  header band of the flipped selection:
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 sel= 420x120
+      StackPanel 420x36
+        TabItem bg=#FFFF0000 fg=#FFD1D1D6 sel=False 60x36
+        TabItem bg=#FF00FF00 fg=#FFF5F5F7 sel=True 60x36
+        TabItem bg=#FF0000FF fg=#FF636366 sel=False 70x36
+      ContentPresenter 65.52x19.78
+        TextBlock text="body two" fg=#FFFFFFFF 65.52x19.78
+
+=== B. label foreground: bright lime, counted inside the header band ===
+  B label foreground lime: 420x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=50280  box=0..419x0..119
+    surface  exact=45010  within96=50280  box=0..419x0..119
+  labels in the tree: "body one" fg=#FFFFFFFF
+
+=== C. the strip: background, border brush, height 60 ===
+  C strip: 420x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=17110  within96=17110  box=60..419x0..58
+    ink      exact=0      within96=28260  box=0..419x0..119
+    surface  exact=24780  within96=28260  box=0..419x0..119
+    TabStripBackground=#FFFF00FF TabStripBorderBrush=#FF00FF00 TabStripHeight=60
+  strip reads: read
+  header row geometry: item0 at (0,0) size 60x60, first child height 60
+
+=== D. the selection indicator ===
+  D indicator height 10: 420x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=600    within96=600    box=0..59x26..35
+    ink      exact=0      within96=49800  box=0..419x0..119
+    surface  exact=45010  within96=49800  box=0..419x0..119
+  D indicator, selection on the disabled third tab: 420x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=49700  box=0..419x0..119
+    surface  exact=47110  within96=49700  box=0..419x0..119
+
+=== E. TabStripPlacement=Bottom ===
+  read back: Bottom
+  E placement bottom: 420x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=50280  box=0..419x0..119
+    surface  exact=45010  within96=50280  box=0..419x0..119
+  header row geometry: item0 at (0,84) size 60x36, first child height 36
+  baseline header row geometry: item0 at (0,0) size 60x36, first child height 36
+
+=== F. ten tabs in a 200 DIP host: what does the strip do? ===
+  items: 70x36,61.6x36,70x36,70x36,86.8x36,61.6x36,60x36,70x36,61.6x36,70x36
+  F crowded: 200x120
+    red      exact=0      within96=0      box=-
+    lime     exact=0      within96=0      box=-
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=23860  box=0..199x0..119
+    surface  exact=21150  within96=23860  box=0..199x0..119
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 sel= 200x120
+      StackPanel 200x36
+        TabItem bg=#00FFFFFF fg=#FFF5F5F7 sel=True 70x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 61.6x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 70x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 70x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 86.8x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 61.6x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 60x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 70x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 61.6x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 sel=False 70x36
+
+=== G. keyboard: why did pass 1's constructors throw? ===
+    Focus() returned True; IsKeyboardFocused=True
+  focus: called
+  Keyboard.PrimaryDevice=SystemKeyboardDevice
+  PresentationSource=Jalium.UI.PresentationSource, window is one: False
+  source used: null
+  Right ctor(RoutedEvent,Key,ModifierKeys,Boolean,Boolean,Int32) threw ArgumentNullException: Value cannot be null. (Parameter 'routedEvent')
+  Right ctor(KeyboardDevice,PresentationSource,Int32,Key) threw ArgumentNullException: Value cannot be null. (Parameter 'inputSource')
+  Right: no constructor accepted the arguments
+  Left ctor(RoutedEvent,Key,ModifierKeys,Boolean,Boolean,Int32) threw ArgumentNullException: Value cannot be null. (Parameter 'routedEvent')
+  Left ctor(KeyboardDevice,PresentationSource,Int32,Key) threw ArgumentNullException: Value cannot be null. (Parameter 'inputSource')
+  Left: no constructor accepted the arguments
+  the control's own selection handlers, with real arguments:
+    ok SelectAdjacentTab(1): 1 -> 2
+    ok SelectAdjacentTab(-1): 2 -> 1
+    ok SelectTab(item 2): 1 -> 2
+    after the drives: [0] sel=False bg=#FFFF0000 selectedBg=#FFFF0000  [1] sel=False bg=#FF00FF00 selectedBg=#FF00FF00  [2] sel=True bg=#FF0000FF selectedBg=#FF0000FF
+  G after the selection drives: 420x120
+    red      exact=2160   within96=2160   box=0..59x0..35
+    lime     exact=2160   within96=2160   box=60..119x0..35
+    blue     exact=0      within96=0      box=-
+    magenta  exact=0      within96=0      box=-
+    ink      exact=0      within96=43700  box=0..419x0..119
+    surface  exact=42910  within96=43630  box=0..419x0..119

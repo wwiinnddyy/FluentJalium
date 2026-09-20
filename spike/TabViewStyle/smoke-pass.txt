@@ -1,0 +1,7 @@
+==> navigation
+    'FluentJalium Gallery' - closed cleanly in 6.8 s
+==> overview
+    'FluentJalium Gallery' - closed cleanly in 6.6 s
+==> selection
+    'FluentJalium Gallery' - closed cleanly in 6.4 s
+3 page(s) mounted and closed; no Gallery process left.

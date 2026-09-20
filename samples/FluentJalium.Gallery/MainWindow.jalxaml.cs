@@ -264,6 +264,36 @@ public partial class MainWindow : Window
         ((ToggleButton)InfoBarIconToggle!).Click += (_, _) =>
             bar.IsIconVisible = ((ToggleButton)InfoBarIconToggle!).IsChecked == true;
 
+        var tabs = (FluentTabView)SampleTabView!;
+        var tabsReadout = (TextBlock)TabViewReadout!;
+        tabs.AddTabButtonClick += (_, _) =>
+        {
+            var number = tabs.TabItems.Count + 1;
+            tabs.TabItems.Add(new FluentTabViewItem
+            {
+                Header = $"Tab {number}",
+                Content = new TextBlock { Text = $"Added by the + button as {number}.", Margin = new Thickness(12) },
+            });
+            tabs.SelectedIndex = tabs.TabItems.Count - 1;
+        };
+        tabs.TabCloseRequested += (_, args) =>
+        {
+            var index = tabs.TabItems.IndexOf(args.Item);
+            var header = args.Item.Header as string ?? "tab";
+            tabs.TabItems.Remove(args.Item);
+            if (tabs.SelectedIndex < 0 || index <= tabs.SelectedIndex)
+            {
+                tabs.SelectedIndex = Math.Max(0, Math.Min(index, tabs.TabItems.Count - 1));
+            }
+
+            tabsReadout.Text = $"{header} closed; {tabs.TabItems.Count} left.";
+        };
+        tabs.SelectionChanged += (_, args) => tabsReadout.Text =
+            args.NewSelectedItem is { } tab ? $"{tab.Header} selected." : "Nothing selected.";
+        ((ToggleButton)TabViewAddToggle!).Click += (_, _) =>
+            tabs.IsAddButtonVisible = ((ToggleButton)TabViewAddToggle!).IsChecked == true;
+        ((Button)TabViewSelectFirstButton!).Click += (_, _) => tabs.SelectedIndex = 0;
+
         foreach (var (button, shapes) in new[]
                  {
                      ((Button)DialogThreeButton!, 3),

@@ -212,6 +212,13 @@ public class AstraResourceKeyTests
     /// count is not decidable on its own, since another class's open acrylic popup paints that same window
     /// (audits/app-bar.md).
     /// </para>
+    /// <para>
+    /// The TabView batch joined with two rows added rather than one. Its own dictionary publishes sixty-four rows -
+    /// fifty-three from upstream's themed branch and eleven from the thirty-one metric rows outside it - and
+    /// <c>AstraTabViewTests.A_withheld_upstream_row_is_not_published</c> holds the other side, so a deferred name
+    /// cannot leak back in. The same pass over the list found <c>ContentDialog.jalxaml</c> had never been put
+    /// through this gate when that batch shipped; it reads clean now, and the row counts rather than the omission.
+    /// </para>
     /// </summary>
     [Theory]
     [InlineData("ThemeResources/Button.jalxaml")]
@@ -237,6 +244,8 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/MenuBar.jalxaml")]
     [InlineData("ThemeResources/AppBar.jalxaml")]
     [InlineData("ThemeResources/TeachingTip.jalxaml")]
+    [InlineData("ThemeResources/ContentDialog.jalxaml")]
+    [InlineData("ThemeResources/TabView.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

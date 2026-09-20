@@ -713,6 +713,82 @@ mount 后优雅关闭、无残留进程，新加的树在折叠线以下**未目
 不声称宿主级 disable 会把整棵子树压暗；不声称 `Path` 箭头等于上游的字体 glyph；不声称子层那 16 DIP 缩进与上游像素相同；
 不声称 DataGrid / TabView / NavigationView 沾了这批的光。
 
+**阶段 5 第四段（TabView + TabViewItem：把"自有类型"从计划变成三条通路的测量，2026-09-20）**：目标里这一行写的是
+"TabView(自有)"，本批没有照抄这个判断，而是先花三遍探针把它变成读数（`spike/TabViewProbe` pass 1 类型普查与模板赋值、
+`spike/TabViewTint` pass 2 逐杠杆着色、`spike/TabViewStyle` pass 3 模板到达通路 `tab-style1.txt`），量出的承重结论：
+
+(1) **"能不能重模板"的位置在类型链上**：反射读 `UseTemplateContentManagement` 的声明类型，它是 `ContentControl` 上的
+`protected` 成员。`TabItem : HeaderedContentControl : ContentControl` 够得着，`TabControl : Selector : ItemsControl :
+Control` 链上根本没有 `ContentControl`，任何子类都够不着。而"够得着"**不是**充分条件：pass 3 让 `TabItem` 的子类在
+构造函数里自己开这个开关，部件仍然不在树里、模板根上的 lime 仍然 0 像素，482×36 整块还是它自己的 `OnRender` 画的
+（选中时 `#3A3A3C` + 964 像素的 `#1E793F` 指示条）。同一段里 `ListBox` 作阳性对照（样式 setter → 部件全在、54600 像素），
+`ContentControl` 子类开同一个开关也建（9640 像素）。**三条通路 + 一个开关全测过**，"原生 tab 族不能重模板"才是读数不是偏好。
+(2) **要模板反而更坏**：给 `TabControl` 写上 `Template` 之后它自己的条 measure 成 `StackPanel 0x0`、页签宽 0 却仍在画
+（没有 `Template` 时同一宿主量到 `420x36`）——失败模式不是"退回原样"而是"退回一个塌陷的原样"。
+(3) **原生那套的行为是好的、外观通路是死的**：`SelectedIndex` 改到 1 之后 `SelectedContent`、可见正文、`IsSelected`
+三处都跟（pass 1/2 实测），所以自有类型保的是它的**语义形状**（选中不跟随焦点、`SelectionChanged` 报两端），换掉的只有绘制。
+宿主 `FluentTabView : ContentControl`、条目 `FluentTabViewItem : HeaderedContentControl`——后者选这个基类是为了保住上游
+"`Header` 在条上、`Content` 在 body"那一刀切分，与 `FluentNavigationView` 走的是同一条被证明能建树的链。
+(4) **第三种静默：这里的 `ContentPresenter` 是纯内容宿主**。上游两个按钮样式的模板根正是 `ContentPresenter`，
+并在它身上写 `Background`/`BorderBrush`/`BorderThickness`/`CornerRadius`/`VerticalContentAlignment`
+（`TabView.xaml:191`、`:242`）——照搬过来被结构闸口逐条点出（"ContentPresenter 'ContentPresenter' has no Background" ×5、
+`has no BorderBrush` ×5）。这与 S1-f（格子的 `Foreground`）、S1-g（元素属性）同族：那两次读的是名字存不存在，
+这次要记的是**这个类型的 presenter 根本没有画笔层**。笔挪到 `Border ContentRoot`，presenter 只留内容与居中。
+(5) **两条会咬人的度量读数**：① 本运行时 `Button` 默认 `MinHeight=36`，样式已写 `Height=24` 仍量到 36，
+于是整页签从上游的 32 顶到 44（`Assert.Equal(32d, …)` 读出 44）；补 `MinHeight=0` 后回到 24/32。上游没有这行也不需要——
+**"上游没有的行"有时正是这个运行时的坑**。② `FontSize` 写在 `ContentPresenter` 上到不了它生成的 `TextBlock`
+（标签量到 19.78 = 14 的字高），挪到条目样式（`Control` 真有这个成员）之后量到 17.24。
+另记一条：`AutomationProperties` 不能作为前缀属性写进 `.jalxaml`（闸口原文 "does not export"），名字一律在代码里 `SetName`。
+(6) **计数也要被自己数出来的东西打脸一次**：审计 §1 第一版写"发 46 / withhold 17"，本批把上游 `sed` 切成
+分支块（68）与字典外度量块（31）、把我们这份数成 64 之后，两边做集合差分才看清真数是**分支 53 + 度量 11 = 64**，
+withhold 是 **15 条分支名 + 20 条度量行**（12 条滚动按钮色、2 条 active-tab、1 条拖拽、3 条滚动容器度量、
+1 条 `TabViewSelectedItemHeaderPadding`、16 条 `x:Double`），并且自造名 0 个。已按差分改写。
+同一趟差分还发现 `ThemeResources/ContentDialog.jalxaml` **从来没进过消费点闸口**（那一批漏接），本批一起接进去。
+
+产物：`ThemeResources/TabView.jalxaml`（64 行全部上游原名，`Light` 与 `Default` 两支逐字节相同故一份覆盖，
+High Contrast 整支按住并在 §1 列名）、`Styles/TabView.jalxaml`（4 份样式：`TabViewButtonStyle`、`TabViewCloseButtonStyle`、
+宿主与条目两份；上游 9 个 VisualState 组 → 19 条 `Trigger` + 2 条 `MultiTrigger`，映射表在 §3，
+含 `HasIcon`/`IsLeftOfSelected`/`IsRightOfSelected`/`TopCornerRadius` 四条代码维护的布尔）、
+`Controls/Navigation/{FluentTabView,FluentTabViewItem,FluentTabViewItemCollection,FluentTabViewEventArgs}.cs`、
+`Themes/Manifest.txt` 两行（字典 42 → 44）、`audits/tab-view.md`（§0 路线表、§1 计数与 withhold、§2 部件映射、
+§3 状态映射、§5 六条偏离、§6 不声称、§7 八条 Known Gaps）、`adaptation/00` 新 **S1-h**（8 条）、
+`AstraTabViewTests`（**19 个方法：18 条事实 + 1 条 24 组 InlineData 的反向发布闸口，共 42 条**）、
+`AstraResourceKeyTests` 消费闸口扩到本字典（并补上 ContentDialog 那份）、Catalog 新增两行（各 8 / 4 条 gap）、
+Gallery `navigation` 页加"Tab view"卡。
+
+四类证据分开记：构建 = 串行闸口（restore→build→test→调色板）**979/979 全绿、0 skip、Debug 构建 0 警告 0 错误**
+（951 → 979 多的 28 条就是本批：24 组反向发布闸口 + 2 行新字典进消费点闸口 + 2 条 `SelectedIndex` 顺序事实，
+见下面那条更正），调色板三档 checked=True 且 83 源色 / 101 刷未变（本批零改动）；行为 = 两张模板对象身份读回与"原生 `TabControl` 存下 `Template` 而不建"的对照事实、
+选中三处联动（线折叠、描边抬起 1 DIP、正文搬进 body）、`SelectionChanged` 报两端、关闭请求点名而不自删、
+应用自删后选中落到邻居、+ 按钮"先在那里、可见之后才报"、方向键浏览与**按下-松开才选中**、Ctrl+Tab 只走启用页签、
+禁用页签拒绝按下并交出字色、无关按钮时把内缩还给标签、有图标才占那一列、邻居页签的线缩短 2 DIP、
+两个按钮的笔落在 `Border` 而不是 presenter；视觉 = 3 条（选中底色以其精确实例上屏 >200 像素、Light↔Dark 不同、
+框架绿 `#1E793F` 0 命中）+ 底部线 1 DIP 与 32/24 的几何读数；上屏 = Gallery `navigation` 页挂载后优雅关闭、无残留进程，
+新卡片在折叠线以下**未目视**；硬件输入 = **仍为零**（任务 13），且 `KeyEventArgs` 在本运行时造不出来
+（`spike/TabViewProbe` section C），键盘通路是按它调用的同一内部方法（`MoveFocus`/`MoveSelection`/`OnCloseRequested`）证明的，
+不是按一条真实按键。
+
+不声称：不声称逐像素等于 WinUI（选中页外翻那 4 DIP 的钩在本批是方的，§7 第一条）；不声称高对比；
+不声称触摸与键盘端到端；不声称条目有自己的 `AutomationPeer`；不声称 `TabWidthMode`、拖拽、重排、溢出滚动按钮、
+`TabStripHeaderTemplate`、`StripPlacement`、`DataPanes`、`ToolTipTitle/Text` 存在；不声称宿主底部线的合并/缩短状态已交。
+
+**这一段的一条更正（冒烟抓出来的真崩溃）**：`Test-AstraGallerySmoke -Page navigation` **第一次跑就把窗口弄死了**，
+栈是 `FluentJalium.Controls.FluentTabView.set_SelectedIndex` ← `MainWindow.InitializeComponent()`
+（`FluentJalium_Gallery_MainWindow.g.cs:2486`）——`System.ArgumentOutOfRangeException: SelectedIndex must name a tab or be -1`。
+根因是本批自加的范围闸不管**顺序**：源生成器先写属性再挂子元素，所以 `SelectedIndex="0"` 落在 `TabItems` 还是空的时刻。
+**那棵树上前一遍 977/977 全绿、Debug 构建 0 警告，同一条崩溃一次都没被看见**——这正是"上屏"这一类证据存在的理由，
+也是"构建通过不是结论"的一条实测。修法：上界不校验（值留着，页签真的进来时由 `OnItemsChanged` 落地），
+只拒 `< -1`；两条新事实**先在崩溃版本上红过**（红的 message 就是上面那条原文），修后 42/42 绿，
+冒烟 `navigation,overview,selection` 三页各 6.4~6.8 秒挂载并优雅关闭、无残留进程。审计 §5 第 6 条记了这次判断的改变。
+**另记一条测试基座的账**：这一批把整套顺序跑了四遍，四种结果——前两遍（951 那一版树）分别 20 条红
+（19 条 "ContentDialog could not resolve a host window" + 1 条 `AstraForegroundRoutingTests`
+"the open dropdown never reached the overlay layer"）与 1 条红（"capture never settled:
+`#FFFFFFx34848 #FF00FFx17025 #FFB3FFx7357 …`"），后两遍（977 与最终 979）各 0 条红。
+原始日志全在 `spike/TabViewStyle/suite-run{1..5}-*.txt`（第 5 遍是最终这棵树，仍 0 红）。
+而 `AstraContentDialogTests` 单独跑 38/38、与 `AstraTabViewTests` 配对跑 54/54 都全绿——
+**同一棵树三种结果**，因此这是跨类时序 flake，既不是本批引入的交互，也不是可稳定复现的缺陷；
+机制未取证（不猜），已立任务在下次复现时先把宿主窗口自己的 `IsVisible`/`IsLoaded` 写进异常消息再决定修法。
+
 **哑格批（68 条状态格子永远不到达像素，2026-09-20）**：S1-e 第 7 条那一枚反射读数往下挖的一批结算——不是新控件，
 是把已经"发货"的八张样式的状态格子逐条查一遍有没有写达。先量后改。
 

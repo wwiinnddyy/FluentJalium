@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- TabView pass 3: the one question that decides the batch's shape. Pass 1 (spike/TabViewProbe) assigned a
+       ControlTemplate to TabControl and TabItem as a LOCAL VALUE and measured that it is recorded as set and never
+       built. Every Astra style that works - ListBox, ListView, TreeView (Styles/ListBoxes.jalxaml:17-36) - delivers
+       its template through an implicit STYLE SETTER instead, so that route is a different code path and has never
+       been tried on the tab pair. This pass merges one style at a time so a failing host cannot hide a working
+       item, keeps ListBox as the positive control that proves the probe can see a built template at all, and asks
+       where the framework's template-content opt-in is actually declared, since a subclass could reach it and an
+       outside caller could not. Reflection is used only to read the type chain; nothing here writes a private
+       field. Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TabViewStyle</RootNamespace>
+    <AssemblyName>TabViewStyle</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

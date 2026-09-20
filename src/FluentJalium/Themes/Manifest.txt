@@ -27,6 +27,7 @@ ThemeResources/AutoSuggestBox.jalxaml
 ThemeResources/ListBox.jalxaml
 ThemeResources/ListView.jalxaml
 ThemeResources/TreeView.jalxaml
+ThemeResources/TabView.jalxaml
 ThemeResources/ContentDialog.jalxaml
 ThemeResources/TeachingTip.jalxaml
 Styles/Common.jalxaml
@@ -43,3 +44,4 @@ Styles/Menus.jalxaml
 Styles/AppBar.jalxaml
 Styles/ContentDialog.jalxaml
 Styles/TeachingTip.jalxaml
+Styles/TabView.jalxaml
