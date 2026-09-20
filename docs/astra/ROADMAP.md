@@ -543,6 +543,63 @@ Card ⇒ 本段交付**令牌 + 配方**（`Styles/Common.jalxaml` 的 `CardBord
 有上游那样的连续跟随——`LayoutUpdated` 只在目标挂过的时候接，滚动容器里的重排未测。
 Gallery 侧 8 页全部上屏并优雅关闭、无残留进程；新卡片本身在折叠线以下，**未目视**。
 
+**阶段 5 第一段（ListBox + ListBoxItem，"左右边距不一样长"在列表上结清，2026-09-20）**：阶段 4 收尾后开列表族，
+先量后写。`spike/ListProbe`（10 个模式：types/mount/retmpl/virtual/select/gutter/itemstyle/theme/itemtmpl/attach，
+原始输出 `adaptation/s1c-list-host-raw.txt`，含样式落地后复测的第二趟）量出七件承重的事：
+
+(1) **宿主能接我们的模板，不需要解锁调用**（`ListBox : Selector : ItemsControl : Control` 那条链不调
+`UseTemplateContentManagement`），而条目宿主的契约是**类型不是名字**：`ItemsPresenter` 改名照样出容器，换成普通
+`StackPanel` 就 0 个。(2) **容器样式只有隐式类型键这一条干净**：应用级（或窗口级）合入
+`<Style TargetType="ListBoxItem">` 后框架生成的容器**当场就吃**，而容器自己的 `Style` 属性永远读 null；
+`ItemContainerStyle` 压过它并把 `Style` 写成非 null——所以本批发隐式键、`ListBox` 样式**不写**
+`ItemContainerStyle`，并把这条钉成断言（写了就是收走消费方的覆写权）。同时顺带**撤回一条旧预测**：
+`AstraItemHostTests` 那句"本地赋值，因为列表批会走这条路"是错的预测，改成带理由的更正而不是静默删掉。
+(3) **选中本来就被画出来了，画的是 `#99680081`**——原生条目 `PART_BackgroundBorder` 在 `SelectedIndex=0` 后读这个值，
+正是上游 `SystemControlHighlightListAccentLowBrush`（`generic.xaml:301` = 强调色 @0.6）落在 OS 默认强调色上；
+原生 resting padding 实测 10,6,10,6 而上游那格是 12,9,12,12。这两条差就是"必须重模板"的量化理由。
+(4) **0.6 挂不进调色板，于是透明度搬到部件**：`Light.jalxaml` / `Dark.jalxaml` 是
+`tools/Sync-AstraPalette.ps1` 生成的（手工加行会被生成器和调色板闸口抹掉），我们的强调色只有 1/0.9/0.8 三档，
+所以三条选中行只带颜色（别名到 `AccentFillColorDefaultBrush`，跟着应用强调色走），
+0.6 / 0.8 / 0.9 由同一状态写高亮部件的 `Opacity` 带——单层实色乘出来的像素与上游那支 brush 等价。
+(5) **12 DIP 右槽在列表面上被数出来**（用户那半句"边距不一样长"的第三处根）：我们自己的壳里左 1 右 13、
+原生左 3 右 15，而 `IsOverlayScrollBarEnabled="True"` 把两档都拉成 0/0（5 条和 50 条一样），
+`IsScrollBarAutoHideEnabled` 对此**完全没用**；第二趟还量到 `Hidden` 根本不扣布局，所以已发货的 ComboBox 下拉
+与建议列表不在这条缺陷上。复测里另一个可见后果：行从 33.78 长到 40.78 之后，5 条就溢出，滚动条真的出来了。
+(6) **附着 setter 这条路在本读法下是死的**：mode J 四格全读 `viewer.Auto/False`——带 `ScrollViewer.` 前缀的
+setter 解析成 Style 却到不了部件，`{TemplateBinding ScrollViewer.X}` 也读不到（回落到类型默认），
+只有把属性字面写在部件上才生效；仓库既有 11 个样式文件里 `Property="ScrollViewer.` 出现 **0 次**，与此一致。
+代价是应用改不动我们列表的滚动条开关，进 Catalog gaps。(7) **选择语义整个是框架的**（`HandleArrowKey`/
+`HandleSpaceKey`/`HandleDragSelect`/`Select{Single,Multiple,Extended,Range,All}` + 三个 UIA provider），
+1000 项只实现 11 个容器，`ScrollToVerticalOffset` 与 `IScrollItemProvider.ScrollIntoView()` 都动得起来 ⇒
+**不起自有类型**；另外 `ControlTemplate` 只许一个视觉根（并列两根本地抛 `XamlParseException` 并带走整本字典），
+`ListBoxItem` 没有 `IsHighlighted`/`IsPressed`/`IsSelectionActive`，这两条决定了状态映射的形状。
+
+落点：`ThemeResources/ListBox.jalxaml`（**12 行**：10 条别名 + 1 条描边厚 + 1 条条目 padding；上游 27 个行名里
+15 条 8.1 世代 `*ThemeBrush` 不发，因为上游自己也无人读）、`Styles/ListBoxes.jalxaml`（两张模板、**17 个属性
+setter、6 格触发器、15 条部件级 setter**，两条隐式样式）、`Themes/Manifest.txt` 两行、
+`audits/listbox.md`（§1 逐行表 + §3 八态映射 + §5 八条差异 + §6 不声称）、
+`adaptation/00` 新 **S1-c**（10 条）、`adaptation/s1c-list-host-raw.txt`（两趟）、`AstraListBoxTests`
+（**22 个方法 / 45 条断言事实**，含 15 条"不发即名"）、`AstraResourceKeyTests` 新增本字典的逐行消费闸口、
+`AstraGalleryCatalogTests` **删掉 `ListBox` / `ListBoxItem` 两条欠账豁免**（留着就等于允许以后把列表样式删掉还判绿）、
+Catalog 新增两行（各带 4-5 条 gap）、Gallery `selection` 页加一条多选溢出列表 + 一句诚实说明。
+新工具 `spike/ListProbe`。四类证据：构建 = 串行闸口 **793/793 全绿、0 skip、本批 0 新增警告**（构建报的 18 条
+警告全部落在 `AstraMenuTests` / `AstraAppBarTests` / `AstraContentDialogTests` 三个既有文件的可空性告警上，与本批无关、未清），
+调色板三档 checked=True
+且 **83 源色 / 101 刷未变**（本批没碰生成层，这是 §5.3 那条改法的直接后果）；行为 = 隐式键落地（`Style` 读 null
+而模板对象与 `GetStyle` 里那条同实例）、部件名换血（`PART_OuterBorder` 消失、`LayoutRoot`/`PressedBackground` 出现）、
+padding 行吃掉原生 10,6,10,6、行宽=列宽且左右隙同为 0、溢出时仍为 0、逐模式的多选与单选排他、1000 项只实现一屏、
+长文本不换行、滚动 400 后顶行真的上去、`ScrollIntoView` 把贴边的行完整带进来、UIA provider 能力；
+视觉 = 4 条（表面 token 上屏、选中把那一格从底色推向强调色【两帧对比，不假装算得出混合色】、框架紫 0 命中、
+Light↔Dark 顶色不同）；硬件输入 = **仍为零**（任务 13），本批还实测到 `ISelectionItemProvider.Select()`
+从容器自建的 peer 调用**不改** `SelectedIndex`，因此只声称能力、不声称驱动。
+上屏 = `Test-AstraGallerySmoke.ps1 -Page selection,menus,overview` 三页全部 mount 后优雅关闭、无残留进程
+（本工具故意不截屏，理由记在 `adaptation/06`）；新增的两条列表在 `selection` 页折叠线以下，**未目视**。
+
+不声称：不声称悬停 / 按下 / 拖选 / 键鼠导航有任何真实输入证据；不声称焦点框（原生模板树里没有焦点部件、
+本运行时也没有 `UseSystemFocusVisuals` 槽位，不自造外观）；不声称选中色的**叠加**结果与上游逐位相同；
+不声称 `SelectedItems` 可用（实测写 `SelectedIndex` 之后仍读空，故多条选择的断言全部改读容器自己的 `IsSelected`）；
+不声称 ListView / GridView / TreeView / DataGrid 沾了这批的光——它们各自的模板与条目类型还要各自量。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

@@ -24,6 +24,7 @@ ThemeResources/NumberBox.jalxaml
 ThemeResources/Slider.jalxaml
 ThemeResources/ComboBox.jalxaml
 ThemeResources/AutoSuggestBox.jalxaml
+ThemeResources/ListBox.jalxaml
 ThemeResources/ContentDialog.jalxaml
 ThemeResources/TeachingTip.jalxaml
 Styles/Common.jalxaml
@@ -31,6 +32,7 @@ Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml
 Styles/AutoSuggestBox.jalxaml
 Styles/Selection.jalxaml
+Styles/ListBoxes.jalxaml
 Styles/Navigation.jalxaml
 Styles/Surfaces.jalxaml
 Styles/Menus.jalxaml

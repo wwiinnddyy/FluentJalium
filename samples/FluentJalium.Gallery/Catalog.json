@@ -164,6 +164,22 @@
       "the 5,2,5,2 row inset rides as a literal because upstream's is a literal on the template root, and the 32 MinHeight is ours - upstream sets none and gets the same height from its padding" ]
     },
     {
+      "markup": "ListBox",
+      "source": "Styles/ListBoxes.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listbox.md", "tests/FluentJalium.Tests/AstraListBoxTests.cs", "spike/ListProbe/Program.cs" ],
+      "gaps": [ "upstream's eleven ScrollViewer.* attached setters have no working equivalent: an attached-name setter parses and never reaches the part (mode J read viewer.Auto/False in all four combinations), so the switches are literals on our part and an application cannot retarget them", "the surface token stands in for SystemControlBackgroundChromeMediumLow, whose two hexes no palette row carries (#F2F2F2 / #2B2B2B against our #F3F3F3 / #202020)", "no grouping, so GroupStyle rows are untouched", "no real pointer or touch evidence for hover, press and drag-select" ]
+    },
+    {
+      "markup": "ListBoxItem",
+      "source": "Styles/ListBoxes.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listbox.md", "tests/FluentJalium.Tests/AstraListBoxTests.cs", "spike/ListProbe/Program.cs" ],
+      "gaps": [ "the row style ships under the implicit type key, so a container's own Style property stays null - every assertion here reads the effect, not the assignment", "upstream's SelectedUnfocused state has no signal on this type (no IsSelectionActive, no IsHighlighted), so it merges onto the Selected row as upstream's own values do", "the 0.6 / 0.8 / 0.9 accent alphas ride on the highlight part's Opacity rather than in the rows, because the palette layer that would carry them is generated", "the fifteen legacy *ThemeBrush rows are not published - they are dead in upstream itself", "no focus visual is claimed: the stock template shows none inside its own tree, and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
+    },
+    {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",

@@ -328,6 +328,21 @@
                 <ListBoxItem Content="Review" />
                 <ListBoxItem Content="Ship" />
               </ListBox>
+              <TextBlock Text="Rows overflow" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- Multiple selection and a list long enough to show the bar: the row gaps on both lists are equal
+                   (measured 1 versus 13 before the overlay switch, adaptation/00 S1-c), and the selection fill is
+                   the palette accent at upstream's 0.6, not the framework's own purple. -->
+              <ListBox x:Name="SampleOverflowList" Height="156" SelectionMode="Multiple">
+                <ListBoxItem Content="Backlog" />
+                <ListBoxItem Content="In progress" />
+                <ListBoxItem Content="In review" />
+                <ListBoxItem Content="Blocked" />
+                <ListBoxItem Content="Ready to ship" />
+                <ListBoxItem Content="Shipped" />
+                <ListBoxItem Content="Rolled back" />
+                <ListBoxItem Content="Archived" />
+              </ListBox>
+              <TextBlock Text="Hover, press and the drag-select gesture are not claimed: the row states here are driven by selection in a test, never by a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
             </StackPanel>
 
             <StackPanel x:Name="NavigationPage">

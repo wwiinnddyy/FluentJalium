@@ -41,8 +41,13 @@ public sealed class AstraItemHostTests
     [Fact]
     public void A_container_style_reaches_the_generated_item()
     {
-        // Locally assigned, because that is the route the list batch will use; the value read back is
-        // what proves the style landed rather than the tree merely surviving.
+        // Locally assigned - and this comment used to predict that "that is the route the list batch will use".
+        // The prediction was wrong and is retracted here rather than quietly edited: spike/ListProbe mode G measured
+        // that an application-level implicit <Style TargetType="ListBoxItem"> reaches generated containers while the
+        // container's own Style stays null, and that ItemContainerStyle OUTRANKS such an implicit style. The shipped
+        // list therefore styles its rows by type key (Styles/ListBoxes.jalxaml) and leaves this property unset, so
+        // an application can still write it. What this test asserts still holds - the assigned style lands - because
+        // the explicit route wins, which is exactly the interference the list batch avoids. See adaptation/00 S1-c.
         _fixture.Run(() =>
         {
             var style = new Style(typeof(ListBoxItem));

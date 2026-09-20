@@ -1,0 +1,94 @@
+<!-- WinUI 3 ListBox_themeresources.xaml @19e3bdc3c (MIT), blob df9ca8dfe48b7cd4487b24b4f7954c7a74e683f8:
+     DefaultListBoxStyle lines 195-233, DefaultListBoxItemStyle lines 90-194. Jalium 26.10.9 part and trigger
+     contracts come from spike/ListProbe (adaptation/s1c-list-host-raw.txt); the row-by-row mapping and what was
+     left out is docs/astra/audits/listbox.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. Upstream's template is Border 'LayoutRoot' > ScrollViewer 'ScrollViewer' > ItemsPresenter and
+     that shape is kept; ItemsPresenter is the contract by TYPE, not by name (mode C: renaming it still yields
+     containers, replacing it with a plain StackPanel yields none), so the name stays for readers only. -->
+  <Style x:Key="DefaultListBoxStyle" TargetType="ListBox">
+    <Setter Property="Foreground" Value="{ThemeResource ListBoxForeground}" />
+    <Setter Property="Background" Value="{ThemeResource ListBoxBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ListBoxBorder}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ListBoxBorderThemeThickness}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListBox">
+      <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+        <!-- The three scroll switches ride as literals on the part because that is the only route this reader
+             honours: an attached-name setter (<Setter Property="ScrollViewer.VerticalScrollBarVisibility">) parses
+             into a Style and never reaches the part, and {TemplateBinding ScrollViewer.X} reads the type default
+             either way - mode J read viewer.Auto/False in all four combinations, including the one where the style
+             set overlay=True. No shipped Astra style uses an attached setter (grep: 0 occurrences), and upstream's
+             eleven of them (ListBox_themeresources.xaml:201-209) therefore have no equivalent here; the app-facing
+             consequence is recorded in audits/listbox.md §5.2.
+             IsOverlayScrollBarEnabled is the one that carries a defect fix: without it the list reserves 12 DIP on
+             the right for the vertical bar even while the bar is collapsed, so the row's left gap and its right
+             gap differ (measured 1/13 in this shell, 3/15 on the stock template - the asymmetry the user reported
+             twice). With it both gaps are equal at 5 items and at 50, whether or not the bar is showing. -->
+        <ScrollViewer Name="ScrollViewer" Focusable="False" Padding="{TemplateBinding Padding}"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      IsOverlayScrollBarEnabled="True">
+          <ItemsPresenter Name="ItemsPresenter" />
+        </ScrollViewer>
+      </Border>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="ListBox" BasedOn="{StaticResource DefaultListBoxStyle}" />
+
+  <!-- The item. Upstream's eight CommonStates cells (ListBox_themeresources.xaml:116-187) write two things and
+     nothing else: the Rectangle's Fill and the ContentPresenter's Foreground. Jalium's ListBoxItem declares only
+     IsSelected (mode B), and has no IsHighlighted, IsPressed or IsSelectionActive (mode I) - so the state map is
+     IsMouseOver for PointerOver, IsMouseCaptureWithin for Pressed, and IsSelected with no focus distinction,
+     which merges upstream's Selected and SelectedUnfocused onto one row exactly as upstream's own values do
+     (both name ListBoxItemBackgroundSelected). -->
+  <Style x:Key="DefaultListBoxItemStyle" TargetType="ListBoxItem">
+    <Setter Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="{ThemeResource ListBoxItemPadding}" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template"><ControlTemplate TargetType="ListBoxItem">
+      <!-- One root element, because a template with two parallel roots throws at dictionary parse time
+           (mode J's neighbour: XamlParseException "ControlTemplate can only have one visual tree root element"
+           aborts the whole ResourceDictionary). Upstream's Rectangle + ContentPresenter are siblings at line
+           188-189; the Grid here is the wrapper this reader requires. -->
+      <Grid Background="{TemplateBinding Background}">
+        <!-- The state fill, named as upstream names it and resting transparent exactly as it does there: only the
+             cells below ever paint it, so nothing an app or the framework writes on the item's own Background can
+             leak into the highlight (the failure the ComboBox item documents - a local value on a shared
+             container type once put brand green in a Fluent flyout). This is also the part the alpha rides on:
+             the three selected rows alias the accent token, and Opacity 0.6 / 0.8 / 0.9 reproduces what upstream's
+             SystemControlHighlightListAccent{Low,Medium,High}Brush resolve to
+             (dxaml/xcp/dxaml/themes/generic.xaml:300-302). The runtime's own stock item paints #99680081 for a
+             selected row - the same 60 % of an accent - so the multiplication is the shape being copied. -->
+        <Rectangle Name="PressedBackground" Fill="Transparent" Opacity="1" IsHitTestVisible="False" />
+        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}" Margin="{TemplateBinding Padding}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+          <!-- Upstream sets TextWrapping="NoWrap" on this presenter (line 189) and the attribute is a dead cell
+               here, so the promise goes onto the text element the presenter builds - the same finding the
+               ComboBox item carries (audits/combobox.md), and without it a long item grows the row. -->
+          <ContentPresenter.Resources>
+            <Style TargetType="TextBlock">
+              <Setter Property="TextWrapping" Value="NoWrap" />
+            </Style>
+          </ContentPresenter.Resources>
+        </ContentPresenter>
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PressedBackground" Property="Fill" Value="{ThemeResource ListBoxItemBackgroundPointerOver}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" /></Trigger>
+        <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="PressedBackground" Property="Fill" Value="{ThemeResource ListBoxItemBackgroundPressed}" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" /></Trigger>
+        <Trigger Property="IsSelected" Value="True"><Setter TargetName="PressedBackground" Property="Fill" Value="{ThemeResource ListBoxItemBackgroundSelected}" /><Setter TargetName="PressedBackground" Property="Opacity" Value="0.6" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="PressedBackground" Property="Fill" Value="{ThemeResource ListBoxItemBackgroundSelectedPointerOver}" /><Setter TargetName="PressedBackground" Property="Opacity" Value="0.8" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseCaptureWithin" Value="True" /></MultiTrigger.Conditions><Setter TargetName="PressedBackground" Property="Fill" Value="{ThemeResource ListBoxItemBackgroundSelectedPressed}" /><Setter TargetName="PressedBackground" Property="Opacity" Value="0.9" /><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForeground}" /></MultiTrigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ContentPresenter" Property="Foreground" Value="{ThemeResource ListBoxItemForegroundDisabled}" /><Setter TargetName="PressedBackground" Property="Opacity" Value="0" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <!-- Implicit, not ItemContainerStyle: the container style reaches generated containers through the type key at
+       application or window scope and leaves the container's own Style property null, which is how a list stays
+       overridable by an app. Naming it in the ListBox style instead would outrank everything an app writes (mode G
+       read ItemContainerStyle beating the implicit route on both markers). -->
+  <Style TargetType="ListBoxItem" BasedOn="{StaticResource DefaultListBoxItemStyle}" />
+</ResourceDictionary>

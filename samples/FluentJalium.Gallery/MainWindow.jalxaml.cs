@@ -442,6 +442,12 @@ public partial class MainWindow : Window
         ((RadioButton)CompactRadio!).Checked += (_, _) => Report("Density choice: Compact.");
         ((ListBox)SampleListBox!).SelectionChanged += (_, _) =>
             Report($"List selection: {Describe(((ListBox)SampleListBox!).SelectedItem)}.");
+
+        // The overflow list only reports the last row the control named, because SelectedItems was measured not to
+        // follow a SelectedIndex write on this runtime (AstraListBoxTests drives multi-selection through the rows
+        // themselves), and a readout that listed nothing would claim the framework does something it does not.
+        var overflow = (ListBox)SampleOverflowList!;
+        overflow.SelectionChanged += (_, _) => Report($"Overflow list last change: {Describe(overflow.SelectedItem)}.");
     }
 
     private void WireAppearance()

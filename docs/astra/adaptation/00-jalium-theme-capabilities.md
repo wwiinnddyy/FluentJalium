@@ -1051,3 +1051,70 @@ override 是死代码，已删除。同时 `A_tip_holds_no_layout_room_and_still
 `FrameworkElement.Parent`：挂载后的链是 `FluentTeachingTip < Grid < StackPanel < Window`（mode parent），
 `FindWindow()` 因此走逻辑父链。顺带量到并被**拒绝**的另一条：`Application.Current.MainWindow` 确实指向上屏那个
 窗口，但它给整个应用只点名一个窗口，第二窗口场景会拿错的边界去裁卡片——所以用它不是省事，是换一个会错的答案。
+
+## S1-c：列表条目容器的样式走隐式类型键——容器自己的 `Style` 永远是 null（阶段 5 第一段，2026-09-20）
+
+写 `ListBox` / `ListBoxItem` 之前必须量清的十件事，全部来自 `spike/ListProbe` 一趟 `all`（原始输出
+`adaptation/s1c-list-host-raw.txt`）。样式与两张模板的参考是上游
+`controls/dev/CommonStyles/ListBox_themeresources.xaml`（blob `df9ca8dfe48b7cd4487b24b4f7954c7a74e683f8`），
+那几格 `SystemControl*` 目标到底等于多少查的是 `dxaml/xcp/dxaml/themes/generic.xaml:243/300-304`，
+方法是 ModernWpf 的 `Styles/ListBox.xaml` + `Styles/ListBoxItem.xaml`。
+
+**1 · `ListBox` 接我们的模板不需要解锁。** `ContentControl.UseTemplateContentManagement` 声明在
+`ContentControl` 上，而列表那条链（`ListBox : Selector : ItemsControl : Control`）没有调用它——同一支探针里
+`Template = 解析出来的模板` 直接生效，`Style` 仍是 null（S0-h 那个"没有默认样式 ≠ 没有默认长相"在列表族复现）。
+原生树是 `ListBox > Grid > Border 'PART_OuterBorder' > ScrollViewer > ItemsPresenter >
+VirtualizingStackPanel > ListBoxItem > Grid > Border 'PART_BackgroundBorder' > ContentPresenter`。
+
+**2 · 条目宿主的契约是类型，不是名字。** 把 `ItemsPresenter` 改名成 `NotTheItemsPresenter` 照样出 4 个容器；
+把它换成一个具名的普通 `StackPanel` 就 0 个容器。S0-i 那笔"具名部件 vs 类型"的账在列表上站在类型一侧。
+
+**3 · 容器的样式通路里只有隐式类型键这一条没有副作用。** 往 `Application.Resources`（或 `Window.Resources`）
+合一本带 `<Style TargetType="ListBoxItem">` 的字典，框架生成的容器**当场就吃**：探针里条目的 `Background`
+从 `#00FFFFFF` 变成分组色、`Padding` 从 10,6,10,6 变成 31,7,31,7，而容器自己的 `Style` 属性读回仍是 `null`
+——所以断言只能测效果，测不了"样式挂上了"。反过来 `list.ItemContainerStyle = 样式` 压过隐式那条（两个标记
+同时改成它那份）并把 `Style` 写成非 null。字典**移除**时已实例化的容器当场退回原生值，不需要修复回路。
+上游自己的写法就是 `<Style TargetType="ListBoxItem" BasedOn="{StaticResource DefaultListBoxItemStyle}" />`，
+因此这批按隐式键发货，`ListBox` 样式里**不**写 `ItemContainerStyle`——写了等于把想覆写条目的应用挡在门外。
+
+**4 · `ItemContainerTheme` 这个 WinUI 名字在这里不存在**（按属性名反射：not exported），
+`ItemContainerStyle` 从 `ItemsControl` 继承，`ListBox` 自己不声明。
+
+**5 · 原生条目已经把"选中"画出来了，画的是 OS 强调色 @0.6。** 未选中时 `PART_BackgroundBorder` 读
+`#00FFFFFF`，`SelectedIndex=0` 之后同一格读 `#99680081`——正是上游 `ListBoxItemBackgroundSelected` 指向的
+`SystemControlHighlightListAccentLowBrush`（`generic.xaml:301`：`Color={ThemeResource SystemAccentColor}
+Opacity="0.6"`）落在 OS 默认强调色上的值。原生 resting `Padding` 是 10,6,10,6，而上游那格是
+`<Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness>`（同文件 89 行）。两个差都是可断言的数值差，
+也是"这批必须重模板"的理由。
+
+**6 · 那 0.6 做不成一条调色板行，于是透明度搬到部件上。** 强调色家族在我们这里只有 `Opacity` 1 / 0.9 / 0.8
+三档（`AccentFillColor{Default,Secondary,Tertiary}Brush`），而 `Light.jalxaml` / `Dark.jalxaml` 是
+`tools/Sync-AstraPalette.ps1` 从上游生成的，往里加键会被生成器和调色板闸口抹掉。所以条目的选中格 `Fill`
+写强调色 token，同一状态另外写那个部件的 `Opacity`（0.6 / 0.8 / 0.9，数值逐个来自 `generic.xaml:300-302`）；
+单层实色乘出来的像素与上游那支 brush 等价，而且跟着强调色和主题走。
+
+**7 · S0-u 那条"滚动条先扣布局宽度"在列表面上量到 12 DIP。** 用我们自己的模板（`Border > ScrollViewer >
+ItemsPresenter`）：不带任何属性时左隙 1、右隙 13；`VerticalScrollBarVisibility="Auto"` 仍是 13（收起的条照样
+占 12）；`="Visible"` 时条读 12x178；`IsOverlayScrollBarEnabled="True"` 把这些都拉成 **1 / 1**，50 条溢出时一样
+（overlay 条出现时读 40x178 却不扣布局）；`IsScrollBarAutoHideEnabled="True"` 对这件事**没有任何作用**
+（13 原样留着）。原生 `ListBox` 那侧同一条链读 3 / 15。这就是用户两次报的"flyout / 下拉左右边距不一样长"
+落在列表面上的那一半根因。
+
+**8 · 虚拟化是真活着的。** 1000 条塞进 260x180 只实现 11 个容器；`ScrollViewer.ScrollToVerticalOffset(400)`
+可用，滚完 `Content` 仍是 `ItemsPresenter`。任何"遍历一遍容器"的写法在这个族上不只是被闸口禁，是**根本看不全**。
+
+**9 · 选择语义整个是框架的。** `ListBox` 自己声明的处理器包含 `HandleArrowKey`、`HandleSpaceKey`、
+`HandleDragSelect`、`SelectSingle/Multiple/Extended/Range/All`、`UpdateContainerSelection`、
+`TryResolveSelectionItem`；`SelectionMode` 三档 `{Single, Multiple, Extended}` 可写；
+`ListBoxAutomationPeer` 与 `ListBoxItemAutomationPeer`（后者实现 `ISelectionItemProvider`、
+`IVirtualizedItemProvider`、`IScrollItemProvider`）都在。→ 列表族**不起自有类型**，只重模板。
+
+**10 · `ControlTemplate` 在这里只能有一个视觉根。** 探针那份并列 `Border` + `ContentPresenter` 作根的条目模板
+解析时抛 `XamlParseException: ControlTemplate can only have one visual tree root element.`，而且是在解析整本
+`ResourceDictionary` 时抛的（`BOOT threw`）——一颗坏树根吃掉整本字典。上游 WinUI 的条目模板正是并列两个根
+（`ListBox_themeresources.xaml:188-189` 的 `Rectangle` + `ContentPresenter`），照抄就得裹一层 `Grid`。
+另外 `ListBoxItem` 上没有 `IsHighlighted` / `IsPressed` / `IsSelectionActive`（三条都 not exported），格子只能用
+`IsSelected` / `IsMouseOver` / `IsMouseCaptureWithin` / `IsEnabled`；`MinHeight`、`CornerRadius`、`Padding`
+的 setter 实测都落到容器上（读回 34、4,4,4,4、12,9,12,12），换成我们的树之后 `Content` 与 `TextBlock`
+都还在（"Item 1" 原样上屏），条目宽 = 呈现器宽、左右隙各 1。
+
