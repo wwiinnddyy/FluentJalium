@@ -1,0 +1,14 @@
+theme dictionaries=42
+our ListView styles are live: ListViewItemStyle=True
+our ListBox styles are live: ListBoxStyle=True
+TreeViewItem type: Jalium.UI.Controls.TreeViewItem base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+
+=== K. the text colour: which element a state cell can actually write ===
+  does a ContentPresenter carry Foreground at all? NO - ContentPresenter has no Foreground member, so a template cell aimed at it has nothing to write
+  what the shipped template's cell produced: TextBlock.Foreground=#FFFFFFFF inherited-from-item=#FFFFFFFF
+  write Foreground on the item (the style-trigger route): item=#FF112233 text=#FF112233
+  the glyph's Stroke route: no path
+  merge a style with a Style.Triggers cell: ok
+  resting foreground through the style setter: item=#FF445566 text=#FF445566
+  the disabled cell fires: item=#FF778899 text=#FF778899
+  and the second row is untouched: item=#FF445566 text=#FF445566

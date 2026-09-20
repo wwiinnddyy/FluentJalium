@@ -652,6 +652,67 @@ padding 与行高换成上游 16,0,12,0 与 40（原生 10,5,10,5 与 30）、`S
 的列头可用（我们的模板没有列头面，设了 View 就丢）；不声称悬停 / 按下 / 拖选 / 键鼠导航有真实输入证据；不声称焦点框；
 不声称 TreeView / DataGrid / TabView / NavigationView 沾了这批的光。
 
+**阶段 5 第三段（TreeView + TreeViewItem，形状对不上、`Expander` 什么都不钩、`ContentPresenter` 没有 `Foreground`，2026-09-20）**：
+列表族走到树上，还是先量后写。`spike/TreeViewProbe`（11 模式：types/mount/retmpl/itemstyle/states/variants/indent/
+gutter/depth/gate/fg，原始输出
+`adaptation/s1e-treeview-raw.txt`，四趟：量 → 补量 → 复测已发货样式 → 字色通路对照）先推翻一条前提，再量出承重的事：
+
+(1) **WinUI 的 TreeView 与原生 TreeView 根本不是同一种东西**：上游 `DefaultTreeViewStyle` 的模板体只有一个
+`controls:TreeViewList`（`TreeView.xaml:26`），而 `MUX_TreeViewItemStyle` 是 `BasedOn DefaultListViewItemStyle`
+（`TreeViewItem.xaml:3`），缩进来自 `TreeViewItemTemplateSettings.Indentation`（:131）——**一张展平的行列表**。
+这个运行时：`TreeView : ItemsControl : Control`（**不是 Selector**，自有 DP 只有 `SelectedItem/SelectedValue/SelectedValuePath`），
+`TreeViewItem : HeaderedItemsControl`（自有 `IsExpanded/IsSelected/IsSelectionActive` + `HasItems`）——一棵嵌套的容器树。
+`TreeViewList`/`TreeViewNode`/`TreeViewItemPresenter`/`TreeViewItemTemplateSettings` 均未导出，`SelectionMode`、多选、
+拖放、invocation、`Glyph*`、`Content` 逐条打点全是缺。结论是**让嵌套的行穿上 WinUI 那张行皮**，不是起自有类型。
+(2) **`Expander` 这个名字什么都不钩**：出厂树里 `ToggleButtons=0`，我们自己往模板里塞一个 `Name="Expander"` 的
+ToggleButton、再用自动化 peer 把它 `Toggle()`，`IsExpanded` 一字不变（S1-c 的"按名字挂 attached 属性"在这里也不成立，
+因为树根本没有那个 attached 名）。唯一通路是 `IsChecked="{Binding IsExpanded, RelativeSource TemplatedParent, Mode=TwoWay}"`，
+两个方向都实测可写——这是继 peer 驱动之后找到的**第二条**通路。
+(3) **没有属性承载深度**：把 level-1 行与 level-2 行的全部可读属性、连同整条继承链的 public static DP 逐个差分，
+只有 `IsExpanded`/`Header`/布局记账/`Parent` 类型/`PersistId` 不同。出厂模板靠 `PART_IndentSpacer`（L1 宽 0、L2 宽 16、
+行 x 不变）画缩进，而那个机制读不出来。我们的缩进只能由嵌套本身给出：子层 `ItemsPresenter Margin="16,0,0,0"`。
+代价是**子层底色每深一层窄 16 DIP**（上游的行横贯整个列表），16 是出厂的步进而非自加。
+(4) **"容器 `Style` 恒 null"这条不变量在此翻车**：运行时自带 `TreeView`/`TreeViewItem` 隐式样式，`Style` 读回来非 null，
+所以本批一律只断言效果、不断言属性来源。并且是**时序**的：容器已经生成之后再并隐式条目样式不会重贴皮，
+生成之前则完整生效——我们的字典落在任何容器存在之前。
+(5) **`ContentPresenter` 没有 `Foreground` 成员**：这意味着仓库里所有 `Setter TargetName="…" Property="Foreground"`
+的字格**从来就是静默失效的**（不报错、字典照常加载、颜色永远不变）。可用通路是 `Style.Triggers` 不带 `TargetName`、
+写容器自己的 `Foreground`，生成的 `TextBlock` 继承下去（实测 `item=#FF112233 → text=#FF112233`，逐行独立、兄弟行不动）。
+本批照此修正，并把其它族的历史账立成任务 31。
+(6) **树有 `IsSelectionActive`（列表没有），仍然没有 `IsPressed`/`IsPointerOver`**，所以按下态照旧近似 `IsMouseCaptureWithin`；
+而选择的排他性**会**裁决直接写 `IsSelected`（与 ListView 那批"直接写会留两行亮"相反）。
+(7) **上游同样不发布任何 `TreeView*` 宿主行**（宿主样式只设 `IsTabStop`/拖放 flag/转置/Template）⇒ 宿主只发
+`Background=Transparent`、`BorderThickness=0`，不借名。于是"一次覆写同时动两个宿主"那条断言在此**反转为
+"动 ListBox、必须不动 TreeView"**。药丸几何这次三个数全读得到（`Rectangle Width=3 Height=16 RadiusX=2 RadiusY=2`，
+`TreeViewItem.xaml:130`），不像 `ListViewItemPresenter` 藏在 C++ 里——全部照抄，零自加。12 DIP 的左右隙在第三个宿主上
+复现（出厂 1/13、我们 1/13、行宽 300），探针里那个 1/1 是探针自己把边框厚度 `TemplateBinding` 出来的，产品样式钉 0。
+(8) **一处行高被发货样式自己撑坏**：Fluent `ToggleButton` 自带 `MinHeight=32` 把树行顶到 40，复测已发货样式当场抓到
+（ContentBorder 292x**40**，上游 28）→ 命中区钉 `Width=20 Height=20 MinHeight=0`，复测 28、容器 32，正好是上游的算术
+（20 内容 + 3 + 5 + 4）。
+
+产物：`ThemeResources/TreeView.jalxaml`（上游 39 行/分支发 **31 行**：8 底色 + 8 描边色 + 8 字色 + 4 指示器色 +
+1 条 `BorderThemeThickness` + `PresenterMargin`/`PresenterPadding` 两条度量；按住 8 条并逐名给理由——4 条勾选面无驱动、
+1 条多选描边无承载、3 条 x:Double 本 reader 读不动，其中 MinHeight 28 与 ContentHeight 20 以字面量进模板），
+`Styles/TreeViews.jalxaml`（宿主 + 条目两张模板、两条隐式样式、
+模板内 7 格状态 + 3 格展开/箭头 + `Style.Triggers` 7 格字色，`IsSelected+IsEnabled=False` 那格排最后以赢下同权重）、`Themes/Manifest.txt` 两行
+（字典 40 → 42）、`audits/treeview.md`（§0 两条前提与那条被推翻的不变量、§1 家族表、§2 上下游件树与我们的部件映射、
+§3 13 视觉态 → 10 格映射（含为何不用 `IsSelectionActive`、SelectedDisabled 的排序契约）、§5 十三条差异与 Known Gaps、§6 不声称）、
+`adaptation/00` 新 **S1-e**（11 条）、`AstraTreeViewTests`（**24 个方法：21 Fact + 3 Theory 带 39 组 InlineData，跑出 60 条事实**）、
+`AstraResourceKeyTests` 反向消费闸口扩到本字典、Catalog 新增两行（各 4 条 gap）、Gallery `selection` 页加一棵树（两层展开、
+一行选中、一根禁用的根）与一句边界说明。
+
+四类证据分开记：构建 = 串行闸口 **920/920 全绿、0 skip、本批 0 新增警告**（18 条落在 Menu/AppBar/ContentDialog 三个既有文件），
+调色板三档 checked=True 且 83 源色 / 101 刷未变；行为 = 两张模板对象身份读回、出厂部件名换血（`PART_IndentSpacer`/
+`PART_ExpanderBorder`/`PART_ItemsHost` 消失，`ContentBorder`/`SelectionIndicator`/`ChevronHitTarget`/`ChildHost` 出现）、
+`Toggle()` 双向驱动 `ChildHost` 可见、折叠仍实现子容器（与出厂一致）、叶隐藏箭头且保留 20 DIP 列、缩进 16/层、行宽 300
+两侧等隙、500 项只实现一屏、长标题不换行、逐格换色与选中/禁用组合、选择的排他性与 `SelectedItem` 跟随；视觉 = 4 条
+（药丸上屏 20~64 像素、非强调色块、框架紫 0 命中、Light↔Dark 顶色不同）；上屏 = `selection,surfaces,overview` 三页
+mount 后优雅关闭、无残留进程，新加的树在折叠线以下**未目视**；硬件输入 = **仍为零**（任务 13）。
+
+不声称：不声称 `IsTabStop` 与上游一致（未抄）；不声称悬停 / 按下 / 键盘导航有真实输入证据（箭头键与 `Enter` 通路本批未量）；
+不声称宿主级 disable 会把整棵子树压暗；不声称 `Path` 箭头等于上游的字体 glyph；不声称子层那 16 DIP 缩进与上游像素相同；
+不声称 DataGrid / TabView / NavigationView 沾了这批的光。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

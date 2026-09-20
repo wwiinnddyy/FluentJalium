@@ -196,6 +196,22 @@
       "gaps": [ "the indicator pill's 16 DIP height is ours: upstream keeps the geometry in the C++ ListViewItemPresenter, which is not in the reference tree, while its 4 DIP width and 1.5 radius are read from rows", "a disabled host does not re-run the row's disabled cell - IsEnabled reaches the generated container (asserted) yet the row keeps Opacity 1, so the 0.3 dim only appears when the row itself is disabled", "upstream's SelectedUnfocused, Selecting, MultiSelect and reorder states have no signal on this container, so 21 of its rows (focus, check, drag, placeholder, multi-arrange) are withheld rather than published unread", "the row style ships under the implicit type key, so a container's own Style stays null and every assertion here reads an effect rather than an assignment", "no focus visual is claimed: the stock template shows none inside its own tree and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
     },
     {
+      "markup": "TreeView",
+      "source": "Styles/TreeViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/treeview.md", "tests/FluentJalium.Tests/AstraTreeViewTests.cs", "spike/TreeViewProbe/Program.cs" ],
+      "gaps": [ "WinUI's tree is a flattened list: its whole template is one TreeViewList (TreeView.xaml:26) and none of TreeViewList, TreeViewNode, TreeViewItemPresenter or TreeViewItemTemplateSettings is exported here, so this is the runtime's nested TreeView wearing WinUI's row, not WinUI's TreeView", "the host paints no surface on purpose - upstream's DefaultTreeViewStyle reads no colour row at all - so overriding a background token moves a ListBox and not a tree (asserted both ways)", "upstream's IsTabStop=False is not copied: its host has a focusable inner list and this one does not, so the value would take the tree out of the tab order", "no SelectionMode, no multi-select, no drag, no ItemInvoked and no ExpandAll on this control, so 8 of upstream's 39 rows are withheld rather than published unread" ]
+    },
+    {
+      "markup": "TreeViewItem",
+      "source": "Styles/TreeViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/treeview.md", "tests/FluentJalium.Tests/AstraTreeViewTests.cs", "spike/TreeViewProbe/Program.cs" ],
+      "gaps": [ "the 16 DIP indent is produced by the nesting (each level's child host insets 16), because no dependency property carries depth here - the consequence is a child row whose fill is 16 DIP narrower than its parent's, where WinUI's row spans the list", "a part named Expander hooks nothing on this runtime, so expansion runs through a two-way TemplatedParent binding on IsExpanded; the keyboard route is not claimed, and any route that writes the property drives the same visuals", "state text colour is written on the container, not on the presenter: ContentPresenter has no Foreground member here, so every template cell aimed at it is inert (adaptation/00 S1-e 7, tracked for the earlier families as a separate fix)", "hover and press are still trigger readings rather than a pointer: no real pointer or touch injection backs the PointerOver and Pressed cells", "collapse keeps child containers realised, as the runtime itself does; the visible effect is the child host's visibility, not the container count" ]
+    },
+    {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",

@@ -1188,3 +1188,79 @@ DependencyObject`，`is Control=False`、`is ItemsControl=False`，`Activator.Cr
 （宿主外壳在闭源 dxaml/generic.xaml），所以宿主样式只能吃已发的 `ListBox*` 行且**不自造名**；
 而探针里 `GetStyle("DefaultListViewStyle")` 在未发货前抛异常这件事，对本仓库所有测试是一个契约：
 读 keyed 样式做"未发布"断言时不能走 `GetStyle`，要走 `Application.Current.TryFindResource`（缺失返回 null）。
+
+---
+
+## S1-e：`TreeView` 的形状对不上、`Expander` 这个名字什么都不钩，而 `ContentPresenter` 没有 `Foreground`（阶段 5 第三段，2026-09-20）
+
+原始读数：`adaptation/s1e-treeview-raw.txt`（探针 `spike/TreeViewProbe`，`Program.cs` 第一轮、`ProbePass2.cs` 第二到第四轮）。
+上游三文件与 blob：`controls/dev/TreeView/TreeView_themeresources.xaml` `8e7a107255310706dda5e4e5ca6edf99b6b14eb9`、
+`TreeView.xaml` `9f419035a19cc68910b97cec4fd5ce264cdfefde`、`TreeViewItem.xaml` `e6655da4feacad75dd68395ec2ddb231e6ad5cfb`。
+
+**1 · 这一段的主前提是形状对不上，而不是缺几个属性。** WinUI 的树是**扁平列表**：`DefaultTreeViewStyle` 的模板整体
+是一个 `TreeViewList`（`TreeView.xaml:26`），`MUX_TreeViewItemStyle` 甚至 `BasedOn DefaultListViewItemStyle`
+（`TreeViewItem.xaml:3`）。本运行时是 WPF 的嵌套形：`TreeView : ItemsControl : Control`（**不是** `Selector`），
+`TreeViewItem : HeaderedItemsControl : ItemsControl`。`TreeViewList`、`TreeViewNode`、`TreeViewItemPresenter`、
+`TreeViewItemTemplateSettings` 四个全部未导出；`TreeView` 自有 DP 只有 `SelectedItem`/`SelectedValue`/`SelectedValuePath`，
+`TreeViewItem` 自有 DP 只有 `IsExpanded`/`IsSelected`/`IsSelectionActive`（外加 `HasItems` 属性）。WinUI 侧的
+`SelectionMode`、`SelectedNode`、`ExpandAll`/`CollapseAll`、`MultiSelect`、`ItemInvoked`、`CollapsedGlyph`/`ExpandedGlyph`/
+`GlyphBrush`/`GlyphOpacity`/`GlyphSize`、`CanDragItems`/`CanReorderItems`/`AllowDrop`、`ItemContainerTransitions` 逐条打点全是空。
+结论是"外观可 1:1、行为面一半无处安放"，所以起原生重模板，不起自有类型：缺的是运行时的行为面，不是模板能补的东西。
+
+**2 · 没有锁，条目宿主契约是 TYPE（列表族第三次确认）。** 我们的宿主模板直接挂得上；把 `ItemsPresenter` 改名照样出容器；
+删掉 `ItemsPresenter` 出 **0** 容器；连 `ScrollViewer` 都不要也能出容器（第一行 300x28）——保留 `ScrollViewer` 是为了
+滚动条与 overlay 契约，不是因为容器需要它。
+
+**3 · 名字不是契约这件事，在树上走得更远：`Expander` 什么都不钩。** 在模板里放一个 `Name='Expander'` 的 `ToggleButton`，
+用它的点击通路（automation `Toggle`）打下去，`IsExpanded` 纹丝不动；而 stock 模板里**根本没有** ToggleButton
+（`toggle-button parts in the tree: 0`）。唯一能用的模板内路线是属性：
+`IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"` 实测**两个方向都通**
+（点击→`IsExpanded=True`→子容器落地；`IsExpanded` 写 True→`IsChecked=True`；直写 `IsChecked=False`→`IsExpanded=False`）。
+这和 S1-c 那条"附加属性 Setter 到不了部件"不矛盾：**附加 Setter 不行，TemplatedParent 双向绑定行**——这是模板驱动
+控件状态的第二条通路，本仓库第一次量到。
+
+**4 · 折叠不销毁容器，且触发器要写对Targets。** 展开使容器数增加、再折叠数不回去（stock 与我们一致），所以可见效果只能
+看子宿主的 `Visibility`。四种静止值写法（只有反向格 / 属性上 `Visibility='Collapsed'` + 正向格 / 正反双格 / 外层 `Border`
+承载门）实测**全部有效**。第一轮里那个"失效"的变体是另一回事：它在代码里构造 `Style` 并塞进一个**没有 `TargetType`** 的
+解析模板，那条 `Trigger Property='IsExpanded'` 就永不触发；换成带 `TargetType='TreeViewItem'` 的模板立刻正常。
+发货写法因此必须让 `ControlTemplate` 带 `TargetType`（我们的 `.jalxaml` 一直如此）。叶子行用
+`Trigger Property='HasItems' Value='False' → Visibility='Hidden'` 收掉箭头，`Hidden`（不是 `Collapsed`）才保住 20 DIP 的
+列位、让叶子和兄弟的标签对齐。
+
+**5 · 深度没有任何可读承载面，缩进只能由嵌套表达。** 对 level-1 与 level-2 两行做**全部可读值差分**（含整条继承链上
+每个 public static DP 逐个 `GetValue`）只差 `IsExpanded`、`Header`、尺寸与布局记账、`Parent` 类型——没有任何
+indentation/depth。stock 用 `PART_IndentSpacer` 画缩进（level-1 宽 0、level-2 宽 16、行 x 不动），但那个宽度不是可读
+属性。于是我们的实现把 16 放在子宿主的 `Margin` 上，让递归自己叠出层级；步长不是自加的（stock 实测同为 16）。
+代价进 Known Gaps：子行的填充比父行窄 16 DIP，而 WinUI 的行永远铺满列表宽。
+
+**6 · 树族的容器 `Style` 不是 null，且隐式样式只吃"生成之前"的那一份。** `Application.TryFindResource(typeof(TreeView))`
+与 `(typeof(TreeViewItem))` 都返回 Style——本运行时自带这两条隐式样式，所以 S1-c/S1-d 的"容器 Style 恒为 null"在这里
+**不成立**，跨族断言只能读效果。另外量到时序：先把树挂上再生效的应用级隐式条目样式**不更新已生成的容器**
+（padding 仍是 stock 的 6,3,6,3），生成之前合并则六种模板变体全部吃到。本仓库的字典在任何容器存在之前就已应用，
+所以这条不是产品缺陷，但它是"运行时热改主题能改到已存在条目"这个设想的硬限制。
+
+**7 · 硬缺陷类：`ContentPresenter` 没有 `Foreground` 成员，指向它的状态前景格全是哑格。** 反射读数
+`NO - ContentPresenter has no Foreground member`。往它写 `Setter TargetName="ContentPresenter" Property="Foreground"`
+不报错、字典照常加载、颜色永远不变。可用路线是同一条状态写在**条目控件自己**的 `Foreground` 上（`Style.Triggers`，
+不带 `TargetName`），生成的 `TextBlock` 靠属性继承取到：实测 `item=#FF112233 → text=#FF112233`，
+`IsEnabled=False` 格逐行生效且不动兄弟行。本批按这条路线发八条前景行；已上库的 ListBox/ListView/ComboBox/菜单族里
+同类格另立修复任务（#31），因为资源键反查闸只查"名字有没有被读"，查不出"写的目标根本没有这个属性"。
+
+**8 · 树比列表多一个 `IsSelectionActive`，少的是同一批。** 可选信号：`IsExpanded`、`IsSelected`、`IsSelectionActive`、
+`HasItems`、`IsMouseOver`、`IsMouseCaptureWithin`、`IsEnabled`、`IsFocused`；仍没有 `IsPressed`/`IsPointerOver`，
+所以按下态照旧只能用 `IsMouseCaptureWithin` 近似。选择互斥与 S1-d 相反：**在两行上直写 `IsSelected` 最终只有一行选中**，
+`tree.SelectedItem` 跟着走，因此这里不需要"直写绕过互斥"那条边界断言。
+
+**9 · 上游连一条 `TreeView*` 宿主行都没有（第二次遇到，但这次连可借的名也没有）。** `DefaultTreeViewStyle` 只设
+`IsTabStop`、三个拖放开关、`ItemContainerTransitions` 和 `Template`，背景靠 `TemplateBinding` 递给内部列表。
+所以宿主发 `Background=Transparent`、`BorderThickness=0`，不 Borrow 也不自造名；S1-d 那条"一次令牌覆盖同时移动两个宿主"
+的断言在这里反转成"同一个覆盖移动 ListBox 而**不**移动 TreeView"，两边都进断言，防止有人日后把树刷成实心底。
+
+**10 · 药丸几何这次整份可读。** `TreeViewItem.xaml:130` 明写 `Rectangle Width=3 Height=16 RadiusX=2 RadiusY=2`，
+不像 ListViewItem 那样把数藏在 C++ presenter 里（S1-d 第 9 条），所以本批三个数全部照抄、没有自加几何。
+上游那四条指示器行名字带 `Foreground` 而实际喂 `Fill`，我们保持同名同喂法。
+
+**11 · 12 DIP 右空隙在第三个宿主上复现，并由同一个开关修掉。** stock `left=1 right=13`；我们的宿主模板 overlay 关
+`1/13`、开 `1/1`（行 298）。那 1 DIP 来自探针模板的 `BorderThickness={TemplateBinding BorderThickness}`（该控件默认
+1）；产品样式把 `BorderThickness` 钉成 0，测试实测左右相等且行宽 300。叠加条的读数与列表族一致：条元素报 40 宽是
+命中区，真正画出来的是 `ThumbBorder` 2 DIP。

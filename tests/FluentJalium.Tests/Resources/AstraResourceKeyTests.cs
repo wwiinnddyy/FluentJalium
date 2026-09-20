@@ -219,6 +219,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/ComboBox.jalxaml")]
     [InlineData("ThemeResources/ListBox.jalxaml")]
     [InlineData("ThemeResources/ListView.jalxaml")]
+    [InlineData("ThemeResources/TreeView.jalxaml")]
     [InlineData("ThemeResources/AutoSuggestBox.jalxaml")]
     [InlineData("ThemeResources/HyperlinkButton.jalxaml")]
     [InlineData("ThemeResources/RadioButton.jalxaml")]

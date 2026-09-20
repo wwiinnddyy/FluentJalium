@@ -1,0 +1,52 @@
+theme dictionaries=40
+our ListView styles are live: ListViewItemStyle=True
+our ListBox styles are live: ListBoxStyle=True
+TreeViewItem type: Jalium.UI.Controls.TreeViewItem base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+
+=== I. the indent carrier: what differs between a level-1 row and a level-2 row ===
+  expand the first two levels: containers=3
+  rows realised: 3
+  [0] header=L1 row@1,1 286x55.98 part_Header@x=23
+      PART_IndentSpacer 0x28@0,0 vis=Visible | PART_ExpanderBorder 16x28@0,0 vis=Visible | PART_ItemsHost 286x28@0,28 vis=Visible
+  [1] header=L2 row@1,29 286x28 part_Header@x=39
+      PART_IndentSpacer 16x28@0,0 vis=Visible | PART_ExpanderBorder 16x28@16,0 vis=Visible | PART_ItemsHost 0x0@0,0 vis=Collapsed
+  [2] header=Other root row@1,56.98 286x28 part_Header@x=7
+      PART_IndentSpacer 0x28@0,0 vis=Visible | PART_ExpanderBorder 0x0@0,0 vis=Collapsed | PART_ItemsHost 286x0@0,28 vis=Visible
+  every readable value that differs between row 0 and row 1:
+    IsExpanded: row0=True row1=False
+    Header: row0=L1 row1=L2
+    ActualHeight: row0=55.977027893066406 row1=28
+    VisualBounds: row0=0,0,286,55.977027893066406 row1=0,0,286,28
+    Parent: row0=Jalium.UI.Controls.VirtualizingStackPanel row1=Jalium.UI.Controls.StackPanel
+    DesiredSize: row0=61.39453125,56 row1=61.39453125,28
+    RenderSize: row0=286,55.977027893066406 row1=286,28
+    IsMeasureValid: row0=False row1=True
+    IsArrangeValid: row0=False row1=True
+    PersistId: row0=47 row1=46
+    TreeViewItem.IsExpanded: row0=True row1=False
+    HeaderedItemsControl.Header: row0=L1 row1=L2
+    FrameworkElement.ActualHeight: row0=55.977027893066406 row1=28
+  every readable value that differs between row 0 and the leaf root:
+    HasItems: row0=True leafRoot=False
+    Header: row0=L1 leafRoot=Other root
+    ActualHeight: row0=55.977027893066406 leafRoot=28
+    VisualBounds: row0=0,0,286,55.977027893066406 leafRoot=0,55.977027893066406,286,28
+    DesiredSize: row0=61.39453125,56 leafRoot=85.0390625,28
+    RenderSize: row0=286,55.977027893066406 leafRoot=286,28
+    IsMeasureValid: row0=False leafRoot=True
+    IsArrangeValid: row0=False leafRoot=True
+    PersistId: row0=47 leafRoot=48
+    HeaderedItemsControl.Header: row0=L1 leafRoot=Other root
+    ItemsControl.HasItems: row0=True leafRoot=False
+    FrameworkElement.ActualHeight: row0=55.977027893066406 leafRoot=28
+  DependencyProperty fields declared by the chain and by the host:
+    TreeViewItem: IsExpanded, IsSelected, IsSelectionActive
+    HeaderedItemsControl: HasHeader, Header, HeaderStringFormat, HeaderTemplate, HeaderTemplateSelector
+    TreeView: SelectedItem, SelectedValue, SelectedValuePath
+
+  our own item template on the same content (does the survive, do children gate):
+    merge before building: ok
+    containers before expanding: 2 (a nested template with no ItemsPresenter at all: can children ever appear?)
+    L1 row@1,1 298x32 presenter@x=13 min-height=28 padding=0,3,0,5
+    Other root row@1,33 298x32 presenter@x=13 min-height=28 padding=0,3,0,5
+    parts our template puts on a row: Border:ContentBorder, ToggleButton:IndentSpacer, Border:Surface, Border:FocusOutline, ToggleButton:Chevron, ContentPresenter:HeaderHost

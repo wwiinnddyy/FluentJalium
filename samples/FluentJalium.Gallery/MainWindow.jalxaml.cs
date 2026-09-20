@@ -451,6 +451,9 @@ public partial class MainWindow : Window
 
         var view = (ListView)SampleListView!;
         view.SelectionChanged += (_, _) => Report($"List view selection: {Describe(view.SelectedItem)}.");
+
+        var tree = (TreeView)SampleTreeView!;
+        tree.SelectedItemChanged += (_, _) => Report($"Tree selection: {Describe(tree.SelectedItem)}.");
     }
 
     private void WireAppearance()

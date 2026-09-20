@@ -1,0 +1,42 @@
+theme dictionaries=40
+our ListView styles are live: ListViewItemStyle=True
+our ListBox styles are live: ListBoxStyle=True
+TreeViewItem type: Jalium.UI.Controls.TreeViewItem base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+
+=== J. gating the nested ItemsPresenter on IsExpanded, three resting values ===
+  --- gate: inverse cell only, host rests visible
+    merge: ok
+    at rest (IsExpanded=False): containers=2 ItemsHost 0x0@0,0 vis=Collapsed ChildHostBorder: absent
+    expand through the item property: containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    collapse again: containers=4 ItemsHost 270x65.56@16,0 vis=Collapsed ChildHostBorder: absent
+    via=peer
+    expand through the chevron click path: item.IsExpanded=True containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    a leaf rests with its chevron hidden? header=Child 1 HasItems=False Chevron 16x32.78@0,0 vis=Hidden
+    row geometry at the top level: 286x65.56
+  --- gate: host rests collapsed, one true cell
+    merge: ok
+    at rest (IsExpanded=False): containers=2 ItemsHost 0x0@0,0 vis=Collapsed ChildHostBorder: absent
+    expand through the item property: containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    collapse again: containers=4 ItemsHost 270x65.56@16,0 vis=Collapsed ChildHostBorder: absent
+    via=peer
+    expand through the chevron click path: item.IsExpanded=True containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    a leaf rests with its chevron hidden? header=Child 1 HasItems=False Chevron 16x32.78@0,0 vis=Hidden
+    row geometry at the top level: 286x65.56
+  --- gate: host rests collapsed, both cells
+    merge: ok
+    at rest (IsExpanded=False): containers=2 ItemsHost 0x0@0,0 vis=Collapsed ChildHostBorder: absent
+    expand through the item property: containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    collapse again: containers=4 ItemsHost 270x65.56@16,0 vis=Collapsed ChildHostBorder: absent
+    via=peer
+    expand through the chevron click path: item.IsExpanded=True containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder: absent
+    a leaf rests with its chevron hidden? header=Child 1 HasItems=False Chevron 16x32.78@0,0 vis=Hidden
+    row geometry at the top level: 286x65.56
+  --- gate: a wrapper Border carries the gate
+    merge: ok
+    at rest (IsExpanded=False): containers=2 ItemsHost 0x0@0,0 vis=Visible ChildHostBorder 0x0@0,0 vis=Collapsed
+    expand through the item property: containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder 286x65.56@0,0 vis=Visible
+    collapse again: containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder 286x65.56@0,0 vis=Collapsed
+    via=peer
+    expand through the chevron click path: item.IsExpanded=True containers=4 ItemsHost 270x65.56@16,0 vis=Visible ChildHostBorder 286x65.56@0,0 vis=Visible
+    a leaf rests with its chevron hidden? header=Child 1 HasItems=False Chevron 16x32.78@0,0 vis=Hidden
+    row geometry at the top level: 286x65.56
