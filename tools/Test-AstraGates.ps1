@@ -51,6 +51,13 @@ try {
         Write-Host '==> palette drift'
         & (Join-Path $PSScriptRoot 'Sync-AstraPalette.ps1') -Check
         if ($LASTEXITCODE -ne 0) { Write-Error 'Palette drift gate failed.' }
+
+        # The inventory document is generated, so staleness is the failure mode and -Check is the assertion.
+        # The suite cross-reads the same files with its own parser; this step is what proves the document
+        # itself was regenerated, which a test in the suite cannot see.
+        Write-Host '==> public resource key inventory'
+        & (Join-Path $PSScriptRoot 'Report-AstraResourceKeys.ps1') -Check
+        if ($LASTEXITCODE -ne 0) { Write-Error 'Public resource key inventory is stale.' }
     }
     Write-Host 'All Astra gates passed.'
 }

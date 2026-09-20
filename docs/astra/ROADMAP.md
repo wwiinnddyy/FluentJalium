@@ -1336,3 +1336,29 @@ Debug 构建 **0 条警告 / 0 错误**（真重编）；整套 **1167/1167 通�
 比第八段 1137 多 30 条 ＝ 新控件 29 条 + 资源键闸口那份新字典行的 +1）；调色板漂移 Light 83 源色 / 101 刷、
 Dark 同、HighContrast 101 映射键（3 条上游键因调色板无对应而按住），三行 `checked=True`；`All Astra gates passed.`
 Gallery 冒烟 `-Page navigation` 12.8 秒干净关窗、无残留进程。
+
+**测试基座批（公开资源键清单 `audits/keys.md`，结清任务 #11 与 #40，2026-09-20）**：目标里"测试基座补公开资源键清单
+keys.md"这条从第一天起就没做，因为一直没定"谁来保证它不烂"。这一批的答法是**两个独立解析器互相核对**，
+而不是一个解析器自己检查自己。
+
+- `tools/Report-AstraResourceKeys.ps1` 用**行读法**（先剥掉注释块，再按 `<Type x:Key=...>` 取键与别名目标/字面值）
+  生成 `docs/astra/audits/keys.md`：55 份字典共 **1230 行**（调色板 368 ＝ Light/Dark 各 184、令牌 734、样式层 128），
+  另有 `HighContrast.map` 的 **101 条映射行**；类型普查 `StaticResource 609 / SolidColorBrush 202 / Color 166 /
+  Thickness 107 / Style 75 / ImplicitStyle 60 / CornerRadius 10 / LinearGradientBrush 1`。
+  无键的隐式样式按"类型可查、名字不可命名"单列，计数进总账但进不了键名集合。
+- `AstraPublicKeysInventoryTests` 用 **`XDocument`** 重读同一批文件，把"文件里真实存在的键名集合"与
+  "文档表格里列出的键名集合"做双向差集（缺失 / 凭空多出各报前 20 个），并把 `Totals:` 那一行的四个数
+  重新数一遍。闸口新增第 5 步跑工具的 `-Check`（比对整份文件与文档尾部的 `canonical-lines`/`sha256`）——
+  测试能证明"清单与字典一致"，只有 `-Check` 能证明"这份文档是刚生成的、没人手改过"，两件事不互相替代。
+- 牙量过三次，每次先确认改动真的落进文件：删一行真键 ⇒ `Not in the document: PipsPagerSelectionIndicatorBackgroundPointerOver`；
+  插一行假键 ⇒ `Not in the dictionaries: InventedKeyForTeethCheck`；改 `Totals:` 的数 ⇒ 计数用例红；还原 ⇒ 全绿。
+  **第一次尝试是假实验**：`sed` 删的键名 `PipsPagerSelectedPipForeground` 在文件里根本不存在（`grep -c` 读回 **0**），
+  于是"该红的没红"看起来和"锁有效"一模一样。往后所有 A/B 先断言改动落地（行数或 grep 计数）再看结果。
+- 不声称：keys.md 只说"我们发了哪些键"，不说"上游有哪些键"——后者仍在各控件 `audits/*.md` 的逐名反向断言里；
+  它也不证明任何键走到像素；写在模板内部的带键元素（今天只有 `Styles/Common.jalxaml` 那一支渐变刷）
+  作用域是该模板，已作为口径注记写进文档开头而不是偷偷算进"公开"。
+
+**闸口读数（测试基座批，串行 `tools/Test-AstraGates.ps1`，exit 0）**：restore 全部最新；Debug 构建
+**0 条警告 / 0 错误**（真重编）；整套 **1169/1169 通过、0 失败、0 跳过**（5 m 28 s，比第九段 1167 多的 2 条
+就是这份清单的双向用例）；调色板三行 `checked=True`；**新增第 5 步**"public resource key inventory"读回
+`keys.md is current: 1230 canonical lines.`；`All Astra gates passed.` 硬件输入 / 视觉：本批不动产品码，各 0 条。
