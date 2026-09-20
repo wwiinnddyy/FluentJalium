@@ -1,0 +1,12 @@
+==> surfaces
+    'FluentJalium Gallery' - closed cleanly in 5.2 s
+1 page(s) mounted and closed; no Gallery process left.
+==> selection
+    'FluentJalium Gallery' - closed cleanly in 4.9 s
+==> inputs
+    'FluentJalium Gallery' - closed cleanly in 4.9 s
+==> menus
+    'FluentJalium Gallery' - closed cleanly in 4.9 s
+==> overview
+    'FluentJalium Gallery' - closed cleanly in 4.8 s
+4 page(s) mounted and closed; no Gallery process left.

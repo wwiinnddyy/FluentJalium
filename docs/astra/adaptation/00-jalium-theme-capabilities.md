@@ -1264,3 +1264,83 @@ indentation/depth。stock 用 `PART_IndentSpacer` 画缩进（level-1 宽 0、le
 `1/13`、开 `1/1`（行 298）。那 1 DIP 来自探针模板的 `BorderThickness={TemplateBinding BorderThickness}`（该控件默认
 1）；产品样式把 `BorderThickness` 钉成 0，测试实测左右相等且行宽 300。叠加条的读数与列表族一致：条元素报 40 宽是
 命中区，真正画出来的是 `ThumbBorder` 2 DIP。
+
+## S1-f：格子的目标必须真的有那个属性——68 条哑格的普查、重定向与一条可见缺陷（哑格批，2026-09-20）
+
+原始读数：`spike/ForegroundSweep/`（`census.txt` 普查、`gate-before.txt` 闸口首跑 68 条、`reroute-report.txt` 发货变换、
+`census-after.txt` 复测 0 条、`routing-before.txt`/`routing-after.txt` 效果事实先失败后通过、`suite-after.txt` 中间全量、
+`gates-menu-cleanup-fail.txt` 与 `gates-final.txt` 收尾两次串行闸口（`gates-before-cleanup.txt` 是中间那一次）、
+`build-noincremental.txt` 非增量重建警告数、
+`gallery-smoke.txt` 四页上屏）。哑格这一类的第一手测量是 `spike/TreeViewProbe/treeview-probe-fg.txt` 第 7 行
+（`does a ContentPresenter carry Foreground at all? NO`），即 S1-e 第 7 条。
+结构闸口：`tests/FluentJalium.Tests/AstraGateTests.cs` 的 `State_cells_name_properties_the_template_parts_actually_have`；
+效果闸口：`tests/FluentJalium.Tests/AstraForegroundRoutingTests.cs`（8 条事实）。
+
+**1 · 先量后改，把整棵 `Styles/` 的格子逐条反射。** 闸口做法：解析每个 `ControlTemplate`，把 `Name=` 的**声明元素类型**
+记成部件表，再拿每条 `<Setter TargetName Property>` 去 `GetType().GetProperty(property, Public|Instance)` 查一遍。
+首跑命中 **68 条**：`Foreground` 写到 `ContentPresenter` 上的 **50** 条（`CheckLabel` 11、`RadioLabel` 7、
+`ComboBoxItem` 的 `ContentPresenter` 9、`PART_SelectionPresenter` 5、`ListBoxItem` 6、`ListViewItem` 5、菜单三条
+item 样式的 `IconContent` 6、`DefaultNumberBoxStyle` 的 `HeaderContentPresenter` 1），`BorderBrush` 写到 `Grid` 上的
+**18** 条（`CheckRoot` / `RadioRoot`——两条根都是 Grid，和上游的 `RootGrid` 同形）。
+"格子指向模板里根本没声明的部件"这一类是 **0** 条，所以名字是对的、属性是不存在的。
+这类缺陷的隐蔽处在于：字典照收、构建照绿、条件照触发，只是那一格永远无事——本仓库此前的六种证据里没有一种能看见它，
+资源键反查闸只问"这个名字有没有被读"，答案永远是"读了"。
+
+**2 · 可用路线是同一条状态写在控件/容器自己身上，共 61 条重定向。** 做法是删掉 `TargetName`，让格子落到
+`TemplatedParent`，生成的 `TextBlock` 靠属性继承取到（TreeView 批量的实测：`item=#FF112233 → text=#FF112233`）。
+按文件：`Selection.jalxaml` 36、`Inputs.jalxaml` 14、`ListBoxes.jalxaml` 6、`ListViews.jalxaml` 5。
+`ControlTemplate.Triggers` 里不带 `TargetName` 的 Setter 落到控件本身，这条在 ComboBox 占位符的测量里复量过一次
+（改动前那格是死的、改动后颜色到位，说明落点确实是控件而不是模板根）。
+
+**3 · 菜单那 6 条是删除而不是重定向。** `MenuFlyoutItem` / `ToggleMenuFlyoutItem` / `MenuFlyoutSubItem` 的两条标签行
+**早已**作为 `Style.Triggers` 的活格写在控件上（同一个 `Foreground`、同一批行名），模板里那 6 条 `IconContent` 格子是
+它们的重复副本，且 `IconContent` 自己的 `Foreground="{TemplateBinding Foreground}"` 已经把图标接到控件的 Foreground 上。
+留着反而埋一个日后与活格抢优先级的死格，所以删掉，资源行的读者数不变。
+
+**4 · 需要独立颜色的头部不能走控件级路线，于是换承载元素：`ContentPresenter` → `ContentControl`。**
+NumberBox 的头必须与编辑区异色，写到自己身上就把两者并成一条，所以头部只能保住部件级写法。反射读数是
+`ContentControl` 有 `Foreground`、`ContentPresenter` 没有，于是承载元素改成 `ContentControl`（其余属性一字不动），
+那一格立刻可达。**同时故意不写静止色**：元素的 `Foreground=` 属性是本地值，本地值压过一切格子，写上就等于把
+disabled 格再次锁死；静止色由盒子继承过来（两个名字都指向 `TextFillColorPrimaryBrush`，同一支笔刷），
+disabled 格因此是唯一的写者。字典侧随之把 `TextControlHeaderForeground` **收回**——没有读者的行不发布，
+只留 `TextControlHeaderForegroundDisabled` 与 `TextBoxTopHeaderMargin`。
+测到的止点：格子现在确实落在承载元素上，而它生成的那一枚字形仍保持**构建时**继承到的颜色，所以 disabled 头部
+离像素还差一跳，按原样写进事实与 Known Gaps，不做相邻替代。
+
+**5 · 框架会在禁用时给生成的文字盖一个本地值，disabled 标签色因此不是我们的。** 诊断读数
+`box=#FFAEAEB2 boxLocal=False text=#FFAEAEB2 textLocal=True token=#5C000000`：控件自己不带本地值，文字元素带，
+颜色是 `#FFAEAEB2`，而所有 disabled 行要的是 `TextFillColorDisabledBrush` = `#5C000000`。本地值排在格子前面，
+`TextBlock` 上那一个我们读得到、改不动（除非再写一个本地值，那就是伪造）。所以四条 disabled 事实钉的是**测量值**，
+并在注释里点名本该生效的行名；这是"哪天框架不再盖章，就该回到 token"的四个哨位，不是四个通过。
+
+**6 · 这批唯一肉眼可见的缺陷是 ComboBox 的占位符。** 可观测性地图（不带指针就能分得开、且不被框架盖章抢走的行）：
+`CheckBox`/`RadioButton`/`ListBoxItem`/`ListViewItem` 的状态前景除了 disabled 全部别名同一支
+`TextFillColorPrimaryBrush`，`ComboBoxItem` 的 pressed 走 Secondary、disabled/selected-disabled 走 Disabled，
+于是真正能读回的只有 `ComboBoxPlaceHolderForeground`（Secondary）对 `ComboBoxForeground`（Primary）——空框把占位符
+涂成选中色正是本批修掉的可见缺陷，选中与清空两侧都断言。
+
+**7 · 18 条 `BorderBrush` 重定向后仍然不落地，但这与上游一致。** 这些行在上游全部别名
+`SubtleFillColorTransparentBrush`（`CheckBox_themeresources.xaml:29,205`），本来就画不出东西；真正的可见环是
+`CheckSurface` / `RadioRing` 那批 `CheckBoxCheckBackgroundStroke*` 行。改它们的动机是结构诚实（闸口绿、格子可达），
+不是外观，因此不声称任何描边像素变化。
+
+**8 · 闸口的边界要说清：它查格子，不查模板属性。** 同一种静默失效在属性上还在——例如根 Grid 上
+`BorderBrush=` / `BorderThickness=` 这类该类型没有的属性——本批没有把它一起扫，另立任务 #32，
+不把"格子全绿"说成"模板全绿"。
+
+**9 · 四类证据的落点。** 构建：`gates-final.txt`（串行闸口全绿：928/928、0 skip、调色板三档 checked=True）与
+`build-noincremental.txt`（非增量整解重建 18 条警告 / 0 错误，全部落在 `AstraMenu`/`AstraAppBar`/`AstraContentDialog`
+三个既有文件的 nullability 上，与基线逐名相同）；行为：死格先失败后通过（`routing-before.txt` 8 条里 6 失败 →
+修完只剩被测量的框架止点），中间态 `suite-after.txt` 的 11 条失败逐条是旧测试形状把死格读数写死；
+上屏：`gallery-smoke.txt` 里 `selection,inputs,menus,overview` 四页各自 mount 后优雅关闭、无残留进程；
+视觉：本批**没有**新增像素捕获，读回值不等于像素；硬件输入：仍未做（#13），指针态（hover/press）一条格子都没有用真指针验证过。
+
+**10 · 改完之后的两次重跑各抓到一个"看代码看不出来"的错误，这两条留在证据里。**
+第一次：删掉那 6 条菜单死格之后，`ToggleMenuFlyoutItem` 的 `IsEnabled=False` 触发器变成空壳，撤掉它之后
+`AstraMenuTests.Each_item_style_carries_one_cell_per_reachable_state` 报该样式的状态集合多了一条
+（`gates-menu-cleanup-fail.txt`，1 失败 / 927 通过）——契约本身没错，错在我改了模板却没同步契约，
+按新形状改断言而不是把空触发器塞回去。第二次：改了 `Catalog.json` 的 gap 文案之后单跑测试项目，
+`The_gallery_project_carries_the_catalog_it_reads` 报不一致——那条闸口比的是**源文件与 Gallery 输出目录里的副本**，
+而 `dotnet test tests/…` 根本不构建 Gallery 项目，于是一次完全正常的编辑被读成"复制清单坏了"。
+教训写在这里：改过 `.jalxaml` 或 `Catalog.json` 之后，唯一算数的读数是把整解重建的串行闸口再跑一遍，
+不是"上一次全绿所以这次也算绿"。

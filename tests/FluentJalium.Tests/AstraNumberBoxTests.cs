@@ -374,7 +374,9 @@ public sealed class AstraNumberBoxTests
         _fixture.Run(() =>
         {
             var box = Mount(new NumberBox { Value = 3 });
-            var presenter = (ContentPresenter)Part(box, "HeaderContentPresenter")!;
+            // The header carrier is a ContentControl since the foreground sweep: the row it has to carry is a
+            // Foreground, and this runtime's ContentPresenter has no such member to write.
+            var presenter = (FrameworkElement)Part(box, "HeaderContentPresenter")!;
             var surface = (Border)Part(box, "OuterBorder")!;
             Assert.Multiple(
                 () => Assert.Equal(Visibility.Collapsed, presenter.Visibility),

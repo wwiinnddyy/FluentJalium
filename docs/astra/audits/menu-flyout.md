@@ -149,3 +149,17 @@ x=350..479、宽 130 px = 74.27 DIP×1.75，只差半径：**弧深**在 8 的�
 11. **已结（2026-09-20，`spike/FlyoutSurfaceProbe -Mode tree/sweep`）**：`MenuPopupScrollHost` 与 `MenuFlyoutPresenter` 的关系结清了——**两条都是真的，且分属两种表面**。`MenuFlyout` 的是 `PopupWindow > PopupRoot > MenuFlyoutPresenter > MenuPopupScrollHost`（presenter 在上面，是宿主 `Control`）；`ContextMenu` 的是 `PopupRoot > Border > MenuPopupScrollHost > ScrollViewer`，那里**根本没有 presenter**，外壳是一个普通 `Border`，四格由控件抄过去（0.12）。`MenuBar` 的下拉半径欠账同时收掉：`Menu` 的子菜单走 `ContextMenu` 那条复制通路，读回 `radius=8,8,8,8 LOCAL`（0.13 与 4c）。
 12. **弧的量比它自己的名义半径短，且顶行那一格不稳**（4c 的三帧）：`CornerRadius=8` 在 dpi 168 下应给 14 px 的弧，弧深度量到 9~10；`=14` 应给 24.5，量到 17。同一张卡片的宽度方向逐数吻合 1.75 倍，所以不是采集器缩放错了。另外**顶行咬入在同一个模式重采之间就有 3 px 抖动**（12 → 9，弹窗落点差 0.67 DIP），因此本批只用"弧深"这一档稳定的量做对比。两档半径短同一个系数 ⇒ 比值可信、绝对值不可信，帧因此只证"变了"。**未解释，且不只影响菜单**：如果这个系数成立，全项目每一个圆角都比名义值小，会影响与 WinUI 的 1:1 判定；要定性需要一次跨 DPI 或跨已知半径的对照，本机给不了，所以不在这里下结论。
 13. **`ContextMenu` 的卡片没有我们那份亚克力**：那层复制 `Border` 的 `Background` 抄到的是 `{ThemeResource MenuFlyoutPresenterBackground}`，帧上读出 `#FF2C2C2C`——与 4b 里 `MenuFlyout` 弹窗的框架灰同一支。也就是说 `ContextMenu` 现在**画的是卡片色，但不是 acrylic**（背衬在本运行时未接）。与 5.4 的"卡片色归框架"是同一件事的两面：一个拿不到我们的行，一个拿到了却没有材质。材质批（任务 8）欠。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+全仓哑格普查在本族命中 **6** 条：`MenuFlyoutItem` / `ToggleMenuFlyoutItem` / `MenuFlyoutSubItem` 三条样式的模板里
+各有两条 `Setter TargetName="IconContent" Property="Foreground"`，而 `IconContent` 是 `ContentPresenter`——
+本运行时该类型没有 `Foreground` 成员，那 6 格永远无事。本族的标签行**没有**中招：它们一直作为
+`Style.Triggers` 的活格写在控件上（§3 与 S0-q 的那条"标签读 `Foreground`"），所以菜单的外观不因这批变化。
+处理是**删除**这 6 条重复副本而不是重定向：同一行的活格已经在写控件，`IconContent` 自己又带
+`Foreground="{TemplateBinding Foreground}"`，留着只是埋一个日后与活格抢优先级的死格。
+随动：`ToggleMenuFlyoutItem` 模板里那条 `IsEnabled=False` 触发器删掉最后一格后变空，一并撤掉（该态的底色本族从不写，
+见 §3）。`AstraMenuTests` 两处同调：`Each_item_style_carries_one_cell_per_reachable_state` 里该样式的状态集合去掉
+`IsEnabled=False`（模板现在确实没有那一格），另一条逐格断言理论里把该格当契约的 `InlineData` 一行删除（−1 条事实）。
+守卫：`AstraForegroundRoutingTests.A_disabled_menu_item_carries_its_row_into_the_icon_as_well_as_the_text`
+钉图标与标签同时取到行——这条是删格子之后唯一的证据通路，仍然只是属性读回，不是像素。

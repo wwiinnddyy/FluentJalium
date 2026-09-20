@@ -168,3 +168,17 @@
 10. 不声称 Gallery 里 NumberBox **画对了**：`--page inputs` 已能证明 Inputs 页真的上屏、
     parity 与 gap 文案走到了屏幕（§4），但 NumberBox 卡本身没入镜，也没有逐控件的裁剪断言——
     这属于 E4（每页/每卡渲染到像素），仍欠。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+§0.6 那条读数的**机制**当时读错了半层：写向 `HeaderContentPresenter.Foreground` 的那一格根本不曾到达任何元素，
+因为本运行时的 `ContentPresenter` 没有 `Foreground` 成员（哑格，S1-e 第 7 条）；标题之所以看起来是我们的颜色，
+是**继承**来的，不是格子写出来的。修法是把承载元素换成 `ContentControl`（该类型有 `Foreground`，其余属性一字未动），
+于是 disabled 格现在确实落在头部承载元素上。两处随动：
+**(a)** 承载元素上**故意不再写** `Foreground=` 属性——本地值压过一切格子，写上就是把 disabled 格重新锁死；
+静止色由盒子继承（`TextControlHeaderForeground` 与控件的 `Foreground` 都别名 `TextFillColorPrimaryBrush`，同一支笔刷）。
+**(b)** `ThemeResources/TextBox.jalxaml` 因此**收回** `TextControlHeaderForeground` 不发布，
+只留 `TextControlHeaderForegroundDisabled` 与 `TextBoxTopHeaderMargin`——没有读者的行不发布。
+§0.6 的结论在效果上仍然成立：**字形那一枚**读回的还是它构建时继承到的颜色，disabled 头部离像素差一跳，
+`AstraForegroundRoutingTests.A_disabled_number_box_sends_the_disabled_row_into_its_header` 把"格子到承载元素"和
+"字形不动"两半同时钉住，不做相邻替代。

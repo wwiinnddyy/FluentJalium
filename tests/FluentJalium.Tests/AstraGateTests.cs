@@ -156,6 +156,63 @@ public class AstraGateTests
         Assert.False(offenders.Count > 0, "Keyed ControlTemplate resources with state cells:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// The other half of the setter gate, added after the TreeView probe measured that this runtime's
+    /// <c>ContentPresenter</c> has no <c>Foreground</c> member at all (spike/TreeViewProbe mode K,
+    /// <c>docs/astra/adaptation/00</c> S1-e 8). The exclusion above therefore threw away the largest class of dead
+    /// cells: fifty state setters across six families aimed at a label presenter, each of which builds, loads and
+    /// paints nothing while the family's audit claims the state is implemented. A cell aimed at a named part is now
+    /// resolved against the element type that part is declared as in the same template.
+    /// </summary>
+    [Fact]
+    public void State_cells_name_properties_the_template_parts_actually_have()
+    {
+        var root = RepositoryRoot();
+        var types = typeof(Jalium.UI.Controls.Button).Assembly.GetTypes().Concat(typeof(FluentThemeManager).Assembly.GetTypes())
+            .Where(static type => type.IsPublic && type.IsSubclassOf(typeof(Jalium.UI.DependencyObject)))
+            .ToList();
+        var offenders = new List<string>();
+        var checkedCells = 0;
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium"), "*.jalxaml", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(root, file).Replace('\\', '/');
+            foreach (var template in XDocument.Load(file).Descendants().Where(static element => element.Name.LocalName == "ControlTemplate"))
+            {
+                var parts = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (var element in template.Descendants())
+                {
+                    var name = element.Attributes().FirstOrDefault(static attribute => attribute.Name.LocalName == "Name")?.Value;
+                    if (name is not null) parts[name] = element.Name.LocalName;
+                }
+
+                foreach (var setter in template.Descendants().Where(static element => element.Name.LocalName == "Setter"))
+                {
+                    var target = setter.Attributes().FirstOrDefault(static attribute => attribute.Name.LocalName == "TargetName")?.Value;
+                    var property = setter.Attributes().FirstOrDefault(static attribute => attribute.Name.LocalName == "Property")?.Value;
+                    if (target is null || property is null || property.Contains('.', StringComparison.Ordinal)) continue;
+
+                    // A target this template never names is the other silent-drop class, and it is an offender too:
+                    // the cell cannot reach an element that does not exist.
+                    if (!parts.TryGetValue(target, out var partType))
+                    {
+                        offenders.Add($"{relative}: cell aimed at part {target}, which this template does not declare");
+                        continue;
+                    }
+
+                    var owner = types.FirstOrDefault(type => type.Name == partType);
+                    if (owner is null) continue;
+                    checkedCells++;
+                    if (owner.GetProperty(property, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance) is null)
+                        offenders.Add($"{relative}: {partType} '{target}' has no {property}");
+                }
+            }
+        }
+
+        Assert.True(checkedCells > 100, $"only {checkedCells} cells were checked; the gate has gone vacuous.");
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, $"Cells writing a property their target does not have ({offenders.Count}):" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

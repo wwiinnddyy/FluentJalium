@@ -366,9 +366,14 @@ public sealed class AstraMenuTests
         });
     }
 
+    /// <summary>
+    /// Template cells only, per style. The toggle item has no <c>IsEnabled=False</c> cell because its template wrote
+    /// nothing for that state but the dead icon-foreground copy the sweep deleted (docs/astra/adaptation/00 S1-f);
+    /// its disabled row lives on the style triggers, like the other two items'.
+    /// </summary>
     [Theory]
     [InlineData("DefaultMenuFlyoutItemStyle", new[] { "Icon=null", "IsMouseOver=True", "IsEnabled=False" })]
-    [InlineData("DefaultToggleMenuFlyoutItemStyle", new[] { "Icon=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False" })]
+    [InlineData("DefaultToggleMenuFlyoutItemStyle", new[] { "Icon=null", "IsChecked=True", "IsMouseOver=True" })]
     [InlineData("DefaultMenuFlyoutSubItemStyle", new[] { "Icon=null", "IsMouseOver=True", "IsEnabled=False" })]
     [InlineData("DefaultMenuBarItemStyle", new[] { "IsMouseOver=True" })]
     public void Each_item_style_carries_one_cell_per_reachable_state(string key, string[] expected)
@@ -380,10 +385,16 @@ public sealed class AstraMenuTests
         });
     }
 
+    /// <summary>
+    /// The template cells only. The item's own text and icon colour rows live in the style's
+    /// <c>Style.Triggers</c> - this runtime paints a template part's Foreground nowhere the icon is a
+    /// ContentPresenter - so <c>MenuFlyoutItemForeground*</c> is not asserted here;
+    /// <c>AstraForegroundRoutingTests.A_disabled_menu_item_carries_its_row_into_the_icon_as_well_as_the_text</c>
+    /// reads the icon by effect instead.
+    /// </summary>
     [Theory]
     [InlineData("DefaultMenuFlyoutItemStyle", "IsMouseOver=True", "Background", "MenuFlyoutItemBackgroundPointerOver")]
     [InlineData("DefaultMenuFlyoutItemStyle", "IsEnabled=False", "Background", "MenuFlyoutItemBackgroundDisabled")]
-    [InlineData("DefaultMenuFlyoutItemStyle", "IsEnabled=False", "Foreground", "MenuFlyoutItemForegroundDisabled")]
     [InlineData("DefaultMenuFlyoutSubItemStyle", "IsMouseOver=True", "Background", "MenuFlyoutSubItemBackgroundPointerOver")]
     [InlineData("DefaultMenuFlyoutSubItemStyle", "IsEnabled=False", "Background", "MenuFlyoutSubItemBackgroundDisabled")]
     [InlineData("DefaultToggleMenuFlyoutItemStyle", "IsChecked=True", "Visibility", null)]

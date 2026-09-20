@@ -45,9 +45,14 @@
        NumberBox batch, whose template carries a header presenter. Upstream consumes both names in its TextBox
        style (Controls/dev/CommonStyles/TextBox_themeresources.xaml:259,335) but defines neither in this
        checkout - grep for x:Key="TextControlHeaderForeground" hits 0 - so the values follow what WinUI renders:
-       the primary text token at rest, the disabled token when the control is off. -->
+       the primary text token at rest, the disabled token when the control is off.
+       The resting row is deliberately NOT published (the foreground sweep of 2026-09-20): the only element that
+       could hold it is the header carrier itself, and a value written there is a local value, which outranks every
+       cell this reader has and would put the disabled row out of reach again. The carrier therefore takes its
+       resting colour by inheritance from the box - the same brush - and only the disabled row is written, by the
+       cell in Styles/TextInput.jalxaml. Publishing the resting name would have meant publishing a row nothing
+       reads. -->
   <Thickness x:Key="TextBoxTopHeaderMargin">0,0,0,8</Thickness>
-  <StaticResource x:Key="TextControlHeaderForeground" ResourceKey="TextFillColorPrimaryBrush" />
   <StaticResource x:Key="TextControlHeaderForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
   <!-- The eight delete-button rows upstream's TextBox template paints. The text controls still have no part for
        them; the NumberBox spin buttons do, and upstream routes those through exactly this family (its

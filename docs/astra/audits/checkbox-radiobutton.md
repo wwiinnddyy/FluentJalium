@@ -173,3 +173,18 @@ CheckBox 的 `Padding` 由 `CheckBoxPadding` 行驱动。
 - **海拔渐变键仍未点亮**：3 个 `*ElevationBorderBrush` 在 HC 与 Light/Dark 都无行，
   9 处替换是"最近的实心令牌"，不是等价物；上屏逐位一致不声称。
 - **高对比逐键断言未做**：别名行走的是同一 palette 实例，但 HC 下这 112 行的逐键值还没断言（任务 #11/#12 收尾项）。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+上面状态映射表里"标签字色"与"根描边"两类格子，发货时**全是哑的**：`CheckLabel` 与 `RadioLabel` 是
+`ContentPresenter`，本运行时该类型没有 `Foreground` 成员；`CheckRoot` 与 `RadioRoot` 是 `Grid`，该类型没有
+`BorderBrush` 成员（与上游 `RootGrid` 同形）。反射查 owner 首跑在本审计两族命中 **36 条**——
+复选 `CheckLabel.Foreground` 11 + `CheckRoot.BorderBrush` 11（`Styles/Selection.jalxaml`）、
+单选 `RadioLabel.Foreground` 7 + `RadioRoot.BorderBrush` 7（`Styles/Inputs.jalxaml`）。
+修法：这 36 条去掉 `TargetName`，改写控件自己的 `Foreground` / `BorderBrush`，标签由生成的 `TextBlock` 继承取到。
+两条限制一并记在这里：**(a)** 18 条 `BorderBrush` 落到控件后依然没有画者（根是 Grid），而这些行上游全别名
+`SubtleFillColorTransparentBrush`，本来画不出东西——可见环一直是 `CheckSurface` / `RadioRing` 的
+`*CheckBackgroundStroke*` 行，所以本更正不声称任何描边像素变化；**(b)** disabled 两行的标签色不归我们，
+框架在禁用时给生成的文字盖了本地值 `#FFAEAEB2`（行要的是 `#5C000000`），本地值压过格子，
+`AstraForegroundRoutingTests` 四条 disabled 事实钉的是这个读数而不是 token。
+结构闸口：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`。

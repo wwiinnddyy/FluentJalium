@@ -108,3 +108,13 @@ select/gutter/itemstyle/theme/itemtmpl/attach）。
 - 条目像素只声称"选中把那一格从底色推向强调色"（两帧对比），不声称与 WinUI 截图逐位一致。
 - 虚拟化只声称"1000 项仍只实现一屏容器"，不声称回收模式（`VirtualizationMode.Recycling`）下的行为。
 - ListView / GridView / TreeView / DataGrid 由后续批次负责；本批只把 `ListBox : Selector` 这条链量穿。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+§3 那行"上游每个态只写两件事：`PressedBackground.Fill` 与 `ContentPresenter.Foreground`"里的第二件，
+在本运行时**照抄即哑**：`Styles/ListBoxes.jalxaml` 的 6 条字色格目标 `ContentPresenter` 没有 `Foreground` 成员，
+字典照收、构建照绿、条件照触发，只是那一格永远无事。修法是把这 6 条写到 `ListBoxItem` 自己身上
+（删 `TargetName`），标签由生成的 `TextBlock` 继承取到；`Foreground` 一族行名与行值一字未动，因此键清单不变。
+同批的 TreeView 度量（S1-e 第 7 条）是本更正的出处，列表族当时留的任务 #31 现已结。
+限制照记：状态字色除 disabled 全别名同一支 `TextFillColorPrimaryBrush`，所以换点读回相同、
+本批不声称这 6 条改变了像素；disabled 那一条被框架在生成的文字上盖的本地值（`#FFAEAEB2`）挡住，不归我们。

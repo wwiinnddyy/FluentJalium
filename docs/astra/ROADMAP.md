@@ -713,6 +713,54 @@ mount 后优雅关闭、无残留进程，新加的树在折叠线以下**未目
 不声称宿主级 disable 会把整棵子树压暗；不声称 `Path` 箭头等于上游的字体 glyph；不声称子层那 16 DIP 缩进与上游像素相同；
 不声称 DataGrid / TabView / NavigationView 沾了这批的光。
 
+**哑格批（68 条状态格子永远不到达像素，2026-09-20）**：S1-e 第 7 条那一枚反射读数往下挖的一批结算——不是新控件，
+是把已经"发货"的八张样式的状态格子逐条查一遍有没有写达。先量后改。
+
+(1) **先立结构闸口，让死格无法再发货**：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`
+解析每个 `ControlTemplate`，把 `Name=` 的**声明元素类型**记成部件表，再拿每条 `<Setter TargetName Property>` 去反射查
+owner。首跑 **68 条命中**：`Foreground` 写到 `ContentPresenter` 上 **50** 条（`CheckLabel` 11、`RadioLabel` 7、
+`ComboBoxItem` 9、`PART_SelectionPresenter` 5、`ListBoxItem` 6、`ListViewItem` 5、菜单 `IconContent` 6、
+`HeaderContentPresenter` 1），`BorderBrush` 写到 `Grid` 上 **18** 条（`CheckRoot`/`RadioRoot`，与上游 `RootGrid` 同形）。
+"格子指向模板未声明的部件" **0** 条——名字全对、属性不存在，所以资源键反查闸一路绿灯。
+(2) **修法只有一条被量到可用：同一条状态写到控件/容器自己身上**（删 `TargetName`），生成的 `TextBlock` 靠属性继承取到。
+发货量：重定向 **61** 条（`Selection` 36 / `Inputs` 14 / `ListBoxes` 6 / `ListViews` 5）、**删除** 6 条（菜单那 6 条是
+`Style.Triggers` 活格的重复副本，且 `IconContent` 自己已 `TemplateBinding Foreground`）、**换承载元素** 1 条
+（NumberBox 头部 `ContentPresenter` → `ContentControl`，因为只有它有 `Foreground` 成员，而头部必须与编辑区异色，
+控件级路线不可用）。
+(3) **本地值压过格子，两处据此反向收行**：NumberBox 头部**故意不带** `Foreground=` 属性（带上就是把 disabled 格再锁死），
+静止色由盒子继承（同一支笔刷）；`ThemeResources/TextBox.jalxaml` 因此把 `TextControlHeaderForeground` **收回不发布**，
+只留 `…Disabled` 与 `TextBoxTopHeaderMargin`。
+(4) **框架会在禁用时给生成的文字盖一个本地值**：`box=#FFAEAEB2 boxLocal=False text=#FFAEAEB2 textLocal=True
+token=#5C000000`——disabled 标签色不是我们的。四条 disabled 事实因此钉**测量值**并在注释里点名本该生效的行名，
+当作"框架哪天不盖章就回到 token"的哨位，而不是四条通过。
+(5) **这批唯一肉眼可见的缺陷是 ComboBox 占位符**：可观测性地图量完后（复选/单选/列表行的状态前景除 disabled 全别名同一支
+`TextFillColorPrimaryBrush`），只有 `ComboBoxPlaceHolderForeground`(Secondary) 对 `ComboBoxForeground`(Primary)
+既不带指针、又不被框架盖章抢走——空框把占位符涂成选中色正是它，选中与清空两侧都进断言。
+(6) **18 条 `BorderBrush` 重定向后仍不落地，但这与上游一致**：这些行上游全别名 `SubtleFillColorTransparentBrush`
+（`CheckBox_themeresources.xaml:29,205`），可见环是 `CheckSurface`/`RadioRing` 那批 stroke 行，因此本批不声称任何描边像素变化。
+
+产物：`Styles/{Selection,Inputs,ListBoxes,ListViews}.jalxaml` 61 格重定向、`Styles/Menus.jalxaml` 删 6 格并清掉一格随之变空的
+`Trigger`、`Styles/TextInput.jalxaml` 头部换 `ContentControl` 承载、`ThemeResources/TextBox.jalxaml` 收回 1 行、
+`AstraGateTests` 新闸口（查 100+ 条格子）、`AstraForegroundRoutingTests`（新，**8 条事实**：形状不变量 1 + disabled 归属 4 +
+占位符 1 + NumberBox 头 1 + 菜单图标 1）、`AstraComboBoxTests`/`AstraSelectionTests`/`AstraMenuTests`/`AstraNumberBoxTests`
+按新形状更新；`adaptation/00` 新 **S1-f**（10 条）；`spike/ForegroundSweep/{census,reroute}.py` 与 14 份读数；
+六份审计文档（checkbox-radiobutton / combobox / listbox / listview / menu-flyout / numberbox）各加一节带日期的更正，
+Catalog 里 CheckBox / RadioButton / ListBox / ListView / NumberBox / TreeViewItem 六条 gap 文案同步更正。
+
+四类证据分开记：构建 = 串行闸口 **928/928 全绿、0 skip、调色板三档 checked=True、83 源色 / 101 刷未变**，
+非增量整解重建 **18 条警告、0 错误**且与基线逐名相同（全在 `AstraMenu`/`AstraAppBar`/`AstraContentDialog`
+三个既有文件的 nullability）；行为 = 死格先失败后通过（`routing-before.txt` 8 条里 6 失败 → 修完 0 失败），
+中间态 `suite-after.txt` 的 11 条失败逐条是旧测试形状把死格读数写死，最终 928（基线 920：+8 条路由事实、
+−1 条随死格一起删掉的 `InlineData`）；上屏 = `selection,inputs,menus,overview` 四页各自 mount 后优雅关闭、
+无残留进程；视觉 = **本批 0 条新增像素捕获**，读回值不等于像素；硬件输入 = **仍为零**（任务 13），
+hover/press 那一半格子没有一条经真指针验证。收尾两次重跑各抓到一个改完没同步的契约
+（`gates-menu-cleanup-fail.txt` 的菜单状态集合、Catalog 副本比对），两条都按新形状修断言而不是回滚改动。
+
+不声称：不声称 61 条重定向里除占位符与菜单图标之外的每一条都改变了像素（多数状态行别名同一支 Primary，读回本来相同）；
+不声称 disabled 标签色归我们（框架盖章）；不声称 NumberBox 头部的 disabled 色到达像素（止于承载元素，差一跳）；
+不声称模板**属性**也干净（闸口只查格子，属性那一层另立任务 32）；不声称悬停 / 按下通路有效（无输入证据）；
+不声称这批之后 Styles 里再没有静默失效——只再没有**这一类**。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

@@ -195,9 +195,13 @@ public sealed class AstraSelectionTests
             {
                 var wanted = new List<(string Part, string Property, string Key)>
                 {
-                    ("RadioLabel", "Foreground", cell.Foreground),
+                    // Two of the seven land on the control, not on a part: the label is a ContentPresenter, which
+                    // this runtime gives no Foreground, and the root is a Grid, which has no BorderBrush. Both rows
+                    // are still written, on the element that holds the property, and inherited down - see
+                    // AstraForegroundRoutingTests and spike/ForegroundSweep/census.txt.
+                    ("self", "Foreground", cell.Foreground),
                     ("RadioRoot", "Background", cell.Foreground.Replace("Foreground", "Background")),
-                    ("RadioRoot", "BorderBrush", cell.Foreground.Replace("Foreground", "BorderBrush")),
+                    ("self", "BorderBrush", cell.Foreground.Replace("Foreground", "BorderBrush")),
                     ("RadioRing", "Background", cell.RingFill),
                     ("RadioRing", "BorderBrush", cell.RingStroke),
                     ("RadioDot", "Fill", cell.DotFill),
@@ -449,9 +453,9 @@ public sealed class AstraSelectionTests
         foreach (var (part, property, key) in wanted)
         {
             var setter = TriggerSetters(cell).OfType<Setter>()
-                .FirstOrDefault(candidate => candidate.TargetName == part && NameOf(candidate) == property)
+                .FirstOrDefault(candidate => (candidate.TargetName ?? "self") == part && NameOf(candidate) == property)
                 ?? throw new InvalidOperationException($"{label}: no {part}.{property} setter; the cell carries "
-                    + string.Join(", ", TriggerSetters(cell).OfType<Setter>().Select(static candidate => $"{candidate.TargetName}.{NameOf(candidate)}")));
+                    + string.Join(", ", TriggerSetters(cell).OfType<Setter>().Select(candidate => $"{candidate.TargetName ?? "self"}.{NameOf(candidate)}")));
             var actual = setter.Value?.GetType().GetProperty("ResourceKey")?.GetValue(setter.Value) as string;
             Assert.Equal(key, actual);
         }

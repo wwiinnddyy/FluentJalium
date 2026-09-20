@@ -180,9 +180,21 @@
                upstream's 32. Pinned as Known Gap 2 in docs/astra/audits/right-gap.md rather than papered over
                with a literal height, because the extra 8 is the header's own gap and hiding it would break the
                case that has a header. -->
-          <ContentPresenter Name="HeaderContentPresenter" Grid.Row="0" Content="{TemplateBinding Header}"
-                            Foreground="{ThemeResource TextControlHeaderForeground}" Margin="{ThemeResource TextBoxTopHeaderMargin}"
-                            FontSize="{TemplateBinding FontSize}" FontWeight="Normal" VerticalAlignment="Top" />
+          <!-- The header carries a colour of its own (TextControlHeaderForeground, and a disabled variant the box
+               itself must not inherit), so the control-level route the label families use is not available here.
+               This runtime's ContentPresenter has no Foreground member either - the attribute this element used to
+               carry sat on a presenter that could not hold it, so the header was painted by inheritance and the
+               disabled row never arrived - so the carrier is a ContentControl, whose Foreground the generated text
+               does pick up. The resting row is deliberately NOT written here as an attribute: a local value on the
+               element outranks every cell this reader has, which would put the disabled state out of reach again.
+               Inheritance from the box carries the same brush (both alias TextFillColorPrimaryBrush), leaving the
+               disabled cell the only writer. Measured limit: the cell now lands on this element, and the glyph the
+               element generated keeps the colour it inherited when it was built, so the disabled header stops one
+               hop short of pixels (AstraForegroundRoutingTests.A_disabled_number_box_sends_the_disabled_row_into_its_header
+               pins both halves of that reading). -->
+          <ContentControl Name="HeaderContentPresenter" Grid.Row="0" Content="{TemplateBinding Header}"
+                          Margin="{ThemeResource TextBoxTopHeaderMargin}"
+                          FontSize="{TemplateBinding FontSize}" FontWeight="Normal" VerticalAlignment="Top" />
           <Border Name="OuterBorder" Grid.Row="1" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
             <Grid>

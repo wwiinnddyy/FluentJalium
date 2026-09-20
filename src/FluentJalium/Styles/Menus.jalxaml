@@ -70,18 +70,18 @@
           <Trigger Property="Icon" Value="{x:Null}"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
           <Trigger Property="IsMouseOver" Value="True">
             <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutItemBackgroundPointerOver}" />
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundPointerOver}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
             <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutItemBackgroundDisabled}" />
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundDisabled}" />
           </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>
     <!-- The label is the control's own paint, and the tint probe measures that its painter reads this
          Foreground (a magenta value came out magenta on the capture), so the two label rows stay live as
-         style triggers rather than as a template cell on a TextBlock that no longer exists. -->
+         style triggers rather than as a template cell on a TextBlock that no longer exists. The sweep that
+         fixed the dead cells deleted a third copy of each of these rows: they also sat inside the template
+         as Foreground cells on IconContent, a ContentPresenter, which has no Foreground member to write. -->
     <Style.Triggers>
       <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundPointerOver}" /></Trigger>
       <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundDisabled}" /></Trigger>
@@ -124,10 +124,6 @@
           <Trigger Property="IsChecked" Value="True"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
           <Trigger Property="IsMouseOver" Value="True">
             <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundPointerOver}" />
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundPointerOver}" />
-          </Trigger>
-          <Trigger Property="IsEnabled" Value="False">
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundDisabled}" />
           </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
@@ -168,11 +164,9 @@
           <Trigger Property="Icon" Value="{x:Null}"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
           <Trigger Property="IsMouseOver" Value="True">
             <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundPointerOver}" />
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundPointerOver}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
             <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundDisabled}" />
-            <Setter TargetName="IconContent" Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundDisabled}" />
           </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>

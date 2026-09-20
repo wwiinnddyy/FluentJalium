@@ -111,7 +111,7 @@
       "page": "inputs",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/numberbox.md", "tests/FluentJalium.Tests/AstraNumberBoxTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
-      "gaps": [ "5 of the 13 upstream NumberBox* keys have no row here: 4 are x:Double metrics this reader cannot parse and ride as literals, 1 has no second element to land on", "upstream's template-local RepeatButton* alias block is read through its targets instead, because those names belong to the RepeatButton control at application scope", "the spinner popup opens on focus, not on tapping the indicator: tapping needs code", "the header text element carries the framework's own local foreground, so the header rows are written and may not reach the pixels", "no real pointer or touch drives hover or press on the spin buttons" ]
+      "gaps": [ "5 of the 13 upstream NumberBox* keys have no row here: 4 are x:Double metrics this reader cannot parse and ride as literals, 1 has no second element to land on", "upstream's template-local RepeatButton* alias block is read through its targets instead, because those names belong to the RepeatButton control at application scope", "the spinner popup opens on focus, not on tapping the indicator: tapping needs code", "the header carrier is a ContentControl because this runtime's ContentPresenter has no Foreground member to write: the disabled row lands on the carrier, while the glyph it generates keeps the colour inherited when it was built, so the row stops one hop short of the pixels", "no real pointer or touch drives hover or press on the spin buttons" ]
     },
     {
       "markup": "AutoCompleteBox",
@@ -135,7 +135,7 @@
       "source": "Styles/Selection.jalxaml",
       "page": "selection",
       "parity": "audited",
-      "gaps": [ "pointer-over and pressed cells have no real-pointer evidence", "the mark is geometry, not upstream's AnimatedIcon frame set", "the selection page is not measured on screen" ],
+      "gaps": [ "pointer-over and pressed cells have no real-pointer evidence", "the mark is geometry, not upstream's AnimatedIcon frame set", "the selection page is not measured on screen", "label rows are written on the control, not the presenter: this runtime's ContentPresenter has no Foreground member, so the template cells aimed at it were inert (adaptation/00 S1-f); on a disabled box the label is the framework's own local grey, not CheckBoxForegroundUncheckedDisabled" ],
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ]
     },
     {
@@ -144,7 +144,7 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
-      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen" ]
+      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen", "label rows are written on the control, not the presenter (adaptation/00 S1-f), and a disabled dot's label keeps the framework's own local grey rather than RadioButtonForegroundDisabled" ]
     },
     {
       "markup": "ComboBox",
@@ -169,7 +169,7 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/listbox.md", "tests/FluentJalium.Tests/AstraListBoxTests.cs", "spike/ListProbe/Program.cs" ],
-      "gaps": [ "upstream's eleven ScrollViewer.* attached setters have no working equivalent: an attached-name setter parses and never reaches the part (mode J read viewer.Auto/False in all four combinations), so the switches are literals on our part and an application cannot retarget them", "the surface token stands in for SystemControlBackgroundChromeMediumLow, whose two hexes no palette row carries (#F2F2F2 / #2B2B2B against our #F3F3F3 / #202020)", "no grouping, so GroupStyle rows are untouched", "no real pointer or touch evidence for hover, press and drag-select" ]
+      "gaps": [ "upstream's eleven ScrollViewer.* attached setters have no working equivalent: an attached-name setter parses and never reaches the part (mode J read viewer.Auto/False in all four combinations), so the switches are literals on our part and an application cannot retarget them", "the surface token stands in for SystemControlBackgroundChromeMediumLow, whose two hexes no palette row carries (#F2F2F2 / #2B2B2B against our #F3F3F3 / #202020)", "no grouping, so GroupStyle rows are untouched", "no real pointer or touch evidence for hover, press and drag-select", "the row's text colour is written on the container, not the presenter, because this runtime's ContentPresenter has no Foreground member to receive the cell (adaptation/00 S1-f); a disabled row's label then keeps the framework's local grey rather than ListBoxItemForegroundDisabled" ]
     },
     {
       "markup": "ListBoxItem",
@@ -185,7 +185,7 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/listview.md", "tests/FluentJalium.Tests/AstraListViewTests.cs", "spike/ListViewProbe/Program.cs" ],
-      "gaps": [ "the reference commit publishes no ListView-level theme rows at all (no ListViewBackground, no ListViewStyle key, no controls/dev/ListView directory - the host chrome is in the closed dxaml generic.xaml), so the host reads the ListBox rows and one override of ListBoxBackground moves both list surfaces", "ListView.View - the WPF column view this runtime exposes as its only own dependency property - has no header surface in our template, so a list carrying a View loses its column headers; the stock PART_ColumnHeadersBorder measured 0x0 with the View null", "the grid surface the objective names is not here: Jalium's GridView is the WPF column View (ViewBase, not a Control) and no GridViewItem type is exported, so the card layout is an ItemsPanel swap on this host and the WrapPanel fact is as far as the claim goes", "no real pointer or touch evidence for hover, press and drag-select" ]
+      "gaps": [ "the reference commit publishes no ListView-level theme rows at all (no ListViewBackground, no ListViewStyle key, no controls/dev/ListView directory - the host chrome is in the closed dxaml generic.xaml), so the host reads the ListBox rows and one override of ListBoxBackground moves both list surfaces", "ListView.View - the WPF column view this runtime exposes as its only own dependency property - has no header surface in our template, so a list carrying a View loses its column headers; the stock PART_ColumnHeadersBorder measured 0x0 with the View null", "the grid surface the objective names is not here: Jalium's GridView is the WPF column View (ViewBase, not a Control) and no GridViewItem type is exported, so the card layout is an ItemsPanel swap on this host and the WrapPanel fact is as far as the claim goes", "no real pointer or touch evidence for hover, press and drag-select", "the row's five text cells write the container, not the presenter, because this runtime's ContentPresenter has no Foreground member to receive them (adaptation/00 S1-f) - a reading of the property, not of pixels" ]
     },
     {
       "markup": "ListViewItem",
@@ -209,7 +209,7 @@
       "page": "selection",
       "parity": "audited",
       "evidence": [ "docs/astra/audits/treeview.md", "tests/FluentJalium.Tests/AstraTreeViewTests.cs", "spike/TreeViewProbe/Program.cs" ],
-      "gaps": [ "the 16 DIP indent is produced by the nesting (each level's child host insets 16), because no dependency property carries depth here - the consequence is a child row whose fill is 16 DIP narrower than its parent's, where WinUI's row spans the list", "a part named Expander hooks nothing on this runtime, so expansion runs through a two-way TemplatedParent binding on IsExpanded; the keyboard route is not claimed, and any route that writes the property drives the same visuals", "state text colour is written on the container, not on the presenter: ContentPresenter has no Foreground member here, so every template cell aimed at it is inert (adaptation/00 S1-e 7, tracked for the earlier families as a separate fix)", "hover and press are still trigger readings rather than a pointer: no real pointer or touch injection backs the PointerOver and Pressed cells", "collapse keeps child containers realised, as the runtime itself does; the visible effect is the child host's visibility, not the container count" ]
+      "gaps": [ "the 16 DIP indent is produced by the nesting (each level's child host insets 16), because no dependency property carries depth here - the consequence is a child row whose fill is 16 DIP narrower than its parent's, where WinUI's row spans the list", "a part named Expander hooks nothing on this runtime, so expansion runs through a two-way TemplatedParent binding on IsExpanded; the keyboard route is not claimed, and any route that writes the property drives the same visuals", "state text colour is written on the container, not on the presenter: ContentPresenter has no Foreground member here, so every template cell aimed at it is inert (adaptation/00 S1-e 7; the same route now covers the eight families that shipped before it - S1-f)", "hover and press are still trigger readings rather than a pointer: no real pointer or touch injection backs the PointerOver and Pressed cells", "collapse keeps child containers realised, as the runtime itself does; the visible effect is the child host's visibility, not the container count" ]
     },
     {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",

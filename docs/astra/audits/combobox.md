@@ -188,3 +188,16 @@ StaysOpenOnEdit, Text`，外加 `Selector`（`SelectedIndex/SelectedItem/IsSelec
 高亮 `ActualWidth = 条目 ActualWidth − 10`、`ActualHeight = 条目 ActualHeight − 4`。
 另记一笔未治：条目样式上的 `MinHeight=32` 与 `FontSize=14` 是自加的（上游 `DefaultComboBoxItemStyle`
 :602–610 两条都没有，32 是它的 padding 与字号自然量出来的高度），留着是因为去掉后本运行时的行高要另量。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+§3 那张映射表里的字色格子发货时是哑的：条目模板写 `TargetName="ContentPresenter"` **9** 条、
+宿主模板写 `TargetName="PART_SelectionPresenter"` **5** 条，两处目标都是 `ContentPresenter`，
+而本运行时该类型没有 `Foreground` 成员。修法同批统一：14 条去掉 `TargetName`，写到 `ComboBoxItem` /
+`ComboBox` 自己身上，标签由生成的 `TextBlock` 继承取到。
+这批唯一**肉眼可见**的缺陷就在这里：`ComboBoxPlaceHolderForeground`(Secondary) 与 `ComboBoxForeground`(Primary)
+两支不同，哑格使空框把占位符涂成选中色；现在两侧都进断言
+（`AstraForegroundRoutingTests.An_unselected_combo_box_shows_the_placeholder_row_and_a_selected_one_its_own`）。
+另两条读数同时更正本审计的旧说法：条目 disabled / selected-disabled 的字色在像素上归框架
+（`#FFAEAEB2` 那枚本地值章在生成的文字上，压过格子），而本批所有换色证据一律是**属性读回**，
+没有一条新增像素捕获——读回值不等于像素，这条限制对上面每一句都成立。

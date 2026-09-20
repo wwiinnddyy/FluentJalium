@@ -183,13 +183,13 @@ public sealed class AstraComboBoxTests
                     "IsEnabled=False",                 },
                 combo.Select(static cell => cell.Condition));
 
-            AssertCell(combo, "SelectedIndex=-1", ("PART_SelectionPresenter", "Foreground", "ComboBoxPlaceHolderForeground"));
+            AssertCell(combo, "SelectedIndex=-1", ("self", "Foreground", "ComboBoxPlaceHolderForeground"));
             AssertCell(combo, "IsMouseOver=True",
                 ("PART_MainBorder", "Background", "ComboBoxBackgroundPointerOver"),
                 ("PART_MainBorder", "BorderBrush", "ComboBoxBorderBrushPointerOver"),
                 ("self", "Foreground", "ComboBoxForegroundPointerOver"));
             AssertCell(combo, "SelectedIndex=-1+IsMouseOver=True",
-                ("PART_SelectionPresenter", "Foreground", "ComboBoxPlaceHolderForegroundPointerOver"));
+                ("self", "Foreground", "ComboBoxPlaceHolderForegroundPointerOver"));
             AssertCell(combo, "IsEditable=True+IsMouseOver=True",
                 ("DropDownOverlay", "Background", "ComboBoxDropDownBackgroundPointerOver"));
             AssertCell(combo, "IsMouseCaptureWithin=True",
@@ -197,7 +197,7 @@ public sealed class AstraComboBoxTests
                 ("PART_MainBorder", "BorderBrush", "ComboBoxBorderBrushPressed"),
                 ("self", "Foreground", "ComboBoxForegroundPressed"));
             AssertCell(combo, "SelectedIndex=-1+IsMouseCaptureWithin=True",
-                ("PART_SelectionPresenter", "Foreground", "ComboBoxPlaceHolderForegroundPressed"));
+                ("self", "Foreground", "ComboBoxPlaceHolderForegroundPressed"));
             AssertCell(combo, "IsEditable=True+IsMouseCaptureWithin=True",
                 ("DropDownOverlay", "Background", "ComboBoxDropDownBackgroundPointerPressed"));
             AssertCell(combo, "IsKeyboardFocused=True",
@@ -205,7 +205,7 @@ public sealed class AstraComboBoxTests
                 ("self", "Foreground", "ComboBoxForegroundFocused"),
                 ("PART_ToggleButton", "Foreground", "ComboBoxDropDownGlyphForegroundFocused"));
             AssertCell(combo, "SelectedIndex=-1+IsKeyboardFocused=True",
-                ("PART_SelectionPresenter", "Foreground", "ComboBoxPlaceHolderForegroundFocused"));
+                ("self", "Foreground", "ComboBoxPlaceHolderForegroundFocused"));
             AssertCell(combo, "IsKeyboardFocused=True+IsMouseOver=True",
                 ("DropDownOverlay", "Background", "ComboBoxFocusedDropDownBackgroundPointerOver"));
             AssertCell(combo, "IsKeyboardFocused=True+IsMouseCaptureWithin=True",
@@ -213,7 +213,7 @@ public sealed class AstraComboBoxTests
                 ("PART_ToggleButton", "Foreground", "ComboBoxDropDownGlyphForegroundFocusedPressed"),
                 ("DropDownOverlay", "Background", "ComboBoxFocusedDropDownBackgroundPointerPressed"));
             AssertCell(combo, "SelectedIndex=-1+IsKeyboardFocused=True+IsMouseCaptureWithin=True",
-                ("PART_SelectionPresenter", "Foreground", "ComboBoxPlaceHolderForegroundFocusedPressed"));
+                ("self", "Foreground", "ComboBoxPlaceHolderForegroundFocusedPressed"));
             AssertCell(combo, "IsEditable=True",
                 ("DropDownOverlay", "Visibility", null),
                 ("PART_ToggleButton", "Foreground", "ComboBoxEditableDropDownGlyphForeground"));
@@ -241,36 +241,36 @@ public sealed class AstraComboBoxTests
             AssertCell(item, "IsMouseOver=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundPointerOver"),
                 ("LayoutRoot", "BorderBrush", "ComboBoxItemBorderBrushPointerOver"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundPointerOver"));
+                ("self", "Foreground", "ComboBoxItemForegroundPointerOver"));
             AssertCell(item, "IsHighlighted=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundPointerOver"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundPointerOver"));
+                ("self", "Foreground", "ComboBoxItemForegroundPointerOver"));
             AssertCell(item, "IsMouseCaptureWithin=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundPressed"),
                 ("LayoutRoot", "BorderBrush", "ComboBoxItemBorderBrushPressed"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundPressed"));
+                ("self", "Foreground", "ComboBoxItemForegroundPressed"));
             AssertCell(item, "IsSelected=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundSelected"),
                 ("LayoutRoot", "BorderBrush", "ComboBoxItemBorderBrushSelected"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundSelected"),
+                ("self", "Foreground", "ComboBoxItemForegroundSelected"),
                 ("Pill", "Opacity", null));
             AssertCell(item, "IsSelected=True+IsMouseOver=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundSelectedPointerOver"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundSelectedPointerOver"));
+                ("self", "Foreground", "ComboBoxItemForegroundSelectedPointerOver"));
             AssertCell(item, "IsSelected=True+IsHighlighted=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundSelectedPointerOver"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundSelectedPointerOver"));
+                ("self", "Foreground", "ComboBoxItemForegroundSelectedPointerOver"));
             AssertCell(item, "IsSelected=True+IsMouseCaptureWithin=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundSelectedPressed"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundSelectedPressed"));
+                ("self", "Foreground", "ComboBoxItemForegroundSelectedPressed"));
             AssertCell(item, "IsEnabled=False",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundDisabled"),
                 ("LayoutRoot", "BorderBrush", "ComboBoxItemBorderBrushDisabled"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundDisabled"));
+                ("self", "Foreground", "ComboBoxItemForegroundDisabled"));
             AssertCell(item, "IsEnabled=False+IsSelected=True",
                 ("LayoutRoot", "Background", "ComboBoxItemBackgroundSelectedDisabled"),
                 ("LayoutRoot", "BorderBrush", "ComboBoxItemBorderBrushSelectedDisabled"),
-                ("ContentPresenter", "Foreground", "ComboBoxItemForegroundSelectedDisabled"));
+                ("self", "Foreground", "ComboBoxItemForegroundSelectedDisabled"));
         });
     }
 
@@ -309,7 +309,7 @@ public sealed class AstraComboBoxTests
                 () => Assert.Same(Res("ComboBoxBackground"), Get(Part(combo, "PART_MainBorder"), "Background")),
                 () => Assert.Same(Res("ComboBoxDropDownGlyphForeground"), Get(Part(combo, "PART_ToggleButton"), "Foreground")),
                 () => Assert.Same(Res("ComboBoxForeground"),
-                    Part(combo, "PART_SelectionPresenter").GetValue(CellProperty(ComboTemplate(), "SelectedIndex=-1", "PART_SelectionPresenter", "Foreground"))),
+                    Part(combo, "PART_SelectionPresenter").GetValue(CellProperty(ComboTemplate(), "SelectedIndex=-1", "self", "Foreground"))),
                 () => Assert.Equal(new Thickness(11, 5, 38, 6), Get(Part(combo, "PART_EditableTextBox"), "Padding")),
                 () => Assert.Equal(new CornerRadius(7), Get(Part(combo, "HighlightBackground"), "CornerRadius")),
                 () => Assert.Equal(new Thickness(2), Get(Part(combo, "HighlightBackground"), "BorderThickness")),
@@ -437,7 +437,7 @@ public sealed class AstraComboBoxTests
     {
         _fixture.Run(() =>
         {
-            var foreground = CellProperty(ComboTemplate(), "SelectedIndex=-1", "PART_SelectionPresenter", "Foreground");
+            var foreground = CellProperty(ComboTemplate(), "SelectedIndex=-1", "self", "Foreground");
             var combo = Mount(new ComboBox { ItemsSource = new[] { "one", "two" }, PlaceholderText = "Pick one" });
             var presenter = Part(combo, "PART_SelectionPresenter");
 
@@ -533,7 +533,7 @@ public sealed class AstraComboBoxTests
             // directly and not the text of a mounted combo. Same shape as the mounted TextBox.Foreground
             // and the resting PasswordBox.Background (audits/textbox-passwordbox.md).
             Assert.NotSame(Res("ComboBoxForegroundDisabled"), combo.Foreground);
-            var presenterForeground = CellProperty(ComboTemplate(), "SelectedIndex=-1", "PART_SelectionPresenter", "Foreground");
+            var presenterForeground = CellProperty(ComboTemplate(), "SelectedIndex=-1", "self", "Foreground");
 
             // The dropped row, measured rather than assumed: the presenter carries no local value of its
             // own, so what it shows while disabled is the control's framework-written grey reaching it by
@@ -573,7 +573,7 @@ public sealed class AstraComboBoxTests
             PixelHarness.Build(item, 200, 32);
             var pill = Part(item, "Pill");
             var surface = Part(item, "LayoutRoot");
-            var foreground = CellProperty(ItemTemplate(), "IsMouseOver=True", "ContentPresenter", "Foreground");
+            var foreground = CellProperty(ItemTemplate(), "IsMouseOver=True", "self", "Foreground");
             var text = Part(item, "ContentPresenter");
             Assert.Multiple(
                 () => Assert.Equal(0d, (double)Get(pill, "Opacity")),
@@ -593,9 +593,14 @@ public sealed class AstraComboBoxTests
 
             item.IsEnabled = false;
             PixelHarness.Settle(20);
+            // #FFAEAEB2, not ComboBoxItemForegroundSelectedDisabled (#5C000000): a disabled control gets its text
+            // Foreground stamped as a local value by the framework, and a local value outranks every cell. The same
+            // reading is pinned in AstraForegroundRoutingTests; before the sweep this assert passed only because the
+            // cell it exercised was dead.
             Assert.Multiple(
                 () => Assert.Same(Res("ComboBoxItemBackgroundSelectedDisabled"), Get(surface, "Background")),
-                () => Assert.Same(Res("ComboBoxItemForegroundSelectedDisabled"), text.GetValue(foreground)));
+                () => Assert.Equal(Color.FromRgb(0xAE, 0xAE, 0xB2),
+                    ((SolidColorBrush)text.GetValue(foreground)!).Color));
         });
     }
 

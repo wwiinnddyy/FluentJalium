@@ -132,3 +132,13 @@ CommonStates 六格（287-346）**只写两样**：`BorderBackground` 的 Fill+O
 一致；不声称宿主级 disable 会把行压暗；不声称 `GridView` 已交付；不声称 `ListView.View` 的列头可用；
 不声称 `SelectedItems` 可用（ListBox 批量到的那条不继承到这里的断言，本批只按 `SelectedIndex` 与容器 `IsSelected`
 说话）；不声称 ListView 沾了 GridView 的光，也不声称 GridView 沾了 ListView 的光。
+
+## 更正（哑格批 2026-09-20，`adaptation/00` S1-f）
+
+§2/§3 里"上游 CommonStates 只写两样"的第二样（`ContentPresenter.Foreground`）在本运行时照抄即哑：
+`Styles/ListViews.jalxaml` 的 **5** 条字色格目标是一个 `ContentPresenter`，而该类型在本运行时没有
+`Foreground` 成员——字典照收、构建照绿、格子永不生效。修法与列表族同一条：5 条去掉 `TargetName`
+写到 `ListViewItem` 自己身上，标签由生成的 `TextBlock` 继承取到；行名与行值一字未动，键清单不变。
+不声称这 5 条改变了像素：这些状态字色除 disabled 全别名同一支 `TextFillColorPrimaryBrush`，换点读回相同；
+disabled 那一条另有框架在生成的文字上盖的本地值（`#FFAEAEB2`）挡在前面。
+闸口：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`。
