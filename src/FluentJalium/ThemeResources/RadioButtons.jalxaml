@@ -1,0 +1,18 @@
+<!-- WinUI 3 RadioButtons_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob efbc00b43e516636dcbe421bd5f5640a64c9260a. The control's whole token surface is five rows: two foreground
+     aliases inside the theme dictionaries (Light 4-7 and Default 8-11 are identical name-for-name and
+     target-for-target; HighContrast 12-15 re-points them at SystemControlForegroundBaseHighBrush and
+     SystemControlDisabledBaseMediumLowBrush) and three metrics outside them (:17-19). Counted inventory and what
+     this layer leaves out is docs/astra/audits/radio-buttons.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The two foreground rows alias the same palette instances the rest of the layer uses, so ApplyTheme and
+       ApplyAccent reach them and the HighContrast retint map re-points them the way it does every other token. -->
+  <StaticResource x:Key="RadioButtonsHeaderForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="RadioButtonsHeaderForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- RadioButtonsColumnSpacing (7) and RadioButtonsRowSpacing (8) are x:Double rows at :17-18 and this reader
+       cannot parse one at all - an x:Double row destroys its whole dictionary - so they are the defaults of the
+       two properties on Controls/Layout/FluentRadioButtonsPanel.cs, named after them, rather than published rows.
+       Both names are held out of the published set by the gate in AstraRadioButtonsTests.
+       RadioButtonsTopHeaderMargin is a real Thickness upstream, so it is transcribed as one. -->
+  <Thickness x:Key="RadioButtonsTopHeaderMargin">0,0,0,8</Thickness>
+</ResourceDictionary>

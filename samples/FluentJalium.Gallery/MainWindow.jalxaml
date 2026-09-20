@@ -289,6 +289,14 @@
                   <RadioButton x:Name="CompactRadio" Content="Compact" GroupName="GalleryDensity" Style="{StaticResource DefaultRadioButtonStyle}" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Radio button list" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="A header, generated radios, and a column count the layout reads back off the control: nothing here sets a style on the rows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                  <fluent:FluentRadioButtons x:Name="TransportChoices" Header="Transport" Margin="0,0,0,12" />
+                  <CheckBox x:Name="TransportTwoColumns" Content="Two columns" IsChecked="True" />
+                </StackPanel>
+              </Border>
               <TextBlock Text="Combo boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel Margin="16">

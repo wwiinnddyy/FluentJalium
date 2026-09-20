@@ -19,6 +19,7 @@ ThemeResources/MenuBar.jalxaml
 ThemeResources/AppBar.jalxaml
 ThemeResources/CheckBox.jalxaml
 ThemeResources/RadioButton.jalxaml
+ThemeResources/RadioButtons.jalxaml
 ThemeResources/TextBox.jalxaml
 ThemeResources/NumberBox.jalxaml
 ThemeResources/Slider.jalxaml
@@ -42,6 +43,8 @@ Styles/AutoSuggestBox.jalxaml
 Styles/Selection.jalxaml
 Styles/ListBoxes.jalxaml
 Styles/ListViews.jalxaml
+# The radio-button list: its panel and spacing come from code, its two foreground rows and its header margin do not.
+Styles/RadioButtons.jalxaml
 Styles/TreeViews.jalxaml
 Styles/Navigation.jalxaml
 Styles/Surfaces.jalxaml

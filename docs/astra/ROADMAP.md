@@ -1213,3 +1213,55 @@ HighContrast 101 映射键，三行 `checked=True`；`All Astra gates passed.`
 `AstraMenuTests.cs` CS8604/8602/8600 共 8 条、`AstraTreeDataGridTests.cs` CS8604 4 条、
 `AstraDataGridTests.cs` CS8604/8602/8600 共 6 条（后两个文件是本仓前两段自己写的，那 10 条是我们的账），
 `AstraNavigationTests.cs` **0 条**。清警批与"警告数必须先确认它真编译过"这条读数纪律一起记进任务 #41。
+
+**阶段 5 第八段（RadioButtons：撤掉一条挡住自造条目宿主的旧纪律，2026-09-20）**：
+
+- 开工前先量底座，而不是先写控件。`adaptation/09` 从"裸 `ItemsControl` 上屏后 UI 线程 60 秒不回应"
+  读出机制＝"`Template` 为 null ⇒ 框架走进不产出帧的路径"，并立了纪律"自造条目宿主不要继承 ItemsControl"——
+  这条纪律一直在把 `BreadcrumbBar`/`RadioButtons`/`PipsPager` 往"手写命名面板塞子元素"上推。
+  `spike/ItemHostProbe` 三处读数把它拆开：同形状挂载 **4 帧返回**、无模板也有回退条目宿主
+  （`UsesFallbackItemsHost`/`ItemsHostInternal` 在属性面里读得到，`ContentPresenter×3` 真在树里）、
+  `RenderTargetBitmap.Render` 计时 0.03s/0.00s 两侧都不是成本。剩下的解释是 `PixelHarness.cs:259-268`
+  自己记着的看门狗缺陷（静态场景不发 `Rendering`，释放被排到没人泵的线程池 dispatcher 上）。
+  **那是 harness 的 bug，不是 `ItemsControl` 的性质**；纪律撤销，原文与读数在 `adaptation/09`，
+  转录在 `adaptation/s1l-itemhost-raw.txt`，能力行记进 `adaptation/00` S1-l。
+- 量出来的正面通路：`GetContainerForItemOverride`/`IsItemItsOwnContainerOverride`/
+  `PrepareContainerForItemOverride` 等在 26.10.9 里是 **protected/virtual**（签名同 WPF），
+  我们的模板（`Border > ItemsPresenter`）本地值与 `Style` 的 `Template` setter 两条路都跑得通，
+  `ItemsPanel` 赋值换面板有效（`WrapPanel` 按内容宽换行、`UniformGrid Columns=4` 每格正好 105x80）。
+  `FluentRadioButtons : ItemsControl` 因此是本库**第一个**继承 ItemsControl 的类型。
+- 上游与选型：`RadioButtons : Control`（`RadioButtons.idl:9`）不是 ItemsControl，条目由 repeater 的
+  element factory 造真 `RadioButton`（`RadioButtonsElementFactory.cpp:49-87`）——本层用 ItemsControl 的
+  容器覆写走同一条机制，不是"退而求其次"。整个键面只有 5 行：2 条前景别名（Light 与 Default 逐行相同，
+  HC 两条重指 `SystemControl*`）+ 3 条度量，其中只有 `RadioButtonsTopHeaderMargin` 是 Thickness 能发布，
+  两条 x:Double 间距落到面板属性默认值。全表与逐条去处见 `audits/radio-buttons.md` §1-§2。
+- 一处**必须由断言撑着**的推断：条目面板要拿到 `MaxColumns`，上游靠模板绑定，本层
+  `ItemsPanelTemplate` 只携带 `PanelType`——`FrameworkElementFactory` 那个构造器**只抄 `root.Type`、
+  丢掉全部 SetValue**（源码 `DataTemplateSelector.cs`），所以列数只能由面板自己找宿主。
+  第一版只读 `TemplatedParent`，实测条目全挤在 X=100 一列（静默退化，除位置断言外谁也抓不到），
+  改走公开的 `Parent` 链（框架自己在 `ItemsPresenter.cs:168` 也是这么走的）才通过。
+  `MaxColumns_reaches_the_layout_and_fills_the_first_column_before_the_second` 用
+  `TranslatePoint` 读回位置钉死两件事：确实分了三列，且是先填满第一列。
+- 另一条读数纪律的实例：探针里生成的 `RadioButton` 容器 `Style` 读回 **null**，但树里
+  `#RadioRing/#RadioDot/#RadioLabel` 全是我们阶段 3 的部件、颜色是调色板实例——
+  框架给原生类型解析隐式样式时不写 `Style` 属性。**判据是建出来的树，不是 `Style` 的读回值**，
+  所以本批第一条断言在部件上而不是在样式对象上。
+- 视觉判据差点选错：Dark 下圆点填的就是标签那支白，勾选时该色键**少了 165 个像素**，
+  真正长出来的是勾选环的强调色（+216）。像素断言改成盯勾选环那一支的单色键增量。
+- 并行任务 #41 一并结掉：测试工程 24 条警告清零（8 处 `ColorOf(Brush)` 改可空参数并保留响亮断言、
+  两处 `Walk` 收可空节点、`HostOf`/`TextsIn` 同理、`AstraContentDialogTests` 三处按钮文本改用
+  `SetValue(...TextProperty, …)` 因为 null 是有意义的值、两处 xUnit 分析器改 `Assert.DoesNotContain`）。
+  这一版是**真重编**后的 0 警告，不是第七段那种增量构建的读数；`git ls-files --eol` 顺带纠正了一个口径：
+  本仓测试 `.cs` 是 LF（30 个里 28 个），不是 ModernWpf 那条 CRLF 规则说的 C# 一律 CRLF。
+- 视觉/Gallery：Selection 页新增"Radio button list"卡片（6 条字符串条目、表头、两列开关），
+  `Catalog.json` 加 `FluentJalium.Controls.FluentRadioButtons`（`own-type`，gaps 按 §5 重写）；
+  `Test-AstraGallerySmoke.ps1 -Page selection` 10.3 秒干净关窗。
+
+不声称：勾选全部由写 `IsChecked` 驱动，**零真指针/键盘/触摸帧**；方向键跨行导航一次没测；
+面板取全局最大格子且不做虚拟化（上游按列取最大且可虚拟化）；两条间距不是主题行，应用侧覆盖不到资源键；
+高对比一次没量；`HeaderTemplateSelector`/`ContainerContentChanging` 这类上游公开面本层没有。
+
+**闸口读数（第八段，串行 `tools/Test-AstraGates.ps1`，exit 0）**：restore 全部最新；Debug 构建
+**0 条警告 / 0 错误**（真重编，非增量）；整套顺序跑 **1137/1137 通过、0 失败、0 跳过**（6 m 47 s；
+比第七段 1120 多 17 条 ＝ 新控件 16 条 + 资源键闸口那条字典行的 +1）；调色板漂移 Light 83 源色 / 101 刷、
+Dark 同、HighContrast 101 映射键，三行 `checked=True`；`All Astra gates passed.`

@@ -1656,3 +1656,34 @@ DataGrid 落地时表格一个字的像素都没有：`cell.Content` 是控制�
 修法不是加裁剪而是**不呈现内容**（上游 WPF Fluent 的行头也只画"当前行"记号，而本运行时不暴露那个读数），
 `DataGridRowHeaderForeground` 随之失去消费者、撤出别名表并进"不发布"闸口；
 Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_carries_the_item_but_draws_no_text_of_its_own`。
+
+## S1-l：条目管线是可继承的基面——`ItemsControl` 的覆写面是 protected、模板与面板都能换（阶段 5 收尾段选型，2026-09-20）
+
+`spike/ItemHostProbe`（mode `census`/`api`/`mount`/`panel`/`capture`，读数转录在 `s1l-itemhost-raw.txt`）。
+这一段是阶段 5 收尾批（GridView 判断 + BreadcrumbBar/RadioButtons/PipsPager）的选型输入，
+同时**撤回了 `adaptation/09` 的一条纪律**。
+
+1. **换我们的模板：两条路都通**。把 `Border #ProbeHostRoot > ItemsPresenter #ProbeItems` 的
+   `ControlTemplate` 交给 `ItemsControl`——本地值一次、`Style` 的 `Template` setter 一次——
+   两次都在 10 帧内读到同一棵树：`Border > ItemsPresenter > StackPanel > ContentPresenter×3 > TextBlock×3`，
+   每项 `420x19.78`。也就是说条目宿主这一层和 ListBox/TabView 那些层的区别只在"框架有没有默认模板"，
+   不在"能不能被重模板"（S1-i 第 9 条的逐层判据在这里第三次复现）。
+2. **容器生成可以继承**：`GetContainerForItemOverride()`、`IsItemItsOwnContainerOverride(Object)`、
+   `PrepareContainerForItemOverride(DependencyObject, Object)`、`ClearContainerForItemOverride(...)`、
+   `GetContainerForItem(Object)` 反射读出的属性位全是 **protected/virtual**，签名与 WPF 一致。
+   `ItemContainerStyle`/`ItemTemplate`/`ItemsPanel`/`AlternationCount` 等是 public。
+   → 自造条目宿主不必再手写"把子元素塞进命名面板"。
+3. **面板能换，版式就不用自造**：`ItemsPanel` 赋 `ItemsPanelTemplate` 后 8 帧读到
+   `WrapPanel` → 条目按内容宽换行（每项 `68.36x40.78`）、`UniformGrid Columns=4` → 每项正好 `105x80`
+   （420/4、160/2）、横向 `StackPanel` → `68.36x160`。换行/网格这类版式是面板赋值，不是控件类型。
+4. **运行时的 `GridView` 不是 WinUI 的 `GridView`**：它是 `GridView : ViewBase`，同族 14 个导出类型全是
+   WPF 的视图装饰器（`GridViewColumn`/`GridViewColumnHeader`/`GridViewRowPresenter(Base)`+peers），
+   `GridViewRow`、`GridViewItem` 各 0 命中；`ListView` 声明的唯一 DP 就是 `View`。
+   `BreadcrumbBar`/`PipsPager`/`RadioButtons`/`ItemsRepeater`/`CardAction` 五个名字 0 命中。
+5. **撤回**：`adaptation/09` 说裸 `ItemsControl`（`Template` 为 null）会"让 UI 线程 60 秒不回应"，
+   机制读成"框架走进了不产出帧的路径"，并据此禁止自造控件继承 `ItemsControl`。本轮同一形状挂载
+   **4 帧返回**，且树里实实在在有回退条目宿主生成的 3 个容器（属性面也读得到 `UsesFallbackItemsHost`、
+   `ItemsHostInternal`）；`RenderTargetBitmap.Render` 计时 `ListBox` 0.03s、裸 `ItemsControl` 0.00s，
+   捕获侧也不是成本。剩下的解释就是 `PixelHarness.cs:259-268` 自己记下的那条 harness 缺陷：
+   静态场景不发 `CompositionTarget.Rendering`，而当年的看门狗把释放排到了没人泵的线程池 dispatcher 上。
+   **那是 harness 的 bug，不是 `ItemsControl` 的性质**；纪律撤销，原始三处读数与强度写在 `adaptation/09`。

@@ -1,4 +1,4 @@
-{
+﻿{
   "note": "One file, two consumers: the Gallery renders its parity strip from it, and tests/FluentJalium.Tests/Gallery/AstraGalleryCatalogTests.cs fails when it stops matching the styles Astra actually ships. Scope is the implicit-style universe - every TargetType a product dictionary restyles without an x:Key - because that is the set an app inherits silently.",
   "parityLegend": {
     "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion. Whatever is missing is named in gaps.",
@@ -145,6 +145,14 @@
       "parity": "audited",
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
       "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen", "label rows are written on the control, not the presenter (adaptation/00 S1-f), and a disabled dot's label keeps the framework's own local grey rather than RadioButtonForegroundDisabled" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentRadioButtons",
+      "source": "Styles/RadioButtons.jalxaml",
+      "page": "selection",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/radio-buttons.md", "docs/astra/adaptation/s1l-itemhost-raw.txt", "tests/FluentJalium.Tests/AstraRadioButtonsTests.cs", "spike/ItemHostProbe/Program.cs" ],
+      "gaps": [ "no real pointer, keyboard or touch reaches a generated row: the choice is driven by writing IsChecked, which is the state a click leaves behind rather than the click", "the header's colour is written on the control and inherited, because a ContentPresenter here declares no Foreground (adaptation/00 S1-f)", "upstream fills each column to the largest item in that column and virtualises; this panel makes every cell the size of the largest item overall and realizes every row", "RadioButtonsColumnSpacing and RadioButtonsRowSpacing are the panel's own defaults rather than published rows, because an x:Double row cannot be read here", "no HeaderTemplateSelector, no ItemContainerStyle override surface and no ContainerContentChanging event upstream has", "arrow-key navigation across the generated rows is the framework's RadioButton group behavior and is unmeasured" ]
     },
     {
       "markup": "ComboBox",
