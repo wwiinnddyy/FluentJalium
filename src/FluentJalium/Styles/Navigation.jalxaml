@@ -1,17 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Source baseline: microsoft-ui-xaml 19e3bdc3c, NavigationView_themeresources.xaml.
-     The flat left pane uses a single shared selection indicator outside item clips. -->
+<!-- Source baseline: microsoft-ui-xaml 19e3bdc3c, NavigationView_themeresources.xaml (blob aa3ff11b2) plus the
+     left-pane presenter style in the same file (:440-500) and NavigationView.xaml's pane layout.
+     The flat left pane uses a single shared selection indicator outside item clips.
+     Every colour on the item is a NavigationViewItem* name from ThemeResources/NavigationView.jalxaml, not a
+     palette token read directly: the pixels were already right, but a name that is not published cannot be
+     overridden, which is the whole point of the token layer (docs/astra/audits/navigation.md §1). -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- The pane toggle keeps the generic subtle rows. Upstream's six NavigationViewButton* names are not this
+       button's: they are read by NavigationBackButton.xaml:26-52, and this control builds no back button, so
+       publishing them here would name a surface nobody draws (audits/navigation.md §2). -->
   <Style x:Key="FluentNavigationPaneToggleButtonStyle" TargetType="Button">
+    <!-- PaneToggleButtonWidth=40 / PaneToggleButtonHeight=36 are upstream's own numbers, but x:Double rows are
+         unparseable in this reader, so the pair rides as literals. -->
     <Setter Property="Width" Value="40" />
     <Setter Property="Height" Value="36" />
     <Setter Property="MinWidth" Value="40" />
     <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="CornerRadius" Value="{StaticResource ControlCornerRadius}" />
     <Setter Property="Template">
@@ -36,7 +45,7 @@
             <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
           </Trigger>
           <Trigger Property="IsEnabled" Value="False">
-            <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundDisabled}" />
           </Trigger>
           <Trigger Property="IsKeyboardFocused" Value="True">
             <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
@@ -51,13 +60,18 @@
 
   <Style x:Key="FluentNavigationItemStyle" TargetType="local:FluentNavigationItem">
     <Setter Property="MinWidth" Value="0" />
+    <!-- NavigationViewItemOnLeftMinHeight is an x:Double row (:217), so the 36 rides as a literal. -->
     <Setter Property="MinHeight" Value="36" />
-    <Setter Property="Margin" Value="4,2" />
+    <Setter Property="Margin" Value="{ThemeResource NavigationViewItemButtonMargin}" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="Background" Value="{ThemeResource SubtleFillColorTransparentBrush}" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource NavigationViewItemBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
     <Setter Property="BorderThickness" Value="0" />
-    <Setter Property="CornerRadius" Value="{StaticResource NavigationViewItemCornerRadius}" />
+    <!-- Upstream's left-pane presenter sets this to OverlayCornerRadius (:447), not to a navigation-specific row:
+         the name NavigationViewItemCornerRadius this style used to read does not exist anywhere in
+         microsoft-ui-xaml (git grep at 19e3bdc3c: 0 hits), and its 4 was ControlCornerRadius's value wearing a
+         navigation name. audits/navigation.md §3 is the withdrawal. -->
+    <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
     <Setter Property="FontSize" Value="14" />
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -70,6 +84,8 @@
                   TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
             <Grid>
               <Grid.ColumnDefinitions>
+                <!-- NavigationViewIconBoxWidth (40) and NavigationViewItemOnLeftIconBoxHeight (16) are x:Double
+                     rows (:209, :219); both values ride as literals on the column and the icon. -->
                 <ColumnDefinition Width="40" />
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
@@ -98,25 +114,40 @@
           </Border>
         </Grid>
         <ControlTemplate.Triggers>
+          <!-- Order is the state map: the single-state rows first, then the pairs that qualify them, so a
+               selected-and-hovered row wins over a merely hovered one. Upstream's own pointer-over/pressed
+               setters inside MUX_NavigationViewItemPresenterStyleWhenOnLeftPane (:459-470) are the same
+               precedence expressed in a VisualStateGroup. -->
           <Trigger Property="IsCompact" Value="True">
             <Setter TargetName="PART_Label" Property="Visibility" Value="Collapsed" />
           </Trigger>
           <Trigger Property="IsSelected" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundSelected}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundSelected}" />
           </Trigger>
           <Trigger Property="IsMouseOver" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundPointerOver}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundPointerOver}" />
           </Trigger>
           <Trigger Property="IsPressed" Value="True">
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundPressed}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundPressed}" />
           </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundDisabled}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundDisabled}" />
+          </Trigger>
+          <!-- The two rows that are not a blend of their singles: pressing a selected item steps the fill BACK
+               up to Secondary and the text down to Secondary, which is why upstream carries a name per pair
+               instead of compositing. -->
           <MultiTrigger>
             <MultiTrigger.Conditions>
               <Condition Property="IsSelected" Value="True" />
               <Condition Property="IsMouseOver" Value="True" />
               <Condition Property="IsEnabled" Value="True" />
             </MultiTrigger.Conditions>
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundSelectedPointerOver}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundSelectedPointerOver}" />
           </MultiTrigger>
           <MultiTrigger>
             <MultiTrigger.Conditions>
@@ -124,11 +155,17 @@
               <Condition Property="IsPressed" Value="True" />
               <Condition Property="IsEnabled" Value="True" />
             </MultiTrigger.Conditions>
-            <Setter TargetName="Root" Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundSelectedPressed}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundSelectedPressed}" />
           </MultiTrigger>
-          <Trigger Property="IsEnabled" Value="False">
-            <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
-          </Trigger>
+          <MultiTrigger>
+            <MultiTrigger.Conditions>
+              <Condition Property="IsSelected" Value="True" />
+              <Condition Property="IsEnabled" Value="False" />
+            </MultiTrigger.Conditions>
+            <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundSelectedDisabled}" />
+            <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundSelectedDisabled}" />
+          </MultiTrigger>
           <Trigger Property="IsKeyboardFocused" Value="True">
             <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
           </Trigger>
@@ -141,19 +178,23 @@
   </Style>
 
   <Style x:Key="FluentNavigationViewStyle" TargetType="local:FluentNavigationView">
-    <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+    <Setter Property="Background" Value="{ThemeResource NavigationViewContentBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
     <Setter Property="Padding" Value="24" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Focusable" Value="False" />
     <Setter Property="Template">
       <ControlTemplate TargetType="local:FluentNavigationView">
+        <!-- The pane's own surface. Upstream asks for NavigationViewDefaultPaneBackground, which is
+             AcrylicInAppFillColorDefaultBrush - a backdrop material this library has not characterised yet, so
+             the pane sits on the base solid and the difference is recorded as owed (audits/navigation.md §4). -->
         <Grid Background="{ThemeResource SolidBackgroundFillColorBaseBrush}">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
+          <!-- 240 is OpenPaneLength's default on the control, not a row upstream publishes. -->
           <Border Name="PART_PaneRoot" Width="240" ClipToBounds="True"
                   TransitionProperty="Width" TransitionDuration="0:0:0.200" TransitionTimingFunction="Recommended">
             <Grid Margin="0,8">
@@ -175,13 +216,17 @@
               </ScrollViewer>
               <StackPanel Name="PART_FooterMenuItems" Grid.Row="2" Margin="0,12,0,0" />
               <Canvas Name="PART_IndicatorLayer" Grid.RowSpan="3" IsHitTestVisible="False" Focusable="False" ClipToBounds="True">
+                <!-- The pill's geometry is upstream's (:602 reads three x:Double rows for it - Width 3, Height 16,
+                     Radius 2) and all three ride as literals because this reader cannot parse an x:Double resource.
+                     Height 16 is duplicated on the code side as NavigationIndicatorAnimator.RestingHeight, which is
+                     what centres the pill against a 36-DIP row; AstraNavigationTests pins the two to each other. -->
                 <Border Name="PART_SelectionIndicator" Width="3" Height="16" CornerRadius="2" Opacity="0"
-                        Background="{ThemeResource AccentFillColorDefaultBrush}" IsHitTestVisible="False" Focusable="False" />
+                        Background="{ThemeResource NavigationViewSelectionIndicatorForeground}" IsHitTestVisible="False" Focusable="False" />
               </Canvas>
             </Grid>
           </Border>
           <Border Grid.Column="1" Margin="0,8,8,8" Background="{TemplateBinding Background}"
-                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                  BorderBrush="{ThemeResource NavigationViewContentGridBorderBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
             <ContentPresenter Name="PART_ContentPresenter" Margin="{TemplateBinding Padding}"
                               Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />

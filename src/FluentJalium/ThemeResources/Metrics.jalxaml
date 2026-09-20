@@ -8,12 +8,14 @@
      upstream row that nothing read yet - an idle name only looks overridable. All three come back with the
      batch that consumes them; ThemeResources/Metrics.jalxaml is now held to the same key-consumption gate as
      the per-control dictionaries, so a row cannot sit here unused again.
-     NavigationViewItemCornerRadius stays and is still owed: our NavigationView template reads it, but no
-     upstream row carries that name, so the NavigationView batch has to settle what upstream actually uses
-     there (docs/astra/audits, task list) rather than leave our own name in the public key list. -->
+     NavigationViewItemCornerRadius is now gone too, and for the opposite reason: it was never idle, our template
+     read it every day - it was a name upstream does not have. microsoft-ui-xaml @19e3bdc3c carries zero hits for
+     it, and the left-pane presenter sets CornerRadius to OverlayCornerRadius instead (NavigationView_themeresources
+     .xaml:447, blob aa3ff11b2), so the row was ControlCornerRadius's value wearing a navigation name and the pane
+     items were 4 DIP round where WinUI draws 8. Styles/Navigation.jalxaml now reads OverlayCornerRadius;
+     docs/astra/audits/navigation.md §3 records the withdrawal and the pixel reading that followed it. -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
   <CornerRadius x:Key="OverlayCornerRadius">8</CornerRadius>
-  <CornerRadius x:Key="NavigationViewItemCornerRadius">4</CornerRadius>
   <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
 </ResourceDictionary>

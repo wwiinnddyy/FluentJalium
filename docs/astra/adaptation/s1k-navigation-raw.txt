@@ -1,0 +1,84 @@
+s1k - NavigationView 批的原始读数（2026-09-20，阶段 5 第七段）
+每一条都是从命令输出里抄下来的，不是从文档里推出来的。上游是只读引用仓库，本文件只记录读数。
+
+========================================================================
+[A] 上游键清单计数：NavigationView_themeresources.xaml
+    commit 19e3bdc3ccf3361393d623d3a5d2667cb8f33229
+    blob   aa3ff11b2c3128dd198d7140417594cfa6fe5c74
+    方法：数 x:Key= 的出现次数；Light/Default 的比较是把 (name -> target) 做成排序后的多重集再比。
+========================================================================
+Default 64 Light 64 HC 64
+same name set D/L: True D/H: True
+D==L as multiset: True          # 同名且同目标
+diffs D vs L: []
+SolidColorBrush rows in D: 0    # 64 条全是 StaticResource 别名
+metric rows 63 Counter({'Thickness': 40, 'x': 20, 'CornerRadius': 3})
+                                  # 20 条 x:Double 在本 reader 里是"整份字典炸掉"，故只能字面量
+
+本批发布的 19 条别名逐名核对（"pub names not upstream" 必须是空表 = 0 个自造名）：
+total 64 published 19 withheld 45
+pub names not upstream: []
+
+========================================================================
+[B] 自造名结清：NavigationViewItemCornerRadius
+========================================================================
+$ git grep -c "NavigationViewItemCornerRadius" 19e3bdc3ccf3361393d623d3a5d2667cb8f33229
+（无输出 = 整个仓库 0 命中）
+
+$ grep -n 'CornerRadius' controls/dev/NavigationView/NavigationView_themeresources.xaml | 相关三行
+283:    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />      # top 条目
+447:    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />      # 左栏条目 ← 本控件对应的这一条
+645:    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />      # 设置按钮
+
+本库撤掉的那行（ThemeResources/Metrics.jalxaml）：
+17:  <CornerRadius x:Key="NavigationViewItemCornerRadius">4</CornerRadius>
+值 4 == ControlCornerRadius；上游左栏用的是 OverlayCornerRadius == 8。
+
+方法权威 ModernWpf 同一条：
+ModernWpf.Controls/NavigationView/NavigationView.xaml:176:
+        <Setter Property="CornerRadius" Value="{DynamicResource OverlayCornerRadius}" />
+ModernWpf/ThemeResources/{Light,Dark,HighContrast}.xaml 各 52 条 NavigationView* 行；三条指示条度量行它没发（写死在模板里）。
+
+========================================================================
+[C] 像素：选中行相对未选中的单色键增量（Light 主题，Astra 默认强调色）
+    路由：PixelHarness.Host（整窗合成，保留 alpha）；同一元素两次 Host，一次选中一次取消。
+    第一次量到的是"整张直方图差值"，两次运行不一致，故改成单色键增量（见 [D]）。
+    下面两条读数都是把阈值临时抬到 999999 逼出来的失败信息，两种跑法各一次。
+========================================================================
+$ dotnet test ... --filter FullyQualifiedName~AstraNavigationTests   # 整类顺序跑
+selecting added 8220 pixels of the pill colour;
+  selected #F3F3F3x113061 #F9F9F9x60244 #000000x41728 #EAEAEAx8220
+  resting  #F3F3F3x121373 #F9F9F9x60244 #000000x41728 #E5E5E5x1056
+
+$ dotnet test ... --filter FullyQualifiedName~Selecting_a_pane_item   # 单独跑同一条
+selecting added 7993 pixels of the pill colour;
+  selected #F3F3F3x112615 #F9F9F9x59714 #000000x31429 #EAEAEAx7993
+  resting  #F3F3F3x121373 #F9F9F9x60244 #000000x41728 #E5E5E5x1056
+
+#EAEAEA = SubtleFillColorSecondary(#0A000000, 5.54%) 叠在 pane 的 #F3F3F3 上；
+条目 232x36 = 8352 px，pill 两次量到 8220 / 7993 px（差的是 8 DIP 外边距与圆角切掉的角），
+resting 那两张图里这个色键都是 0 px（它们各自的 #E5E5E5 1056 px 是别的面板的边）。
+断言阈值取 6000——低于两次读数里较低的那次，不是先猜再套。品牌绿 #207245 在 selected 两张图里都 0 px。
+
+========================================================================
+[D] 两条 harness 读数（都是这一批里撞出来的，写进 adaptation/06）
+========================================================================
+1) Host() 与 Build() 的父级互斥：
+   System.InvalidOperationException : The logical child already has a parent
+   (child: FluentNavigationView, current parent: Grid, attempted parent: Window).
+   PixelHarness.Host 把主体塞进它自己的窗口，走过 Build()（挂在 Grid 里）的元素不能再交给 Host()。
+
+2) 第一次 Host() 的读数与后续不同源。同一对"选中前/选中后"的捕获：
+   单独跑这一条测试：changed = 30054 px（before #000000x31429 / after #000000x41728）
+   整类顺序跑：      changed = 16624 px（before 已经带 #000000x41728 与 #E5E5E5x1056）
+   差在窗体背衬与上一位主体留下的像素要在第一次捕获之间才稳定。
+   => 直方图整张差值不可当判据；要跨捕获比，只能比"某个色键的增量"。
+
+========================================================================
+[E] 本批测试的两段读数
+========================================================================
+$ dotnet test ... --filter FullyQualifiedName~AstraNavigationTests
+已通过! - 失败: 0，通过: 78，已跳过: 0，总计: 78，持续时间: 5 s - FluentJalium.Tests.dll (net10.0)
+
+$ dotnet test ... --filter FullyQualifiedName~Selecting_a_pane_item     # 单独跑也绿（顺序无关）
+已通过! - 失败: 0，通过: 1，已跳过: 0，总计: 1，持续时间: 1 s - FluentJalium.Tests.dll (net10.0)

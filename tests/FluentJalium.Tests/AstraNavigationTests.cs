@@ -1,8 +1,10 @@
 using FluentJalium.Controls;
+using FluentJalium.Motion;
 using FluentJalium.Tests.Pixel;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Media;
 
 namespace FluentJalium.Tests;
 
@@ -128,4 +130,265 @@ public sealed class AstraNavigationTests
                 () => Assert.True(text.ActualHeight < 30d, $"the label took {text.ActualHeight:0.#} DIP, more than one line"));
         });
     }
+
+    // ---------- the token layer: docs/astra/audits/navigation.md §1-§3 ----------
+
+    /// <summary>
+    /// Before this batch the pane drew the right colours by reading the palette directly, so there was no
+    /// NavigationViewItem* name an application could override. These are upstream's names, and every one of
+    /// them has a reader in Styles/Navigation.jalxaml - which is also what the consumption gate in
+    /// Resources/AstraResourceKeyTests.cs holds the dictionary to.
+    /// </summary>
+    [Theory]
+    [InlineData("NavigationViewItemBackground")]
+    [InlineData("NavigationViewItemBackgroundPointerOver")]
+    [InlineData("NavigationViewItemBackgroundPressed")]
+    [InlineData("NavigationViewItemBackgroundDisabled")]
+    [InlineData("NavigationViewItemBackgroundSelected")]
+    [InlineData("NavigationViewItemBackgroundSelectedPointerOver")]
+    [InlineData("NavigationViewItemBackgroundSelectedPressed")]
+    [InlineData("NavigationViewItemBackgroundSelectedDisabled")]
+    [InlineData("NavigationViewItemForeground")]
+    [InlineData("NavigationViewItemForegroundPointerOver")]
+    [InlineData("NavigationViewItemForegroundPressed")]
+    [InlineData("NavigationViewItemForegroundDisabled")]
+    [InlineData("NavigationViewItemForegroundSelected")]
+    [InlineData("NavigationViewItemForegroundSelectedPointerOver")]
+    [InlineData("NavigationViewItemForegroundSelectedPressed")]
+    [InlineData("NavigationViewItemForegroundSelectedDisabled")]
+    [InlineData("NavigationViewContentBackground")]
+    [InlineData("NavigationViewContentGridBorderBrush")]
+    [InlineData("NavigationViewSelectionIndicatorForeground")]
+    [InlineData("NavigationViewItemButtonMargin")]
+    public void Every_navigation_row_the_pane_reads_is_published(string key)
+    {
+        _fixture.Run(() => Assert.NotNull(Application.Current!.TryFindResource(key)));
+    }
+
+    /// <summary>
+    /// An alias, not a copy: the row must resolve to the very brush instance the palette retints, or a theme
+    /// switch or an <c>ApplyAccent</c> would move the token and leave the navigation row behind. This is the
+    /// same identity the FrameworkRetints layer is held to for the same reason.
+    /// </summary>
+    [Fact]
+    public void The_navigation_rows_alias_one_brush_rather_than_copying_it()
+    {
+        _fixture.Run(() => Assert.Multiple(
+            () => Assert.Same(Brush("SubtleFillColorTransparentBrush"), Brush("NavigationViewItemBackground")),
+            () => Assert.Same(Brush("SubtleFillColorSecondaryBrush"), Brush("NavigationViewItemBackgroundSelected")),
+            () => Assert.Same(Brush("SubtleFillColorTertiaryBrush"), Brush("NavigationViewItemBackgroundPressed")),
+            () => Assert.Same(Brush("TextFillColorSecondaryBrush"), Brush("NavigationViewItemForegroundPressed")),
+            () => Assert.Same(Brush("TextFillColorDisabledBrush"), Brush("NavigationViewItemForegroundDisabled")),
+            () => Assert.Same(Brush("AccentFillColorDefaultBrush"), Brush("NavigationViewSelectionIndicatorForeground")),
+            () => Assert.Same(Brush("CardStrokeColorDefaultBrush"), Brush("NavigationViewContentGridBorderBrush")),
+            () => Assert.Same(Brush("LayerFillColorDefaultBrush"), Brush("NavigationViewContentBackground"))));
+    }
+
+    /// <summary>
+    /// The row this batch exists to settle. <c>NavigationViewItemCornerRadius</c> was in the public key list with
+    /// a value of 4, and microsoft-ui-xaml carries no such row: the left-pane presenter sets
+    /// CornerRadius to OverlayCornerRadius (NavigationView_themeresources.xaml:447), which is 8. So the name was
+    /// ControlCornerRadius's value wearing a navigation name, and the pill it rounds was 4 DIP round where WinUI
+    /// draws 8. Both halves are asserted: the row the pane now reads, and the fake name staying unpublished.
+    /// </summary>
+    [Fact]
+    public void The_pane_item_is_rounded_at_the_radius_upstream_uses()
+    {
+        _fixture.Run(() =>
+        {
+            _ = Pane(out var item);
+            var root = (Border)PixelHarness.Named(item, "Root")!;
+            Assert.Multiple(
+                () => Assert.Equal(CornerRadius("OverlayCornerRadius"), item.CornerRadius),
+                () => Assert.Equal(CornerRadius("OverlayCornerRadius"), root.CornerRadius),
+                () => Assert.True(item.CornerRadius != CornerRadius("ControlCornerRadius"),
+                    "the pane item is back on the 4 DIP control radius"),
+                () => Assert.Null(Application.Current!.TryFindResource("NavigationViewItemCornerRadius")));
+        });
+    }
+
+    /// <summary>
+    /// The one metric row this layer can carry at all (upstream's other metric rows are x:Double, which the
+    /// reader cannot parse) - asserted where it lands, not just where it is declared: 4,2 is what leaves the
+    /// item 8 DIP narrower than the pane, which the compact-mode test above depends on.
+    /// </summary>
+    [Fact]
+    public void The_item_margin_row_reaches_the_item()
+    {
+        _fixture.Run(() =>
+        {
+            _ = Pane(out var item);
+            Assert.Multiple(
+                () => Assert.Equal(new Thickness(4, 2), (Thickness)Resource("NavigationViewItemButtonMargin")),
+                () => Assert.Equal((Thickness)Resource("NavigationViewItemButtonMargin"), item.Margin));
+        });
+    }
+
+    /// <summary>
+    /// Pixels, and only the composited route claims anything here: the selected fill is a translucent subtle
+    /// brush over the pane surface, and a direct element capture drops the alpha of a brush that rides through a
+    /// TransitionProperty layer (PixelHarness remarks).
+    /// </summary>
+    [Fact]
+    public void Selecting_a_pane_item_moves_pixels_without_a_brand_green()
+    {
+        _fixture.Run(() =>
+        {
+            // Host() parents the subject into the harness window itself, so this view must not have gone through
+            // Build() first - a logical child with a parent throws rather than moving.
+            var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
+            var item = new FluentNavigationItem { Content = "Overview" };
+            view.MenuItems.Add(item);
+            view.MenuItems.Add(new FluentNavigationItem { Content = "Buttons" });
+            view.SelectedItem = item;
+            var selected = PixelHarness.Host(view, 400, 420);
+            view.SelectedItem = null;
+            var resting = PixelHarness.Host(view, 400, 420);
+
+            // A colour delta, not a whole-histogram diff: the first capture through the host window is not
+            // comparable with a later one (measured across two runs of this file: the same pair of captures read
+            // 30 054 and 16 624 changed pixels, because the host's own backdrop settles between them). The pill's
+            // colour is SubtleFillColorSecondary at 5.54% over the pane's #F3F3F3 = #EAEAEA, and that key counts
+            // 8 220 pixels when the whole class runs and 7 993 when this test runs alone (the item is 232x36, so
+            // the pill area is 8 352 minus margins and corners); the resting capture holds none of it. 6 000 is
+            // under the lower reading, and docs/astra/adaptation/s1k-navigation-raw.txt carries both.
+            var pill = selected.Count(PillOverPane) - resting.Count(PillOverPane);
+            Assert.Multiple(
+                () => Assert.True(selected.Stable, $"the pane never settled: {selected.Subject}"),
+                () => Assert.True(pill > 6000,
+                    $"selecting added {pill} pixels of the pill colour; selected {selected.Top(4)} resting {resting.Top(4)}"),
+                () => Assert.Equal(0, selected.Count(BrandEmerald)));
+        });
+    }
+
+    /// <summary>
+    /// The pill's geometry is three x:Double rows upstream (:220-222), so the values ride as literals in the
+    /// template - and a literal that a second copy of the same number depends on has to be pinned to it, because
+    /// the animator's <c>RestingHeight</c> is what centres the bar against a 36 DIP row. Height 16 is also what
+    /// upstream draws, so the three literals are one fact rather than three guesses.
+    /// </summary>
+    [Fact]
+    public void The_indicator_measures_what_the_animator_centres_on()
+    {
+        _fixture.Run(() =>
+        {
+            var view = Pane(out var item);
+            view.SelectedItem = item;
+            PixelHarness.Settle(60);
+            var indicator = (Border)PixelHarness.Named(view, "PART_SelectionIndicator")!;
+            var accent = ((SolidColorBrush)Brush("NavigationViewSelectionIndicatorForeground")).Color;
+            Assert.Multiple(
+                () => Assert.Equal(3d, indicator.Width, 0.01),
+                () => Assert.Equal(16d, indicator.Height, 0.01),
+                () => Assert.Equal(NavigationIndicatorAnimator.RestingHeight, indicator.Height, 0.01),
+                () => Assert.Equal(new CornerRadius(2), indicator.CornerRadius),
+                () => Assert.Same(Brush("AccentFillColorDefaultBrush"), indicator.Background),
+                () => Assert.Equal(PixelHarness.PixelKey(accent), PixelHarness.PixelAt(indicator, 1, 8)));
+        });
+    }
+
+    /// <summary>
+    /// What the alias buys: the row itself never changes between themes, its target does. Read through one
+    /// instance, so a copied brush would show the same colour twice and pass silently.
+    /// </summary>
+    [Fact]
+    public void A_navigation_row_follows_the_theme_because_it_aliases_a_theme_token()
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var light = ((SolidColorBrush)Brush("NavigationViewItemForegroundPressed")).Color;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            var dark = ((SolidColorBrush)Brush("NavigationViewItemForegroundPressed")).Color;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            Assert.True(light != dark, $"NavigationViewItemForegroundPressed held {light} across the theme switch");
+        });
+    }
+
+    /// <summary>
+    /// Upstream rows this library deliberately does not publish, each for a reason that is about a surface the
+    /// control does not build rather than about a number it cannot read. audits/navigation.md §2 carries the
+    /// per-name table; the gate's job is to keep an omission from quietly becoming an invented default.
+    /// </summary>
+    [Theory]
+    // Our item exposes IsSelected, never IsChecked: upstream's four checked pairs belong to a state this type lacks.
+    [InlineData("NavigationViewItemBackgroundChecked")]
+    [InlineData("NavigationViewItemBackgroundCheckedPointerOver")]
+    [InlineData("NavigationViewItemBackgroundCheckedPressed")]
+    [InlineData("NavigationViewItemBackgroundCheckedDisabled")]
+    [InlineData("NavigationViewItemForegroundChecked")]
+    [InlineData("NavigationViewItemForegroundCheckedPointerOver")]
+    [InlineData("NavigationViewItemForegroundCheckedPressed")]
+    [InlineData("NavigationViewItemForegroundCheckedDisabled")]
+    // Upstream's left-pane root is a Grid that draws no border; the eight rows go to a border nobody renders.
+    [InlineData("NavigationViewItemBorderBrush")]
+    [InlineData("NavigationViewItemBorderBrushPointerOver")]
+    [InlineData("NavigationViewItemBorderBrushPressed")]
+    [InlineData("NavigationViewItemBorderBrushDisabled")]
+    [InlineData("NavigationViewItemBorderBrushSelected")]
+    [InlineData("NavigationViewItemBorderBrushSelectedPointerOver")]
+    [InlineData("NavigationViewItemBorderBrushSelectedPressed")]
+    [InlineData("NavigationViewItemBorderBrushSelectedDisabled")]
+    // Read by NavigationBackButton.xaml:26-52, and this control builds no back button.
+    [InlineData("NavigationViewButtonBackgroundPointerOver")]
+    [InlineData("NavigationViewButtonBackgroundPressed")]
+    [InlineData("NavigationViewButtonBackgroundDisabled")]
+    [InlineData("NavigationViewButtonForegroundPointerOver")]
+    [InlineData("NavigationViewButtonForegroundPressed")]
+    [InlineData("NavigationViewButtonForegroundDisabled")]
+    // The top pane, which this control does not build at all - all thirteen rows.
+    [InlineData("TopNavigationViewItemForeground")]
+    [InlineData("TopNavigationViewItemForegroundPointerOver")]
+    [InlineData("TopNavigationViewItemForegroundPressed")]
+    [InlineData("TopNavigationViewItemForegroundDisabled")]
+    [InlineData("TopNavigationViewItemForegroundSelected")]
+    [InlineData("TopNavigationViewItemForegroundSelectedPointerOver")]
+    [InlineData("TopNavigationViewItemForegroundSelectedPressed")]
+    [InlineData("TopNavigationViewItemBackgroundPointerOver")]
+    [InlineData("TopNavigationViewItemBackgroundPressed")]
+    [InlineData("TopNavigationViewItemBackgroundSelected")]
+    [InlineData("TopNavigationViewItemBackgroundSelectedPointerOver")]
+    [InlineData("TopNavigationViewItemBackgroundSelectedPressed")]
+    [InlineData("TopNavigationViewItemSeparatorForeground")]
+    // Upstream gives the icon box a background of its own; ours is a bare presenter with nothing to fill.
+    [InlineData("NavigationViewItemIconBackground")]
+    // Surfaces this template does not have: a material pane backdrop, a header, a separator.
+    [InlineData("NavigationViewDefaultPaneBackground")]
+    [InlineData("NavigationViewExpandedPaneBackground")]
+    [InlineData("NavigationViewTopPaneBackground")]
+    [InlineData("NavigationViewItemHeaderForeground")]
+    [InlineData("NavigationViewItemSeparatorForeground")]
+    // x:Double rows, which this reader cannot parse at all; their values ride as literals.
+    [InlineData("NavigationViewSelectionIndicatorWidth")]
+    [InlineData("NavigationViewSelectionIndicatorHeight")]
+    [InlineData("NavigationViewSelectionIndicatorRadius")]
+    [InlineData("NavigationViewItemOnLeftMinHeight")]
+    [InlineData("NavigationViewIconBoxWidth")]
+    public void A_row_this_control_does_not_build_is_not_published(string key)
+    {
+        _fixture.Run(() => Assert.Null(Application.Current!.TryFindResource(key)));
+    }
+
+    private static readonly Color BrandEmerald = Color.FromRgb(0x20, 0x72, 0x45);
+
+    /// <summary>SubtleFillColorSecondary at 5.54% over the pane's #F3F3F3 - the selected pill as the window shows it.</summary>
+    private static readonly Color PillOverPane = Color.FromRgb(0xEA, 0xEA, 0xEA);
+
+    /// <summary>An open pane with two items, laid out and settled; the first one is handed back unselected.</summary>
+    private static FluentNavigationView Pane(out FluentNavigationItem item)
+    {
+        var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
+        item = new FluentNavigationItem { Content = "Overview" };
+        view.MenuItems.Add(item);
+        view.MenuItems.Add(new FluentNavigationItem { Content = "Buttons" });
+        PixelHarness.Build(view, 400, 420);
+        PixelHarness.Settle(60);
+        return view;
+    }
+
+    private static object Resource(string key) => Application.Current!.TryFindResource(key)!;
+
+    private static Brush Brush(string key) => (Brush)Resource(key);
+
+    private static CornerRadius CornerRadius(string key) => (CornerRadius)Resource(key);
 }

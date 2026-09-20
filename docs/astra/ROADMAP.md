@@ -1047,7 +1047,9 @@ InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
   图标右半截露在框外；改 `Hidden`（实测不扣且仍可滚，`A_hidden_bar_still_lets_the_pane_scroll` 断言）
   后高亮框回到 4…44 DIP（`adaptation/12`）。代价：长列表没有可拖滑块——本框架没有覆盖式滚动条。
 - 不声称 90 DIP 就是 WinUI 的 52 DIP：余下 42 DIP 是汉堡带，要等窗口外壳把汉堡接进标题栏才压得掉。
-  NavigationView 的九步出口仍欠 `audits/navigation.md`。
+  【第七段已结】NavigationView 的九步出口已补 `audits/navigation.md`；那条"欠审计"的账在此了结，
+  而它顺带量出侧栏条目圆角自造名 `NavigationViewItemCornerRadius`=4 上游根本没有，上游左栏用
+  `OverlayCornerRadius`=8（见下面第七段）。
 - 一条**已撤回的改动**：把 83ms `TransitionProperty` 从 Button/导航扩散到 CheckBox/RadioButton/
   ComboBox/ComboBoxItem/TextBox/BottomStroke（6 处）。实测过渡在飞期间 `Background` 是**新造的插值实例**
   （`sc#0.66,0,0.12,0.43`），直接顶穿别名层"处处同一实例"的不变量，而 WinUI 这些状态填充本就是
@@ -1152,3 +1154,62 @@ gaps 逐条写明"本族没有 WinUI 上游""行保留框架模板的原因""排
 列拖拽/重排/排序/编辑提交同样零证据；行状态矩阵（hover/selected/focus 成套 VisualState）一格没写；
 虚拟化下的行回收没测；高对比未测；缩进只量到"子在父右"，没量到 DIP 精度；
 markup 属性名/属性类型这一层闸口仍缺（`AstraGateTests` 查不到）。
+
+## 阶段 5 第七段：NavigationView 补样式——结清一条自造名，顺手把侧栏圆角改回上游的 8（2026-09-20）
+
+这一段的入口是目标里那句"NavigationView 补样式"，落到实物上是一条**上线即错**的视觉账：
+库里发布的 `NavigationViewItemCornerRadius`=4。逐名查上游（blob `aa3ff11b2`）量到三件事——
+
+1. **这个名字在上游不存在**：`git grep NavigationViewItemCornerRadius 19e3bdc3c` 整个仓库 0 命中；
+2. **上游左栏用的是 `OverlayCornerRadius`**（:447，`MUX_NavigationViewItemPresenterStyleWhenOnLeftPane`），
+   也就是 8；方法权威 ModernWpf 同一条读法（`NavigationView.xaml:176`）；
+3. 我们那行的值 4 **恰好等于 `ControlCornerRadius`**——不是"另一个上游键"，而是"ControlCornerRadius 的值
+   穿了个导航的名字"。判据写成三条断言：条目与模板 `Root` 都等于 `OverlayCornerRadius`、
+   且**不等于** `ControlCornerRadius`（这条会抓住哪天滑回 4）、被撤的名字由测试钉成"不得再发布"。
+
+键层那边是本批的主体。上游 64 条别名行里落地 19 条、按名撤 45 条并逐组给理由
+（`TopNavigationViewItem*` 13 条＝没有顶部条；条目 `BorderBrush*` 12 条＝上游左栏根是 `Grid`，那块描边
+在上游自己也不画；`*Checked*` 8 条＝我们的条目只有 `IsSelected`；`NavigationViewButton*` 6 条＝那六行的
+真消费者是 `NavigationBackButton.xaml:26-52` 而本控件没有返回按钮；pane 背衬 3 条＝材质未摸底；
+`Separator`/`Header`/`IconBackground` 3 条＝没有那些面）。45 条**逐名**进"不得发布"闸口，不是只记一个数。
+Light 与 Default 两支**同名且同目标**（把 (name→target) 做成排序多重集比出来 `diffs=[]`），所以一份与主题
+无关的别名层就是忠实转录；高对比靠 `HighContrast.map` 在别名目标的下面重映射，不必抄第二块。
+另有 20 条 `x:Double` 度量行（含上游 220-222 那三条指示条键，上游 602 行真的在消费它们）在本 reader 上
+是"一行毁整份字典"，只能以字面量进模板——值仍与上游逐一对上（36/40/16/48/3/2），且指示条那个 16
+被钉在代码侧的 `NavigationIndicatorAnimator.RestingHeight` 上：同一个数有两处，就必须有断言把两处绑住。
+
+四类证据分开记：
+- 构建：串行闸口 `tools/Test-AstraGates.ps1` 在本批最终树上跑（读数见本节末"闸口读数"）。
+- 行为/结构：`AstraNavigationTests` 4→78 例（+74）：19+1 条键逐名已发布、45+5 条逐名不得发布、
+  别名**同一实例** 8 条 `Assert.Same`、半径读回、`NavigationViewItemButtonMargin` 落到 `item.Margin`、
+  指示条几何与动画器常数绑定、一条别名行跨主题变色（Light↔Dark 不同色，证明变的是目标不是行）。
+- 像素：选中 pill 在同一色键上的增量 8 220（整类跑）/ 7 993（单跑），未选中那张图这个键恒 0；
+  品牌绿 `#207245` 0 像素；指示条 1×8 那个点采到的就是强调色刷的 RGB。
+  两条 harness 边界（`Host()` 与 `Build()` 父级互斥；第一次 `Host()` 与后续不同源，故只能比单色键增量）
+  已写进 `adaptation/06`，原始读数归档在 `adaptation/s1k-navigation-raw.txt`。
+- 视觉/Gallery：`Catalog.json` 里 `FluentNavigationView`/`FluentNavigationItem` 两条从 `own-type` 改判 `audited`
+  （legend 对 `own-type` 的措辞是"Jalium 没有这个原生类型"，而实测**有**、只是没有样式，见下），
+  证据补 `audits/navigation.md` 与 raw 日志，gaps 按 §2/§6 重写；`Test-AstraGallerySmoke.ps1 -Page navigation`
+  5.8 秒干净关窗（Gallery 侧栏就是这个控件本身，所以冒烟顺带盖住了半径改动后的真实上屏路径）。
+
+一处**改判**要留在账上：`Catalog` 的 `own-type` 标签一直暗示"原生没有 NavigationView 才自建"。普查读数其实是
+`Jalium.UI.Controls.NavigationView : ContentControl`，16 个自声明属性，`style=False render=False parts=0`、
+`templateLock=Void:null-or-void`（`adaptation/01:92-95`、`s0y-outstanding-names.txt:16`）——**类型在，样式与部件树不在**。
+所以"换原生重模板"省不下任何事，反倒要重新量 16 个属性的契约；本批继续用自有类型，但把这个判断连它的读数
+一起写进 `audits/navigation.md` §9，而不是让它住在标签里。
+
+不声称：hover/press 只有触发器在位的结构证据，**零真指针输入帧**；8 DIP 圆角只读回到属性，角上是否真把
+填充留出去没采；条目前景的状态变化是否走到 `SymbolIcon` 字形没读；pane 背衬是纯色，上游那一层是亚克力
+（材质摸底未做）；高对比一次没量；指示条滑动动画无逐帧证据；条目 `StackPanel` 无虚拟化。
+
+**闸口读数（第七段，串行 `tools/Test-AstraGates.ps1`，exit 0）**：restore 全部最新；Debug 构建
+**24 条警告 / 0 错误**；整套顺序跑 **1120/1120 通过、0 失败、0 跳过**（5 m 27 s；比上段 1047 多 73 条
+＝导航类 6→78 的 +72，加资源键闸口那条字典行的 +1）；调色板漂移 Light 83 源色 / 101 刷、Dark 同、
+HighContrast 101 映射键，三行 `checked=True`；`All Astra gates passed.`
+
+那条 **24 条警告**要单独记账，因为它推翻了本文件前面几段的一个读数口径：第 5、6 段写的"Debug 构建 0 警告 0 错误"
+是**增量构建没重编测试工程**的结果——同一份日志这次真编了，xUnit 分析器与可空性警告就出来了。分布：
+`AstraAppBarTests.cs` CS8604 16 条、`AstraContentDialogTests.cs` CS8601 6 + CS8605 2 + CS8602 2 条、
+`AstraMenuTests.cs` CS8604/8602/8600 共 8 条、`AstraTreeDataGridTests.cs` CS8604 4 条、
+`AstraDataGridTests.cs` CS8604/8602/8600 共 6 条（后两个文件是本仓前两段自己写的，那 10 条是我们的账），
+`AstraNavigationTests.cs` **0 条**。清警批与"警告数必须先确认它真编译过"这条读数纪律一起记进任务 #41。

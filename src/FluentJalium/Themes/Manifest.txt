@@ -31,6 +31,7 @@ ThemeResources/TabView.jalxaml
 ThemeResources/ContentDialog.jalxaml
 ThemeResources/TeachingTip.jalxaml
 ThemeResources/DataGrid.jalxaml
+ThemeResources/NavigationView.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml

@@ -177,10 +177,28 @@ Dispatcher.CurrentDispatcher.InvokeAsync(() => frame.Continue = false)
 `--no-build`。读数一旦用来支撑"某条主张不成立"，还要写下它是在哪次构建上取的——
 `tools/Test-AstraGates.ps1` 之所以把 restore→build→test 串成一条，理由就是这条。
 
+## `Host()` 的两条边界（阶段 5 第七段量到，2026-09-20）
+
+整窗合成路径（`PixelHarness.Host`）是"半透明叠色"唯一可信的取景方式，但它自己有两条约定的边界，
+都是 NavigationView 批撞出来的，原始读数在 `adaptation/s1k-navigation-raw.txt` 的 [C]/[D]：
+
+1. **`Host()` 与 `Build()` 的父级互斥。**`Host()` 把主体挂到它自己的窗口上，所以走过 `Build()`（挂在 Grid 里）
+   的元素再交给 `Host()` 会抛 `The logical child already has a parent (child: FluentNavigationView,
+   current parent: Grid, attempted parent: Window)`。要合成读数就必须一开始只走 `Host()`，别先 `Build()`。
+2. **第一次 `Host()` 的读数与后续不同源。**同一对"选中前/选中后"的整窗捕获，用整张直方图算差值，
+   两种跑法分别量到 **30 054** 与 **16 624** 个变化像素——差的不是控件，是窗体背衬与上一位主体留下的像素
+   要在这次与下次之间才稳。所以跨捕获比较只能是**单个色键的增量**：同一条断言换成数 `#EAEAEA`
+   （选中 pill 叠出来的那个色）之后，两次跑法给出 8 220 / 7 993，未选中那张图里这个键恒为 0。
+   阈值取低于两次读数的 6 000。
+
+规则：拿 `Host()` 做判据时，(a) 主体只经 `Host()` 上屏；(b) 断言写成"某个色键在 A 里比在 B 里多 N 像素"，
+不要写成"两张直方图差 N 个像素"；(c) N 先量再一次写死，且把两种跑法的读数都记下。
+
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——
-  alpha 字节不可信，这条只能等整窗裁剪基座做出来再验。
+  alpha 字节不可信，这条只能等整窗裁剪基座做出来再验。**NavigationView 批已经把整窗那条路走通了**
+  （见上面"`Host()` 的两条边界"：叠色用单色键增量断言），但 `self` 路径本身仍未解决。
 - 混合 DPI（1.0 / 1.25 / 1.75）下的计数一致性：只在本机 1.75 上证过 1:1 这条规则。
 - 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时。**很可能**就是上面那条看门狗缺陷（静止 → 不来帧 →
   永不返回），但那次没有留下逐步日志，不能算已归因；本批只把"聚焦无动画的控件"这一条测到底。

@@ -263,17 +263,17 @@
       "markup": "FluentJalium.Controls.FluentNavigationView",
       "source": "Styles/Navigation.jalxaml",
       "page": "navigation",
-      "parity": "own-type",
-      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
-      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item", "back-button and item invocation not gated", "the pane bar is Hidden, not overlaid: Auto costs 12 DIP of layout width, which is what broke compact" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/navigation.md", "docs/astra/adaptation/s1k-navigation-raw.txt", "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
+      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item, no back button - which is why 13 TopNavigationViewItem* and 6 NavigationViewButton* upstream rows stay unpublished", "the type is ours while the runtime ships a style-less native NavigationView (adaptation/01 census: style=False parts=0); audits/navigation.md §9 carries that judgement with its readings", "the pane sits on a solid brush: upstream's NavigationViewDefaultPaneBackground is acrylic and materials are not characterised yet", "the 20 upstream x:Double metric rows cannot be resource rows on this reader, so 36/40/16/48/3/2 ride as literals", "back-button and item invocation not gated", "the pane bar is Hidden, not overlaid: Auto costs 12 DIP of layout width, which is what broke compact" ]
     },
     {
       "markup": "FluentJalium.Controls.FluentNavigationItem",
       "source": "Styles/Navigation.jalxaml",
       "page": "navigation",
-      "parity": "own-type",
-      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
-      "gaps": [ "no expandable children, icon sources beyond SymbolIcon", "selection indicator motion unmeasured" ]
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/navigation.md", "docs/astra/adaptation/s1k-navigation-raw.txt", "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
+      "gaps": [ "no expandable children, icon sources beyond SymbolIcon, and no checked state - so upstream's 8 NavigationViewItem*Checked* rows have nothing to bind to", "hover/press reach the pixel gate only as trigger structure: no real pointer input has been captured", "the corner clip itself is not sampled: the 8 DIP OverlayCornerRadius is read back on the item and its Root border, not measured at the corner", "selection indicator motion unmeasured", "whether the item's Foreground states reach the SymbolIcon glyph was never read" ]
     },
     {
       "markup": "ContentDialog",
