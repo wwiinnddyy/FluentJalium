@@ -1577,6 +1577,8 @@ UI.WPF.Modern / wpfui / uno / FluentAvalonia 六棵树里全为 0——它属于
 或改那两个 token 名。第二个办法有全局风险：`AccentBrush` 是框架 token 层，别的框架控件也读它，
 在应用级字典里重定义等于给全仓改语义（S0-n/NumberBox 批那条"应用级名字撞车、最后写入者赢"的账）。
 **本段决定：绿由模板与行/列头/单元格样式压，不动 `AccentBrush`。**
+［本段这条决定在收尾时被推翻了一半，见下面第 9 条：行模板装不上，所以选中行的 `AccentBrush` 只能改名字；
+焦点边框那条仍然成立，因为宿主模板是我们的。原句留着记账。］
 另一条没量清的先挂着：`Application.Resources` 上 `ContainsKey(typeof(DataGrid))` 是 True、
 索引器取回的 `Style` 与合并查找同一个对象，但 `Keys.Count` 是 **0**——两个访问器对同一本字典的说法不一致，
 "框架那份样式到底住在应用字典里还是另一个作用域"这条**未结**；它只影响叙述，不影响上面的成本结论。
@@ -1587,3 +1589,31 @@ UI.WPF.Modern / wpfui / uno / FluentAvalonia 六棵树里全为 0——它属于
 在像素上，就是不在属性上。凡是"这个控件有没有默认样式"的问题，读 `TryFindResource(typeof(X))`
 与挂载后的实际值，别读 `X.Style`。
 
+
+**9 · 给容器换模板会把它孙辈的内容 visual 卡死——"能不能重模板"要按层回答，不能按控件回答。**
+DataGrid 落地时表格一个字的像素都没有：`cell.Content` 是控制替绑定列生成的 `TextBlock`，
+`ContentPresenter.Content` 也确实是它、`Visibility=Visible`，但 presenter `desired=0,0`，
+而且从单元格往下走视觉树根本找不到那个 `TextBlock`；同一棵树不加载 Astra 字典时量到 `47.45x19.78`。
+逐块撤样式的二分（每格一次构建一次读数，四份日志在 `s1i-datagrid-cells-raw.txt` /
+`s1i-datagrid-content-raw.txt`，被拆散的原始样式留在 `spike/DataGridProbe/bisect-Styles-DataGrid.jalxaml`）：
+只装**单元格**样式→文字正常；只装**行**样式→文字死；四块全不装、只留 token 字典→文字正常。
+也就是说杀死文字的从来不是 token 层、不是单元格模板、也不是第 5 条那把部件名锁，而是**行的模板被换掉**：
+行是控制往 `PART_CellsPanel` 里塞单元格的容器，换行的模板等于重建那批内容 visual 所在的子树，
+而 26.10.9 的 `ContentPresenter` 没有"模板拆除时归还托管 visual"那一步（参考树里后来长出
+`ReleaseContentElementForTemplateTeardown`，注释逐字描述的就是这个卡死：旧 presenter 仍持有该 visual 时，
+新 presenter 渲染同一实例而它的 `VisualParent` 还指着退役的树，输入与布局失效停在那个断根上）。
+**证据边界**：私有字段没读到，只量到行为一致——撤了就好、装了（只在行这一层）就坏。
+所以三条规则给后面每一批：
+1. **"这个控件能不能重模板"要拆成"它的哪一层能换"**。宿主/叶子（单元格、列头、行头）能换，
+   中间那层容器（持有由控制自己生成的子视觉的行）不能换；判据不是类型链（S1-h 那条已经被本段第 1 条推翻），
+   也不是"我们的模板落没落地"（落了，落地恰恰是破坏点）。
+2. **凡是"内容 visual 由控制生成、再交给 presenter 托管"的控件（`DataGridCell`、`DataGridColumnHeader` 这类
+   `ContentControl` 容器），换它的父级模板之后必须量一次孙辈文字的实际尺寸**，别量 presenter 的 `Content`——
+   `Content` 非空、`Visibility=Visible`、样式全部命中，文字可以照样是零。树里找不到那个 `TextBlock` 才是信号。
+3. **父级模板不能换，它读的资源名就成了唯一的入口。**本段因此改判：新增
+   `ThemeResources/FrameworkRetints.jalxaml` 把框架的 `AccentBrush` 别名到 `AccentFillColorDefaultBrush`
+   （别名而不是重定义：同一个 brush 实例，`ApplyAccent`/`OverrideBrush` 才推得动），作用域实测是框架字典里
+   58 处读这个名字、目前全部铺品牌绿。这一层是"撞名重着色"这条已有账的正面用法，代价是选中行拿到的是
+   强调色不透明底，上游 `ListAccentLowOpacity` 0.4 那层丢了——x:Double 发不出去，行模板又装不上，
+   没有第三条路。这个字典故意不进"每行都要有消费者"的资源键闸口：它的读者是框架模板，
+   要求我们的样式引用它只会逼人写一条假引用（与 `TitleBar.jalxaml`/`FlyoutPresenter.jalxaml` 同族豁免）。

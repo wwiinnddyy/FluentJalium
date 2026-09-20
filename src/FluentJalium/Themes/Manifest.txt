@@ -30,6 +30,10 @@ ThemeResources/TreeView.jalxaml
 ThemeResources/TabView.jalxaml
 ThemeResources/ContentDialog.jalxaml
 ThemeResources/TeachingTip.jalxaml
+ThemeResources/DataGrid.jalxaml
+# Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
+# whose readers are the framework's own templates rather than ours (see its header comment).
+ThemeResources/FrameworkRetints.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml
@@ -45,3 +49,4 @@ Styles/AppBar.jalxaml
 Styles/ContentDialog.jalxaml
 Styles/TeachingTip.jalxaml
 Styles/TabView.jalxaml
+Styles/DataGrid.jalxaml

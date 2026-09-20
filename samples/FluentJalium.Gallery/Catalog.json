@@ -212,6 +212,38 @@
       "gaps": [ "the 16 DIP indent is produced by the nesting (each level's child host insets 16), because no dependency property carries depth here - the consequence is a child row whose fill is 16 DIP narrower than its parent's, where WinUI's row spans the list", "a part named Expander hooks nothing on this runtime, so expansion runs through a two-way TemplatedParent binding on IsExpanded; the keyboard route is not claimed, and any route that writes the property drives the same visuals", "state text colour is written on the container, not on the presenter: ContentPresenter has no Foreground member here, so every template cell aimed at it is inert (adaptation/00 S1-e 7; the same route now covers the eight families that shipped before it - S1-f)", "hover and press are still trigger readings rather than a pointer: no real pointer or touch injection backs the PointerOver and Pressed cells", "collapse keeps child containers realised, as the runtime itself does; the visible effect is the child host's visibility, not the container count" ]
     },
     {
+      "markup": "DataGrid",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs", "spike/DataGridProbe/Program.cs", "docs/astra/adaptation/s1i-datagrid-host-raw.txt" ],
+      "gaps": [ "this family has NO WinUI 3 upstream - microsoft-ui-xaml ships no DataGrid at all, so the authority being copied is the dotnet/wpf official Fluent theme as ModernWpf transcribes it (audits/datagrid.md §1); a 'WinUI parity' reading of this row is really a WPF Fluent reading", "the row is the framework's own template on purpose: installing a DataGridRow style strands the cell's generated text and the table renders no values (audits/datagrid.md §5) - which is also why the selected row fills through the retinted AccentBrush name in ThemeResources/FrameworkRetints.jalxaml instead of a part of ours", "the host paints no focus border: the runtime's own ControlBorderFocused measures brand emerald #FF1E793F and the WPF Fluent theme this family copies carries no host focus border at all", "RowHeight 32 and ColumnHeaderHeight 32 are literals, because upstream keeps those two rows as x:Double this reader cannot publish; the four selected-row opacity rows are withheld with the same reason and the selected fill therefore sits at the accent brush's own opacity 1", "column drag, drop, reorder, resize and cell editing have no input evidence of any kind, and the row-header gutter carries none of upstream's four gripper Thumbs (audits/datagrid.md §4)", "TreeDataGrid is NOT covered by this style: its node feed is unmeasured and the runtime's TreeDataGridNode is internal" ]
+    },
+    {
+      "markup": "DataGridCell",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs", "docs/astra/adaptation/s1i-datagrid-cells-raw.txt" ],
+      "gaps": [ "no selection overlay of its own: the layer that would hold one is the row, and the row cannot be re-templated, so the text-on-accent colour is the only half of upstream's selected cell this batch delivers", "upstream's focus visual rows (DataGridCellFocusVisual*) are withheld rather than published unread - the runtime draws the cell focus surface itself", "a disabled host does not move the cell's foreground: the framework writes #FFAEAEB2 locally and a local value outranks the style cell (asserted as a loss, not dropped)" ]
+    },
+    {
+      "markup": "DataGridColumnHeader",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs" ],
+      "gaps": [ "the sort glyph's Text and Visibility are local values the control writes (Primitives/DataGridColumnHeader.cs:269-286), so the template owns only its size and family and no state cell can retarget it", "no three-state or multi-column sort surface, and the resize grip's hit-testing is written by the control as a local value, so drag-to-size is unproven here" ]
+    },
+    {
+      "markup": "DataGridRowHeader",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs" ],
+      "gaps": [ "upstream's row header is a ButtonBase with four resize gripper Thumbs and a seventeen-cell state matrix; this runtime's row-header code resolves no part name at all, so the shipped template is the resting surface and row select, resize and edit are owed" ]
+    },
+    {
       "markup": "FluentJalium.Controls.FluentToggleSwitch",
       "source": "Styles/Inputs.jalxaml",
       "page": "inputs",

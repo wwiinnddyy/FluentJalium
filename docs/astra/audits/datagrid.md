@@ -109,6 +109,8 @@ ModernWpf 未新增语义键，全部是补官方模板要求的别名（该文�
    修法只有一条符合纪律：**用我们自己的模板与行/列头/单元格样式压掉**，不在应用级字典里重定义
    `AccentBrush`/`ControlBorderFocused`——那是框架 token 层，别的框架控件也读它，重定义等于给全仓改语义
    （S0-n/NumberBox 批那条"应用级名字撞车、最后写入者赢"的账）。
+   ［本节第 1 条的结论已在 §5 推翻，保留原文以记账：行模板装不上，所以选中行的底只能从 `AccentBrush`
+   这个名字改；焦点边框那条仍然成立——宿主模板是我们的，格子根本没写进去。］
 3. **选中行的反色文字到不了单元格。** 行样式触发把 `row.Foreground` 写成 `TextOnAccent`
    （实测 `#FFFFFFFF`），但 `DataGridCell` 自己的样式格子写着 `Foreground = TextPrimary`，
    实测 `cell.Foreground=#FFF5F5F7` 不变——渐变上盖常态字色。这条要在我们的条目样式里定夺
@@ -133,3 +135,50 @@ ModernWpf 未新增语义键，全部是补官方模板要求的别名（该文�
 7. 像素级证据尚未产出（本批只有树与实例读数）。像素批必须包含"选中行不出现品牌绿主导像素"这条硬闸口，
    并说明裁剪区含框架自己那套条目（S0-j/S0-w 的教训）。
 8. `PART_SortIndicator` 由代码填文本，我们换模板之后排序指示是否还在，未测。
+
+## 5 · 落地形状：一条实测出来的"行不能重模板"契约（2026-09-20 收尾）
+
+第一批样式装完之后，**表格里一个字的像素都没有**：单元格的 `ContentPresenter` 报告
+`content=TextBlock`、`vis=Visible`，但 `desired=0,0`，而且那棵子树里根本找不到 `TextBlock`；
+框架自己的表格（不加载 Astra 字典，`--mode content`）在同一棵树上量到 `47.45x19.78 / 43.45x19.78`。
+四份日志：`adaptation/s1i-datagrid-cells-raw.txt`（Astra）、`s1i-datagrid-content-raw.txt`（框架基线）、
+`bisect-Styles-DataGrid.jalxaml`（被拆散的原始样式）。二分按"整块撤下→单块装回"走，每一格都是一次构建一次读数：
+
+| 装上的样式 | 单元格文字 |
+| --- | --- |
+| 全装（宿主+行+单元格+两种表头） | `desired=0,0`，树里无 TextBlock |
+| 撤宿主+单元格（只留行/列头/行头） | 仍然 0 |
+| 只留行样式 | 仍然 0 |
+| 四块全撤、只留 token 字典 | `43.45x19.78`，正常 |
+| 只留单元格样式（带我们自己的模板） | 正常，单元格 120x32 |
+| **宿主+单元格+列头+行头，不留行样式** | **正常，全部事实绿** |
+
+结论一句话：**能给单元格换模板，不能给行换模板。** 行是控制自己往 `PART_CellsPanel` 里塞单元格的容器，
+换掉行的模板等于把那批内容 visual 所在的子树重建一遍，而 26.10.9 的 `ContentPresenter` 没有
+"模板拆除时把托管的 visual 释放回去"这一步——参考树里后来长出了这个方法
+（`Jalium.UI.Controls/ContentPresenter.cs` 的 `ReleaseContentElementForTemplateTeardown`，注释逐字写着
+"旧的 presenter 继续持有该 visual 时，替换上来的 presenter 会渲染同一个实例而它的 `VisualParent` 还指向退役的树，
+输入与布局失效就停在那个断根上"）。运行时版本没有它，于是同一根 `TextBlock` 卡在退役子树里，新 presenter
+拿着 Content 却测不出尺寸。这条推论的证据边界要说清：**没读到运行时的私有字段，只量到行为一致**
+（撤样式即恢复、装样式即失效、且只在行这一层）。
+两个直接后果写进了产品代码：
+1. `Styles/DataGrid.jalxaml` 只发四块样式，行那一块连隐式样式都不注册；
+   `AstraDataGridTests.The_row_keeps_the_frameworks_template` 钉住"名字查不到、部件里也没有我们独有的
+   `RowSelectionBackground`/`PART_DetailsPresenter`"。
+2. 选中行的底色归框架行模板所有，它读 `AccentBrush`——于是第 3 节"绝不重定义框架 token"那条被推翻了：
+   新增 `ThemeResources/FrameworkRetints.jalxaml`，把 `AccentBrush` 别名到 `AccentFillColorDefaultBrush`
+   （同一实例，所以 `ApplyAccent`/`OverrideBrush` 照样能推）。作用域实测：框架字典里 58 处读这个名字
+   （RangeControls 26、Dialogs 8、PropertyGrid 6、Calendar 5、ToggleControls 4、Containers 2、Navigation 2、
+   TreeView 2、DataGrid/TreeDataGrid/DockLayout/MenusToolbars 各 1），今天全部铺品牌绿，改完之后全部跟随应用强调色；
+   我们重模板过的控件不读它。代价：`ListAccentLowOpacity` 0.4 那层半透明没了（x:Double 发不出去，
+   行模板又装不上），选中行按强调色不透明铺满。两条都在测试里点名：
+   `An_alias_row_resolves_to_its_target`（`AccentBrush`↔`AccentFillColorDefaultBrush` 实例同一）、
+   `The_selected_row_fills_through_the_frameworks_own_name_...`（读在 `PART_RowBorder` 自己身上、断言不是渐变）、
+   `Overriding_the_accent_moves_the_selected_row_fill_through_both_names`（把强调色换成哨兵色，选中行像素 >200）、
+   `A_selected_grid_never_paints_the_frameworks_emerald_gradient`（#1D733C/#2B804A/品牌绿各 0 像素）。
+
+顺带把三条老账结清：第 4 节第 7 条（"像素证据未产出"）由
+`The_grid_surface_paints_its_background_row`、`The_grid_repaints_between_the_two_themes` 与上面那条
+无品牌绿闸口交付；那 30 个读不出来源的 `#1D733C` 随宿主/行模板的形状一起消失，不再挂账；
+单元格模板里的 `ContentPresenter` 一律显式绑 `Content`/`ContentTemplate`/`ContentTemplateSelector`/
+`ContentStringFormat`——这是 S1-h 那条"裸 presenter 在这个运行时只是内容宿主"的同一笔账，列头与行头也一并补上。

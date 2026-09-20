@@ -1,0 +1,188 @@
+<!-- ModernWpf Styles/DataGrid.xaml @23555a6c00623b2f80e67f20d7f1df49a1d28ad8 (MIT): DefaultDataGridStyle 552-684,
+     DefaultDataGridRowStyle 193-250, DefaultDataGridCellStyle 140-190, DefaultDataGridColumnHeaderStyle 406-497,
+     DefaultDataGridRowHeaderStyle 267-338. No WinUI 3 upstream exists for this family (audits/datagrid.md §1), and
+     ModernWpf's own templates cannot be transcribed anyway: they are built on SelectiveScrollingGrid,
+     DataGridCellsPresenter and DataGridDetailsPresenter placement that this runtime does not offer - its rows build
+     cells in code into a StackPanel named PART_CellsPanel. So these are our templates over the runtime's own part
+     contract, with the row/cell/header state matrix and the metrics taken from ModernWpf.
+     The part contract is measured, not guessed. Jalium.UI.Controls/DataGrid.cs:1071-1077 resolves exactly
+     PART_ColumnHeadersHost and PART_RowsHost as StackPanel, PART_ColumnHeadersBorder and PART_RowHeaderCorner as
+     FrameworkElement, PART_ColumnHeadersScrollViewer and PART_DataScrollViewer as ScrollViewer, PART_DragOverlay as
+     Canvas; DataGrid.cs:5450 resolves PART_CellsPanel as a StackPanel and then writes its Orientation and builds the
+     inner horizontal panel itself; Primitives/DataGridColumnHeader.cs:199-200 resolves PART_SortIndicator as a
+     TextBlock and PART_ResizeGrip as a FrameworkElement and writes IsHitTestVisible=false on it as a local value.
+     Drop one of those names and the feature goes silently: a Border+ItemsPresenter-only template measured 0 cells,
+     no header row and no 20 DIP row-header gutter (docs/astra/adaptation/00 S1-i 5).
+     Every ContentPresenter below binds its content explicitly. That is not decoration: the template that answers for
+     a DataGridCell once Astra's dictionaries are applied hosts its TextBlock at desired 0x0 with the element never
+     entering the visual tree, while the instance the same control gets before Apply realizes it at 47.45x19.78
+     (spike/DataGridProbe datagrid-probe-cells.txt vs datagrid-probe-content.txt). A bare <ContentPresenter/> in this
+     runtime's markup is the same silence the TabView batch paid for (adaptation/00 S1-h). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. RowHeight 32 and ColumnHeaderHeight 32 are DataGridColumnHeaderMinHeight and the cell's MinHeight
+       in upstream's block; the runtime's own theme rests both at 30/34, which is what a mounted grid reported
+       before this style existed. No outer focus border is painted: upstream's row is the runtime's own
+       ControlBorderFocused token, which measures brand-emerald #FF1E793F on this machine, and the WPF Fluent theme
+       this family is copied from has no host focus border at all. -->
+  <Style x:Key="DefaultDataGridStyle" TargetType="DataGrid">
+    <Setter Property="Background" Value="{ThemeResource DataGridBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource DataGridRowForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource DataGridBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource DataGridBorderThickness}" />
+    <Setter Property="RowBackground" Value="{ThemeResource DataGridRowBackground}" />
+    <Setter Property="AlternatingRowBackground" Value="{ThemeResource DataGridAlternatingRowBackground}" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{ThemeResource DataGridGridLinesBrush}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{ThemeResource DataGridGridLinesBrush}" />
+    <Setter Property="RowHeight" Value="32" />
+    <Setter Property="ColumnHeaderHeight" Value="32" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template"><ControlTemplate TargetType="DataGrid">
+      <Border Name="PART_OuterBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{ThemeResource ControlCornerRadius}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <!-- The header band and its synchronised scroller: PART_ColumnHeadersHost has to be a StackPanel because
+               that is the type the control casts the lookup result to, and the band's own bottom line is a
+               Rectangle rather than a border so it survives the header items painting over it. -->
+          <Grid Name="PART_ColumnHeadersBorder" Grid.Row="0" Background="{ThemeResource DataGridColumnHeaderBackground}">
+            <ScrollViewer Name="PART_ColumnHeadersScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
+              <StackPanel Name="PART_ColumnHeadersHost" Orientation="Horizontal" />
+            </ScrollViewer>
+            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+          </Grid>
+          <!-- The 20 DIP corner over the row-header gutter. Its width is the runtime's own RowHeaderWidth (measured
+               20 on a mounted grid); upstream hides the whole corner with HeadersVisibility, which the control does
+               by writing Visibility on the part. -->
+          <Grid Name="PART_RowHeaderCorner" Grid.Row="0" Width="20" HorizontalAlignment="Left" Background="{ThemeResource DataGridColumnHeaderBackground}">
+            <Rectangle Width="1" HorizontalAlignment="Right" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+          </Grid>
+          <ScrollViewer Name="PART_DataScrollViewer" Grid.Row="1" Focusable="False" VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}" HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}">
+            <StackPanel Name="PART_RowsHost" />
+          </ScrollViewer>
+          <!-- Column drag and drop both draw into this canvas; the behaviour is the control's, the surface is ours. -->
+          <Canvas Name="PART_DragOverlay" Grid.RowSpan="2" IsHitTestVisible="False" Visibility="Collapsed" />
+        </Grid>
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource DataGridRowForegroundDisabled}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="DataGrid" BasedOn="{StaticResource DefaultDataGridStyle}" />
+
+  <!-- A row. The cells are built in code into PART_CellsPanel, so the template's job is the fill, the separator
+       line, the selection overlay and the details strip. Wrapping the panel in a Grid is measured safe: with the
+       overlay and the details presenter removed the cell content still hosted at desired 0, so the panel is not what
+       was swallowing the text (spike/DataGridProbe s1i-datagrid-cells-raw.txt). -->
+  <!-- NO DataGridRow style ships, and that is a measured contract rather than an omission. Installing one strands
+       the cell's content visual: with only this style present, a bound cell's TextBlock reports desired 0,0 and
+       never enters the visual tree, while with it withheld the same cell hosts it at 43.45x19.78 - read on the same
+       instance, in the same process, at spike/DataGridProbe/bin/Debug/net10.0-windows/datagrid-probe-cells.txt
+       against datagrid-probe-content.txt. The row is the container the control builds its cells into, so replacing
+       its template rebuilds the subtree the content visuals are parented in, and 26.10.9 has no release hook for a
+       presenter whose visual is left behind (the reference tree grows one later: ContentPresenter.
+       ReleaseContentElementForTemplateTeardown). Re-templating the cell is measured safe, so every cell state lives
+       below. What the row keeps from the framework is its fill, its bottom line and its IsSelected row - and that
+       last one is why ThemeResources/DataGrid.jalxaml republishes the framework's AccentBrush name. -->
+
+
+  <!-- A cell. Upstream's DefaultDataGridCellStyle is a Border with a content host and four state rows; the fill of
+       the selected state lives on the row overlay above, so the cell keeps the resting surface, the line and the
+       text colour. The text colour is written on the cell itself because DataGridCell declares a Foreground and the
+       runtime's own cell style writes it, which is what kept a selected row's TextOnAccent from the text.
+       The presenter binds Content, ContentTemplate, ContentTemplateSelector and ContentStringFormat by name: the
+       header of this file records what happens when it does not. -->
+  <Style x:Key="DefaultDataGridCellStyle" TargetType="DataGridCell">
+    <Setter Property="Background" Value="{ThemeResource DataGridRowBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource DataGridRowForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource DataGridGridLinesBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource DataGridCellBorderThickness}" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="10,5,10,5" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="DataGridCell">
+      <Border Name="PART_CellBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+        <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="True" />
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource DataGridRowForegroundDisabled}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+    <Style.Triggers>
+      <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="{ThemeResource DataGridRowSelectedForeground}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource DataGridRowForegroundDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="DataGridCell" BasedOn="{StaticResource DefaultDataGridCellStyle}" />
+
+  <!-- A column header. It is a ButtonBase, so the press state is reachable without a pointer; the separator comes
+       from the column's own SeparatorBrush/SeparatorVisibility pair, which is what upstream uses for the vertical
+       line and what the runtime's DP list confirms exists. PART_ResizeGrip must stay in the tree: the control
+       resolves it and writes its hit-testing itself. -->
+  <Style x:Key="DefaultDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
+    <Setter Property="Background" Value="{ThemeResource DataGridColumnHeaderBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource DataGridColumnHeaderForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource DataGridHeaderBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource DataGridColumnHeaderBorderThickness}" />
+    <Setter Property="SeparatorBrush" Value="{ThemeResource DataGridHeaderSeparatorBrush}" />
+    <Setter Property="SeparatorVisibility" Value="Visible" />
+    <Setter Property="Padding" Value="{ThemeResource DataGridColumnHeaderPadding}" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="DataGridColumnHeader">
+      <Grid>
+        <Border Name="SeparatorBorder" BorderBrush="{TemplateBinding SeparatorBrush}" BorderThickness="0,0,1,0" Visibility="{TemplateBinding SeparatorVisibility}" />
+        <Border Name="PART_HeaderBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            <!-- The control writes this element's Text and Visibility itself, as local values
+                 (Primitives/DataGridColumnHeader.cs:269-286 sets "▲"/"▼" or the empty string and the matching
+                 Visibility), so a state cell here could never win - see adaptation/00's precedence rule. What the
+                 template owns is the typeface and the size, and since the glyph the control picks is a text
+                 character and not a Segoe Fluent Icons codepoint, the family is left to inherit. The size is the
+                 runtime's own CaptionFontSize (10), not upstream's 8, which was measured against a font glyph. -->
+            <TextBlock Name="PART_SortIndicator" Grid.Column="1" FontSize="10" Margin="4,4,2,4" VerticalAlignment="Center" Visibility="Collapsed" />
+          </Grid>
+        </Border>
+        <Rectangle Name="PART_ResizeGrip" Width="8" HorizontalAlignment="Right" Fill="{x:Null}" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="PART_HeaderBorder" Property="Background" Value="{ThemeResource DataGridHeaderBackgroundPointerOver}" /></Trigger>
+        <Trigger Property="IsPressed" Value="True"><Setter TargetName="PART_HeaderBorder" Property="Background" Value="{ThemeResource DataGridHeaderBackgroundPressed}" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="PART_HeaderBorder" Property="Background" Value="{ThemeResource DataGridHeaderBackgroundDisabled}" /><Setter Property="Foreground" Value="{ThemeResource DataGridColumnHeaderForegroundDisabled}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}" />
+
+  <!-- The row-header gutter. Upstream's DataGridRowHeader is a ButtonBase with four gripper Thumbs and a
+       seventeen-cell state matrix; this runtime's row-header code resolves no part name at all, so the shipped
+       template is the resting surface and the resize/edit states are owed (audits/datagrid.md §4). -->
+  <Style x:Key="DefaultDataGridRowHeaderStyle" TargetType="DataGridRowHeader">
+    <Setter Property="Background" Value="{ThemeResource DataGridRowHeaderBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource DataGridRowHeaderForeground}" />
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Template"><ControlTemplate TargetType="DataGridRowHeader">
+      <Border Name="PART_RowHeaderBorder" Background="{TemplateBinding Background}" BorderBrush="{ThemeResource DataGridGridLinesBrush}" BorderThickness="0,0,1,1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <ContentPresenter Name="ContentPresenter" Grid.Row="0" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+      </Border>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource DefaultDataGridRowHeaderStyle}" />
+</ResourceDictionary>

@@ -1,0 +1,25 @@
+<!-- Application-level retints of names the framework's own control dictionaries read. Nothing here is an Astra
+     resource key: every row exists because 26.10.9 paints something with a name of its own, that paint is wrong for
+     a Fluent surface, and the markup that reads it cannot be replaced. A control template that owns the surface can
+     be re-templated and reads Astra rows; a template that cannot be touched can only be reached through its name.
+     That is the same mechanism the window-chrome and flyout-presenter aliases use (audits/window-shell.md,
+     flyout-presenter.md), and the reason this dictionary is deliberately out of the key-consumption gate in
+     tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs: the reader lives in the framework, so there is no
+     setter of ours that could cite it, and a gate that demanded one would only be satisfiable by a lie.
+     What each row must keep doing, per row, is pinned by an Assert.Same fact in the control batch that found it. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Found by the DataGrid batch. The runtime's DataGridRow template fills a selected row with this name, and its
+       value on 26.10.9 is a brand-emerald LinearGradientBrush (#1D733C..#2B804A as measured,
+       s1i-datagrid-tokens-raw.txt §J) - the exact colour this library is not allowed to show. The row cannot be
+       re-templated to hold a different fill: installing a DataGridRow style strands the cell's content visual, so
+       the cell renders no text at all (the reading is recorded in Styles/DataGrid.jalxaml). Aliasing rather than
+       redefining is what makes this follow the application accent - both names resolve to the same brush instance,
+       which is the instance FluentThemeManager.ApplyAccent and OverrideBrush move.
+       Scope, measured over the framework's own dictionaries: 58 reads in twelve files (RangeControls 26, Dialogs 8,
+       PropertyGrid 6, Calendar 5, ToggleControls 4, Containers 2, Navigation 2, TreeView 2, DataGrid 1,
+       TreeDataGrid 1, DockLayout 1, MenusToolbars 1). Every one of them paints emerald today, so all of them change
+       together. Controls this library restyles outright are unaffected - their own templates never ask for this
+       name - which is what AstraDataGridTests.The_selected_row_fills_through_the_frameworks_own_name pins for the
+       grid, and what the palette drift gate covers for the rest. -->
+  <StaticResource x:Key="AccentBrush" ResourceKey="AccentFillColorDefaultBrush" />
+</ResourceDictionary>

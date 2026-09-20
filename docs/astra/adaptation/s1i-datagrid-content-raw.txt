@@ -1,0 +1,40 @@
+theme dictionaries=46
+
+=== G. bound cell content under Astra's style ===
+  our DataGrid style live=threw InvalidOperationException: Call FluentThemeManager.Apply(application) before using Astra resources.
+  cell content=TextBlock size=120x30.78 selected=False padding=10,5,10,5 minH=0 hca=Left text="Row 1" textSize=43.45x19.78 textFg=#FFF5F5F7 textFs=14
+  cell content=TextBlock size=120x30.78 selected=False padding=10,5,10,5 minH=0 hca=Left text="10" textSize=18.42x19.78 textFg=#FFF5F5F7 textFs=14
+  cell content=TextBlock size=120x30.78 selected=False padding=10,5,10,5 minH=0 hca=Left text="Row 2" textSize=43.45x19.78 textFg=#FFF5F5F7 textFs=14
+  cell content=TextBlock size=120x30.78 selected=False padding=10,5,10,5 minH=0 hca=Left text="20" textSize=18.42x19.78 textFg=#FFF5F5F7 textFs=14
+  content parent chain: TextBlock#65226
+  live presenter=ContentPresenter#45305 itsContentSame=yes
+  cell template: type=Jalium.UI.Controls.ControlTemplate hash=13346312 target=Jalium.UI.Controls.DataGridCell
+    xaml=
+  row template: type=Jalium.UI.Controls.ControlTemplate hash=39284339
+    xaml=
+  auto-generated grid: cells=4 presenters=6 texts=8
+    cell[0] content=TextBlock
+    DataGridCell  size=120x30.78 desired=120,30.7802734375
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78 desired=68.4462890625,29.7802734375
+    ContentPresenter content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+  first cell tree (bound columns):
+    DataGridCell  size=120x30.78 desired=120,30.7802734375
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78 desired=68.4462890625,29.7802734375
+    ContentPresenter content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+  first row tree (bound columns):
+    DataGridRow  size=406x30 desired=260,30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=406x30 desired=260,31.7802734375
+    StackPanel 'PART_CellsPanel'  size=406x29 desired=260,30.7802734375
+    StackPanel  size=406x30.78 desired=260,30.7802734375
+    DataGridCell  size=120x30.78 desired=120,30.7802734375
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78 desired=68.4462890625,29.7802734375
+    ContentPresenter content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+    DataGridCell  size=120x30.78 desired=120,30.7802734375
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78 desired=43.419921875,29.7802734375
+    ContentPresenter content=Jalium.UI.Controls.TextBlock vis=Visible size=22.42x19.78 desired=22.419921875,19.7802734375
+    TextBlock text="10" size=18.42x19.78 desired=22.419921875,19.7802734375
+    DataGridRowHeader  size=20x30 desired=20,30
+    DataGridDetailsPresenter content=null vis=Collapsed size=0x0 desired=0,0

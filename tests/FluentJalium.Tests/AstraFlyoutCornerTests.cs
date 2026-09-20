@@ -86,11 +86,11 @@ public sealed class AstraFlyoutCornerTests
 
     /// <summary>
     /// What the corner audit turned up, and the defect this batch fixes. The framework gives its suggestion
-    /// rows a <see cref="ComboBoxItem"/> container and writes a LinearGradientBrush of accent greens onto it
-    /// as a local value - a property a style setter and a template trigger cannot outrank. While the row
-    /// template bound that property the open list painted the brand green across a Fluent flyout (measured
-    /// before the fix: #1D733C..#2B804A, ~450 px per stop against 2 020 px of surface). Now the row fills
-    /// from ComboBoxItemBackground, so the green stays where it belongs - on the property, not on the pixels.
+    /// rows a <see cref="ComboBoxItem"/> container and writes an accent-derived brush onto it as a local value -
+    /// a property a style setter and a template trigger cannot outrank. While the row template bound that property
+    /// the open list painted the brand green across a Fluent flyout (measured before the fix:
+    /// #1D733C..#2B804A, ~450 px per stop against 2 020 px of surface). Now the row fills from
+    /// ComboBoxItemBackground, so the green stays where it belongs - on the property, not on the pixels.
     /// </summary>
     [Fact]
     public void A_suggestion_row_pays_our_token_instead_of_the_frameworks_accent_gradient()
@@ -101,10 +101,16 @@ public sealed class AstraFlyoutCornerTests
             try
             {
                 var background = DependencyProperty.FromName(row.GetType(), "Background")!;
+                var local = row.ReadLocalValue(background);
 
-                // The framework still owns the property: the local value is untouched, which is why this had
-                // to be settled in the template rather than in a setter.
-                Assert.IsType<LinearGradientBrush>(row.ReadLocalValue(background));
+                // The framework still owns the property: the local value is there, which is why this had to be
+                // settled in the template rather than in a setter. Its SHAPE is not what the corner audit measured:
+                // the DataGrid batch's AccentBrush retint (ThemeResources/FrameworkRetints.jalxaml) reaches this
+                // derived brush too, so the value now comes back a SolidColorBrush where the audit recorded a
+                // LinearGradientBrush. Both halves stay pinned - ownership because it is the constraint, type
+                // because a later build that re-materialises the gradient has to explain itself.
+                Assert.True(local is Brush, $"the container carries no local Background at all: {local?.GetType().Name ?? "unset"}");
+                Assert.IsNotType<LinearGradientBrush>(local);
 
                 var sample = PixelHarness.Chrome(container);
                 var greens = sample.Histogram

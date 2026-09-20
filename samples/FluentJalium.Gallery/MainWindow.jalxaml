@@ -372,6 +372,21 @@
                 <TreeViewItem Header="Archive" IsEnabled="False" />
               </TreeView>
               <TextBlock Text="The chevron runs on a two-way binding to IsExpanded, because a part named Expander hooks nothing on this runtime. The subtree's fill is 16 DIP narrower than its parent's - the cost of an indent built by nesting rather than by a depth value, which this runtime does not expose." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="Data grid" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- Row 32 and header 32 are upstream's pair; the runtime's own theme rests them at 30/34, so a mounted
+                   grid had to be measured before those two lines were written. The row keeps the framework's template
+                   deliberately: installing a DataGridRow style of ours strands the cell's generated text and the
+                   table renders no values at all (docs/astra/audits/datagrid.md §5), which also means the selected
+                   row fills through the retinted AccentBrush name rather than through a part of ours - the accent
+                   here is the application accent, never the framework's brand-emerald gradient. -->
+              <DataGrid x:Name="SampleDataGrid" Height="180" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" Width="200" />
+                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" Width="140" />
+                  <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
+                </DataGrid.Columns>
+              </DataGrid>
+              <TextBlock Text="Column sort writes a glyph into PART_SortIndicator itself, so the template only owns its size; the row line is the framework's, the cell line is ours. Editing a cell still needs the runtime's own commit path - see the parity strip." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
             </StackPanel>
 
             <StackPanel x:Name="NavigationPage">

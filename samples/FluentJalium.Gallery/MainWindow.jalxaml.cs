@@ -484,7 +484,25 @@ public partial class MainWindow : Window
 
         var tree = (TreeView)SampleTreeView!;
         tree.SelectedItemChanged += (_, _) => Report($"Tree selection: {Describe(tree.SelectedItem)}.");
+
+        // A grid cannot be fed from markup the way the other three lists can: its columns read a Binding path, so
+        // the rows have to be objects with public properties.
+        var grid = (DataGrid)SampleDataGrid!;
+        grid.ItemsSource = new[]
+        {
+            new GridWorkItem("Phase 5 gate list", "Lince", "Shipped"),
+            new GridWorkItem("Pixel attribution", "Lince", "Shipped"),
+            new GridWorkItem("NavigationView styles", "Lince", "Open"),
+            new GridWorkItem("Hardware input evidence", "Lince", "Open"),
+            new GridWorkItem("Public key inventory", "Lince", "Open"),
+        };
+        grid.SelectionChanged += (_, _) =>
+            Report(grid.SelectedItem is GridWorkItem item
+                ? $"Grid row: {item.Name} · {item.Status}."
+                : $"Grid row: {Describe(grid.SelectedItem)}.");
     }
+
+    private sealed record GridWorkItem(string Name, string Owner, string Status);
 
     private void WireAppearance()
     {

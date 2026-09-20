@@ -59,7 +59,7 @@ internal static partial class Program
             // pass 2 boots without Astra's dictionaries on purpose: the framework's own grid theme is the baseline
             // the readings are about, and Apply is called from inside the mode so the same instance can be re-read
             // after it lands.
-            if (_mode is not ("pass2" or "pass3"))
+            if (_mode is not ("pass2" or "pass3" or "content"))
             {
                 FluentThemeManager.Apply(application);
             }
@@ -79,6 +79,7 @@ internal static partial class Program
     private static void Run(Application application)
     {
         var root = new StackPanel { Margin = new Thickness(24) };
+        Root = root;
         var window = new Window { Content = root, Width = 900, Height = 700, Title = "DataGrid probe" };
         window.Loaded += (_, _) =>
         {
@@ -120,6 +121,11 @@ internal static partial class Program
                 {
                     TokenRoute(root, window);
                     OverrideCost(root, window);
+                }
+
+                if (_mode is "cells" or "content")
+                {
+                    CellContent();
                 }
 
                 if (_mode is "pass3")
@@ -513,6 +519,118 @@ internal static partial class Program
         }
     }
 
+    // ---------- G. does a bound column put text into a cell under our style? ----------
+
+    private static void CellContent()
+    {
+        Note("");
+        Note("=== G. bound cell content under Astra's style ===");
+        var gridType = TypeByName("DataGrid")!;
+        var grid = Activator.CreateInstance(gridType)!;
+        var columnType = TypeByName("DataGridTextColumn")!;
+        foreach (var (header, path) in new[] { ("Alpha", "Name"), ("Beta", "Value") })
+        {
+            var column = Activator.CreateInstance(columnType)!;
+            _ = Set(column, "Header", header);
+            _ = Set(column, "Width", 160d);
+            var bindingType = TypeByName("Binding")!;
+            var binding = Activator.CreateInstance(bindingType, [path]);
+            _ = Set(column, "Binding", binding);
+            var columns = Prop(grid, "Columns");
+            columns!.GetType().GetMethod("Add")!.Invoke(columns, [column]);
+        }
+
+        _ = Set(grid, "ItemsSource", Rows(2));
+        _ = Set(grid, "Width", 420d);
+        _ = Set(grid, "Height", 160d);
+        var element = (FrameworkElement)grid;
+        ((Panel)Root).Children.Add(element);
+        Pump(10);
+        Note($"  our DataGrid style live={Read(() => FluentThemeManager.GetStyle("DefaultDataGridStyle") is not null)}");
+        foreach (var cell in AllOfType(element, TypeByName("DataGridCell")!))
+        {
+            var content = Prop(cell, "Content");
+            var text = content as TextBlock;
+            Note($"  cell content={(content?.GetType().Name ?? "null")} size={SizeOf((FrameworkElement)cell)} selected={Show(Prop(cell, "IsSelected"))} " +
+                 $"padding={Show(Prop(cell, "Padding"))} minH={Show(Prop(cell, "MinHeight"))} hca={Show(Prop(cell, "HorizontalContentAlignment"))} " +
+                 (text is null
+                     ? $"text=\"{Show(content)}\""
+                     : $"text=\"{Trim(text.Text)}\" textSize={SizeOf(text)} textFg={Hex(text.Foreground)} textFs={text.FontSize}"));
+        }
+
+        var firstCell = AllOfType(element, TypeByName("DataGridCell")!).FirstOrDefault();
+        if (firstCell is not null)
+        {
+            // Where does the cell's content element actually live? ContentPresenter caches the visual it built and
+            // the runtime has an explicit release hook for the case where a re-templated control leaves that visual
+            // parented into the retired tree (ContentPresenter.ReleaseContentElementForTemplateTeardown). If the
+            // TextBlock's parent chain does not reach the live presenter, the 0x0 is stranding, not sizing.
+            var parentChain = new List<string>();
+            object? walk = Prop(firstCell, "Content");
+            for (var hop = 0; hop < 6 && walk is not null; hop++)
+            {
+                var visualParent = Read(() => Prop(walk!, "VisualParent"));
+                parentChain.Add($"{walk.GetType().Name}#{walk.GetHashCode() % 100000}");
+                walk = visualParent;
+            }
+
+            var presenter = AllOfType(firstCell, typeof(ContentPresenter)).FirstOrDefault();
+            Note("  content parent chain: " + string.Join(" <- ", parentChain));
+            Note($"  live presenter={(presenter is null ? "none" : $"{presenter.GetType().Name}#{presenter.GetHashCode() % 100000}")} " +
+                 $"itsContentSame={(presenter is null ? "-" : ReferenceEquals(Prop(presenter, "Content"), Prop(firstCell, "Content")) ? "yes" : "no")}");
+            var cellTemplate = Prop(firstCell, "Template") as ControlTemplate;
+            var cellTarget = cellTemplate is null ? "null" : Show(Prop(cellTemplate, "TargetType"));
+            Note($"  cell template: type={(cellTemplate?.GetType().FullName ?? "null")} hash={cellTemplate?.GetHashCode()} target={cellTarget}");
+            Note($"    xaml={(cellTemplate is null ? "none" : Trim(TemplateXaml(cellTemplate)))}");
+        }
+
+        var firstRow = AllOfType(element, TypeByName("DataGridRow")!).FirstOrDefault();
+        if (firstRow is not null)
+        {
+            var rowTemplate = Prop(firstRow, "Template") as ControlTemplate;
+            Note($"  row template: type={(rowTemplate?.GetType().FullName ?? "null")} hash={rowTemplate?.GetHashCode()}");
+            Note($"    xaml={(rowTemplate is null ? "none" : Trim(TemplateXaml(rowTemplate)))}");
+        }
+
+        // A/B: the same grid with the columns generated by the control instead of supplied by us. A generated
+        // column hands the cell a string, a bound one hands it a TextBlock the control built (ElementStyle), and
+        // only the first shape is what the framework's own template was ever measured on.
+        var auto = Activator.CreateInstance(gridType)!;
+        _ = Set(auto, "AutoGenerateColumns", true);
+        _ = Set(auto, "ItemsSource", Rows(2));
+        _ = Set(auto, "Width", 420d);
+        _ = Set(auto, "Height", 160d);
+        var autoElement = (FrameworkElement)auto;
+        ((Panel)Root).Children.Add(autoElement);
+        Pump(10);
+        var autoCells = AllOfType(autoElement, TypeByName("DataGridCell")!).ToList();
+        Note($"  auto-generated grid: cells={autoCells.Count} presenters={CountTypeName(autoElement, "ContentPresenter")} texts={CountTypeName(autoElement, "TextBlock")}");
+        if (autoCells.Count > 0)
+        {
+            Note($"    cell[0] content={(Prop(autoCells[0], "Content")?.GetType().Name ?? "null")}");
+            PrintTree(autoCells[0], "    ", 8);
+        }
+
+        ((Panel)Root).Children.Remove(autoElement);
+        Note("  first cell tree (bound columns):");
+        var first = AllOfType(element, TypeByName("DataGridCell")!).FirstOrDefault();
+        if (first is not null)
+        {
+            PrintTree(first, "    ", 10);
+        }
+
+        var boundRow = AllOfType(element, TypeByName("DataGridRow")!).FirstOrDefault();
+        if (boundRow is not null)
+        {
+            Note("  first row tree (bound columns):");
+            PrintTree(boundRow, "    ", 12);
+        }
+
+        ((Panel)Root).Children.Remove(element);
+    }
+
+    private static Panel Root = null!;
+
     // ---------- plumbing ----------
 
     private static string AddColumns(object grid)
@@ -626,11 +744,15 @@ internal static partial class Program
             var name = NameOf(node);
             var extra = node switch
             {
-                Border border => $"bg={Hex(border.Background)} r={border.CornerRadius} bt={border.BorderThickness} size={SizeOf(border)}",
-                FrameworkElement element => $"size={SizeOf(element)}",
+                Border border => $"bg={Hex(border.Background)} r={border.CornerRadius} bt={border.BorderThickness}",
+                TextBlock text => $"text=\"{Trim(text.Text)}\"",
+                ContentPresenter presenter => $"content={Show(presenter.Content)} vis={presenter.Visibility}",
                 _ => string.Empty,
             };
-            Note($"{pad}{node.GetType().Name}{(string.IsNullOrEmpty(name) ? "" : " '" + name + "'")} {extra}");
+            var measure = node is FrameworkElement framed
+                ? $" size={SizeOf(framed)} desired={Read(() => Prop(framed, "DesiredSize"))}"
+                : string.Empty;
+            Note($"{pad}{node.GetType().Name}{(string.IsNullOrEmpty(name) ? "" : " '" + name + "'")} {extra}{measure}");
         }
 
         Walk(root, Visit, maxDepth);

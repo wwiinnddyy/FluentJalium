@@ -1053,3 +1053,45 @@ InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
   （`sc#0.66,0,0.12,0.43`），直接顶穿别名层"处处同一实例"的不变量，而 WinUI 这些状态填充本就是
   `KeyTime="0"` 离散换刷。三个样式字典已回退到 HEAD，全套 67/67 复绿。既有三处（Button/NavigationView/
   ToggleSwitch）不动，但要知道它们的画刷实例同样只在稳态等于调色板实例。
+
+**阶段 5 第五段（DataGrid：表格族没有 WinUI 上游，而"能不能重模板"要按层回答，2026-09-20）**：
+上一段把账量齐（`379c44e` 那份测量：框架自带一套表格主题、11 个 token 名、两条品牌绿缺陷、部件契约），这一段落地。
+落地之后表格**一个字都没显示**——于是这一段真正的产出不是样式，是一条契约。
+
+(1) **先死一次再说为什么**：宿主+行+单元格+两种表头全装上，绑定单元格的 `ContentPresenter` 报
+`content=TextBlock`、`vis=Visible`、`desired=0,0`，视觉树里根本没有那个 `TextBlock`；同一棵树不加载 Astra
+字典时段落是 `47.45x19.78`。逐块撤样式二分（一格一次构建一次读数）：只装**单元格**样式→正常；
+只装**行**样式→死；全撤只留 token→正常。结论 **叶子能换模板，装单元格的容器行不能换**——
+行的模板被换等于重建内容 visual 所在的子树，26.10.9 的 `ContentPresenter` 没有"模板拆除时归还托管 visual"
+那一步（参考树里后来长出 `ReleaseContentElementForTemplateTeardown`，注释逐字就是这个卡死）。
+证据边界写进文档：私有字段没读到，只有"撤了好、装了（只在行）就坏"的行为一致。见 `adaptation/00` S1-i 9、
+`audits/datagrid.md` §5，两份读数 `s1i-datagrid-cells-raw.txt` / `s1i-datagrid-content-raw.txt`。
+所以 `Styles/DataGrid.jalxaml` 只发 **4 份样式**（宿主/单元格/列头/行头，各有隐式样式），
+**不发 `DataGridRow` 样式**，`The_row_keeps_the_frameworks_template` 把这条钉住（名字查不到 + 行里没有我们独有的部件）。
+
+(2) **行不能换，行读的名字就得改**：行选中底是框架模板的 `{ThemeResource AccentBrush}`，而那在这个运行时是
+品牌绿渐变——本仓硬闸口"品牌绿不出现"过不去。新增 `ThemeResources/FrameworkRetints.jalxaml`（清单 46→47 份），
+把 `AccentBrush` **别名**（不是重定义）到 `AccentFillColorDefaultBrush`：同一实例，`ApplyAccent`/`OverrideBrush`
+推得动。作用域实测：框架字典 12 份共 58 处读这个名字，今天全铺品牌绿。这条推翻了上一段 §3
+"绝不动框架 token"的决定，原文留着记账。**代价**：上游 `ListAccentLowOpacity` 0.4 那层半透明拿不到
+（x:Double 发不出去、行模板又装不上），选中行按强调色不透明铺满——写进 Known Gaps，不粉饰。
+
+(3) **跨批作用域立刻抓到一次**：整套顺序跑第一次红了 2 条。除了目录差集（本批新增 4 个隐式 TargetType，
+Catalog 46→50 行），另一条是**弹层角批**的 `A_suggestion_row_pays_our_token_instead_of_the_frameworks_accent_gradient`：
+它断言框架写在生成 `ComboBoxItem` 上的**本地值是渐变**，而 `AccentBrush` 一别名，那个派生刷变成了
+`SolidColorBrush`。这是**好处**（框架那支品牌绿渐变少了一处），但那条事实的前提不再成立，已按"所有权 + 类型"
+两半重写（所有权是约束，类型是"以后谁再把渐变变回来必须解释"）。改完定向跑 100/100。
+
+(4) **四类证据分开记**。行为/结构：`AstraDataGridTests` **54 条**（21 条别名行 + 4 条度量行 + 17 条
+"没有消费者就不发布"的反向闸口 + 部件契约/几何/交替线/禁用优先序/两主题重绘），其中
+`A_bound_cell_renders_its_text` 是本批的牙齿——它读的是生成 `TextBlock` 的**实际尺寸与在树与否**，
+不是 `Content` 是否非空。像素：表面哨兵色 >2 000 像素、Light↔Dark 顶部颜色不同、选中网格
+`#1D733C`/`#2B804A`/品牌绿各 **0** 像素、强调色换成哨兵色后选中行 >200 像素。视觉/Gallery：
+`Catalog.json` 加 4 行（`DataGrid`/`DataGridCell`/`DataGridColumnHeader`/`DataGridRowHeader`，全 audited，
+gaps 逐条写明"本族没有 WinUI 上游""行保留框架模板的原因""排序字形由代码写本地值"），
+`selection` 页挂上真表格，`tools/Test-AstraGallerySmoke.ps1 -Page selection` 9 秒干净关窗。
+构建：串行闸口 `tools/Test-AstraGates.ps1` 四步全绿——restore 全部最新；Debug 构建 **0 警告 0 错误**；
+整套顺序跑 **1034/1034 通过、0 失败、0 跳过**（5 m 25 s，含本批新增 54 条与被本批改写的弹层角批那条）；
+调色板漂移 Light 83 源色 / 101 刷、Dark 同、HighContrast 101 映射键，三行 `checked=True`。
+不声称：列宽拖拽/重排/排序点击/单元格提交没有任何真输入证据；`TreeDataGrid` 没有落地（节点喂法是下一段）；
+行头那四枚 gripper Thumb 与十七格状态矩阵没做；高对比下表格走哪条路未测；强调色 0.4 未拿到。

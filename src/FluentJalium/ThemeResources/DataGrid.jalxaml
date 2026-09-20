@@ -1,0 +1,64 @@
+<!-- ModernWpf Styles/DataGrid.xaml @23555a6c00623b2f80e67f20d7f1df49a1d28ad8 (MIT) +
+     ThemeResources/Light.xaml 994-1053, Dark.xaml 991+, HighContrast.xaml 974+ (MIT): the rows this control's
+     own markup actually reads. There is NO WinUI 3 upstream to copy here - microsoft-ui-xaml has no DataGrid at
+     all (git ls-files | grep -ic datagrid = 0 at 19e3bdc3c, and TreeDataGrid is CommunityToolkit, not WinUI), so
+     the authority for this family is the dotnet/wpf official Fluent theme as ModernWpf transcribed it, and
+     audits/datagrid.md §1 records why. Every name below is ModernWpf's own; nothing was invented.
+     ModernWpf's rows split three ways here, and the split is measured (docs/astra/audits/datagrid.md §2, §4):
+       twenty-six names are transcribed and read by Styles/DataGrid.jalxaml below;
+       DataGridRow{BorderThickness,HoveredBackground,SelectedBackground} and DataGridDetailsPresenterBackground are
+         dropped again, because the row is the framework's own template on this runtime - re-templating it strands
+         the cell content visual - so no markup of ours owns those four states (the row comment in
+         Styles/DataGrid.jalxaml carries the reading);
+       DataGridRowSelected{,Hovered,Unfocused,HoveredUnfocused}BackgroundOpacity - x:Double rows this reader
+         cannot parse (the same limit that kept sixteen TabView metrics out of ThemeResources/TabView.jalxaml), and
+         the row template that would hold them as an overlay opacity cannot be installed either - see the row comment
+         in Styles/DataGrid.jalxaml. The selected row therefore fills at the accent brush's own opacity 1.
+       DataGridCheckBox*, DataGridRowGroupHeader*, DataGridCurrencyVisualPrimaryBrush, ScrollBarsSeparatorBackground,
+       InvalidBrush and the System*/Filler* legacy aliases - group rows, checkbox columns and validation are not
+         shipped by this batch; audits/datagrid.md §4 lists each as owed.
+     Every other row below is written by Styles/DataGrid.jalxaml, and the key-consumption gate in
+     tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs is what keeps it that way. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host surface. ModernWpf's DataGrid has no Background row of its own - the WPF control inherits the
+       window surface - so this is the Fluent card pair the rest of the library uses for a contained list. The
+       runtime's own grid theme uses a different layer (SurfaceBackground), which is why a mounted grid had to be
+       measured before this line was written (docs/astra/adaptation/00 S1-i 2). -->
+  <StaticResource x:Key="DataGridBackground" ResourceKey="CardBackgroundFillColorDefaultBrush" />
+  <StaticResource x:Key="DataGridBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+  <Thickness x:Key="DataGridBorderThickness">1</Thickness>
+  <!-- Grid lines. Upstream's row is SystemControlGridLinesBaseMediumLowBrush (#FF999999 in Light, the one HC-only
+       difference in the whole block); ours aliases the Fluent divider so the lines follow the theme. -->
+  <StaticResource x:Key="DataGridGridLinesBrush" ResourceKey="DividerStrokeColorDefaultBrush" />
+  <Thickness x:Key="DataGridCellBorderThickness">0,0,1,0</Thickness>
+  <!-- Rows. Alternation is a host-level write the control makes on its rows, so these two are read by the host
+       style; the resting row fill is also the cell's own background. Measured on a mounted grid, PART_RowBorder
+       rests transparent on row 0 and carries the SubtleFillColorSecondary instance on row 1
+       (s1i-datagrid-host-raw.txt) - the same step upstream takes. -->
+  <StaticResource x:Key="DataGridRowBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="DataGridAlternatingRowBackground" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="DataGridRowForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="DataGridRowForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Selection. The fill is the framework's row's own doing (retinted through ThemeResources/FrameworkRetints.jalxaml,
+       which is why no row of ours names it), so what this row owns is the colour of the text drawn on top of it.
+       That write has to sit on the cell: DataGridCell declares a Foreground and the runtime's own cell style writes
+       it, which is what kept the framework's TextOnAccent from ever reaching the text
+       (s1i-datagrid-tokens-raw.txt §J, docs/astra/audits/datagrid.md §3). -->
+  <StaticResource x:Key="DataGridRowSelectedForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+
+  <!-- Column headers. ModernWpf's header pair is DataGridColumnHeader{Foreground,Background}; the four state
+       fills and the separator/border rows are its own names from the same block. -->
+  <StaticResource x:Key="DataGridColumnHeaderForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="DataGridColumnHeaderBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="DataGridColumnHeaderForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="DataGridHeaderBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="DataGridHeaderBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="DataGridHeaderBackgroundDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <StaticResource x:Key="DataGridHeaderBorderBrush" ResourceKey="ControlStrokeColorSecondaryBrush" />
+  <StaticResource x:Key="DataGridHeaderSeparatorBrush" ResourceKey="ControlStrokeColorSecondaryBrush" />
+  <Thickness x:Key="DataGridColumnHeaderBorderThickness">0,0,0,1</Thickness>
+  <Thickness x:Key="DataGridColumnHeaderPadding">4,0</Thickness>
+  <!-- The row-header gutter. The details strip's row is dropped with the row template that would have read it. -->
+  <StaticResource x:Key="DataGridRowHeaderBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="DataGridRowHeaderForeground" ResourceKey="TextFillColorSecondaryBrush" />
+</ResourceDictionary>
