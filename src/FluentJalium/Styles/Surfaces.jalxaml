@@ -49,7 +49,6 @@
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
               <ContentPresenter Name="PART_HeaderContent" Content="{TemplateBinding Header}"
-                                Foreground="{TemplateBinding Foreground}"
                                 HorizontalAlignment="Left" VerticalAlignment="Center" />
               <!-- Upstream's ExpanderChevronButtonSize / ExpanderChevronGlyphSize are x:Double rows, so 32 and
                    12 ride as literals, and the chevron is a Path rather than the AnimatedIcon with a font-glyph
@@ -77,10 +76,12 @@
                   BorderThickness="{ThemeResource ExpanderContentDownBorderThickness}"
                   CornerRadius="0,0,4,4" Padding="{TemplateBinding Padding}" MinHeight="48"
                   Visibility="Collapsed" HorizontalAlignment="Stretch">
+            <!-- A ContentPresenter has no Horizontal/VerticalContentAlignment member either, so the two rows
+                 upstream hands its content alignment were dead here; on this runtime the same intent is the
+                 presenter's own alignment, and Foreground arrives by inheritance (adaptation/00 S1-f/S1-g). -->
             <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                              Foreground="{TemplateBinding Foreground}" />
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
           </Border>
           <Border Name="FocusOutline" Grid.RowSpan="2" Margin="1" BorderThickness="2" CornerRadius="4"
                   BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
@@ -129,11 +130,15 @@
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Template">
       <ControlTemplate TargetType="controls:FluentInfoBar">
+        <!-- RootBorder is the padded box: the content root below it is a Grid, and a Grid has no Padding and no
+             CornerRadius member, so upstream's InfoBarContentRootPadding row was written here and never read -
+             the bar's content sat flush against the surface (spike/AttributeSweep). MinHeight travels with the
+             padding so the 48 floor keeps meaning the same thing it meant on that one box. -->
         <Border Name="RootBorder" Background="{ThemeResource InfoBarInformationalSeverityBackgroundBrush}"
                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding CornerRadius}" VerticalAlignment="Top">
-          <Grid Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                CornerRadius="{TemplateBinding CornerRadius}" VerticalAlignment="Top"
                 MinHeight="48" Padding="{ThemeResource InfoBarContentRootPadding}">
+          <Grid Background="{TemplateBinding Background}">
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto" />
               <ColumnDefinition Width="*" />
@@ -153,19 +158,23 @@
                          FontSize="16" TextAlignment="Center" VerticalAlignment="Top"
                          Foreground="{ThemeResource InfoBarInformationalSeverityIconForeground}" />
             </Grid>
-            <StackPanel Name="Panel" Grid.Column="1" VerticalAlignment="Top"
-                        Margin="{ThemeResource InfoBarPanelMargin}"
-                        Padding="{ThemeResource InfoBarPanelVerticalOrientationPadding}">
-              <TextBlock Name="Title" Text="{TemplateBinding Title}" FontWeight="SemiBold" FontSize="14"
-                         TextWrapping="Wrap"
-                         Margin="{ThemeResource InfoBarTitleVerticalOrientationMargin}"
-                         Foreground="{ThemeResource InfoBarTitleForeground}" />
-              <TextBlock Name="Message" Text="{TemplateBinding Message}" FontSize="14" TextWrapping="Wrap"
-                         Margin="{ThemeResource InfoBarMessageVerticalOrientationMargin}"
-                         Foreground="{ThemeResource InfoBarMessageForeground}" />
-              <ContentPresenter Name="ActionArea" Content="{TemplateBinding ActionButton}" VerticalAlignment="Top"
-                                Margin="{ThemeResource InfoBarActionVerticalOrientationMargin}" />
-            </StackPanel>
+            <!-- Same reason as the root above: a StackPanel has no Padding member, so upstream's vertical-orientation
+                 panel padding needs a Border to sit on. The wrapper takes the margin and the padding; Panel keeps
+                 its name and the stacking. -->
+            <Border Name="PanelSurface" Grid.Column="1" VerticalAlignment="Top" Margin="{ThemeResource InfoBarPanelMargin}"
+                    Padding="{ThemeResource InfoBarPanelVerticalOrientationPadding}">
+              <StackPanel Name="Panel">
+                <TextBlock Name="Title" Text="{TemplateBinding Title}" FontWeight="SemiBold" FontSize="14"
+                           TextWrapping="Wrap"
+                           Margin="{ThemeResource InfoBarTitleVerticalOrientationMargin}"
+                           Foreground="{ThemeResource InfoBarTitleForeground}" />
+                <TextBlock Name="Message" Text="{TemplateBinding Message}" FontSize="14" TextWrapping="Wrap"
+                           Margin="{ThemeResource InfoBarMessageVerticalOrientationMargin}"
+                           Foreground="{ThemeResource InfoBarMessageForeground}" />
+                <ContentPresenter Name="ActionArea" Content="{TemplateBinding ActionButton}" VerticalAlignment="Top"
+                                  Margin="{ThemeResource InfoBarActionVerticalOrientationMargin}" />
+              </StackPanel>
+            </Border>
             <ContentPresenter Grid.Column="1" Grid.Row="1" Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}" VerticalAlignment="Center" />
             <!-- PART_CloseButton is the one name the base class listens to: its Click handler raises

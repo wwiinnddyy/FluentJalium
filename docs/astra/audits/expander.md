@@ -118,3 +118,16 @@
 6. 接缝圆角用字面量 `4,4,0,0`，因为 `ControlCornerRadius` 是整体资源、上游的两个转换器不存在。
 7. 触摸/笔路径、混合 DPI、高对比逐键断言未做；`ExpanderHeaderBorderThickness` 在 HC 下上游是 2，此处发布 1。
 8. `RootBorder`/`PART_HeaderContent` 两个名字保留但**未证明**有行为（只证了 S1/S2/S3 那三个）。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+§2 部件表里正文 presenter 带的那两条 `HorizontalContentAlignment` / `VerticalContentAlignment`，在
+`ContentPresenter` 身上**没有对应成员**（该类型有 `HorizontalAlignment` / `VerticalAlignment`）：属性被读进去、
+没人取，"正文对齐跟随控件"这句话从来没落地。同一段另外两条 `Foreground="{TemplateBinding Foreground}"`
+（`Styles/Surfaces.jalxaml:52` 头部、`:83` 正文）是 S1-f 已经量到的空转——标签颜色走控件级 `Foreground`
+加生成文字的继承。修法：两条对齐改绑 presenter 自身的 `HorizontalAlignment` / `VerticalAlignment`
+（复选、单选两个标签模板本来就是这个形状），两条 `Foreground` 删除。
+读回见 `AstraSurfaceGeometryTests.The_expander_hands_its_content_alignment_to_the_presenter`
+（先 `Right` 后 `Center`，读回随赋值走）。
+不声称：对齐与颜色都只到属性读回，**没有像素捕获**；正文 presenter 是按 `PART_ContentBorder` 往下
+`Descendant<ContentPresenter>` 取到的，它自己没有名字。

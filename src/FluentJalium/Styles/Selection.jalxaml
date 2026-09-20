@@ -14,7 +14,7 @@
     <Setter Property="BorderBrush" Value="{ThemeResource CheckBoxBorderBrushUnchecked}" />
     <Setter Property="Padding" Value="{ThemeResource CheckBoxPadding}" />
     <Setter Property="Template"><ControlTemplate TargetType="CheckBox">
-      <Grid Name="CheckRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+      <Grid Name="CheckRoot" Background="{TemplateBinding Background}">
         <Grid.ColumnDefinitions><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
         <Border Name="CheckSurface" Width="20" Height="20" CornerRadius="4" BorderThickness="{ThemeResource CheckBoxBorderThickness}"
                 Background="{ThemeResource CheckBoxCheckBackgroundFillUnchecked}" BorderBrush="{ThemeResource CheckBoxCheckBackgroundStrokeUnchecked}" VerticalAlignment="Center">
@@ -24,7 +24,7 @@
             <Border Name="MixedGlyph" Width="8" Height="2" CornerRadius="1" Background="{ThemeResource CheckBoxCheckGlyphForegroundUnchecked}" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0" />
           </Grid>
         </Border>
-        <ContentPresenter Name="CheckLabel" Grid.Column="1" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Foreground="{TemplateBinding Foreground}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="Wrap" />
+        <ContentPresenter Name="CheckLabel" Grid.Column="1" Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
         <Border Name="CheckFocus" Grid.ColumnSpan="2" Margin="-2,1" CornerRadius="4" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" BorderThickness="2" Opacity="0" IsHitTestVisible="False" />
       </Grid>
       <ControlTemplate.Triggers>

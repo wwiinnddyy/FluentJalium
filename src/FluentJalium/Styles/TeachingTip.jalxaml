@@ -53,7 +53,15 @@
                    control's own BorderThickness and lets the binding below carry it: upstream's C++ writes that
                    same property, and a cell with no TargetName outranks a style setter here (S0-u, and the same
                    route the ContentDialog default button takes). -->
-              <Grid Name="ContentRootGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="3" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+              <Grid Name="ContentRootGrid" Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="3">
+                <!-- The card is a Border, not the grid: a Grid has no CornerRadius, BorderBrush or BorderThickness
+                     member, so the three rows this element used to carry were written and never read and the tip
+                     rendered square and edgeless (spike/AttributeSweep, adaptation/00 S1-g). It sits as the first
+                     child spanning every row, so the content stays on top of the fill and the layout name stays
+                     on the element the parts hang off. -->
+                <Border Name="ContentRootSurface" Grid.RowSpan="3" Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}" />
                 <Grid.RowDefinitions>
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="*" />
@@ -65,7 +73,11 @@
                       <TextBlock Name="TitleTextBlock" Text="{TemplateBinding Title}" Foreground="{ThemeResource TeachingTipTitleForegroundBrush}" FontWeight="SemiBold" TextWrapping="Wrap" />
                       <TextBlock Name="SubtitleTextBlock" Text="{TemplateBinding Subtitle}" Foreground="{ThemeResource TeachingTipSubtitleForegroundBrush}" TextWrapping="Wrap" />
                     </StackPanel>
-                    <ContentPresenter Name="MainContentPresenter" Content="{TemplateBinding Content}" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}" Margin="{ThemeResource TeachingTipMainContentPresentMargin}" />
+                    <!-- No Background and no Foreground here: a ContentPresenter has neither member on this runtime,
+                         so upstream's two rows on this part had nowhere to land (spike/AttributeSweep). The card
+                         Border above already paints the same Background, and the label colour arrives by inheritance
+                         - the route the dead-cell sweep measured (adaptation/00 S1-f). -->
+                    <ContentPresenter Name="MainContentPresenter" Content="{TemplateBinding Content}" Margin="{ThemeResource TeachingTipMainContentPresentMargin}" />
                     <Grid Name="ButtonPanel" Margin="{ThemeResource TeachingTipButtonPanelMargin}">
                       <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />

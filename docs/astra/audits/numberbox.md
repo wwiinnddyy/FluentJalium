@@ -182,3 +182,13 @@
 §0.6 的结论在效果上仍然成立：**字形那一枚**读回的还是它构建时继承到的颜色，disabled 头部离像素差一跳，
 `AstraForegroundRoutingTests.A_disabled_number_box_sends_the_disabled_row_into_its_header` 把"格子到承载元素"和
 "字形不动"两半同时钉住，不做相邻替代。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+§3 与部件表里那层 Spinner 弹层的表面（`PopupContentRoot`）**原本是 Grid**，而 `OverlayCornerRadius`、
+`NumberBoxPopupBorderBrush`、`NumberBoxPopupBorderThickness` 三条挂在它身上——Grid 没有这三个成员，
+所以本审计里"弹层有 8 DIP 圆角和 1 DIP 描边"这句话在运行时**从来不成立**：弹层是直角、无边框。
+修法是把画者换成 Border（名字留在画者上，两行布局挪进内层 Grid），读回见
+`AstraSurfaceGeometryTests.The_spinner_popup_surfaces_on_a_border_that_can_hold_its_radius`
+（半径 / 边框厚度 / 底色 / 描边四项，弹层用 `IsOpen=true` 打开后从 `Popup.Child` 本身读——按名字查找只往下走）。
+不声称：弹层的圆角与描边**没有像素捕获**，这条是属性读回；打开通路仍只到"焦点格写 `IsOpen`"，没有真指针。

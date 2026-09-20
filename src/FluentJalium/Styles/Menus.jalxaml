@@ -63,7 +63,7 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -114,7 +114,7 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -157,7 +157,7 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" Foreground="{TemplateBinding Foreground}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -293,11 +293,13 @@
     <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="MenuBarItem">
-        <!-- ContentRoot / Background / ContentButton are upstream's three names. The Border is the tinted
+        <!-- ContentRoot / Background / ContentButton are upstream's three names. The Border is the only tinted
              layer and the Button carries the title, so a hover of the item still shows the button's own
              visual states nowhere - upstream neutralises them with four transparent ButtonBackground rows in
-             Grid.Resources, which is what the four literals below are. -->
-        <Grid Name="ContentRoot" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+             Grid.Resources, which is what the four literals below are. ContentRoot stays unpainted: a fill on
+             the Grid sits square under the Border that rounds it, invisible while the resting row is transparent
+             and showing as corners the moment an app sets a Background of its own. -->
+        <Grid Name="ContentRoot">
           <Border Name="Background" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
                   BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}"
                   TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083" />

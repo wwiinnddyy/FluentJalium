@@ -761,6 +761,56 @@ hover/press 那一半格子没有一条经真指针验证。收尾两次重跑�
 不声称模板**属性**也干净（闸口只查格子，属性那一层另立任务 32）；不声称悬停 / 按下通路有效（无输入证据）；
 不声称这批之后 Styles 里再没有静默失效——只再没有**这一类**。
 
+**属性死写批（35 条属性写到没有该成员的要素上，2026-09-20）**：上一批末尾按住的那条欠账（"模板**属性**也干净"）
+这次结掉，同一套做法往下走一层：普查每个元素的**声明类型**是否真有该成员。先量后改。
+
+(1) **结构闸口先立**：`AstraGateTests.Template_attributes_name_members_the_element_type_actually_has`
+把每个可解析元素的直接属性与带前缀的附加属性都反射查一遍。首跑普查 **2530 个元素 / 5263 条属性**、
+命中 **35 条**（附加属性 **0**），发货后复测 2533 个元素、直接 0 / 附加 0。命中的形状就是那几个"看着像成员"的名字：
+`ContentPresenter` 的 `Foreground` 15 / `TextWrapping` 2 / `*ContentAlignment` 2 / `Background` 1，
+`Grid` 的 `BorderBrush` 4 / `BorderThickness` 4 / `CornerRadius` 4 / `Padding` 2，`StackPanel` 的 `Padding` 1。
+同一元素上的 `Background` / `Margin` 是活的，所以布局看起来一切正常——构建、字典加载、资源键反查闸三样全不响。
+(2) **四处真正看得见的后果，这批不是为了清洁**：NumberBox Spinner 弹层（半径 + 描边三条落在 Grid 上 → 直角无边框，
+承载换 Border、名字留在画者上）；InfoBar 两条 padding（内容根 Grid 与 `Panel` StackPanel 都没有 `Padding` 成员 →
+内容贴死表面，`InfoBarContentRootPadding` 挪到 `RootBorder` 且 `MinHeight=48` 跟过去、
+`…PanelVerticalOrientationPadding` 由新增的 `PanelSurface` 承载）；TeachingTip 卡片（三条边框/半径落在
+`ContentRootGrid` 上 → 有底色、直角、无边框，画者换成第一个孩子 `ContentRootSurface`）；
+MenuBarItem 根 Grid 与圆角 Border 绑同一支笔刷（**静置与悬停都看不见**，因为静止行是
+`SubtleFillColorTransparentBrush`；要应用自设 `Background` 才溢出，见 (4)）。
+(3) **删除之前先量"继承有没有已经代偿"**：15 条 `Foreground` 与 2 条 `TextWrapping` 能删，依据是 S1-f 量到的
+控件级前景 + 生成文字继承，以及 `Styles/Navigation.jalxaml` 里那条更早的测量（本运行时生成文字默认 `Wrap`）。
+留一条事实钉住"行为没变"（复选 / 单选标签删属性后仍 `Wrap`）。Expander 的两条对齐改绑 presenter 自身的
+`HorizontalAlignment` / `VerticalAlignment`——那是复选、单选模板一直在用的路线，不是新发明。
+(4) **读数本身也会静默**：修 MenuBarItem 那条的第一版断言写的是 `root.GetValue(Control.BackgroundProperty)`，
+而 `Grid` 不是 `Control`，那格 `DependencyProperty` 与它自己声明的 `Background` 不是同一个对象——
+元素带着 `#00FFFFFF` 时读数仍 `null`，是一条永远为真的断言。两行并排放一次就分出来，改成读 Grid 自己的那格后
+**在修复前跑红、修复后跑绿**（`spike/AttributeSweep/menuitem-fill-first.txt`）。
+按 `GetValue(<类型>.<X>Property)` 扫全测试工程又抓到同一处错的兄弟一条（`AstraTeachingTipTests` 卡片事实里
+"布局格不再声明 `Background`"那行，按同一条机制它在坏标记上也是绿的），一并改读元素自己声明的那格。
+立此一条通用要求：修静默失效的断言，必须先在缺陷还在的时候红一次。
+(5) **闸口与普查覆盖面不同，数字留档**：闸口的类型宇宙是两个程序集里的 `DependencyObject` public 子类
+（本次读回 1972 条属性），普查多带 `Jalium.UI.Core` / `Media` 所以走到 5240 条；哪天两边背离先看这两个计数。
+`PixelHarness.Named` 只看子树，弹层表面的名字落在 `Popup.Child` 自己身上，因此那条事实直接读 child 并断言其 `Name`
+（同一陷阱 `AstraTeachingTipTests` 早写过，这次重新踩）。
+
+产物：`Styles/{Common,Inputs,Menus,Navigation,Selection,Surfaces,TeachingTip,TextInput}.jalxaml` 属性与承载修正；
+`AstraGateTests` 新闸口（带 1500 条 vacuity 下限）、`AstraSurfaceGeometryTests`（新，**6 条事实**）、
+`AstraTeachingTipTests` 部件清单补 `ContentRootSurface` + 1 条卡片事实；`adaptation/00` 新 **S1-g**（9 条）；
+`spike/AttributeSweep/{Program.cs,strip.py}` 与 6 份读数；六份审计文档（numberbox / infobar / expander /
+teachingtip / menu-flyout / checkbox-radiobutton）各加一节带日期的更正，Catalog 里 NumberBox / Expander /
+InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
+
+四类证据分开记：构建 = 串行闸口 **935/935 全绿、0 skip**、调色板两档 `checked=True`、83 源色 / 101 刷未变
+（`gates-2.txt`；基线 928 → 935 是本批 +6 条表面事实与 +1 条卡片事实）；行为 = 死属性先普查（35）后复测（0），
+四处表面几何按属性读回钉住，MenuBarItem 那条额外留下"修复前红 / 修复后绿"两份读数；
+视觉 = **本批 0 条新增像素捕获**，弹层只打开到属性层、卡片四角未裁帧；上屏 = Gallery 冒烟单独记；
+硬件输入 = **仍为零**（任务 13）。
+
+不声称：不声称那四处表面几何在像素上变了（全部只到属性读回）；不声称 MenuBarItem 的方角溢出肉眼可见
+（静止行透明，未测过应用自设填色的那一帧）；不声称属性名合法但资源名不存在的写法被治住（那是资源键闸口的地盘）；
+不声称 `Style` / `Setter` 等标记类型上的属性名拼错会被查到（闸口的类型过滤把它们排除在外）；
+不声称真指针 / 触摸路径——一条都没有；不声称 Styles 里再没有静默失效，只再没有**这一类**。
+
 | 1.0 | CLR API 清单 + 公开资源键清单冻结 + 每控件审计 + Light/Dark 像素证据 + 真实键鼠触证据 + 仅 NuGet 消费者冒烟 | 见 `docs/astra/resources`、`audits`、`testing` |
 
 ## 不声称清单（写进每个审计文档，不许被"构建通过"替代）

@@ -188,3 +188,18 @@ CheckBox 的 `Padding` 由 `CheckBoxPadding` 行驱动。
 框架在禁用时给生成的文字盖了本地值 `#FFAEAEB2`（行要的是 `#5C000000`），本地值压过格子，
 `AstraForegroundRoutingTests` 四条 disabled 事实钉的是这个读数而不是 token。
 结构闸口：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+上一条删的是格子，这次是同一批元素上的**属性**，本审计两族命中 6 条：
+`CheckRoot`（`Styles/Selection.jalxaml:17`）与 `RadioRoot`（`Styles/Inputs.jalxaml:353`）各自带着
+`BorderBrush="{TemplateBinding BorderBrush}"` 与 `BorderThickness="{TemplateBinding BorderThickness}"`，
+而 `Grid` 两样都没有成员——所以这两族的**根从来没有画过边框**，那两条属性只是标记形状；
+`CheckLabel`（`:27`）与 `RadioLabel`（`:366`）的 `Foreground` 是 S1-f 量过的同一类空转，
+两条 `TextWrapping="Wrap"`（`:27` / `:368`）`ContentPresenter` 也没有该成员。
+删除依据：`adaptation/00` S1-g 第 4 条——本运行时 presenter 生成的文字元素**默认就是 `Wrap`**
+（当初为了"别换行"才不得不写隐式 `TextBlock` 样式，见 `Styles/Navigation.jalxaml`），
+所以删属性行为不变，并留一条事实钉住它：
+`AstraSurfaceGeometryTests.A_check_box_label_and_a_radio_label_still_wrap_without_the_attribute`。
+边框那两条不声称任何像素变化：可见环一直是 `CheckSurface` / `RadioRing` 的 `*CheckBackgroundStroke*` 行，
+控件的 `BorderBrush` / `BorderThickness` 在删之前也没有读者。

@@ -213,6 +213,98 @@ public class AstraGateTests
         Assert.False(offenders.Count > 0, $"Cells writing a property their target does not have ({offenders.Count}):" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
     }
 
+    /// <summary>
+    /// The same rule, one layer down: an attribute an element's type does not declare is the identical silent drop,
+    /// and it is the layer the cell gate cannot see. The attribute sweep (docs/astra/adaptation/00 S1-g) found 35 of
+    /// them shipped in templates that looked finished - a <c>CornerRadius</c> on a <c>Grid</c>, a
+    /// <c>TextWrapping</c> on a <c>ContentPresenter</c>, a <c>Padding</c> on a <c>StackPanel</c> - four of which were
+    /// the whole reason a surface came out square: the NumberBox spinner popup, the InfoBar content root and panel,
+    /// the TeachingTip card and the menu bar item's fill bleeding past its own rounded border.
+    ///
+    /// Element names the runtime does not export are skipped rather than failed: <c>StaticResource</c> is a markup
+    /// extension with no type to check, and the reader resolves those by other means. Namespaced attributes are the
+    /// markup compiler's (<c>x:Key</c>), and a dotted element name is a property path, not an element.
+    /// </summary>
+    [Fact]
+    public void Template_attributes_name_members_the_element_type_actually_has()
+    {
+        var root = RepositoryRoot();
+        var types = typeof(Jalium.UI.Controls.Button).Assembly.GetTypes()
+            .Concat(typeof(FluentThemeManager).Assembly.GetTypes())
+            .Where(static type => type.IsPublic && type.IsSubclassOf(typeof(Jalium.UI.DependencyObject)))
+            .ToList();
+        var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance;
+        var staticFlags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
+        var offenders = new List<string>();
+        var checkedAttributes = 0;
+
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(root, "src", "FluentJalium"), "*.jalxaml", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(root, file);
+            foreach (var element in XDocument.Load(file).Descendants())
+            {
+                var localName = element.Name.LocalName;
+                if (localName.Contains('.', StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                var owner = types.FirstOrDefault(type => type.Name == localName);
+                if (owner is null)
+                {
+                    continue;
+                }
+
+                foreach (var attribute in element.Attributes())
+                {
+                    if (attribute.IsNamespaceDeclaration || attribute.Name.NamespaceName.Length > 0)
+                    {
+                        continue;
+                    }
+
+                    var name = attribute.Name.LocalName;
+                    if (name is "Name" or "Key" or "Uid" or "Class")
+                    {
+                        continue;
+                    }
+
+                    checkedAttributes++;
+                    if (name.Contains('.', StringComparison.Ordinal))
+                    {
+                        var split = name.IndexOf('.');
+                        var holder = types.FirstOrDefault(type => type.Name == name[..split]);
+                        var member = name[(split + 1)..];
+                        if (holder is null)
+                        {
+                            offenders.Add($"{relative}: <{localName} {name}> names a prefix type {name[..split]} the runtime does not export");
+                        }
+                        else if (holder.GetProperty(member, flags) is null && holder.GetProperty(member, staticFlags) is null
+                                     && holder.GetField(member + "Property", staticFlags) is null
+                                     && holder.GetMethod("Get" + member, staticFlags) is null)
+                        {
+                            offenders.Add($"{relative}: <{localName} {name}> - {holder.Name} exposes no attached {member}");
+                        }
+
+                        continue;
+                    }
+
+                    if (owner.GetProperty(name, flags) is null && owner.GetEvent(name, flags) is null
+                        && owner.GetMethod("Get" + name, staticFlags) is null)
+                    {
+                        offenders.Add($"{relative}: <{localName} {name}> - {owner.Name} has no {name}");
+                    }
+                }
+            }
+        }
+
+        // The floor is lower than spike/AttributeSweep's count on purpose: this universe is DependencyObject
+        // subclasses, so markup types that carry no dispatcher-side members (Color, Thickness, Geometry, key
+        // frames) are skipped here and walked there. Both read zero offenders.
+        Assert.True(checkedAttributes > 1500, $"only {checkedAttributes} attributes were checked; the gate has gone vacuous.");
+        offenders.Sort(StringComparer.Ordinal);
+        Assert.False(offenders.Count > 0, $"Attributes no element type can hold ({offenders.Count}):" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
     private static string RepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

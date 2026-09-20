@@ -1,0 +1,40 @@
+MenuBarItem 的静止底色只画一次：先失败、后通过（属性死写批 2026-09-20，adaptation/00 S1-g）
+
+事实：`AstraSurfaceGeometryTests.A_menu_bar_item_paints_its_fill_once_so_the_corners_stay_round`
+缺陷形状：`Styles/Menus.jalxaml` 里 `ContentRoot`（Grid）与内层 `Background`（Border）画同一支笔刷，
+Grid 那份没有圆角可说。
+
+== 修复前（Grid 仍带 Background="{TemplateBinding Background}"）==
+
+读法一：同一条事实里并排放两行读数，看哪一行会响。
+
+  Assert.Null(root.GetValue(Control.BackgroundProperty))   ← 本批第一版的写法
+  Assert.Null(root.Background)                              ← Grid 自己声明的那格
+
+  [FAIL] A_menu_bar_item_paints_its_fill_once_so_the_corners_stay_round
+      Assert.Null() Failure: Value is not null
+      Expected: null
+      Actual:   SolidColorBrush(#00FFFFFF)
+  失败! - 失败: 1，通过: 0，已跳过: 0，总计: 1
+
+只有一条失败，且失败的是第二行。→ 第一行**永远为真**：`Control.BackgroundProperty` 不是 `Grid` 声明的那格属性，
+元素画了东西也读成 null。这条断言在本批第一版里是一条静默的空断言（与它要防的缺陷同一类：名字对、通路不存在）。
+
+读法二：改成只剩 `root.Background` 的那行，同一条 Markup 下重跑 → 仍然 `失败: 1`，读数同上。
+所以这条事实在修复前会红，修复后才绿。
+
+== 修复后 ==
+
+`dotnet test tests/FluentJalium.Tests/FluentJalium.Tests.csproj --configuration Debug
+  --filter "FullyQualifiedName~AstraSurfaceGeometryTests|FullyQualifiedName~AstraMenuTests|FullyQualifiedName~AstraGateTests"`
+
+已通过! - 失败: 0，通过: 121，已跳过: 0，总计: 121，持续时间: 18 s
+
+== 这条缺陷到底看得见吗 ==
+
+看不见（在静置与悬停两态下）。`MenuBarItemBackground` 别名 `SubtleFillColorTransparentBrush`，
+上面那行读数就是 `#00FFFFFF` ——底层方角画的是透明的，什么都盖不出来。
+会看见的条件是**应用自己给条目设 `Background`**：本地值经 `TemplateBinding` 同时喂给两层，
+Grid 那份就是方角溢出。事实的第二半钉的是这个条件（本地刷只落到 Border），
+但它的"修复前会红"**没有单独跑过**——第一半先抛，第二半在修复前没执行到。
+四角也没有帧捕获（`IsMouseOver` 从外部写不进去，S0-m）。

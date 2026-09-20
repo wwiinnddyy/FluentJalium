@@ -350,7 +350,7 @@
     <Setter Property="HorizontalAlignment" Value="Left" /><Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Left" /><Setter Property="VerticalContentAlignment" Value="Top" />
     <Setter Property="Template"><ControlTemplate TargetType="RadioButton">
-      <Grid Name="RadioRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+      <Grid Name="RadioRoot" Background="{TemplateBinding Background}">
         <Grid.ColumnDefinitions><ColumnDefinition Width="20" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
         <Grid Name="RadioColumn" Width="20" Height="32" VerticalAlignment="Top">
           <Border Name="RadioRing" Width="20" Height="20" CornerRadius="10" VerticalAlignment="Center"
@@ -363,9 +363,9 @@
         </Grid>
         <ContentPresenter Name="RadioLabel" Grid.Column="1" Content="{TemplateBinding Content}"
                           ContentTemplate="{TemplateBinding ContentTemplate}" ContentStringFormat="{TemplateBinding ContentStringFormat}"
-                          Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}"
+                          Margin="{TemplateBinding Padding}"
                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" TextWrapping="Wrap" />
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
         <Border Name="RadioFocus" Grid.ColumnSpan="2" Margin="-2,1" BorderThickness="2" CornerRadius="4"
                 BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False" />
       </Grid>

@@ -160,7 +160,7 @@ public sealed class AstraTeachingTipTests : IDisposable
         _fixture.Run(() =>
         {
             var tip = Opened();
-            foreach (var name in new[] { "TailOcclusionGrid", "ContentRootGrid", "TitlesStackPanel", "TitleTextBlock", "SubtitleTextBlock", "MainContentPresenter", "ButtonPanel", "PART_ActionButton", "PART_CloseButton", "TailPolygon" })
+            foreach (var name in new[] { "TailOcclusionGrid", "ContentRootGrid", "ContentRootSurface", "TitlesStackPanel", "TitleTextBlock", "SubtitleTextBlock", "MainContentPresenter", "ButtonPanel", "PART_ActionButton", "PART_CloseButton", "TailPolygon" })
             {
                 Assert.NotNull(Find(name));
             }
@@ -168,6 +168,30 @@ public sealed class AstraTeachingTipTests : IDisposable
             Assert.NotNull(Container());
             Assert.NotNull(tip.Template);
             Assert.IsType<Popup>(OpenedPopup());
+        });
+    }
+
+    /// <summary>
+    /// The card's own geometry, read off the element that now holds it. Before the attribute sweep these four rows
+    /// sat on <c>ContentRootGrid</c>: a Grid has no CornerRadius, BorderBrush or BorderThickness member, so the
+    /// tip drew square and edgeless while every row still counted as consumed (spike/AttributeSweep,
+    /// docs/astra/adaptation/00 S1-g). The layout element keeps its name; the painting moved to a Border under it.
+    /// The last row reads the property <c>Grid</c> declares - <c>Control.BackgroundProperty</c> is a different
+    /// dependency property on a type this element is not, and a first draft of this assertion read that one and
+    /// passed on the broken markup (same class as S1-g item 8).
+    /// </summary>
+    [Fact]
+    public void The_card_paints_on_a_border_that_can_hold_its_radius()
+    {
+        _fixture.Run(() =>
+        {
+            var tip = Opened();
+            var surface = (Border)Find("ContentRootSurface")!;
+            Assert.Multiple(
+                () => Assert.Equal((CornerRadius)Application.Current!.TryFindResource("OverlayCornerRadius")!, surface.CornerRadius),
+                () => Assert.Same(Application.Current!.TryFindResource("TeachingTipBackgroundBrush"), surface.Background),
+                () => Assert.Equal(tip.BorderThickness, surface.BorderThickness),
+                () => Assert.Null(((Grid)Find("ContentRootGrid")!).Background));
         });
     }
 

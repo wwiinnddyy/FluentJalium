@@ -1,0 +1,7 @@
+elements checked: 2533, attributes checked: 5240
+unknown element names (not exported by the runtime): 493
+  ? StaticResource x493
+
+direct attributes with no member on the element type: 0
+
+attached attributes with no member on the prefix type: 0

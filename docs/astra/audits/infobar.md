@@ -163,3 +163,15 @@
 本轮普查（`ghost-probe4.txt` 第 C 段）给出的候选是 `NumberBox` 要 `PART_LayoutRoot` 而 `Styles/TextInput.jalxaml`
 没有这个名字；`Slider` 要 `PART_Segments`、`ComboBox` 要 `PART_SelectionPresenter`，本库都没有——三者是否真的因此
 多画一层，尚未按缺陷 1 那样量过，见 Known Gaps 第 10 条。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+本审计发的两条 padding 行**从来到不了元素**：`InfoBarContentRootPadding`（`16,0,0,0`）写在内容根的 `Grid` 上、
+`InfoBarPanelVerticalOrientationPadding`（`0,14,0,18`）写在 `Panel` 的 `StackPanel` 上，
+而 Grid 与 StackPanel 都没有 `Padding` 成员（同一元素上的 `Background`/`Margin` 有，所以布局看起来一切正常）。
+修法：前者挪到 `RootBorder`（同一个盒子，`MinHeight=48` 跟着挪过去，48 才仍然"含 padding"），
+后者由新增的 `PanelSurface` Border 承载，`Panel` 的名字与 StackPanel 类型不动；
+内容根 Grid 上那条同样无处落地的 `CornerRadius` 删除。读回见
+`AstraSurfaceGeometryTests.The_info_bar_insets_its_content_with_the_rows_that_now_have_a_painter`。
+残留缺陷（进 Catalog）：条自身的 `Background` 仍由那层 Grid 画，它没有圆角可说，
+所以**应用设了 Background 时不会被根半径裁掉**——本批没给它画者，也没量过这条会不会真看见。

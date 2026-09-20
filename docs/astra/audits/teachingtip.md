@@ -152,3 +152,20 @@ HC 464-476。WinUI Gallery（`Samples/WinUIGallery`）的"卡片"是**手搓 Bor
 照 CardPage 的数值摆卡片面，并把"WinUI 没有 Card 控件"这条证据写进 Catalog。
 若将来要一个真类型，得先证明有配方覆盖不了的行为缺口——按 AGENTS.md"只有证明的行为缺口才起自有类型"，
 现在没有这个证据。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+§2 那棵部件树里画卡片的层**原本只有一个 `ContentRootGrid`**，它同时带着 `Background`、`BorderBrush`、
+`BorderThickness`、`CornerRadius` 四条。`Grid` 只有 `Background`——另外三条没有成员可落，
+所以本审计"卡片有 `TeachingTipContentBorderThickness*` 描边、走 `OverlayCornerRadius` 圆角"那句话在运行时
+**从来不成立**：卡片有底色、直角、无边框。`MainContentPresenter` 上的 `Background` 与 `Foreground` 同理，
+`ContentPresenter` 两样都没有。
+修法：布局格保留原名与原职责（各部件仍挂在它下面），画者换成它的第一个孩子 `ContentRootSurface`
+（`Border`，跨全部行、内容盖在填色之上），三条行名跟着搬过去；presenter 那两条删除——底色由上面那张 Border 画，
+字色走 S1-f 量到的继承通路。部件清单同批补上 `ContentRootSurface`。
+读回见 `AstraTeachingTipTests.The_card_paints_on_a_border_that_can_hold_its_radius`
+（半径 / `Background` / `BorderThickness` 落在 Border 上，且布局格自己不再声明 `Background`）。
+该行第一版读的是 `Control.BackgroundProperty`，而 `Grid` 不是 `Control`：两格依赖属性不是同一个对象，
+按 MenuBarItem 那次实测的同一机制（元素带着笔刷也读回 `null`，`adaptation/00` S1-g 第 8 条），
+它是一条永远为真的断言，已改读 `Grid.Background`。
+不声称：卡片四角**没有帧捕获**，这条只到属性读回；尾部几何与本节其余状态映射（§3）不因这条更正重测。

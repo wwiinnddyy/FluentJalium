@@ -228,22 +228,28 @@
                control instead of overlapping its right edge. -->
           <Popup Name="UpDownPopup" Grid.Row="1" IsOpen="False" StaysOpen="False" Placement="Bottom"
                  PlacementTarget="{Binding RelativeSource={RelativeSource AncestorType=NumberBox}}">
-            <Grid Name="PopupContentRoot" Padding="6" CornerRadius="{ThemeResource OverlayCornerRadius}"
-                  Background="{ThemeResource NumberBoxPopupBackground}" BorderBrush="{ThemeResource NumberBoxPopupBorderBrush}"
-                  BorderThickness="{ThemeResource NumberBoxPopupBorderThickness}">
-              <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-              </Grid.RowDefinitions>
-              <RepeatButton Name="PopupUpSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Margin="0,0,0,4">
-                <Path Data="M 1,4.5 L 5,0.5 L 9,4.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
-              </RepeatButton>
-              <RepeatButton Name="PopupDownSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Grid.Row="1">
-                <Path Data="M 1,0.5 L 5,4.5 L 9,0.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
-                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
-              </RepeatButton>
-            </Grid>
+            <!-- The painter has to be a Border. On a Grid this block carried three rows nothing could read:
+                 Grid has no CornerRadius, BorderBrush or BorderThickness member, so the spinner popup came out
+                 square and edgeless whatever the rows said (spike/AttributeSweep, adaptation/00 S1-g). The name
+                 stays on the painting element; the rows move into a layout Grid under it. -->
+            <Border Name="PopupContentRoot" Padding="6" CornerRadius="{ThemeResource OverlayCornerRadius}"
+                    Background="{ThemeResource NumberBoxPopupBackground}" BorderBrush="{ThemeResource NumberBoxPopupBorderBrush}"
+                    BorderThickness="{ThemeResource NumberBoxPopupBorderThickness}">
+              <Grid>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="*" />
+                  <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <RepeatButton Name="PopupUpSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Margin="0,0,0,4">
+                  <Path Data="M 1,4.5 L 5,0.5 L 9,4.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+                </RepeatButton>
+                <RepeatButton Name="PopupDownSpinButton" Style="{StaticResource NumberBoxPopupSpinButtonStyle}" Grid.Row="1">
+                  <Path Data="M 1,0.5 L 5,4.5 L 9,0.5" Width="12" Height="8" Stretch="Uniform" StrokeThickness="1.25"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}" />
+                </RepeatButton>
+              </Grid>
+            </Border>
           </Popup>
         </Grid>
         <ControlTemplate.Triggers>

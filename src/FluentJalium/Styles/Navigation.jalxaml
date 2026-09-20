@@ -21,7 +21,7 @@
                   Background="{TemplateBinding Background}" TransitionProperty="Background"
                   TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                              Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" />
+                              Content="{TemplateBinding Content}" />
           </Border>
           <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
                   BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
@@ -74,8 +74,7 @@
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
               <ContentPresenter Content="{TemplateBinding Icon}" Width="16" Height="16"
-                                HorizontalAlignment="Center" VerticalAlignment="Center"
-                                Foreground="{TemplateBinding Foreground}" />
+                                HorizontalAlignment="Center" VerticalAlignment="Center" />
               <!-- The presenter's own TextWrapping attribute is accepted by the reader and goes nowhere, and
                    Jalium's generated text element defaults to Wrap, so a long pane label grew the row to
                    55.3 DIP and pushed the rest of the list down. The promise has to sit on the text element
@@ -84,7 +83,7 @@
                    restates it (NavigationView_themeresources.xaml:1085). -->
               <ContentPresenter Name="PART_Label" Grid.Column="1" Margin="0,0,12,0"
                                 Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center">
+                                VerticalAlignment="Center">
                 <ContentPresenter.Resources>
                   <Style TargetType="TextBlock">
                     <Setter Property="TextWrapping" Value="NoWrap" />
@@ -185,7 +184,7 @@
                   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
             <ContentPresenter Name="PART_ContentPresenter" Margin="{TemplateBinding Padding}"
                               Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
-                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="{TemplateBinding Foreground}" />
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
           </Border>
         </Grid>
       </ControlTemplate>

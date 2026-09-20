@@ -1344,3 +1344,71 @@ disabled 格因此是唯一的写者。字典侧随之把 `TextControlHeaderFore
 而 `dotnet test tests/…` 根本不构建 Gallery 项目，于是一次完全正常的编辑被读成"复制清单坏了"。
 教训写在这里：改过 `.jalxaml` 或 `Catalog.json` 之后，唯一算数的读数是把整解重建的串行闸口再跑一遍，
 不是"上一次全绿所以这次也算绿"。
+
+## S1-g：属性也一样要"目标真的有这个成员"——35 条死写属性与四处方角表面（属性死写批，2026-09-20）
+
+原始读数：`spike/AttributeSweep/`（`Program.cs` 普查、`attrsweep-1.txt` 首跑 35 条、`strip-report.txt` 逐条删除清单、
+`attrsweep-2.txt` 复测 0 条、`menuitem-fill-first.txt` 一处读数的先失败后通过、`gates-1.txt` 与 `gates-2.txt` 两轮串行闸口）。
+结构闸口：`AstraGateTests.Template_attributes_name_members_the_element_type_actually_has`；
+效果闸口：`AstraSurfaceGeometryTests`（6 条事实）与 `AstraTeachingTipTests.The_card_paints_on_a_border_that_can_hold_its_radius`。
+
+**1 · S1-f 那道闸口只反射格子，属性是同一类缺陷的下一层。** 普查用同一套做法（把每个元素的**声明类型**记成成员表，
+再逐条反射属性名），范围扩到 `src/FluentJalium` 下每一个可解析元素：首跑 **2530 个元素 / 5263 条属性**，
+命中 **35 条**；带前缀的附加属性 **0** 条（`Grid.Row`、`ScrollViewer.*` 那一批全都有主）。发货后复测
+2533 个元素，直接命中 0、附加命中 0。
+
+**2 · 命中的形状就是那几个"看着像成员"的名字。** `ContentPresenter` 的 `Foreground` 15 条、`TextWrapping` 2 条、
+`HorizontalContentAlignment` / `VerticalContentAlignment` 各 1 条、`Background` 1 条；`Grid` 的 `BorderBrush` 4 条、
+`BorderThickness` 4 条、`CornerRadius` 4 条、`Padding` 2 条；`StackPanel` 的 `Padding` 1 条。
+`Grid` 有 `Background`、`ContentPresenter` 有 `Margin`/`HorizontalAlignment`——这正是它们能"看起来正常"的原因，
+也是为什么资源键反查闸、构建、字典加载三样全都不会响。
+
+**3 · 四处真正看得见的后果，这批不是为了清洁。**
+(1) **NumberBox 的 Spinner 弹层**：`PopupContentRoot` 是 Grid，`OverlayCornerRadius`、`NumberBoxPopupBorderBrush`、
+`NumberBoxPopupBorderThickness` 三条落在它身上永远读不到 → 弹层直角、无边框。承载元素换成 Border，行名 `PopupContentRoot`
+留在画者身上，行布局挪进内层 Grid。
+(2) **InfoBar 的两条 padding**：`InfoBarContentRootPadding`（`16,0,0,0`）写在 Grid、
+`InfoBarPanelVerticalOrientationPadding`（`0,14,0,18`）写在 StackPanel，两处都没有该成员 → 内容贴死在表面边上。
+前者挪到 `RootBorder`（同一个盒子，`MinHeight=48` 跟着挪，48 才仍然含 padding），后者由新增的 `PanelSurface` Border 承载，
+`Panel` 名字与 StackPanel 类型都不动。
+(3) **TeachingTip 的卡片**：`ContentRootGrid` 上的 `BorderBrush`/`BorderThickness`/`CornerRadius` 读不到 → 卡片直角无边框。
+布局格保留原名与原职责，画者换成它第一个孩子 `ContentRootSurface`（跨全部行、被内容盖在上方）。
+(4) **MenuBarItem 的静止底色画了两次**：根 Grid 与内层圆角 Border 绑同一支笔刷，Grid 那份没有圆角可说。
+**但这条在静置与悬停两态都看不见**：`MenuBarItemBackground` 别名 `SubtleFillColorTransparentBrush`，
+底层方角画的是 `#00FFFFFF`——什么都盖不出来。会看见的条件是应用自己设 `Background`（本地值经 `TemplateBinding`
+同时喂两层）。修法仍是只让 Border 画。读数与"第一版断言其实是空的"记在
+`spike/AttributeSweep/menuitem-fill-first.txt`；**四角没有像素捕获**。
+
+**4 · 删除之前先量"继承有没有已经代偿"，不猜。** 15 条 `Foreground="{TemplateBinding Foreground}"` 一律删除：
+S1-f 已经量到控件级 `Foreground` 是本运行时唯一通路，生成的文字靠继承取到（`item=#FF112233 → text=#FF112233`），
+那条属性本来就是空转。2 条 `TextWrapping="Wrap"` 也删，依据是 `Styles/Navigation.jalxaml` 里那条更早的测量——
+**本运行时 ContentPresenter 生成的文字默认就是 `Wrap`**（当初为"别换行"才不得不写进 `ContentPresenter.Resources`
+的隐式 `TextBlock` 样式）。删完仍留一条事实把"行为没变"钉住：`AstraSurfaceGeometryTests.A_check_box_label_and_a_radio_label_still_wrap_without_the_attribute`。
+
+**5 · 内容对齐换的是同一条已验证路线，不是新发明。** `ContentPresenter` 没有 `*ContentAlignment` 成员，
+但有 `HorizontalAlignment`/`VerticalAlignment`——复选、单选两个标签模板一直就是这么写的。Expander 的内容 presenter
+照同一形状改绑，读回随 `HorizontalContentAlignment` 两个取值走。
+
+**6 · 弹层里读部件要读"孩子本身"，按名字查找只往下走。** `PixelHarness.Named(popup.Child, "PopupContentRoot")` 返回 null：
+名字就落在那个 child 上，而名字查找只测子树。改成把 `popup.Child` 直接当画者读、断言它的 `Name`——
+这条陷阱 `AstraTeachingTipTests` 早就写过一遍，这次是我重新踩。
+
+**7 · 闸口与普查的覆盖面不同，把数字留在这儿。** 闸口的类型宇宙是"两个程序集里的 `DependencyObject` public 子类"
+（本次读回 1972 条属性），普查多带 `Jalium.UI.Core`/`Media` 所以能走到 5240 条——`Color`、`Thickness`、几何、
+关键帧这类没有部件语义的类型因此只有普查在看。两边现在都是 0 命中；哪天两边数字背离，先看这两个计数。
+
+**8 · 读数本身也会静默——它必须认元素的类型。** `AstraSurfaceGeometryTests` 那条 MenuBarItem 事实的**第一版**写的是
+`root.GetValue(Control.BackgroundProperty)`，而 `root` 是 `Grid`：`Control` 不是它的基类，那格 `DependencyProperty`
+与 `Grid` 自己声明的 `Background` 不是同一个对象，所以元素明明带着 `#00FFFFFF`，读数仍是 `null`——
+一条永远为真的断言，和它要防的缺陷是同一类（名字对、通路不存在）。两行并排放一次就分出来了：
+只有读 `root.Background` 的那行会响（`spike/AttributeSweep/menuitem-fill-first.txt`）。
+把整个测试工程按 `GetValue(<类型>.<X>Property)` 扫一遍，同一处错还有一个兄弟：`AstraTeachingTipTests` 里"布局格不再声明
+`Background`"那一行读的也是 `Control.BackgroundProperty`，按上面同一条机制它在坏标记上也是绿的，已改读 `Grid.Background`
+（这条**没有**单独再破一次标记去量，依据是上面那次实测的机制）。
+剩下的跨类型读数两类：接收元素本来就是 `Control`（`ScrollViewer`、`SplitButton`），或者读错了会**当场抛**而不是静默
+（`(double)element.GetValue(UIElement.OpacityProperty)` 拿到 null 就炸）。
+**推论：修静默失效的断言，要先在缺陷还在的时候跑红一次**，否则"绿"可能只是又一次读错了格子。
+
+**9 · 这批没做的。** 属性名合法但 `{ThemeResource}` 资源名不存在的情况（资源键闸口管）；`Style`/`Setter` 这些
+非 `DependencyObject` 标记类型上的属性名拼错（闸口的类型过滤把它们排除在外）；真指针输入（#13）一条都没有；
+`ContentRootGrid` 那类"格子里名字对了但部件不存在"的组合仍由 S1-f 那道闸口负责。

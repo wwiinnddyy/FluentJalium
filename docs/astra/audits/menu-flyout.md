@@ -163,3 +163,18 @@ x=350..479、宽 130 px = 74.27 DIP×1.75，只差半径：**弧深**在 8 的�
 `IsEnabled=False`（模板现在确实没有那一格），另一条逐格断言理论里把该格当契约的 `InlineData` 一行删除（−1 条事实）。
 守卫：`AstraForegroundRoutingTests.A_disabled_menu_item_carries_its_row_into_the_icon_as_well_as_the_text`
 钉图标与标签同时取到行——这条是删格子之后唯一的证据通路，仍然只是属性读回，不是像素。
+
+## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）
+
+同三处 `IconContent` 上还各挂着一条 `Foreground="{TemplateBinding Foreground}"` 属性（`Styles/Menus.jalxaml:66 / :117 / :160`），
+`ContentPresenter` 没有这个成员，上一条更正删掉格子之后它就是纯空转，一并删除。
+`MenuBarItem` 那段还有一条真死掉的：根 `ContentRoot` 是 `Grid`，却带着 `CornerRadius="{TemplateBinding CornerRadius}"`（`:300`）。
+另外那层 Grid 与内层圆角 Border **绑同一支笔刷**，本批把它也删了（只让 Border 画）——但要说清楚：
+`MenuBarItemBackground` 别名 `SubtleFillColorTransparentBrush`，底层方角画的是 `#00FFFFFF`，
+**静置与悬停两态都看不见**这条溢出；会看见的条件是应用自己给条目设 `Background`（本地值经 `TemplateBinding` 喂给两层）。
+读回见 `AstraSurfaceGeometryTests.A_menu_bar_item_paints_its_fill_once_so_the_corners_stay_round`
+（静置 + 本地填色两半：Grid 不声明 `Background`，Border 取到那一支）。
+这条更正还要记一次自打：该事实**第一版**读的是 `root.GetValue(Control.BackgroundProperty)`，而 `Grid` 不是 `Control`，
+那格依赖属性与它自己声明的 `Background` 不是同一个对象——元素带着 `#00FFFFFF` 时读数仍是 `null`，
+是一条永远为真的断言（两行并排放一次就分出来，见 `spike/AttributeSweep/menuitem-fill-first.txt`）。
+不声称：四角**没有像素捕获**（`IsMouseOver` 从外部写不进去，S0-m），只到属性读回 + 形状推理。
