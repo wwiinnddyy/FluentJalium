@@ -1421,7 +1421,10 @@ S1-f 已经量到控件级 `Foreground` 是本运行时唯一通路，生成的�
 `Styles/TabView.jalxaml`、`ThemeResources/TabView.jalxaml`、`docs/astra/audits/tab-view.md`；
 效果闸口：`AstraTabViewTests`（16 条事实）。
 
-**1 · "能不能重模板"是有位置的，位置在类型链上。** 反射读 `UseTemplateContentManagement` 的声明类型：它是
+**1 · "能不能重模板"是有位置的，位置在类型链上。**〔下一段作废了这条的普适性，见 S1-i 第 1 条：
+`DataGrid` 同样不在 `ContentControl` 链上，三条通路却全部落上我们的模板。真正的判别量是"框架给那个类型的
+样式里有没有 `Template` 格子"。下面这段保留，因为它记录的 `TabControl` 那条测量仍然成立——错的是我
+把它写成了通用判据。〕反射读 `UseTemplateContentManagement` 的声明类型：它是
 `ContentControl` 上的 `protected` 成员。链上有 `ContentControl` 的（`TabItem : HeaderedContentControl :
 ContentControl`、`ListBoxItem`、`ContentControl` 本身）子类够得着；链上没有的（`TabControl : Selector :
 ItemsControl : Control`、`ListBox`、`ItemsControl`）任何子类都够不着。注意这条**不是**"够得着就能建"的充分条件，
@@ -1476,3 +1479,111 @@ presenter 只留内容与居中；`Foreground` 仍然写在按钮自己身上，
 改法与账单在 `audits/tab-view.md` §5 第 6 条。
 **推论给后面每一批：这类崩溃测试工程一条都看不见**——同一棵树上 40 条 TabView 事实与 977 条全套全绿，
 只有把那一页真的挂上屏（`tools/Test-AstraGallerySmoke.ps1 -Page navigation`）才炸得出来。
+## S1-i：表格族推翻 S1-h 的判据——能不能重模板不看类型链，看框架那份样式里有没有 `Template` 格子（阶段 5 第五段，2026-09-20）
+
+原始读数：`s1i-datagrid-host-raw.txt`（653 行，`spike/DataGridProbe --mode all`）、
+`s1i-datagrid-tokens-raw.txt`（100 行，`--mode pass2`）。运行时 = NuGet Jalium.UI 26.10.9；
+框架自己的表格标记在 sibling 树 `src/managed/Jalium.UI.Controls/Themes/Controls/DataGrid.jalxaml`（195 行）
+与 `TreeDataGrid.jalxaml`（111 行），该树 `git describe` = **v26.10.9**，与运行时同版本，所以它的
+部件名与 token 名可以当名单用；每一条仍在本进程复核过。
+
+**1 · 先更正上一段刚写下的判据。** S1-h 第 1 条把"链上没有 `ContentControl` 就不能重模板"当成了
+分类型开关。`DataGrid : MultiSelector : Selector : ItemsControl : Control`——和 `TabControl` 同一条
+`Selector` 支系——但三条通路全部落上我们的模板：隐式应用级样式、显式 `Style` + `Template` 格子、
+`Template` 本地值，每次都能在同一次挂载里读到 `ProbeTemplateRoot(Border)` 与 `ProbeItems(ItemsPresenter)`，
+`TabControl` 三条全塌（`spike/TabViewStyle`）。所以真正的判别量不是链，而是**框架给这个类型的那份样式里
+到底有没有 `Template` 格子**：`Application.TryFindResource(typeof(DataGrid))` 返回一个
+`TargetType=DataGrid` 的 `Style`，11 个格子里第 11 个就是 `Jalium.UI.Controls.ControlTemplate`
+（`s1i-datagrid-tokens-raw.txt` §I）；`TabControl` 那边根本没有这份样式。改判据一句话：
+**问"框架样式有没有模板格子"，别问"链上有没有 ContentControl"。**
+
+**2 · "框架不嵌 .jalxaml、163 个控件零默认样式"这条要收窄，本批把它证伪了一半。** 类型清单里明明白白躺着
+`__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml` 和
+`_Dict_..._TreeDataGrid_jalxaml`——标记在，只是编译成预构建字典类而不是资源流，所以
+`LoadGenericTheme()` / `GetGenericThemeStream()` 返回 null 说的是流那条路，不等于"框架没有主题"。
+更要紧的是**读取时机**：未挂载的 `new DataGrid()` 报 `Template=null Style=null`，挂载 + 10 帧之后报
+`Template=SET`，而 `Style` 仍然是 `null`——当年那 163 个 `Style == null` 全是在未挂载实例上读的，
+这个属性在这条运行时里根本不报告主题样式。所以"Astra 站在 ModernWpf `ControlsResources` 的位置、
+我们没画的控件会裸奔"这句要改成：**Astra 是在覆盖框架自带的一套近似 Fluent 的主题**；没覆盖的控件不是
+朴素，是框架那套（表格里就是 r=12 圆角 + 强调色渐变行）。`adaptation/05` 第 36 行
+"DataGrid | 纯模板，可完全覆盖 | Styles" 从预测升为已测。
+
+**3 · 框架那份表格主题一共读 11 个名字，Astra 只定义其中 2 个。** 逐个查 `x:Key`：
+`LayerFillColorAltBrush`、`SubtleFillColorSecondaryBrush` 在 `ThemeResources/Light.jalxaml` 与
+`Dark.jalxaml` 里（WinUI token 名），其余 9 个——`SurfaceBackground`、`TextPrimary`、`TextSecondary`、
+`TextDisabled`、`ControlBorder`、`ControlBorderFocused`、`AccentBrush`、`TextOnAccent`、
+`CaptionFontSize`——是框架自己的 token 层，Astra 一条都没有。**身份才是钩子的证据**：挂载后
+`PART_OuterBorder.Background` 与 `TryFindResource("SurfaceBackground")` 是**同一个实例**
+（`sameInstance=True`，`TextPrimary`/`ControlBorder` 同），并且 `IsEnabled=False` 那条
+`TextDisabled` 也是同实例 + `Opacity=0.56` 落地。同一份网格在
+`FluentThemeManager.Apply` 前后各读一次：`LayerFillColorAltBrush` 从框架的 `#FF3A3A3C` 翻成我们的
+`#0DFFFFFF`、`SubtleFillColorSecondaryBrush` 翻成 `#0FFFFFFF`，都是实例同一性成立——
+**名字撞上去就能给框架自己的模板换色，一行代码都不用**。这是 A2 别名层（并行任务 #12）第一次拿到
+"撞名字能到什么程度"的实测边界。
+
+**4 · 撞名也撞出一条品牌绿缺陷，两条选中文本缺陷。** 未加 Astra 的框架基线：
+`ControlBorderFocused = #FF1E793F`（品牌绿）挂在 `PART_OuterBorder.BorderBrush` 的
+`IsKeyboardFocused=True` 格子上；`AccentBrush` 是一个 **LinearGradientBrush**（S0-w/角批那支
+`#1D733C..#2B804A` 渐变），选中行 `PART_RowBorder.Background` 实测就是它——**整行铺品牌绿渐变**。
+第二条：行样式触发把 `row.Foreground` 写成 `TextOnAccent`（`#FFFFFFFF`，实测到了），但
+`DataGridCell` 自己的样式格子写着 `Foreground = TextPrimary`，实测 `cell.Foreground=#FFF5F5F7`
+不变——**选中行的"反色文字"到不了单元格**，渐变上盖的是常态字色。两条都是本批必须用我们自己的样式
+压掉的缺陷，不是可以"照抄上游"的东西：上游没有 WinUI DataGrid 可抄（第 6 条）。
+`AccentBrush` 那一行在 §G 里 `sameInstance=False` 不算反证——那处比的是未选中行的 `Transparent`，
+真凭据是 §J 选中后的读数。**凡是"实例同一性"的断言都要在状态真的那一侧读。**
+
+**5 · 部件名是契约，我们的模板不给那些名字就掉功能。** 换上一个只有 `Border + ItemsPresenter` 的模板之后：
+行仍然生成（`DataGridRow` 2 个，各自带框架 `PART_RowBorder`/`PART_CellsPanel`），但
+`DataGridCell=0`、列头整排消失、`PART_OuterBorder` 不存在、行宽从 466 涨到 480（`PART_RowHeaderCorner`
+的 20 DIP 槽没了）。也就是说宿主模板负责列头带、滚动带、拖拽层与行头角，条目/单元格/列头各有自己的
+框架样式可以单独覆盖（`DataGridRow`、`DataGridCell : ContentControl`、`DataGridColumnHeader : ButtonBase`、
+`DataGridRowHeader : ButtonBase`、`DataGridDetailsPresenter : ContentPresenter`、
+`DataGridCellsPresenter`/`DataGridRowsPresenter`/`DataGridColumnHeadersPresenter`）。
+框架那份的几何基线（全部实测，非读码）：外框 `r=12,12,12,12` + `ClipToBounds=True`、
+`bt=1,1,1,1`；行 30；列头带 34；单元格 padding `10,5,10,5`；列头 padding `10,7,6,7`；
+`PART_ResizeGrip` 8x34 且 `IsHitTestVisible=False`；`PART_SortIndicator` 空串。
+和 WinUI/ModernWpf 的距离（行 40、半径 4/8、列头 40）全部要写进差异表。`GridSplitter` 类型在
+（`GridSplitter : Thumb`，6 个 DP 含 `ResizeBehavior/ResizeDirection/ShowsPreview`），
+WinUI 侧的"列头里嵌 gripper"形状在这里是另一种做法——这条只登记，不在本批动。
+
+**6 · 上游没有 WinUI DataGrid，本批的"照抄上游"没有对象。** 在只读引用树
+`../microsoft-ui-xaml`（commit `19e3bdc3c`）里：`git ls-files | grep -ic datagrid` = **0**，
+`git ls-tree -r HEAD | grep -ic datagrid` = 0，`controls/dev/` 无 DataGrid 目录，全 ref 历史按
+datagrid 找新增只命中 TableView 的提交；33 处 "DataGrid" 文本命中全是 `AutomationControlType.DataGrid`
+枚举、UIA 窗口类名和 TableView 设计稿里的提及。`TreeDataGrid` 在 microsoft-ui-xaml / ModernWpf /
+UI.WPF.Modern / wpfui / uno / FluentAvalonia 六棵树里全为 0——它属于 CommunityToolkit.WinUI，
+本机没有那棵树。上游真正的表格是 `controls/dev/TableView/`（dll-tabular，MUX_PREVIEW）：
+`TableView_themeresources.xaml` 70 行、三分支各 12 条**纯度量无 brush**（度量与画笔分家的原因写在
+该文件 11–19 行注释：合并会 duplicate-key 编译失败），画笔另在
+`controls/dev/CommonStyles/TabularSurfaces_themeresources.xaml`（305 行 189 键，`TabularSurface*` 前缀），
+`TableView.xaml` 393 行 15 个 `PART_` 部件、行状态组 `CommonStates` 8 格（含
+`Selected/SelectedPointerOver/SelectedPressed/SelectedDisabled` 同组）。
+**所以本批的样式与键权威是 ModernWpf 的 `ModernWpf/Styles/DataGrid.xaml`（831 行、53 键）——
+它自己抄的是 dotnet/wpf 官方 Fluent，不是 WinUI**（`ModernWpf/docs/datagrid-wpf-fluent-source-audit.md`
+82 行是这份差异的逐字说明，含它删掉的 WinUI 猜测层清单）。把这条写死，免得下一批又去找不存在的
+`DataGrid_themeresources.xaml`。路线图第 221 行"列拖拽实时读 Accent"这句要按 §4 重读：
+运行时确实把 `AccentBrush` 用在选中行上，但那是框架自己那份模板的行为，不是上游契约。
+
+**7 · 我们的隐式样式不是"顶掉"框架那份，而是叠在上面——所以漏写的格子会留下框架值。** 这条本段先记成
+"待补测"，`spike/DataGridProbe --mode pass3`（`s1i-datagrid-ownership-raw.txt`）量完直接结清：
+`DataGrid.RowHeight/ColumnHeaderHeight/BorderThickness/GridLinesVisibility/RowBackground/`
+`AlternatingRowBackground/Background/Foreground` 八个 DP 的 `DefaultValue` **全是 null**，
+所以 30 / 34 / `1,1,1,1` / `All` 这些读数不可能是默认值兜出来的；把只有一个 `Template` 格子的
+`Application.Resources[typeof(DataGrid)]` 装上去之后，这六条读数与"什么都没装"的框架基线**逐条相同**，
+`Background`/`Foreground` 也仍然指向 `SurfaceBackground`/`TextPrimary` 那个实例。
+结论两半：(a) 省格子不会掉外观，`Styles/DataGrid.jalxaml` 不必把 11 条重抄一遍；
+(b) 反过来，**漏写也杀不掉任何东西**——品牌绿的 `AccentBrush` 选中行与
+`ControlBorderFocused` 焦点边框不能靠"我们不写"来消除，只能靠换模板（pass 1 证明我们的模板真的落）
+或改那两个 token 名。第二个办法有全局风险：`AccentBrush` 是框架 token 层，别的框架控件也读它，
+在应用级字典里重定义等于给全仓改语义（S0-n/NumberBox 批那条"应用级名字撞车、最后写入者赢"的账）。
+**本段决定：绿由模板与行/列头/单元格样式压，不动 `AccentBrush`。**
+另一条没量清的先挂着：`Application.Resources` 上 `ContainsKey(typeof(DataGrid))` 是 True、
+索引器取回的 `Style` 与合并查找同一个对象，但 `Keys.Count` 是 **0**——两个访问器对同一本字典的说法不一致，
+"框架那份样式到底住在应用字典里还是另一个作用域"这条**未结**；它只影响叙述，不影响上面的成本结论。
+
+**8 · 判据本身要留一句：`Style` 属性不是读取点。** 本段三次读 `mounted.Style` 都是 null，而
+`TryFindResource(typeof(DataGrid))` 明明白白返回一个 11 格的 `Style`——**"挂载后样式仍然不落在公开
+`Style` 属性上"（S1-c 第 1 条）在表格族同样成立，且现在有了正向证据**：样式在合并查找里、在格子里、
+在像素上，就是不在属性上。凡是"这个控件有没有默认样式"的问题，读 `TryFindResource(typeof(X))`
+与挂载后的实际值，别读 `X.Style`。
+

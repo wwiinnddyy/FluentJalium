@@ -1,0 +1,100 @@
+theme dictionaries=44
+
+=== G/H. the framework's grid before Astra's dictionaries are applied ===
+  rendered= size=480x140
+  [framework-only] outer bg=#FF2C2C2E border=#FF48484A bt=1,1,1,1 r=12,12,12,12 clip=True
+  [framework-only] host=480x140 headers=478x34 rowsHost=466x92 row=466x30 cell=120x30.78 header=120x34
+  [framework-only] cell padding=10,5,10,5 header padding=10,7,6,7 gridRowHeight=30 columnHeaderHeight=34
+  [framework-only] row border bg=#00FFFFFF bt=0,0,0,1 bc=#FF48484A rowFg=#FFF5F5F7
+  [framework-only] header border bg=#FF3A3A3C bc=#FF48484A bt=0,0,1,0 sortIndicator= size=8x34
+  token identity (name -> app lookup instance vs the instance the part carries):
+    SurfaceBackground: lookup=#FF2C2C2E carried=#FF2C2C2E sameInstance=True inAstra=no
+    TextPrimary: lookup=#FFF5F5F7 carried=#FFF5F5F7 sameInstance=True inAstra=no
+    ControlBorder: lookup=#FF48484A carried=#FF48484A sameInstance=True inAstra=no
+    LayerFillColorAltBrush: lookup=#FF3A3A3C carried=#FF3A3A3C sameInstance=True inAstra=no
+    SubtleFillColorSecondaryBrush: lookup=#FF3A3A3C carried=#FF3A3A3C sameInstance=True inAstra=no
+    AccentBrush: lookup=LinearGradientBrush carried=#00FFFFFF sameInstance=False inAstra=no
+    plain lookup SurfaceBackground: SolidColorBrush #FF2C2C2ESolidColorBrush(#FF2C2C2E)
+    plain lookup TextPrimary: SolidColorBrush #FFF5F5F7SolidColorBrush(#FFF5F5F7)
+    plain lookup TextSecondary: SolidColorBrush #FFD1D1D6SolidColorBrush(#FFD1D1D6)
+    plain lookup TextDisabled: SolidColorBrush #FF636366SolidColorBrush(#FF636366)
+    plain lookup ControlBorder: SolidColorBrush #FF48484ASolidColorBrush(#FF48484A)
+    plain lookup ControlBorderFocused: SolidColorBrush #FF1E793FSolidColorBrush(#FF1E793F)
+    plain lookup AccentBrush: LinearGradientBrush nullLinearGradientBrush
+    plain lookup TextOnAccent: SolidColorBrush #FFFFFFFFSolidColorBrush(#FFFFFFFF)
+    plain lookup LayerFillColorAltBrush: SolidColorBrush #FF3A3A3CSolidColorBrush(#FF3A3A3C)
+    plain lookup SubtleFillColorSecondaryBrush: SolidColorBrush #FF3A3A3CSolidColorBrush(#FF3A3A3C)
+    plain lookup CaptionFontSize: Double null10
+  selected row via SelectedItem -> SelectedItem set, SelectedIndex=0
+    selected[0] row.IsSelected=True PART_RowBorder.bg=LinearGradientBrush row.Foreground=#FFFFFFFF cell.Foreground=#FFF5F5F7
+    selected[1] row.IsSelected=False PART_RowBorder.bg=#FF3A3A3C row.Foreground=#FFF5F5F7 cell.Foreground=#FFF5F5F7
+  IsEnabled=false -> IsEnabled=False
+    disabled: grid.Foreground=#FF636366 opacity=0.56 outer.bg=#FF2C2C2E
+    TextDisabled lookup=#FF636366 same=True
+
+  --- now apply Astra's dictionaries and re-read the SAME mechanism ---
+  FluentThemeManager.Apply -> ok
+  [with Astra applied] outer bg=#FF2C2C2E border=#FF48484A bt=1,1,1,1 r=12,12,12,12 clip=True
+  [with Astra applied] host=480x140 headers=478x34 rowsHost=466x92 row=466x30 cell=120x30.78 header=120x34
+  [with Astra applied] cell padding=10,5,10,5 header padding=10,7,6,7 gridRowHeight=30 columnHeaderHeight=34
+  [with Astra applied] row border bg=#00FFFFFF bt=0,0,0,1 bc=#FF48484A rowFg=#FFF5F5F7
+  [with Astra applied] header border bg=#0DFFFFFF bc=#FF48484A bt=0,0,1,0 sortIndicator= size=8x34
+  token identity (name -> app lookup instance vs the instance the part carries):
+    SurfaceBackground: lookup=#FF2C2C2E carried=#FF2C2C2E sameInstance=True inAstra=no
+    TextPrimary: lookup=#FFF5F5F7 carried=#FFF5F5F7 sameInstance=True inAstra=no
+    ControlBorder: lookup=#FF48484A carried=#FF48484A sameInstance=True inAstra=no
+    LayerFillColorAltBrush: lookup=#0DFFFFFF carried=#0DFFFFFF sameInstance=True inAstra=yes
+    SubtleFillColorSecondaryBrush: lookup=#0FFFFFFF carried=#0FFFFFFF sameInstance=True inAstra=yes
+    AccentBrush: lookup=LinearGradientBrush carried=#00FFFFFF sameInstance=False inAstra=no
+    plain lookup SurfaceBackground: SolidColorBrush #FF2C2C2ESolidColorBrush(#FF2C2C2E)
+    plain lookup TextPrimary: SolidColorBrush #FFF5F5F7SolidColorBrush(#FFF5F5F7)
+    plain lookup TextSecondary: SolidColorBrush #FFD1D1D6SolidColorBrush(#FFD1D1D6)
+    plain lookup TextDisabled: SolidColorBrush #FF636366SolidColorBrush(#FF636366)
+    plain lookup ControlBorder: SolidColorBrush #FF48484ASolidColorBrush(#FF48484A)
+    plain lookup ControlBorderFocused: SolidColorBrush #FF1E793FSolidColorBrush(#FF1E793F)
+    plain lookup AccentBrush: LinearGradientBrush nullLinearGradientBrush
+    plain lookup TextOnAccent: SolidColorBrush #FFFFFFFFSolidColorBrush(#FFFFFFFF)
+    plain lookup LayerFillColorAltBrush: SolidColorBrush #0DFFFFFFSolidColorBrush(#0DFFFFFF)
+    plain lookup SubtleFillColorSecondaryBrush: SolidColorBrush #0FFFFFFFSolidColorBrush(#0FFFFFFF)
+    plain lookup CaptionFontSize: Double null10
+
+=== I. what an app-level implicit style for typeof(DataGrid) costs ===
+  app-level resource keyed by typeof(DataGrid) BEFORE ours: Style target=Jalium.UI.Controls.DataGrid
+  framework style setter count=11
+    Background = Jalium.UI.Markup.DynamicResourceReference
+    Foreground = Jalium.UI.Markup.DynamicResourceReference
+    BorderBrush = Jalium.UI.Markup.DynamicResourceReference
+    BorderThickness = 1
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    HorizontalGridLinesBrush = Jalium.UI.Markup.DynamicResourceReference
+    VerticalGridLinesBrush = Jalium.UI.Markup.DynamicResourceReference
+    AlternatingRowBackground = Jalium.UI.Markup.DynamicResourceReference
+    RowBackground = Transparent
+    Template = Jalium.UI.Controls.ControlTemplate
+  probe style parsed: ok
+  after our style: Style=null template is ours=True
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    BorderThickness = 1,1,1,1
+    GridLinesVisibility = All
+    RowBackgroundResource = null
+    row: 480x30 cells=0
+    outer border present=False rows host=-
+    tree:
+      DataGrid size=480x140
+      Border 'ProbeTemplateRoot' bg=#FFFF00FF r=0,0,0,0 bt=0,0,0,0 size=480x140
+      ItemsPresenter 'ProbeItems' size=480x140
+      StackPanel size=480x140
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0

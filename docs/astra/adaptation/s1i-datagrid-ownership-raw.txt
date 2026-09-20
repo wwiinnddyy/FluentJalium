@@ -1,0 +1,68 @@
+theme dictionaries=44
+
+=== K [before Astra]. where the grid style lives, and what a Template-only style has to re-declare ===
+  DP defaults read off the metadata (the fallback a cell-less style would show):
+    RowHeight: dp=ok default=null
+    ColumnHeaderHeight: dp=ok default=null
+    Background: dp=ok default=null
+    Foreground: dp=ok default=null
+    BorderThickness: dp=ok default=null
+    GridLinesVisibility: dp=ok default=null
+    RowBackground: dp=ok default=null
+    AlternatingRowBackground: dp=ok default=null
+  Application.Resources: ResourceDictionary
+  ContainsKey(typeof(DataGrid)) -> True
+  Keys count=0; type-keyed entries=0
+  merged lookup typeof(DataGrid): Style
+  Application.Resources[typeof(DataGrid)] directly: Style sameObjectAsMerged=True
+  under our Template-only style:
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    BorderThickness = 1,1,1,1
+    GridLinesVisibility = All
+    RowBackground = SolidColorBrush(#00FFFFFF)
+    AlternatingRowBackground = SolidColorBrush(#FF3A3A3C)
+    Background = #FF2C2C2E; SurfaceBackground token = #FF2C2C2E sameInstance=True
+    Foreground = #FFF5F5F7; TextPrimary token = #FFF5F5F7 sameInstance=True
+  under the framework style (ours removed):
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    BorderThickness = 1,1,1,1
+    GridLinesVisibility = All
+    RowBackground = SolidColorBrush(#00FFFFFF)
+    AlternatingRowBackground = SolidColorBrush(#FF3A3A3C)
+    Background = #FF2C2C2E sameInstanceWithToken=True
+  FluentThemeManager.Apply -> ok
+
+=== K [after Astra]. where the grid style lives, and what a Template-only style has to re-declare ===
+  DP defaults read off the metadata (the fallback a cell-less style would show):
+    RowHeight: dp=ok default=null
+    ColumnHeaderHeight: dp=ok default=null
+    Background: dp=ok default=null
+    Foreground: dp=ok default=null
+    BorderThickness: dp=ok default=null
+    GridLinesVisibility: dp=ok default=null
+    RowBackground: dp=ok default=null
+    AlternatingRowBackground: dp=ok default=null
+  Application.Resources: ResourceDictionary
+  ContainsKey(typeof(DataGrid)) -> True
+  Keys count=0; type-keyed entries=0
+  merged lookup typeof(DataGrid): Style
+  Application.Resources[typeof(DataGrid)] directly: Style sameObjectAsMerged=True
+  under our Template-only style:
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    BorderThickness = 1,1,1,1
+    GridLinesVisibility = All
+    RowBackground = SolidColorBrush(#00FFFFFF)
+    AlternatingRowBackground = SolidColorBrush(#0FFFFFFF)
+    Background = #FF2C2C2E; SurfaceBackground token = #FF2C2C2E sameInstance=True
+    Foreground = #FFF5F5F7; TextPrimary token = #FFF5F5F7 sameInstance=True
+  under the framework style (ours removed):
+    RowHeight = 30
+    ColumnHeaderHeight = 34
+    BorderThickness = 1,1,1,1
+    GridLinesVisibility = All
+    RowBackground = SolidColorBrush(#00FFFFFF)
+    AlternatingRowBackground = SolidColorBrush(#0FFFFFFF)
+    Background = #FF2C2C2E sameInstanceWithToken=True
