@@ -1,0 +1,224 @@
+<!-- WinUI 3 PipsPager_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     0d93a289b39a22b7e859a2ecea964575826e52f7 (the six Style rows, :110-290) and PipsPager.xaml, blob
+     42c1ab313201354cb4d77897acfc36b8b867cc25 (the implicit control style). Six styles plus the control's own
+     default style, in the order upstream writes them, with these differences and no others:
+       - a pip is drawn rather than typed: an Ellipse at the diameter the glyph would have printed. spike/
+         PipsPagerProbe mode pip measured why - the symbol glyph lays out at the right box but its ink never
+         reaches a capture, so a glyph-only pip is untestable in this library, while a drawn 8x8 reference read
+         60 inked pixels through the same call.
+       - the previous/next glyph is this layer's Path chevron, the same shape NumberBox already uses
+         (Styles/TextInput.jalxaml:209-214). One chevron is drawn and the two buttons differ by the transform
+         that aims it, because upstream's difference lives in the glyph string its styles pick.
+       - UseSystemFocusVisuals and FocusVisualMargin (:117-118) are not written: 26.10.9 declares neither
+         member, and an attribute this markup parser does not know is dropped in silence rather than rejected.
+     Full mapping, including which VisualState became which trigger: docs/astra/audits/pips-pager.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- ============ PipsPagerNavigationButtonBaseStyle (upstream :110-191) ============ -->
+  <Style x:Key="PipsPagerNavigationButtonBaseStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource PipsPagerNavigationButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource PipsPagerNavigationButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerNavigationButtonBorderBrush}" />
+    <!-- PipsPagerNavigationButtonBorderThickness is the published Thickness row; Width/Height 24 come from the
+         unpublishable x:Double rows of the same names, and the font size 8 row only ever scaled a glyph, so it
+         goes with the glyph. -->
+    <Setter Property="BorderThickness" Value="{ThemeResource PipsPagerNavigationButtonBorderThickness}" />
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border Name="RootGrid" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <Border Name="ScaleHost" RenderTransformOrigin="0.5,0.5">
+              <!-- CommonStates/Pressed (:156-163) has no colour to change - all four background and border rows
+                   resolve to transparent - so the pressed state is nothing but this 0.875 scale.
+                   PipsPagerNavigationButtonScalePressed is an x:Double row and cannot be published; the literal
+                   here is its value, and the arm it drives is unverifiable without real pointer input. -->
+              <Path Name="Content" Data="M 1,4.5 L 5,0.5 L 9,4.5" Width="8" Height="6" Stretch="Uniform"
+                    Stroke="{TemplateBinding Foreground}" StrokeThickness="1.25"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerNavigationButtonBackgroundPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerNavigationButtonForegroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerNavigationButtonBorderBrushPointerOver}" />
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerNavigationButtonBackgroundPressed}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerNavigationButtonForegroundPressed}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerNavigationButtonBorderBrushPressed}" />
+                <Setter TargetName="ScaleHost" Property="RenderTransform">
+                  <Setter.Value><ScaleTransform ScaleX="0.875" ScaleY="0.875" /></Setter.Value>
+                </Setter>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerNavigationButtonBackgroundDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerNavigationButtonForegroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerNavigationButtonBorderBrushDisabled}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <!-- Upstream's derived pair (:192-197) differs only in which glyph it puts in Content - EDDB points up, EDDC
+       points down - and PipsPager.xaml:66-77 then rotates both by -90 degrees when the row is horizontal. With a
+       drawn chevron the direction has nowhere to live but the transform, so these two keys exist for the
+       TemplateBinding to resolve and the aiming happens in the control's template below. -->
+  <Style x:Key="PipsPagerPreviousPageButtonStyle" TargetType="Button" BasedOn="{StaticResource PipsPagerNavigationButtonBaseStyle}" />
+  <Style x:Key="PipsPagerNextPageButtonStyle" TargetType="Button" BasedOn="{StaticResource PipsPagerNavigationButtonBaseStyle}" />
+
+  <!-- ============ PipsPagerButtonBaseStyle - one pip (upstream :198-279) ============ -->
+  <Style x:Key="PipsPagerButtonBaseStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource PipsPagerSelectionIndicatorBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource PipsPagerSelectionIndicatorForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerSelectionIndicatorBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource PipsPagerButtonBorderThickness}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <!-- Our implicit Button style brings a 32 DIP minimum height and 11,5,11,6 padding onto every Button in the
+         process, and a pip is 12x24: measured in spike/PipsPagerProbe mode C, a Button forced to 12x24 came out
+         12x32 until MinHeight was zeroed. Upstream never hits this because a pip button is not a Fluent button
+         at all; ours is a Button with this style, and the frame has to be taken off explicitly. -->
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <!-- The footprint (PipsPagerHorizontalOrientationButtonWidth 12 / Height 24, and the vertical pair
+               24/12) is written on each pip by FluentPipsPager rather than here: x:Double rows cannot be
+               published, and the only member that knows the orientation is the control. The RootGrid therefore
+               stretches to whatever the container is sized to. -->
+          <Border Name="RootGrid" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+            <!-- PipsPagerSelectedGlyph and PipsPagerNormalGlyph are the same codepoint at two font sizes; 3.8 and
+                 5.6 are the 0.938 em ink of a 4 and a 6 DIP run, measured off the font's own glyf box. -->
+            <!-- Upstream's two x:String font-size rows (4 and 6) are what its styles write; 3.8 and 5.6 are those
+                 runs' ink, 0.938 em measured off the font's own glyf box. Both dots are drawn and one is shown,
+                 because a Style setter cannot reach a template part on this runtime and a part's Visibility can be
+                 switched by a template trigger - the same mechanism the button focus outline uses. Which dot shows
+                 is carried on the pip's Tag by FluentPipsPager, alongside the style swap. -->
+            <Grid>
+              <Ellipse Name="NormalDot" Width="3.8" Height="3.8" Fill="{TemplateBinding Foreground}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <Ellipse Name="SelectedDot" Width="5.6" Height="5.6" Fill="{TemplateBinding Foreground}"
+                       Visibility="Collapsed"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+            <ControlTemplate.Triggers>
+              <!-- Which dot the row shows. Written first so the pointer states below, which enlarge and shrink the
+                   same pair, take precedence over it. -->
+              <Trigger Property="Tag" Value="selected">
+                <Setter TargetName="NormalDot" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="SelectedDot" Property="Visibility" Value="Visible" />
+              </Trigger>
+              <!-- CommonStates (upstream :216-263). PointerOver enlarges the dot to the selected diameter
+                   (:229-231 writes FontSize = PipsPagerSelectedGlyphFontSize) and Pressed shrinks it back to the
+                   normal one (:245-247). -->
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerSelectionIndicatorBackgroundPointerOver}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerSelectionIndicatorBorderBrushPointerOver}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerSelectionIndicatorForegroundPointerOver}" />
+                <Setter TargetName="NormalDot" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="SelectedDot" Property="Visibility" Value="Visible" />
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerSelectionIndicatorBackgroundPressed}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerSelectionIndicatorBorderBrushPressed}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerSelectionIndicatorForegroundPressed}" />
+                <Setter TargetName="NormalDot" Property="Visibility" Value="Visible" />
+                <Setter TargetName="SelectedDot" Property="Visibility" Value="Collapsed" />
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="{ThemeResource PipsPagerSelectionIndicatorBackgroundDisabled}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerSelectionIndicatorBorderBrushDisabled}" />
+                <Setter Property="Foreground" Value="{ThemeResource PipsPagerSelectionIndicatorForegroundDisabled}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style x:Key="PipsPagerSelectedPipButtonStyle" TargetType="Button" BasedOn="{StaticResource PipsPagerButtonBaseStyle}">
+    <Setter Property="Background" Value="{ThemeResource PipsPagerSelectionIndicatorBackgroundSelected}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource PipsPagerSelectionIndicatorBorderBrushSelected}" />
+    <Setter Property="Foreground" Value="{ThemeResource PipsPagerSelectionIndicatorForegroundSelected}" />
+  </Style>
+  <Style x:Key="PipsPagerNormalPipButtonStyle" TargetType="Button" BasedOn="{StaticResource PipsPagerButtonBaseStyle}" />
+
+  <!-- ============ the control's default style (PipsPager.xaml:3-100) ============ -->
+  <Style x:Key="DefaultPipsPagerStyle" TargetType="controls:FluentPipsPager">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="PreviousButtonStyle" Value="{StaticResource PipsPagerPreviousPageButtonStyle}" />
+    <Setter Property="NextButtonStyle" Value="{StaticResource PipsPagerNextPageButtonStyle}" />
+    <Setter Property="SelectedPipStyle" Value="{StaticResource PipsPagerSelectedPipButtonStyle}" />
+    <Setter Property="NormalPipStyle" Value="{StaticResource PipsPagerNormalPipButtonStyle}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FluentPipsPager">
+          <StackPanel Name="RootPanel" Orientation="{TemplateBinding Orientation}" Background="{TemplateBinding Background}">
+            <Button Name="PreviousPageButton" Style="{TemplateBinding PreviousButtonStyle}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <!-- Upstream hides both bars and disables both scroll modes (PipsPager.xaml:83); this runtime
+                 declares no ScrollMode or chaining member at all, so the visibility pair is the whole of that
+                 contract and the row just gets the width the control clamps it to. The pip host is a plain
+                 StackPanel that FluentPipsPager fills with generated buttons - upstream fills the same slot with
+                 an ItemsRepeater bound to TemplateSettings.PipsPagerItems. -->
+            <ScrollViewer Name="PipsPagerScrollViewer" HorizontalScrollBarVisibility="Hidden"
+                          VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <StackPanel Name="PipsPagerItemsHost" Orientation="{TemplateBinding Orientation}" />
+            </ScrollViewer>
+            <Button Name="NextPageButton" Style="{TemplateBinding NextButtonStyle}" RenderTransformOrigin="0.5,0.5"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+              <Button.RenderTransform><ScaleTransform ScaleY="-1" /></Button.RenderTransform>
+            </Button>
+          </StackPanel>
+            <ControlTemplate.Triggers>
+              <!-- PreviousPageButtonVisibilityStates / NextPageButtonVisibilityStates (:17-29, :38-50): Hidden
+                   keeps the slot and drops the opacity, Collapsed gives the slot back. The enable half of those
+                   groups is written by the control, because IsEnabled lives on the button and not on the pager. -->
+              <Trigger Property="PreviousButtonVisibility" Value="Collapsed">
+                <Setter TargetName="PreviousPageButton" Property="Visibility" Value="Collapsed" />
+              </Trigger>
+              <Trigger Property="PreviousButtonVisibility" Value="VisibleOnPointerOver">
+                <Setter TargetName="PreviousPageButton" Property="Opacity" Value="0" />
+              </Trigger>
+              <Trigger Property="NextButtonVisibility" Value="Collapsed">
+                <Setter TargetName="NextPageButton" Property="Visibility" Value="Collapsed" />
+              </Trigger>
+              <Trigger Property="NextButtonVisibility" Value="VisibleOnPointerOver">
+                <Setter TargetName="NextPageButton" Property="Opacity" Value="0" />
+              </Trigger>
+              <!-- RootPanelOrientationStates (:59-80). Vertical is the resting look - up for previous, and the
+                       scale on the next button for down - and horizontal turns both chevrons through the same
+                       quarter turn upstream uses, -90 on the one that already points where previous must. -->
+              <Trigger Property="Orientation" Value="Horizontal">
+                <Setter TargetName="PreviousPageButton" Property="RenderTransformOrigin" Value="0.5,0.5" />
+                <Setter TargetName="PreviousPageButton" Property="RenderTransform">
+                  <Setter.Value><RotateTransform Angle="-90" /></Setter.Value>
+                </Setter>
+                <Setter TargetName="NextPageButton" Property="RenderTransform">
+                  <Setter.Value><RotateTransform Angle="90" /></Setter.Value>
+                </Setter>
+              </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="controls:FluentPipsPager" BasedOn="{StaticResource DefaultPipsPagerStyle}" />
+</ResourceDictionary>

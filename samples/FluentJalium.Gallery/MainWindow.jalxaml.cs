@@ -294,6 +294,36 @@ public partial class MainWindow : Window
             tabs.IsAddButtonVisible = ((ToggleButton)TabViewAddToggle!).IsChecked == true;
         ((Button)TabViewSelectFirstButton!).Click += (_, _) => tabs.SelectedIndex = 0;
 
+        var pager = (FluentPipsPager)SlidesPager!;
+        var pagerReadout = (TextBlock)PagerReadout!;
+        void ReportPager()
+        {
+            var pips = 0;
+            while (pager.PipFromIndex(pips) is not null)
+            {
+                pips++;
+            }
+
+            pagerReadout.Text = $"Page {pager.SelectedPageIndex + 1} of {pager.NumberOfPages}; " +
+                $"{pips} pips generated, {pager.MaxVisiblePips} of them in the window.";
+        }
+
+        pager.SelectedIndexChanged += (_, _) => ReportPager();
+        ((ToggleButton)PagerVertical!).Click += (_, _) =>
+            pager.Orientation = ((ToggleButton)PagerVertical!).IsChecked == true
+                ? Jalium.UI.Controls.Orientation.Vertical
+                : Jalium.UI.Controls.Orientation.Horizontal;
+        ((ToggleButton)PagerHiddenArrows!).Click += (_, _) =>
+        {
+            var visibility = ((ToggleButton)PagerHiddenArrows!).IsChecked == true
+                ? FluentPipsPagerButtonVisibility.Collapsed
+                : FluentPipsPagerButtonVisibility.Visible;
+            pager.PreviousButtonVisibility = visibility;
+            pager.NextButtonVisibility = visibility;
+        };
+        ((Button)PagerNextButton!).Click += (_, _) => pager.SelectedPageIndex++;
+        ReportPager();
+
         foreach (var (button, shapes) in new[]
                  {
                      ((Button)DialogThreeButton!, 3),

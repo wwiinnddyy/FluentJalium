@@ -1687,3 +1687,39 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
    捕获侧也不是成本。剩下的解释就是 `PixelHarness.cs:259-268` 自己记下的那条 harness 缺陷：
    静态场景不发 `CompositionTarget.Rendering`，而当年的看门狗把释放排到了没人泵的线程池 dispatcher 上。
    **那是 harness 的 bug，不是 `ItemsControl` 的性质**；纪律撤销，原始三处读数与强度写在 `adaptation/09`。
+
+## S1-m：一个"只有字形"的视觉在这个运行时量不到墨——PipsPager 的四类静默退化（阶段 5 第九段，2026-09-20）
+
+`spike/PipsPagerProbe`（mode `census`/`api`/`cmap`/`chrome`/`mount`/`ink`，读数转录在 `s1m-pips-pager-raw.txt`），
+外加 `spike/SymbolCmap/check.py`（fontTools 直读 cmap 与 glyph 边界框）。这一段是 PipsPager 的选型输入，
+但它量出的四条 markup/渲染性质是跨控件的，所以写在这里。
+
+1. **"字形画不出墨"是可测量的，不是猜测**。`FontIcon` 用 `Symbol` 码点 `EA3B`（上游 `PipsPager` 正常点的那一枚）：
+   cmap **命中**（1 条轮廓、边界框 0.938x0.938 em，即一枚实心圆）、容器布局框正确（24 字号量到 26x26、6 字号 6x6），
+   但逐格数墨全是 0；同一运行时里参照物——用 `Ellipse` 画出来的 6 DIP 圆——数得到 60 个像素。**字体路径上的
+   glyph 在 RTB 捕获里不产像素**，而它的布局框、cmap、控件树一切都像画上了。所以本层的点不是 `FontIcon`，
+   是按测到的墨径（0.938 x 6 ＝ 5.6、0.938 x 4 ＝ 3.8）画的两个 `Ellipse`。
+   这条直接决定阶段 6 的 `SymbolIcon`/`FontIcon` 批：判"码点命中"要用 `check.py` 读 cmap，判"画出来了"要另找判据。
+2. **`<ControlTemplate.Triggers>` 必须是 `ControlTemplate` 的直接子元素**。写进模板根元素的内部，解析期抛
+   `Cannot find attached property setter for: ControlTemplate.Triggers`；三份模板在第一轮绿之前各撞一次。
+3. **`Style` 的 setter 够不到模板部件**：`<Setter TargetName="SelectedDot">` 静默不生效（点仍是基础样式的 3.8），
+   而同一处写入放进 `ControlTemplate.Triggers` 就成了——按钮焦点框一直是这么画的。选中/正常因此靠
+   pip 的 `Tag` 由模板触发器切两个已画点的 `Visibility`，样式只带刷子。
+4. **一个 `Border` 里两个平铺的 `Ellipse` 会让命名部件整个消失**：`Named(pip,"NormalDot")` 返回 null，
+   同模板的 `#RootGrid` 却解析得到，且没有解析错误也没有警告。包一层 `Grid` 之后两点都找得到。
+5. **用自己的度量结果去限自己的可视区，会把这条回路饿死**：`MaxVisiblePips` 的第一版按已生成容器的
+   `DesiredSize` 算钳制宽度，于是 `UpdateViewport` 在任何人度量之前跑了一次，而本该重跑它的 `SizeChanged`
+   再也没来——因为宿主宽度正是被钳制的那个量。读数：两枚点时候口仍是 12，第二枚点零墨。
+   改成用控件自己写在容器上的脚印常量。
+6. **半透明令牌在 harness 的黑色背衬上等于没画**：Light 下点色是 `#5E000000`，打包 RGB 与背衬同键，
+   `PixelKey(brush)` 在 9600 像素的样本里数到 105966，加一枚点读数不变。判墨量因此改成**白底卡片 + 两次捕获的
+   直方图差值**（选中点 19 px，加点第二枚再涨），而不是数某个色键。同段另一条：同一窗口里宿主第二个元素时，
+   第一个仍在捕获前方——比较只能是同一个被宿主元素跨三次页面数的差值。
+7. **写回同一个值的 DP 回调仍会触发，且 `OldValue` 是那个被拒的值**——第一版钳制因此对第二次越界写
+   发了两次 `SelectedIndexChanged`。加上 `ButtonAutomationPeer.Invoke()` 对禁用按钮抛
+   `InvalidOperationException`，边界禁用这条规则变成可断言的，而不只是读 `IsEnabled`。
+
+选型上这一段也是对上一段的**反向使用**：`PipsPager` 上游没有 `ItemsSource`、条目纯粹由页面数派生
+（`PipsPager.cpp` 的 element factory 只从 `TemplateSettings.PipsPagerItems` 取 1-based 页号），
+继承 `ItemsControl` 会把 `Items`/`ItemContainerStyle` 这一整面公开 API 白递给应用，所以本层落回 `Control`
++ 自管 `Panel` 子元素——S1-l 量出的是"能继承"，不是"该继承"。

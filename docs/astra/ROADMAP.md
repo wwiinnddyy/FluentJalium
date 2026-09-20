@@ -1265,3 +1265,74 @@ HighContrast 101 映射键，三行 `checked=True`；`All Astra gates passed.`
 **0 条警告 / 0 错误**（真重编，非增量）；整套顺序跑 **1137/1137 通过、0 失败、0 跳过**（6 m 47 s；
 比第七段 1120 多 17 条 ＝ 新控件 16 条 + 资源键闸口那条字典行的 +1）；调色板漂移 Light 83 源色 / 101 刷、
 Dark 同、HighContrast 101 映射键，三行 `checked=True`；`All Astra gates passed.`
+
+**阶段 5 第九段（PipsPager：一枚"确实存在"的字形可以一滴墨都不出，2026-09-20）**：目标写的是
+"PipsPager(自有)"，这一段把它改成**可证的**自有类型，并且顺带把阶段 6 图标族的前提量死。
+
+- **字形这条路在本运行时不是"不好看"，是"读不到"**。上游正常点用 `Symbol` 的 `EA3B`；`spike/SymbolCmap/check.py`
+  （fontTools 直读 cmap）量到 **cmap 命中**：1 条轮廓、边界框 **0.938x0.938 em**，也就是一枚几乎铺满 em 的实心圆，
+  MDL2 同样有。挂载侧一切正常——`FontIcon` 建成、字号 24 量到 26x26、6 量到 6x6——但逐格数墨 **0**，
+  而同进程里 `Ellipse` 画的 6 DIP 圆数到 **60**。**布局框、cmap、控件树三项全绿而像素为空**，
+  这是本仓第一次把"glyph 不出墨"从猜测变成两列对照读数。结论落在设计上：点改成按测到的墨径画的
+  `Ellipse`（5.6 / 3.8 ＝ 0.938 x 6 / 0.938 x 4），阶段 6 的 `SymbolIcon`/`FontIcon` 批从此分两支判——
+  **码点命中查 cmap，"画出来了"必须另找判据**。
+- **选型是对上一段结论的反向使用**：第八段量出 `ItemsControl` 的覆写面可继承并据此建了 `FluentRadioButtons`；
+  本段仍然落回 `Control` + 自管 `Panel` 子元素，因为上游 `PipsPager` 根本没有 `ItemsSource`，
+  element factory 只从 `TemplateSettings.PipsPagerItems` 取 **1-based 页号**——继承 `ItemsControl`
+  等于白递 `Items`/`ItemContainerStyle` 一整面公开 API。**"能继承"不等于"该继承"**，两条结论各管各的前提。
+- 上游那些反直觉的规则全部按读数抄，不按常识抄：N 页 ⇒ N 枚点（**没有前后缀点、没有省略号点**），
+  `MaxVisiblePips` 只是把 ScrollViewer 钳到 `(k-1)*默认 + 选中`；导航一次 **±1 页**；
+  `SelectedIndexChanged` 的参数是**空的**；越界写先钳制、只发一次（含"钳回当前值"那条臂——本运行时
+  写回同一个值仍会进 changed 回调，且 `OldValue` 是被拒的那个值，第一版就是被它顶出两次事件）；
+  方向键只搬焦点、从不搬选择；启用性是 `isGenerallyVisible` 那条合取（边缘 + 0 页 + `MaxVisiblePips=0` 三种情形）；
+  `NumberOfPages` 默认 **-1**（无界行，只增不减，且要在 `Clear()` 之前拿到旧计数，否则 8 枚缩回 5 枚）。
+  禁用侧还买回一条通用判据：`ButtonAutomationPeer`/`IInvokeProvider.Invoke()` 在禁用按钮上抛
+  `InvalidOperationException`，于是"到边即禁"不再只能读 `IsEnabled`。
+- 键面：上游那一份 51 行（**27 条画刷别名 + 12 条字典外度量 + 6 条 `x:String` 字形/字号 + 6 个 Style**）
+  在令牌层发 **29 条**（27 条前景/底色别名 + 2 条 `Thickness`），6 个 Style 用上游同名键落在样式层；
+  **16 条不发**（10 个 `x:Double` + 6 个 `x:String`——本 reader 解析这两类行会毁掉整份字典），
+  值改成控件常量与样式字面量并逐名配反向断言；其中 `PipsPagerButtonWidth`/`PipsPagerButtonHeight`
+  两条**上游自己也没读**（整棵参考树除自身区块与 TestUI 控件命名外无人点名）。
+  Light 与 Default **逐行同名同目标**、HC 把 27 条全部重指 `SystemColor*`，所以别名层照旧走调色板实例。
+- 四条静默退化（`adaptation/00` 新 **S1-m**）：① `<ControlTemplate.Triggers>` 必须是 `ControlTemplate` 的
+  **直接子元素**，写进模板根内部在解析期抛 `Cannot find attached property setter for`（三份模板各撞一次）；
+  ② **`Style` 的 setter 够不到模板部件**——`TargetName="SelectedDot"` 静默失效，同一处写入放进模板触发器才生效，
+  所以选中/正常改成用 pip 的 `Tag` 由模板触发器切两点 `Visibility`；③ 一个 `Border` 里两个平铺 `Ellipse`
+  会让**命名部件整个消失**（`#RootGrid` 仍在、无错无警告），包一层 `Grid` 就都找得到；
+  ④ **拿自己的度量结果去钳自己的可视区会把回路饿死**（`UpdateViewport` 在任何度量之前跑完，
+  本该重跑它的 `SizeChanged` 再也不来，因为宿主宽度正是被钳的量），改用控件自己写的脚印常量。
+  另有一条像素账：Light 下点色 `#5E000000` 与 harness 黑背衬打包后同键，`PixelKey` 在 9600 像素样本里数到
+  105966、加点读数不变 ⇒ 判据换成**白底卡片 + 两次捕获的直方图差值**（选中点 19 px，第二枚再涨），
+  且比较只能在**同一个被宿主元素**跨三次页面数之间做（同窗宿第二个元素时第一个仍挡在前面）。
+- 落点：`Controls/Navigation/FluentPipsPager.cs`（自有类型 + 1 枚举 + 8 DP + 1 事件）、
+  `ThemeResources/PipsPager.jalxaml`、`Styles/PipsPager.jalxaml`（5 份样式、导航键 chevron 走 `Path` +
+  `ScaleHost` 按下缩放，`Manifest.txt` 51→**53** 份）、新测 `AstraPipsPagerTests` **29 条**、
+  资源键闸口 +1 份字典、`audits/pips-pager.md`（§2 运行时差表把"没有的 API"逐名量过：
+  `Button.FocusVisualMargin`/`UseSystemFocusVisuals`/`ScrollViewer.*ScrollMode`/`Is*ScrollChainingEnabled`/
+  `GettingFocus`/`LosingFocus` 全 0 命中，所以上游那条"滚动跟随选中"的钳制只在可视区一层，本层不做平滑滚动）、
+  `adaptation/s1m-pips-pager-raw.txt`、Gallery Navigation 页"Pips pager"卡（横向 10 页钳 5、纵向、
+  隐藏箭头、下一页按钮 + 读数条）、`Catalog.json` 新行（`own-type`，9 条 gap）。
+
+四类证据分开记：**构建** = 串行闸口（文末读数）；**行为** = 29 条（部件名与"一页一键"、脚印进容器、
+Invoke 选页并换两份 Style 且只发一次、越界钳制的两条臂、无界行只增、0 页禁两侧、±1 导航与到边即禁
+（含"禁用键 Invoke 必抛"）、可视区钳制横 60/120/24 与竖 24、朝向换脚印与 `RotateTransform.Angle`、
+三种箭头可见性、两点身份与可见性、`Page {i}` + `PositionInSet`/`SizeOfSet`）；
+**视觉** = 白底卡片上"加一枚点多出多少墨"（选中点 > 正常点、且都 > 0）、品牌绿 0 命中、
+Dark↔Light 两张直方图不同且都画满；**硬件输入** = **仍为零**（选中由 `IInvokeProvider` 与写属性驱动，
+hover/press 两格只有触发器定义、没有任何输入帧能把它们打开）。
+
+不声称：hover/pressed 两格无像素证据（任务 13 同一堵墙）；钳制出的可视区不做平滑滚动、不把选中点滚进视野
+（上游 `ScrollAlong` 依赖 `ScrollViewer` 的 `ScrollMode`/`ScrollChain` 那族 API，本运行时逐个 0 命中）；
+`TemplateSettings.PipsPagerItems` 那一层没有对应物，页号由控件自己编号；无界行没有"到底就停"的判据；
+`PreviousButtonStyle`/`NextButtonStyle`/`SelectedPipStyle`/`NormalPipStyle` 四格是自有 API 而非上游键；
+高对比一次没量；Gallery 那张卡没有目视过（冒烟只证窗口上屏与干净关窗）。
+
+**闸口读数（第九段，串行 `tools/Test-AstraGates.ps1`，同一棵树跑两遍）**：第一遍 **exit 1**——
+1166 通过 / **1 失败** / 0 skip（9 m 55 s），失败的是 `AstraDataGridTests.The_grid_surface_paints_its_background_row`
+的"capture never settled"（调色板步骤因此没跑到）。单独跑该类 **56/56** 绿，再与两个同样吃洋红哨兵、
+共用同一个宿主窗口的类（PipsPager + TeachingTip）合跑 **159/159** 绿，两次都归不了本批的账 ⇒
+按任务 #35 那条序列 flake 记账，不当成"已验"也不当成回归。第二遍（本机无其他进程）**exit 0**——restore 全部最新；
+Debug 构建 **0 条警告 / 0 错误**（真重编）；整套 **1167/1167 通过、0 失败、0 跳过**（5 m 35 s，
+比第八段 1137 多 30 条 ＝ 新控件 29 条 + 资源键闸口那份新字典行的 +1）；调色板漂移 Light 83 源色 / 101 刷、
+Dark 同、HighContrast 101 映射键（3 条上游键因调色板无对应而按住），三行 `checked=True`；`All Astra gates passed.`
+Gallery 冒烟 `-Page navigation` 12.8 秒干净关窗、无残留进程。

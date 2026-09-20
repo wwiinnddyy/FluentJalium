@@ -249,6 +249,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/DataGrid.jalxaml")]
     [InlineData("ThemeResources/NavigationView.jalxaml")]
     [InlineData("ThemeResources/RadioButtons.jalxaml")]
+    [InlineData("ThemeResources/PipsPager.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

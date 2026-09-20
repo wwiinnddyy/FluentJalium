@@ -475,6 +475,21 @@
                   <TextBlock Text="Clicking a tab selects it and Ctrl+Tab moves the selection; the arrow keys only move focus, because upstream sets SingleSelectionFollowsFocus=False on the strip. Closing a tab raises TabCloseRequested and removes nothing until this page asks for it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Pips pager" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <CheckBox x:Name="PagerVertical" Content="Vertical" Margin="0,0,8,8" />
+                    <CheckBox x:Name="PagerHiddenArrows" Content="Hide the arrows" Margin="0,0,8,8" />
+                    <Button x:Name="PagerNextButton" Content="Next page" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentPipsPager x:Name="SlidesPager" NumberOfPages="10" MaxVisiblePips="5"
+                                          PreviousButtonVisibility="Visible" NextButtonVisibility="Visible"
+                                          HorizontalAlignment="Center" Margin="0,12,0,0" />
+                  <TextBlock x:Name="PagerReadout" Text="Page 1." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="Ten pages in a five-pip window: the row generates all ten pips and the viewport is clamped to what MaxVisiblePips allows, which is upstream's rule rather than a paging one. The arrows move a single page and disable themselves at the ends; a pip is chosen by clicking it, and the arrow keys only move focus. The readout is built from the control's own values, because this markup parser drops an attribute it does not recognise instead of rejecting it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="SurfacesPage">

@@ -33,6 +33,7 @@ ThemeResources/ContentDialog.jalxaml
 ThemeResources/TeachingTip.jalxaml
 ThemeResources/DataGrid.jalxaml
 ThemeResources/NavigationView.jalxaml
+ThemeResources/PipsPager.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -47,6 +48,9 @@ Styles/ListViews.jalxaml
 Styles/RadioButtons.jalxaml
 Styles/TreeViews.jalxaml
 Styles/Navigation.jalxaml
+# The pip pager: the control generates its own pip buttons, so this file also carries the six styles upstream
+# publishes next to its token rows (the footprints those styles read are x:Double rows this reader cannot parse).
+Styles/PipsPager.jalxaml
 Styles/Surfaces.jalxaml
 Styles/Menus.jalxaml
 Styles/AppBar.jalxaml

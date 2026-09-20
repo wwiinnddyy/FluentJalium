@@ -1,4 +1,4 @@
-﻿{
+{
   "note": "One file, two consumers: the Gallery renders its parity strip from it, and tests/FluentJalium.Tests/Gallery/AstraGalleryCatalogTests.cs fails when it stops matching the styles Astra actually ships. Scope is the implicit-style universe - every TargetType a product dictionary restyles without an x:Key - because that is the set an app inherits silently.",
   "parityLegend": {
     "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion. Whatever is missing is named in gaps.",
@@ -145,6 +145,29 @@
       "parity": "audited",
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
       "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen", "label rows are written on the control, not the presenter (adaptation/00 S1-f), and a disabled dot's label keeps the framework's own local grey rather than RadioButtonForegroundDisabled" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentPipsPager",
+      "source": "Styles/PipsPager.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/pips-pager.md",
+        "docs/astra/adaptation/s1m-pips-pager-raw.txt",
+        "tests/FluentJalium.Tests/AstraPipsPagerTests.cs",
+        "spike/PipsPagerProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no PipsPager and no ItemsRepeater to build one out of",
+        "a pip is drawn rather than typed: the upstream glyph lays out at the right box but its ink reaches no capture in this runtime, so nothing about a glyph pip could be asserted",
+        "WrapMode is not shipped: upstream keeps it behind MUX_PUBLIC_V7",
+        "TemplateSettings.PipsPagerItems has no public twin here - there is no data-bound repeater to feed - so the pip list stays internal and PipFromIndex is this port's door",
+        "no automation peer: upstream's exposes a Selection pattern whose control type is Menu, and the pips here carry only their Name/PositionInSet/SizeOfSet",
+        "arrow keys and the VisibleOnPointerOver reveal have no driver: the harness delivers no real pointer or key",
+        "the pip's hover and pressed enlargement, and the nav button's 0.875 press scale, are markup no capture reaches",
+        "high contrast resolves through the palette aliases, which lands on different system colors than upstream's 27 re-pointed rows",
+        "no scroll-into-view: a selected pip beyond the clamped window is not brought back, because the runtime exposes no verified offset API"
+      ]
     },
     {
       "markup": "FluentJalium.Controls.FluentRadioButtons",
