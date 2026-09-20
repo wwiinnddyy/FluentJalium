@@ -1095,3 +1095,60 @@ gaps 逐条写明"本族没有 WinUI 上游""行保留框架模板的原因""排
 调色板漂移 Light 83 源色 / 101 刷、Dark 同、HighContrast 101 映射键，三行 `checked=True`。
 不声称：列宽拖拽/重排/排序点击/单元格提交没有任何真输入证据；`TreeDataGrid` 没有落地（节点喂法是下一段）；
 行头那四枚 gripper Thumb 与十七格状态矩阵没做；高对比下表格走哪条路未测；强调色 0.4 未拿到。
+【同段更正】其中"`TreeDataGrid` 没有落地"已被第六段结掉，且它给的理由（节点类型 internal ⇒ 喂法未量）被推翻，
+见下面第六段与 `audits/treedatagrid.md` §1；"行头没做 gripper/状态矩阵"仍成立，但行头**画模型 `ToString()`**
+这条已上线的缺陷也在第六段修掉了。
+
+## 阶段 5 第六段：TreeDataGrid 落地，顺手挖出表格族两条静默 markup 账（2026-09-20）
+
+上一段把 `TreeDataGrid` 挡在库外的只有一句话："`TreeDataGridNode` 是 internal，层级数据怎么喂进去尚未量"。
+对着 26.10.9 公版程序集把成员表拉出来，这句话的推论断了（`audits/treedatagrid.md` §1、`adaptation/00` S1-j）：
+
+- 喂法是 `ItemsSource`（普通 `IEnumerable`）+ `ChildrenPropertyPath`（字符串）+ `TreeColumnIndex`（树列是索引不是列类型）；
+  节点类型确实 internal、`TreeDataGridRow` 只有 `IsSelected` 公开，但**消费者一辈子不点名它**。
+- 展开闭环全公开：`ExpandAll()` / `CollapseAll()` / `IsExpanded(int)` / `FlattenedCount` +
+  `NodeExpanding/NodeExpanded/NodeCollapsed`。实测 2 根 → 展开 6 行（落地文字 6→14 条）→ 收回 2 行，
+  不需要一次 OS 输入，也不需要反射进私有字段。
+- 缩进 `IndentSize` 默认就是 16，与上游 TreeView 步长一致，父子文字 X 位移有断言。
+
+本批交付：`Styles/TreeDataGrid.jalxaml` 一份宿主隐式样式（部件契约按实测七件套写，`PART_RowHeaderCorner` 这种
+树没有的名字不塞），**不新造任何资源键**——运行时没有 tree-only 的 cell/列头/行头，DataGrid 族那三条隐式样式
+直接接管这棵树，用模板实例同一性 + 32 DIP 下限证明。行保留框架模板：S1-i 那条"能不能换模板要逐层判"在第二个
+控件上复现，而且这里更硬——每条行的 `Background` 都是控件写上去的本地值（实测偶 `#00FFFFFF`、奇 `#0FFFFFFF`），
+样式格子在那层本来就赢不了。
+
+挖出来的两条静默 markup 账（`adaptation/00` S1-j，七种配置在 `s1j-treedatagrid-columns-raw.txt`）：
+
+1. `DataGridColumn.Width` 是 `DataGridLength`，**markup 里的裸数字不转换、静默停在 `Auto`**，不报错、构建绿；
+   `MinWidth`/`MaxWidth` 是普通 `double` 才写得进。后果分家：`DataGrid` 把 `Auto` 摊成实宽（120），
+   `TreeDataGrid` 把 `Auto` 量成 **0** —— 单元格 `ActualWidth=0`，文字有 `desired` 没宽度，整棵树看不见字。
+   **Gallery 的表格从上线第一天起三条列宽全是 `Auto`**，本批全改 `MinWidth` 并在两侧各钉一条断言。
+2. 未知属性名同样静默：`DefinitelyNotAProperty='42'` 解析通过并上屏；`TreeDataGrid` 根本没有
+   `AutoGenerateColumns`（也不带滚动条可见性属性，宿主模板那两处只能写常量），Gallery 里那句一直是空写，已删。
+   另有一条：列宽必须在首次度量之前定，挂载后改 `Width` 列自己读到 200、单元格仍是旧布局那一版。
+
+顺手结掉一条已上线的可见缺陷：这条运行时会把**行数据本身**塞进 `DataGridRowHeader.Content`
+（完整树路径在探测日志里），而我们上一批的行头模板带内容呈现器，于是 20 DIP 的行头槽里画的是模型 `ToString()`。
+修法是行头**不呈现内容**（上游 WPF Fluent 的行头也只画"当前行"记号，而本运行时不暴露那个读数），
+`DataGridRowHeaderForeground` 随之失去消费者、撤出别名表并进"不发布"闸口，Gallery 表格另加 `HeadersVisibility='Column'`。
+这是本仓第二次"上一批的模板形状在下一批被量成缺陷"——上一次是弹层角批把建议列表的渐变底判成缺陷。
+
+四类证据分开记：
+- 行为/结构：`AstraTreeDataGridTests` 11 条（喂法/展开闭环/缩进/部件契约七件套/与 DataGrid 共享样式/行本地填充/
+  交替实例/表面刷与半径/Auto-vs-MinWidth 两组/行高列头高落部件/两主题重绘），`AstraDataGridTests` 加 2 条（行头不出文字、markup 列宽静默）。
+  写的时候自己也踩了一次：两条树测试一开始用探测数据里的旧节点名断言，红了才改正——红的是断言，不是产品。
+- 像素：选中树行 `#1D733C`/`#2B804A`/品牌绿各 0 像素（并扫裁剪区内所有渐变持有者）、Light↔Dark 顶行颜色不同。
+- 视觉/Gallery：`Catalog.json` 50→51 行（`TreeDataGrid`，parity `audited`，8 条 gaps 逐条写明"没有 WinUI 上游"
+  "行本地填充""Auto=0""未知属性静默"），`selection` 页挂上真的两层树，`Test-AstraGallerySmoke.ps1 -Page selection`
+  10.8 秒干净关窗。
+- 构建：串行闸口 `tools/Test-AstraGates.ps1` 在**最终这棵树上**四步全绿——restore 全部最新；Debug 构建
+  **0 警告 0 错误**；整套顺序跑 **1047/1047 通过、0 失败、0 跳过**（5 m 23 s，比上段 1034 多 13 条 =
+  本段树表 11 + 表格 2）；调色板漂移 Light 83 源色 / 101 刷、Dark 同、HighContrast 101 映射键，
+  三行 `checked=True`。记账顺序如实写下来：第一条闸口跑（1046/1046，7 m 3 s）之后又补了
+  `The_row_and_header_heights_we_set_are_the_heights_the_parts_get`（行高要落到生成的行上，不只是样式装在宿主上），
+  于是整条串行闸口重跑了一次，提交的就是重跑验证过的那棵树。
+
+不声称：chevron 的命中区、hover、键盘 `Alt+Right/Left`、触摸展开**零真输入证据**（展开只证明公开调用还活着）；
+列拖拽/重排/排序/编辑提交同样零证据；行状态矩阵（hover/selected/focus 成套 VisualState）一格没写；
+虚拟化下的行回收没测；高对比未测；缩进只量到"子在父右"，没量到 DIP 精度；
+markup 属性名/属性类型这一层闸口仍缺（`AstraGateTests` 查不到）。

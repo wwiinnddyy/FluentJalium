@@ -59,7 +59,7 @@ internal static partial class Program
             // pass 2 boots without Astra's dictionaries on purpose: the framework's own grid theme is the baseline
             // the readings are about, and Apply is called from inside the mode so the same instance can be re-read
             // after it lands.
-            if (_mode is not ("pass2" or "pass3" or "content"))
+            if (_mode is not ("pass2" or "pass3" or "content" or "feedbare"))
             {
                 FluentThemeManager.Apply(application);
             }
@@ -110,6 +110,16 @@ internal static partial class Program
                 if (_mode is "all" or "tree")
                 {
                     TreeDataGridShape(root, window);
+                }
+
+                if (_mode is "all" or "feed" or "feedbare")
+                {
+                    TreeDataGridFeed(root, window);
+                }
+
+                if (_mode is "cols")
+                {
+                    ColumnWidths(root, window);
                 }
 
                 if (_mode is "all" or "parts")
@@ -478,8 +488,371 @@ internal static partial class Program
         Pump(2);
     }
 
-    // ---------- F. headers, gridlines, resize ----------
+    // ---------- H. TreeDataGrid feed path ----------
 
+    /// <summary>
+    /// audits/datagrid.md §4-5 closed the previous slice on an inference: "TreeDataGridNode is internal, so how
+    /// hierarchical data gets in is unmeasured". That inference has a decisive consequence - if a consumer cannot
+    /// build the control's data, the control cannot be styled, galleryed or tested and the whole row would have to
+    /// be declared out of scope. The reference tree claims the feed is a plain IEnumerable plus a children path,
+    /// with the node type staying private; the shipped assembly is the authority, so the names are read here.
+    /// Markup and Bindings are used because that is the shape Gallery will mount, and a bare object handed to a
+    /// probe measures a different code path (the keyed-template lesson).
+    /// </summary>
+    private static void TreeDataGridFeed(Panel root, Window window)
+    {
+        Note("");
+        Note("=== H. TreeDataGrid feed path ===");
+        var type = TypeByName("TreeDataGrid");
+        if (type is null)
+        {
+            Note("TreeDataGrid NOT EXPORTED.");
+            return;
+        }
+
+        static string Names(IEnumerable<string> values) => Join(values.OrderBy(n => n, StringComparer.Ordinal));
+        Note($"  declared public props: {Names(type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(p => $"{p.Name}:{p.PropertyType.Name}"))}");
+        Note($"  declared public DPs: {Names(DeclaredDpNames(type))}");
+        Note($"  expand/collapse members: {Join(type.GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(m => m.Name.Contains("Expand", StringComparison.Ordinal) || m.Name.Contains("Collapse", StringComparison.Ordinal)).Select(m => $"{m.Name}({string.Join(",", m.GetParameters().Select(p => p.ParameterType.Name))})").Distinct(StringComparer.Ordinal).OrderBy(n => n, StringComparer.Ordinal))}");
+        Note($"  public events: {Names(type.GetEvents(BindingFlags.Public | BindingFlags.Instance).Select(e => e.Name))}");
+
+        var node = TypeByName("TreeDataGridNode");
+        Note($"  TreeDataGridNode: exported={node is not null} public={(node is null ? "-" : node.IsPublic.ToString().ToLowerInvariant())} publicCtors={(node?.GetConstructors(BindingFlags.Public | BindingFlags.Instance).Length ?? -1)}");
+        var rowType = TypeByName("TreeDataGridRow");
+        if (rowType is null)
+        {
+            Note("  TreeDataGridRow NOT EXPORTED - no container to build, so the feed cannot be measured.");
+            return;
+        }
+
+        Note($"  TreeDataGridRow ({Chain(rowType)}) declared public props: {Names(rowType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(p => $"{p.Name}:{p.PropertyType.Name}"))}");
+        Note($"  TreeDataGridRow expand members: {Join(rowType.GetMethods(BindingFlags.Public | BindingFlags.Instance).Where(m => m.Name.Contains("Expand", StringComparison.Ordinal) || m.Name.Contains("Collapse", StringComparison.Ordinal)).Select(m => m.Name).Distinct(StringComparer.Ordinal))}");
+
+        // Mount in Gallery's shape: columns and bindings in markup, only the rows coming from code. The namespace
+        // matters and was measured, not copied from the other probes: with
+        // 'https://schemas.jalium.dev/jalxaml/presentation' the TreeDataGrid itself resolves but
+        // DataGridTextColumn throws XamlParseException "Cannot resolve type", while Gallery's
+        // 'http://schemas.jalium.ui/2024' resolves both. Two "default" namespaces, two type tables.
+        const string Markup = """
+            <TreeDataGrid xmlns='http://schemas.jalium.ui/2024'
+                          AutoGenerateColumns='False' TreeColumnIndex='0' Width='460' Height='220'>
+              <TreeDataGrid.Columns>
+                <DataGridTextColumn Header='Name' Binding='{Binding Name}' Width='220' />
+                <DataGridTextColumn Header='Owner' Binding='{Binding Owner}' Width='140' />
+              </TreeDataGrid.Columns>
+            </TreeDataGrid>
+            """;
+        var parsed = Read(() => XamlReader.Parse(Markup));
+        var element = parsed as FrameworkElement;
+        if (element is null)
+        {
+            Note($"  markup parse -> {Text(() => parsed)}");
+            return;
+        }
+
+        Note($"  parsed: {element.GetType().Name}");
+        Note($"  columns from markup: {Show(Prop(Prop(element, "Columns"), "Count"))}");
+
+        // Does the parser honour a name the type does not have? TreeDataGrid has no AutoGenerateColumns property in
+        // this build (its 26 declared names are above), yet the markup carries the attribute and parsed without an
+        // error - so either the parser drops unknown names silently or the attribute lands elsewhere. A number on a
+        // column's Width behaving like this is the reason the question matters.
+        const string UnknownMarkup = """
+            <TreeDataGrid xmlns='http://schemas.jalium.ui/2024' DefinitelyNotAProperty='42' Width='460' Height='60'>
+              <TreeDataGrid.Columns>
+                <DataGridTextColumn Header='Name' Binding='{Binding Name}' MinWidth='200' />
+              </TreeDataGrid.Columns>
+            </TreeDataGrid>
+            """;
+        var unknown = Read(() => XamlReader.Parse(UnknownMarkup));
+        Note($"  unknown attribute markup -> {(unknown is string failure ? failure : $"{unknown.GetType().Name}, columns={Show(Prop(Prop(unknown, "Columns"), "Count"))}")}");
+        if (unknown is not string)
+        {
+            root.Children.Add((FrameworkElement)unknown);
+            Pump(8);
+            Note($"    unknown-attribute grid mounted: size={SizeOf((FrameworkElement)unknown)} cells={CountTypeName((FrameworkElement)unknown, "DataGridCell")}");
+            root.Children.Remove((FrameworkElement)unknown);
+            Pump(2);
+        }
+
+        foreach (var path in new[] { "ChildrenPropertyPath", "ChildrenSelector", "HasChildrenPath", "HasChildrenSelector", "Indentation", "ChildItemsPath" })
+        {
+            Note($"  set {path}=\"Children\" -> {Set(element, path, "Children")}");
+        }
+
+        _ = Set(element, "ItemsSource", TreeNodes());
+        root.Children.Add(element);
+        var frames = Pump(12);
+        Note($"  mounted after {frames} frames: size={SizeOf(element)} template={(Prop(element, "Template") is null ? "null" : "SET")}");
+        Note($"  parts: {PartNames(element)}");
+        var rows = AllOfType(element, rowType).OfType<FrameworkElement>().ToList();
+        Note($"  TreeDataGridRow count={rows.Count} (2 roots + 4 children if the path landed)");
+        foreach (var row in rows)
+        {
+            var border = FirstNamed(row, "PART_RowBorder");
+            Note($"    row \"{Show(Prop(row, "Content"))}\" index={Show(Prop(row, "Index"))} level={Show(Prop(row, "Level"))} " +
+                 $"height={SizeOf(row)} localBG={HasLocal(row, "Background")} bg={Hex(Prop(row, "Background") as Brush)} " +
+                 $"borderBG={(border is null ? "-" : Hex(Prop(border, "Background") as Brush))} margin={Show(Prop(row, "Margin"))}");
+            Note($"      parts={PartNames(row)} cells={CountTypeName(row, "DataGridCell")} path={CountTypeName(row, "Path")} toggle={CountTypeName(row, "ToggleButton")} expander={CountTypeName(row, "Expander")}");
+        }
+
+        // The defect this mode exists to locate: the rows realize, the text measures, but every cell arranges to
+        // ActualWidth 0. Either the column never got an ActualWidth (framework layout) or our implicit DataGridCell
+        // / DataGridColumnHeader styles - which TreeDataGrid reuses, because the framework has no tree-only cell -
+        // are what collapse it. Both are read here, and the same mode runs a second time with Astra off.
+        Note($"  astra dictionaries={Text(() => FluentThemeManager.DictionaryNames.Count.ToString())}");
+        var columns = Prop(element, "Columns");
+        var columnCount = Prop(columns, "Count") is int length ? length : 0;
+        var indexer = columns?.GetType().GetProperty("Item");
+        for (var index = 0; index < columnCount; index++)
+        {
+            var column = Read(() => indexer?.GetValue(columns, [index]));
+            Note($"    col{index} header={Show(Prop(column, "Header"))} width={Show(Prop(column, "Width"))} actualWidth={Show(Prop(column, "ActualWidth"))} " +
+                 $"minWidth={Show(Prop(column, "MinWidth"))} visibility={Show(Prop(column, "Visibility"))} cellStyle={Show(Prop(Prop(column, "CellStyle"), "TargetType"))}");
+        }
+
+        foreach (var cell in AllOfType(element, typeof(DataGridCell)).Take(2).Cast<FrameworkElement>())
+        {
+            var style = Prop(cell, "Style");
+            var styleName = style is null ? "null" : $"{Show(Prop(style, "Name"))}/{Show(Prop(style, "TargetType"))}";
+            Note($"    cell size={SizeOf(cell)} desired={Text(() => Prop(cell, "DesiredSize"))} style={styleName} " +
+                 $"localWidth={HasLocal(cell, "Width")} actualWidthValue={Show(Prop(cell, "ActualWidth"))} padding={Show(Prop(cell, "Padding"))} minH={Show(Prop(cell, "MinHeight"))}");
+        }
+
+        foreach (var (name, value) in new (string, object)[]
+                 {
+                     ("EnableColumnVirtualization", false),
+                     ("EnableRowVirtualization", false),
+                     ("ColumnHeaderHeight", 34d),
+                     ("RowHeight", 30d),
+                 })
+        {
+            _ = Set(element, name, value);
+            Pump(8);
+            var wide = AllOfType(element, typeof(DataGridCell)).Cast<FrameworkElement>().FirstOrDefault();
+            Note($"  after {name}={value}: cellActualWidth={(wide is null ? "-" : wide.ActualWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))} gridDesired={Text(() => Prop(element, "DesiredSize"))}");
+        }
+
+        // The DataGrid slice's teeth: does the bound text reach a real TextBlock with real size, or sit stranded?
+        var texts = AllOfType(element, typeof(TextBlock)).Cast<TextBlock>().Where(t => !string.IsNullOrEmpty(t.Text)).ToList();
+        Note($"  realized TextBlocks={texts.Count}: {Join(texts.Take(12).Select(t => $"\"{t.Text}\"@{SizeOf(t)}"))}");
+        if (_mode != "feedbare")
+        {
+            PrintTree(element, "    ", 10);
+        }
+
+        // Expanding without pointer input: the control publishes ExpandAll/CollapseAll/IsExpanded(int) and a
+        // FlattenedCount, so the expand cycle is assertable in the gate the way the ToggleButton batch drives a
+        // toggle - no OS input, and no reflection into the internal node.
+        Note($"  FlattenedCount before expand={Show(Prop(element, "FlattenedCount"))} rowHeight={Show(Prop(element, "RowHeight"))} indentSize={Show(Prop(element, "IndentSize"))}");
+        if (rows.Count > 0)
+        {
+            var first = rows[0];
+            Note($"  row 0 public surface: IsSelected={Show(Prop(first, "IsSelected"))} localIsSelected={HasLocal(first, "IsSelected")} Node={Show(Prop(first, "Node"))}");
+            Note($"  grid.IsExpanded(0)={Text(() => type.GetMethod("IsExpanded", [typeof(int)])?.Invoke(element, [0]))}");
+            Note($"  ExpandAll() -> {Text(() => { element.GetType().GetMethod("ExpandAll")?.Invoke(element, []); return (object)"invoked"; })}");
+            Pump(12);
+            var expandedRows = AllOfType(element, rowType).OfType<FrameworkElement>().ToList();
+            Note($"  rows after ExpandAll={expandedRows.Count} FlattenedCount={Show(Prop(element, "FlattenedCount"))}");
+            foreach (var row in expandedRows)
+            {
+                Note($"    row height={SizeOf(row)} margin={Show(Prop(row, "Margin"))} localBG={HasLocal(row, "Background")} bg={Hex(Prop(row, "Background") as Brush)} cells={CountTypeName(row, "DataGridCell")}");
+            }
+
+            Note($"  realized TextBlocks after expand={AllOfType(element, typeof(TextBlock)).Cast<TextBlock>().Count(t => !string.IsNullOrEmpty(t.Text))}");
+            Note($"  collapse back -> {Text(() => { element.GetType().GetMethod("CollapseAll")?.Invoke(element, []); return (object)"invoked"; })}");
+            Pump(8);
+            Note($"  rows after CollapseAll={AllOfType(element, rowType).Count()} FlattenedCount={Show(Prop(element, "FlattenedCount"))}");
+            _ = Text(() => { element.GetType().GetMethod("ExpandAll")?.Invoke(element, []); return (object)"ok"; });
+            Pump(8);
+        }
+
+        // What the framework's own row and grid templates consume - the method that decides themeability.
+        foreach (var label in new[] { "TreeDataGrid", "TreeDataGridRow" })
+        {
+            var candidate = label == "TreeDataGrid" ? element : rows.FirstOrDefault();
+            var template = candidate is null ? null : Prop(candidate, "Template") as ControlTemplate;
+            if (template is null)
+            {
+                Note($"  {label}: mounted Template null");
+                continue;
+            }
+
+            var xaml = TemplateXaml(template);
+            Note($"  {label}: template {xaml.Length} chars triggers={Read(() => template.Triggers.Count)} keys=[{Join(ThemeResourceNames(xaml).OrderBy(k => k, StringComparer.Ordinal))}]");
+        }
+
+        root.Children.Remove(element);
+        Pump(2);
+    }
+
+    private static List<TreeNode> TreeNodes() =>
+    [
+        new("Ship train", "Mara", [new("Astra styles", "Mara", []), new("Gallery pages", "Ivo", [new("Selection", "Ivo", [])])]),
+        new("Test base", "Nils", [new("Pixel harness", "Nils", [])]),
+    ];
+
+    private sealed record TreeNode(string Name, string Owner, IReadOnlyList<TreeNode> Children);
+
+    // ---------- I. why a column's Width='220' reads back Auto ----------
+
+    /// <summary>
+    /// The feed probe found rows that realize, text that measures and cells that all arrange to width 0, with
+    /// <c>column.Width</c> reading back as <c>Auto</c> although the markup said 220 - and the same shape with Astra
+    /// switched off, so it is not our styles. Two grids share DataGridColumn, so this either indicts the Gallery's
+    /// shipping grid or the markup path specifically. Four configurations are compared in one run: markup Width,
+    /// markup MinWidth, and a code-side set through whatever type the property actually wants.
+    /// </summary>
+    private static void ColumnWidths(Panel root, Window window)
+    {
+        Note("");
+        Note("=== I. column width: markup vs code, DataGrid vs TreeDataGrid ===");
+        ReportColumns(root, "DataGrid markup Width=200", GridMarkup("DataGrid", false, "Width='200'"), 0);
+        ReportColumns(root, "TreeDataGrid markup Width=200", GridMarkup("TreeDataGrid", true, "Width='200'"), 0);
+        ReportColumns(root, "DataGrid markup MinWidth=200", GridMarkup("DataGrid", false, "MinWidth='200'"), 0);
+        ReportColumns(root, "TreeDataGrid markup MinWidth=200", GridMarkup("TreeDataGrid", true, "MinWidth='200'"), 0);
+        ReportColumns(root, "DataGrid code Width=200", GridMarkup("DataGrid", false, string.Empty), 1);
+        ReportColumns(root, "TreeDataGrid code Width=200", GridMarkup("TreeDataGrid", true, string.Empty), 1);
+        ReportColumns(root, "DataGrid code Width=200 AFTER mount", GridMarkup("DataGrid", false, string.Empty), 2);
+        ReportColumns(root, "TreeDataGrid code Width=200 AFTER mount", GridMarkup("TreeDataGrid", true, string.Empty), 2);
+    }
+
+    private static string GridMarkup(string control, bool tree, string columnAttributes) => $$"""
+        <{{control}} xmlns='http://schemas.jalium.ui/2024' Height='160' Width='460'
+                     AutoGenerateColumns='False'{{(tree ? " TreeColumnIndex='0' ChildrenPropertyPath='Children'" : string.Empty)}}>
+          <{{control}}.Columns>
+            <DataGridTextColumn Header='Name' Binding='{Binding Name}' {{columnAttributes}} />
+            <DataGridTextColumn Header='Owner' Binding='{Binding Owner}' {{columnAttributes}} />
+          </{{control}}.Columns>
+        </{{control}}>
+        """;
+
+    private static void ReportColumns(Panel root, string label, string markup, int when)
+    {
+        var parsed = Read(() => XamlReader.Parse(markup));
+        if (parsed is not FrameworkElement element)
+        {
+            Note($"  {label}: parse -> {Text(() => parsed)}");
+            return;
+        }
+
+        _ = Set(element, "ItemsSource", TreeNodes());
+        var columns = Prop(element, "Columns");
+        var count = Prop(columns, "Count") is int length ? length : 0;
+        var indexer = columns?.GetType().GetProperty("Item");
+
+        void SetWidthFromCode()
+        {
+            for (var index = 0; index < count; index++)
+            {
+                var column = Read(() => indexer?.GetValue(columns, [index]));
+                if (column is null or string)
+                {
+                    Note($"  {label}: column {index} -> {column}");
+                    continue;
+                }
+
+                var property = column.GetType().GetProperty("Width", BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                var widthType = property?.PropertyType;
+                if (property is null || widthType is null)
+                {
+                    Note($"  {label}: no readable Width on {column.GetType().Name}");
+                    continue;
+                }
+
+                var built = Read(() => widthType.IsValueType ? Activator.CreateInstance(widthType, 200d)! : (object)200d);
+                if (built is string failure)
+                {
+                    Note($"  {label}: {widthType.Name}(200) -> {failure}");
+                    continue;
+                }
+
+                Note($"  {label}: code col{index} widthType={widthType.Name} -> {Text(() => { property.SetValue(column, built); return (object)$"read back {Show(property.GetValue(column))}"; })}");
+            }
+        }
+
+        if (when == 1)
+        {
+            SetWidthFromCode();
+        }
+
+        root.Children.Add(element);
+        if (when == 2)
+        {
+            SetWidthFromCode();
+        }
+
+        Pump(12);
+        Note($"  {label}: grid size={SizeOf(element)} desired={Text(() => Prop(element, "DesiredSize"))} cells={CountTypeName(element, "DataGridCell")}");
+        for (var index = 0; index < count; index++)
+        {
+            var column = Read(() => indexer?.GetValue(columns, [index]));
+            Note($"    col{index} width={Show(Prop(column, "Width"))} actualWidth={Show(Prop(column, "ActualWidth"))} minWidth={Show(Prop(column, "MinWidth"))} maxWidth={Show(Prop(column, "MaxWidth"))}");
+        }
+
+        foreach (var cell in AllOfType(element, typeof(DataGridCell)).Cast<FrameworkElement>().Take(4))
+        {
+            Note($"    cell size={SizeOf(cell)} desired={Text(() => Prop(cell, "DesiredSize"))} localWidth={HasLocal(cell, "Width")}");
+        }
+
+        var texts = AllOfType(element, typeof(TextBlock)).Cast<TextBlock>().Where(t => !string.IsNullOrEmpty(t.Text)).ToList();
+        Note($"    realized text: {Join(texts.Take(6).Select(t => $"\"{t.Text}\"@{SizeOf(t)}"))}");
+
+        if (label.StartsWith("DataGrid markup Width", StringComparison.Ordinal))
+        {
+            // One of those realized strings was the whole item's ToString. Which part holds it decides whether the
+            // shipping Gallery grid paints a stray row of model text, so the path is printed rather than guessed.
+            var steps = new List<string>();
+            var hits = new List<string>();
+            void Find(DependencyObject node, int depth)
+            {
+                var label2 = node.GetType().Name + (string.IsNullOrEmpty(NameOf(node)) ? string.Empty : $"'{NameOf(node)}'");
+                steps.Add(label2);
+                if (Prop(node, "Content") is TreeNode item)
+                {
+                    hits.Add($"{string.Join(" > ", steps)} Content={Trim(item.ToString() ?? "?")}");
+                }
+
+                if (depth < 12)
+                {
+                    var children = 0;
+                    try
+                    {
+                        children = VisualTreeHelper.GetChildrenCount(node);
+                    }
+                    catch
+                    {
+                        children = 0;
+                    }
+
+                    for (var index = 0; index < children; index++)
+                    {
+                        try
+                        {
+                            Find(VisualTreeHelper.GetChild(node, index), depth + 1);
+                        }
+                        catch
+                        {
+                            // unreadable child, already covered by its parent line
+                        }
+                    }
+                }
+
+                steps.RemoveAt(steps.Count - 1);
+            }
+
+            Find(element, 0);
+            foreach (var hit in hits.Take(3))
+            {
+                Note($"    item-content path: {hit}");
+            }
+        }
+
+        root.Children.Remove(element);
+        Pump(2);
+    }
+
+    // ---------- F. headers, gridlines, resize ----------
     private static void ColumnParts(Panel root, Window window)
     {
         Note("");

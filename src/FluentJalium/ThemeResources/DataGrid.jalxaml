@@ -58,7 +58,9 @@
   <StaticResource x:Key="DataGridHeaderSeparatorBrush" ResourceKey="ControlStrokeColorSecondaryBrush" />
   <Thickness x:Key="DataGridColumnHeaderBorderThickness">0,0,0,1</Thickness>
   <Thickness x:Key="DataGridColumnHeaderPadding">4,0</Thickness>
-  <!-- The row-header gutter. The details strip's row is dropped with the row template that would have read it. -->
+  <!-- The row-header gutter. The details strip's row is dropped with the row template that would have read it, and
+       DataGridRowHeaderForeground went with the row header's ContentPresenter: this runtime puts the row's data item
+       in that presenter's Content, so drawing it paints the model's ToString (Styles/DataGrid.jalxaml carries the
+       tree path reading). Upstream's header has no text of its own either. -->
   <StaticResource x:Key="DataGridRowHeaderBackground" ResourceKey="SubtleFillColorTransparentBrush" />
-  <StaticResource x:Key="DataGridRowHeaderForeground" ResourceKey="TextFillColorSecondaryBrush" />
 </ResourceDictionary>

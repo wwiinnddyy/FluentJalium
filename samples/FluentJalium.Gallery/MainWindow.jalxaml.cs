@@ -500,9 +500,29 @@ public partial class MainWindow : Window
             Report(grid.SelectedItem is GridWorkItem item
                 ? $"Grid row: {item.Name} · {item.Status}."
                 : $"Grid row: {Describe(grid.SelectedItem)}.");
+
+        // The hierarchical grid is fed the same way: a flat list plus the ChildrenPropertyPath the markup names.
+        // The control's own node type is private and a consumer never has to name it - the reading that let this
+        // control into the library (docs/astra/audits/treedatagrid.md §1). ExpandAll is a public call, so the tree
+        // opens here without a pointer, and what that proves is the activation path only.
+        var treeGrid = (TreeDataGrid)SampleTreeDataGrid!;
+        treeGrid.ItemsSource = new[]
+        {
+            new TreeWorkItem("Phase 5 gate list", "Lince",
+                [new TreeWorkItem("Astra gates", "Lince", []), new TreeWorkItem("Palette drift", "Lince", [])]),
+            new TreeWorkItem("NavigationView styles", "Lince", [new TreeWorkItem("Selection indicator", "Lince", [])]),
+            new TreeWorkItem("Hardware input evidence", "Lince", []),
+        };
+        treeGrid.ExpandAll();
+        treeGrid.SelectionChanged += (_, _) =>
+            Report(treeGrid.SelectedItem is TreeWorkItem node
+                ? $"Tree grid row: {node.Name}."
+                : $"Tree grid row: {Describe(treeGrid.SelectedItem)}.");
     }
 
     private sealed record GridWorkItem(string Name, string Owner, string Status);
+
+    private sealed record TreeWorkItem(string Name, string Owner, IReadOnlyList<TreeWorkItem> Children);
 
     private void WireAppearance()
     {

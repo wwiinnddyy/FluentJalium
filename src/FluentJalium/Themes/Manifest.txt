@@ -50,3 +50,6 @@ Styles/ContentDialog.jalxaml
 Styles/TeachingTip.jalxaml
 Styles/TabView.jalxaml
 Styles/DataGrid.jalxaml
+# Reads the DataGrid family's token rows rather than declaring its own: the two grids share the cell, the column
+# header and the surface, and this runtime has no tree-only versions of them.
+Styles/TreeDataGrid.jalxaml

@@ -378,15 +378,33 @@
                    deliberately: installing a DataGridRow style of ours strands the cell's generated text and the
                    table renders no values at all (docs/astra/audits/datagrid.md §5), which also means the selected
                    row fills through the retinted AccentBrush name rather than through a part of ours - the accent
-                   here is the application accent, never the framework's brand-emerald gradient. -->
-              <DataGrid x:Name="SampleDataGrid" Height="180" AutoGenerateColumns="False">
+                   here is the application accent, never the framework's brand-emerald gradient.
+                   Two readings from spike/DataGridProbe (datagrid-probe-cols.txt) shaped the markup below, and both
+                   are silent failures rather than errors: a bare number on a column's Width does not convert to that
+                   property's DataGridLength type and stays Auto, while MinWidth is a plain number and lands; and this
+                   runtime hands the row's own data item to DataGridRowHeader.Content, so a visible row header paints
+                   the model's ToString in the gutter. Hence MinWidth everywhere and HeadersVisibility="Column". -->
+              <DataGrid x:Name="SampleDataGrid" Height="180" AutoGenerateColumns="False" HeadersVisibility="Column">
                 <DataGrid.Columns>
-                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" Width="200" />
-                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" Width="140" />
-                  <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120" />
+                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" MinWidth="200" />
+                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" MinWidth="140" />
+                  <DataGridTextColumn Header="Status" Binding="{Binding Status}" MinWidth="120" />
                 </DataGrid.Columns>
               </DataGrid>
               <TextBlock Text="Column sort writes a glyph into PART_SortIndicator itself, so the template only owns its size; the row line is the framework's, the cell line is ours. Editing a cell still needs the runtime's own commit path - see the parity strip." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="Tree data grid" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- The hierarchical grid is the same host family: it reuses our cell, column header and row-header
+                   styles because this runtime has no tree-only versions of them, and only the host template is new.
+                   Its feed is a plain list plus a children path - the node type stays private inside the control and
+                   a consumer never has to name it - and the tree column is an index rather than a column type. -->
+              <TreeDataGrid x:Name="SampleTreeDataGrid" Height="200" HeadersVisibility="Column"
+                            TreeColumnIndex="0" ChildrenPropertyPath="Children">
+                <TreeDataGrid.Columns>
+                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" MinWidth="220" />
+                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" MinWidth="140" />
+                </TreeDataGrid.Columns>
+              </TreeDataGrid>
+              <TextBlock Text="Indent is 16 DIP per level, the runtime's own IndentSize. Unlike the plain grid, a tree column left at Auto lays out at zero width, so every column here carries a minimum; the chevron is drawn by the control inside the tree cell, not by this template. Expanding is a public call here (ExpandAll / IsExpanded), so the gallery's expand evidence is API-driven, not a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
             </StackPanel>
 
             <StackPanel x:Name="NavigationPage">

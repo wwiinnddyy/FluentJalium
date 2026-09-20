@@ -167,21 +167,18 @@
 
   <!-- The row-header gutter. Upstream's DataGridRowHeader is a ButtonBase with four gripper Thumbs and a
        seventeen-cell state matrix; this runtime's row-header code resolves no part name at all, so the shipped
-       template is the resting surface and the resize/edit states are owed (audits/datagrid.md §4). -->
+       template is the resting surface and the resize/edit states are owed (audits/datagrid.md §4).
+       It draws no content, and that is a measured defect rather than a simplification: this runtime hands the row's
+       own data item to DataGridRowHeader.Content (the path is printed in
+       spike/DataGridProbe/bin/Debug/net10.0-windows/datagrid-probe-cols.txt -
+       PART_RowsHost > DataGridRow > PART_CellsPanel > DataGridRowHeader > PART_RowHeaderBorder > ContentPresenter
+       with Content=<the item>), so a presenter here paints the model's ToString inside a 20 DIP gutter. WPF's own
+       row header carries only the current-row marker, which this runtime exposes no lever for. -->
   <Style x:Key="DefaultDataGridRowHeaderStyle" TargetType="DataGridRowHeader">
     <Setter Property="Background" Value="{ThemeResource DataGridRowHeaderBackground}" />
-    <Setter Property="Foreground" Value="{ThemeResource DataGridRowHeaderForeground}" />
     <Setter Property="Width" Value="20" />
     <Setter Property="Template"><ControlTemplate TargetType="DataGridRowHeader">
-      <Border Name="PART_RowHeaderBorder" Background="{TemplateBinding Background}" BorderBrush="{ThemeResource DataGridGridLinesBrush}" BorderThickness="0,0,1,1">
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
-          <ContentPresenter Name="ContentPresenter" Grid.Row="0" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        </Grid>
-      </Border>
+      <Border Name="PART_RowHeaderBorder" Background="{TemplateBinding Background}" BorderBrush="{ThemeResource DataGridGridLinesBrush}" BorderThickness="0,0,1,1" />
     </ControlTemplate></Setter>
   </Style>
   <Style TargetType="DataGridRowHeader" BasedOn="{StaticResource DefaultDataGridRowHeaderStyle}" />

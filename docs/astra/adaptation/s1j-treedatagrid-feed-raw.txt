@@ -1,0 +1,155 @@
+theme dictionaries=48
+
+=== H. TreeDataGrid feed path ===
+  declared public props: 26: AlternatingRowBackground:Brush, CanUserReorderColumns:Boolean, CanUserResizeColumns:Boolean, CanUserSortColumns:Boolean, ChildrenPropertyPath:String, ChildrenSelector:Func`2, ColumnHeaderHeight:Double, Columns:ObservableCollection`1, EnableColumnVirtualization:Boolean, EnableRowVirtualization:Boolean, FlattenedCount:Int32, GridLinesVisibility:DataGridGridLinesVisibility, HasChildrenSelector:Func`2, HeadersVisibility:DataGridHeadersVisibility, HorizontalGridLinesBrush:Brush, IndentSize:Double, IsReadOnly:Boolean, ItemsSource:IEnumerable, RowBackground:Brush, RowHeight:Double, SelectedIndex:Int32, SelectedItem:Object, SelectedItems:IList`1, SelectionMode:DataGridSelectionMode, TreeColumnIndex:Int32, VerticalGridLinesBrush:Brush
+  declared public DPs: 21: AlternatingRowBackground, CanUserReorderColumns, CanUserResizeColumns, CanUserSortColumns, ChildrenPropertyPath, ColumnHeaderHeight, EnableColumnVirtualization, EnableRowVirtualization, GridLinesVisibility, HeadersVisibility, HorizontalGridLinesBrush, IndentSize, IsReadOnly, ItemsSource, RowBackground, RowHeight, SelectedIndex, SelectedItem, SelectionMode, TreeColumnIndex, VerticalGridLinesBrush
+  expand/collapse members: 9: CollapseAll(), ExpandAll(), IsExpanded(Int32), add_NodeCollapsed(EventHandler`1), add_NodeExpanded(EventHandler`1), add_NodeExpanding(EventHandler`1), remove_NodeCollapsed(EventHandler`1), remove_NodeExpanded(EventHandler`1), remove_NodeExpanding(EventHandler`1)
+  public events: 132: ContextMenuClosing, ContextMenuOpening, DataContextChanged, DragEnter, DragLeave, DragOver, Drop, FocusableChanged, GiveFeedback, GotFocus, GotKeyboardFocus, GotMouseCapture, GotStylusCapture, GotTouchCapture, Initialized, IsEnabledChanged, IsHitTestVisibleChanged, IsKeyboardFocusWithinChanged, IsKeyboardFocusedChanged, IsMouseCaptureWithinChanged, IsMouseCapturedChanged, IsMouseDirectlyOverChanged, IsStylusCaptureWithinChanged, IsStylusCapturedChanged, IsStylusDirectlyOverChanged, IsVisibleChanged, KeyDown, KeyUp, LayoutUpdated, Loaded, LostFocus, LostKeyboardFocus, LostMouseCapture, LostStylusCapture, LostTouchCapture, ManipulationBoundaryFeedback, ManipulationCompleted, ManipulationDelta, ManipulationInertiaStarting, ManipulationStarted, ManipulationStarting, MouseDoubleClick, MouseDown, MouseEnter, MouseLeave, MouseLeftButtonDown, MouseLeftButtonUp, MouseMove, MouseRightButtonDown, MouseRightButtonUp, MouseUp, MouseWheel, NodeCollapsed, NodeExpanded, NodeExpanding, PointerCancel, PointerDown, PointerMove, PointerMoved, PointerPressed, PointerReleased, PointerUp, PreviewDragEnter, PreviewDragLeave, PreviewDragOver, PreviewDrop, PreviewGiveFeedback, PreviewGotKeyboardFocus, PreviewKeyDown, PreviewKeyUp, PreviewLostKeyboardFocus, PreviewManipulationBoundaryFeedback, PreviewManipulationCompleted, PreviewManipulationDelta, PreviewManipulationInertiaStarting, PreviewManipulationStarted, PreviewManipulationStarting, PreviewMouseDoubleClick, PreviewMouseDown, PreviewMouseLeftButtonDown, PreviewMouseLeftButtonUp, PreviewMouseMove, PreviewMouseRightButtonDown, PreviewMouseRightButtonUp, PreviewMouseUp, PreviewMouseWheel, PreviewPointerCancel, PreviewPointerDown, PreviewPointerMove, PreviewPointerUp, PreviewQueryContinueDrag, PreviewStylusButtonDown, PreviewStylusButtonUp, PreviewStylusDown, PreviewStylusInAirMove, PreviewStylusInRange, PreviewStylusMove, PreviewStylusOutOfRange, PreviewStylusSystemGesture, PreviewStylusUp, PreviewTextInput, PreviewTouchDown, PreviewTouchMove, PreviewTouchUp, QueryContinueDrag, QueryCursor, RequestBringIntoView, ResourcesChanged, SelectionChanged, SizeChanged, SourceUpdated, StylusButtonDown, StylusButtonUp, StylusDown, StylusEnter, StylusInAirMove, StylusInRange, StylusLeave, StylusMove, StylusOutOfRange, StylusSystemGesture, StylusUp, TargetUpdated, TextInput, ToolTipClosing, ToolTipOpening, TouchDown, TouchEnter, TouchLeave, TouchMove, TouchUp, Unloaded
+  TreeDataGridNode: exported=True public=false publicCtors=1
+  TreeDataGridRow (TreeDataGridRow : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject) declared public props: 1: IsSelected:Boolean
+  TreeDataGridRow expand members: none declared
+  parsed: TreeDataGrid
+  columns from markup: 2
+  unknown attribute markup -> TreeDataGrid, columns=1
+    unknown-attribute grid mounted: size=460x60 cells=0
+  set ChildrenPropertyPath="Children" -> ChildrenPropertyPath=Children
+  set ChildrenSelector="Children" -> threw ArgumentException: Object of type 'System.String' cannot be converted to type 'System.Func`2[System.Object,System.Collections.IEnumerable]'.
+  set HasChildrenPath="Children" -> no writable HasChildrenPath on TreeDataGrid
+  set HasChildrenSelector="Children" -> threw ArgumentException: Object of type 'System.String' cannot be converted to type 'System.Func`2[System.Object,System.Boolean]'.
+  set Indentation="Children" -> no writable Indentation on TreeDataGrid
+  set ChildItemsPath="Children" -> no writable ChildItemsPath on TreeDataGrid
+  mounted after 12 frames: size=460x220 template=SET
+  parts: PART_OuterBorder(Border), PART_ColumnHeadersBorder(Grid), PART_ColumnHeadersScrollViewer(ScrollViewer), PART_ColumnHeadersHost(StackPanel), SeparatorBorder(Border), PART_HeaderBorder(Border), PART_SortIndicator(TextBlock), PART_ResizeGrip(Rectangle), PART_ButtonRoot(Border), PART_Arrow(Path), ThumbBorder(Border), PART_DataScrollViewer(ScrollViewer), PART_RowsHost(StackPanel), PART_RowBorder(Border), PART_CellsPanel(StackPanel), PART_CellBorder(Border), ContentPresenter(ContentPresenter), PART_DragOverlay(Canvas)
+  TreeDataGridRow count=2 (2 roots + 4 children if the path landed)
+    row "null" index=null level=null height=446x32 localBG=True bg=#00FFFFFF borderBG=#00FFFFFF margin=0,0,0,0
+      parts=PART_RowBorder(Border), PART_CellsPanel(StackPanel), PART_CellBorder(Border), ContentPresenter(ContentPresenter) cells=2 path=1 toggle=0 expander=0
+    row "null" index=null level=null height=446x32 localBG=True bg=#0FFFFFFF borderBG=#0FFFFFFF margin=0,0,0,0
+      parts=PART_RowBorder(Border), PART_CellsPanel(StackPanel), PART_CellBorder(Border), ContentPresenter(ContentPresenter) cells=2 path=1 toggle=0 expander=0
+  astra dictionaries=48
+    col0 header=Name width=Auto actualWidth=0 minWidth=20 visibility=Visible cellStyle=null
+    col1 header=Owner width=Auto actualWidth=0 minWidth=20 visibility=Visible cellStyle=null
+    cell size=0x32 desired=0,32 style=null localWidth=True actualWidthValue=0 padding=10,5,10,5 minH=32
+    cell size=0x32 desired=0,32 style=null localWidth=True actualWidthValue=0 padding=10,5,10,5 minH=32
+  after EnableColumnVirtualization=False: cellActualWidth=0 gridDesired=460,220
+  after EnableRowVirtualization=False: cellActualWidth=0 gridDesired=460,220
+  after ColumnHeaderHeight=34: cellActualWidth=0 gridDesired=460,220
+  after RowHeight=30: cellActualWidth=0 gridDesired=460,220
+  realized TextBlocks=6: 6: "Name"@0x19.78, "Owner"@0x19.78, "Ship train"@0x17.24, "Mara"@0x19.78, "Test base"@0x17.24, "Nils"@0x19.78
+    TreeDataGrid  size=460x220 desired=460,220
+    Border 'PART_OuterBorder' bg=#0DFFFFFF r=4,4,4,4 bt=1,1,1,1 size=460x220 desired=460,108
+    Grid  size=458x218 desired=458,106
+    Grid 'PART_ColumnHeadersBorder'  size=458x34 desired=458,34
+    ScrollViewer 'PART_ColumnHeadersScrollViewer'  size=458x34 desired=0,34
+    StackPanel 'PART_ColumnHeadersHost'  size=458x34 desired=0,34
+    DataGridColumnHeader  size=0x34 desired=0,34
+    Grid  size=0x34 desired=51.8564453125,34
+    Border 'SeparatorBorder' bg=null r=0,0,0,0 bt=0,0,1,0 size=0x34 desired=1,0
+    Border 'PART_HeaderBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=0x34 desired=51.8564453125,20.7802734375
+    Grid  size=0x33 desired=43.8564453125,19.7802734375
+    ContentPresenter content=Name vis=Visible size=0x19.78 desired=43.8564453125,19.7802734375
+    TextBlock 'PART_SortIndicator' text="" size=0x0 desired=0,0
+    Rectangle 'PART_ResizeGrip'  size=8x34 desired=8,34
+    DataGridColumnHeader  size=0x34 desired=0,34
+    Grid  size=0x34 desired=56.5322265625,34
+    Border 'SeparatorBorder' bg=null r=0,0,0,0 bt=0,0,1,0 size=0x34 desired=1,0
+    Border 'PART_HeaderBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=0x34 desired=56.5322265625,20.7802734375
+    Grid  size=0x33 desired=48.5322265625,19.7802734375
+    ContentPresenter content=Owner vis=Visible size=0x19.78 desired=48.5322265625,19.7802734375
+    TextBlock 'PART_SortIndicator' text="" size=0x0 desired=0,0
+    Rectangle 'PART_ResizeGrip'  size=8x34 desired=8,34
+    ScrollBar  size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Track  size=0x0 desired=0,12
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    Thumb  size=0x12 desired=0,12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    ScrollBar  size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Track  size=0x0 desired=12,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    Thumb  size=12x0 desired=12,0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Rectangle  size=458x1 desired=458,1
+    ScrollViewer 'PART_DataScrollViewer'  size=458x184 desired=12,72
+    StackPanel 'PART_RowsHost'  size=446x172 desired=0,60
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    TreeDataGridRow  size=446x30 desired=0,30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=446x30 desired=0,33
+    StackPanel 'PART_CellsPanel'  size=446x29 desired=0,32
+    DataGridCell  size=0x32 desired=0,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=0x32 desired=97.99609375,27.240234375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.Grid vis=Visible size=0x17.24 desired=76.99609375,17.240234375
+    DataGridCell  size=0x32 desired=0,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=0x32 desired=61.5009765625,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=0x19.78 desired=40.5009765625,19.7802734375
+    TreeDataGridRow  size=446x30 desired=0,30
+    Border 'PART_RowBorder' bg=#0FFFFFFF r=0,0,0,0 bt=0,0,0,1 size=446x30 desired=0,33
+    StackPanel 'PART_CellsPanel'  size=446x29 desired=0,32
+    DataGridCell  size=0x32 desired=0,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=0x32 desired=96.923828125,27.240234375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.Grid vis=Visible size=0x17.24 desired=75.923828125,17.240234375
+    DataGridCell  size=0x32 desired=0,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=0x32 desired=52.3134765625,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=0x19.78 desired=31.3134765625,19.7802734375
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    ScrollBar  size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Track  size=0x0 desired=0,12
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    Thumb  size=0x12 desired=0,12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    ScrollBar  size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Track  size=0x0 desired=12,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    Thumb  size=12x0 desired=12,0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0 desired=0,0
+    RepeatButton  size=0x0 desired=0,0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0 desired=0,0
+    Path 'PART_Arrow'  size=0x0 desired=0,0
+    Canvas 'PART_DragOverlay'  size=0x0 desired=0,0
+  FlattenedCount before expand=2 rowHeight=30 indentSize=16
+  row 0 public surface: IsSelected=False localIsSelected=True Node=null
+  grid.IsExpanded(0)=False
+  ExpandAll() -> invoked
+  rows after ExpandAll=6 FlattenedCount=6
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#00FFFFFF cells=2
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#0FFFFFFF cells=2
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#00FFFFFF cells=2
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#0FFFFFFF cells=2
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#00FFFFFF cells=2
+    row height=446x30 margin=0,0,0,0 localBG=True bg=#0FFFFFFF cells=2
+  realized TextBlocks after expand=14
+  collapse back -> invoked
+  rows after CollapseAll=2 FlattenedCount=2
+  TreeDataGrid: template 1748 chars triggers=1 keys=[3: ControlCornerRadius, DataGridColumnHeaderBackground, DataGridHeaderSeparatorBrush]
+  TreeDataGridRow: template 0 chars triggers=2 keys=[none declared]

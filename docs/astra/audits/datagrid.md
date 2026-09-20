@@ -131,6 +131,9 @@ ModernWpf 未新增语义键，全部是补官方模板要求的别名（该文�
 5. `TreeDataGrid` 只量到外壳与行（`TreeDataGrid : Control`，模板部件与 DataGrid 同名 + `PART_DragOverlay`，
    行内 `TreeDataGridRow` 直接生成、无 Expander/ToggleButton）。它需要自己的 `ItemsSource`/节点形状，
    运行时 `TreeDataGridNode` 是 `internal`——层级数据怎么喂进去尚未量，属下一段。
+   **【下一段已结，且这条推论被推翻】** 节点类型是 internal 不假，但喂法根本不点名它：`ItemsSource` 收普通
+   `IEnumerable`、层级由 `ChildrenPropertyPath`（字符串）反射，`ExpandAll/CollapseAll/IsExpanded(int)/FlattenedCount`
+   全公开。"数据喂不进去"是从一个真读数多跨了一级台阶。见 `audits/treedatagrid.md` §1。
 6. 高对比（HC）下表格的行为未测：框架那份字典只有 Light/Dark 两套，HC 走哪条路未知。
 7. 像素级证据尚未产出（本批只有树与实例读数）。像素批必须包含"选中行不出现品牌绿主导像素"这条硬闸口，
    并说明裁剪区含框架自己那套条目（S0-j/S0-w 的教训）。

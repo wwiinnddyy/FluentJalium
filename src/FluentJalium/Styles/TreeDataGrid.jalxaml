@@ -1,0 +1,69 @@
+<!-- The hierarchical grid. audits/datagrid.md §4-5 closed the DataGrid slice on the sentence "TreeDataGridNode is
+     internal, so how hierarchical data gets in is unmeasured", and that sentence was the reason the control stayed
+     out of the library. It is now measured, and it was wrong in the direction that lets this file exist: the shipped
+     26.10.9 TreeDataGrid publishes the feed as a plain IEnumerable plus ChildrenPropertyPath (a string), and keeps
+     expand/collapse public too - ExpandAll(), CollapseAll(), IsExpanded(int), FlattenedCount, IndentSize and the
+     NodeExpanding/NodeExpanded/NodeCollapsed events (spike/DataGridProbe datagrid-probe-feed.txt). A consumer never
+     touches the node type. There is still no WinUI 3 upstream for this family (microsoft-ui-xaml has no DataGrid and
+     no TreeDataGrid; the toolkit's is not WinUI), so the same authority as Styles/DataGrid.jalxaml applies: the
+     dotnet/wpf Fluent reading, over this runtime's own part contract.
+     The part contract is read off a mounted control, not from the type graph: PART_OuterBorder(Border),
+     PART_ColumnHeadersBorder(Grid), PART_ColumnHeadersScrollViewer(ScrollViewer), PART_ColumnHeadersHost(StackPanel),
+     PART_DataScrollViewer(ScrollViewer), PART_RowsHost(StackPanel), PART_DragOverlay(Canvas) - the same seven the
+     DataGrid host resolves, minus the row-header corner, which the tree has no concept of. The tree column is not a
+     column type: it is whichever index TreeColumnIndex names, and the control builds the chevron into that cell's
+     content itself (a Path inside a Grid, measured one per row), so our DataGridCell style hosts it unchanged.
+     The ROW gets no style from us, per the layer rule the DataGrid batch paid for: TreeDataGridRow is the container
+     the control fills with cells, and it is also where the control writes its own local values - Background carries a
+     local value on every row (measured: #00FFFFFF on even rows, #0FFFFFFF on odd ones, alternating), so a style
+     setter on that property could not win even if we shipped one. What the tree does inherit is our cell, column
+     header and row-header styles, because the framework has no tree-only versions of those. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The rows this style reads are the DataGrid family's own: the two grids share the cell, the column header and
+       the surface, so publishing a second set of names for the same instances would be inventing keys no upstream
+       has (the ComboBox batch's correction). No TreeDataGrid* row is declared, and the consumption gate in
+       tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs is what keeps that honest.
+       RowHeight/ColumnHeaderHeight: the runtime rests them at 30/34 on a mounted tree (datagrid-probe-feed.txt);
+       32/32 is what the DataGrid style above settles for the family. -->
+  <Style x:Key="DefaultTreeDataGridStyle" TargetType="TreeDataGrid">
+    <Setter Property="Background" Value="{ThemeResource DataGridBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource DataGridRowForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource DataGridBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource DataGridBorderThickness}" />
+    <Setter Property="RowBackground" Value="{ThemeResource DataGridRowBackground}" />
+    <Setter Property="AlternatingRowBackground" Value="{ThemeResource DataGridAlternatingRowBackground}" />
+    <Setter Property="HorizontalGridLinesBrush" Value="{ThemeResource DataGridGridLinesBrush}" />
+    <Setter Property="VerticalGridLinesBrush" Value="{ThemeResource DataGridGridLinesBrush}" />
+    <Setter Property="RowHeight" Value="32" />
+    <Setter Property="ColumnHeaderHeight" Value="32" />
+    <Setter Property="IndentSize" Value="16" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template"><ControlTemplate TargetType="TreeDataGrid">
+      <Border Name="PART_OuterBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{ThemeResource ControlCornerRadius}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+          <Grid Name="PART_ColumnHeadersBorder" Grid.Row="0" Background="{ThemeResource DataGridColumnHeaderBackground}">
+            <ScrollViewer Name="PART_ColumnHeadersScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
+              <StackPanel Name="PART_ColumnHeadersHost" Orientation="Horizontal" />
+            </ScrollViewer>
+            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+          </Grid>
+          <!-- TreeDataGrid derives from Control, not from ItemsControl, and declares no scrollbar-visibility property
+               of its own (its 26 public properties are listed in datagrid-probe-feed.txt), so unlike the DataGrid
+               host above these cannot be TemplateBindings - the host decides, and the control scrolls. -->
+          <ScrollViewer Name="PART_DataScrollViewer" Grid.Row="1" Focusable="False" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Name="PART_RowsHost" />
+          </ScrollViewer>
+          <Canvas Name="PART_DragOverlay" Grid.RowSpan="2" IsHitTestVisible="False" Visibility="Collapsed" />
+        </Grid>
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource DataGridRowForegroundDisabled}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="TreeDataGrid" BasedOn="{StaticResource DefaultTreeDataGridStyle}" />
+</ResourceDictionary>

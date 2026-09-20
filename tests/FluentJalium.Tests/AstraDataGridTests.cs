@@ -4,6 +4,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Data;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
 
 namespace FluentJalium.Tests;
@@ -79,7 +80,6 @@ public sealed class AstraDataGridTests : IDisposable
     [InlineData("DataGridHeaderBorderBrush", "ControlStrokeColorSecondaryBrush")]
     [InlineData("DataGridHeaderSeparatorBrush", "ControlStrokeColorSecondaryBrush")]
     [InlineData("DataGridRowHeaderBackground", "SubtleFillColorTransparentBrush")]
-    [InlineData("DataGridRowHeaderForeground", "TextFillColorSecondaryBrush")]
     [InlineData("AccentBrush", "AccentFillColorDefaultBrush")]
     public void An_alias_row_resolves_to_its_target(string alias, string target)
     {
@@ -122,6 +122,7 @@ public sealed class AstraDataGridTests : IDisposable
     [InlineData("DataGridCurrencyVisualPrimaryBrush")]
     [InlineData("ScrollBarsSeparatorBackground")]
     [InlineData("FillerGridLinesBrush")]
+    [InlineData("DataGridRowHeaderForeground")]
     public void A_withheld_upstream_row_is_not_published(string key)
     {
         _fixture.Run(() => Assert.Null(Application.Current!.TryFindResource(key)));
@@ -496,8 +497,72 @@ public sealed class AstraDataGridTests : IDisposable
         });
     }
 
-    // ---------- plumbing ----------
+    /// <summary>
+    /// The row-header gutter must not speak. This runtime hands the row's own data item to the row header's Content
+    /// (full path in the probe log: PART_RowsHost &gt; DataGridRow &gt; PART_CellsPanel &gt; DataGridRowHeader &gt;
+    /// PART_RowHeaderBorder &gt; ContentPresenter), so a presenter in that template paints the model's ToString
+    /// inside 20 DIP - which is what the Gallery's grid did from the moment the DataGrid batch shipped, on a page no
+    /// gate had ever captured. The framework still owns the Content, so the claim is about what reaches the tree.
+    /// </summary>
+    [Fact]
+    public void The_row_header_carries_the_item_but_draws_no_text_of_its_own()
+    {
+        _fixture.Run(() =>
+        {
+            var grid = Mount(Grid());
+            var headers = All<DataGridRowHeader>(grid).ToList();
+            Assert.NotEmpty(headers);
+            Assert.All(headers, header =>
+            {
+                Assert.IsType<Row>(Prop(header, "Content"));
+                Assert.Empty(All<ContentPresenter>(header));
+                Assert.Empty(All<TextBlock>(header));
+            });
 
+            // Read across the whole grid as well: the gutter is the framework's own child, so a regression can only
+            // show up as model text somewhere in the subtree.
+            Assert.DoesNotContain(All<TextBlock>(grid), text => text.Text is { } value && value.Contains("Value =", StringComparison.Ordinal));
+        });
+    }
+
+    /// <summary>
+    /// Two silent failures this family has to author around, and neither one shows up in a build. A bare number on a
+    /// column's Width does not convert to that property's DataGridLength type: the parse succeeds, the value reads
+    /// back as Auto, and the columns then take the control's own Auto share - the Gallery shipped 200/140/120 markup
+    /// that never applied. MinWidth is a plain number and does land, which is what the page uses now. The
+    /// code-constructed grid every other test in this file mounts goes through the property directly and was
+    /// unaffected, which is exactly why no earlier reading caught it (spike/DataGridProbe datagrid-probe-cols.txt).
+    /// </summary>
+    [Fact]
+    public void A_column_width_written_in_markup_is_silently_auto_while_min_width_lands()
+    {
+        _fixture.Run(() =>
+        {
+            const string WidthMarkup = """
+                <DataGrid xmlns='http://schemas.jalium.ui/2024' AutoGenerateColumns='False'>
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header='Alpha' Binding='{Binding Name}' Width='200' />
+                  </DataGrid.Columns>
+                </DataGrid>
+                """;
+            const string MinimumMarkup = """
+                <DataGrid xmlns='http://schemas.jalium.ui/2024' AutoGenerateColumns='False'>
+                  <DataGrid.Columns>
+                    <DataGridTextColumn Header='Alpha' Binding='{Binding Name}' MinWidth='200' />
+                  </DataGrid.Columns>
+                </DataGrid>
+                """;
+
+            var written = (DataGrid)XamlReader.Parse(WidthMarkup)!;
+            var floored = (DataGrid)XamlReader.Parse(MinimumMarkup)!;
+            Assert.Multiple(
+                () => Assert.Equal("Auto", written.Columns[0].Width.ToString()),
+                () => Assert.Equal(20d, written.Columns[0].MinWidth),
+                () => Assert.Equal(200d, floored.Columns[0].MinWidth));
+        });
+    }
+
+    // ---------- plumbing ----------
     private static readonly Color BrandEmerald = Color.FromRgb(0x20, 0x72, 0x45);
     private static readonly Color FrameworkEmeraldDark = Color.FromRgb(0x1D, 0x73, 0x3C);
     private static readonly Color FrameworkEmeraldLight = Color.FromRgb(0x2B, 0x80, 0x4A);

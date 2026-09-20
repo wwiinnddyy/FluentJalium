@@ -1617,3 +1617,42 @@ DataGrid 落地时表格一个字的像素都没有：`cell.Content` 是控制�
    强调色不透明底，上游 `ListAccentLowOpacity` 0.4 那层丢了——x:Double 发不出去，行模板又装不上，
    没有第三条路。这个字典故意不进"每行都要有消费者"的资源键闸口：它的读者是框架模板，
    要求我们的样式引用它只会逼人写一条假引用（与 `TitleBar.jalxaml`/`FlyoutPresenter.jalxaml` 同族豁免）。
+
+## S1-j：markup 里两种"写了没生效"——`DataGridLength` 不吃裸数字、未知属性名静默丢弃（阶段 5 第六段，2026-09-20）
+
+`spike/DataGridProbe` mode `cols`，七种配置一次跑完（`s1j-treedatagrid-columns-raw.txt`），加上 mode `feed` 的
+两条对照（`s1j-treedatagrid-feed-raw.txt`）。这一段和主题能力没有直接关系，它打的是"markup 写得对不对"这条闸口，
+因为两种静默失败都没有任何报错，只能靠读回值。
+
+1. **`DataGridColumn.Width` 是 `DataGridLength`，markup 的裸数字不转换，静默停在 `Auto`。**
+   `<DataGridTextColumn Width='200'/>` 解析成功、构建成功、挂载成功，读回 `Width=Auto`、`MinWidth=20`（默认）。
+   同一列改写成 `MinWidth='200'` 就读回 200。`Width` 只有从代码里赋（`DataGridLength` 构造）才落。
+   后果分两种网格：`DataGrid` 把 `Auto` 摊成实宽（120），`TreeDataGrid` 把 `Auto` 量成 **0**，
+   于是树上单元格 `ActualWidth=0`、文字有 `desired` 没宽度——看得见控件看不见字。
+   Gallery 的表格从上线第一天起就在走这条静默路径（三条列宽全是 `Auto`），本批改成 `MinWidth` 并钉了
+   `A_column_width_written_in_markup_is_silently_auto_while_min_width_lands`（DataGrid 侧）与
+   `A_tree_column_at_auto_lays_out_at_zero_width_while_min_width_reaches_the_cells`（树侧）。
+2. **未知属性名同样静默**：`<TreeDataGrid DefinitelyNotAProperty='42'/>` 解析通过、控件建成、上屏 460x60。
+   所以 Gallery 树 markup 里那句 `AutoGenerateColumns='False'` 一直没起作用——`TreeDataGrid` 公开声明的 26 个名字
+   里根本没有它（`TreeDataGrid : Control`，不是 `ItemsControl`；它也没有滚动条可见性属性，宿主模板里那两处只能写常量）。
+3. **列宽要在首次度量之前定**：挂载之后再改 `Width`，列自己读到 200，单元格的本地宽度仍是旧布局那一版
+   （120 / 0）。这条和 S0/S1 的"本地值优先于格子"是同一堵墙的不同层——控制自己写在本地的东西，事后改属性不重排。
+
+给后面每一批的规则：**markup 里凡属性类型不是 `double`/`string`/枚举（长度类、`GridLength` 类、`DataGridLength` 类、
+`Duration` 类），必须读回那个值确认它落下了**，不能只看解析没抛；能构建不等于写进去了。这与 `{x:Bind}` 静默丢弃、
+`{ThemeResource}` 空字符串条件（S0-g→AutoSuggestBox 批下调）同族：**判据是挂在树上的读回值，不是属性的名字**。
+现存 markup 闸口（`AstraGateTests`）只查键消费与格子目标，查不了属性名是否存在、也查不了属性类型能不能吃裸数字；
+这条记在闸口欠账里。
+
+同段还结掉一条挡路的旧推论：`TreeDataGridNode` 是 `internal`（sealed，消费者不可见），但**喂数据不需要点名它**——
+`ItemsSource` 收普通 `IEnumerable`、层级走 `ChildrenPropertyPath`，`ExpandAll/CollapseAll/IsExpanded(int)/FlattenedCount`
+全公开，所以展开闭环可以像 ToggleButton 批用 automation peer 那样无 OS 输入地驱动。上一段"节点内部类型 ⇒ 数据喂不进去"
+是从一个真读数多跨了一级；判"控件能不能落地"先把**公版程序集**的成员表拉出来。行的处境仍然硬：
+`TreeDataGridRow` 只有 `IsSelected` 公开，且每行 `Background` 都是控件写上去的本地值（偶 `#00FFFFFF`、奇 `#0FFFFFFF`），
+所以样式格子在那一层永远赢不了——本批只出宿主模板，行保留框架模板（S1-i 第 9 条的逐层判据在第二个控件上复现）。
+
+顺带清掉一条已上线的可见缺陷：这条运行时会把**行数据本身**塞进 `DataGridRowHeader.Content`，
+而我们上一批的行头模板有个内容呈现器，于是 20 DIP 的行头槽里画的是模型的 `ToString()`。
+修法不是加裁剪而是**不呈现内容**（上游 WPF Fluent 的行头也只画"当前行"记号，而本运行时不暴露那个读数），
+`DataGridRowHeaderForeground` 随之失去消费者、撤出别名表并进"不发布"闸口；
+Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_carries_the_item_but_draws_no_text_of_its_own`。
