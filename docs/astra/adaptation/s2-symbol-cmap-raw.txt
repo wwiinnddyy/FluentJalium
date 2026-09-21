@@ -1,0 +1,65 @@
+source: C:\git\Jalium\Jalium.UI\src\managed\Jalium.UI.Controls\Symbol.cs
+members parsed: 764
+distinct codepoints: 729, duplicated codepoints: 35
+  shared U+E713: Settings, Setting
+  shared U+E721: Find, Search
+  shared U+E734: FavoriteStar, Favorite
+  shared U+E756: CommandPrompt, Terminal
+  shared U+E765: Keyboard, KeyboardClassic
+  shared U+E770: Laptop, System
+  shared U+E77B: Account, Contact
+  shared U+E786: Slideshow, SlideShow
+  shared U+E78C: SaveLocal, SaveAll
+  shared U+E790: Color, Palette
+  shared U+E791: DataSense, DataSense2
+  shared U+E793: Light, Theme
+  shared U+E7A1: Contrast, ScreenShot
+  shared U+E7B3: ShowAllFiles, RedEye
+  shared U+E7B8: Package, Extension
+  shared U+E7ED: RingerSilent, StepOver
+  shared U+E7EE: OtherUser, StepInto
+  shared U+E7EF: Admin, StepOut
+  shared U+E823: Clock, Recent
+  shared U+E838: FolderOpen, OpenFolder
+  shared U+E89F: ClosePane, SplitView
+  shared U+E8A1: PreviewLink, GoToLine
+  shared U+E8A5: Document, NewFile
+  shared U+E8AD: Go, SourceControl
+  shared U+E8B3: SelectAll, SelectAll2
+  shared U+E8D6: Audio, Music
+  shared U+E8D9: Unfavorite, UnFavorite
+  shared U+E8EE: Replace, RepeatAll
+  shared U+E8FD: BulletedList, Designer
+  shared U+E909: World, WorldClock
+  shared U+E90B: MusicInfo, MusicInfo2
+  shared U+EA86: Puzzle, Razor
+  shared U+EA8A: HomeSolid, HomeMirrored
+  shared U+EBE8: Bug, Debug
+  shared U+EC50: FileExplorer, Explorer
+outside the PUA: 0
+--- Segoe Fluent Icons  (upem=2048, 2033 mapped)
+    hits 762 / 764, misses 2
+  U+E919  MISSING  AlarmClock
+  U+E7A0  MISSING  ScreenCapture
+--- Segoe MDL2 Assets  (upem=2048, 1833 mapped)
+    hits 755 / 764, misses 9
+  U+EA85  MISSING  VolumeDisabled
+  U+E919  MISSING  AlarmClock
+  U+E733  MISSING  Blocked
+  U+E7A1  MISSING  Contrast
+  U+E794  MISSING  Effects
+  U+E7AA  MISSING  PhotoCollection
+  U+EC91  MISSING  Uninstall
+  U+E7A0  MISSING  ScreenCapture
+  U+E7A1  MISSING  ScreenShot
+
+--- what this repository actually ships (same day, spike/SymbolCmap/check.py) ---
+SymbolIcon members written into src/FluentJalium: Accept, Important, Cancel, GlobalNavButton
+  - all four hit Segoe Fluent Icons' cmap; none of the four is on the 35 shared-codepoint list
+FontIcon literals written into src/FluentJalium: EA38 (InfoBadge Attention), F13F (InfoBadge Information)
+  U+EA38 uniEA38  advance=1.000em  bbox=0.875x0.875em  x=+0.062..+0.938 y=+0.062..+0.938 contours=1   (Segoe Fluent Icons)
+  U+F13F uniF13F  advance=1.000em  bbox=0.094x0.406em  x=+0.422..+0.516 y=+0.281..+0.688 contours=2   (Segoe Fluent Icons)
+  (Segoe MDL2 Assets, same two: EA38 0.897x1.000em, F13F 0.062x0.438em)
+  - the ink box is the fraction of em, i.e. how much of a FontSize actually paints: Attention fills
+    seven eighths of the box, Information is a narrow mark at less than half the height, so an
+    InfoBadge dot and an InfoBadge glyph are not the same visual size at the same FontSize.
