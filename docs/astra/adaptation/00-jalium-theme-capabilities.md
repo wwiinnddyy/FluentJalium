@@ -1889,7 +1889,9 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 4. **模板部件不继承控件的 `Foreground`**（同一次诊断顺手量到）：上屏后读回模板里 `TextBlock` 的前景是框架默认
    `#E4000000`，而它所在控件的 `Foreground` 是 `#FFFFFFFF`。上游 InfoBadge 模板不写这一条，靠继承。
    本层的修法是部件上显式 `Foreground="{TemplateBinding Foreground}"`（`Styles/InfoBadge.jalxaml` 里注明）。
-   **未审的相邻面**：其余自有样式里凡是靠继承拿前景色的文本部件都可能同样哑色——已开任务，不在本段结。
+   **相邻面已审结**（阶段 6 尾批之后，`audits/foreground.md`）：全库 243 条前景声明（attribute 15 + `Setter` 228）
+   在两档主题下逐条解析，无一死键；42 个可读文本节点全部随主题翻转，InfoBadge 那一类在本层是孤例且已修。灵敏的那道
+   闸是"键必须解析成刷"——令牌与继承墨同色的配对（InfoBar 标题）改坏键名时读数断言不红，这条边界见同文件第 5 节。
 
 5. **`FontFamily` 令牌行同样载不住值**（阶段 6 图标族量到，`audits/icon-family.md` §5）：想原样转录上游的
    `SymbolThemeFontFamily`，三种写法 `<FontFamily x:Key=K>名字</FontFamily>`、`Source=名字`、`FamilyName=名字`

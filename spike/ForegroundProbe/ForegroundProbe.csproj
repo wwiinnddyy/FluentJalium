@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for the visible-defect batch #55: which text parts in our own templates actually paint a
+       different colour than the control that owns them. Stage 6 measured once, on InfoBadge, that a template TextBlock
+       does NOT inherit the control's Foreground on this runtime - it read the framework default while its host read
+       white - and the note left the rest of the library unmeasured. This asks every family at once: one mounted panel,
+       one tree walk, one line per text part, so "mute text" becomes a count instead of a suspicion. Not referenced by
+       FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ForegroundProbe</RootNamespace>
+    <AssemblyName>ForegroundProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS8618;CS8625;CS8600;CS8602;CS8604</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

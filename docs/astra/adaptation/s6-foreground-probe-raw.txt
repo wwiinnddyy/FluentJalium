@@ -1,0 +1,77 @@
+-- spike/ForegroundProbe 原始读数（2026-09-21，运行时 26.10.9，FluentThemeManager Light/Dark 两档）
+-- 判据：具名前景声明从 markup 读，"到不到"由两问决定——键解析出的色是否等于部件自身前景、翻主题后色是否变。
+-- 读数全是树上读数（老账 #50：文本字形在任何捕获通路都拿不到墨）。
+-- OK/DEAD = 具名声明到不到达；GAP = 探针取不到该部件或该 owner 没有 subject 行；
+-- LOWCONTRAST/READABLE = 文本节点对其背景的 WCAG 比。背景先沿祖先找不透明刷，再看同一重叠布局面板里画在它
+--   前面的兄弟图元（InfoBar 的严重度圆盘就是兄弟 Ellipse）；"painted by" 点出这块底究竟谁画的，page = subject
+--   内没有不透明底。
+-- 本文件由那次运行原样拷贝；三次仪器纠错的经过见 audits/foreground.md 第 4 节。
+
+[claims] 44 named template parts, 14 carrying a Foreground claim
+[claimscan] the whole of src/FluentJalium writes Foreground on 16 elements - colour is nearly all inheritance
+[GAP] AppBarToggleButton has no subject row in the probe
+[GAP] DataGridCell has no subject row in the probe
+[GAP] DataGridColumnHeader has no subject row in the probe
+[GAP] MenuBarItem has no subject row in the probe
+[GAP] MenuFlyoutItem has no subject row in the probe
+[GAP] MenuFlyoutSubItem has no subject row in the probe
+[GAP] ToggleMenuFlyoutItem has no subject row in the probe
+[Light] page surface SolidBackgroundFillColorBaseBrush = #F3F3F3
+[GAP] ComboBox.PART_ScrollViewer unreachable on a realised tree
+[GAP] FluentBreadcrumbBarItem.PART_ChevronTextBlock unreachable on a realised tree
+[GAP] FluentTabViewItem.IconHost unreachable on a realised tree
+[GAP] FluentTeachingTip.SubtitleTextBlock unreachable on a realised tree
+[GAP] FluentTeachingTip.TitleTextBlock unreachable on a realised tree
+[Light] claims + 42 text nodes read so far
+[Dark] page surface SolidBackgroundFillColorBaseBrush = #202020
+[Dark] claims + 42 text nodes read so far
+[OK] FluentInfoBar.IconGlyph token InfoBarInformationalSeverityIconForeground -> #FFFFFF vs token #FFFFFF (SolidColorBrush)
+[OK] FluentInfoBar.Message token InfoBarMessageForeground -> #E4000000 vs token #E4000000 (SolidColorBrush)
+[OK] FluentInfoBar.Title token InfoBarTitleForeground -> #E4000000 vs token #E4000000 (SolidColorBrush)
+[OK] FluentInfoBar.IconGlyph token InfoBarInformationalSeverityIconForeground -> #E4000000 vs token #E4000000 (SolidColorBrush)
+[OK] FluentInfoBar.Message token InfoBarMessageForeground -> #FFFFFF vs token #FFFFFF (SolidColorBrush)
+[OK] FluentInfoBar.Title token InfoBarTitleForeground -> #FFFFFF vs token #FFFFFF (SolidColorBrush)
+[claims] judged 42 text nodes, 6 claims (6 landed, 0 dead)
+[LOWCONTRAST] 4.08 FluentRatingControl TextBlock.#1D91F32 text "" painted by page light #0078D4 on #F3F3F3 = 4.08 / dark #60CDFF on #202020 = 9.06
+[LOWCONTRAST] 4.08 FluentRatingControl TextBlock.#55989B text "" painted by page light #0078D4 on #F3F3F3 = 4.08 / dark #60CDFF on #202020 = 9.06
+[LOWCONTRAST] 4.08 FluentRatingControl TextBlock.#81BE92 text "" painted by page light #0078D4 on #F3F3F3 = 4.08 / dark #60CDFF on #202020 = 9.06
+[LOWCONTRAST] 4.08 FluentRatingControl TextBlock.#1A6CEC6 text "" painted by page light #0078D4 on #F3F3F3 = 4.08 / dark #60CDFF on #202020 = 9.06
+[LOWCONTRAST] 4.08 FluentRatingControl TextBlock.#31E8115 text "" painted by page light #0078D4 on #F3F3F3 = 4.08 / dark #60CDFF on #202020 = 9.06
+[READABLE] 4.53 FluentInfoBadge TextBlock#348E8BB text "7" painted by Border.RootGrid light #FFFFFF on #0078D4 = 4.53 / dark #000000 on #60CDFF = 11.67
+[READABLE] 4.53 FluentInfoBar TextBlock#2E9E73C text "" painted by Ellipse.IconBackground light #FFFFFF on #0078D4 = 4.53 / dark #E4000000 on #60CDFF = 10.21
+[READABLE] 6.03 ComboBox ContentPresenter#2394F77 content "Select an item..." painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 ComboBox TextBlock.#81EC5 text "Select an item..." painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 ComboBoxItem ContentPresenter#2C090B7 content "Select an item..." painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 ComboBoxItem TextBlock.#3D1B3ED text "Select an item..." painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 FluentRatingControl TextBlock.#110B3A1 text "" painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 FluentRatingControl TextBlock.#69595 text "" painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 FluentRatingControl TextBlock.#58BFE3 text "" painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 FluentRatingControl TextBlock.#296AD71 text "" painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 6.03 FluentRatingControl TextBlock.#1788015 text "" painted by page light #9E000000 on #F3F3F3 = 6.03 / dark #C5FFFFFF on #202020 = 10.15
+[READABLE] 15.68 Button ContentPresenter.#235D8B1 content "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 Button TextBlock.#1CAAEB text "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 CheckBox ContentPresenter#236F901 content "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 CheckBox TextBlock.#24A61B6 text "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 Expander ContentPresenter#D056D7 content "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 Expander TextBlock.#F10380 text "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 Expander ContentPresenter.#3A87C19 content "body" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 Expander TextBlock.#3D2D82 text "body" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentInfoBar TextBlock#15D798D text "title" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentInfoBar TextBlock#1BF2C32 text "message" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentNavigationItem ContentPresenter#3E763E5 content "one" painted by Grid light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentNavigationItem TextBlock.#CC1B80 text "one" painted by Grid light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentNavigationView ContentPresenter#1FFCB7C content "one" painted by Grid light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentNavigationView TextBlock.#1584C1E text "one" painted by Grid light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentRadioButtons ContentPresenter#14C5D14 content "one" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 FluentRadioButtons TextBlock.#369724B text "one" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 ListBoxItem ContentPresenter#7083CC content "one" painted by Border.LayoutRoot light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 ListBoxItem TextBlock.#E04B80 text "one" painted by Border.LayoutRoot light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 ListViewItem ContentPresenter#30506D1 content "one" painted by Border.LayoutRoot light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 ListViewItem TextBlock.#3CDA8D9 text "one" painted by Border.LayoutRoot light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 RadioButton ContentPresenter#1B9D28B content "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 RadioButton TextBlock.#3ABFE4C text "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 SplitButton ContentPresenter.#177994D content "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 SplitButton TextBlock.#1FDDBF5 text "label" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 TreeViewItem ContentPresenter#28CC084 content "one" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[READABLE] 15.68 TreeViewItem TextBlock.#3928EE8 text "one" painted by page light #E4000000 on #F3F3F3 = 15.68 / dark #FFFFFF on #202020 = 16.29
+[TOTALS] named parts=44 claims=14 text nodes=42 below 4.5 in at least one theme=5 late=0
