@@ -44,20 +44,21 @@
             <RowDefinition Height="*" />
           </Grid.RowDefinitions>
           <!-- The header band and its synchronised scroller: PART_ColumnHeadersHost has to be a StackPanel because
-               that is the type the control casts the lookup result to, and the band's own bottom line is a
-               Rectangle rather than a border so it survives the header items painting over it. -->
+               that is the type the control casts the lookup result to. The band's bottom line is a Border declared
+               after the scroller rather than a Rectangle inside it, so it paints over the header items - and a
+               1-DIP Rectangle would not paint at all on this renderer (audits/divider.md §6 clause 4). -->
           <Grid Name="PART_ColumnHeadersBorder" Grid.Row="0" Background="{ThemeResource DataGridColumnHeaderBackground}">
             <ScrollViewer Name="PART_ColumnHeadersScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
               <StackPanel Name="PART_ColumnHeadersHost" Orientation="Horizontal" />
             </ScrollViewer>
-            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+            <Border Height="1" VerticalAlignment="Bottom" Background="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
           </Grid>
           <!-- The 20 DIP corner over the row-header gutter. Its width is the runtime's own RowHeaderWidth (measured
                20 on a mounted grid); upstream hides the whole corner with HeadersVisibility, which the control does
                by writing Visibility on the part. -->
           <Grid Name="PART_RowHeaderCorner" Grid.Row="0" Width="20" HorizontalAlignment="Left" Background="{ThemeResource DataGridColumnHeaderBackground}">
-            <Rectangle Width="1" HorizontalAlignment="Right" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
-            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+            <Border Width="1" HorizontalAlignment="Right" Background="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+            <Border Height="1" VerticalAlignment="Bottom" Background="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
           </Grid>
           <ScrollViewer Name="PART_DataScrollViewer" Grid.Row="1" Focusable="False" VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}" HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}">
             <StackPanel Name="PART_RowsHost" />

@@ -1980,4 +1980,56 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 `FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`）——它们只被"键必解析"覆盖；
 兄弟图元判底用的是"重叠布局面板 + 尺寸同阶"的启发式（本运行时没有可用的跨要素变换读数）；高对比档下这些前景走不走
 映射本段没测；228 条状态 Setter 只测了键能不能解析，没测"该状态下那一格真被画上"；#46 五处 1 DIP `Rectangle`
-无墨仍未结。
+无墨那条**已结**——见下面"缺陷批：五处 1 DIP 分隔线换形状"一段，那一批同时补上了这条主张该用的判据（折叠后逐键减量）。
+
+## 缺陷批：五处 1 DIP 分隔线换形状（结清 #46，并新立 #58）
+
+用户可见的那类缺陷里最安静的一种：命令栏分隔线与两张表格的表头底线**本来就不在屏幕上**。§S1-q 第 2 条已经量死运行时
+事实（1 DIP `Rectangle` 在任何对齐下印 0 墨，同盒子 `Border` 印 600，`Rectangle` 要 4 DIP 才恢复），这批把那条事实
+落到**已发布的五处站点**，并且把"这条线到了像素"这句主张改成能证的形式。改动：`Styles/AppBar.jalxaml` 的
+`SeparatorRectangle`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52` 五条 1 DIP `Rectangle`
+换成同盒子、同令牌、同对齐的 `Border`（`Fill`→`Background`，`RadiusX/Y=0.5`→`CornerRadius=0.5`）；部件名照上游，
+上游没有名的三条不新起名字。新测试 `tests/FluentJalium.Tests/AstraOneDipRulesTests.cs` 7 条。
+
+1. **五处站点逐处量到墨，两档主题都量**。同一份 witness、同一张随主题的卡：表格两例 Light/Dark 各 **338** 像素，
+   应用栏两例各 **64**。64 是可解释的：线在 48 格内去掉 2,8,2,8 边距是 32 DIP 高，1 DIP 宽在这台缩放跨两个设备列，
+   所以墨是 32x2；`Border` 会印，但"1 DIP"不等于"1 列"。
+2. **判据换了一次，而且第一次是错的**。第一版数"改前的颜色在改后彻底不见"，表格线只读到 **2 与 3** 像素——而它
+   其实每次都印出 338 格：混出来的 `#9F9F9F` 在同一张裁剪图里也被字形反锯齿产出，那个键从来没"消失"过。改成
+   **逐键减量** `sum(max(0, with-without))` 之后同一份 markup 读到 338。这条与 §S1-m/§S1-r"几何计数不是令牌证据"同族，
+   补的是另一半：**同一个混色键可以有多个来源，所以差分只能按减量算，不能按有无算**。
+3. **witness 必须自带表面**。上游表头带是透明的（`DataGridColumnHeaderBackground → SubtleFillColorTransparentBrush`），
+   暗色第一次跑读到 0 且 with/without 逐键相同——不是"暗色里线又不印"，是 §S1-q 第 4 条那个坑在 witness 侧复现：
+   半透明白线画在白上等于没画。给每条主张配一张卡（白 / `#202020`）之后两档同数。
+4. **折叠必须整族一起、且按声明盒子认部件**。DataGrid 三条线共享同一个 `#29000000`，只折一条时那个键由另外两条
+   供给、减量读回 0；找部件用 markup 写的 `Width/Height=1`，不用实测几何——滚动条自己的轨道也满足"某边实际是 1"。
+5. **路线被从源头闸死**：`No_shipped_template_draws_a_one_dip_rectangle` 扫 `src/FluentJalium` 全部 `.jalxaml`，
+   出现任何 1 DIP `Rectangle` 即红。钉的是路线不是当下的数量（将来运行时能画薄 `Rectangle` 也不改这条判断，因为
+   `Border` 是实测会印墨的那个形状）。
+6. **顺手量到一条新缺陷，另立 #58 不混进本批**：暗色下挂载的 `DataGrid`/`TreeDataGrid` 那一片表面仍读 `#FFFFFF`
+   （86 230 格，与 Light 的 85 668 同级）——上面第 3 条能看出它对用户的后果：任何半透明白令牌叠在它上面都不出现。
+
+四类证据：**构建**——闸口里那次真重编（52.5 s，三个工程重出 dll）**0 警告 / 0 错误**；本批其余轮次跑的是 Release
+增量构建，只看到"0 个错误"，警告数不单独主张（没有重编就没有警告读数）。**行为**——`AstraAppBarTests` 里
+`SeparatorRectangle` 的类型断言按上游偏离改成 `Border`（这条是本批唯一被改的既有断言，它同时是"名字保留、形状换掉"的
+见证）。**视觉**——上面 1..3 的六个数；本轮另有一条流程账：一次 `dotnet build` 失败后用 `;` 串起来的
+`dotnet test --no-build` 跑了旧 dll，打印"通过: 4"看着像绿读数，实际那次构建根本没成功（此后每条命令用 `&&` 串联，
+且先看到"0 个错误"再读测试数）。**硬件输入**——本批不动输入路径；#13 照欠。
+
+**牙的验证（A/B）**：三份 markup 退回 HEAD 的 `Rectangle`、测试与卡都不动 → **7 红 / 0 绿**，六条 witness 读数
+**一律 0**，且每条的 with/without 直方图逐键相同（折叠那条线对屏幕没有任何影响）；markup 闸那条读
+`Assert.Empty() Failure: Collection was not empty`。换回 `Border` → 7/7 绿；四个受影响类
+（OneDipRules / AppBar / DataGrid / TreeDataGrid）合跑 **175/175 绿**。第一轮用错判据时同一份退回 markup 读到的是
+2 与 3 而不是 0——那也是"有牙"，但牙口弱到会把"印不出"读成"几乎印不出"，所以第 2 条的判据换形是这条主张的一部分。
+
+**闸口读数**（串行 `tools/Test-AstraGates.ps1`，管道退出 **0**）：整套 **1457/1457 通过、0 失败、0 跳过**（6 m 25 s），
+比上段 1450 多 7 条＝本批 7 条（其中三条 fact 在加主题轴后变成 theory，所以本批内部净 +3）；调色板三档 `checked=True`
+（Light/Dark 各 83 源色→101 刷，HighContrast 101 键映射 + 3 条按住）；`keys.md is current: 1298 canonical lines.`
+（键数不变——本批只换形状，不发布也不撤销任何键）；末行 `All Astra gates passed.`。
+
+不声称：这六条主张全是离屏 `Render()` 合成，真窗口里的命令栏与表格表面没有截屏账（#10、#21 照欠），高对比档下
+这五条线走什么颜色本批没测（#57 照欠）；`CornerRadius=0.5` 与上游 `RadiusX/Y=0.5` 只在"同一个 1 DIP 盒子"这一级对齐，
+半设备圆角本身在 1 DIP 上不可见、没单独量；`MenuFlyoutSeparator`、`ScrollBar` 等**同族但不同形状**的线没有在本批
+被扫进主张（markup 闸只认 1 DIP `Rectangle`，别的薄写法不在其列）；#58 那条暗色表面缺陷的成因（本地值 / 没画刷子 /
+harness 底色）未判；`Styles/Divider.jalxaml` 那条"运行时默认线色从哪来"照旧未查。
+

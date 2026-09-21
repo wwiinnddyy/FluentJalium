@@ -49,7 +49,7 @@
             <ScrollViewer Name="PART_ColumnHeadersScrollViewer" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False">
               <StackPanel Name="PART_ColumnHeadersHost" Orientation="Horizontal" />
             </ScrollViewer>
-            <Rectangle Height="1" VerticalAlignment="Bottom" Fill="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
+            <Border Height="1" VerticalAlignment="Bottom" Background="{ThemeResource DataGridHeaderSeparatorBrush}" IsHitTestVisible="False" />
           </Grid>
           <!-- TreeDataGrid derives from Control, not from ItemsControl, and declares no scrollbar-visibility property
                of its own (its 26 public properties are listed in datagrid-probe-feed.txt), so unlike the DataGrid

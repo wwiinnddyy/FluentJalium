@@ -186,14 +186,15 @@
     <Setter Property="Padding" Value="{ThemeResource AppBarSeparatorMargin}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="AppBarSeparator">
-        <!-- Upstream's RootGrid carries a 1-wide rectangle filled from Foreground, with the half-device
-             corner radius the row list publishes as an unparsable double and so rides here as a literal. The
-             2,8,2,8 is the rectangle's margin, not the control's, and there is no MinHeight: the bar's row
-             height is what makes the rule 48 tall inside a 64 cell. -->
+        <!-- Upstream's RootGrid carries a 1-wide rule filled from Foreground, with the half-device corner
+             radius the row list publishes as an unparsable double and so rides here as a literal. The 2,8,2,8
+             is the rule's margin, not the control's, and there is no MinHeight: the bar's row height is what
+             makes it 48 tall inside a 64 cell. It is a Border where upstream has a Rectangle because a 1-DIP
+             Rectangle inks nothing on this renderer - measured in audits/divider.md §6 clause 4. -->
         <Grid Name="RootGrid">
-          <Rectangle Name="SeparatorRectangle" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
-                     Margin="{TemplateBinding Padding}"
-                     RadiusX="0.5" RadiusY="0.5" Fill="{TemplateBinding Foreground}" />
+          <Border Name="SeparatorRectangle" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                  Margin="{TemplateBinding Padding}"
+                  CornerRadius="0.5" Background="{TemplateBinding Foreground}" />
         </Grid>
       </ControlTemplate>
     </Setter>

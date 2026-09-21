@@ -662,7 +662,9 @@ public sealed class AstraAppBarTests
 
             var separator = Mount(new AppBarSeparator { Height = 64 }, 8, 64);
             Assert.IsType<Grid>(Part(separator, "RootGrid"));
-            Assert.IsType<Jalium.UI.Shapes.Rectangle>(Part(separator, "SeparatorRectangle"));
+            // Upstream names a Rectangle here; ours is the same box as a Border, because a 1-DIP Rectangle inks zero
+            // pixels on this renderer. The name stays upstream's so the pair still lines up row by row.
+            Assert.IsType<Border>(Part(separator, "SeparatorRectangle"));
         });
     }
 

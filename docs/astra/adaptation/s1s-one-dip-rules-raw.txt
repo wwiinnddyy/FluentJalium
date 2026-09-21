@@ -1,0 +1,114 @@
+S1-s 原始读数：五处 1 DIP 分隔线站点，改形状前后各量一次（2026-09-21）
+====================================================================================================
+
+来源：tests/FluentJalium.Tests/AstraOneDipRulesTests.cs（本轮新增），dotnet test --filter
+"FullyQualifiedName~AstraOneDipRulesTests"，配置 Release，主题 Light，无显式强调色。
+诊断串是测试自己打的（红色时输出 rules / with / without 三行），不是事后补的。
+
+站点清单（改前）
+----------------
+Styles/AppBar.jalxaml:194        Rectangle Width=1  VerticalAlignment=Stretch  Fill={TemplateBinding Foreground}  RadiusX/Y=0.5   Name=SeparatorRectangle
+Styles/DataGrid.jalxaml:53       Rectangle Height=1 VerticalAlignment=Bottom   Fill={ThemeResource DataGridHeaderSeparatorBrush}
+Styles/DataGrid.jalxaml:59       Rectangle Width=1  HorizontalAlignment=Right  Fill={ThemeResource DataGridHeaderSeparatorBrush}
+Styles/DataGrid.jalxaml:60       Rectangle Height=1 VerticalAlignment=Bottom   Fill={ThemeResource DataGridHeaderSeparatorBrush}
+Styles/TreeDataGrid.jalxaml:52   Rectangle Height=1 VerticalAlignment=Bottom   Fill={ThemeResource DataGridHeaderSeparatorBrush}
+
+令牌身份：DataGridHeaderSeparatorBrush --StaticResource--> ControlStrokeColorSecondaryBrush，Light 下实测色刷 #29000000
+（测试的 rules: 行直接从已挂载 Border.Background 读回，见下方"改后"）。
+
+------------------------------------------------------------------------------------------------------------
+A. 判据的第一版（"整键消失"计数）——两条网格 witness 在【改后】的markup上仍然接近 0
+------------------------------------------------------------------------------------------------------------
+[改后 markup / 键消失判据]
+the TreeDataGrid header rules account for 2 pixels
+rules: Border 438.0x1.0 fill=SolidColorBrush(#29000000)
+with:    #FFFFFFx85668 #D9D9D9x1248 #D2D2D7x426 #9F9F9Fx338 #C8C8C8x160
+without: #FFFFFFx85766 #D9D9D9x1248 #D2D2D7x426 #C8C8C8x400 #EAEAEAx62
+
+the DataGrid header rules account for 3 pixels
+rules: Border 438.0x1.0 fill=SolidColorBrush(#29000000) | Border 1.0x32.0 fill=SolidColorBrush(#29000000) | Border 20.0x1.0 fill=SolidColorBrush(#29000000)
+with:    #FFFFFFx71908 #F2F2F2x13001 #D9D9D9x1248 #D2D2D7x852 #9F9F9Fx337
+without: #FFFFFFx72057 #F2F2F2x13001 #D9D9D9x1248 #D2D2D7x852 #C8C8C8x380
+
+读法：#9F9F9F 从 338 掉到 2 左右——墨明明在，键却没有"消失"，因为同一crop里的字形反锯齿也产出 #9F9F9F。
+判据用错，主张再真也测不出来。换成正的逐键减量：max(0, with[key] - without[key]) 求和。
+
+------------------------------------------------------------------------------------------------------------
+B. 改后（Border）+ 正确判据（逐键减量）——阈值为了拿读数被临时抬高，所以下面三行是"红着打出来的实测值"
+------------------------------------------------------------------------------------------------------------
+the TreeDataGrid header rules account for 338 pixels
+the DataGrid header rules account for 338 pixels
+the app bar separator accounted for 64 pixels
+
+64 = 该线在 48 格内去掉 2,8,2,8 边距后是 32 DIP 高，1 DIP 宽在该缩放上跨两个设备列，所以墨是 32x2。
+338 = 438 宽的表头带里被这条线改色的那一行；其余 100 像素落在行头角等已被更深的键占住的位置。
+
+------------------------------------------------------------------------------------------------------------
+C. 对测（A/B）：把三份 markup 退回 HEAD 的 Rectangle，其余不变 —— 四条全红，三条 witness 读数一律 0
+------------------------------------------------------------------------------------------------------------
+失败: 4，通过: 0，已跳过: 0，总计: 4
+
+the TreeDataGrid header rules account for 0 pixels
+rules: Rectangle 438.0x1.0 fill=n/a
+with:    #FFFFFFx85766 #D9D9D9x1248 #D2D2D7x426 #C8C8C8x400 #EAEAEAx62
+without: #FFFFFFx85766 #D9D9D9x1248 #D2D2D7x426 #C8C8C8x400 #EAEAEAx62
+
+the DataGrid header rules account for 0 pixels
+rules: Rectangle 438.0x1.0 fill=n/a | Rectangle 1.0x32.0 fill=n/a | Rectangle 20.0x1.0 fill=n/a
+with:    #FFFFFFx72057 #F2F2F2x13001 #D9D9D9x1248 #D2D2D7x852 #C8C8C8x380
+without: #FFFFFFx72057 #F2F2F2x13001 #D9D9D9x1248 #D2D2D7x852 #C8C8C8x380
+
+the app bar separator accounted for 0 pixels
+rules: Rectangle 1.0x32.0 fill=n/a
+with:    #FFFFFFx4268 #F8F8F8x80 #FBFBFBx4
+without: #FFFFFFx4268 #F8F8F8x80 #FBFBFBx4
+
+No_shipped_template_draws_a_one_dip_rectangle -> Assert.Empty() Failure: Collection was not empty
+
+读法：改前改后两次的 with/without 逐键完全相同——折叠这条线对屏幕没有任何影响，因为线上本来就没有像素。
+这不是"阈值调一调"的差别：同一份 markup 在两种形状下，一个是 0，一个是 338/64。
+
+------------------------------------------------------------------------------------------------------------
+D. 折叠粒度：为什么必须整族一起折叠
+------------------------------------------------------------------------------------------------------------
+DataGrid 表头带（438x1）、行头角竖线（1x32）、行头角底线（20x1）三条共用 #29000000，叠在同一个底色上混成同一个键。
+只折叠其中一条，那一格颜色仍由另外两条供给，"消失/减量"读到的仍是 0。所以 Rules() 取子树里所有声明盒子为 1 DIP 的
+Border/Rectangle 一起折叠；找部件用的是 markup 声明的 Width/Height==1，不是实测几何——滚动条自己的轨道也满足
+"某一边的实际尺寸是 1"。
+
+E. 焦点跑（恢复 Border 之后）
+------------------------------------------------------------------------------------------------------------
+dotnet test --filter AstraOneDipRulesTests|AstraAppBarTests|AstraDataGridTests|AstraTreeDataGridTests
+已通过! - 失败: 0，通过: 175，已跳过: 0，总计: 175，持续时间: 59 s
+
+------------------------------------------------------------------------------------------------------------
+F. 加主题轴之后的两轮（每条主张带自己的表面）
+------------------------------------------------------------------------------------------------------------
+先给每条 witness 一张随主题的卡（横杠那侧 `#FFFFFF` / 暗侧 `#202020`；表格两例把同一张卡交给 `Background`，
+因为上游的表头带本身是透明的：`DataGridColumnHeaderBackground -> SubtleFillColorTransparentBrush`）。
+加暗色腿的第一次实测（表面没给对时）就读到 0，并且 with/without 直方图逐键相同：
+
+the TreeDataGrid header rules in Dark account for 0 pixels
+rules: Border 438.0x1.0 fill=SolidColorBrush(#18FFFFFF)
+with:    #FFFFFFx86230 #2D2D2Dx1248 #48484Ax426 #D1D1D6x28 #000000x12
+without: #FFFFFFx86230 #2D2D2Dx1248 #48484Ax426 #D1D1D6x28 #000000x12
+
+—— 暗色表格在这台捕获里那一片仍是白的（`#FFFFFF` 86230 与 Light 的 85668 同级），半透明白线画在白上等于没画。
+这条是 §S1-q 第 4 条的坑（"暗令牌放在白卡上等于没放"）在 witness 侧复现，另一笔账（暗色下表格表面）记进 ROADMAP 的
+不声称清单，不在本批处理。给了卡之后：
+
+the TreeDataGrid header rules in Light account for 338 pixels      the TreeDataGrid header rules in Dark account for 338 pixels
+the DataGrid header rules in Light account for 338 pixels          the DataGrid header rules in Dark account for 338 pixels
+the app bar separator in Light accounted for 64 pixels             the app bar separator in Dark accounted for 64 pixels
+rules（暗）: Border 1.0x32.0 fill=SolidColorBrush(#15FFFFFF)
+with: #202020x4268 #323232x64 #292929x16 #252525x4    without: #202020x4268 #292929x80 #252525x4
+
+最终树：dotnet test --filter FullyQualifiedName~AstraOneDipRulesTests -> 失败: 0，通过: 7，总计: 7
+对测（三份 markup 退回 HEAD 的 Rectangle，测试与卡都不动）-> 失败: 7，通过: 0，六条 witness 读数一律 0：
+the TreeDataGrid header rules in Light account for 0 pixels     ... in Dark account for 0 pixels
+the DataGrid header rules in Light account for 0 pixels         ... in Dark account for 0 pixels
+the app bar separator in Light accounted for 0 pixels           ... in Dark accounted for 0 pixels
+
+一次误记要写在这里：第一轮 A/B 之后有人会把"通过: 4"当成读数——那是构建失败后用 `;` 串起来的 `--no-build`
+在跑旧 dll。此后每条命令都用 `&&` 串联，且构建那一步先打印"0 个错误"再跑测试。
+

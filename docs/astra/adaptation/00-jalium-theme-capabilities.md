@@ -1838,6 +1838,7 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
    `Line` = 604；`Rectangle` 2 DIP = 600、3 DIP 仍只有 2 行 600、4 DIP = 1200。所以这不是"Shape 类型不能画"，
    是**薄到 1 DIP 就丢**，机制未量。跨控件意义是一条已经欠下的账：仓库里已发布五处 1 DIP `Rectangle`
    （`Styles/AppBar.jalxaml:194`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52`）现在印不出墨。
+   **（这笔账已在下面 §S1-s 结清：五处换成同盒子的 `Border`，逐处量到墨，并在 markup 层闸死这条路线。）**
 3. **`{ThemeResource}` 在"解析过但没并入"的片段里不解析**——S1-p 那条"读不到不等于没有"的坑第二次遇到，而且这次更绕：
    `XamlReader.Parse` 出来的 `Border` 写 `Background="{ThemeResource DividerStrokeColorDefaultBrush}"` 印 0 墨，
    同结构的字面色 `Border` 印 600。改成在代码里从 `Application.Current.TryFindResource` 取刷子再交给它，才第一次量到
@@ -1917,4 +1918,36 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 `Thickness`、`Duration`）用无限定名的类型化行发布，且必须配一条"从已挂载要素读回该值"的测试——`{ThemeResource}`
 交付的是属性默认值而不是失败，绿灯的构建与解析都不算证据。不要为了"看起来发布了"改用 `sys:Double` 或字符串行；
 任何"某个数字/字形印出了墨"的主张只能靠树上读数，色块主张才走像素。
+
+## S1-s：把"这条线印不出墨"变成可证的三件事——五处 1 DIP 站点结清时量出的三条账（缺陷批，2026-09-21）
+
+原始读数：`adaptation/s1s-one-dip-rules-raw.txt`（`AstraOneDipRulesTests` 的正测与两轮对测，测试自己打的诊断串）。
+§S1-q 第 2 条欠下的账在这批结清：`Styles/AppBar.jalxaml`、`Styles/DataGrid.jalxaml`（三处）、`Styles/TreeDataGrid.jalxaml`
+里那五条 1 DIP `Rectangle` 换成同盒子、同令牌的 `Border`（`RadiusX/Y=0.5` → `CornerRadius=0.5`，`Fill` → `Background`，
+部件名照上游保留）。三条新账：
+
+1. **"形状换对了"不是一条主张，是六个数**。同一份测试、同一张随主题的卡，退回 `Rectangle` 时六条 witness 读数
+   一律 **0**、且 with/without 直方图逐键相同（折叠这条线对屏幕没有任何影响）；换成 `Border` 之后是表格两例各档
+   **338**、应用栏两例各 **64**。64 这条顺便量到一个可解释的形状：线在 48 格内去掉 2,8,2,8 边距是 32 DIP 高，
+   1 DIP 宽在这个缩放上跨两个设备列，所以墨是 32x2——"1 DIP 印不出"只对 `Rectangle` 成立，`Border` 仍然要
+   按列数摊，别把它读成"1 列"。跨控件意义：**"某条线/某个部件到了像素"这类主张，只能按"折叠它，哪几个键少了几格"来立**，
+   绝对色值主张在这族上必然错（见第 2 条）。
+2. **"这个颜色消失了"是错的判据，"这个颜色的墨少了多少"才是对的**。第一版 witness 数的是"改前的键在改后彻底不见"，
+   于是表格线只读到 2 与 3 像素——而它其实每次都印出 338 格：表头线混出来的 `#9F9F9F` 在同一张裁剪图里也被字形
+   反锯齿产出，键从来没"消失"过。改成 `sum(max(0, with[key] - without[key]))` 之后同一份 markup 读到 338，退回 `Rectangle` 读到 0。
+   跨控件意义：这条与 §S1-m/§S1-r 那批"几何计数不是令牌证据"的账同族，但要补一句——**同一个混色键可以来自多个来源，
+   所以差分要按"减量"算，不能按"有无"算**。
+3. **witness 必须自带表面，否则暗色腿是假的**。上游的表头带是透明的（`DataGridColumnHeaderBackground →
+   SubtleFillColorTransparentBrush`），所以暗色下那条 `#18FFFFFF` 的线叠到的白读回 0，with/without 逐键相同——
+   看起来像"暗色里这条线又不印了"，其实是 §S1-q 第 4 条那个坑在 witness 侧复现。给每条主张配一张随主题的卡
+   （白 / `#202020`）之后两档都读到同样的 338 与 64。同一轮顺手量到一件本批不处理的事：**暗色下挂载的
+   `DataGrid`/`TreeDataGrid` 那一片表面仍是白的**（`#FFFFFF` 86 230，与 Light 的 85 668 同级），已另立一条账，
+   不混进这条形状结论。
+
+规则：本层不再用 1 DIP `Rectangle` 画线——`AstraOneDipRulesTests.No_shipped_template_draws_a_one_dip_rectangle`
+从 markup 层扫 `src/FluentJalium` 的全部 `.jalxaml`，出现一条就红；这条闸钉的是**路线**而不是当下的数量（哪怕
+将来的运行时能画薄 `Rectangle`，本层的分隔线仍走 `Border`，因为 `Border` 是实测会印墨的那个形状）。
+另两条：折叠部件要用**声明的盒子**（`Width`/`Height` 等于 1）认，不要用实测几何——滚动条自己的轨道也满足"某边实际是 1"；
+共享同一混色的多条线必须**整族一起折叠**，只折一条时另外几条让那个键继续存在，减量读回 0。
+
 

@@ -69,7 +69,7 @@
 1. 本层的"分隔线"外观**无法与上游逐字对齐**，因为 §1 那条搜索：上游参考 commit 里没有这个控件。目录里这一行的 parity 用的是新加的 `no-upstream-control`，不是 `audited`。
 2. 盒子高度 12 DIP 是运行时对 `Separator` 自己的度量（模式 `surface`/`mount`：横 300x12、竖 12x100），不是上游数字——上游各处同角色线的总高分别是 3（菜单）、8（侧栏）、20（应用栏），本层一个都没采用，也没有声称该采用哪个。
 3. 不设 margin：七处各写各的，没有一处能代表通用分隔线；页面自己排版。
-4. 上游用 `Rectangle` 画这条线，这台运行时 1 DIP 的 `Rectangle` 不印任何东西。本层因此把线交给控件自绘。**已发布模板里还有五处这种 1 DIP `Rectangle`**（`Styles/AppBar.jalxaml:194`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52`），它们现在印不出墨；这是一条独立缺陷，不在本段处理（另开一批，`AstraDividerTests.A_one_dip_rectangle_is_not_a_route_this_layer_can_take` 先把读数钉住）。
+4. 上游用 `Rectangle` 画这条线，这台运行时 1 DIP 的 `Rectangle` 不印任何东西。本层因此把线交给控件自绘。**那笔欠下的账已结**（缺陷批，2026-09-21）：已发布模板里那五处 1 DIP `Rectangle`（`Styles/AppBar.jalxaml:194`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52`）全部换成同盒子的 `Border`，逐处按"折叠该线、数逐键减量"量到墨（338 / 64 像素，退回 `Rectangle` 后三条读数一律 0），并由 `AstraOneDipRulesTests.No_shipped_template_draws_a_one_dip_rectangle` 从 markup 层闸死这条路线。账目在 `adaptation/00` §S1-s，原始读数在 `adaptation/s1s-one-dip-rules-raw.txt`。
 5. `Separator` 的 `Background` 属性存在，但自绘路径读的是 `StrokeBrush`；`Background` 在这个类型上到底画不画东西**没量**，因此本层不写这一条 setter。
 6. 运行时默认线色 `#A3A3A4` 是从哪儿来的（哪一行令牌、还是硬编码）没查；只知道换掉它可行。
 7. 高对比没有控件级动作，与全库同一条账（§4）。
