@@ -1,4 +1,4 @@
-{
+﻿{
   "note": "One file, two consumers: the Gallery renders its parity strip from it, and tests/FluentJalium.Tests/Gallery/AstraGalleryCatalogTests.cs fails when it stops matching the styles Astra actually ships. Scope is the implicit-style universe - every TargetType a product dictionary restyles without an x:Key - because that is the set an app inherits silently.",
   "parityLegend": {
     "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion. Whatever is missing is named in gaps.",
@@ -145,6 +145,46 @@
       "parity": "audited",
       "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
       "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen", "label rows are written on the control, not the presenter (adaptation/00 S1-f), and a disabled dot's label keeps the framework's own local grey rather than RadioButtonForegroundDisabled" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentBreadcrumbBarItem",
+      "source": "Styles/BreadcrumbBar.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/breadcrumb-bar.md",
+        "docs/astra/adaptation/s1n-breadcrumb-upstream-raw.txt",
+        "tests/FluentJalium.Tests/AstraBreadcrumbBarTests.cs"
+      ],
+      "gaps": [
+        "the item needs ContentControl's UseTemplateContentManagement opt-in: with Template set and the style found, the realized crumb still painted a bare TextBlock and no template part existed at all",
+        "the four Current* states and their rows are not implemented: upstream reaches them only through the last crumb's own button, which its LastItem state collapses",
+        "the last crumb's current colour is written on the item rather than on its presenter, because a ContentPresenter declares no Foreground on this runtime (adaptation/00 S1-f)",
+        "no pointer, touch or keyboard measurement of the hover, press or focus arms (task #13)",
+        "IsTabStop=True and the two IsTemplateFocusTarget cells have no equivalent here, so the crumb's keyboard stop is the nested button's own"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentBreadcrumbBar",
+      "source": "Styles/BreadcrumbBar.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/breadcrumb-bar.md",
+        "docs/astra/adaptation/s1n-breadcrumb-upstream-raw.txt",
+        "tests/FluentJalium.Tests/AstraBreadcrumbBarTests.cs",
+        "spike/BreadcrumbProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no BreadcrumbBar, no BreadcrumbBarItem and no ItemsRepeater, StackLayout or Flyout to build one out of",
+        "19 of upstream's 29 token rows are unpublished: six because this reader cannot parse or resolve them, thirteen because nothing in this port could read them without overwriting a live cell",
+        "the hide mechanism is Visibility=Hidden rather than upstream's zero arrange rect: measured here that a zero rect leaves a sized child painted and hit-testable, and that Collapsed removes the container from the panel's Children",
+        "the ellipsis is a part of the bar's template rather than a synthetic zeroth crumb, so its entries are MenuFlyoutItems showing item.ToString() instead of the app's ItemTemplate",
+        "the drop-down entry's close-then-raise ordering is unmeasured, and no pointer, touch or keyboard path is measured at all (task #13)",
+        "no Navigation landmark and no AccessibilityView: neither property exists on this runtime, so the ellipsis stays in the automation tree it would be pulled out of",
+        "RTL chevrons and the four Current* visual states are not implemented; upstream's own arrow-key escape hatch has no object here",
+        "high-contrast: the flyout border thickness stays 1 where upstream moves it to 2, and three foreground rows resolve through the palette rather than to the system colours upstream names"
+      ]
     },
     {
       "markup": "FluentJalium.Controls.FluentPipsPager",

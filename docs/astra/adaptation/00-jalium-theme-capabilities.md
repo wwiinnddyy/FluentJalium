@@ -1723,3 +1723,28 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 （`PipsPager.cpp` 的 element factory 只从 `TemplateSettings.PipsPagerItems` 取 1-based 页号），
 继承 `ItemsControl` 会把 `Items`/`ItemContainerStyle` 这一整面公开 API 白递给应用，所以本层落回 `Control`
 + 自管 `Panel` 子元素——S1-l 量出的是"能继承"，不是"该继承"。
+
+## S1-n：`ContentControl` 派生的自有类型不主动展开模板，而被收进的条目容器会整个离开 `Children`（阶段 5 第十段，2026-09-21）
+
+`spike/BreadcrumbProbe`（mode `api`/`layout`/`ink`/`hidden`/`style`/`narrow`，读数转录在
+`s1n-breadcrumb-upstream-raw.txt` [G1]-[G7]）。这一段是 BreadcrumbBar 的选型与两处返工输入，量出的五条性质跨控件。
+
+1. **零矩形 arrange 在本运行时不是"藏起来"**（[G4]）。上游 `BreadcrumbLayout.cpp:89-93` 用
+   `Arrange(new Rect(0,0,0,0))` 收条目，从不碰 `Visibility`。四枚自带 `Width=100 Height=40` 的 `Border` 实测：
+   被"收进"的两枚仍是 `100x40`，只是叠回原点，**照旧画笔、照旧命中**（直方图黄 4000 + 绿 4000，蓝 0 因为被压住）；
+   不带自身宽度的 `TextBlock` 才会变成 `0x0`。所以照抄上游会得到一条"隐藏条目挤在第一个可见条目底下、只有读
+   `ActualWidth` 的人看不见"的行。`Visibility` 是这里唯一量得出"没了"的机制（[G5]：红 4000 绿 4000，蓝/黄 0）。
+2. **"能读到值"不等于"样式落到了控件上"**（[G6]）。`Style` 找得到、隐式键找得到、`Template` 已是
+   `ControlTemplate`、`LoadContent()` 能展开出三部件——而落地控件的唯一视觉子元素是一枚裸 `TextBlock`。
+   `ContentControl` 派生的自有类型必须调 `UseTemplateContentManagement()` 并设 `DefaultStyleKey`，本层四个
+   `ContentControl` 派生类型全都这么做。顺带推翻一种写法：靠"构造时 `Style` 还是 null"来判定"没人选过样式"
+   的兜底，对这类类型**永远不成立**——那个槽位一开始就坐着框架自己的 `ContentControl` 默认模板。
+3. **`Collapsed` 的条目容器会从 `Panel.Children` 里消失**（[G7a]）。实测收掉四枚中的第一枚之后，下一趟测量
+   读到的宽度和从 307 掉到 225（只剩三枚），于是"放不下"翻成"放得下"，行不再声明溢出而那一枚仍没被摆位。
+   `Hidden` 保留子元素与 `DesiredSize`，由 arrange 自己拒绝给位置——墨量结论不变（捕获里 0 像素）。
+4. **溢出判据要用宿主的宽度，不能用自己那一列的宽度**（[G7b]）。省略号在左侧列里，显示它会让本列变窄；
+   用 `finalSize.Width` 判定就是"答案改变判据、判据再改答案"。改用宿主条宽（应用给的那个数）后判定与结果解耦，
+   显示省略号只需补一趟 measure 让预留量取到真数。S1-m 第 5 条是同一类错误的镜像：用自己的度量结果限自己。
+5. **`ItemContainerGenerator` 一面都没有**（[G2]）。`ItemsControl.ContainerFromItem` 不存在，所以条目到容器
+   的反查只能由控件自己记账（`FluentRadioButtons`/`FluentPipsPager`/`FluentBreadcrumbBar` 三处同一条），
+   测试与自动化也只能走这个清单。这条是"面板 vs 宿主"分工的实际边界：面板能决定可见集合，宿主才能知道集合是谁。

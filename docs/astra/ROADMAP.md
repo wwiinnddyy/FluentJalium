@@ -1362,3 +1362,58 @@ keys.md"这条从第一天起就没做，因为一直没定"谁来保证它不�
 **0 条警告 / 0 错误**（真重编）；整套 **1169/1169 通过、0 失败、0 跳过**（5 m 28 s，比第九段 1167 多的 2 条
 就是这份清单的双向用例）；调色板三行 `checked=True`；**新增第 5 步**"public resource key inventory"读回
 `keys.md is current: 1230 canonical lines.`；`All Astra gates passed.` 硬件输入 / 视觉：本批不动产品码，各 0 条。
+
+**阶段 5 第十段（BreadcrumbBar 落地——三条"看起来对"的通路里两条是假的，2026-09-21）**：
+基型选 `ItemsControl` 而不是上一段 PipsPager 的 `Control`。判据不是"哪个更顺手"，是上游公开了什么：
+`BreadcrumbBar.idl` 真的只有 `ItemsSource` + `ItemTemplate` 加一枚 `ItemClicked`，所以继承条目管线不会白递给
+应用一面它不该有的 API；S1-l 量到 `ItemsControl` 的四个 protected 容器覆写与 `ItemsPanelTemplate` 可换，
+S1-m 量到"能继承"不等于"该继承"，这一段就是那个判据的正面用例。条目是 `FluentBreadcrumbBarItem : ContentControl`，
+行是 `FluentBreadcrumbPanel`（`ItemsPanelTemplate` 只带类型，横向 `StackPanel` 无从设起）。
+
+三条测量把"照抄上游"顶回去两次，读数都在 `adaptation/s1n-breadcrumb-upstream-raw.txt`：
+- **零矩形不是"藏起来"**（[G4]）。上游 `BreadcrumbLayout.cpp:89-93` 收条目用 `Arrange(new Rect(0,0,0,0))`，
+  从不碰 `Visibility`。四枚自带 `100x40` 的 `Border` 实测：被收的两枚仍是 `100x40`、只是叠回原点、
+  **照旧画笔**（直方图黄 4000 + 绿 4000，蓝 0 只因被压住），不带自身宽度的子元素才会变 `0x0`——上游活的正是后者那个世界。
+  照抄会得到一条"隐藏条目挤在第一个可见条目底下、只有读 `ActualWidth` 的人看不见"的行。
+- **`Collapsed` 也不是答案**（[G7a]）。它确实让有尺寸的子元素不画（[G5]：红 4000 绿 4000，蓝/黄 0），
+  但它把容器整个从 `Panel.Children` 里摘掉：收掉第一枚后下一趟量到的和从 307 掉到 225（只剩三枚），
+  "放不下"当场翻成"放得下"，行不再声明溢出而那一枚仍没被摆位。最终落 `Visibility=Hidden`——
+  留得住子元素与 `DesiredSize`，由 arrange 自己拒绝给位置，墨量结论与 `Collapsed` 一致（像素用例两向都断）。
+- **判据不能用自己那列的宽度**（[G7b]）。省略号在左侧列，显示它就是改窄本列，拿 `finalSize.Width` 判定
+  等于"答案改判据、判据再改答案"。改成比宿主条宽（应用给的那个数），显示时补一趟 measure 让预留量取到真数。
+
+另有一条跨控件的基座事实（[G6]，已写进 `adaptation/00` S1-n）：`ContentControl` 派生的自有类型
+**不主动展开自己的模板**。症状是"部件找不到"，而资源全绿——`Style` 查得到、隐式键查得到、`Template` 已是
+`ControlTemplate`、`LoadContent()` 能展开出三部件，可落地控件的唯一子元素是一枚裸 `TextBlock`。
+缺的是 `UseTemplateContentManagement()` + `DefaultStyleKey`（本层另外四个 `ContentControl` 派生类型早就都调了）。
+顺带推翻一种抄法：靠"构造时 `Style` 还是 null"判定"没人选过样式"的兜底对这类类型**永不成立**，
+那个槽位一开始就坐着框架自己的 `ContentControl` 默认模板。
+
+键账被闸口逼成诚实的两类：上游 29 行，本层发布 **10**、扣住 **19**。扣住里有 6 行是本管线读不出来
+（`x:String`/`x:Double`/`x:FontWeight`，加一枚指向未发布字号行的别名、一枚指向调色板没有那支刷子的别名），
+另外 13 行是"本层没有能读到它的模板"：四枚 `Current*` 属于最后一枚条目那个被收起的按钮（上游死码），
+七枚 `EllipsisDropDownItem*` 与两枚 flyout 表面行属于"下拉列表改由菜单族呈现"这条替换。
+第二类的存在正是 `Transcribed_control_rows_are_read_by_a_template` 那条闸口的价值——第一遍跑它就把
+`BreadcrumbBarFocusForegroundBrush` 抓成红（我以为写了焦点格，其实那次补丁在写文件前就异常退出了）。
+
+四类证据分开记：
+1. 构建：`dotnet build FluentJalium.slnx -c Debug` → **0 警告 / 0 错误**（真重编）；`Manifest.txt` 53→55。
+2. 行为：新增 `AstraBreadcrumbBarTests` 38 条（容器与三部件、只标最后一枚、无溢出时逐枚紧挨**零间距**、
+   溢出时藏的是前缀且省略号与最后一枚必留、`ItemClicked` 报条目集合里的序号、省略号列表自深至浅、
+   `PositionInSet/SizeOfSet` 只数可见条目、10 条发布行解析得到、19 条扣住的名字取不到）。
+   **A/B 有牙**：把隐藏机制换回上游的零矩形后 3 条转红（像素、后缀、自动化重排），先断言改动落地再看结果，随后还原。
+3. 视觉：`The_dropped_crumb_paints_nothing_in_the_capture` 用三枚 100x24 不透明哨兵白底卡片直方图，
+   按容器实际状态双向断言（藏者 0 像素、留者满格），并要求"确有条目被藏"以免空转；
+   `Dark_and_light_...` 断言 Light/Dark 前景不同且品牌绿 `#207245` 为 0 像素。箭头字形只断刷子与内衬，
+   不断墨（S1-m 第 1 条：字体路径在 RTB 捕获里不产像素）。Gallery 冒烟：新 markup 入树后进程 12 s 不退出、
+   截图 `spike/VisualQA/out/breadcrumb-gallery.png`——但导航页没有滚到，所以**没有任何一条上屏帧主张**。
+4. 硬件输入：**仍为零**。hover/press/focus 三支触发器、真指针点条目与省略号条目、方向键遍历全未量（任务 #13）。
+
+**闸口读数（第十段，串行 `tools/Test-AstraGates.ps1`，跑两遍）**：第一遍 **exit 1**，2 条红 1206 条绿——
+`AstraGalleryCatalogTests` 抓到隐式样式与目录差集（`FluentBreadcrumbBarItem` 有隐式样式却没登记），
+`AstraResourceKeyTests` 抓到一行没人读的键；两处都是补真东西（目录加该类型一行 + 焦点触发器真写进模板），
+不是放宽闸口。第二遍 **exit 0**：Debug **0 警告 / 0 错误**（真重编）；整套 **1208/1208 通过、0 失败、0 跳过**
+（5 m 17 s）；调色板三行 `checked=True`；清单 `keys.md is current: 1245 canonical lines.`；`All Astra gates passed.`
+仍欠：省略号下拉条目的"关闭后发事件"顺序没测；下拉不吃应用的 `ItemTemplate`（只 `ToString()`）；
+`LandmarkType`/`AccessibilityView`/`IsTemplateFocusTarget` 运行时没有对应属性；RTL 箭头无路径；
+高对比那三行整组没实现（含 1→2 的描边宽度）；字号三连 token 本层根本没有，条目文字继承运行时默认值。

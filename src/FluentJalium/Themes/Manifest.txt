@@ -34,6 +34,7 @@ ThemeResources/TeachingTip.jalxaml
 ThemeResources/DataGrid.jalxaml
 ThemeResources/NavigationView.jalxaml
 ThemeResources/PipsPager.jalxaml
+ThemeResources/BreadcrumbBar.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -61,3 +62,6 @@ Styles/DataGrid.jalxaml
 # Reads the DataGrid family's token rows rather than declaring its own: the two grids share the cell, the column
 # header and the surface, and this runtime has no tree-only versions of them.
 Styles/TreeDataGrid.jalxaml
+# The breadcrumb bar: its crumb row is a panel of its own, so this file carries the item style, the nested button
+# style the item and the ellipsis share, and the bar style that hosts both.
+Styles/BreadcrumbBar.jalxaml

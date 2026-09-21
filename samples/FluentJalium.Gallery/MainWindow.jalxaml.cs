@@ -324,6 +324,46 @@ public partial class MainWindow : Window
         ((Button)PagerNextButton!).Click += (_, _) => pager.SelectedPageIndex++;
         ReportPager();
 
+        var trail = (FluentBreadcrumbBar)TrailBar!;
+        var trailReadout = (TextBlock)BreadcrumbReadout!;
+        foreach (var level in new[] { "This PC", "Documents", "Projects", "FluentJalium" })
+        {
+            trail.Items.Add(level);
+        }
+
+        void ReportTrail(string action)
+        {
+            var shown = 0;
+            for (var index = 0; index < trail.Items.Count; index++)
+            {
+                if (trail.ContainerFromIndex(index)?.Visibility == Jalium.UI.Visibility.Visible)
+                {
+                    shown++;
+                }
+            }
+
+            trailReadout.Text = $"{action} {trail.Items.Count} levels, {shown} of them in the row" +
+                (trail.IsEllipsisRendered ? ", the rest behind the ellipsis." : ".");
+        }
+
+        trail.ItemClicked += (_, args) => ReportTrail($"Crumb {args.Index} ({args.Item}) clicked;");
+        ((Button)BreadcrumbPushButton!).Click += (_, _) =>
+        {
+            trail.Items.Add($"Level {trail.Items.Count + 1}");
+            ReportTrail("Pushed;");
+        };
+        ((Button)BreadcrumbPopButton!).Click += (_, _) =>
+        {
+            if (trail.Items.Count > 1)
+            {
+                trail.Items.RemoveAt(trail.Items.Count - 1);
+            }
+
+            ReportTrail("Popped;");
+        };
+        ((Slider)BreadcrumbWidthSlider!).ValueChanged += (_, args) => trail.Width = args.NewValue;
+        ReportTrail("Loaded:");
+
         foreach (var (button, shapes) in new[]
                  {
                      ((Button)DialogThreeButton!, 3),

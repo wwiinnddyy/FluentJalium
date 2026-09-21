@@ -1,0 +1,205 @@
+S1-n upstream readings - BreadcrumbBar (WinUI 3 @19e3bdc3ccf3361393d623d3a5d2667cb8f33229, read-only tree)
+============================================================================================================
+Source of [A]-[F]: one pass over ../microsoft-ui-xaml by a search agent, then the lines marked [V] re-measured
+here directly against the files. The runtime side of this slice (what 26.10.9 actually offers) is [G] and is not
+filled yet - nothing in this file is evidence about Jalium.
+
+[A] File shape [V]
+  controls/dev/Breadcrumb/  (the folder is "Breadcrumb", the control is BreadcrumbBar; ItemsProjectName differs)
+    BreadcrumbBar_themeresources.xaml   blob af094a1594bb76d73034e91d8c6e9677d7c67e15   97 lines
+    BreadcrumbBar.xaml                  340 lines   <Type>DefaultStyle</Type> (Breadcrumb.vcxitems:40-42)
+    BreadcrumbBar_perf2026.xaml         328 lines   <Type>StylePerf2026</Type> (:46-48)
+    BreadcrumbBar.idl / .cpp / .h, BreadcrumbBarItem.* , BreadcrumbLayout.*, BreadcrumbIterator.*,
+    BreadcrumbBarElementFactory.*, BreadcrumbBarItemAutomationPeer.*, Strings/*/Resources.resw
+  All logic is C++. There is no managed source for this control; the only C# is tests and the gallery sample.
+
+[B] Theme resources - 29 rows x 3 sections, nothing outside the dictionaries [V]
+  90 x:Key rows in the file = 3 section headers + 87 rows. Sections: Default(:4) Light(:35) HighContrast(:66).
+  There is no "Dark" section - in this repo Default IS dark (repo-wide: 140 files use Default, 7 use a literal
+  Dark, all of those Number/TestUI pages).
+  Default and Light are byte-identical (diff of :5-33 against :36-64 returns nothing) [V].
+  23 of the 29 rows differ from Default/Light, and every one of those 23 differs only in HighContrast [V-count].
+  The 6 rows identical in all three sections: BreadcrumbBarChevronLeftToRight, ChevronRightToLeft,
+  ChevronPadding, ItemFontWeight, ItemThemeFontSize, ChevronFontSize.
+  Type census per section [V]: Default and Light each hold 21 StaticResource brush aliases + 2 SolidColorBrush
+  + 2 Thickness + 2 x:String + 1 FontWeight + 1 x:Double = 29; HighContrast holds 23 StaticResource + the same
+  2 Thickness + 2 x:String + 1 FontWeight + 1 x:Double = 29. Across the file: 65 StaticResource, 6 x:String,
+  6 Thickness, 4 SolidColorBrush, 3 FontWeight, 3 x:Double.
+  Two rows change *value type* between sections: BreadcrumbBarBackgroundBrush and BreadcrumbBarBorderBrush are
+  SolidColorBrush Color="Transparent" in Default/Light (:27-28, :58-59) and StaticResource in HighContrast
+  (:89-90). A transcriber that assumes one type per name breaks on exactly these two.
+  Only one numeric literal moves between themes: BreadcrumbBarEllipsisFlyoutPresenterBorderThemeThickness
+  1 -> 2 (HighContrast :93).
+
+[C] One upstream dead key [V-partial]
+  BreadcrumbBarEllipsisDropDownItemBackground is declared in all three sections (:19,:50,:81) and named 0 times
+  in either style file (BreadcrumbBar.xaml carries 3 hits for the *prefix* - PointerOver/Pressed/Disabled - while
+  the bare name has none). The EllipsisDropDown state never writes PART_LayoutRoot.Background, so nothing reads it.
+
+[D] Public surface (idl + Generated/*.properties.*)
+  BreadcrumbBar: two dependency properties, ItemsSource and ItemTemplate, both default null
+  (BreadcrumbBar.idl:27-28; Generated/BreadcrumbBar.properties.cpp:35,46). Zero routed events. One event:
+  ItemClicked(TypedEventHandler<BreadcrumbBar, BreadcrumbBarItemClickedEventArgs>) (idl:30).
+  There is NO Items collection, so <BreadcrumbBar><BreadcrumbBarItem/></BreadcrumbBar> is not supported at all -
+  UpdateItemsRepeaterItemsSource bails when ItemsSource() is null (BreadcrumbBar.cpp:138).
+  No FlipsIntoItems, no ItemsChanged, no Cancel on the event args.
+  BreadcrumbBarItem : ContentControl declares nothing public (idl:14-17); index and the three role bits are
+  private C++ fields (BreadcrumbBarItem.h:88-94), and m_index is documented as 1-indexed (:87).
+
+[E] How it collapses (this is the part a port either reproduces or records)
+  BreadcrumbLayout : NonVirtualizingLayout (BreadcrumbLayout.cpp). Every crumb is realized and measured; collapse
+  is done by arranging to a zero rect (HideItem = Arrange(0,0,0,0), :89-93), never by Visibility.
+  MeasureOverride (:35-72): accumulate crumb widths skipping index 0 (the ellipsis never counts toward the needed
+  width), then one boolean: m_ellipsisIsRendered = accumulated > available. Desired size excludes the ellipsis.
+  GetFirstBreadcrumbBarItemToArrange (:101-118): greedy from the right, seeded with lastItem + ellipsis, walking
+  leftwards until the next crumb would not fit; floor is "ellipsis + last crumb". No threshold constant, no
+  minimum-visible count, no spacing added by the layout - items butt against each other, all gaps come from
+  template padding.
+  The ellipsis is a *synthetic* slot, not an inserted item: BreadcrumbIterator wraps the source with
+  size = Count + 1 and returns nullptr at index 0 (BreadcrumbIterator.cpp:17,25-39), so repeater index is always
+  data index + 1 and slot 0 is permanently there, shown or hidden.
+  HiddenElements() (:314-331) exposes the data prefix that scrolled off the left; GetHiddenElementsList (:299-312).
+
+[F] Interaction contract worth reproducing
+  Args: BreadcrumbBarItemClickedEventArgs { Int32 Index; Object Item } with m_index defaulting to -1
+  (BreadcrumbBarItemClickedEventArgs.h:12-20). Item is the raw data object, not a string; Index is 0-based into
+  ItemsSource (raised as m_index - 1).
+  Middle crumb click -> exactly one ItemClicked. Last/current crumb -> NO event, because the LastItem state
+  collapses its button (BreadcrumbBar.xaml:89) - asserted upstream by CheckCurrentItemDoesNotRaiseInvokeEvent
+  (BreadcrumbBarTests.cs:138-158). Ellipsis click -> opens the flyout, no ItemClicked. Flyout entry click ->
+  CloseFlyout() first, then ItemClicked (BreadcrumbBarItem.cpp:721-722), with the flyout order reversed
+  (deepest-first) and SetIndex(itemCount - index) (UpdateFlyoutIndex :257-277; CloneEllipsisItemSource :279-299).
+  Keyboard: the bar handles Left/Right only, mirrored by FlowDirection, and escapes to FocusManager.TryMoveFocus
+  for gamepad DPad (BreadcrumbBar.cpp:514-560, MoveFocus :427-460 with the ellipsis reachable as a real node in
+  the ring). Item level: Enter or Space activates (BreadcrumbBarItem.cpp:224-246); no Up/Down/Home/End typing.
+  Automation: the bar has NO peer class (the file named BreadcrumbBarAutomationPeer.idl declares the *item* peer);
+  the bar only carries AutomationProperties.LandmarkType="Navigation" and IsTabStop="False"
+  (BreadcrumbBar.xaml:329-330). Item peer: control type Button, Invoke pattern, class name BreadcrumbBarItem,
+  localized control type "breadcrumb bar item". PositionInSet/SizeOfSet are recomputed on every arrange over the
+  *visible* items and never count the ellipsis (BreadcrumbBar.cpp:333-367), whose AccessibilityView flips between
+  Content and Raw (349-353). Two RESW strings: AutomationNameEllipsisBreadcrumbBarItem = "More",
+  BreadcrumbBarItemLocalizedControlType = "breadcrumb bar item".
+  Visual states (BreadcrumbBar.xaml:22-111): groups ItemTypeStates {Inline, EllipsisDropDown},
+  EllipsisDropDownItemCommonStates {Normal, PointerOver, Pressed, Disabled}, InlineItemTypeStates
+  {Default, DefaultRTL, LastItem, Ellipsis, EllipsisRTL}; the nested Button template carries its own CommonStates
+  with a Current-prefixed twin of every state (10 states, :185-241), all setter-only, no VisualTransition, and
+  every setter targets PART_ContentPresenter's Foreground/Background/BorderBrush rather than the Button.
+  CurrentPressed writes literal Transparent where its siblings use theme brushes (:218-219) - an upstream
+  inconsistency, recorded not fixed.
+  perf2026 twin differs in exactly 3 hunks: the three PointerOver/Pressed/Disabled storyboards become flat Setters
+  with the same target/value pairs; the Normal state keeps its PointerUpThemeAnimation, which reads as an oversight.
+  Both vcxitems entries register the SAME themeresources file under two Types; there is no perf theme file.
+
+[G] Runtime side (26.10.9) - spike/BreadcrumbProbe modes api | layout | ink
+  All of it is one process, one shown window, and Pump() copied from PixelHarness.cs:269 (DispatcherFrame +
+  CompositionTarget.Rendering + a watchdog that releases THAT dispatcher). The first version of the probe pumped
+  with bare dispatcher.Invoke calls and read "measureCalls=0, 0x0" everywhere - that was the probe never yielding
+  a frame, not the framework, and it is the reason pass C below prints how many frames it actually pumped.
+
+[G1] Type census (first match by Type.Name over the loaded assemblies)
+  ABSENT: BreadcrumbBar, BreadcrumbBarItem, ItemsRepeater, StackLayout, NonVirtualizingLayout, LayoutPanel, Flyout.
+  present: ItemsControl : Control; ItemsPanelTemplate : FrameworkTemplate; ContentControl : Control;
+    FocusManager (Jalium.UI.Input) : Object; AutomationProperties (Jalium.UI.Automation) : Object;
+    MenuFlyout : FlyoutBase; MenuFlyoutPresenter : Control; FlyoutBase : DependencyObject;
+    Popup (Primitives) : FrameworkElement; TextBlock : FrameworkElement; Button : ButtonBase; ToolTipService.
+  The line reading "Path : System.IO.Path" is the probe matching the wrong assembly - the visual is
+  Jalium.UI.Shapes.Path, which every style in this layer already uses. Recorded so nobody reads it as a gap.
+
+[G2] Members the port would lean on
+  FocusManager.TryMoveFocus ABSENT; GetFocusedElement present; FindFirstFocusableElement ABSENT.
+    -> upstream's arrow-ring escape hatch (BreadcrumbBar.cpp:528-538) has no object here; focus leaves the bar
+       only the way the framework's own traversal decides.
+  AutomationProperties: LandmarkType ABSENT (so the bar's WinUI "Navigation" landmark cannot be transcribed);
+    AccessibilityView ABSENT (so the ellipsis cannot be pulled out of the UIA tree the way upstream does at
+    BreadcrumbBar.cpp:349-353); PositionInSet / SizeOfSet / Name present.
+  ItemsControl: ItemsSource, ItemTemplate, ItemsPanel, ItemContainerStyle present;
+    GetContainerForItemOverride / IsItemItsOwnContainerOverride / PrepareContainerForItemOverride /
+    ClearContainerForItemOverride present (protected virtual, s1l); ContainerFromItem ABSENT
+    -> the container cannot be looked up from outside; the RadioButtons/PipsPager route (keep our own list) holds.
+  Panel.MeasureOverride / ArrangeOverride / Children / InternalChildren present.
+  FrameworkElement.Parent / TemplatedParent / FlowDirection / Focus present; UIElement.IsVisible / Visibility /
+    GotFocus / PreviewKeyDown present; UIElement.CapturePointer ABSENT (pointer capture is a different API).
+
+[G3] Does the collapse decision have what it needs? yes
+  A custom Panel used as ItemsPanel gets a CONSTRAINED width: lastAvailable=400 with the ItemsControl at 400, and
+  finalSize.Width=400 at arrange. measureCalls=1, arrangeCalls=1 after 20 frames - one pass, no measure loop, so
+  deciding "what fits" inside ArrangeOverride is safe here (unlike the PipsPager viewport clamp, which starved
+  itself because it measured the containers it was about to size - s1m [E].4).
+  The realized panel found its host on the FIRST Parent step ("via Parent[0]: ItemsControl") while
+  TemplatedParent read <null> - the same asymmetry the RadioButtons panel measured (s1l), reproduced.
+  Children realized by the framework's presenter are ContentPresenters at natural widths (27.47 / 27.17 / 37.07 /
+  29.73 / 25.87 / 19.30 for one-word items), so per-crumb widths are available at arrange time.
+
+[G4] The finding that changes the design: zero-rect arrange does not hide a sized child
+  Upstream hides a collapsed crumb with Arrange(new Rect(0,0,0,0)) and never touches Visibility
+  (BreadcrumbLayout.cpp:89-93). Copied literally onto this runtime, with four Borders of Width=100 Height=40 in a
+  250-wide panel (so the rule zero-rects the third and fourth):
+      child[0] Border actual=100x40 at=(0,0)      <- red
+      child[1] Border actual=100x40 at=(100,0)    <- lime
+      child[2] Border actual=100x40 at=(0,0)      <- blue,   zero-rected, still 100x40, now at the origin
+      child[3] Border actual=100x40 at=(0,0)      <- yellow, zero-rected, still 100x40, now at the origin
+      capture 250x40: red 0 px, lime 4000 px, blue 0 px, yellow 4000 px, black 2000 px
+  The arranged rect sets the OFFSET but not the extent: an element carrying its own Width/Height keeps that size
+  inside a 0x0 slot and stacks at the panel origin. The three "hidden" boxes all pile up at (0,0) and the
+  last-drawn one (yellow) is what paints there. So the histogram is exactly what an unhidden overlap looks like:
+  0..100 yellow, 100..200 lime, 200..250 nothing.
+  A width-less child behaves differently - in pass B the six TextBlock crumbs that were zero-rected did report
+  actual=0x0 - because with no local size the framework re-measured them into the zero slot. That is the case
+  upstream lives in (a crumb is a ContentPresenter sized to its content) and it is NOT the case a crumb with a
+  template's own MinWidth/Padding lands in.
+  Consequence for this layer: the collapse must go through Visibility=Collapsed (or by not realizing the crumb),
+  not through a zero rect. Recording it before writing the panel, because a zero-rect port would have produced a
+  bar whose hidden crumbs pile up under the visible first crumb - painted, hit-testable, and invisible only to
+  whoever reads ActualWidth.
+
+[G5] The replacement mechanism, measured the same way
+  Same four 100x40 solid Borders in a 250-wide panel, same rule (the third and fourth are hidden), only the
+  mechanism changes to Visibility=Collapsed:
+      child[0] Border actual=100x40 at=(0,0)
+      child[1] Border actual=100x40 at=(100,0)
+      child[2] Border actual=0x0    at=(0,0)
+      child[3] Border actual=0x0    at=(0,0)
+      capture 250x40: red 4000 px, lime 4000 px, blue 0 px, yellow 0 px, black 2000 px
+      histogram: FF0000x4000 00FF00x4000 000000x2000
+  Both the geometry read-back and the capture agree, which is the pair this branch requires: a mechanism is only a
+  hiding mechanism if the pixels say so too. So FluentBreadcrumbBar's collapse panel takes the same greedy
+  right-to-left fit and the same floor (ellipsis + last crumb always visible) as upstream's BreadcrumbLayout, and
+  implements the "shrink to nothing" of BreadcrumbLayout.cpp:89-93 as Collapsed.
+  What is deliberately NOT claimed: that a zero rect never hides anything. Pass B (six width-less TextBlock crumbs
+  inside a real ItemsControl) did read actual=0x0 after zero-rect arrange, so the upstream mechanism works for a
+  container that carries no size of its own. It is this layer's templates that put MinWidth/Padding on the crumb
+  root, and once they do, the zero rect stops being a hide. If a future change makes the crumb root size-free, the
+  question is open again - and pass C is the experiment that answers it.
+
+[G6] A ContentControl-derived own type does not expand its own template until it opts in
+  symptom: the behaviour tests read "No PART_ItemButton under FluentBreadcrumbBarItem" while the resource lookups
+  were all green. What the probe (spike/BreadcrumbProbe mode style) measured instead:
+      TryFindResource(DefaultBreadcrumbBarItemStyle) => Style
+      implicit style for FluentBreadcrumbBarItem     => Style
+      crumb.Style=<null> crumb.Template=ControlTemplate  template.LoadContent() => Grid, children=3
+      realized crumb's only visual child             => TextBlock 59.75x19.78
+  So the style is found, the Template property is set, the template itself materialises on demand - and the realized
+  control still paints its bare content. The missing line is ContentControl's protected UseTemplateContentManagement(),
+  which every ContentControl-derived own type in this layer already calls (FluentTabViewItem.cs:77, FluentInfoBar.cs:51,
+  FluentNavigationView.cs:53, FluentTeachingTip.cs:161), together with DefaultStyleKey = typeof(itself). With both,
+  the same crumb walks out as Grid 81.75x36 > {Button PART_ItemButton 63.75x36, PART_LastItemContentPresenter 0x0,
+  TextBlock PART_ChevronTextBlock 18x14}.
+  Why the obvious reading is wrong: the layer's ApplyDefaultStyle fallback (FluentDropDownButton/FluentRadioButtons)
+  never runs for these types, because "Style is already set" is true from the start - the framework's own
+  ContentControl default is in that slot. A fallback that keys off Style being null cannot see the difference
+  between "the application chose" and "nobody chose"; DefaultStyleKey is the only route that wins.
+
+[G7] A collapsed container leaves the items panel's Children, and the row must be judged against the bar's width
+  Two readings from mode narrow, both after the control looked correct at 600:
+      width=260 measured=225.25 (three of four crumbs) arranged=200 first=0
+      after switching the hide to Hidden: measured=307 arranged=200 against=260 first=2
+  (a) Visibility=Collapsed removes the container from Panel.Children, so the NEXT measure pass no longer sees the
+      crumb it just hid: the sum falls, "does it fit" flips to yes, and the row reports no overflow while the
+      crumb is still not arranged. Hidden keeps the element in Children and keeps its DesiredSize; the arrange walk
+      is what declines to give it a place. The ink claim is unchanged - the capture of a Hidden crumb holds 0 pixels
+      of its sentinel, which is the arm the A/B in the tests locks down.
+  (b) The fit cannot compare against finalSize.Width, because that number is the presenter's column, and the column
+      is what showing the ellipsis changes. It compares against the host bar's own width (FluentBreadcrumbBar.RowWidth),
+      which the app gave and nothing inside the control disturbs. The ellipsis's measured 60 DIP is then reserved out
+      of that width, and showing it invalidates measure once so the reservation uses a real number instead of the 0 a
+      collapsed element reports.

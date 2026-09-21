@@ -1,0 +1,121 @@
+<!-- WinUI 3 BreadcrumbBar.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob d7d0b16aae852dc792122bcfc1d788237f784209:
+     one item style (3-327) with three visual state groups and a nested button template of its own (169-259), the
+     bar style (328-338) whose whole template is an ItemsRepeater, and one implicit style per type (339).
+     Both types are own because 26.10.9 exports neither, nor the ItemsRepeater, StackLayout or Flyout the templates
+     lean on (spike/BreadcrumbProbe pass A). Row-by-row state mapping and every deviation:
+     docs/astra/audits/breadcrumb-bar.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- The nested button of BreadcrumbBar.xaml:169-259. Upstream writes its four reachable states onto
+       PART_ContentPresenter; on this runtime a ContentPresenter declares no Foreground, so the same four cells are
+       written on the button and reach the text through inheritance - the routing the gate in
+       AstraForegroundRoutingTests exists for. The Current* twins are left out: they belong to the last crumb, whose
+       button is collapsed, so no state change can reach them (the audit counts them as dead). -->
+  <Style x:Key="BreadcrumbBarItemInlineButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource BreadcrumbBarBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource BreadcrumbBarBorderBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarNormalForegroundBrush}" />
+    <Setter Property="Padding" Value="1,3" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="Button">
+      <Border Name="BackgroundRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+              BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Margin="{TemplateBinding Padding}" VerticalAlignment="Center" />
+      </Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarHoverForegroundBrush}" /></Trigger>
+        <Trigger Property="IsPressed" Value="True"><Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarPressedForegroundBrush}" /></Trigger>
+        <!-- Focus is its own state upstream (:232-241) and it reads a row of its own; it is written on the button
+             so the text inherits it, for the same reason as the three above. -->
+        <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarFocusForegroundBrush}" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarDisabledForegroundBrush}" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <Style x:Key="DefaultBreadcrumbBarItemStyle" TargetType="controls:FluentBreadcrumbBarItem">
+    <!-- Six of the fourteen setters at BreadcrumbBar.xaml:4-17. The eight that are not here: FocusVisualMargin and
+         UseSystemFocusVisuals (no such property on this runtime's element set), FontFamily, FontSize and FontWeight
+         (they alias ControlContentThemeFontFamily / ControlContentThemeFontSize / an x:FontWeight row, none of
+         which this layer publishes - see the held-out names in AstraBreadcrumbBarTests), CornerRadius (the item's
+         own chrome is transparent, so the radius is written where it paints - on the inline button above), plus
+         HorizontalAlignment=Stretch and IsTabStop=True, which are already this type's defaults. -->
+    <Setter Property="Background" Value="{ThemeResource BreadcrumbBarBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource BreadcrumbBarBorderBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarForegroundBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="controls:FluentBreadcrumbBarItem">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Button Name="PART_ItemButton" Grid.Column="0" Style="{StaticResource BreadcrumbBarItemInlineButtonStyle}"
+                Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                IsTabStop="False" />
+        <!-- BreadcrumbBar.xaml:285-300, the presenter the last crumb shows instead of the button. It is collapsed
+             in the resting markup because a crumb is not last until the bar says so. -->
+        <ContentPresenter Name="PART_LastItemContentPresenter" Grid.Column="0" Visibility="Collapsed"
+                          Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Margin="1,3" VerticalAlignment="Center" />
+        <!-- The separator. Its glyph is the value of BreadcrumbBarChevronLeftToRight (E974) written as a literal,
+             because x:String rows cannot be published here, and its size is BreadcrumbBarChevronFontSize's 12 for
+             the same reason. The RTL twin (E973) has no route at all: see the audit. -->
+        <TextBlock Name="PART_ChevronTextBlock" Grid.Column="1" Text="&#xE974;" FontFamily="Segoe Fluent Icons"
+                   FontSize="12" Padding="{ThemeResource BreadcrumbBarChevronPadding}"
+                   Foreground="{ThemeResource BreadcrumbBarNormalForegroundBrush}"
+                   VerticalAlignment="Center" HorizontalAlignment="Center" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <!-- InlineItemTypeStates/LastItem (BreadcrumbBar.xaml:87-95): button and chevron out, plain text in, and
+             the current-crumb foreground on the item so the text it hosts inherits it. -->
+        <Trigger Property="IsLastItem" Value="True">
+          <Setter TargetName="PART_ItemButton" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="PART_ChevronTextBlock" Property="Visibility" Value="Collapsed" />
+          <Setter TargetName="PART_LastItemContentPresenter" Property="Visibility" Value="Visible" />
+          <Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarCurrentNormalForegroundBrush}" />
+        </Trigger>
+        <Trigger Property="IsEnabled" Value="False">
+          <Setter Property="Foreground" Value="{ThemeResource BreadcrumbBarDisabledForegroundBrush}" />
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <Style TargetType="controls:FluentBreadcrumbBarItem" BasedOn="{StaticResource DefaultBreadcrumbBarItemStyle}" />
+
+  <!-- The bar itself. Upstream's whole template is one ItemsRepeater (BreadcrumbBar.xaml:331-337) whose synthetic
+       slot 0 is the ellipsis peer; here the crumbs are the runtime's own items pipeline in
+       FluentBreadcrumbPanel, and the ellipsis is a part of this template so the panel can reserve its width. -->
+  <Style x:Key="DefaultBreadcrumbBarStyle" TargetType="controls:FluentBreadcrumbBar">
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="Template"><ControlTemplate TargetType="controls:FluentBreadcrumbBar">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!-- SetPropertiesForEllipsisItem (BreadcrumbBarItem.cpp:137-148) puts an ordinary crumb in the Ellipsis
+             inline state, which shows the E712 glyph in place of the content and keeps the trailing chevron, so
+             both glyphs are inside one button here too. It starts collapsed: the panel only reveals it in the
+             pass where a crumb had to go. -->
+        <Button Name="PART_EllipsisButton" Grid.Column="0" Visibility="Collapsed" IsTabStop="False"
+                Style="{StaticResource BreadcrumbBarItemInlineButtonStyle}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="&#xE712;" FontFamily="Segoe Fluent Icons" Padding="3" VerticalAlignment="Center" />
+            <TextBlock Text="&#xE974;" FontFamily="Segoe Fluent Icons" FontSize="12"
+                       Padding="{ThemeResource BreadcrumbBarChevronPadding}" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
+        <ItemsPresenter Name="ItemsPresenter" Grid.Column="1" />
+      </Grid>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <Style TargetType="controls:FluentBreadcrumbBar" BasedOn="{StaticResource DefaultBreadcrumbBarStyle}" />
+</ResourceDictionary>

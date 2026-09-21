@@ -490,6 +490,19 @@
                   <TextBlock Text="Ten pages in a five-pip window: the row generates all ten pips and the viewport is clamped to what MaxVisiblePips allows, which is upstream's rule rather than a paging one. The arrows move a single page and disable themselves at the ends; a pip is chosen by clicking it, and the arrow keys only move focus. The readout is built from the control's own values, because this markup parser drops an attribute it does not recognise instead of rejecting it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Breadcrumb bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="BreadcrumbPushButton" Content="Push a level" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="BreadcrumbPopButton" Content="Pop one" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Slider x:Name="BreadcrumbWidthSlider" Minimum="160" Maximum="760" Value="760" Width="240" VerticalAlignment="Center" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentBreadcrumbBar x:Name="TrailBar" Width="760" HorizontalAlignment="Left" Margin="0,12,0,0" />
+                  <TextBlock x:Name="BreadcrumbReadout" Text="Four levels." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="The row keeps the last crumb and as many of the ones before it as fit, and everything that does not fit moves behind the ellipsis - so dragging the width slider collapses the head of the path and brings it back, which is upstream's rule read straight off its layout: the floor is the ellipsis and the last crumb, and crumbs are packed with no spacing. The last crumb is plain text rather than a button, so clicking it reports nothing, and the ellipsis reports nothing either: it only opens its list." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="SurfacesPage">
