@@ -934,7 +934,13 @@ InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
   我们钉在 26.10.9 并有运行时断言，删除即编译失败（单文件），行为退化即测试失败。
 - 不声称跟随系统"减弱动画"设置：Windows 侧无 API。
 - 不声称逐位一致的上屏合成：RTB 离屏与上屏一致性未证。
-- 不声称 `Symbol` 全 764 码点可用：需逐个 cmap 命中验证。
+- `Symbol` 的 764 个成员已逐个查过 cmap（`spike/SymbolCmap/sweep.py`，原始读数 `adaptation/s2-symbol-cmap-raw.txt`）：
+  **729** 个不同码点、**35** 处两个名字共用同一码点（`Settings`/`Setting`、`Find`/`Search`、`FavoriteStar`/`Favorite`…）、
+  **0** 个落在 PUA 之外；Segoe Fluent Icons 命中 **762/764**（缺 `AlarmClock` U+E919、`ScreenCapture` U+E7A0），
+  Segoe MDL2 Assets 命中 **755/764**（另 7 个只在这条字体上缺）。
+  仍不声称两件事：这份表读的是兄弟源码树 `Jalium.UI.Controls/Symbol.cs`，**与钉住的 26.10.9 程序集是否逐字一致还没对账**
+  （成员数 764 与普查表记的相同，成员集合未 diff）；"码点在 cmap 里"只证明字形存在，
+  不证明形状是 Fluent 风格，也不证明它进得了本基座的任何捕获通路（§S1-r 第 3 条 / #50）。
 - 不声称液态玻璃/折射是 Fluent 的一部分。
 - 不声称 Button 状态已完成：`PointerOver` 除"触发器带的是上游键名"这层结构证据外，多了一次真指针像素
   （`SetCursorPos` → 悬停哨兵色 8296 px），但它依赖物理鼠标、被人同时用鼠标打断过，**不在闸口里**；
@@ -1734,3 +1740,49 @@ HC 101 映射 + 上游三行因调色板无对应而按住），`Report-AstraRes
 HighContrast 的两条别名重指向没进 `ThemeResources/HighContrast.map`（与 ProgressBar/ProgressRing/PipsPager 同账）；
 无 AutomationPeer（上游也没有）、无 `Severity` 枚举、`DisplayKind` 是本层加的可写属性而上游藏在 C++ 里；
 硬件输入零。
+
+**阶段 6 第四段补（结清 #35：宿主窗口是线程亲和的持久状态，判据修在 harness 侧，2026-09-21）**：
+上一段末尾那句"那是下一段第一件事"兑现了。成因、探针逐字读数与修法全文在
+`adaptation/06-pixel-attribution.md` 的"宿主窗口是谁给的"一节，这里只记结论加四类证据。
+
+一句话成因：`ContentDialog` 解析宿主时**先问 Win32 要调用线程的 active 窗口**，要不到才回退
+`Application.MainWindow`；本仓库的测试宿主从来不走 `app.Run(window)`，而 `Window.Show()` 自己不写
+`MainWindow`，所以第二条通路在我们的进程里**永远断着**，每个对话框都吊在第一步。更要紧的是 active 会因
+**别的窗口关闭**变成 0 并且一直 0 下去（探针 B 读：`neighbour closed: active=0 … dialog threw: ContentDialog
+could not resolve a host window.`）。于是"单跑一类全绿、整套顺序跑从某一格起整类红"挂了三个阶段的东西
+根本不是竞态，是一条**线程亲和的持久状态**——顺序跑里任何一次开合窗口（弹层自己的顶层窗口首当其冲）
+都能永久制造它。
+
+修法落在判据侧，产品代码一行未改：`PixelHarness.EnsureHost` 建宿主窗口时，`Application.Current.MainWindow`
+为 null 就把它指过去（只在 null 时；别的地方命名过就不动）。
+
+四类证据分开记：
+1. 构建：`dotnet build FluentJalium.slnx -c Debug -t:Rebuild` → **0 警告 / 0 错误 / 7.94 s**。特意重编而不是
+   沿用闸口里那次 2.87 s 的 up-to-date 构建，并按三个输出 DLL 的 mtime（00:02:59 / 00:03:01 / 00:03:02）
+   确认真的重新产出过——增量空跑里的"0 警告"不算证据。
+2. 行为：新增 `AstraContentDialogTests.The_dialog_resolves_the_host_the_harness_names`，整套 1330 → **1331**。
+   **A/B**：只加测试、不加 harness 那三行 → 该条红（`Assert.Same()` 读回 null）；加上 → `AstraContentDialogTests`
+   整类 **39/39 绿**（补跑一次实测：39 条 / 37 s），整套里 `could not resolve a host window.` 一句**不再出现**。
+   中间态按原样记，不藏：第一版回归测试照探针的样子在测试内部再开一个邻居窗口然后关掉，ContentDialog 是绿了，
+   可整套红从 20 涨到 **30 条、散在 15 个类**（一片 `No part named SuggestionsContainer` /
+   `PART_DropDownItemsHost`、几张 `capture never settled: #000000x7920` 空屏）——**在同一根共享 UI 线程上关一个
+   窗口会毒掉之后所有依赖覆盖层的断言**，探针里那句 `active=0` 影响面比对话框大得多。复现因此退回一次性探针
+   进程，测试只做不变式读回，注释里写明不许在这条通路上开合窗口。
+3. 视觉：本段**没有任何像素主张**，也没重跑视觉测试——改的是测试宿主，不是任何控件的样式或模板。
+   上一段那两条负面读数（文本与字形墨到不了任何捕获通路）不受影响，仍是 #50。
+4. 硬件输入：**仍为零**，本段没碰输入通路。
+
+**闸口读数（串行 `tools/Test-AstraGates.ps1`，全绿一次，管道退出 0）**：`已通过! - 失败: 0，通过: 1331，
+已跳过: 0，总计: 1331，持续时间: 5 m 23 s`；`Sync-AstraPalette.ps1 -Check` 三档 `checked=True`（Light/Dark 各
+83 源色 101 刷，HC 101 映射 + 上游三行因调色板无对应而按住）；`Report-AstraResourceKeys.ps1 -Check` 报
+`keys.md is current: 1280 canonical lines.`；末行 `All Astra gates passed.`。
+**这是阶段 6 开工以来第一次整套全绿**，上一段"这套闸口当前不是全绿"那句读数因此被本段取代（原文按段保留，
+不删）。上一段那条非对话框族的红 `AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach`
+在同一次全绿里也绿了：它同属"弹层要一个活宿主"这张因果图，但**本段没有单独证这条的因果**，只记"它不再红"。
+#47（子菜单 `IsSubmenuOpen` 读回）与 #48（NavigationView 选中指示器像素增量）同样在这条绿跑里没复发，
+仍然挂着——**一次不红不等于一次证清**。
+
+仍欠：解析顺序是"先 active 后 MainWindow"，所以"active 恰好是别人的窗口"那一格本段没治（探针 A 读里那次
+"邻居活着时开对话框"其实把对话框开进了**邻居**窗口）；harness 只有长期唯一宿主，正常路径碰不到，但弹层还开着
+时建对话框仍可能挂到弹层的顶层窗口上，这条留在 #35 的账下继续观察。另：`Symbol` 成员集合与钉住的 26.10.9
+程序集仍未逐字 diff（#37）。

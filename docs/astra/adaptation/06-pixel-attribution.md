@@ -223,6 +223,59 @@ Debug 0 警告 0 错误、**1288/1288、0 失败、0 跳过**（5 m 28 s）、�
 （多个窗口与多个 DX12 设备并存）时出现过；#35 / #47 / #48 因此都还开着。这次真正的收获是：
 下次再红，红字会自己说是哪一种（轮数与毫秒都会写在消息里）。
 
+## 宿主窗口是谁给的：ContentDialog 整类失效的成因（阶段 6 第四段补，2026-09-21）
+
+#35 从阶段 3 挂到现在，形状一直是"单跑全绿、整套顺序跑从某一格起整类抛
+`ContentDialog could not resolve a host window.`"。这次不再猜时机，去量**这个进程里到底谁算宿主窗口**。
+
+先说清楚证据的分量：解析顺序是从兄弟源码树读来的（`Jalium.UI.Controls/ContentDialog.cs:786-798` →
+`DialogOwnerResolver.ResolveWindow`：先 Win32 `GetActiveWindow()`，再 `Application.Current.MainWindow`），
+而兄弟树**可能比钉住的 26.10.9 新**，所以那句话只算线索，结论一律以 26.10.9 上的实测为准。
+`spike/HostWindowProbe` 一个进程四次读数，逐字如下：
+
+```text
+A  host shown, MainWindow unassigned: host=0x1CA15FC active=0x1CA15FC foreground=0x2871238 app.MainWindow=null
+   dialog opened: Visibility=Visible
+   neighbour shown: neighbour=0x1A910D8 active=0x1A910D8 app.MainWindow=null
+   dialog opened: Visibility=Visible
+B  neighbour closed: active=0 foreground=0x2871238 app.MainWindow=null
+   dialog threw: InvalidOperationException: ContentDialog could not resolve a host window.
+C  app.MainWindow = host: active=0 app.MainWindow=Probe host
+   dialog opened: Visibility=Visible
+```
+
+三件事一次量清：
+
+1. `Window.Show()` **不会**把窗口写成 `Application.MainWindow`（A/B 两读都是 null；源码里那条赋值只出现在
+   `Application.Run` 与 `JaliumApp` 的启动路径上）。本仓库的测试宿主从来不用 `app.Run(window)`，
+   所以框架那条回退通路在我们的进程里**永远是断的**，每个对话框都吊在第一步上。
+2. 线程的 active 窗口**会因为"另一个窗口关闭"而归零**（B 读），归零之后对话框直接抛——
+   顺序跑里任何一处开合窗口（弹层自己的顶层 `PopupWindow` 首当其冲）都能制造这个状态，
+   而且它是**线程亲和的持久状态**：一旦归零，之后每一个对话框都失败，直到有窗口重新拿到激活。
+   这就是"整类从某一格起全红"的机制，也是为什么单跑这一类永远是绿的。
+3. 把宿主窗口写成 `Application.MainWindow` 之后，active 仍是 0 而对话框照样打开（C 读）——
+   回退通路一旦可用，判据就不再依赖前台激活这种本不该由测试赌的东西。
+
+修法落在判据侧而不是产品侧：`tests/FluentJalium.Tests/Pixel/PixelHarness.cs` 建宿主窗口时，
+若 `Application.Current.MainWindow` 为 null 就把它指过去（只在 null 时，别的地方命名过就不动）。
+回归测试是 `AstraContentDialogTests.The_dialog_resolves_the_host_the_harness_names`
+（读回 `Application.Current.MainWindow` 就是 harness 那一个宿主窗口，并真的开一次对话框）。
+**A/B**：只加测试不改 harness → 红（`Assert.Same()` 不同实例，MainWindow 是 null）；改 harness →
+ContentDialog 整类 **39/39 绿**，整套里 `ContentDialog could not resolve a host window.` 这句**一条也不剩**。
+
+这一段同时踩到一个**新判据坑**，按原样记下来比藏掉值钱：第一版回归测试照探针的样子在测试里开一个邻居窗口再关掉，
+ContentDialog 整类照样绿，可整套跑的红从 20 涨到 **30 条、散在 15 个类**，错因换成一片
+`No part named SuggestionsContainer` / `PART_DropDownItemsHost` / `the open dropdown never reached the overlay layer`
+外加几张 `capture never settled: #000000x7920` 的空屏。也就是说**在同一根共享 UI 线程上关一个窗口，
+会把之后所有依赖覆盖层的断言一起毒掉**——探针里那句 `active=0` 不是只影响对话框。
+复现因此留在探针（一次性进程）里，测试只做不变式检查，注释里写明不许再在这条通路上开合窗口。
+
+仍要留一条**未证**：解析顺序是先 active 后 MainWindow，所以"active 恰好是别人的窗口"这一格本段没有治——
+B 之前那次"邻居活着时开对话框"其实把对话框开进了**邻居**窗口（active 就是它），
+而 harness 只有长期唯一宿主，正常路径碰不到；若某个类在弹层还开着的时候建对话框，它可能挂到弹层的顶层窗口上。
+`AstraAppBarTests.The_open_bar_shows_its_overflow_...`（`popupOpened` 读回假）与 #47 / #48 都在这一带的
+同一张因果图上，本段没有把它们结清，只是少了一个会持续污染整类的假红来源。
+
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——

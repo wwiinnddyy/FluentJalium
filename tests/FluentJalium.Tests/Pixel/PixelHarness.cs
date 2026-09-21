@@ -237,6 +237,16 @@ internal static class PixelHarness
         };
         window.Show();
         Pump(8);
+        // The framework resolves a ContentDialog's host from the calling thread's Win32 active window and only
+        // then from Application.MainWindow, and closing whatever window held activation leaves that handle at 0
+        // (spike/HostWindowProbe). A test run opens and closes surfaces - popups among them - so without this
+        // assignment every later dialog in the process throws "could not resolve a host window", which is what
+        // #35 met as a whole class failing mid-suite. Only when null: a window the suite names stays named.
+        if (Application.Current is { } application && application.MainWindow is null)
+        {
+            application.MainWindow = window;
+        }
+
         _host = window;
         return window;
     }

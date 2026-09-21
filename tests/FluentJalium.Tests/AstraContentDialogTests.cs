@@ -576,6 +576,39 @@ public sealed class AstraContentDialogTests : IDisposable
         });
     }
 
+    [Fact]
+    public void The_dialog_resolves_the_host_the_harness_names()
+    {
+        // spike/HostWindowProbe measured the order the framework resolves a dialog's host in: the calling
+        // thread's Win32 active window first, Application.MainWindow only as the fallback - and closing the
+        // window that held activation leaves the active handle at 0, which is how #35 took out this whole class
+        // part-way through a sequential run ("could not resolve a host window"). The probe reproduces it; this
+        // test guards the fix: the harness names its one long-lived window as the application's main window, so
+        // resolution does not depend on who is in the foreground.
+        //
+        // Deliberately no second window here. Showing and closing one inside the shared UI thread is exactly the
+        // state change that poisons every later overlay assertion in the process - a run that did measured 30
+        // failures across 15 classes instead of the 20 it was chasing.
+        _fixture.Run(() =>
+        {
+            var host = PixelHarness.HostWindow();
+            Assert.Same(host, Application.Current!.MainWindow);
+
+            var dialog = new ContentDialog { Title = "T", Content = "C", PrimaryButtonText = "OK" };
+            dialog.ShowAsync();
+            PixelHarness.Settle();
+            try
+            {
+                Assert.Equal(Visibility.Visible, dialog.Visibility);
+            }
+            finally
+            {
+                dialog.Hide();
+                PixelHarness.Settle(8);
+            }
+        });
+    }
+
     /// <summary>
     /// Opens a dialog for real. The control hosts it in the window's own overlay layer, so nothing here places
     /// it; callers that mutate it must still close it, and a fact that clicks a button does not need to.
