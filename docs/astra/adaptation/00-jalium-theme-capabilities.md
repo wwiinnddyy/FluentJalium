@@ -1748,3 +1748,35 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 5. **`ItemContainerGenerator` 一面都没有**（[G2]）。`ItemsControl.ContainerFromItem` 不存在，所以条目到容器
    的反查只能由控件自己记账（`FluentRadioButtons`/`FluentPipsPager`/`FluentBreadcrumbBar` 三处同一条），
    测试与自动化也只能走这个清单。这条是"面板 vs 宿主"分工的实际边界：面板能决定可见集合，宿主才能知道集合是谁。
+
+## S1-o：一条"能换模板"的结论里，几何归宿主、尺寸归包裹层——进度条量出的六条账（阶段 6 第一段，2026-09-21）
+
+`spike/ProgressProbe`（mode `census`/`mount`/`retemplate`/`anim`/`later`/`alias`/`axis`，读数转录在 `s1o-progress-raw.txt`）。
+这一段是 ProgressBar 选型的输入，但六条性质都是跨控件的。
+
+1. **模板部件名可以是几何契约**。宿主自己的 `ProgressBar` 模板里就叫 `PART_Track` / `PART_Indicator`，而它按
+   Value 比例改写 `PART_Indicator` 的宽度（300 宽、25% 量到 75，100% 量到 300）。换上我们的模板只要沿用这两个
+   名字，比例行为就跟着来；三条声明式替代路线都不等价：`Width="{TemplateBinding Value}"` 量到的是"值的 DIP"
+   （25% → 25 而不是 75），固定宽度不动，`PART_GlowRect`/`PART_Decorator` 这些别的名宿主根本不查。
+2. **宿主会改写部件身上的本地值**：标记里给 `PART_Indicator` 写的 `Height=4` 被读回成 `NaN` +
+   `VerticalAlignment=Stretch`，于是指示器填满控件整个 40 DIP 盒子。把尺寸写在**包裹层**（`Band`，
+   `Height="{TemplateBinding MinHeight}"`）上，指示器在里面拉伸，就同时拿到 3 DIP 带形与比例宽度。这条与
+   S0-n/S1-n 那张"框架本地值"账是同一类，但它落在模板部件上而不是控件属性上。
+3. **一条 Color 值进 Brush 属性是整条写入消失**。`ProgressBar_themeresources.xaml:9` 把 `ProgressBarBackground`
+   指到 `ControlStrongStrokeColorDefault`，而这在本 palette 里是 Color 行。mode `alias` 量到：setter 值解析成
+   Color 再落到 `Border.Background` 时读回 `null`（不抛、不警告、不画），换成孪生刷子名 `...DefaultBrush` 就正常。
+   因此本层保留上游**名字**、改吃它的刷子目标，并把这条钉成断言。同段另一条正向读数：`CornerRadius` 与
+   `Thickness` 行都会落到属性（读到 `4,4,4,4`）。
+4. **动画路由按 DP 类型分岔**。`RepeatBehavior.Forever` 的 `DoubleAnimation` 挂在元素自己的 double DP 上会走
+   （`Width` 20→46→92、`Canvas.Left` 0→42→87、`Opacity` 也在动），挂在**Freezable 变换**上永远不动
+   （`TranslateTransform.X` 与 `RotateTransform.Angle` 三个采样点全为 0）——而上游的不定进度条与进度环恰好全靠
+   `(UIElement.RenderTransform).(CompositeTransform.TranslateX)` 这类路径。另外两条：markup 里的 `Storyboard`
+   水合出来 `Children` 是空的（attached-property 路径与 `TargetName`+`TargetProperty="Angle"` 两种写法一样），
+   以及 `BeginAnimation` 对**类型不匹配**的 DP（`RenderTransformProperty`、`MarginProperty` 上挂 DoubleAnimation）
+   照收不误且什么都不做——第一轮探针就是被这条骗了一次，"能挂上"不等于"会动"。
+5. **`<x:Double>` 行在这个 reader 里是解析错误，不是静默丢弃**：`Cannot resolve type 'Double' in namespace
+   'http://schemas.microsoft.com/winfx/2006/xaml'`。所以 S1-m 那批"x:Double 读不了"的度量行在 markup 里连写都不
+   能写，只能变模板字面量或控件属性（本段的 3 DIP 带、1 DIP 轨即如此）。
+6. **Trigger 的 setter 里 `{TemplateBinding}` 是真会解析的**，把 `MinHeight` 改成 7 后两个轴向的带子都变成 7；
+   `"Auto"` 与 `"NaN"` 两种写法都能落到"未设置"哨兵。这条给"一个模板同时服务两个朝向"留了声明式通路，
+   不必回到代码里改写部件。

@@ -12,6 +12,7 @@
     { "id": "selection", "title": "Selection", "host": "SelectionPage" },
     { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
     { "id": "surfaces", "title": "Surfaces", "host": "SurfacesPage" },
+    { "id": "status", "title": "Status", "host": "StatusPage" },
     { "id": "menus", "title": "Menus", "host": "MenusPage" },
     { "id": "command-bar", "title": "Command bar", "host": "CommandBarPage" },
     { "id": "settings", "title": "Settings", "host": "SettingsPage" }
@@ -552,6 +553,25 @@
         "Upstream builds the selected tab's outline in code from TabViewItemTemplateSettings.TabGeometry; TopCornerRadius here is the item's own read-only row over the same value the TopCornerRadiusFilterConverter produces.",
         "No ToolTipTitle/ToolTipText rows and no TabViewTemplateSettings surface; a long header trims to an ellipsis at the 240 DIP maximum.",
         "No automation peer of its own: the tab is a HeaderedContentControl, so an inspector sees a text control rather than a SelectionItem, and this runtime cannot synthesize a KeyEventArgs to prove the keyboard path end to end (spike/TabViewProbe section C)."
+      ]
+    },
+    {
+      "markup": "ProgressBar",
+      "source": "Styles/ProgressBar.jalxaml",
+      "page": "status",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/progress-bar.md",
+        "tests/FluentJalium.Tests/AstraProgressBarTests.cs",
+        "docs/astra/adaptation/s1o-progress-raw.txt"
+      ],
+      "gaps": [
+        "the indeterminate bar is a still picture: spike/ProgressProbe mode F measured that a repeating animation on TranslateTransform.XProperty and on RotateTransform.AngleProperty never advances on 26.10.9 while Width and Canvas.Left do, and a Storyboard read out of markup hydrates with zero children - so upstream's two-bar slide has no declarative route and no animator is wired for it",
+        "ShowError and ShowPaused do not exist on the host's ProgressBar, so upstream's Error and Paused states - and the two foreground rows they read - are not published at all",
+        "there is no ProgressBarTemplateSettings here, so TemplateSettings.ClipRect and IndicatorLengthDelta (ProgressBar.cpp:195, :246) are dropped rather than faked: no clip layer, no reposition rebound on the Updating-to-Determinate transition",
+        "the 3 DIP band and the 1 DIP rail are literals in the template: ProgressBarMinHeight and ProgressBarTrackHeight are x:Double rows this markup reader rejects outright, not silently drops",
+        "upstream declares no Orientation at all, so the vertical band this layer honours is a host extra, asserted as geometry and not as parity",
+        "no pointer or touch evidence: the bar takes no input, so nothing on this page is claimed as an interaction path"
       ]
     }
   ]

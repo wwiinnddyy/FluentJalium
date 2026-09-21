@@ -43,6 +43,7 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
             [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
             [(FluentNavigationItem)SurfacesItem!] = (FrameworkElement)SurfacesPage!,
+            [(FluentNavigationItem)StatusItem!] = (FrameworkElement)StatusPage!,
             [(FluentNavigationItem)MenusItem!] = (FrameworkElement)MenusPage!,
             [(FluentNavigationItem)CommandBarItem!] = (FrameworkElement)CommandBarPage!,
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
@@ -53,6 +54,7 @@ public partial class MainWindow : Window
         _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
         _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
         _pageIds[(FluentNavigationItem)SurfacesItem!] = "surfaces";
+        _pageIds[(FluentNavigationItem)StatusItem!] = "status";
         _pageIds[(FluentNavigationItem)MenusItem!] = "menus";
         _pageIds[(FluentNavigationItem)CommandBarItem!] = "command-bar";
         _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
@@ -65,6 +67,7 @@ public partial class MainWindow : Window
         WireInputs();
         WireSelection();
         WireSurfaces();
+        WireStatus();
         WireMenus();
         WireCommandBar();
         WireAppearance();
@@ -183,6 +186,38 @@ public partial class MainWindow : Window
             ((TextBlock)CommandBarReadout!).Text = "Check cleared: the accent fill left with it.";
         };
     }
+
+    private void WireStatus()
+    {
+        var bar = (ProgressBar)SampleProgressBar!;
+        ((Slider)ProgressValueSlider!).ValueChanged += (_, args) =>
+        {
+            if (bar.IsIndeterminate)
+            {
+                return;
+            }
+
+            bar.Value = args.NewValue;
+            ReportProgress(bar);
+        };
+
+        var indeterminate = (CheckBox)IndeterminateCheck!;
+        void Changed(object sender, RoutedEventArgs args)
+        {
+            bar.IsIndeterminate = indeterminate.IsChecked == true;
+            ReportProgress(bar);
+            Report(bar.IsIndeterminate ? "Progress: indeterminate." : "Progress: determinate.");
+        }
+
+        indeterminate.Checked += Changed;
+        indeterminate.Unchecked += Changed;
+        ReportProgress(bar);
+    }
+
+    private void ReportProgress(ProgressBar bar) =>
+        ((TextBlock)ProgressReadout!).Text = bar.IsIndeterminate
+            ? "Indeterminate: a third of the row, and it stays put."
+            : $"{bar.Value:0} of {bar.Maximum:0}.";
 
     private void WireMenus()
     {

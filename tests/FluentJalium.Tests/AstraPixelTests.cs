@@ -148,9 +148,9 @@ public sealed class AstraPixelTests
     {
         // Retrained claim: the 954 px of #207245 recorded for an unstyled Slider in
         // docs/astra/adaptation/02-render-ceiling.md came from the old un-framed capture and does not
-        // reproduce. The ProgressBar still has no Astra style, so what is on screen for it is the
-        // framework's own default; the Slider is ours now (AstraSliderTests owns its positive pixel
-        // claim), and this test is the regression that neither one emits the frozen brand.
+        // reproduce. The Slider and the ProgressBar are both ours now (AstraSliderTests and
+        // AstraProgressBarTests own their positive pixel claims), so this is the regression that neither
+        // the templated bar nor the templated slider emits the frozen brand the framework draws by default.
         // The IL reading that the drawing code consults ThemeColors is untouched by this.
         _fixture.Run(() =>
         {

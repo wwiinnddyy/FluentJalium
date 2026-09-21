@@ -31,6 +31,9 @@
         <fluent:FluentNavigationItem x:Name="SurfacesItem" Content="Surfaces" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Calendar" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="StatusItem" Content="Status" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Info" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
         <fluent:FluentNavigationItem x:Name="CommandBarItem" Content="Command bar" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="List" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
@@ -587,6 +590,22 @@
                     </Border>
                   </WrapPanel>
                   <TextBlock Text="CardBorderStyle carries the recipe: the default fill, the stroke row at 1 DIP, ControlCornerRadius and 16 DIP of padding. Upstream's sample card rounds at 8 and its tiles at 4; this page keeps 4 on its section containers, so the corner claim is deliberately the tile row rather than the CardPage row." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="StatusPage">
+              <TextBlock Text="Status" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="State the user reads but does not operate. The bar below is the framework's own control wearing our template; what follows on this page will be the types this runtime does not have at all." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Progress bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Slider x:Name="ProgressValueSlider" Minimum="0" Maximum="100" Value="40" Width="280" HorizontalAlignment="Left" />
+                  <ProgressBar x:Name="SampleProgressBar" Value="40" Margin="0,12,0,0" />
+                  <ProgressBar x:Name="VerticalProgressBar" Orientation="Vertical" Height="60" Value="60" Margin="0,12,0,0" HorizontalAlignment="Left" />
+                  <CheckBox x:Name="IndeterminateCheck" Content="Indeterminate" Margin="0,12,0,0" />
+                  <TextBlock x:Name="ProgressReadout" Text="40 of 100." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="The filled bar is three DIP tall and the rail behind it one, which is upstream's own geometry; dragging the slider moves the end of the fill because the control sizes that part and the template only hands it a band to land in. Checking indeterminate is honest about this runtime: the block stops moving, because the slide upstream animates has no route here." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
             </StackPanel>

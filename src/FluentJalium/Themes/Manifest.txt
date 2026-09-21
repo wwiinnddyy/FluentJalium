@@ -35,6 +35,7 @@ ThemeResources/DataGrid.jalxaml
 ThemeResources/NavigationView.jalxaml
 ThemeResources/PipsPager.jalxaml
 ThemeResources/BreadcrumbBar.jalxaml
+ThemeResources/ProgressBar.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -65,3 +66,6 @@ Styles/TreeDataGrid.jalxaml
 # The breadcrumb bar: its crumb row is a panel of its own, so this file carries the item style, the nested button
 # style the item and the ellipsis share, and the bar style that hosts both.
 Styles/BreadcrumbBar.jalxaml
+# The progress bar: the host's own control keeps the geometry (it sizes PART_Indicator against Value), so this file
+# only carries the band that geometry has to land in - one style, no own type.
+Styles/ProgressBar.jalxaml

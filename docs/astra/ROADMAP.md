@@ -1417,3 +1417,65 @@ S1-m 量到"能继承"不等于"该继承"，这一段就是那个判据的正�
 仍欠：省略号下拉条目的"关闭后发事件"顺序没测；下拉不吃应用的 `ItemTemplate`（只 `ToString()`）；
 `LandmarkType`/`AccessibilityView`/`IsTemplateFocusTarget` 运行时没有对应属性；RTL 箭头无路径；
 高对比那三行整组没实现（含 1→2 的描边宽度）；字号三连 token 本层根本没有，条目文字继承运行时默认值。
+
+## 阶段 6 第一段：ProgressBar 落地——比例是部件名契约，尺寸只能交给包裹层（2026-09-21）
+
+阶段 6 起手的第一件事是改掉一条旧主张：`adaptation/02-render-ceiling.md` 给未换模板的 Slider 记过 954 像素的
+`#207245` 品牌绿，而那条捕获从来没有渲染帧。本轮把 `ProgressBar` 接进本层时，顺手在 `AstraPixelTests` 里
+把那条注释改成"两套声明都由各自的控件用例接管"，并留下"未上屏的捕获里没有绿、也没有任何别的东西"这一句。
+
+基型选择没有翻案：运行时里 `ProgressBar` 是公开原生类型、`Orientation` 是它的公开属性，因此走原生重模板。
+真正改变计划的是 `spike/ProgressProbe` 的七个模式（`census|mount|retemplate|anim|later|alias|axis`）——
+它量出"能不能换模板"在这一层不是一句话，而是**同一模板内部要逐条判**（`adaptation/00` §S1-o）：
+
+1. **部件名可以是几何契约**。宿主会按 `Value` 比例改宽 `PART_Indicator`（300 宽的条，25/50/75/100 →
+   75/150/225/300），而 `{TemplateBinding Value}` 给的是 DIP 不是比例；`PART_GlowRect`、`PART_Decorator`
+   这些上游名字**从来没被读过**。所以本层的比例不是算出来的，是让宿主继续算——我们只负责把它算出的东西放进能看的带子里。
+2. **宿主把本地值写在部件身上**。模板里给 `PART_Indicator` 写 `Height=4`，读回来是 `NaN` + `VerticalAlignment=Stretch`：
+   那条值被宿主覆盖了。尺寸只能搬到包裹层（`Band`），搬完仍然是 3 DIP 的带 + 随 Value 伸缩的宽。
+   这条推翻了"照抄上游模板结构就行"——上游那份是 5 层嵌套的宿主驱动，抄结构等于抄一个被覆盖的槽位。
+3. **`Color` 值别名递到 `Brush` 属性是静默消失**。`Background` 读回 `null`，不报错、构建绿；
+   刷子的孪生键正常。于是 `ProgressBarBackground` 保留上游键名但指向 `ControlStrongStrokeColorDefaultBrush`。
+   `CornerRadius`/`Thickness` 那两类行是落得进去的（读回 `4,4,4,4`），所以"静默"是值类型的问题，不是行类型的问题。
+4. **动画通路量死在一半**。重复的 `DoubleAnimation` 在元素级 double 依赖属性上会走表（`Width`、`Canvas.Left`、`Opacity`），
+   在 Freezable 变换上**永不走表**（`TranslateTransform.X`、`RotateTransform.Angle` 三帧全 0）；
+   markup 里的 `Storyboard` 实例化出来是**零子元素**（attached-property 与 `TargetName`/`TargetProperty` 两种写法都是）；
+   `BeginAnimation` 接受**类型不匹配**的依赖属性并且什么都不做。
+   后果直接落在计划上：不确定态在这一层做不出来，`IsIndeterminate` 只能是一张静图（用例名就这么叫），
+   而下一段 ProgressRing 的旋转不能走变换，得走 `Width`/`Canvas.Left` 或代码环。
+5. `<x:Double x:Key>` 在这份读取器里是**硬解析错误**（`Cannot resolve type 'Double'`），不是静默丢——
+   上游那几枚数值行因此扣住，`ProgressRingStrokeThickness` 更上游就是死码。
+6. `Trigger` setter 里的 `{TemplateBinding}` **会解析**（`MinHeight=7` 两轴都成 7），且 `"Auto"` 与 `"NaN"` 都落到未设置哨兵。
+   竖向那条触发器因此能写 `{TemplateBinding MinHeight}` 而不是抄一个常量。
+
+另外量到宿主的不确定态默认模板本身：indeterminate 时它是一个 `CornerRadius=999` 的胶囊铺满整框（50% 处 5704 支色像素），
+宿主指标不随帧变化（额外 2 帧与 40 帧后同一个 90x40 块）——所以"沿用宿主模板"在这条控件上等于"交出一个铺满的胶囊"，
+这是本层必须自带模板的实测理由，不是审美选择。
+
+键账：上游 `ProgressBar_themeresources.xaml` 10 行，本层发布 **6**、扣住 **4**。
+四枚扣住的都在用例里反向钉住（`Resource(...)` 取不到），发布的六枚逐字照抄上游键名，
+其中 `ProgressBarBorderThemeThickness`/`ProgressBarCornerRadius`/`ProgressBarTrackCornerRadius` 三枚真的被模板读到，
+第二类的"写了没人读"由 `Transcribed_control_rows_are_read_by_a_template` 那条闸口看着（本轮给它加了 `Styles/ProgressBar.jalxaml` 一行）。
+
+四类证据分开记：
+1. 构建：串行闸口内 Debug **0 警告 / 0 错误**（真重编）；`Manifest.txt` 55→**57** 份字典。
+2. 行为：新增 `AstraProgressBarTests` 35 条（`[Theory]` 把 25/50/75/100 的比例逐档读回、宿主持有指示器尺寸所以带子必须自己扛、
+   上游九条 setter、竖向触发器换轴、`MinHeight` 两轴同大小、不确定态是静图、
+   上游点名颜色的那行在本层是刷子（`Assert.Same` 指着 `ControlStrongStrokeColorDefaultBrush`）、6 发布 + 4 扣住键）。
+   **A/B 有牙**：把模板里的 `Name="PART_Indicator"` 改名为 `Indicator` → **11 红 / 24 绿**（先断言改名落地再看结果，随后还原，
+   还原后 `Name="PART_Indicator"` 计数回到 1）。这条 A/B 就是上面第 1 点的证据：名字本身就是契约。
+3. 视觉：`The_band_paints_across_the_row_and_never_the_whole_box` 白底卡片直方图，主张带子墨量在 `200~1500` 之间
+   （宿主自己的模板在同一个主题下是 5704 像素的满框胶囊，所以这条不是"随便取个区间"而是把两套模板分开）；
+   品牌绿 `#207245` 为 0 像素；`Light_and_dark_hand_over_different_rail_brushes` 断两种主题的铁轨刷子不同。
+   Gallery 冒烟：新增第 10 页 Status（进度条 + 竖向条 + 不确定态勾选 + 读数），进程 10.5 s 干净退出——
+   **本轮故意不截图**，因为没有上屏帧可读，所以这一页只主张"markup 入树且启动不崩"。
+4. 硬件输入：**仍为零**。hover/press 没有分支可量（这条控件不吃指针），真指针拖 `Slider` 改值未量（任务 #13）。
+
+**闸口读数（第一段，串行 `tools/Test-AstraGates.ps1`，跑一遍）**：**exit 0** 一次通过——Debug **0 警告 / 0 错误**；
+整套 **1244/1244 通过、0 失败、0 跳过**（5 m 16 s）；调色板三行 `checked=True`；清单
+`keys.md is current: 1252 canonical lines.`；`All Astra gates passed.`
+
+仍欠：不确定态没有动画（通路被 S1-o 第 4 条量死，要么走 `Width`/`Canvas.Left` 要么等代码环，ProgressRing 那台动画器会一并结这条）；
+上游 Error/Paused 两个状态在这一层根本没有驱动属性（`ShowError`/`ShowPaused` 读不到），因此 11 个 VisualState 只映射成 1 条 Trigger；
+`TemplateSettings`（`IndicatorLengthDelta`、`Container*AnimationPosition`、`ClipRect`）在本层没有对应物，
+所以"裁切窗口"这条上游机制无法复刻；高对比那一组上游行没进本层键账。

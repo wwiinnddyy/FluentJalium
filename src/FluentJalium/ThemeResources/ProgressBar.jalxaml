@@ -1,0 +1,32 @@
+<!-- WinUI 3 ProgressBar_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     f2cf8b8edbc50ab21d0f2d5f460f30b92d662a36. Ten rows: six theme rows inside the Light/Default/HighContrast
+     dictionaries (Light and Default are byte-identical name-for-name and target-for-target) and four metric rows
+     outside them (:27-30). Six of the ten are published here; the four that are not are named and reasoned in
+     docs/astra/audits/progress-bar.md, and each one is pinned out of the published set by a theory in
+     AstraProgressBarTests. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The three brush aliases are upstream's own names and upstream's own targets, with one substitution that is
+       not cosmetic: ProgressBarBackground points at ControlStrongStrokeColorDefault there (:10), which is a Color
+       row in this palette rather than a brush. spike/ProgressProbe mode alias measured what that costs - a Style
+       setter whose value resolves to a Color and lands on a Brush property leaves the property at its default and
+       says nothing at all (Background read back null, while the identical setter aimed at
+       ControlStrongStrokeColorDefaultBrush read back the brush). So the row keeps upstream's name and takes its
+       brush twin; the substitution is the reason the pixel assertion can name a colour at all.
+       The HighContrast targets upstream writes for these rows (SystemColorHighlightColor, SystemColorWindowColor,
+       SystemColorWindowTextColor) are not reproduced: this layer's HighContrast story is the palette-level
+       ThemeResources/HighContrast.map, which re-points the alias targets underneath, and control-level
+       re-pointing is a documented open item, not something this file claims. -->
+  <StaticResource x:Key="ProgressBarForeground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ProgressBarBackground" ResourceKey="ControlStrongStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ProgressBarBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <!-- 0 in Light and Default, 1 in HighContrast. Kept as a row because the style reads it, and because the
+       surface's border is the one piece of chrome that a high-contrast theme is allowed to draw here. -->
+  <Thickness x:Key="ProgressBarBorderThemeThickness">0</Thickness>
+  <!-- The two CornerRadius rows parse (the probe read a CornerRadius row back as 4,4,4,4 on a Border that asked
+       for one, so a row of this type reaches the property) and both have a consumer in Styles/ProgressBar.jalxaml.
+       The two x:Double metric rows next to them do not: this reader cannot parse an x:Double row at all, so
+       ProgressBarMinHeight=3 and ProgressBarTrackHeight=1 became properties in the template - the same accounting
+       PipsPager's sixteen unparsable rows got (adaptation/00 S1-m). -->
+  <CornerRadius x:Key="ProgressBarCornerRadius">1.5</CornerRadius>
+  <CornerRadius x:Key="ProgressBarTrackCornerRadius">0.5</CornerRadius>
+</ResourceDictionary>
