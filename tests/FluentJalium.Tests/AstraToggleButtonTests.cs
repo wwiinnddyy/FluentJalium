@@ -385,16 +385,18 @@ public sealed class AstraToggleButtonTests
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(new ToggleButton { Content = "toggle", Width = 200, Height = 44 }, 200, 44);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                new ToggleButton { Content = "toggle", Width = 200, Height = 44 }, PixelHarness.Self,
+                PixelHarness.LightPage, 200, 44, 2_000, "the toggle button's resting surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(new ToggleButton { Content = "toggle", Width = 200, Height = 44 }, 200, 44);
+            var (darkInk, dark) = PixelHarness.AssertSurfaceLands(
+                new ToggleButton { Content = "toggle", Width = 200, Height = 44 }, PixelHarness.Self,
+                PixelHarness.DarkPage, 200, 44, 2_000, "the toggle button's resting surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
             Assert.Equal(0, dark.Count(BrandEmerald));
         });

@@ -371,16 +371,18 @@ public sealed class AstraSplitButtonTests
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(new SplitButton { Content = "split", Width = 220, Height = 36 }, 220, 36);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                new SplitButton { Content = "split", Width = 220, Height = 36 }, PixelHarness.Self,
+                PixelHarness.LightPage, 220, 36, 2_000, "the split button's own surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(new SplitButton { Content = "split", Width = 220, Height = 36 }, 220, 36);
+            var (darkInk, dark) = PixelHarness.AssertSurfaceLands(
+                new SplitButton { Content = "split", Width = 220, Height = 36 }, PixelHarness.Self,
+                PixelHarness.DarkPage, 220, 36, 2_000, "the split button's own surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
             // The framework's own dark chrome is the other thing that must not survive the retemplate.
             Assert.Equal(0, dark.Count(FrameworkChrome));
@@ -465,16 +467,18 @@ public sealed class AstraSplitButtonTests
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(new FluentDropDownButton { Content = "more", Width = 160, Height = 32 }, 160, 32);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                new FluentDropDownButton { Content = "more", Width = 160, Height = 32 }, PixelHarness.Self,
+                PixelHarness.LightPage, 160, 32, 2_000, "the drop down button's own surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(new FluentDropDownButton { Content = "more", Width = 160, Height = 32 }, 160, 32);
+            var (darkInk, dark) = PixelHarness.AssertSurfaceLands(
+                new FluentDropDownButton { Content = "more", Width = 160, Height = 32 }, PixelHarness.Self,
+                PixelHarness.DarkPage, 160, 32, 2_000, "the drop down button's own surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
             Assert.Equal(0, dark.Count(BrandEmerald));
         });

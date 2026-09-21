@@ -351,16 +351,20 @@ public sealed class AstraExpanderInfoBarTests
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(new Expander { Header = "header", Content = "body" }, 320, 140);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                new Expander { Header = "header", Content = "body" },
+                element => PixelHarness.Named(element, "PART_HeaderBorder"),
+                PixelHarness.LightPage, 320, 140, 2_000, "the expander header's surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(new Expander { Header = "header", Content = "body" }, 320, 140);
+            var (darkInk, _) = PixelHarness.AssertSurfaceLands(
+                new Expander { Header = "header", Content = "body" },
+                element => PixelHarness.Named(element, "PART_HeaderBorder"),
+                PixelHarness.DarkPage, 320, 140, 2_000, "the expander header's surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
         });
     }
@@ -599,14 +603,18 @@ public sealed class AstraExpanderInfoBarTests
             Assert.Same(Template(FluentThemeManager.GetStyle("DefaultFluentInfoBarStyle")), bar.Template);
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(new FluentInfoBar { Title = "title", Message = "message" }, 360, 60);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                new FluentInfoBar { Title = "title", Message = "message" },
+                element => PixelHarness.Named(element, "RootBorder"),
+                PixelHarness.LightPage, 360, 60, 8_000, "the info bar's severity surface");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(new FluentInfoBar { Title = "title", Message = "message" }, 360, 60);
+            var (darkInk, _) = PixelHarness.AssertSurfaceLands(
+                new FluentInfoBar { Title = "title", Message = "message" },
+                element => PixelHarness.Named(element, "RootBorder"),
+                PixelHarness.DarkPage, 360, 60, 8_000, "the info bar's severity surface");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
             Assert.Equal(0, light.Count(FrameworkInfoBarFill));
         });

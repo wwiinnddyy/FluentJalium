@@ -2118,5 +2118,57 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 `ScrollBarTrack` 诱饵只量了暗色腿，轨道自身在亮色下的墨没测；`Over()` 的整数量化按"每通道一次 round"拟合，
 遇到两层以上半透明叠加时未与渲染器对齐验证过。
 
+## 复批判 第三步：余下 11 条两档像素断言一次改判（2026-09-21，#60 结清）
+
+上一批"不声称"里点名的 11 条，本批按同一配方全部改判。做法是先做一次**统一测量**：临时探针（`AstraPlateProbeTests`，
+读数抄进本节、文件随即删除，不留在仓库里）把这 11 个主体各配一张不透明页底、两档各成像一次，报告"建好之后树上到底带着
+哪些背景刷"，再按每支刷子的合成值数格子。测出来的东西决定了每条该换成什么形状：
+
+1. **9 条换成"自己的刷子合成到了页底上"**（新 `PixelHarness.AssertSurfaceLands`）：主体包在不透明页底里
+   （亮 `#F3F3F3`、暗 `#202020`，两把常量进了 harness：`LightPage/DarkPage`），刷子**从被建好的那个部件自己读**
+   （`Self`，或按部件名取），期望 = `Over(plate, brush)`，两档各断"落格数 ≥ 地板"，再加 `NotEqual(lightInk, darkInk)`。
+   实测落格数（亮/暗）：SplitButton 6212/6216、DropDownButton 4686/4686、ToggleButton 8296/8296、ComboBox 6480/6480、
+   AutoCompleteBox 7468/7468、NumberBox 6248/6248、Expander 头 5656/5660、InfoBar 底 20420/20428、树内容边 7648/7660。
+   地板一律取实测的一半以下（2_000 / 8_000 / 1_000），不是挑出来的整数。
+2. **1 条换成反主张**（新 `AssertNoSurfaceLands`）：`MenuFlyoutSubItem` 两档**一棵背景刷都没有**，9120 格里被盖掉的只有
+   38 格（子菜单箭头那一点）。上游本就把菜单项底给 `SubtleFillColorTransparent`，所以这里唯一能证伪的像素主张是
+   "它不该盖住任何页底"——探针两档各确认一次（0 支刷、页底保留 ≥99%）。
+3. **1 条量出它压根不是"表面"主张**：`AppBarToggleButton` 带 `IsChecked=true` 时，树上唯一带墨的是
+   `AppBarButtonInnerBorder` 的**勾选底**（亮 `#0078D4`、暗 `#60CDFF`，各 3080 格，不透明），控件自己的底两档都是透明的。
+   这条因此改判成"勾选底落到了像素"，断言消息与用例内的注释都写清是勾选态，不再冒充"整个族跟着主题走了表面"。
+
+三件顺带量死的仪器账（写进 `adaptation/06` 同一节末尾）：本运行时一棵树里有**多个同名 `ContentBorder`**（每行一个 +
+控件自己一个），按名取部件的 `Named()` 会先取到全透明那支（`#00000000`），使合成值恰好等于页底、被"不可证伪"那道守卫当场
+判死——因此加了只认"背景刷 alpha>0"的 `NamedSurface`；`ContentPresenter` **没有 `Background` 成员**（编译期 CS1061），
+树上取背景刷只能走 Border/Panel/Control/Shape 四条路；InfoBar 那片曾被记成"硬编码 severity 底"的其实是 `#80F6F6F6`，
+50% 灰而不是不透明常量。
+
+四类证据：**构建**见下闸口读数；**行为**11 条主张换形状（9 条合成落格 + 1 条反主张 + 1 条换主语）；**视觉**即上面
+9×2 组实测落格数、38/9120 那一条与 appbar 的 3080 格；**硬件输入**本批不动输入路径。
+
+**牙的验证（A/B）**：一条突变照全库——把 `AssertSurfaceLands` 的期望从 `Over(plate, brush)` 换成 `brush` 本身
+（等于宣布"配不配底无所谓"），重建后跑这 9 个类 → **9 红 / 530 绿**，每条消息点名自己的部件、刷子与页底，例如
+`implicit/ControlTemplate@200x44 carries #B3FFFFFF which composites to #B3FFFFFF over #FFF3F3F3, but that colour lands
+0 pixels, under the floor of 2000. top=#FBFBFBx8296…`；改回后 `git diff` 与 A/B 前快照逐字节相同（`REVERT_EXACT`）。
+这条突变**照不到第 10 条**：appbar 那支是不透明的 `#0078D4`，合成值恰好等于刷子本身，所以它不红——它的证明力来自
+"点名部件 + 点名刷子"，不来自配底。第 11 条（菜单反主张）由"合成值==页底"这道守卫与"页底保留 ≥99%"这条地板负责。
+
+**闸口读数**（串行 `tools/Test-AstraGates.ps1`，管道退出 **0**）：整套 **1458/1458 通过、0 失败、0 跳过**（6 m 49 s）——
+本批只换 11 条既有断言的形状，不新增也不删除用例，条数与前两批持平；`0 个警告 / 0 个错误`；调色板三档 `checked=True`
+（Light/Dark 各 83 源色→101 刷，HighContrast 101 键映射 + 3 条按住）；`keys.md is current: 1298 canonical lines.`
+（键不变，本批不动资源）；末行 `All Astra gates passed.`。闸口跑在 A/B 改回之后的树上（改回经 `git diff` 逐字节核对），
+所以这笔读数对最终状态成立。
+
+不声称：**appbar 那条不在本批 A/B 的覆盖范围里**（上面写明的原因），它目前只到"点名部件 + 点名刷子 + 数格 3080"这一级；
+9 条合成落格断言都断"≥ 地板"而不是"恰好这些格"，地板取实测的一半以下，因此布局漂移（行高、内边距变了）不会立刻被察觉；
+`PART_HeaderBorder`（Expander）与 `RootBorder`（InfoBar）仍按 `Named()` 取，"这个名字在树里唯一"是从探针报告读出来的，
+没有另做标记审计，只有树的 `ContentBorder` 换成了按 alpha>0 过滤的 `NamedSurface()`；树那 7648/7660 格是同色若干部件
+（每行一支 + 控件自己一支）的**总和**，主张只到"有这样一支刷落到了像素"，不到"这一格是行还是树"；
+`SurfaceBrushes` 报出的第二支刷（`BottomEdge` 的描边、`SecondaryButton` 的次级底、滑块 `Thumb`）本批没有纳入主张；
+高对比档下这 11 条走什么色仍未测（#57 照欠），真窗口/上屏路径没有配底账（#10、#21 照欠）；
+菜单项那 38 格是子菜单箭头的抗锯齿墨，本批没把"箭头该占几格"写成主张（#50 文本字形判据缺口照旧）；
+承担本批测量的 `AstraPlateProbeTests` 是一次性探针，读数抄进本节与 `adaptation/06` 之后文件已删除，
+这些数字因此没有可重跑的守卫——要复用先做成用例。
+
 
 

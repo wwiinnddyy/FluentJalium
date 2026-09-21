@@ -569,16 +569,18 @@ public sealed class AstraTreeViewTests : IDisposable
         _fixture.Run(() =>
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(Mount(NarrowSample()), 300, 220);
+            var (lightInk, _) = PixelHarness.AssertSurfaceLands(
+                NarrowSample(), element => PixelHarness.NamedSurface(element, "ContentBorder"),
+                PixelHarness.LightPage, 300, 220, 2_000, "the tree's content surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(Mount(NarrowSample()), 300, 220);
+            var (darkInk, _) = PixelHarness.AssertSurfaceLands(
+                NarrowSample(), element => PixelHarness.NamedSurface(element, "ContentBorder"),
+                PixelHarness.DarkPage, 300, 220, 2_000, "the tree's content surface");
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
         });
     }
 

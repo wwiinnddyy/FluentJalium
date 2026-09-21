@@ -642,16 +642,15 @@ public sealed class AstraComboBoxTests
     {
         _fixture.Run(() =>
         {
-            var light = PixelHarness.Render(
-                new ComboBox { ItemsSource = new[] { "one", "two" }, SelectedIndex = 1 }, 220, 32);
+            var box = new Func<ComboBox>(() => new ComboBox { ItemsSource = new[] { "one", "two" }, SelectedIndex = 1 });
+            var (lightInk, _) = PixelHarness.AssertSurfaceLands(
+                box(), PixelHarness.Self, PixelHarness.LightPage, 220, 32, 2_000, "the combo's own surface");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
             try
             {
-                var dark = PixelHarness.Render(
-                    new ComboBox { ItemsSource = new[] { "one", "two" }, SelectedIndex = 1 }, 220, 32);
-                Assert.True(light.Stable && dark.Stable, $"light={light.Top(4)} dark={dark.Top(4)}");
-                Assert.NotEqual(light.Top(4), dark.Top(4));
-                Assert.True(dark.DistinctColors > 1, $"dark capture came back flat: {dark.Top(6)}");
+                var (darkInk, _) = PixelHarness.AssertSurfaceLands(
+                    box(), PixelHarness.Self, PixelHarness.DarkPage, 220, 32, 2_000, "the combo's own surface");
+                Assert.NotEqual(lightInk, darkInk);
             }
             finally
             {

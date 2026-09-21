@@ -4,6 +4,7 @@ using Jalium.UI.Controls;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Imaging;
 using Jalium.UI.Threading;
+using Xunit;
 
 namespace FluentJalium.Tests.Pixel;
 
@@ -206,6 +207,17 @@ internal static class PixelHarness
 
     internal static string Hex(uint key) => $"#{key:X6}";
 
+    internal static string Hex(Color colour) => $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
+
+    /// <summary>The page the light branch is measured on: one DIP of the app's own background colour.</summary>
+    internal static Color LightPage => Color.FromRgb(0xF3, 0xF3, 0xF3);
+
+    /// <summary>The page the dark branch is measured on, chosen so no translucent-white surface composite can imitate it.</summary>
+    internal static Color DarkPage => Color.FromRgb(0x20, 0x20, 0x20);
+
+    /// <summary>For a control that carries its surface on itself rather than on a named part.</summary>
+    internal static FrameworkElement Self(FrameworkElement element) => element;
+
     /// <summary>
     /// An opaque plate for a subject whose token is translucent. A capture keeps only the colour bytes
     /// (<c>Bgr32</c>), so over nothing a translucent brush reports its own RGB and the claim cannot be falsified;
@@ -224,6 +236,129 @@ internal static class PixelHarness
         static byte Blend(byte back, byte front, double alpha) => (byte)Math.Round(back + (front - back) * alpha);
         var a = ink.A / 255d;
         return Color.FromRgb(Blend(plate.R, ink.R, a), Blend(plate.G, ink.G, a), Blend(plate.B, ink.B, a));
+    }
+
+    /// <summary>
+    /// Captures a freshly built subject on an opaque page and asserts that <b>its own</b> surface brush lands as the
+    /// composite <see cref="Over"/> predicts, then hands the composite back so the caller can add the cross-theme leg.
+    /// A two-theme pixel claim without this shape is not falsifiable: a capture keeps only the colour bytes, so over
+    /// nothing a translucent brush reports its own RGB, and a shared RGB between two tokens (<c>adaptation/06</c>
+    /// clause 4) lets one element's ink be counted as another's.
+    /// </summary>
+    internal static (Color Ink, Sample Sample) AssertSurfaceLands(
+        FrameworkElement subject,
+        Func<FrameworkElement, FrameworkElement?> surfaceOf,
+        Color plate,
+        int width,
+        int height,
+        int floor,
+        string claim)
+    {
+        var host = Backdrop(subject, plate);
+        Build(host, width, height);
+        Settle(60);
+
+        var surface = surfaceOf(subject) ?? throw new InvalidOperationException($"No surface for '{claim}': {Describe(subject)}.");
+        var brush = BrushOf(surface) ?? throw new InvalidOperationException($"{Describe(surface)} carries no background brush.");
+        var ink = Over(plate, brush.Color);
+
+        Assert.True(ink != plate, $"The page and {Describe(surface)}'s brush composite to the same colour, so '{claim}' cannot be falsified.");
+        var sample = Render(host, width, height);
+        Assert.True(sample.Count(ink) >= floor,
+            $"'{claim}': {Describe(surface)} carries {Hex(brush.Color)} which composites to {Hex(ink)} over {Hex(plate)}, "
+            + $"but that colour lands {sample.Count(ink)} pixels, under the floor of {floor}. top={sample.Top(5)}");
+        return (ink, sample);
+    }
+
+    /// <summary>
+    /// The other side of the same instrument: a subject that upstream paints no surface at all has to leave the page
+    /// intact, so "no ink here" becomes an assertion instead of an unmeasured hope.
+    /// </summary>
+    internal static void AssertNoSurfaceLands(FrameworkElement subject, Color plate, int width, int height, string claim)
+    {
+        var host = Backdrop(subject, plate);
+        Build(host, width, height);
+        Settle(60);
+        var sample = Render(host, width, height);
+        var surfaces = SurfaceBrushes(subject);
+
+        Assert.True(surfaces.Count == 0,
+            $"'{claim}' expected no surface brush, but {surfaces.Count} element(s) carry one: "
+            + $"{string.Join(", ", surfaces.Select(entry => $"{Describe(entry.Element)}={Hex(entry.Colour)}"))}.");
+        Assert.True(sample.Count(plate) > (width * height) - (width * height / 100),
+            $"'{claim}': the page was covered although nothing should paint over it; left={sample.Count(plate)} of {width * height}. top={sample.Top(5)}");
+    }
+
+    private static SolidColorBrush? BrushOf(FrameworkElement element) => element switch
+    {
+        Border border => border.Background as SolidColorBrush,
+        Panel panel => panel.Background as SolidColorBrush,
+        Control control => control.Background as SolidColorBrush,
+        _ => null,
+    };
+
+    /// <summary>
+    /// The first element carrying <paramref name="name"/> that actually has a surface to attribute. A template can
+    /// hand the same part name to several elements - a tree has one <c>ContentBorder</c> per row as well as its own -
+    /// and the ones that stay transparent carry no claim.
+    /// </summary>
+    internal static FrameworkElement? NamedSurface(Visual root, string name)
+    {
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is FrameworkElement { Name: var partName } element
+                && partName == name
+                && BrushOf(element) is { Color.A: > 0 })
+            {
+                return element;
+            }
+
+            if (child is Visual visual && NamedSurface(visual, name) is { } deeper)
+            {
+                return deeper;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Every background brush a <b>built</b> subject carries, with the element that carries it. A surface claim reads
+    /// the receiver's own property instead of naming a token, so it cannot be satisfied by a colour some neighbour
+    /// happens to supply - the failure that <c>adaptation/06</c> clause 4 records for the scroll bar thumb.
+    /// </summary>
+    internal static List<(FrameworkElement Element, Color Colour)> SurfaceBrushes(Visual root)
+    {
+        var hits = new List<(FrameworkElement, Color)>();
+        Collect(root);
+        return hits;
+
+        void Collect(Visual node)
+        {
+            var brush = node switch
+            {
+                Border border => border.Background,
+                Panel panel => panel.Background,
+                Control control => control.Background,
+                Jalium.UI.Shapes.Shape shape => shape.Fill,
+                _ => null,
+            };
+
+            if (brush is SolidColorBrush solid && solid.Color.A > 0 && node is FrameworkElement host)
+            {
+                hits.Add((host, solid.Color));
+            }
+
+            var count = VisualTreeHelper.GetChildrenCount(node);
+            for (var index = 0; index < count; index++)
+            {
+                if (VisualTreeHelper.GetChild(node, index) is Visual child)
+                {
+                    Collect(child);
+                }
+            }
+        }
     }
 
     /// <summary>

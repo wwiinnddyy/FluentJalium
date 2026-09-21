@@ -905,6 +905,14 @@ public sealed class AstraMenuTests
             var dark = PixelHarness.Render(sub, 240, 38);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
+            // Upstream gives a menu flyout item a transparent surface, so the falsifiable pixel claim here is the
+            // negative one: the item may cover none of its own page, and only the submenu arrow inks. Measured
+            // 2026-09-21: 38 of 9120 pixels on each branch, and no background brush anywhere in the built tree.
+            PixelHarness.AssertNoSurfaceLands(
+                new MenuFlyoutSubItem { Text = "sub" }, PixelHarness.LightPage, 240, 38, "the sub item's surface");
+            PixelHarness.AssertNoSurfaceLands(
+                new MenuFlyoutSubItem { Text = "sub" }, PixelHarness.DarkPage, 240, 38, "the sub item's surface");
+
             Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
             Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
             Assert.NotEqual(light.Top(2), dark.Top(2));

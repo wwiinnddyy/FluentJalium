@@ -880,15 +880,20 @@ public sealed class AstraAppBarTests
         _fixture.Run(() =>
         {
             var factory = new Func<AppBarToggleButton>(() => new AppBarToggleButton { Label = "bold", IsChecked = true });
+
+            // The checked state is what carries ink here, so the claim names the inner border the state cell writes.
+            // Measured 2026-09-21: 3080 pixels on each branch, and the probe shows the bar itself contributes none.
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(factory(), 68, 64);
+            var (lightInk, light) = PixelHarness.AssertSurfaceLands(
+                factory(), element => PixelHarness.Named(element, "AppBarButtonInnerBorder"),
+                PixelHarness.LightPage, 68, 64, 1_000, "the checked app bar toggle button's fill");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(factory(), 68, 64);
+            var (darkInk, _) = PixelHarness.AssertSurfaceLands(
+                factory(), element => PixelHarness.Named(element, "AppBarButtonInnerBorder"),
+                PixelHarness.DarkPage, 68, 64, 1_000, "the checked app bar toggle button's fill");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.NotEqual(lightInk, darkInk);
             Assert.Equal(0, light.Count(BrandEmerald));
             Assert.Equal(0, light.Count(FrameworkBarSurface));
         });
