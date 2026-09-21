@@ -1940,9 +1940,10 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 3. **witness 必须自带表面，否则暗色腿是假的**。上游的表头带是透明的（`DataGridColumnHeaderBackground →
    SubtleFillColorTransparentBrush`），所以暗色下那条 `#18FFFFFF` 的线叠到的白读回 0，with/without 逐键相同——
    看起来像"暗色里这条线又不印了"，其实是 §S1-q 第 4 条那个坑在 witness 侧复现。给每条主张配一张随主题的卡
-   （白 / `#202020`）之后两档都读到同样的 338 与 64。同一轮顺手量到一件本批不处理的事：**暗色下挂载的
-   `DataGrid`/`TreeDataGrid` 那一片表面仍是白的**（`#FFFFFF` 86 230，与 Light 的 85 668 同级），已另立一条账，
-   不混进这条形状结论。
+   （白 / `#202020`）之后两档都读到同样的 338 与 64。同一轮顺手记下的一条"暗色下挂载的 `DataGrid`/`TreeDataGrid`
+   那片表面仍是白的"**当天复查后被推翻**——那是 `PixelAt`/`Sample` 不读 alpha 字节的读法造成的，
+   合成实测是对的（`#202020` 底读 `#2B2B2B`、洋红底读 `#FF0DFF`）；账目与判据在 `adaptation/06`
+   "暗色半透明表面在离屏捕获里读成白"一节，本条只保留"witness 要自带表面"这条结论。
 
 规则：本层不再用 1 DIP `Rectangle` 画线——`AstraOneDipRulesTests.No_shipped_template_draws_a_one_dip_rectangle`
 从 markup 层扫 `src/FluentJalium` 的全部 `.jalxaml`，出现一条就红；这条闸钉的是**路线**而不是当下的数量（哪怕

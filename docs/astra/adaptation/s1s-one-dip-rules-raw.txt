@@ -94,8 +94,10 @@ with:    #FFFFFFx86230 #2D2D2Dx1248 #48484Ax426 #D1D1D6x28 #000000x12
 without: #FFFFFFx86230 #2D2D2Dx1248 #48484Ax426 #D1D1D6x28 #000000x12
 
 —— 暗色表格在这台捕获里那一片仍是白的（`#FFFFFF` 86230 与 Light 的 85668 同级），半透明白线画在白上等于没画。
-这条是 §S1-q 第 4 条的坑（"暗令牌放在白卡上等于没放"）在 witness 侧复现，另一笔账（暗色下表格表面）记进 ROADMAP 的
-不声称清单，不在本批处理。给了卡之后：
+这条是 §S1-q 第 4 条的坑（"暗令牌放在白卡上等于没放"）在 witness 侧复现，另一笔账（暗色下表格表面）当时另立成产品缺陷 #58。
+【当天补记：#58 那条主张复查后推翻——`PixelAt`/`Sample` 走 Bgr32、不读 alpha 字节，裸捕获里那批"白"是部分透明像素的 RGB；
+给底后同一采样点读 `#2B2B2B`（灰底）与 `#FF0DFF`（洋红底），合成本来是对的。读数与判据见 adaptation/06 最后一节。
+本批的形状主张与"witness 要自带表面"这条结论不受影响。】给了卡之后：
 
 the TreeDataGrid header rules in Light account for 338 pixels      the TreeDataGrid header rules in Dark account for 338 pixels
 the DataGrid header rules in Light account for 338 pixels          the DataGrid header rules in Dark account for 338 pixels

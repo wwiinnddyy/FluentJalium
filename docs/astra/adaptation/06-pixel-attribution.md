@@ -334,3 +334,28 @@ RatingControl 要把上游那条"画在 32、显示在 0.5"搬到本运行时，
 
 对照环境：`RenderContext` 自动后端 + `RenderingEngine.Impeller`，真实 `Application` + 已 `Show()` 的窗口 +
 `CompositionTarget.Rendering` 计帧后读回；窗口只在本机存在期间被读取，不落用户目录。
+
+## 暗色半透明表面在离屏捕获里读成"白"——一条被误记成产品缺陷的仪器账（#58 复查，2026-09-21）
+
+结清五处 1 DIP 分隔线那批（`adaptation/00` §S1-s）加暗色腿时，同一张表格在两档主题下白像素数几乎相等
+（Light `#FFFFFFx85668` / Dark `#FFFFFFx86230`），当时据此记下一条"暗色下表格族那片表面仍是白的"的缺陷（#58）。
+**这条主张撤回**：复查量到的不是产品行为，是捕获读法。三点实测（`AstraDataGridTests.A_dark_surface_token_only_reads_true_over_a_matching_backdrop`）：
+
+1. 暗色卡片表面令牌 `CardBackgroundFillColorDefaultBrush` 是**半透明白** `#0DFFFFFF`（上游同形：暗色卡片是叠在页背景上的一层），
+   所以"表面是不是白的"这个问题本身，在这套调色板里没有一块不透明的暗面可问。
+2. 给同一个网格一张 `#202020` 的页底，采样点读回 **`#2B2B2B`**，正是 `32 + (255-32)*13/255` 的 source-over 结果；
+   换成洋红底（`#FF00FF`）读回 **`#FF0DFF`**。两条一起说明：合成是对的，而且灰底单独不构成证据（白叠灰还是灰，
+   只有非灰底能把"丢 alpha"和"真合成"分开）。
+3. 什么底都不给时同一采样点读回 `#FFFFFF`，而把我们的 `Background` setter 改成 `{x:Null}` 之后同一点读回 **`#000000`**。
+   所以那张图里"白"是**部分透明像素的 RGB 三元组**：`PixelAt`/`Sample` 走 `Bgr32`，不读 alpha 字节——
+   "有没有东西在它后面"这件事在读数里根本不存在。
+
+跨批意义（比这条本身重要）：**凡是暗色腿用半透明令牌（卡片面、`SubtleFillColor*`、`ControlStrokeColor*`、`DividerStrokeColor*`）
+做的像素主张，样本必须自带一张不透明底**，否则它测的是 alpha 被丢掉之后的 RGB。本仓库里 `Render()` 的裸裁剪区一直是
+按"数非背景像素"和"比两档 Top(2) 不同"在用，这两种写法都不会因此报错，但也都不证明暗色表面落到了像素——
+要证就按第 2 条那样给底并断准混色值。
+
+对测（牙）：把 `Styles/DataGrid.jalxaml` 的 `<Setter Property="Background" Value="{ThemeResource DataGridBackground}" />`
+改成 `{x:Null}` → 该用例红，消息点名读数 `the grid surface reads #202020 over a #202020 page, not the card token's
+composite #2B2B2B (token #0DFFFFFF)`；改回 → 三个相关类合跑 **75/75 绿**（`0 警告 / 0 错误`）。
+

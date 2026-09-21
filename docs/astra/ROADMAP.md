@@ -2006,8 +2006,14 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 5. **路线被从源头闸死**：`No_shipped_template_draws_a_one_dip_rectangle` 扫 `src/FluentJalium` 全部 `.jalxaml`，
    出现任何 1 DIP `Rectangle` 即红。钉的是路线不是当下的数量（将来运行时能画薄 `Rectangle` 也不改这条判断，因为
    `Border` 是实测会印墨的那个形状）。
-6. **顺手量到一条新缺陷，另立 #58 不混进本批**：暗色下挂载的 `DataGrid`/`TreeDataGrid` 那一片表面仍读 `#FFFFFF`
-   （86 230 格，与 Light 的 85 668 同级）——上面第 3 条能看出它对用户的后果：任何半透明白令牌叠在它上面都不出现。
+6. **顺手量到的一条"新缺陷"当天就被自己推翻**（记在这里，不悄悄删掉）：那轮读数写成"暗色下挂载的表格族那片表面
+   仍是白的"并立了 #58。复查量到的其实是仪器的读法——`PixelAt`/`Sample` 走 `Bgr32`、不读 alpha 字节，裸捕获里那一片
+   "白"是一个部分透明像素的 RGB；给同一张网格一张不透明底之后，采样点读回的就是令牌的正牌合成（`#202020` 底
+   `#2B2B2B`、洋红底 `#FF0DFF`）。这条判据与撤回的完整账目在 `adaptation/06` 最后一节，钉它的用例是
+   `AstraDataGridTests.A_dark_surface_token_only_reads_true_over_a_matching_backdrop`（把我们的 `Background` setter
+   改成 `{x:Null}` 即红，消息点名 `reads #202020 … not the card token's composite #2B2B2B`）。**跨批后果**：任何
+   暗色腿用半透明令牌做的像素主张，样本必须自带不透明底，否则测的是丢掉 alpha 之后的 RGB；本仓库既有那批
+   "数非背景像素 / 比两档 Top(2) 不同"的暗色断言按这条读法看**证明力为零**，另立一批补（见下面待办）。
 
 四类证据：**构建**——闸口里那次真重编（52.5 s，三个工程重出 dll）**0 警告 / 0 错误**；本批其余轮次跑的是 Release
 增量构建，只看到"0 个错误"，警告数不单独主张（没有重编就没有警告读数）。**行为**——`AstraAppBarTests` 里
@@ -2030,6 +2036,36 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 不声称：这六条主张全是离屏 `Render()` 合成，真窗口里的命令栏与表格表面没有截屏账（#10、#21 照欠），高对比档下
 这五条线走什么颜色本批没测（#57 照欠）；`CornerRadius=0.5` 与上游 `RadiusX/Y=0.5` 只在"同一个 1 DIP 盒子"这一级对齐，
 半设备圆角本身在 1 DIP 上不可见、没单独量；`MenuFlyoutSeparator`、`ScrollBar` 等**同族但不同形状**的线没有在本批
-被扫进主张（markup 闸只认 1 DIP `Rectangle`，别的薄写法不在其列）；#58 那条暗色表面缺陷的成因（本地值 / 没画刷子 /
-harness 底色）未判；`Styles/Divider.jalxaml` 那条"运行时默认线色从哪来"照旧未查。
+被扫进主张（markup 闸只认 1 DIP `Rectangle`，别的薄写法不在其列）；#58 那条"暗色表面是白的"已经**撤回**（成因见上面
+第 6 条：读法不读 alpha），但由此暴露的"既有暗色像素断言证明力为零"这笔账还没补（新立一条，见 ROADMAP 待办）；
+`Styles/Divider.jalxaml` 那条"运行时默认线色从哪来"照旧未查。
+
+## 复批判：撤回 #58，把"暗色半透明表面"记成仪器账（2026-09-21，同日）
+
+上一批顺手立的那条"暗色下表格族那片表面仍是白的"当天就被推翻，而且推翻它的方式本身就是这笔账的内容：
+不是产品变了，是**读法**。`PixelHarness` 的捕获走 `RenderTargetBitmap(Bgr32)`，只取三个颜色字节，所以一个
+"背后什么都没有"的像素读回来是它自己的 RGB——暗色卡片令牌 `#0DFFFFFF` 在裸捕获里报 `#FFFFFF`，看上去就像"画了白"。
+三点实测（新用例 `AstraDataGridTests.A_dark_surface_token_only_reads_true_over_a_matching_backdrop`）：
+
+1. 同一张暗色网格，给一张 `#202020` 的页底后采样点读 `#2B2B2B`，正是 `32 + (255-32)*13/255` 的 source-over 结果：合成没坏。
+2. 再给一张**洋红**底（`#FF00FF`）读 `#FF0DFF`。这条不是重复第 1 条——白叠灰还是灰，只有非灰底能把"alpha 被丢掉"和
+   "真按 source-over 合成"分开。断言还加了第三条腿：两张底读数必须不同，否则等于什么都没叠。
+3. 把我们的 `<Setter Property="Background" Value="{ThemeResource DataGridBackground}" />` 改成 `{x:Null}`（先确认改动落进
+   文件，再重建）→ 该用例红，消息直接点名 `the grid surface reads #202020 over a #202020 page, not the card token's
+   composite #2B2B2B (token #0DFFFFFF)`；同一采样点在裸捕获里从 `#FFFFFF` 变成 `#000000`。改回 → 三个相关类合跑
+   **75/75 绿**，`0 警告 / 0 错误`。
+
+跨批后果（立新账 #59）：任何"暗色腿 + 半透明令牌"的像素主张，样本必须自带不透明底并把期望算成 source-over 值；
+本仓库既有那批"数非背景像素""比两档 `Top(2)` 不同"的暗色断言，按这条读法**证不到"半透明表面落到了像素"**
+（"背后什么都没有"与"正好合成出该颜色"这两种情况给出同类读数），逐个补底与补算值另起一批。账目与判据落在 `adaptation/06` 最后一节，§S1-s 第 3 条与 `s1s-one-dip-rules-raw.txt`
+里的旧表述都已就地改成"撤回"（原文不删，改在原地写清谁被推翻）。#58 结清为仪器账，不是产品缺陷。
+
+四类证据：**构建**见下闸口读数；**行为**新用例一条（读令牌 → 两张底 → 三点断言）；**视觉**即上面 1、2 两个混色值；
+**硬件输入**本批不动输入路径。
+
+**闸口读数**（串行 `tools/Test-AstraGates.ps1`，管道退出 **0**）：整套 **1458/1458 通过、0 失败、0 跳过**（6 m 25 s），
+比上一批 1457 多 1 条＝本批复判的新用例；Debug 真重编 `0 个警告 / 0 个错误`；调色板三档 `checked=True`；
+`keys.md is current: 1298 canonical lines.`（键不变）；末行 `All Astra gates passed.`。
+
+
 

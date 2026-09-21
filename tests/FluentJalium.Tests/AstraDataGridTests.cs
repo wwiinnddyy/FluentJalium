@@ -498,6 +498,73 @@ public sealed class AstraDataGridTests : IDisposable
     }
 
     /// <summary>
+    /// The instrument fact underneath every dark-theme pixel claim in this suite, pinned where it was first met.
+    /// This palette's dark card surface is a translucent white, and a capture reads only the RGB bytes: over real
+    /// content the composite is exact (#202020 page and magenta both come back as the source-over result), but where
+    /// nothing lies behind, the pixel keeps white RGB with a small alpha and the capture reports <c>#FFFFFF</c>.
+    /// Measured 2026-09-21 after a bare reading of that kind had been filed as "the dark grid paints white" - the
+    /// claim is withdrawn, the cause is the capture (<c>adaptation/06</c>).
+    /// </summary>
+    [Fact]
+    public void A_dark_surface_token_only_reads_true_over_a_matching_backdrop()
+    {
+        var page = Color.FromRgb(0x20, 0x20, 0x20);
+
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            var token = Assert.IsType<SolidColorBrush>(Brush("CardBackgroundFillColorDefaultBrush")).Color;
+
+            var bare = Mount(Grid());
+            var noBackdrop = PixelHarness.PixelAt(Part(bare, "PART_OuterBorder"), 200, 60);
+
+            var host = new Border
+            {
+                Width = 440,
+                Height = 200,
+                Background = new SolidColorBrush(page),
+                Child = Grid(),
+            };
+            PixelHarness.Build(host, 440, 200);
+            PixelHarness.Settle(60);
+            var withBackdrop = PixelHarness.PixelAt(host, 220, 120);
+
+            // A grey page would let a renderer that drops the alpha byte pass by accident (white over grey is still
+            // grey-ish). Magenta cannot: only a real source-over composite turns #FF00FF into #FF0DFF.
+            var tinted = new Border
+            {
+                Width = 440,
+                Height = 200,
+                Background = new SolidColorBrush(Color.FromRgb(0xFF, 0x00, 0xFF)),
+                Child = Grid(),
+            };
+            PixelHarness.Build(tinted, 440, 200);
+            PixelHarness.Settle(60);
+            var overMagenta = PixelHarness.PixelAt(tinted, 220, 120);
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+
+            var grey = (uint)((page.R << 16) | (page.G << 8) | page.B);
+            Assert.True(withBackdrop == Over(page, token),
+                $"the grid surface reads {PixelHarness.Hex(withBackdrop)} over a {PixelHarness.Hex(grey)} page, " +
+                $"not the card token's composite {PixelHarness.Hex(Over(page, token))} (token #{token.A:X2}{token.R:X2}{token.G:X2}{token.B:X2})");
+            Assert.True(overMagenta == Over(Color.FromRgb(0xFF, 0x00, 0xFF), token),
+                $"the grid surface reads {PixelHarness.Hex(overMagenta)} over magenta, " +
+                $"not {PixelHarness.Hex(Over(Color.FromRgb(0xFF, 0x00, 0xFF), token))} - the alpha byte is not reaching the capture");
+            Assert.True(withBackdrop != overMagenta,
+                "both backdrops read the same, so the surface is not compositing over them at all");
+            Assert.Equal(0xFF_FFFFul, noBackdrop);
+        });
+    }
+
+    /// <summary>The sRGB-over-opaque composite a translucent brush produces, in the byte-quantised form this renderer writes.</summary>
+    private static uint Over(Color backdrop, Color ink)
+    {
+        static byte Blend(byte back, byte front, double alpha) => (byte)Math.Round(back + (front - back) * alpha);
+        var alpha = ink.A / 255d;
+        return (uint)(Blend(backdrop.R, ink.R, alpha) << 16 | Blend(backdrop.G, ink.G, alpha) << 8 | Blend(backdrop.B, ink.B, alpha));
+    }
+
+    /// <summary>
     /// The row-header gutter must not speak. This runtime hands the row's own data item to the row header's Content
     /// (full path in the probe log: PART_RowsHost &gt; DataGridRow &gt; PART_CellsPanel &gt; DataGridRowHeader &gt;
     /// PART_RowHeaderBorder &gt; ContentPresenter), so a presenter in that template paints the model's ToString
