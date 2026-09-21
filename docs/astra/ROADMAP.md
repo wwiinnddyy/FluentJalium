@@ -1843,3 +1843,47 @@ could not resolve a host window.`）。于是"单跑一类全绿、整套顺序�
 放大在星心与地板之间那一段的取值；焦点环外观与手柄通路；`ItemInfo` 图片路径的位图显示；
 高对比逐控件重指（审计第 6 节）；`RatingControlAutomationPeer` 与 `AccessibilityView`；
 以及"墨正好居中在 34 的盒子里"这一条对称假定——它若错，表现为整行左右偏一点，而这里无墨可量。
+
+## 阶段 6 第六段：图标族（SymbolIcon / FontIcon / PathIcon 与 `Symbol` 枚举）——量完之后决定"不写模板"
+
+结论先说：**这一段没有新样式、没有新类型、没有新资源键**，出口是"把族量清楚 + 把差异钉成测试 + 把不能声称的写死"。
+理由与读数都在 `audits/icon-family.md`；ROADMAP 只记改变判断的那几笔。
+
+1. **两台仪器都错了，而且错成同一种。** 前两次"运行时没有 `Symbol` 这个类型"的读法都出自 PowerShell 5.1：
+   .NET Framework 的 `LoadFrom` 装 net10.0 程序集后 `GetTypes()` 会抛，脚本里一个空 `catch` 把抛读成缺席。
+   换成同进程反射（`spike/SymbolCmap`）后：类型在，764 个成员，宿主是 `Jalium.UI.Managed`
+   （`Jalium.UI.Controls.dll` 导出类型数实测 0，是一具转发壳）。**"缺席"这种主张以后必须点名它数过哪些接收者。**
+2. **枚举的号不是上游画的那枚字。** 上游 IDL 存旧号（`Add = 0xE109`），出图前经
+   `icon.cpp:461 ConvertSymbolValueToGlyph` 换算（197 个 `case`）；这套枚举存的已经是换算后的号。
+   于是"168 个名字号不同"这种读法完全是问错了问题——按**画出来的字**比：
+   两侧共有的 171 个名字里 **167 个画同一枚字形**，4 个不同（`Account`/`Map`/`MapPin`/`Page`），
+   另有 26 个上游名字这边没有，其中 12 个连字形号都没人承载。三份上游读数（IDL、生成镜像、设计文档表）
+   互相核对为 0 冲突，才敢出这张 diff。逐枚命中另列 `s2-symbol-cmap-raw.txt`：
+   旧号段在装机两字体里 197/197 有字形（所以换算是换图不是补漏），而上游自己要画的 `Target = U+F5F0`
+   **在两个字体里都没有字形**——画不出东西的是上游。
+3. **唯一能抄的键抄不动**：上游的 `SymbolThemeFontFamily` 是 `FontFamily` 行，三种写法（元素文本 / `Source=` /
+   `FamilyName=`）造出来的全是 `Source == ""` 的空家族；换 `<x:String>` 存住了文本却喂不进 `FontFamily` 属性。
+   这是"类型化令牌行"家族里第四个成员（已写进 `adaptation/00` 第 5 条），因此**不发布该键**，
+   并把"这个键查不到"钉成测试——将来能承载时测试会红。
+4. **判据收窄了一条**：同一张白底里 `Border` 与闭合 `PathIcon` 各印出 400 像素，纯文本 `TextBlock` 印出 0
+   （`adaptation/06` 新增段）。所以"字形无墨"是**文本这条路**瞎，不是图标控件瞎；本族像素列由 `PathIcon` 承担，
+   `SymbolIcon`/`FontIcon` 是否落墨在现有通路上不可证。附带量死一条新默认：`PathIcon` 不给尺寸就铺满槽位。
+5. **为什么不起自有类型**：`IconElement` 系不是 `Control`（没有 `Template` 可交），派生路线实测可编译可用
+   （`ProbeIcon : IconElement`，`MeasureOverride` 被调、`base` 返 0x0），但量到的成员、盒子行为
+   （`SymbolIcon` 恒 20、`FontIcon` == 字号）与上游一致，唯一"没画"的怀疑恰好落在测不出来的那条路上。
+   用一条测不出来的怀疑去换三个公开类型，判据不支持这笔交易。
+
+四类证据：**构建**见下闸口读数；**行为**新增 `AstraIconFamilyTests` 32 条（类型面/成员面/枚举号与画出来的字/
+markup 名字解析与未知名静默替换/盒子随不随内容/4+26 个差异的漂移闸/键不可发布的复测）；
+**视觉**只有 `PathIcon` 填充那一条；**硬件输入**本族无交互面（上游亦然），未证项见审计第 7 节第 7 条。
+
+**闸口读数（串行 `tools/Test-AstraGates.ps1`，管道退出 0）**：整套 **1427/1427 通过、0 失败、0 跳过**（6 m 18 s），
+比上段 1395 恰好多 32 条＝本段新类；`0 个警告 / 0 个错误`（21 s 真编译，非 up-to-date）；
+调色板三档 `checked=True`（Light/Dark 各 83 源色→101 刷，HighContrast 101 键映射）；
+`keys.md is current: 1295 canonical lines.`——**行数不变正是本段的结论**：没有新资源键落地，
+因为唯一可抄的 `SymbolThemeFontFamily` 被量出载不住值（`adaptation/00` 第 5 条）；末行 `All Astra gates passed.`
+
+不声称（同 `audits/icon-family.md` 第 6 节）：`SymbolIcon`/`FontIcon` 的字形到达像素（#50：文本这条路瞎，
+本段把范围从"图标字形"收窄为"文本运行"）；上游 4 个偏差名与 26 个缺席名的修复（号在运行时枚举里）；
+高对比下图标前景逐控件重指；`BitmapIcon`/`ImageIcon`/`IconSource` 全家（运行时无这些类型）；
+`PathIcon` 无显式尺寸即铺满槽位这一默认与上游 16x16+Uniform 的差异；本族硬件输入通路。

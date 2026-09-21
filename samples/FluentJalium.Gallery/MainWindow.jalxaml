@@ -648,6 +648,21 @@
                 </StackPanel>
               </Border>
 
+              <TextBlock Text="Icons" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Add" />
+                    <SymbolIcon Symbol="Setting" Margin="12,0,0,0" />
+                    <FontIcon Glyph="&#xE710;" FontSize="20" Margin="12,0,0,0" />
+                    <FontIcon Glyph="&#xE713;" FontSize="32" Margin="12,0,0,0" />
+                    <PathIcon Data="M 0,0 L 16,0 L 16,16 L 0,16 Z" Width="16" Height="16" Margin="12,0,0,0" />
+                    <PathIcon Data="M 0,16 L 8,0 L 16,16 Z" Width="20" Height="20" Margin="12,0,0,0" />
+                  </StackPanel>
+                  <TextBlock Text="These three are the runtime's own types, and this card deliberately ships no style for them: an icon here derives from FrameworkElement rather than Control, so there is no template to hand it - upstream builds the visual in C++ and publishes no default style either. What was measured instead: the symbol box is a constant 20 DIP whatever the symbol, the font icon's box is its font size, and the path icon is the only member whose ink a capture can actually see, which is why it is the one drawn as a solid figure. The honest limits are in docs/astra/audits/icon-family.md - the symbol enum here paints the same glyph as upstream for 167 of the 171 names both sides share, four of them a different one, and the icon font cannot be published as a resource row at all on this runtime, so every template repeats the family name as a literal." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+
               <TextBlock Text="Divider" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel Margin="16">

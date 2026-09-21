@@ -1891,6 +1891,15 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
    本层的修法是部件上显式 `Foreground="{TemplateBinding Foreground}"`（`Styles/InfoBadge.jalxaml` 里注明）。
    **未审的相邻面**：其余自有样式里凡是靠继承拿前景色的文本部件都可能同样哑色——已开任务，不在本段结。
 
+5. **`FontFamily` 令牌行同样载不住值**（阶段 6 图标族量到，`audits/icon-family.md` §5）：想原样转录上游的
+   `SymbolThemeFontFamily`，三种写法 `<FontFamily x:Key=K>名字</FontFamily>`、`Source=名字`、`FamilyName=名字`
+   造出来的都是 `Source == ""` 的空家族——markup 里的值被丢掉且不报错。改走 `<x:String>` 行能存住文本，
+   但把它喂给 `TextBlock.FontFamily`（`{ThemeResource}`）属性读不回这个名字，等于一条死键。
+   于是本层不发布这个键，各模板继续写字面量 `"Segoe Fluent Icons"`；
+   `AstraIconFamilyTests` 同时钉住"三种写法都空"和"这个键查不到"，将来运行时能承载时测试会红，那时再抄。
+   这是"类型化令牌行"这一类的第四个成员（`x:Double` 读回 0、负的 `StackPanel.Spacing` 按 0 排版、
+   未知枚举名静默换成别的成员）。
+
 规则：数值令牌一律写字面量并在样式注释里点明它来自哪条不可发布的行；不要为了"看起来发布了"改用 `sys:Double`
 或字符串行；任何"某个数字/字形印出了墨"的主张只能靠树上读数，色块主张才走像素。
 

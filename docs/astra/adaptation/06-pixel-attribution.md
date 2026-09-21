@@ -305,3 +305,32 @@ RatingControl 要把上游那条"画在 32、显示在 0.5"搬到本运行时，
 所以 `AstraRatingControlTests` 里 0 条像素用例不是漏，是判据在这条通路上没有分辨力。
 仍**未证**：`LayoutTransform` 与 `RenderTransform` 在自捕获下是否同样表现（本段没量前者）；
 祖先捕获在 DPI≠1.75 下的像素数比例（沿用本文件既有的"只在本机 1.75 证过"这条限制）。
+
+## 阶段 6 第六段补：几何有墨、文本无墨，同一张白底同时量到（`spike/IconFamilyProbe`）
+
+图标族需要一个"能不能主张墨"的判定，做法是把被测要素和一枚必须出墨的东西放进同一张 64×64 白底里读：
+
+| 要素（都在 `Foreground/Background = #0078D4`） | 非白像素 | accent 像素 | 墨盒 |
+| --- | --- | --- | --- |
+| `Border` 20×20 实心（正对照） | 400 | 400 | 20×20 @22,22 |
+| `PathIcon` 闭合方块，显式 20×20 | 400 | 400 | 20×20 @0,0 |
+| `PathIcon` 同一几何、不给尺寸 | 4 096 | 4 096 | 铺满 64×64 |
+| `PathIcon` 开口折线 `M0,0 L16,16` | 0 | 0 | 空 |
+| `TextBlock` "IIII" 20px（负对照） | 0 | 0 | 空 |
+| `TextBlock` 图标字体字形 U+E710 | 0 | 0 | 空（DesiredSize 22×22，说明它确实测量了） |
+| `SymbolIcon` / `FontIcon`（默认与显式前景各一次） | 0 | 0 | 空 |
+
+三条账：
+
+1. **几何墨到得了像素，文本墨到不了**——同一张图里 `Border` 和闭合 `PathIcon` 各读回 400 像素，而纯文本 `TextBlock`
+   读回 0。这把 §S1-r 第 3 条"字形无墨"的定位收紧了：瞎的不是图标控件，是**文本这条路**；
+   所以图标族的像素列只允许由 `PathIcon` 的填充承担（`A_closed_geometry_reaches_the_pixel_and_fills_the_slot_it_is_given`），
+   `SymbolIcon`/`FontIcon` 的"画没画"在现有通路上**不可证**，退到树上读数与度量盒。
+2. **开口几何无墨不是判据坏了**：`PathIcon` 只填不描，`M0,0 L16,16` 面积为零。用一条折线去问"图标能不能成像"
+   会得出和 §S1-r 一样的错误结论——问法要先能出墨。
+3. **`PathIcon` 在没有显式尺寸时按槽位铺满**（64 槽 → 4 096 像素，等于 Stretch=Fill 语义）。凡以"墨量 = 尺寸²"
+   做断言的用例，被测要素必须给死尺寸，否则量到的是宿主窗口的大小；这与本文件早先"捕获目标的尺寸会伪装出裁剪"
+   同族——**先确认墨盒属于谁，再读墨盒**。
+
+对照环境：`RenderContext` 自动后端 + `RenderingEngine.Impeller`，真实 `Application` + 已 `Show()` 的窗口 +
+`CompositionTarget.Rendering` 计帧后读回；窗口只在本机存在期间被读取，不落用户目录。
