@@ -61,7 +61,7 @@
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
-                TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
@@ -112,7 +112,7 @@
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
-                TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
@@ -155,7 +155,7 @@
         <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
-                TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
           </Border>
@@ -302,7 +302,7 @@
         <Grid Name="ContentRoot">
           <Border Name="Background" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
                   BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}"
-                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083" />
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" />
           <Button Name="ContentButton" Content="{x:Null}" Foreground="{TemplateBinding Foreground}"
                   Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Padding="{ThemeResource MenuBarItemButtonPadding}"
                   VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />

@@ -1887,3 +1887,50 @@ markup 名字解析与未知名静默替换/盒子随不随内容/4+26 个差异
 本段把范围从"图标字形"收窄为"文本运行"）；上游 4 个偏差名与 26 个缺席名的修复（号在运行时枚举里）；
 高对比下图标前景逐控件重指；`BitmapIcon`/`ImageIcon`/`IconSource` 全家（运行时无这些类型）；
 `PathIcon` 无显式尺寸即铺满槽位这一默认与上游 16x16+Uniform 的差异；本族硬件输入通路。
+
+## 阶段 6 尾批（并行项：减动效资源键化）
+
+出口：模板过渡时长改成上游同名的公开键、`ReduceMotion` 真的写进那些键、并把"哪种资源行载得住时长"量死。
+审计 `audits/motion.md`，原始读数 `adaptation/s6-motion-probe-raw.txt`。
+
+1. **上游的时长行在这台运行时交付的是属性的默认值，且不报错**：`<x:String>00:00:00.083</x:String>` 存成字符串、
+   四种消费形状（属性 `{ThemeResource}` / `{StaticResource}` / 隐式 Setter / **ControlTemplate 内部**）一律读回
+   **180ms**——`UIElement.TransitionDuration` 自己的默认值。同一位置换成无限定名的 `<Duration>` 行，四种形状全部
+   读回 83ms。所以本段的做法是**名字与数字逐字照抄上游，只把行类型换成框架类型**。这条同时把上一段留下的过度概括
+   改回来：`adaptation/00` 新增第 6 条，分界是"框架类型 + 无限定名"（`CornerRadius`/`Thickness`/`Duration` 可行），
+   不是"类型化令牌行都不行"（`x:Double`、`FontFamily` 才是不行那族）。
+2. **减动效的机制框架已经给了一半**：`Application` 静态构造里把所有自动过渡挂在
+   `SystemParameters.ClientAreaAnimation && UIEffects` 上（internal，反射能碰但不该碰——AGENTS.md 禁），
+   而 `TransitionDuration` 是**过渡要启动那一刻现读**，`<= 0` 或无 `TimeSpan` 就直接不起动画。
+   于是应用内自服开关（Gallery 设置页那个）的正确形状是"把键写成 0"，不是走视觉树——
+   探针 [3b] 量到：写 0 之后 4 帧内，一个**早已实例化**的模板部件从 83ms 变 0ms；[4] 量到翻转前后
+   中途读数 `#DC0091`（1600/1600 像素在两端之间）与 `#0000FF`（1600 全终色、0 在中间）。
+3. **落地面**：新增 `ThemeResources/Motion.jalxaml`（3 行 `<Duration>`）进清单；样式里 21 处字面时长全改读键
+   （16×`ControlFasterAnimationDuration`、4×`ControlFastAnimationDuration`、1×`SplitViewPaneAnimationOpenDuration`
+   ——`Navigation.jalxaml` 那处 `0.200` 是 `PART_PaneRoot` 的宽度，对照上游正是 SplitView 面板开合那条，不是自造名）；
+   `FluentThemeManager` 持字典实例，`ReduceMotion` 逐键写 0/回写设计值，设计值**只从已加载的行读回**（代码里不留第二份数），
+   一行都读不回 `Duration` 就启动抛。Motion 字典独立于 Light/Dark，切主题不会把动画还回去（有测试钉）。
+4. **只发布被消费的 3 条**：上游另有 10 条时长行与 1 条 spline，都不抄——`ThemeResources` 与键消费闸口一起管，
+   空转行会被判红；spline 更是无处可落（本运行时过渡时序是 `TransitionTimingFunction` 枚举）。键清单因此
+   1295→1298，恰为本段三行。
+5. **探针自撤一次**：首轮把"探针用错 assembly 名"当成"运行时写不出这个类型"——`Jalium.UI.Core` 与
+   `Jalium.UI.Managed` 两种限定拼写都解不出 `Duration`（图标族那笔转发壳的账在这里复发），补量之后才知道
+   **只有框架自己 xmlns 下的无限定名可行**。顺带量死两条：`DurationConverter` 吃 `"0"` 但 `"Auto"` 抛
+   `FormatException`；被丢弃的行（`Automatic`）与刻意归零的行（`00:00:00`）从属性上可辨，所以"减动效生效了"
+   与"键掉了"不会互相冒充。
+
+四类证据：**构建**见下闸口读数；**行为**新增 `AstraMotionTests` 9 条（三键逐条读毫秒、行形状与字面文本的转录闸、
+已实现模板三部件各读自身 `TransitionDuration`、翻 `ReduceMotion` 后同一要素 83ms→0ms、减动效期间新建的控件生下来即静、
+切主题不还回动画、21 处过渡声明逐处要求读已发布键——出现字面量即判红）。**牙的验证**：摘掉 setter 里的写键调用后重跑，
+正好这 3 条红、其余 6 条绿。**视觉**只有探针 [4] 那三行中途色读数（套件不断言动画在跑，理由见下）。
+**硬件输入**本段不动输入路径。Gallery 设置页"Reduce motion"那张卡的文案按实测覆盖面改写（含"已在跑的过渡走完自己的时钟"）。
+
+**闸口读数（串行 `tools/Test-AstraGates.ps1`，管道退出 0）**：整套 **1436/1436 通过、0 失败、0 跳过**（6 m 16 s），
+比上段 1427 多 9 条＝本段新类；`0 个警告 / 0 个错误`（3.77 s，含 Gallery 重编）；调色板三档 `checked=True`
+（Light/Dark 各 83 源色→101 刷，HighContrast 101 键映射）；`keys.md is current: 1298 canonical lines.`；
+末行 `All Astra gates passed.`
+
+不声称（同 `audits/motion.md` 第 5 节）：动画确实在跑这件事不由套件断言（依赖机器 `ClientAreaAnimation`/`UIEffects`，
+探针那次两档皆 True 并已记录）；已在跑的过渡被中途翻转 `ReduceMotion` 打断；上游其余 10 条时长键与 spline；
+真指针 hover 的"第 N 帧落在哪个色"（与 #13 同一笔账）；`ProgressRing` 自转是否该受减动效影响（上游未证）；
+Gallery 的 Motion 系统页仍未建（#10 剩余部分）。

@@ -24,14 +24,14 @@
             <Border Name="SwitchTrack" CornerRadius="10" BorderThickness="1"
                     BorderBrush="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
                     Background="{ThemeResource ControlAltFillColorSecondaryBrush}"
-                    TransitionProperty="Background" TransitionDuration="0:0:0.083" />
+                    TransitionProperty="Background" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" />
             <Grid Name="ThumbHost" Width="20" Height="20" HorizontalAlignment="Left"
                   Margin="{TemplateBinding ThumbOffset}" TransitionProperty="Margin"
-                  TransitionDuration="0:0:0.167" TransitionTimingFunction="Recommended">
+                  TransitionDuration="{ThemeResource ControlFastAnimationDuration}" TransitionTimingFunction="Recommended">
               <Border Name="Knob" Width="12" Height="12" CornerRadius="7"
                       HorizontalAlignment="Center" VerticalAlignment="Center"
                       Background="{ThemeResource TextFillColorSecondaryBrush}"
-                      TransitionProperty="Width, Height, Background" TransitionDuration="0:0:0.083" />
+                      TransitionProperty="Width, Height, Background" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" />
             </Grid>
           </Grid>
           <Border Name="SwitchFocus" BorderThickness="2" Margin="1" CornerRadius="4"
@@ -181,7 +181,7 @@
                         Background="{ThemeResource SliderOuterThumbBackground}"
                         BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1">
                   <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+                           Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="{ThemeResource ControlFastAnimationDuration}" />
                 </Border>
               </Grid>
               <Border Name="SliderFocus" Grid.RowSpan="3" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
@@ -270,7 +270,7 @@
                             Background="{ThemeResource SliderOuterThumbBackground}"
                             BorderBrush="{ThemeResource SliderThumbBorderBrush}" BorderThickness="1">
                       <Ellipse Name="SliderInnerThumb" Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+                               Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="{ThemeResource ControlFastAnimationDuration}" />
                     </Border>
                   </Grid>
                   <Border Name="SliderFocus" Grid.ColumnSpan="3" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
@@ -358,7 +358,7 @@
                   Background="{ThemeResource RadioButtonOuterEllipseFill}" BorderBrush="{ThemeResource RadioButtonOuterEllipseStroke}">
             <Ellipse Name="RadioDot" Width="12" Height="12" Opacity="0" HorizontalAlignment="Center" VerticalAlignment="Center"
                      Fill="{ThemeResource RadioButtonCheckGlyphFill}" Stroke="{ThemeResource RadioButtonCheckGlyphStroke}"
-                     TransitionProperty="Width, Height" TransitionDuration="0:0:0.167" />
+                     TransitionProperty="Width, Height" TransitionDuration="{ThemeResource ControlFastAnimationDuration}" />
           </Border>
         </Grid>
         <ContentPresenter Name="RadioLabel" Grid.Column="1" Content="{TemplateBinding Content}"

@@ -68,7 +68,7 @@
           <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
                   Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}"
                   />
           <Grid Name="ContentRoot" MinHeight="64">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -130,7 +130,7 @@
           <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
                   Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                  TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}"
                   />
           <Grid Name="ContentRoot" MinHeight="64">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">

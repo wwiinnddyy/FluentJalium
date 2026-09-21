@@ -766,7 +766,7 @@
                 <fluent:FluentSettingsRow Margin="16" StackAtWidth="360">
                   <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Reduce motion" Style="{StaticResource BodyTextBlockStyle}" />
-                    <TextBlock Text="Settle navigation immediately and turn off theme transitions and page entrances." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    <TextBlock Text="Settle navigation immediately, turn off the page entrance, and rewrite the three published animation durations to zero, so a hover or a press snaps instead of easing. A transition already running keeps its clock, and a control built while this is on is born still." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
                   </StackPanel>
                   <fluent:FluentToggleSwitch x:Name="ReduceMotionSwitch" Style="{StaticResource FluentToggleSwitchStyle}" VerticalAlignment="Center" />
                 </fluent:FluentSettingsRow>

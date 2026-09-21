@@ -1900,6 +1900,19 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
    这是"类型化令牌行"这一类的第四个成员（`x:Double` 读回 0、负的 `StackPanel.Spacing` 按 0 排版、
    未知枚举名静默换成别的成员）。
 
-规则：数值令牌一律写字面量并在样式注释里点明它来自哪条不可发布的行；不要为了"看起来发布了"改用 `sys:Double`
-或字符串行；任何"某个数字/字形印出了墨"的主张只能靠树上读数，色块主张才走像素。
+6. **但这一类不是"全都载不住"——边界是读者能不能解出那个类型名**（阶段 6 尾批减动效量到，`audits/motion.md` §2）：
+   `<Duration x:Key=K>00:00:00.083</Duration>` 写无限定名（即框架自己的 xmlns 下的类型）存成真 `Duration`，
+   四种消费形状——属性 `{ThemeResource}`、属性 `{StaticResource}`、隐式样式 Setter、**ControlTemplate 内部**——
+   全部在已挂载要素上读回 83ms；同一个键换成上游的 `<x:String>` 行，四种形状一律读回 180ms
+   （`UIElement.TransitionDuration` 的框架默认值），不报错。`clr-namespace:…;assembly=Jalium.UI.Core` 与
+   `=Jalium.UI.Managed` 两种限定拼写都解不出 `Duration`（转发壳那笔账），`<sys:TimeSpan>` 更糟：行本身就把小数丢了
+   （`00:00:00.083` 存成 `00:00:00`）。所以已有的 `CornerRadius`/`Thickness` 行与本条 `Duration` 行是一族，
+   `x:Double`/`FontFamily` 是另一族：**分界是"框架类型 + 无限定名"，不是"类型化行都不行"**。
+   另两条同一探针量到的：写 `Duration` 行时 `"Auto"` 会抛 `FormatException`（想清空得写 `0`），
+   而行被丢弃 vs 刻意归零是可辨的——前者 `HasTimeSpan=False` 且 `ToString()=="Automatic"`，后者 `True` 且 `00:00:00`。
+
+规则：数值（`double`）令牌写字面量并在样式注释里点明它来自哪条不可发布的行；框架结构类型（`CornerRadius`、
+`Thickness`、`Duration`）用无限定名的类型化行发布，且必须配一条"从已挂载要素读回该值"的测试——`{ThemeResource}`
+交付的是属性默认值而不是失败，绿灯的构建与解析都不算证据。不要为了"看起来发布了"改用 `sys:Double` 或字符串行；
+任何"某个数字/字形印出了墨"的主张只能靠树上读数，色块主张才走像素。
 

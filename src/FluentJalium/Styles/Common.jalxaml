@@ -28,7 +28,7 @@
         <Grid Background="Transparent">
           <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
             <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
                               ContentStringFormat="{TemplateBinding ContentStringFormat}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -174,7 +174,7 @@
         <Grid Background="Transparent">
           <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
             <Path Name="Chevron" Data="M 0,1.5 L 5,6.5 L 10,1.5" Width="12" Height="12" Stretch="Uniform"
                   Stroke="{ThemeResource SplitButtonForegroundSecondary}" StrokeThickness="1.25"
                   HorizontalAlignment="Right" VerticalAlignment="Center" />
@@ -271,7 +271,7 @@
         <Grid Background="Transparent">
           <Border Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
-                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="0:0:0.083">
+                  Padding="{TemplateBinding Padding}" TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
             <Grid>
               <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

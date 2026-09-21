@@ -21,6 +21,8 @@ public static class FluentThemeManager
     private static ResourceDictionary? _palette;
     private static ResourceDictionary? _light;
     private static ResourceDictionary? _dark;
+    private static ResourceDictionary? _motion;
+    private static readonly Dictionary<string, Duration> MotionDesigns = new(StringComparer.Ordinal);
     private static Dictionary<string, string>? _highContrastMap;
     private static readonly List<ResourceDictionary> Installed = [];
     private static readonly Dictionary<string, Color> BrushOverrides = new(StringComparer.Ordinal);
@@ -46,11 +48,12 @@ public static class FluentThemeManager
     public static event Action? Changed;
 
     /// <summary>
-    /// Suppresses the animations Astra drives from code: the page entrance and the navigation
-    /// selection indicator. Template transitions — including the toggle switch thumb — keep their
-    /// designed durations until the motion stage turns them into resource keys; see
-    /// docs/astra/ROADMAP.md. Removing the old visual-tree walk means a mid-session flip of this
-    /// property no longer restyles already-realised templates, which is the honest behaviour.
+    /// Suppresses the animations Astra drives from code - the page entrance and the navigation selection
+    /// indicator - and rewrites the three published animation durations to zero, which is what a template
+    /// transition reads at the moment it would start. The rows live in ThemeResources/Motion.jalxaml and are
+    /// rewritten in place, so a realised template picks the change up on its next transition without a visual-tree
+    /// walk; a transition already running keeps its clock. Jalium additionally gates every automatic transition
+    /// on the OS accessibility settings, so a user who has turned animations off is honoured either way.
     /// </summary>
     public static bool ReduceMotion
     {
@@ -60,6 +63,7 @@ public static class FluentThemeManager
             VerifyAccess();
             if (_reduceMotion == value) return;
             _reduceMotion = value;
+            ApplyMotionKeys();
             NotifyChanged();
         }
     }
@@ -86,7 +90,15 @@ public static class FluentThemeManager
             _palette = Load(Palette + "Light.jalxaml");
             RefreshPalette();
             Add(_palette);
-            foreach (var path in DictionaryNames) Add(Load(path));
+            foreach (var path in DictionaryNames)
+            {
+                var dictionary = Load(path);
+                if (path.EndsWith(MotionDictionary, StringComparison.Ordinal)) _motion = dictionary;
+                Add(dictionary);
+            }
+            if (_motion is null) throw new InvalidOperationException($"The Astra manifest does not carry {MotionDictionary}, so ReduceMotion would have nothing to rewrite.");
+            CaptureMotionDesigns();
+            ApplyMotionKeys();
         }
         catch
         {
@@ -94,6 +106,8 @@ public static class FluentThemeManager
             Installed.Clear();
             _application = null;
             _palette = _light = _dark = null;
+            _motion = null;
+            MotionDesigns.Clear();
             throw;
         }
         NotifyChanged();
@@ -185,6 +199,7 @@ public static class FluentThemeManager
     }
 
     private const string Palette = "ThemeResources/";
+    private const string MotionDictionary = "Motion.jalxaml";
     private static readonly string[] ResourceRoots = ["ThemeResources/", "Styles/", "Themes/"];
 
     private static readonly Dictionary<string, string> EmbeddedNames = BuildEmbeddedNames();
@@ -226,6 +241,35 @@ public static class FluentThemeManager
         }
         foreach (var (key, value) in BrushOverrides) SetColor(key, value);
         ApplyNativeThemeMode();
+    }
+
+    /// <summary>
+    /// Reads every published duration back out of the loaded row, so the designed numbers keep one authority: a
+    /// code-side copy of 83ms and 167ms would be a second set that could drift from the dictionary. A row the reader
+    /// turned into something that is not a <see cref="Duration"/> is not captured, which is what makes an
+    /// unreadable row a startup failure rather than a silent default.
+    /// </summary>
+    private static void CaptureMotionDesigns()
+    {
+        MotionDesigns.Clear();
+        foreach (DictionaryEntry entry in _motion!)
+        {
+            if (entry.Key is string key && entry.Value is Duration duration && duration.HasTimeSpan) MotionDesigns[key] = duration;
+        }
+
+        if (MotionDesigns.Count == 0) throw new InvalidOperationException("ThemeResources/Motion.jalxaml holds no row that reads back as a Duration.");
+    }
+
+    /// <summary>
+    /// Writes the designed duration, or zero, into the live motion rows. Zero is what the framework reads as "do not
+    /// animate": UIElement consults TransitionDuration at the moment a transition would start and starts nothing when
+    /// the value has no TimeSpan or is at or below zero, so rewriting the row reaches a realised template on its next
+    /// transition without a visual-tree walk (spike/MotionProbe [3b] and [4]).
+    /// </summary>
+    private static void ApplyMotionKeys()
+    {
+        if (_motion is null) return;
+        foreach (var (key, designed) in MotionDesigns) _motion[key] = _reduceMotion ? new Duration(TimeSpan.Zero) : designed;
     }
 
     /// <summary>

@@ -28,7 +28,7 @@
         <Grid Background="Transparent">
           <Border Name="Root" Shape="RoundedRectangle" CornerRadius="{TemplateBinding CornerRadius}"
                   Background="{TemplateBinding Background}" TransitionProperty="Background"
-                  TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
+                  TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" TransitionTimingFunction="Recommended">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                               Content="{TemplateBinding Content}" />
           </Border>
@@ -81,7 +81,7 @@
         <Grid Background="Transparent" MinHeight="36">
           <Border Name="Root" Shape="RoundedRectangle" CornerRadius="{TemplateBinding CornerRadius}"
                   Background="{TemplateBinding Background}" TransitionProperty="Background"
-                  TransitionDuration="0:0:0.083" TransitionTimingFunction="Recommended">
+                  TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" TransitionTimingFunction="Recommended">
             <Grid>
               <Grid.ColumnDefinitions>
                 <!-- NavigationViewIconBoxWidth (40) and NavigationViewItemOnLeftIconBoxHeight (16) are x:Double
@@ -196,7 +196,7 @@
           </Grid.ColumnDefinitions>
           <!-- 240 is OpenPaneLength's default on the control, not a row upstream publishes. -->
           <Border Name="PART_PaneRoot" Width="240" ClipToBounds="True"
-                  TransitionProperty="Width" TransitionDuration="0:0:0.200" TransitionTimingFunction="Recommended">
+                  TransitionProperty="Width" TransitionDuration="{ThemeResource SplitViewPaneAnimationOpenDuration}" TransitionTimingFunction="Recommended">
             <Grid Margin="0,8">
               <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
