@@ -28,7 +28,18 @@ internal static class PixelHarness
     private const int FramesPerRound = 4;
     private const int MaxRounds = 12;
 
-    internal sealed record Sample(int Width, int Height, Dictionary<uint, int> Histogram, int Rounds = 0, bool Stable = false, string Subject = "")
+    /// <summary>How long one round is willing to wait for its frames.</summary>
+    private const int PumpBudgetMilliseconds = 400;
+
+    /// <summary>
+    /// The settle question needs <i>two</i> rounds to be answerable at all, and a round costs at most
+    /// <see cref="PumpBudgetMilliseconds"/>, so a cap below two of those can only ever answer "not settled" about
+    /// a picture that is perfectly still but slow to get frames. Three rounds' worth is the smallest cap that
+    /// cannot fail for that reason; a picture that genuinely keeps changing still fails, just after being asked.
+    /// </summary>
+    private const int SettleBudgetMilliseconds = PumpBudgetMilliseconds * 3;
+
+    internal sealed record Sample(int Width, int Height, Dictionary<uint, int> Histogram, int Rounds = 0, bool Stable = false, string Subject = "", int CaptureMilliseconds = 0)
     {
         internal int DistinctColors => Histogram.Count;
 
@@ -148,7 +159,10 @@ internal static class PixelHarness
         var window = EnsureHost(width, height);
         window.Content = element;
         window.UpdateLayout();
-        return Capture(() => CaptureRaw(window, (int)window.ActualWidth, (int)window.ActualHeight));
+        // The subject travels with the sample: a capture that gives up used to report "never settled" with an
+        // empty description, which left no way to tell which of the two shapes it was without re-running.
+        return Capture(() => CaptureRaw(window, (int)window.ActualWidth, (int)window.ActualHeight))
+            with { Subject = $"host/{element.GetType().Name}@{window.ActualWidth}x{window.ActualHeight}" };
     }
 
     /// <summary>
@@ -234,20 +248,28 @@ internal static class PixelHarness
     /// </summary>
     private static Sample Capture(Func<Sample> grab)
     {
-        var deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * 4 / 10;
+        var started = Stopwatch.GetTimestamp();
+        var deadline = started + Stopwatch.Frequency * SettleBudgetMilliseconds / 1000;
         Sample? previous = null;
-        for (var round = 1; round <= MaxRounds; round++)
+        var round = 0;
+        for (round = 1; round <= MaxRounds; round++)
         {
             Pump(FramesPerRound);
             var current = grab();
             if (previous is not null && current.PaintedPixels > 0 && SamePicture(current, previous))
-                return current with { Rounds = round, Stable = true };
+                return current with { Rounds = round, Stable = true, CaptureMilliseconds = Elapsed(started) };
             previous = current;
             if (Stopwatch.GetTimestamp() > deadline) break;
         }
 
-        return previous ?? new Sample(0, 0, [], 0, false);
+        // The round count and the clock survive the failure now, because the two shapes of "not settled" read
+        // identically without them: a picture that really keeps changing spends many rounds, while a picture that
+        // is perfectly still but starved of frames runs out of the budget after one or two - and the second one is
+        // this harness's own fault, not the subject's.
+        return (previous ?? new Sample(0, 0, [])) with { Rounds = round, Stable = false, CaptureMilliseconds = Elapsed(started) };
     }
+
+    private static int Elapsed(long started) => (int)Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
     /// <summary>What the style pipeline actually resolved for the subject, recorded while it is still in the tree.</summary>
     private static string Describe(FrameworkElement element) =>
@@ -266,7 +288,7 @@ internal static class PixelHarness
     /// never executed. Measured as a 60-second fixture timeout on any focus change that starts no
     /// animation (a focused Slider) while controls that do animate returned in milliseconds.
     /// </summary>
-    private static int Pump(int frames, int budgetMilliseconds = 400)
+    private static int Pump(int frames, int budgetMilliseconds = PumpBudgetMilliseconds)
     {
         var frame = new DispatcherFrame();
         var dispatcher = Dispatcher.CurrentDispatcher;

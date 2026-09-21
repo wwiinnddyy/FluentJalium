@@ -194,13 +194,45 @@ Dispatcher.CurrentDispatcher.InvokeAsync(() => frame.Continue = false)
 规则：拿 `Host()` 做判据时，(a) 主体只经 `Host()` 上屏；(b) 断言写成"某个色键在 A 里比在 B 里多 N 像素"，
 不要写成"两张直方图差 N 个像素"；(c) N 先量再一次写死，且把两种跑法的读数都记下。
 
+## 判据自己的耐心不够：settle 上限小于它自己要做的两次等待（阶段 6 第三段，2026-09-21）
+
+四遍串行闸口在同一棵树上给出三种结果（绿 / `AstraContentDialogTests` 整类 + 一条菜单 / 一条 NavigationView pill /
+一条 TeachingTip 落边），把 pill 那条单跑三次拿到 **1 通过 + 2 次"the pane never settled"**，而那条失败消息里
+`{sample.Subject}` 打出来是**空的**——两件事一起指向判据本身而不是控件：
+
+1. **算术**：`Capture` 的判据是"连续两轮抓到同一张图"，一轮最多花 `Pump` 的 400 ms 帧预算；而它给自己的总上限
+   也正好是 **400 ms**。也就是说**一轮花满就没有第二轮**，于是一幅完全静止、只是这一拍迟迟不来帧的画面，
+   会被判成"never settled"。这不是"图在动"，是**问问题的时间不够问完**——之前"仍未证"第三条记的那次
+   "8/16 超时、很可能就是静止不来帧"就是同一件事，只是当时没留下读数。
+2. **报告**：失败路径上 `Sample` 的 `Subject` 从没被赋值（`Host()` 不像 `Render()` 会补一句描述），
+   所以红字里只剩"the pane never settled: "，既不知道是哪张图、也不知道它试了几轮、花了多久。
+
+改法（都在 `tests/FluentJalium.Tests/Pixel/PixelHarness.cs`，判据的形状不变）：
+`Pump` 的预算与 `Capture` 的上限不再各写各的字面量——`SettleBudgetMilliseconds = PumpBudgetMilliseconds * 3`，
+即"至少够问完两轮再加一轮余量"；三轮是能回答这个问题的最小上限，真正在动的图照样不过，只是先被问过。
+超时那条路现在保留 `Rounds` 与新增的 `CaptureMilliseconds`，`Host()` 也补上 `Subject`。
+于是"never settled"从一句话变成两种可读形状：**轮数多 = 图真的在变**，**轮数 1~2 且 ms ≈ 上限 = 帧来晚了**
+（后一种现在是判据的事，不是被测控件的事）。
+
+配套一条 measured 记录：pill 那条改后**单跑 4/4 绿**，再在 8 个 bash 空转进程的 CPU 负载下**仍 3/3 绿**
+（1 s / 4 s 一次），随后 `AstraNavigationTests + AstraTeachingTipTests + AstraDividerTests` 三类
+**165/165 绿**（2 m 35 s，Debug 0 警告 0 错误）；再之后**整套串行闸口第五遍全绿**——
+Debug 0 警告 0 错误、**1288/1288、0 失败、0 跳过**（5 m 28 s）、调色板三行 `checked=True`、
+`keys.md is current: 1257 canonical lines.`、`All Astra gates passed.`，而这是连着三遍红之后的第一遍绿。
+**不能**把这遍绿当"已修"：改后再没能抓到一次红，所以"来帧慢"的确切触发条件仍未证——它只在整套顺序跑
+（多个窗口与多个 DX12 设备并存）时出现过；#35 / #47 / #48 因此都还开着。这次真正的收获是：
+下次再红，红字会自己说是哪一种（轮数与毫秒都会写在消息里）。
+
 ## 仍未证
 
 - 半透明刷（`ControlFillColorSecondaryBrush` 这类带 alpha 的令牌）在 `self` 路径上能否被正确区分——
   alpha 字节不可信，这条只能等整窗裁剪基座做出来再验。**NavigationView 批已经把整窗那条路走通了**
   （见上面"`Host()` 的两条边界"：叠色用单色键增量断言），但 `self` 路径本身仍未解决。
 - 混合 DPI（1.0 / 1.25 / 1.75）下的计数一致性：只在本机 1.75 上证过 1:1 这条规则。
-- 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时。**很可能**就是上面那条看门狗缺陷（静止 → 不来帧 →
-  永不返回），但那次没有留下逐步日志，不能算已归因；本批只把"聚焦无动画的控件"这一条测到底。
+- 静止场景"来帧"的确切条件：run1 出现过一次 8/16 超时，阶段 6 第三段又抓到两次同形状的
+  "the pane never settled"。**判据侧的那一半已经归因**（见上一节：上限只够一轮，静止但迟来的帧必然被判不稳），
+  并且把上限改成派生量之后**再没能复现出红**（单跑 4/4、8 个 CPU 空转下 3/3、三类 165/165）。
+  仍然未证的是另一半：**什么条件下帧会迟到到花满一轮**——它只在整套顺序跑时出现过，改后没有再红过，
+  所以不能宣布已修（#35 / #47 / #48 保持打开）。
 - 除 Button / ScrollViewer+ScrollBar / Popup+FlyoutPresenter / ToolTip / 窗口外壳之外的隐式样式归因。
   另外**真实输入→状态**这一半只在悬停上证过一次，且不进闸口（见 `audits/button.md` 的指针通路一节）。

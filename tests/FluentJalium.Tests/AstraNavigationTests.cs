@@ -254,7 +254,9 @@ public sealed class AstraNavigationTests
             // under the lower reading, and docs/astra/adaptation/s1k-navigation-raw.txt carries both.
             var pill = selected.Count(PillOverPane) - resting.Count(PillOverPane);
             Assert.Multiple(
-                () => Assert.True(selected.Stable, $"the pane never settled: {selected.Subject}"),
+                () => Assert.True(selected.Stable,
+                    $"the pane never settled: {selected.Subject} spent {selected.Rounds} rounds in {selected.CaptureMilliseconds} ms; "
+                    + $"resting {resting.Rounds} rounds in {resting.CaptureMilliseconds} ms"),
                 () => Assert.True(pill > 6000,
                     $"selecting added {pill} pixels of the pill colour; selected {selected.Top(4)} resting {resting.Top(4)}"),
                 () => Assert.Equal(0, selected.Count(BrandEmerald)));
