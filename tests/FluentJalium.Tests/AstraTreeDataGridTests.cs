@@ -308,19 +308,41 @@ public sealed class AstraTreeDataGridTests : IDisposable
     [Fact]
     public void The_tree_repaints_between_the_two_themes()
     {
+        // Same instrument rule as the DataGrid twin: the surface token is translucent and its two themes share one
+        // RGB, so each theme is captured on its own opaque page and has to show the card token's composite there
+        // (docs/astra/adaptation/06-pixel-attribution.md, last section).
+        var lightPlate = Color.FromRgb(0xF3, 0xF3, 0xF3);
+        var darkPlate = Color.FromRgb(0x20, 0x20, 0x20);
+
         _fixture.Run(() =>
         {
-            var light = PixelHarness.Render(Mount(Tree()), 440, 160);
+            var light = OnPlate(Tree(), lightPlate);
+            var lightInk = SurfaceOver(lightPlate);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(Mount(Tree()), 440, 160);
+            var dark = OnPlate(Tree(), darkPlate);
+            var darkInk = SurfaceOver(darkPlate);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.Stable, $"light capture never settled: {light.Top(6)}");
-            Assert.True(light.PaintedPixels > 1_000, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 1_000, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.True(light.Stable && dark.Stable, $"a capture never settled: {light.Top(6)} / {dark.Top(6)}");
+            Assert.NotEqual(lightInk, darkInk);
+            Assert.True(light.Count(lightInk) > 2_000,
+                $"the light card token did not paint the surface over its own page; ink={lightInk} count={light.Count(lightInk)} top={light.Top(6)}");
+            Assert.True(dark.Count(darkInk) > 2_000,
+                $"the dark card token did not paint the surface over its own page; ink={darkInk} count={dark.Count(darkInk)} top={dark.Top(6)}");
+            Assert.Equal(0, dark.Count(lightInk));
         });
     }
+
+    private static PixelHarness.Sample OnPlate(FrameworkElement subject, Color plate)
+    {
+        var host = PixelHarness.Backdrop(subject, plate);
+        PixelHarness.Build(host, 440, 200);
+        PixelHarness.Settle(60);
+        return PixelHarness.Render(host, 440, 200);
+    }
+
+    private static Color SurfaceOver(Color plate) =>
+        PixelHarness.Over(plate, ((SolidColorBrush)Application.Current!.TryFindResource("DataGridBackground")!).Color);
 
     /// <summary>
     /// The host's two metrics have to travel through the control, not just sit on it: the row height is a value the

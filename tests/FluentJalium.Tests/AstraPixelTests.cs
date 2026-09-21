@@ -250,22 +250,38 @@ public sealed class AstraPixelTests
     [Fact]
     public void The_scroll_bar_thumb_follows_the_theme_and_shows_no_brand_emerald()
     {
-        // The palette holds ScrollBarThumb as #72000000 for Light and #8BFFFFFF for Dark, and the
-        // capture keeps the colour channels, so the dark branch has to show white pixels where the
-        // thumb is and the light branch must not leak them. The whole bar is captured rather than the
-        // thumb because a light-theme thumb is black, which an unpainted surface also reads as.
+        // The palette holds ScrollBarThumb as #72000000 for Light and #8BFFFFFF for Dark. Attribution is the whole
+        // problem here, twice over: a capture keeps only the colour bytes, so a translucent brush over nothing reads
+        // as its own RGB (adaptation/06, last section), and ScrollBarTrack is #0FFFFFFF in Dark - the same white RGB
+        // as the thumb. Measured 2026-09-21, the old "dark shows white" reading was the TRACK's ink: with the track
+        // pinned to an opaque decoy, white disappears and the thumb shows up where it actually lands, on the decoy -
+        // #FF8BFF, 64 pixels, which is Over(decoy, #8BFFFFFF). So the claim is now the composite, not the colour.
+        var decoy = Color.FromRgb(0xFF, 0x00, 0xFF);
         _fixture.Run(() =>
         {
             var light = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
-            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var thumb = Assert.IsType<SolidColorBrush>(Application.Current!.TryFindResource("ScrollBarThumb")!).Color;
+            FluentThemeManager.OverrideBrush("ScrollBarTrack", decoy);
+            PixelHarness.Sample dark;
+            try
+            {
+                dark = PixelHarness.RenderPart<ScrollBar>(Scroller(), 200, 44);
+            }
+            finally
+            {
+                FluentThemeManager.OverrideBrush("ScrollBarTrack", null);
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
 
+            var thumbOnDecoy = PixelHarness.Over(decoy, thumb);
             Assert.Equal(0, light.CountAny(BrandEmerald));
-            Assert.True(dark.Count(Colors.White) > 48,
-                $"dark thumb brush did not reach the bar; top={dark.Top(6)}");
-            Assert.Equal(0, light.Count(Colors.White));
+            Assert.True(dark.Count(decoy) > 48,
+                $"the decoy did not paint the track, so the thumb claim below proves nothing; top={dark.Top(6)}");
+            Assert.True(dark.Count(thumbOnDecoy) > 48,
+                $"the dark thumb did not paint over the track; ink={thumbOnDecoy} count={dark.Count(thumbOnDecoy)} top={dark.Top(6)}");
+            Assert.Equal(0, light.Count(thumbOnDecoy));
         });
     }
 

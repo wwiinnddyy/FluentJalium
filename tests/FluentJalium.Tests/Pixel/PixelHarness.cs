@@ -207,6 +207,26 @@ internal static class PixelHarness
     internal static string Hex(uint key) => $"#{key:X6}";
 
     /// <summary>
+    /// An opaque plate for a subject whose token is translucent. A capture keeps only the colour bytes
+    /// (<c>Bgr32</c>), so over nothing a translucent brush reports its own RGB and the claim cannot be falsified;
+    /// over a plate it lands as <see cref="Over"/>, which is nameable in advance. The measurement is in
+    /// <c>docs/astra/adaptation/06-pixel-attribution.md</c>, last section.
+    /// </summary>
+    internal static Border Backdrop(FrameworkElement subject, Color plate) => new()
+    {
+        Background = new SolidColorBrush(plate),
+        Child = subject,
+    };
+
+    /// <summary>The colour an ink lands on when composited source-over an opaque plate, byte-quantised like the renderer.</summary>
+    internal static Color Over(Color plate, Color ink)
+    {
+        static byte Blend(byte back, byte front, double alpha) => (byte)Math.Round(back + (front - back) * alpha);
+        var a = ink.A / 255d;
+        return Color.FromRgb(Blend(plate.R, ink.R, a), Blend(plate.G, ink.G, a), Blend(plate.B, ink.B, a));
+    }
+
+    /// <summary>
     /// The one shown host window, for a claim about the chrome it builds itself. Callers must not
     /// resize or replace its content as a side effect of measuring the shell.
     /// </summary>

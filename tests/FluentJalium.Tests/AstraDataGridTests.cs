@@ -483,19 +483,41 @@ public sealed class AstraDataGridTests : IDisposable
     [Fact]
     public void The_grid_repaints_between_the_two_themes()
     {
+        // Both branches' surface token is translucent and the two share one RGB (Light #B3FFFFFF, Dark #0DFFFFFF),
+        // so a bare crop of the difference proves nothing - see adaptation/06's last section. Each theme is captured
+        // on its own opaque page and has to show the card token's composite there.
+        var lightPlate = Color.FromRgb(0xF3, 0xF3, 0xF3);
+        var darkPlate = Color.FromRgb(0x20, 0x20, 0x20);
+
         _fixture.Run(() =>
         {
-            var light = PixelHarness.Render(Mount(Grid()), 420, 160);
+            var light = OnPlate(Grid(), lightPlate);
+            var lightInk = SurfaceOver(lightPlate);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(Mount(Grid(rows: 3)), 420, 160);
+            var dark = OnPlate(Grid(rows: 3), darkPlate);
+            var darkInk = SurfaceOver(darkPlate);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
-            Assert.True(light.Stable, $"light capture never settled: {light.Top(6)}");
-            Assert.True(light.PaintedPixels > 1_000, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 1_000, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
+            Assert.True(light.Stable && dark.Stable, $"a capture never settled: {light.Top(6)} / {dark.Top(6)}");
+            Assert.NotEqual(lightInk, darkInk);
+            Assert.True(light.Count(lightInk) > 2_000,
+                $"the light card token did not paint the surface over its own page; ink={lightInk} count={light.Count(lightInk)} top={light.Top(6)}");
+            Assert.True(dark.Count(darkInk) > 2_000,
+                $"the dark card token did not paint the surface over its own page; ink={darkInk} count={dark.Count(darkInk)} top={dark.Top(6)}");
+            Assert.Equal(0, dark.Count(lightInk));
         });
     }
+
+    private static PixelHarness.Sample OnPlate(FrameworkElement subject, Color plate)
+    {
+        var host = PixelHarness.Backdrop(subject, plate);
+        PixelHarness.Build(host, 440, 200);
+        PixelHarness.Settle(60);
+        return PixelHarness.Render(host, 440, 200);
+    }
+
+    private static Color SurfaceOver(Color plate) =>
+        PixelHarness.Over(plate, Assert.IsType<SolidColorBrush>(Brush("DataGridBackground")).Color);
 
     /// <summary>
     /// The instrument fact underneath every dark-theme pixel claim in this suite, pinned where it was first met.

@@ -2067,5 +2067,56 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 比上一批 1457 多 1 条＝本批复判的新用例；Debug 真重编 `0 个警告 / 0 个错误`；调色板三档 `checked=True`；
 `keys.md is current: 1298 canonical lines.`（键不变）；末行 `All Astra gates passed.`。
 
+## 复批判 第二步：暗色像素断言配底——三条改判，其中一条是**认错了人**（2026-09-21，#59 开工）
+
+上一批立下的判据（"暗色腿 + 半透明令牌"的像素主张必须自带不透明底、期望要算成 source-over 值）先落到仪器上：
+`PixelHarness` 新增 `Backdrop(subject, plate)`（给主体配一张不透明页底并**由包裹层往下成像**）与 `Over(plate, ink)`
+（按渲染器的整数量化算 source-over，`round(back + (front-back)*A)`），两条都带"为什么存在"的注释并指向 `adaptation/06`。
+本批把三条既有主张改成能证伪的形状。
+
+1. **表格族两档重绘**（`AstraDataGridTests.The_grid_repaints_between_the_two_themes`、
+   `AstraTreeDataGridTests.The_tree_repaints_between_the_two_themes`）。老断言是"两档 `Top(2)` 不同 +
+   `PaintedPixels > 1_000`"——按新读法这证不到"表面令牌落到了像素"（一片没画的透明与正好合成出该颜色给同类读数）。
+   现在两档各自配底（亮 `#F3F3F3`、暗 `#202020`），期望值**从树上读到的令牌算出来**而不是点名常量：
+   `SurfaceOver(plate) = Over(plate, DataGridBackground)`，两档都要 `> 2_000` 格，再加一条跨档腿
+   `dark.Count(lightInk) == 0`。合成值本身：亮档 `#B3FFFFFF` 叠 `#F3F3F3` → `#FBFBFB`，暗档 `#0DFFFFFF` 叠
+   `#202020` → `#2B2B2B`（与上一批的实测一致）。
+2. **滚动条滑块**（`AstraPixelTests.The_scroll_bar_thumb_follows_the_theme_and_shows_no_brand_emerald`）。
+   这一条的问题比"没配底"更糟：**它一直在数别人的墨**。暗色下 `ScrollBarThumb = #8BFFFFFF`、
+   `ScrollBarTrack = #0FFFFFFF`，两支 RGB 都是白，所以老断言 `dark.Count(Colors.White) > 48` 数的是**轨道**。
+   把轨道钉成不透明洋红诱饵（`OverrideBrush("ScrollBarTrack", #FF00FF)`）之后白色整个消失，滑块的墨出现在它真正
+   落在的地方——洋红之上：`Over(#FF00FF, #8BFFFFFF) = #FF8BFF`，实测 **64 格**。断言改成三腿：诱饵色自身
+   `> 48`（先证明钉底到达，否则下面的读数什么都不是）、`#FF8BFF > 48`、亮档同键 0。跨批判据：**断"某个半透明令牌
+   到了像素"之前，要先回答"这张图里还有谁带同一组 RGB"**——把别人钉成诱饵或给自己配底，然后断合成值而不是颜色名。
+3. 量这条时顺手撞开 `RenderPart<T>` 的边界：它把部件单独成像，**祖先不进裁剪图**，所以包在它外面的页底既不产生
+   `#202020` 也不产生任何合成值（读数仍是 `#000000/#FFFFFF/#D2D2D2`）。"带底合成"只认 `Render(wrapper)` /
+   `PixelAt(wrapper,…)`；`RenderPart` 只配得上"这个部件自己画没画"这类不依赖背衬的主张（记 `adaptation/06` 第 5 条）。
+
+四类证据：**构建**见下闸口读数；**行为**三条主张改判后各自带读数消息（点名 plate、令牌、算出的合成值与实测格数）；
+**视觉**即上面 `#FBFBFB`/`#2B2B2B` `> 2_000` 格与 `#FF8BFF` 64 格；**硬件输入**本批不动输入路径。
+
+**牙的验证（A/B）**：两条突变各撞一条腿，一次跑完（先存 A/B 前的 `git diff` 快照）。把 `OnPlate` 的页底改成 alpha=0，
+其余一律不动（`Over()` 仍按同一算式给期望值）→ 表格与树两条各红，消息点名 `ink=#FFFBFBFB count=0`，而同一裁剪图的众数
+变成 `#FFFFFF` 51 908 格——正是"没有底时半透明白报自己的 RGB"这条仪器账本身。另一条只把 `ScrollBarThumb` 钉成不透明绿、
+诱饵腿不动 → 滑块用例红，`ink=#FFFF8BFF count=0`，同时那 **64 格**从 `#FF8BFF` 整块搬到 `#00FF00`
+（`top=#FF00FFx144 #00FF00x64`）：被数的确实是滑块自己的那支刷子，不是这片布局里任何别的东西。三条改回 → 三个类合跑
+**82/82 绿**（23 s），改回后的 `git diff` 与 A/B 前快照逐字节相同（脚本读回 `REVERT_EXACT`），Debug 真重编 `0 警告 / 0 错误`。
+
+**闸口读数**（串行 `tools/Test-AstraGates.ps1`，管道退出 **0**）：整套 **1458/1458 通过、0 失败、0 跳过**（6 m 27 s）——
+本批只把三条既有断言改判，不新增用例，所以条数与上一批持平；`0 个警告 / 0 个错误`（14.31 s，含 Gallery 重编）；
+调色板三档 `checked=True`（Light/Dark 各 83 源色→101 刷，HighContrast 101 键映射 + 3 条按住）；
+`keys.md is current: 1298 canonical lines.`（键不变，本批不动资源只动判据）；末行 `All Astra gates passed.`。
+闸口跑在改判后的树上，A/B 之后的工作副本与它逐字节相同，所以这笔读数对最终状态成立。
+
+不声称：**同族还有 11 条暗色/两档像素主张没有补底**，本批只结清最吃重的三条，其余按同一配方另起一批——
+`AstraMenuTests.cs:908`、`AstraTreeViewTests.cs:579`、`AstraAppBarTests.cs:889`、`AstraSplitButtonTests.cs:381`、
+`AstraSplitButtonTests.cs:475`、`AstraToggleButtonTests.cs:395`、`AstraExpanderInfoBarTests.cs:361`、
+`AstraExpanderInfoBarTests.cs:607` 八处仍是 `PaintedPixels > 0` 两档对；`AstraComboBoxTests.cs:652`、
+`AstraAutoSuggestBoxTests.cs:519`、`AstraNumberBoxTests.cs:428` 三处仍是"`Top(4)` 不同 + `DistinctColors > 1`"。
+这 11 条按现读法只能证"这块区域有东西且两档不同"，证不到"某个半透明表面令牌落到了像素"；
+另外本批全是离屏 `Render()` 合成，真窗口里没有配底账（#10、#21 照欠），高对比档下这三条走什么色也没测（#57 照欠）；
+`ScrollBarTrack` 诱饵只量了暗色腿，轨道自身在亮色下的墨没测；`Over()` 的整数量化按"每通道一次 round"拟合，
+遇到两层以上半透明叠加时未与渲染器对齐验证过。
+
 
 
