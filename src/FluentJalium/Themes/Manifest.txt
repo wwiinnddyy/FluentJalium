@@ -40,6 +40,10 @@ ThemeResources/ProgressRing.jalxaml
 # The badge: two brush aliases and the four Thickness rows of upstream's twelve keys. The six x:Double rows are not
 # here - one spelling is rejected outright and the other carries zero instead of the number (spike/DoubleRowProbe).
 ThemeResources/InfoBadge.jalxaml
+# The rating: the eight brush aliases, the default font info row and the four item templates of upstream's sixteen
+# keys. Its three metric rows are x:Double too, so they became literals and constants the same way (spike/RatingProbe
+# measured the clip route the control then has to use instead of upstream's RectangleGeometry).
+ThemeResources/RatingControl.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -84,3 +88,7 @@ Styles/Divider.jalxaml
 # template, and three triggers standing in for upstream's four DisplayKindStates visual states - the fourth (Dot) is
 # the template's resting look.
 Styles/InfoBadge.jalxaml
+# The rating's look: one style, the implicit row, and six triggers for upstream's six CommonStates - each writing
+# the same foreground presenter upstream writes, and each reached through a state property this control publishes
+# because this runtime has no visual-state manager.
+Styles/RatingControl.jalxaml

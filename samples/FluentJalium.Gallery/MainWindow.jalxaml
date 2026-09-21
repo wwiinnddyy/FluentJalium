@@ -636,6 +636,18 @@
                 </StackPanel>
               </Border>
 
+              <TextBlock Text="Rating control" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <fluent:FluentRatingControl x:Name="SampleRating" />
+                  <fluent:FluentRatingControl Value="3.5" Caption="3.5 out of 5" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="4" IsReadOnly="True" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="2" MaxRating="10" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="5" IsEnabled="False" Margin="0,12,0,0" />
+                  <TextBlock Text="The runtime has no RatingControl, so this is our type. A star is drawn at upstream's 32 and shown at half, which is the resting value of the composition scale upstream puts on every item - this runtime gives an item no visual to animate, so the same 0.5 and the same quadratic lift toward 0.8 under a mouse (1.0 under a finger) are evaluated in code. Half stars are cut by a ClipToBounds host rather than upstream's Clip, which paints nothing here. What this card cannot show is the ink of the star itself: a glyph run reaches no capture on this runtime, so the size, the pitch and the crop are asserted in the tree - and the row really is 17 wide per star at a pitch of 25, which is the number the pointer maths divide by." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+
               <TextBlock Text="Divider" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel Margin="16">

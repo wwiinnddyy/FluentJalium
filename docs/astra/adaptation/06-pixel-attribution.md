@@ -289,3 +289,19 @@ B 之前那次"邻居活着时开对话框"其实把对话框开进了**邻居**
   所以不能宣布已修（#35 / #47 / #48 保持打开）。
 - 除 Button / ScrollViewer+ScrollBar / Popup+FlyoutPresenter / ToolTip / 窗口外壳之外的隐式样式归因。
   另外**真实输入→状态**这一半只在悬停上证过一次，且不进闸口（见 `audits/button.md` 的指针通路一节）。
+
+## 阶段 6 第五段补：捕获目标看不见它自己的 RenderTransform
+
+RatingControl 要把上游那条"画在 32、显示在 0.5"搬到本运行时，第一件事是问 `RenderTransform` 到底动不动墨。
+探针（`spike/RatingProbe`，读数 `adaptation/s1s-rating-raw.txt` [E]）前两行给的答复是"不动"：60×60 实色块挂上
+`ScaleTransform(0.5,0.5)`、原点 `0.5,0.5`，属性读回正确，`Count` 仍是 3 600 像素——与 `Clip` 那条死通路一个形状。
+
+差别在捕获对象。**换成更宽的祖先再量，缩放是真的落墨**：同一枚块从 200×200 宿主里读到 `x=15..44 y=15..44`、
+900 像素，无变换对照读到 `x=0..59`、3 600 像素。也就是说 `RenderTargetBitmap.Render(target)` 这张图
+**按目标的布局盒出图、对目标自身的 RenderTransform 没有分辨力**，这与本文件早已写下的"捕获目标的尺寸会伪装出裁剪"
+（`ClipToBounds` 那一节）是同一条仪器账的两种表现：**要看一个要素自己会不会改变自己的成像，必须从祖先那边看。**
+
+对本段的影响：控件的墨量断言一律走祖先；本段的 `PixelHarness.Render` 通路（自捕获）不参与星级断言，
+所以 `AstraRatingControlTests` 里 0 条像素用例不是漏，是判据在这条通路上没有分辨力。
+仍**未证**：`LayoutTransform` 与 `RenderTransform` 在自捕获下是否同样表现（本段没量前者）；
+祖先捕获在 DPI≠1.75 下的像素数比例（沿用本文件既有的"只在本机 1.75 证过"这条限制）。

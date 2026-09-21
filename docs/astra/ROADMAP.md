@@ -1786,3 +1786,60 @@ could not resolve a host window.`）。于是"单跑一类全绿、整套顺序�
 "邻居活着时开对话框"其实把对话框开进了**邻居**窗口）；harness 只有长期唯一宿主，正常路径碰不到，但弹层还开着
 时建对话框仍可能挂到弹层的顶层窗口上，这条留在 #35 的账下继续观察。另：`Symbol` 成员集合与钉住的 26.10.9
 程序集仍未逐字 diff（#37）。
+
+**阶段 6 第五段（RatingControl 落地——"一颗星多宽"这个问题问错了三层，2026-09-21）**：
+`RatingControl`/`Rating`/`RatingItemInfo`/`RatingItemFontInfo`/`RatingItemImageInfo` 五个名字在真正装着控件的
+程序集（`Jalium.UI.Managed`，2 958 个公开类型）里全部 ABSENT（`s1s` [A]），自有类型是被量出来的。
+键账：上游 16 把，本层发布 **13**（8 别名 + 1 字形条目 + 4 模板），扣住 3 把 `x:Double`（32 / 8 / -12.5）；
+前两条成常量与字面量并由测试从控件读回，**第三条整条不写**——它是上游配 `TextLineBounds="Tight"` 的补偿，
+本运行时的标题没有那个旋钮。`MUX_` 前缀照留。六个 `CommonStates` 一比一变成六条模板触发器，
+目标仍是上游那个 `ForegroundContentPresenter`，但部件类型换成 `ContentControl`
+（26.10.9 的 `ContentPresenter` 不声明 `Foreground`，写上去就是 #31/#33 那类死 setter）。
+
+三层"问错"是被三次红读数一层层顶出来的，全部按原样记：
+- **第一层：间距。** 照抄上游 `Spacing = 8-(advance-actual)`（cpp:249-268）后测试红：期望 24、实测 **34**。
+  探针 [C] 给出口径——`Spacing=-10` 属性读回 -10、三格 16 宽 desired 仍 48、pitch 仍 16：
+  **负号留在属性里、排布按 0 算**，这是继 `{x:Bind}` 与 `Clip` 之后第三类静默失效，而且最阴（属性读回会"证明你写了"）。
+  同一份 -10 拆成正 8 + 后续格 `Margin.Left=-18` 时 pitch 实测 24，负边距确实动布局。
+- **第二层：一颗星到底多宽。** `cpp:190-203` 用裸探针 run 的 `DesiredSize.Width` 覆盖 `m_scaledFontSizeForRendering`，
+  `cpp:51-55` 再取一半——所以模型里的星宽是**实测步进的一半**（本机 34 → 17），不是配置对子暗示的 16。
+  写死 16 的那版测试期望 24、实测 34，两条断言一起红。
+- **第三层：盒子选错。** 上游条目注释自己说了 "32 = 2 * [default fontsize]" 与 "-8,-8 are to compensate for the
+  default scale down"，而那道缩放是 `ApplyScaleExpressionAnimation`（cpp:372-392）：焦点停在哨兵值时二次式被夹到
+  **静止 0.5**，悬停向 0.8（鼠标）/1.0（触摸）抬。本运行时既无自动缩小也无可挂表达式的合成视觉，两件事都得自己写。
+  墨盒 34 当格子还会让半星非线性：墨居中在盒内，裁到 25% 时一刀切在墨左边界之前，什么都不显示。
+  最终**格子 = 墨盒 17**、面板只带公开的 8、条目 `RenderTransform` 缩放 0.5 且左移 8.5：
+  于是 `17+8=25` 同时是排布间距与模型间距，不需要任何补偿，也就没有可被吃掉的东西；
+  实测星宽 17、pitch 25、第五格 X=100、行右边界 117 = `5*17+4*8`，与指针模型逐位相符（`cpp:961/969` 同一套算术）。
+
+仪器自己也错过一次：探针先按"捕获目标自身"量缩放，读到 3 600 像素"缩放不落墨"；换更宽祖先才读到
+`x=15..44`、900 像素——**自捕获对目标自身的 RenderTransform 是瞎的**，已写进 `adaptation/06` 同名新节。
+
+四类证据分开记：
+1. 构建：`dotnet build FluentJalium.slnx -c Debug -t:Rebuild` → **0 警告 / 0 错误 / 17.25 s**。
+   闸口里那次 3.79 s 的"0 警告"是空跑，真重编第一遍确实抖出一条 CS8602（可空局部变量没收敛），改完再重量才归零。
+   `Manifest.txt` 64→**66** 份字典。
+2. 行为：新增 `AstraRatingControlTests` 37 个方法 / **64** 例（钳位从不抛、`MaxRating` 先落自己再拉低 Value/Placeholder、
+   `ValueChanged` 无增量守卫、清除被拒时落 1.0、方向键含 RTL、只读返回未处理、拖动越界清除、
+   字形角色回退表、六态画刷身份、逐格裁剪分数、状态先发布后 dressing、无字典也能建）。整套 1331 → **1395**。
+   **A/B 三次**：撤掉格边距 → pitch 42 且边距读回 0，两条红；退回上游那行负 `Spacing` → pitch 34 红；
+   还原 → 64/64 绿。keys.md 那两条红见下。
+3. 视觉：本段**没有星墨主张**，且新类里 **0 条像素用例**——不是漏，是自捕获对条目缩放没有分辨力（上段那条仪器账）。
+   像素列的可信主张只有探针里实色块那两组：`ClipToBounds` 按比例（30/60→1 800、45/60→2 700、20 宽盖 512 墨→恰 320），
+   `Clip` 完全不裁（3 600/3 600，markup 写法还读回 `rect=Empty`），以及 0.5 缩放经祖先读到 900 像素。
+4. 硬件输入：**仍为零**（#13）。钳位、分数、放大数值都走 routed 处理器调用的内部入口
+   （`TryHandleKey` / `PreviewPointerAt` / `CommitPointerAt` / `LeavePointer`），`MouseMove`→`PreviewAt` 的接线未证。
+
+**闸口自己把清单的盲点逼了出来**：第一次整套跑两条红——`Not in the document: MUX_RatingControlDefaultFontInfo`
+与 `Totals` 计数差 1。根因在**生成器**：`Report-AstraResourceKeys.ps1` 的元素名正则只吃 `[A-Za-z0-9.]`，
+`<controls:FluentRatingItemFontInfo x:Key=...>` 这种带命名空间前缀的键行整条看不见，而测试那台独立的
+`XDocument` 解析器照数。修的是工具不是断言：字符集放行 `:`，并给这类"对象行"补上"值就是它自己的属性"这一格口径。
+1280 → **1295** 行。这正是 #40 当初要做双解析器的理由：**工具与测试口径不一致时，红的是清单而不是某个人的记性。**
+
+**闸口读数（串行 `tools/Test-AstraGates.ps1`，管道退出 0）**：整套 **1395/1395 通过、0 失败、0 跳过**（6 m 21 s）；
+调色板三档 `checked=True`；`keys.md is current: 1295 canonical lines.`；末行 `All Astra gates passed.`
+
+不声称（同 `audits/rating-control.md` 第 12 节）：星的墨（#50 不变）；真指针/真触摸/真键（#13）；
+放大在星心与地板之间那一段的取值；焦点环外观与手柄通路；`ItemInfo` 图片路径的位图显示；
+高对比逐控件重指（审计第 6 节）；`RatingControlAutomationPeer` 与 `AccessibilityView`；
+以及"墨正好居中在 34 的盒子里"这一条对称假定——它若错，表现为整行左右偏一点，而这里无墨可量。

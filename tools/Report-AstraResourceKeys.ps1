@@ -36,7 +36,10 @@ function Get-Rows([string]$file, [string]$layer) {
     if (-not (Test-Path -LiteralPath $path)) { return @() }
     $text = Read-Source $path
     $rows = [System.Collections.Generic.List[object]]::new()
-    foreach ($match in [Regex]::Matches($text, '<([A-Za-z][A-Za-z0-9.]*)\s+([^>]*?)/?>')) {
+    # The element-name class allows a namespace prefix: an object row the layer publishes from a clr namespace -
+    # <controls:FluentRatingItemFontInfo x:Key="MUX_RatingControlDefaultFontInfo" .../> - is a public key too, and
+    # a reader that only matches bare names drops it out of the inventory while the test's XML parser keeps counting it.
+    foreach ($match in [Regex]::Matches($text, '<([A-Za-z][A-Za-z0-9.:]*)\s+([^>]*?)/?>')) {
         $type = $match.Groups[1].Value
         $attrs = $match.Groups[2].Value
         $key = [Regex]::Match($attrs, 'x:Key="([^"]*)"')
@@ -50,6 +53,11 @@ function Get-Rows([string]$file, [string]$layer) {
             if ($resource.Success) { $value = $resource.Groups[1].Value }
             elseif ($color.Success) { $value = $color.Groups[1].Value }
             elseif ($targetType.Success) { $value = $targetType.Groups[1].Value }
+            elseif ($type.Contains(':')) {
+                # A keyed object row from a clr namespace has no target to name - what it publishes is its own
+                # attributes, so those are what the row is worth to a reader.
+                $value = (($attrs -replace 'x:Key="[^"]*"', '') -replace '\s+', ' ').Trim()
+            }
             elseif ($tail -notmatch '/>$') {
                 $body = [Regex]::Match($text.Substring($match.Index), ('(?s)<[A-Za-z][A-Za-z0-9.]*\s+[^>]*?>(.*?)</' + [Regex]::Escape($type) + '>'))
                 if ($body.Success) { $value = $body.Groups[1].Value.Trim() }

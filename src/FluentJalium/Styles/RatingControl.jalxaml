@@ -1,0 +1,90 @@
+<!-- WinUI 3 RatingControl.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     6229cfe469d53d5d466f0baead99c19a5cc7eb6b - the control's default style, all eighty-two lines of it. One style
+     here, one implicit row, and the six CommonStates turned into six template triggers. The mapping table, the
+     upstream line numbers behind every setter, and what was dropped: docs/astra/audits/rating-control.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="DefaultRatingControlStyle" TargetType="controls:FluentRatingControl">
+    <!-- MinHeight 32 (:4) is RatingControlFontSizeForRendering's number again, and for the same reason it is a
+         literal: the row is an x:Double this reader cannot carry. -->
+    <Setter Property="MinHeight" Value="32" />
+    <!-- :6-7, with upstream's own comment that these two are stopgaps until every piece has a resource key. The
+         caption brush is the control's resting Foreground because the foreground layer only ever shows in a state,
+         and every state that can show it has a trigger below. -->
+    <Setter Property="Foreground" Value="{ThemeResource RatingControlCaptionForeground}" />
+    <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+    <Setter Property="ItemInfo" Value="{ThemeResource MUX_RatingControlDefaultFontInfo}" />
+    <!-- Three setters at :7, :15 and :16 are not written because this runtime declares no such member, and an
+         attribute it does not know is dropped in silence rather than rejected: UseSystemFocusVisuals,
+         FocusVisualMargin -8,-7,-8,0, and IsFocusEngagementEnabled. The focus ring therefore stays self-drawn like
+         every other control in this layer, and the gamepad engage/disengage contract upstream builds on the last
+         one has no counterpart here (audit clause 5, "no gamepad path"). -->
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FluentRatingControl">
+          <!-- LayoutRoot (:20) is the template root upstream names it, and it is the one thing that carries the
+               Background. The ±20/±40 reverse-margin pairs (:55-73) exist to keep the two item layers aligned
+               around a ContentPresenter that clips differently; here both layers sit in the same grid cell, so the
+               pair has nothing to compensate and is left out - which is also what removes upstream's need for the
+               two TranslateTransforms and the stale-ActualHeight write they carry (:229-242). -->
+          <Grid Name="LayoutRoot" Background="{TemplateBinding Background}">
+            <StackPanel Name="CaptionStackPanel" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+              <Grid Name="StarLayer" VerticalAlignment="Center">
+                <!-- Input rides on the background layer, as it does upstream (:56): the foreground layer is inside a
+                     presenter that is not hit-test visible at all, so a star never eats the pointer from the row
+                     that measures it. Background="Transparent" is upstream's own line and is what makes the empty
+                     part of the row answer the pointer. -->
+                <StackPanel Name="RatingBackgroundStackPanel" Orientation="Horizontal" Background="Transparent"
+                            HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <!-- :67, and the one element the six state setters below write to. The control reads this part's
+                     Foreground and hands it to the runs it loads from the four DataTemplates, because a run outside
+                     the template's name scope inherits nothing on this runtime. The part keeps upstream's name but
+                     is a ContentControl: 26.10.9's ContentPresenter declares no Foreground member at all, so
+                     writing one onto it would be exactly the dead setter #31 and #33 catalogued elsewhere. -->
+                <ContentControl Name="ForegroundContentPresenter" IsHitTestVisible="False"
+                                HorizontalAlignment="Left" VerticalAlignment="Center">
+                  <StackPanel Name="RatingForegroundStackPanel" Orientation="Horizontal" IsHitTestVisible="False" />
+                </ContentControl>
+              </Grid>
+              <!-- :61. Upstream's TextLineBounds="Tight", its CaptionTextBlockStyle and its two
+                   AutomationProperties values are not written: this runtime declares none of those three members,
+                   and the style it points at is not in this palette. FontSize 12 is its literal. The margin's Left
+                   is rewritten by FluentRatingControl at stamp time to the 12 DIP gap upstream names
+                   c_captionSpacing (RatingControl.cpp:253-259) - upstream subtracts the cell overhang from it there
+                   and this port has none to subtract, because its cells are sized to the ink. -->
+              <TextBlock Name="Caption" Margin="4,0,20,0" FontSize="12" VerticalAlignment="Center"
+                         Foreground="{TemplateBinding Foreground}" Text="{TemplateBinding Caption}" />
+            </StackPanel>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <!-- CommonStates (:21-53). Six states, each of which changes exactly one target upstream - the
+                 foreground presenter's brush - and each becomes one setter on that same part here, with the same
+                 TargetName upstream uses. Set and PointerOverSet share a key upstream itself shares (:45 and :50),
+                 and the unused RatingControlPointerOverSelectedForeground alias is published because upstream
+                 publishes it and dead here exactly as it is dead there. -->
+            <Trigger Property="ActiveRatingState" Value="Set">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlSelectedForeground}" />
+            </Trigger>
+            <Trigger Property="ActiveRatingState" Value="PointerOverSet">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlSelectedForeground}" />
+            </Trigger>
+            <Trigger Property="ActiveRatingState" Value="Placeholder">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlPlaceholderForeground}" />
+            </Trigger>
+            <Trigger Property="ActiveRatingState" Value="PointerOverPlaceholder">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlPointerOverPlaceholderForeground}" />
+            </Trigger>
+            <Trigger Property="ActiveRatingState" Value="PointerOverUnselected">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlPointerOverUnselectedForeground}" />
+            </Trigger>
+            <Trigger Property="ActiveRatingState" Value="Disabled">
+              <Setter TargetName="ForegroundContentPresenter" Property="Foreground" Value="{ThemeResource RatingControlDisabledSelectedForeground}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <Style TargetType="controls:FluentRatingControl" BasedOn="{StaticResource DefaultRatingControlStyle}" />
+</ResourceDictionary>

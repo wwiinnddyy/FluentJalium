@@ -641,6 +641,29 @@
         "no Severity enum and no AutomationPeer upstream either - the five severities are style keys only - and high contrast re-points underneath the aliases in the palette layer rather than in this file",
         "no pointer or touch evidence: upstream declares no events and its style sets IsTabStop=False, so there is no interaction arm to prove"
       ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentRatingControl",
+      "source": "Styles/RatingControl.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/rating-control.md",
+        "docs/astra/adaptation/s1s-rating-raw.txt",
+        "tests/FluentJalium.Tests/AstraRatingControlTests.cs",
+        "spike/RatingProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no RatingControl, Rating, RatingItemInfo, RatingItemFontInfo or RatingItemImageInfo - all five absent across the 2958 public types of the assembly that really holds the controls",
+        "three x:Double rows stay unpublished: this reader rejects the element and carries a clr-namespace numeric row as zero, so 32 and 8 became literals and constants a test reads off the control",
+        "RatingControlCaptionTopMargin (-12.5) is not written at all: upstream applies it against TextLineBounds=Tight on its caption, and this runtime's caption has no such knob to compensate for",
+        "the star's own ink reaches no capture, so this control's visual column is the crop route proven on solid blocks plus the geometry read back in the tree - not a picture of stars",
+        "upstream's Spacing = ItemSpacing - (advance - actual) is a negative number here and a negative StackPanel.Spacing arranges as zero while keeping its value, so the cell box became the ink box instead of copying a line the runtime drops",
+        "UIElement.Clip paints nothing here, so a half star is a ClipToBounds host around the run rather than upstream's RectangleGeometry",
+        "no synthesised pointer, touch or key reaches a control in this suite, so the coercion, the crop fractions and the magnifier are proven through the internal entries the routed handlers call; the wiring from a real MouseMove is not",
+        "the magnifier is evaluated per state change in code: upstream runs one expression animation per item on a composition visual, which this runtime does not give an item, so the lift is exact at the centre and on the floor and unmeasured between them",
+        "no AccessibilityView=Raw on the item runs and no RatingControlAutomationPeer: the runtime has no such property and no peer base was copied, so a screen reader gets the control and not the star count"
+      ]
     }
   ]
 }

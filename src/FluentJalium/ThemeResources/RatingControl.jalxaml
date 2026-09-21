@@ -1,0 +1,56 @@
+<!-- WinUI 3 RatingControl_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     0d9fccdf29a38836bd89fabbc222f6605d104b59. Fifty-six lines: eight brush aliases written once per Light /
+     Default / HighContrast dictionary (:5-12, :16-23, :27-34), the default font info row (:13, :24, :35), three
+     x:Double metric rows (:39-41) and four DataTemplate rows (:42-55). Sixteen distinct keys. This file carries
+     thirteen of them: the eight aliases, the font info, and the four templates. The three metric rows are
+     x:Double, which this reader cannot publish at all - spike/DoubleRowProbe measured that an <x:Double> row fails
+     the whole dictionary and a clr-namespace <sys:Double> row parses but reads back 0 (adaptation/00 S1-r) - so
+     their numbers became the literals in Styles/RatingControl.jalxaml and the constants on
+     Controls/Status/FluentRatingControl.cs, where a test can read them. Key-by-key inventory and the HighContrast
+     targets that are not reproduced: docs/astra/audits/rating-control.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- The eight aliases. Upstream's Light and Default dictionaries are identical name-for-name and
+       target-for-target, so one publication each is faithful; HighContrast re-points seven of them at
+       SystemControl* brushes, and that re-pointing stays out of this layer exactly as it does for InfoBadge,
+       ProgressBar, ProgressRing and PipsPager - it lives under ThemeResources/HighContrast.map, which carries
+       palette brush keys and not per-control aliases (Known Gap, audit clause 6). -->
+  <StaticResource x:Key="RatingControlUnselectedForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="RatingControlSelectedForeground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="RatingControlPlaceholderForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="RatingControlPointerOverPlaceholderForeground" ResourceKey="ControlAltFillColorTertiaryBrush" />
+  <StaticResource x:Key="RatingControlPointerOverUnselectedForeground" ResourceKey="ControlAltFillColorTertiaryBrush" />
+  <StaticResource x:Key="RatingControlPointerOverSelectedForeground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="RatingControlDisabledSelectedForeground" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="RatingControlCaptionForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <!-- The name is upstream's, MUX_ prefix and all (RatingControl_themeresources.xaml:13). Only the two roles
+       checked theme writes are given; the other four stay the empty string, which is what upstream treats as
+       "not provided" and falls through from (:478-486). -->
+  <controls:FluentRatingItemFontInfo x:Key="MUX_RatingControlDefaultFontInfo" Glyph="&#xE735;" UnsetGlyph="&#xE734;" />
+  <!-- The four item templates upstream's code looks up by name and casts without a null check
+       (RatingControl.cpp:395-410). Three differences from the checked lines, all forced:
+         - FontSize is the literal 32 (RatingControlFontSizeForRendering, an unpublishable x:Double row);
+         - the symbol font family is the literal "Segoe Fluent Icons": this palette has no SymbolThemeFontFamily
+           key at all, which is how the BreadcrumbBar and TeachingTip glyphs are already written here.
+         - the -8,-8,0,0 margins are not here. Upstream's own comment says what they are for ("-8, -8 are to
+           compensate for the default scale down"): its items are composition-scaled to 0.5 by
+           ApplyScaleExpressionAnimation (cpp:372-392), whose resting value this runtime has to write itself as a
+           RenderTransform, and whose left inset then has to come out of the item box - both computed by
+           FluentRatingControl from a measured run, because the 34 that a Segoe star really takes at 32 is not the
+           32 the row was designed around (see ItemInset in Controls/Status/FluentRatingControl.cs). A fixed -8 in
+           the markup would be a second, unmeasured copy of that number.
+       The image pair is transcribed with no Foreground to carry: upstream's Image rows have none either. -->
+  <DataTemplate x:Key="BackgroundGlyphDefaultTemplate">
+    <TextBlock Foreground="{ThemeResource RatingControlUnselectedForeground}" FontSize="32" Text="&#xE734;"
+               FontFamily="Segoe Fluent Icons" />
+  </DataTemplate>
+  <DataTemplate x:Key="ForegroundGlyphDefaultTemplate">
+    <TextBlock FontSize="32" Text="&#xE735;" FontFamily="Segoe Fluent Icons" />
+  </DataTemplate>
+  <DataTemplate x:Key="BackgroundImageDefaultTemplate">
+    <Image />
+  </DataTemplate>
+  <DataTemplate x:Key="ForegroundImageDefaultTemplate">
+    <Image />
+  </DataTemplate>
+</ResourceDictionary>
