@@ -621,6 +621,21 @@
                   <TextBlock Text="This runtime has no ProgressRing and no animated-visual player, so the ring is a type of ours that draws its own arc: radius and stroke come out of the two Lottie canvases upstream ships (they differ, and the ring keeps that), a determinate arc is regenerated whenever the value moves, and the spin is a frame loop writing the arc's start angle - an animation clock never reaches a transform here. The second ring is indeterminate, the third is the same control at 64 DIP, and the fourth is inactive: it holds its place and paints nothing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="InfoBadge" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <fluent:FluentInfoBadge />
+                    <fluent:FluentInfoBadge Style="{StaticResource AttentionIconInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource InformationalDotInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource SuccessDotInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource CautionValueInfoBadgeStyle}" Value="12" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource CriticalValueInfoBadgeStyle}" Value="120" Margin="12,0,0,0" />
+                  </StackPanel>
+                  <TextBlock Text="The runtime has no InfoBadge either, so this is our type: the four display kinds come from Value and Icon exactly as upstream's C++ walks them, the pill radius is half the measured height, and the five severities are the sixteen style keys transcribed verbatim. Two of them show a number - which is the honest limit of this card: a glyph run never reaches a capture on this runtime, so the digits are asserted in the tree (text, visibility, foreground) and not in the picture." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+
               <TextBlock Text="Divider" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
               <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel Margin="16">

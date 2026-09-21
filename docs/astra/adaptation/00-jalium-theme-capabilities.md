@@ -1858,3 +1858,39 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
    `BitmapIcon`、各 `*IconSource`、`AnimatedIcon`、`ImageIcon` 全 ABSENT；`Symbol` 是 Enum 不是控件。
    另两条顺手量到的约束：`MenuFlyoutSeparator` 与 `AppBarSeparator` 也各自 `OnRender` 且**没有 `StrokeBrush`**
    （前者自有 DP 为零），所以本段这两条 setter 到不了它们；`GridSplitter : Thumb`、`ToolBar : HeaderedItemsControl`。
+
+## S1-r：数值令牌行有两种死法，字形墨有两条通路都到不了——InfoBadge 量出的三条账（阶段 6 第四段，2026-09-21）
+
+原始读数：`adaptation/s1r-double-row-raw.txt`（`spike/DoubleRowProbe` 两模式 + 一次临时像素诊断）。
+这一节改掉两条被当成已知用了很久、其实只量过一半的结论。
+
+1. **`x:Double` 不是"进不去"，是两种不同的死法**。§S0-b 那行"x:Double 不能"读起来像一种，实际：
+   `<x:Double>` 是整份字典解析失败（`Cannot resolve type 'Double'`，与 §S1-o 第 5 条一致，两种 assembly 拼写都一样）；
+   而换 CLR 写法 `xmlns:sys="clr-namespace:System;assembly=System.Runtime"`（或真身 `System.Private.CoreLib`）
+   `<sys:Double x:Key="N">4</sys:Double>` **解析通过、键在、类型是 `Double`，值读回 0**。
+   `sys:Int32` 与 `sys:TimeSpan` 同形（`0` / `00:00:00`）。这比解析失败更坏：字典里躺一条永远为 0 的"已发布令牌"，
+   每个消费者看起来都正常，`keys.md` 也会把它记成一条已发布的行。
+2. **能带住文本的写法不能当数值令牌用**。`sys:String` 是三行里唯一把元素内容带住的（`4`、`4,4,4,4` 原样读回），
+   但把它经 `{ThemeResource}` 写进 `MinHeight` 仍读回 0，写进 `Padding` 仍读回 `0,0,0,0`——应用期没有
+   字符串→值类型转换。对照腿同时量到：`Thickness` 行 → `Padding=4,4,4,4` 落地，说明 `{ThemeResource}` 这条消费路
+   本身是活的，不是"setter 没跑"。而 `ThemeDictionaries` 里的切换只对 `String`/`Thickness`/`CornerRadius` 成立
+   （Light 8 / Dark 9 读回正确），对任何数值 CLR 类型不成立。所以"一条随主题变的数值令牌"在这份 reader 里
+   **没有承载体**——`InfoBadgeIconHeight`（Default 8、Light/HC 9）这个形状落不了地，只能读它上游有没有消费者
+   （全仓零消费，见 `audits/info-badge.md` §2，因此不必选边）。
+3. **字形墨在两条捕获通路上都不到达**，这条把 §S1-m 的结论放大了。§S1-m 说"只有字形的视觉量不到墨"，
+   当时证据是符号 glyph 的 pip。本次量到：一个最朴素的 `<TextBlock Text="12" Foreground=白 FontSize=11>`
+   压在 accent 蓝板上，`Render` 读回 960 个纯 `#0078D4`、白 0；压 `#202020` 深卡同样 0；
+   走 `Host()` 整窗合成，同一行白字放进灰底面板，`#FFFFFF` 计数恒 0，窗口自身那几个混色键
+   （`#585858x19 #B5B5B5x19 #F1F1F1x16`）不随文本增减。InfoBadge 的 `Dot` 与 `Value=12` 两张 Host 图**逐键相同**。
+   所以"数字/字形印出来了"这句主张在本仓库当前**不可证**：像素列只能主张色块与颜色身份，
+   含文本的状态只能退到树上读数（`Text`、`Visibility`、`Foreground` 刷身份、度量盒）。
+   这条回头削弱 PipsPager（pip 改画椭圆正是绕开它）、TabView、菜单与对话框标题等批次的"像素"列，
+   也意味着 #13（真指针通路）之外还要补一条"文本能否被取景"的量。
+4. **模板部件不继承控件的 `Foreground`**（同一次诊断顺手量到）：上屏后读回模板里 `TextBlock` 的前景是框架默认
+   `#E4000000`，而它所在控件的 `Foreground` 是 `#FFFFFFFF`。上游 InfoBadge 模板不写这一条，靠继承。
+   本层的修法是部件上显式 `Foreground="{TemplateBinding Foreground}"`（`Styles/InfoBadge.jalxaml` 里注明）。
+   **未审的相邻面**：其余自有样式里凡是靠继承拿前景色的文本部件都可能同样哑色——已开任务，不在本段结。
+
+规则：数值令牌一律写字面量并在样式注释里点明它来自哪条不可发布的行；不要为了"看起来发布了"改用 `sys:Double`
+或字符串行；任何"某个数字/字形印出了墨"的主张只能靠树上读数，色块主张才走像素。
+

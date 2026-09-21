@@ -253,6 +253,9 @@ internal static class Program
             "SymbolIcon", "FontIcon", "BitmapIcon", "PathIcon", "ImageIcon", "AnimatedIcon",
             "IconSource", "FontIconSource", "BitmapIconSource", "PathIconSource", "Symbol",
             "SymbolRegular", "SymbolEnum", "Glyphs",
+            // The InfoBadge row's own question: upstream's IconPresenter is a Viewbox around a ContentPresenter fed
+            // by an IconSource, so whether this runtime has a scaler at all decides the icon route.
+            "Viewbox", "Badge", "SymbolIconSource", "ImageIconSource",
         };
         var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(static assembly => SafeTypes(assembly)).ToArray();
         foreach (var name in names)

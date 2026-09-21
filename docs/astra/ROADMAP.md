@@ -920,6 +920,13 @@ InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
   `Slider`（18×18 拇指、12 内芯、4 刻度间隙、14/Auto/14 三段带），其余仍只到"转录时用的是上游度量行原值"
   这一层，没有逐控件的截图差分；`Slider` 的环在最大值处超出控件 2 DIP 是框架给拇指留 16 的结果，未治。
 
+- 不声称本层存在"能随主题切换的数值令牌"：`x:Double` 行让整份字典解析失败；`clr-namespace:System` 的
+  `<sys:Double>` / `<sys:Int32>` / `<sys:TimeSpan>` 能解析、CLR 类型也对、**值恒为该类型的默认值**
+  （文件里写 4、字典里读回 0）；`sys:String` 的 `"4"` 喂给 `MinHeight`/`Padding` 同样不做转换。
+  同一次实验里 `Thickness` 行是正常对照组（`Padding=4,4,4,4`），按主题切换只对 String / Thickness / CornerRadius
+  成立（`adaptation/00` §S1-r 第 1、2 条，原始读数 `adaptation/s1r-double-row-raw.txt`）。
+  因此上游那些分主题的度量一律写成字面量，并且每个省略掉的行配一条反向 theory，钉的是"这一行发不出去"，
+  不是"我们选择不发"。
 - 不声称高对比度 parity：公开管线无驱动入口，只有上游逐键映射 + 一个自加键的自行判断（`SliderThumbStrokeBrush`
   已在 Slider 批回收成上游真名 `SliderThumbBorderBrush`，`ToolbarSurfaceBrush` 更早因无消费点删除），
   且逐控件的 HC 视觉状态覆盖未移植（见 `adaptation/04`）。
@@ -952,6 +959,11 @@ InfoBar / TeachingTip / MenuBarItem 五条 gap 文案同步。
   这条只管**字体字形**，不管几何：选择批已按名字重做那条归因——把表面令牌与标记令牌染成两种哨兵色
   一次拍摄，勾形（几何 `Path`）自己贡献 12 实心 + 22 抗锯齿像素，`Check_mark_follows_the_selected_accent`
   那句"名字过强"的批评就此了结（`audits/checkbox-radiobutton.md`）。
+  **阶段 6 第四段把这条扩到另一条通路**：整窗合成的 `Host()` 同样拿不到字形墨——最朴素的白字 `TextBlock`
+  压在灰底面板上，一张图里 `#FFFFFF` 计数 **0**，同一张图加不加这行文字只差布局挪动（6136/279 对 6118/288），
+  所以这不是离屏 `Render` 路径的产物，而是本基座**两条**捕获通路共同的限制（`adaptation/00` §S1-r 第 3 条、
+  `audits/info-badge.md` §5）。凡像素列写过"文字、图标、数字印出来了"的批次都按这条收缩：PipsPager、TabView、
+  菜单文本、InfoBadge 的数字格，能主张的只剩色块与颜色身份。
 - ~~不声称像素 harness 能连拍~~ **这条已被归因并撤销**（Slider 批，2026-09-18）：当初顶穿 60 秒看门狗的不是
   "一次调用里拍两张"，而是 `PixelHarness.Pump` 的看门狗释放了线程池上另一个没人跑的调度器——
   只要一次状态变化不带动画、不再来帧，`PushFrame` 就永不返回（`adaptation/06` 的"Slider 批"一节）。
@@ -1640,3 +1652,85 @@ IsHitTestVisible=False`。于是 AGENTS.md 的"原生控件优先"这一条**成
 仍欠：出厂线色 `#A3A3A4` 的来源（哪一行令牌还是硬编码）没查；`Separator.Background` 在这个类型上画不画东西没查，
 所以那条 setter 不写；12 DIP 盒子是运行时自己的度量而非上游数字（上游同角色线的总高是 3 / 8 / 20）；
 1 DIP `Rectangle` 的机制未量；五处已发布死线另批处理（#46）。
+
+## 阶段 6 第四段：InfoBadge 落地——数值令牌有两种死法，字形墨两条通路都到不了（2026-09-21）
+
+上游 `InfoBadge/InfoBadge_themeresources.xaml`（blob `b09b56572ac8a2159bf9ba2dda7f063ec5460c6a`，147 行）声明
+**12 个键 × 三套字典 + 16 个 Style**。本层发 6 行（2 别名 + 4 Thickness），16 个 Style 全量转录加隐式行共 17 条。
+不发的那 6 行不是"选择不发"，是量出来的两种死法（`adaptation/00` **§S1-r** 第 1、2 条，原始读数
+`adaptation/s1r-double-row-raw.txt`，探针 `spike/DoubleRowProbe`）：`<x:Double>` 让**整份字典解析失败**；
+`clr-namespace:System` 的 `<sys:Double>` 能解析、CLR 类型也对、**值恒为该类型默认值**（写 4 读回 0），
+`sys:String` 的 `"4"` 喂 `MinHeight` 同样不做转换——同一批实验里 `Thickness` 行是好的（`Padding=4,4,4,4`），
+所以"发一条读回来永远是 0 的令牌"比不发更坏：所有消费者看起来都正常。
+顺带结掉一个本来要做的选择题：`InfoBadgeIconHeight` 是唯一分主题的数值行（Default 8 / Light+HC 9），
+而全仓 grep 它在上游**只有声明处命中、零消费者** ⇒ 8 与 9 之争不存在，两条死行一条都不写。
+
+自有类型的理由是先量宿主再定的：`spike/ControlCensus` 对 `InfoBadge` 与 `Badge` 都给 no type with this name，
+没有可重模板的原生宿主，基类跟上游一样是 `Control`（`Value` 只是"显示不显示数字"的开关，不是范围，所以不是 `RangeBase`）。
+两处公开 API 偏离按实测写：上游输入是 `IconSource`，而 `IconSource`/`FontIconSource`/`SymbolIconSource`/
+`PathIconSource`/`BitmapIconSource`/`ImageIconSource` 在本运行时**一个都没有**，那个属性没有可放的类型，
+故 `Icon : IconElement`（缩放通路不变，`Viewbox` 在运行时确实是 `Decorator` 子类）；另一处是一个样式的
+`Setter.Value` 只装**一个**元素实例，5 个 `*IconInfoBadgeStyle` 各持一个图标元素——树级独立性有断言
+（两个 presenter 的 `Content` 都在且各等于本徽章的 `Icon`），**视觉独立性不可测**，理由见下面第 3 类证据。
+
+状态映射那一格：上游 4 个 `DisplayKindStates` 收进 3 条触发器（`Dot` 那格在上游就没有 setter，本层也不写），
+每条带两行——parts 的 `Visibility` 加各自那条 margin，所以"哪条触发器命中"是拿边距读的，不是拿可见性读的。
+半径 = `ActualHeight/2` 这条（`InfoBadge.cpp:91-98`）连同它"本地设过就不动"的逃生阀一起抄到了：
+写在控件自己的 `CornerRadius` 上、用 `SetCurrentValue` 保类型、模板 `TemplateBinding` 接走，
+两半各有一条断言（`The_pill_radius_is_half_the_measured_height` 与
+`A_locally_set_radius_is_left_alone_the_way_upstream_leaves_it`）。结构偏离保留：本运行时的 `Grid` 没有
+`CornerRadius` 成员（编译器直说），所以根是名为 `RootGrid` 的 `Border` 套一个 `Grid`。
+
+这一段真正的产出是两条**基座级**事实，都不限于 InfoBadge：
+
+1. **模板里的 `TextBlock` 不继承控件的 `Foreground`**。上屏读回是框架默认 `#E4000000`，而徽章自己的
+   `Foreground` 是 `#FFFFFFFF`；上游那行什么都没写、靠继承。本层加 `TemplateBinding` 绕开，
+   但**其余自有样式里所有靠继承拿前景色的文本部件还没有逐处审**（另立 #51）。
+2. **字形墨在本基座两条捕获通路都拿不到**。先量到 `Value=12` 的图与点徽章的图**逐键相同**（920/40），
+   再排除模板因素：一个最朴素的 `TextBlock` 白字压蓝板 960 像素全是 `#0078D4`、压 `#202020` 卡 960 全 `#202020`；
+   整窗合成的 `Host()` 也一样，`#FFFFFF` 计数 **0**，加不加那行文字只差布局挪动（6136/279 对 6118/288）。
+   这条把 §S1-m"符号字形不进像素"扩成**所有文字**，也因此回头削弱 PipsPager、TabView、菜单文本几批的像素列——
+   "数字印出来了"这句在本仓库当前不可证，`The_number_is_laid_out_and_wears_the_badges_own_foreground`
+   是它的退让落点（`Text`/`Visibility`/刷子实例身份/度量盒四样）。颜色主张仍然有牙。
+
+目录那一格还被抓出一条自己的错：`Catalog.json` 里 `markup` 先写成显示名 `FluentInfoBadge`，
+反射目录闸口当场红（"59 restyled, 59 catalogued"却差集非空——own-type 行必须写全限定名）。
+同一段里 `Test-AstraGallerySmoke.ps1 -Page status` **两轮都过**，可见"页能上屏"绝替不了目录闸口，
+这条闸口的价值恰恰是在冒烟全绿时红的。改完单独重跑该类：6 条里 5 绿，剩的一条是
+`The_gallery_project_carries_the_catalog_it_reads`——测试跑 `--no-build`，Gallery 输出目录里还是旧副本，
+完整构建之后才会一致，这是它该红的样子。
+
+四类证据分开记（`audits/info-badge.md` §7 是同内容的展开）：
+1. 构建：清单 60 → **62** 份字典（`Themes/Manifest.txt` 非注释行实测 62）；`keys.md` 1257 → **1280** 行
+   （新增 23 = `ThemeResources/InfoBadge.jalxaml` 6 行 + `Styles/InfoBadge.jalxaml` 17 行）；
+   Debug **0 警告 / 0 错误**（1 m 20 s）。
+2. 行为：`AstraInfoBadgeTests` **42** 条（17 个方法 + theory 展开），整套 1288 → **1330**（+42，没有削减别处）。
+   **A/B 有牙**：三处定向改动（数值行改成哨兵、Critical 那行刷子换掉、`ValueTextBlock` 的 `Foreground` 摘掉）
+   → **失败 3 / 通过 39**，红的正是那三条名字；改前先 `grep -c` 读回锚点为 1、改后读回为 0 才认定还原。
+   第一轮 A/B 因为脚本里用了相对路径，mutate 静默没落地却报"42/42 通过"，已换绝对路径重跑。
+3. 视觉：pill 的 accent `#0078D4` **920** 像素、两条圆角边混色 40、品牌绿 `#207245` 计数 **0**、
+   `Informational` 在 Light 与 Dark 不同色（都走 `Render`）；两条负面读数（`Value` 与 `Dot` 同图、
+   `Host` 白字 0 墨）按原样记进审计 §5，**不当作通过**。Gallery Status 页加 InfoBadge 卡（六徽章一行 + 说明）；
+   冒烟 `-Page status` 第一轮报"30 s 未空闲"，重跑 **17.1 s** 干净关闭——**记成重试，不记成一次通过**。
+4. 硬件输入：**仍为零**。`IsTabStop=False` 是出厂值并被断言，本控件没有可测的输入臂，
+   但这不等于指针通路已验证（#13 依旧是全仓库欠账）。
+
+**闸口读数（第四段，串行 `tools/Test-AstraGates.ps1`，两遍 + 两步补跑）**：第 1 遍在 `dotnet test` 第 31 秒就红，
+红的就是上面那条目录名写错，当场停跑、改 `Catalog.json`、重跑。第 2 遍整套 **1330 条：失败 20、通过 1310、跳过 0**
+（9 m 26 s），**InfoBadge 的 42 条一条没红**；20 条红里 **19 条**是 `AstraContentDialogTests` 整类同一句
+`ContentDialog could not resolve a host window.`（#35 恶化：上一段是 13 名，这次整类）、第 20 条是
+`AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach`
+（`popupOpened` 读回假，弹层没为点击打开——同族第四个成员，记进 #35 那条成因下，另开读数账）。
+脚本在 test 步 `Write-Error` 退出，**后两步因此根本没跑**，所以本段不谎称"闸口给了调色板与键清单读数"，
+改为单独执行同两个脚本：`Sync-AstraPalette.ps1 -Check` 三档 `checked=True`（Light/Dark 各 83 源色 101 刷，
+HC 101 映射 + 上游三行因调色板无对应而按住），`Report-AstraResourceKeys.ps1 -Check` 报
+`keys.md is current: 1280 canonical lines.`，两条 exit 0。**这套闸口当前不是全绿**，也不接受按全绿记。
+判据不稳因此压过继续堆控件：#35 一次吃掉整类，等于这套基座对 ContentDialog 全族已经失去判据——
+本段没有顺手去修它，那是下一段的第一件事。
+
+仍欠（Known Gaps，全量在 `audits/info-badge.md` §6）：`IconSource` 面的公开 API 偏离；
+共用图标元素的**视觉**独立性不可证；6 条数值行发不出去（4 条写成字面量、2 条上游死行不写）；
+文本/字形墨在任何捕获通路都不可见（#50）；模板 `TextBlock` 前景不继承，其余文本部件未逐处审（#51）；
+HighContrast 的两条别名重指向没进 `ThemeResources/HighContrast.map`（与 ProgressBar/ProgressRing/PipsPager 同账）；
+无 AutomationPeer（上游也没有）、无 `Severity` 枚举、`DisplayKind` 是本层加的可写属性而上游藏在 C++ 里；
+硬件输入零。

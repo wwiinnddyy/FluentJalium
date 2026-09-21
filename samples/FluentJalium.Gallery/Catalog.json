@@ -618,6 +618,29 @@
         "the framework's own default line colour before this style existed is a grey (#A3A3A4) this layer reproduces nowhere, so the before/after reading is a probe record rather than a parity claim",
         "no pointer or touch evidence: the runtime already keeps the separator out of the hit-test path, so there is no interaction arm to prove"
       ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentInfoBadge",
+      "source": "Styles/InfoBadge.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/info-badge.md",
+        "docs/astra/adaptation/s1r-double-row-raw.txt",
+        "tests/FluentJalium.Tests/AstraInfoBadgeTests.cs",
+        "spike/DoubleRowProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports neither InfoBadge nor Badge; the sixteen style keys, the two aliases, the four Thickness rows and every number in the look are upstream's",
+        "the icon input is an IconElement, not upstream's IconSource: IconSource, FontIconSource, SymbolIconSource, PathIconSource, BitmapIconSource and ImageIconSource are all absent, so there is no object that property could hold",
+        "a style's Setter.Value holds one element instance, so the five icon styles each carry a single FontIcon/SymbolIcon shared by every badge of that style - tree-level independence is measured, visual independence is not",
+        "six x:Double rows are not published: this reader rejects an x:Double element outright and carries a clr-namespace numeric row as the type's default, so the four the template reads are literals and the two nobody upstream reads are not written at all",
+        "InfoBadgeIconHeight differs per theme upstream (8 in the dark dictionary, 9 in the light two) and no numeric row can carry a theme-dependent number here - immaterial, because nothing in upstream consumes the row",
+        "the number's ink cannot be asserted: neither capture path reaches a glyph run (adaptation/00 S1-r clause 3), so the value state is proven by Text, Visibility, the foreground brush identity and the measured box rather than by pixels",
+        "the template's TextBlock needs an explicit Foreground binding: parts do not inherit the control's foreground here, and upstream's row relies on inheritance",
+        "no Severity enum and no AutomationPeer upstream either - the five severities are style keys only - and high contrast re-points underneath the aliases in the palette layer rather than in this file",
+        "no pointer or touch evidence: upstream declares no events and its style sets IsTabStop=False, so there is no interaction arm to prove"
+      ]
     }
   ]
 }

@@ -37,6 +37,9 @@ ThemeResources/PipsPager.jalxaml
 ThemeResources/BreadcrumbBar.jalxaml
 ThemeResources/ProgressBar.jalxaml
 ThemeResources/ProgressRing.jalxaml
+# The badge: two brush aliases and the four Thickness rows of upstream's twelve keys. The six x:Double rows are not
+# here - one spelling is rejected outright and the other carries zero instead of the number (spike/DoubleRowProbe).
+ThemeResources/InfoBadge.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -77,3 +80,7 @@ Styles/ProgressRing.jalxaml
 # The divider: no upstream control exists at the pinned commit, so this file publishes no rows of its own and
 # styles the runtime's native Separator with the palette's divider token - two setters, no template.
 Styles/Divider.jalxaml
+# The badge's look: sixteen styles upstream writes next to its tokens plus the implicit row from InfoBadge.xaml. One
+# template, and three triggers standing in for upstream's four DisplayKindStates visual states - the fourth (Dot) is
+# the template's resting look.
+Styles/InfoBadge.jalxaml
