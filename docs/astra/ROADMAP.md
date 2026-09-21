@@ -2170,5 +2170,40 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 承担本批测量的 `AstraPlateProbeTests` 是一次性探针，读数抄进本节与 `adaptation/06` 之后文件已删除，
 这些数字因此没有可重跑的守卫——要复用先做成用例。
 
+## 测试基座批：高对比 101 键逐键断言（结清 #57 的"签入表 + 到达"，并量出这台主机没有平台色）
+
+目标里那条"高对比逐键断言"原本已有两半：`HighContrast.map` 是签入表（`tools/Sync-AstraPalette.ps1` 从上游
+`Common_themeresources_any.xaml` 的 HighContrast 分支生成），`High_contrast_mapping_covers_every_palette_brush`
+断言"每个调色板键都有行"，`High_contrast_maps_semantic_roles_to_system_colors` 只读其中 **4** 个键的值。
+本批补上逐键那一半（`Every_high_contrast_row_drives_its_own_brush`，+1 条用例）：先把 101 个键在 Light 下各读一次存表，
+翻到 High Contrast 后**逐键**比对"该键自己的刷 == 该行点名的系统色"，再要求这次翻主题真地把调色板 moved 了
+≥70 个（实测 90/101；剩下 11 个在亮档就已经等于它的高对比值，逐个是谁/为什么没审）。
+读数：**101 行全部驱动了自己的刷**，一条不错。测试侧的系统色用运行时真实成员名
+（`ControlColor`/`ControlTextColor`/`HotTrackColor` 对应 WinUI 命名的 ButtonFace/ButtonText/Hotlight），
+未知行名一律抛错而不是跳过。
+
+**A/B 第一次是无效的，而且它自己就是一条读数。** 先把测试解析器里 `ButtonFace↔ButtonText` 两条腿互换 → 用例照绿。
+换掉不等于改动了期望值：这道红需要第二条突变才出来——把 `ButtonFace` 那条钉成 `#112233` → **红，消息点名 22 个键**
+（`ControlFillColorDefaultBrush names SystemColorButtonFaceColor = #FF112233 but the brush is #FFFF00FF`）。
+两件事因此被量死：其一，这条断言确有牙（一条不可能的期望值立刻 22 红）；其二，**这个无头测试主机里
+`SystemColors.ControlColor` 与 `SystemColors.ControlTextColor` 解析成同一个颜色，而那片刷在 High Contrast 下读回
+`#FF00FF`**——也就是这台主机没有把平台系统色填进来，未设置的槽就是洋红。
+后果写进了用例的 remarks：**这条逐键断言钉的是"哪个键接到哪个系统色槽"的接线，不是用户最终看见的颜色值**；
+"高对比下窗口文字该是白"这种值主张必须拿真平台色，本套件做不到（与 #13 同一条欠账）。
+
+四类证据：**构建**见下闸口读数；**行为**+1 条逐键用例，含"翻主题真动了调色板"的到达腿；**视觉**本批没有像素断言
+（高对比档下没有任何一条用例拿到过墨——#50 未结，且现在多一条已知限制：主机连平台系统色都没有）；
+**硬件输入**本批不动输入路径。
+
+**闸口读数**（串行 `tools/Test-AstraGates.ps1`，管道退出 **0**）：整套 **1459/1459 通过、0 失败、0 跳过**（6 m 47 s），
+比上一批 1458 多 1 条＝本批新用例；`0 个警告 / 0 个错误`；调色板三档 `checked=True`（Light/Dark 各 83 源色→101 刷，
+HighContrast 101 键映射 + 3 条按住）；`keys.md is current: 1298 canonical lines.`（键不变）；末行 `All Astra gates passed.`。
+
+不声称：上面写的"101 行全部驱动了自己的刷"只在**这台无头主机的系统色状态下**成立，洋红槽意味着值层未被检验；
+剩下 11 个"翻档不动"的键没逐个查是谁、该不该动；测试侧解析器与产品侧 `FluentThemeManager.SystemColor` 是**两处**
+独立声明（这正是它能抓错的原因，但也意味着两边同时错会静默）；`SystemColors.*` 在无头主机取到什么，本批只量到
+ButtonFace/ButtonText 这一对相同，其余 7 个槽没逐个比对；控件级高对比视觉态覆盖（上游每条 HighContrast 分支里的
+VisualState 改写）照旧不在范围内，签入表也只到调色板这一层。
+
 
 

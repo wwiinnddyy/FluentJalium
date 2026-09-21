@@ -218,6 +218,66 @@ public sealed class AstraThemeRuntimeTests
             FluentThemeManager.HighContrastMap.Keys.Order(StringComparer.Ordinal)));
     }
 
+    /// <summary>
+    /// The per-key half. The two tests above prove the checked-in table has a row for every brush and read four of
+    /// those rows; this one resolves <b>all</b> of them and compares each brush with the system colour its own row
+    /// names, then requires the theme flip to have actually moved the palette - a current table that is never applied
+    /// reads green otherwise. What each row pins is the <b>wiring</b> (this key is driven by that system-colour slot), not the
+    /// slot's platform value: in the headless test host the unset slots read #FF00FF, and A/B showed swapping two of them is
+    /// invisible because this process resolves those two to the same colour. A claim about the colour a user sees has to be
+    /// made against a real platform palette, which this suite cannot do (#13).
+    /// </summary>
+    [Fact]
+    public void Every_high_contrast_row_drives_its_own_brush()
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var light = FluentThemeManager.HighContrastMap.Keys.ToDictionary(key => key, BrushColor);
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.HighContrast);
+
+            var wrong = new List<string>();
+            foreach (var (key, target) in FluentThemeManager.HighContrastMap.OrderBy(entry => entry.Key, StringComparer.Ordinal))
+            {
+                var actual = BrushColor(key);
+                if (!SystemColour(target).Equals(actual))
+                {
+                    wrong.Add($"{key} names {target} = {SystemColour(target)} but the brush is {actual}");
+                }
+            }
+
+            var moved = FluentThemeManager.HighContrastMap.Keys.Count(key => !BrushColor(key).Equals(light[key]));
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+
+            Assert.True(wrong.Count == 0,
+                $"{wrong.Count} of {FluentThemeManager.HighContrastMap.Count} rows do not drive their own brush: {string.Join("; ", wrong.Take(6))}");
+            // Measured 2026-09-21: 90 of the 101 brushes change colour on the flip; the other 11 already carry
+            // their high-contrast value in Light (Transparent rows and a few tokens whose two modes coincide), and
+            // the count is deterministic, so the floor sits well under the reading without hiding a lost retint.
+            Assert.True(moved >= 70,
+                $"the flip only moved {moved} of {FluentThemeManager.HighContrastMap.Count} palette brushes, so High Contrast is not reaching the palette.");
+        });
+    }
+
+    /// <summary>
+    /// The targets <c>ThemeResources/HighContrast.map</c> names, resolved through the same runtime the retint uses.
+    /// An unknown name fails rather than being skipped, so a new upstream target cannot be quietly dropped.
+    /// </summary>
+    private static Color SystemColour(string target) => target switch
+    {
+        "SystemColorWindowColor" => SystemColors.WindowColor,
+        "SystemColorWindowTextColor" => SystemColors.WindowTextColor,
+        "SystemColorButtonFaceColor" => SystemColors.ControlColor,
+        "SystemColorButtonTextColor" => SystemColors.ControlTextColor,
+        "SystemColorGrayTextColor" => SystemColors.GrayTextColor,
+        "SystemColorHotlightColor" => SystemColors.HotTrackColor,
+        "SystemColorHighlightColor" => SystemColors.HighlightColor,
+        "SystemColorHighlightTextColor" => SystemColors.HighlightTextColor,
+        "Transparent" => Colors.Transparent,
+        _ => throw new InvalidOperationException($"Unknown High Contrast target '{target}' - extend the resolver, do not skip the key."),
+    };
+
     [Fact]
     public void Explicit_brush_override_wins_after_palette_refresh()
     {
