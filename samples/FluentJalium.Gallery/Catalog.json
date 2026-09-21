@@ -3,7 +3,8 @@
   "parityLegend": {
     "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion. Whatever is missing is named in gaps.",
     "ported": "Style came from the pre-Astra adapter and consumes Astra tokens, but the upstream key list was never transcribed verbatim and no pixel assertion covers it.",
-    "own-type": "Jalium has no native type for this control, so an Astra-owned type carries the behavior; adaptation/05 records the demonstrated gap."
+    "own-type": "Jalium has no native type for this control, so an Astra-owned type carries the behavior; adaptation/05 records the demonstrated gap.",
+    "no-upstream-control": "The pinned WinUI commit carries no such control at all (the search is recorded in the cited audit), so the look is built on the token row that commit does ship plus the divider-role templates around it. Nothing on this row is claimed as a key-for-key transcription."
   },
   "pages": [
     { "id": "overview", "title": "Overview", "host": "OverviewPage" },
@@ -595,6 +596,27 @@
         "the 359.9 degree cap and the -90 start follow ModernWpf's reading rather than the asset, which no tool in this repository can inspect",
         "high contrast resolves through the palette aliases instead of upstream's two re-pointed rows",
         "no pointer or touch evidence: upstream sets IsHitTestVisible=False and IsTabStop=False, both asserted, so the ring has no interaction arm to prove"
+      ]
+    },
+    {
+      "markup": "Separator",
+      "source": "Styles/Divider.jalxaml",
+      "page": "status",
+      "parity": "no-upstream-control",
+      "evidence": [
+        "docs/astra/audits/divider.md",
+        "docs/astra/adaptation/s1q-divider-raw.txt",
+        "tests/FluentJalium.Tests/AstraDividerTests.cs",
+        "spike/DividerProbe/Program.cs"
+      ],
+      "gaps": [
+        "the reference commit has no Divider control - zero files by name and no Divider type in any .idl or .h - so this row cannot claim a transcription, a state map or a key list against upstream",
+        "the 1 DIP thickness is the only number every divider-role template in the commit agrees on; the 12 DIP box the line sits in is the runtime's own measurement of Separator and is asserted as measured, not as parity",
+        "no margin is set: upstream's role-specific margins (2,8,2,8 on the app-bar pair, 0,3,0,4 in the sidebar, 0,8,0,8 between tabs) belong to their hosts and none of them is a general divider's",
+        "the line is the control's own OnRender output, not a template: a templated route was measured and works, but the element upstream reaches for - a 1 DIP Rectangle - prints nothing on this runtime, and the five such rectangles already shipped in the table and app-bar styles are an open defect",
+        "no key is published here: the file consumes the palette's DividerStrokeColorDefaultBrush, whose high-contrast re-point is that layer's job",
+        "the framework's own default line colour before this style existed is a grey (#A3A3A4) this layer reproduces nowhere, so the before/after reading is a probe record rather than a parity claim",
+        "no pointer or touch evidence: the runtime already keeps the separator out of the hit-test path, so there is no interaction arm to prove"
       ]
     }
   ]

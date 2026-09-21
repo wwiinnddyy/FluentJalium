@@ -74,3 +74,6 @@ Styles/ProgressBar.jalxaml
 # feeds it. This file carries the twelve setters and the two-part template; the arc's geometry and its spin come
 # from FluentProgressRing and Motion/ProgressRingAnimator.cs.
 Styles/ProgressRing.jalxaml
+# The divider: no upstream control exists at the pinned commit, so this file publishes no rows of its own and
+# styles the runtime's native Separator with the palette's divider token - two setters, no template.
+Styles/Divider.jalxaml

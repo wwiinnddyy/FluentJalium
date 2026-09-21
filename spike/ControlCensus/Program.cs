@@ -238,6 +238,9 @@ internal static class Program
     /// </summary>
     private static void OutstandingNames()
     {
+        // The original 2026-09-19 list is kept in the order it was run in (docs/astra/adaptation/
+        // s0y-outstanding-names.txt). The stage-6 tail below was added on 2026-09-21 for the divider and icon
+        // batch, so its readings live in s1q-divider-raw.txt instead.
         var names = new[]
         {
             "TeachingTip", "Card", "CardAction", "CardGroup", "Divider", "Expander",
@@ -246,6 +249,10 @@ internal static class Program
             "Flyout", "FlyoutBase", "FlyoutPresenter", "MenuScroller", "MenuScrollViewer",
             "RadioMenuFlyoutItem", "SplitMenuFlyoutItem", "ToggleMenuFlyoutItem", "MenuFlyoutSubItem",
             "InfoBar", "CardElement",
+            "Separator", "GridSplitter", "ToolBar", "Status",
+            "SymbolIcon", "FontIcon", "BitmapIcon", "PathIcon", "ImageIcon", "AnimatedIcon",
+            "IconSource", "FontIconSource", "BitmapIconSource", "PathIconSource", "Symbol",
+            "SymbolRegular", "SymbolEnum", "Glyphs",
         };
         var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(static assembly => SafeTypes(assembly)).ToArray();
         foreach (var name in names)

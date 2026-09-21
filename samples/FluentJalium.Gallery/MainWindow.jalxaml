@@ -621,6 +621,20 @@
                   <TextBlock Text="This runtime has no ProgressRing and no animated-visual player, so the ring is a type of ours that draws its own arc: radius and stroke come out of the two Lottie canvases upstream ships (they differ, and the ring keeps that), a determinate arc is regenerated whenever the value moves, and the spin is a frame loop writing the arc's start angle - an animation clock never reaches a transform here. The second ring is indeterminate, the third is the same control at 64 DIP, and the fourth is inactive: it holds its place and paints nothing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Divider" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Two lines of type, one rule between them." Style="{StaticResource BodyTextBlockStyle}" />
+                  <Separator />
+                  <TextBlock Text="The rule is the runtime's own Separator, carrying the palette's divider token at 1 DIP." Style="{StaticResource BodyTextBlockStyle}" />
+                  <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                    <TextBlock Text="Left" VerticalAlignment="Center" />
+                    <Separator Orientation="Vertical" Height="24" Margin="12,0" />
+                    <TextBlock Text="Right" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <TextBlock Text="WinUI has no Divider control at the commit this rewrite is pinned to, so the look here is built from the two things that commit does carry: the DividerStrokeColorDefault token and the 1 DIP thickness every divider-shaped template in it shares. The box the line sits in - 12 DIP across on the running axis - is the runtime's own measurement, not an upstream number, and the line is drawn by the control itself because a 1 DIP Rectangle prints nothing on this runtime at all." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="MenusPage">

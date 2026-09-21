@@ -1555,3 +1555,76 @@ S1-m 量到"能继承"不等于"该继承"，这一段就是那个判据的正�
 **`CompositionTarget.Rendering` 这条通路已经量通并且在本段用上了，因此上一段"进度条不确定态做不出来"的前提部分失效——
 但本段没有顺手去接那根线**（`ProgressBar` 的 `IsIndeterminate` 至今仍是静图，Known Gap 1 原样保留，
 不用相邻证据结清）；变换支点归属未量（Known Gap 6）。
+
+## 阶段 6 第三段：Divider 落地——上游没有这个控件，权威只能来自令牌（2026-09-21）
+
+九步出口的**第一出口**在这一段只能以"搜过什么、没搜到什么"的形式交付：钉住的 commit 里
+`git ls-files | grep -i divider` **0 命中**（同一命令对 `progressring` 有 125 命中，证明树是完整的），
+`.idl`/`.h` 里 `Divider` 只剩三处注释；运行时侧 `adaptation/05` §F 早量过 `Divider` 类型也不存在。
+两头都没有 ⇒ 这一行**不能**声称与 WinUI 的某个控件逐字对齐，目录里给它新加一个图例值
+`no-upstream-control` 而不是 `audited`（`AstraGalleryCatalogTests` 的取证闸口是按图例驱动的，加值不用改测试）。
+
+唯一可用的权威因此只剩两样：**令牌行**与**同角色模板**。七处同角色分隔线逐处读到行号与 blob
+（应用栏 `51801458…`:14/16/18/49、菜单 `6f9f3fd3…`:254/258/733、分裂项竖线同文件 :262/606、
+日期 `8d19f300…`:291-304、时间 `2cfb8a7d…`:294-305、侧栏 `a21c87b4…`:572-605、标签页 `c0e732a4…`:553），
+共同点只有一个：**跨轴厚度 1**。七处没有一处带朝向属性（侧栏靠 VSM 的 `VerticalLine` 换整套数字、
+应用栏靠 `Overflow` 状态、日期/时间直接放两套要素），各处 margin 也互不相同（2,8,2,8 / -4,1,-4,1 / 0,3,0,4 / 0,8,0,8），
+所以本层一个 margin 都不抄——不是忘了抄，是没有任何一个能代表通用分隔线（Known Gap 3）。
+颜色三行 `DividerStrokeColorDefault` / `…Brush` / HC 重指向本层调色板早就有，本段**发布 0 行、消费 1 行**。
+
+基型这一格被量成一个正向结论：运行时里有原生 `Jalium.UI.Controls.Separator : Control`，自己声明 `OnRender`，
+自有 DP 只有 `Orientation` / `StrokeBrush` / `StrokeThickness` 三枚，出厂 `Style=null Template=null
+IsHitTestVisible=False`。于是 AGENTS.md 的"原生控件优先"这一条**成立**，起自有类型反而违规；
+而且 `spike/DividerProbe` 量到不套模板就能换色（thickness 1 → 600 像素 / 2 行，4 → 1200 / 4 行，红色刷子那 4 行印红），
+所以 `Styles/Divider.jalxaml` 整个文件就是**两条 setter、零模板**，并把它钉成文本形状闸口。
+
+这一段最值钱的产出是 §S1-q 七条账里的三条**跨控件**结论：
+
+1. **1 DIP 的 `Rectangle` 什么都不印**（上/中/下三种对齐与 1 DIP 描边写法全 0；同盒子 `Border` 600、`Line` 604；
+   `Rectangle` 到 2 DIP 才恢复，3 DIP 仍只印 2 行）。机制未量，后果是一条已经欠下的账：仓库里**已发布五处**这种写法
+   （`Styles/AppBar.jalxaml:194`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52`，本段逐行复核过，
+   全库再无 1 DIP 的 `Line`/`Rectangle`），它们现在是看不见的线。**不在 Divider 提交里顺手改**，另开 #46 独立缺陷批；
+   顺带记下一条需要重量的旧理由——`DataGrid.jalxaml:48` 的注释写着"用 Rectangle 而不是 border，免得被表头项盖住"。
+2. **`{ThemeResource}` 只在并入主题字典之后解析**：单独 `XamlReader.Parse` 出来的 `Border` 写令牌 `Background` 印 0 墨。
+   这是 S1-p"读不到不等于没有"的坑第二次遇到，差别在于这次三个空格子有两个被第 1 条（死的 1 DIP `Rectangle`）污染，
+   只有一个 `Border` 格子是干净证据——先在代码里解析刷子才拿到真读数。凡是"标记写不写得出东西"的验证，
+   都要区分并入后与单独解析后，**后者不能当作前者的反证**。
+3. **暗令牌配白卡等于没放**（`#15FFFFFF` 叠白实测 `ink=0`，Border 与控件自绘两条路都是 0），
+   所以"两档主题不一样"的像素主张必须给样本配一张同暗度的卡（本层 `#202020`）。这条给 S0 那批像素判据补了前提。
+
+**状态映射那一格是空的，而且这不是"未测"**：上游没有这个控件就没有 VisualState 可映射，运行时侧 `Separator`
+是静态元素、唯一会变的是宿主给的 `Orientation`（那是控件自己的属性）。审计 §5 把这句原样写出来，
+不用"暂未覆盖"糊过去。
+
+四类证据分开记（`audits/divider.md` §7 是同内容的展开）：
+1. 构建：清单 59 → **60** 份字典（实测两遍计数），`keys.md` 重出 1256 → **1257** 行 / 61 → **62** 份，
+   新增行就是 `ImplicitStyle → Separator`；闸口里 Debug 0 警告 / 0 错误。附带一条运行时约束：清单与随包文件双向对账，
+   注掉一行而留着文件会让主题加载抛 `… is not listed in Themes/Manifest.txt`。
+2. 行为：`AstraDividerTests` **13** 条——隐式样式落地用**实例身份**读（`Assert.Same(调色板刷子, separator.StrokeBrush)`
+   并断它不等于出厂灰）、`StrokeBrush` 是刷子不是颜色、`StrokeThickness==1`、`IsHitTestVisible=False`、
+   换轴后两条 setter 仍在、消费行类型 theory、五个自造名反向 theory、两条 setter 零模板的文本形状闸口。
+   **A/B 有牙**：删 `<Style>` 整块（先 `grep -c` 读回 1 → 0）→ **5 红 / 8 绿**，还原 → 13/13。第一次 A/B 改的是清单，
+   结果拿到一堵 1 毫秒全红的假墙（红因是主题加载被拒，不是断言），已在 §S1-q 第 6 条结清。
+   这条 A/B 还顺带量出：**三条几何断言（600/600/200）在没有样式的构建里照样绿**——框架那条灰线印同样多的墨，
+   所以几何不是令牌的证据，令牌的主张只住在颜色断言里。
+3. 视觉：横线 600 = 2 行 × 300、竖线 200 = 2 列 × 100（`Render()` 的 DIP 像素实测）；Light 两行 `#F8F8F8` 且
+   出厂灰 `#A3A3A4` 计数 0；Dark 换深卡后线行比卡亮、两档线色不同；两档品牌绿 `#207245` 计数 0。
+   Gallery：Status 页加 Divider 卡（正文夹横线 + 左中右带竖线）；冒烟 `-Page status` 单页 10.7 s 干净关闭，
+   全 10 页一遍 **exit 0**（status 5.7 s、最慢 command-bar 11.2 s、无残留进程）。**故意不截屏**。
+4. 硬件输入：**仍为零**。`IsHitTestVisible=False` 是出厂值并被断言，这条控件没有可测的输入臂——
+   但这不等于指针通路已验证（#13 依旧是全仓库欠账）。
+
+**闸口读数（第三段，串行 `tools/Test-AstraGates.ps1`，四遍三种结果）**：第 1 遍全绿——Debug **0 警告 / 0 错误**，
+整套 **1288/1288 通过、0 失败、0 跳过**（5 m 6 s；比第二段 1275 多 13 = 本段新增的 13 条，没有一条靠削减别处得到），
+调色板三行 `checked=True`，`keys.md is current: 1257 canonical lines.`。第 2~4 遍都红，**但红的都不是本段的用例**：
+第 2 遍 22 失败（`AstraContentDialogTests` 整类 13 名 + 1 条菜单子菜单，异常逐字仍是 #35 那句
+`ContentDialog could not resolve a host window.`）、第 3 遍 1 失败（NavigationView pill 增量 `1306`——因为"静止"那张里
+#EAEAEA 仍有 8040，压根没拍到取消选中的画面）、第 4 遍 1 失败（TeachingTip 翻转落边 `Expected: Bottom / Actual: Top`）。
+四遍之间产品与测试源码完全相同（第 1 遍就已带着这 13 条），只差 `Catalog.json` 一处四空格缩进；HEAD 全程 `e425208`，
+没有别的会话提交进来。三条红登记在 #35 / #47 / #48。
+**下一步因此不是继续堆控件**：把固定 `Settle` 换成"轮询到稳定或超时"、并查 `Host()` 双拍与顺序跑抢占这条公共成因——
+判据不稳时后面每一段的绿都不算数（阶段 0 的老规矩）。
+
+仍欠：出厂线色 `#A3A3A4` 的来源（哪一行令牌还是硬编码）没查；`Separator.Background` 在这个类型上画不画东西没查，
+所以那条 setter 不写；12 DIP 盒子是运行时自己的度量而非上游数字（上游同角色线的总高是 3 / 8 / 20）；
+1 DIP `Rectangle` 的机制未量；五处已发布死线另批处理（#46）。

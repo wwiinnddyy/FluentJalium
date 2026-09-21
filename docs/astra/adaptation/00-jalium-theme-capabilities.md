@@ -1821,3 +1821,40 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 还有一条属于移植纪律而不是运行时：短名 `ProgressRingForeground` / `ProgressRingBackground` **不是空的**——
 运行时自己的字典已经回答了它们（census 读到 `ProgressRingForeground = SolidColorBrush(#FF1E793F)`）。
 扣住某个上游键时先用 census 确认这个名字在运行时到底存不存在，别把"我们没发布"写成"这个名字没被回答"。
+
+## S1-q：一条分隔线只有"控件自己画"和 `Border` 两条活路——Divider 量出的七条账（阶段 6 第三段，2026-09-21）
+
+上游在钉住的 commit 里没有 `Divider` 这个控件（`git ls-files | grep -i divider` 零命中，同一命令对 `progressring` 有 125 命中），
+运行时也没有那个名字，所以这一段没有可抄的权威，选型只能量。`spike/DividerProbe`（模式 `surface`/`ink`/`alpha`/`mount`/`shape`，
+实跑两次：`all` 与 `shape`；转录 `s1q-divider-raw.txt`）。
+
+1. **原生 `Separator` 是一台自己会画线的 `Control`**。`Separator < Control`，自己声明 `OnRender`，自有 DP 只有三枚：
+   `Orientation` / `StrokeBrush` / `StrokeThickness`；新实例读回 `Style=null Template=null Height=NaN MinHeight=0
+   Margin=0 IsHitTestVisible=False`，横向盒子 300x12、纵向 12x100。不写模板就能被主题驱动：出厂的线在白底上读
+   `#A3A3A4`（600 像素 / 2 行），`StrokeThickness=4` 变 4 行 1200，换红色刷子那 4 行就印红。跨控件意义：**"一条纯色线"
+   不需要 `ControlTemplate`**，本层 `Styles/Divider.jalxaml` 因此只有两条 setter。
+2. **1 DIP 的 `Rectangle` 什么都不印**——而上游七处同角色分隔线里有五处正是这种写法。同盒子同刷子下面：
+   `Rectangle` 1 DIP = 0 墨（上/中/下三种对齐、以及改成 1 DIP 描边写法全都一样），`Border` 1 DIP = 600，
+   `Line` = 604；`Rectangle` 2 DIP = 600、3 DIP 仍只有 2 行 600、4 DIP = 1200。所以这不是"Shape 类型不能画"，
+   是**薄到 1 DIP 就丢**，机制未量。跨控件意义是一条已经欠下的账：仓库里已发布五处 1 DIP `Rectangle`
+   （`Styles/AppBar.jalxaml:194`、`Styles/DataGrid.jalxaml:53/59/60`、`Styles/TreeDataGrid.jalxaml:52`）现在印不出墨。
+3. **`{ThemeResource}` 在"解析过但没并入"的片段里不解析**——S1-p 那条"读不到不等于没有"的坑第二次遇到，而且这次更绕：
+   `XamlReader.Parse` 出来的 `Border` 写 `Background="{ThemeResource DividerStrokeColorDefaultBrush}"` 印 0 墨，
+   同结构的字面色 `Border` 印 600。改成在代码里从 `Application.Current.TryFindResource` 取刷子再交给它，才第一次量到
+   令牌落到像素（白卡上那两行读 `#F8F8F8`，即 `#0F000000` 覆到白）。跨控件意义：凡是"标记里写不写得出东西"的验证，
+   都要区分**并入主题字典后**与**单独解析后**，后者不能当作前者的反证。
+4. **暗色令牌放在白卡上等于没放**：`#15FFFFFF` 叠白实测 `ink=0`（Border 与 `Separator.StrokeBrush` 两条路都是 0）。
+   于是"两档主题不一样"的像素主张必须给样本配一张同暗度的卡（本层用 `#202020`，暗卡上线行读得更亮）。这条给 S0 那批
+   像素判据补了一个前提：低对比度下主题差异是真的，但按"数非背景像素"的写法测不出来。
+5. **模板能落到 `Separator` 上，宿主也让本地值说话**：给它一份带 `DividerLine`（`Border`）的 `ControlTemplate`，部件建得出来
+   （横 320x1 / 300x1）且墨量与不套模板时同级；挂载之后改 `Height`，盒子从 9 跟着变 20，线仍是 1 DIP。也就是说 S1-o
+   那条"尺寸归包裹层"在这里是可行的，只是本段用不上——顺带否掉了"为了改粗细必须重模板"这个假设。
+6. **清单与随包文件是双向对账的**：把 `Styles/Divider.jalxaml` 从 `Themes/Manifest.txt` 注掉而文件还在，
+   `FluentThemeManager.ReadManifest()`（`Themes/FluentThemeManager.cs:278`）直接抛
+   `Styles/Divider.jalxaml is not listed in Themes/Manifest.txt`，整套测试 1 毫秒内全红。跨段意义：想"作废"一段改动来验牙，
+   得改字典本体，**不能改清单**——本轮第一次 A/B 就是这样拿到一堵假红墙。
+7. **图标族的基类地图（同阶段后面几笔的输入）**：`SymbolIcon` / `FontIcon` / `PathIcon` 都是 `IconElement : FrameworkElement`
+   而不是 `Control`（`IconElement` 只带 `Foreground`，三个叶子各自声明 `OnRender`），所以**根本没有隐式样式与模板可换**；
+   `BitmapIcon`、各 `*IconSource`、`AnimatedIcon`、`ImageIcon` 全 ABSENT；`Symbol` 是 Enum 不是控件。
+   另两条顺手量到的约束：`MenuFlyoutSeparator` 与 `AppBarSeparator` 也各自 `OnRender` 且**没有 `StrokeBrush`**
+   （前者自有 DP 为零），所以本段这两条 setter 到不了它们；`GridSplitter : Thumb`、`ToolBar : HeaderedItemsControl`。
