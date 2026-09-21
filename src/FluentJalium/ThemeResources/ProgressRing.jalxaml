@@ -1,0 +1,21 @@
+<!-- WinUI 3 ProgressRing_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     f3fa38ea83ea910200a6a539140a379b128bbf94. Three distinct keys over seven declaration sites: two brush aliases
+     written inside the Light/Default/HighContrast dictionaries (:5-6, :9-10, :13-14) and one metric row outside
+     them (:17). Two of the three are published; the third is named and reasoned in
+     docs/astra/audits/progress-ring.md and pinned out of the published set by a theory in AstraProgressRingTests.
+     Upstream's dictionaries are keyed Light, Default and HighContrast - there is no Dark dictionary in this file
+     at all - so Light and Dark here carry the same targets the Light/Default pair does. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Both rows are aliases of aliases upstream, and both keep their targets: the ring's paint is the accent and
+       its background is genuinely transparent (the asset draws no plate). The HighContrast pair
+       (SystemControlHighlightAccentBrush, SystemControlBackgroundBaseLowBrush) is not reproduced here for the
+       same reason ProgressBar's was not: this layer re-points high contrast underneath the aliases, in
+       ThemeResources/HighContrast.map, and control-level re-pointing stays an open item. -->
+  <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ProgressRingBackgroundThemeBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <!-- ProgressRingStrokeThickness (x:Double 4) is held out on two counts. This reader rejects an x:Double row
+       outright rather than dropping it (adaptation/00 S1-o clause 5), and the row is dead upstream: zero hits in
+       ProgressRing.xaml, blob df15b1794bbd0cda30279b5ab0674cafa544a0cd, the only other mention being a baseline
+       list. What the ring strokes at is a function of the asset's own geometry, so the arithmetic lives in
+       FluentProgressRing where a test can read it. -->
+</ResourceDictionary>

@@ -573,6 +573,29 @@
         "upstream declares no Orientation at all, so the vertical band this layer honours is a host extra, asserted as geometry and not as parity",
         "no pointer or touch evidence: the bar takes no input, so nothing on this page is claimed as an interaction path"
       ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentProgressRing",
+      "source": "Styles/ProgressRing.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/progress-ring.md",
+        "docs/astra/adaptation/s1p-ring-raw.txt",
+        "tests/FluentJalium.Tests/AstraProgressRingTests.cs",
+        "spike/RingProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports neither ProgressRing nor the AnimatedVisualPlayer its template hosts - and no Lottie reader either, so the two shipped assets are not carried and the look is rebuilt from the numbers inside them",
+        "the indeterminate arc keeps its half circle while it turns: upstream's asset also animates TrimStart from 0 to 0.5 across the loop (ProgressRingIndeterminate.cpp:305, :318), which is the taper at the trailing end, and nothing here reproduces it",
+        "the rotation is written into the figure rather than onto a RenderTransform, because the transform route was never measured clean: the first cut's empty-looking picture turned out to be an integer-division constant, so the pivot question stays open",
+        "DeterminateSource and IndeterminateSource (IAnimatedVisualSource, MUX_PREVIEW) have no counterpart, and ProgressRingTemplateSettings is absent, so ApplyTemplateSettings' EllipseDiameter/EllipseOffset/MaxSideLength arithmetic is carried as constants in the control instead of as a bindable surface",
+        "ProgressRingStrokeThickness is not published: this reader rejects an x:Double row outright and upstream's own template never reads it",
+        "the Inactive state's AccessibilityView=Raw has no member here, so an inactive ring leaves the accessibility tree by opacity only",
+        "the 359.9 degree cap and the -90 start follow ModernWpf's reading rather than the asset, which no tool in this repository can inspect",
+        "high contrast resolves through the palette aliases instead of upstream's two re-pointed rows",
+        "no pointer or touch evidence: upstream sets IsHitTestVisible=False and IsTabStop=False, both asserted, so the ring has no interaction arm to prove"
+      ]
     }
   ]
 }

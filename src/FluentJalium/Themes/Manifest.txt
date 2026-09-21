@@ -36,6 +36,7 @@ ThemeResources/NavigationView.jalxaml
 ThemeResources/PipsPager.jalxaml
 ThemeResources/BreadcrumbBar.jalxaml
 ThemeResources/ProgressBar.jalxaml
+ThemeResources/ProgressRing.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
@@ -69,3 +70,7 @@ Styles/BreadcrumbBar.jalxaml
 # The progress bar: the host's own control keeps the geometry (it sizes PART_Indicator against Value), so this file
 # only carries the band that geometry has to land in - one style, no own type.
 Styles/ProgressBar.jalxaml
+# The progress ring: an own type, because 26.10.9 has neither the control nor the animated-visual player upstream
+# feeds it. This file carries the twelve setters and the two-part template; the arc's geometry and its spin come
+# from FluentProgressRing and Motion/ProgressRingAnimator.cs.
+Styles/ProgressRing.jalxaml

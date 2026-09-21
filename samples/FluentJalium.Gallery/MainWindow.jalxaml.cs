@@ -190,6 +190,8 @@ public partial class MainWindow : Window
     private void WireStatus()
     {
         var bar = (ProgressBar)SampleProgressBar!;
+        var ring = (FluentProgressRing)SampleProgressRing!;
+        var bigRing = (FluentProgressRing)BigRing!;
         ((Slider)ProgressValueSlider!).ValueChanged += (_, args) =>
         {
             if (bar.IsIndeterminate)
@@ -198,7 +200,10 @@ public partial class MainWindow : Window
             }
 
             bar.Value = args.NewValue;
+            ring.Value = args.NewValue;
+            bigRing.Value = args.NewValue;
             ReportProgress(bar);
+            ReportRing(ring);
         };
 
         var indeterminate = (CheckBox)IndeterminateCheck!;
@@ -212,12 +217,18 @@ public partial class MainWindow : Window
         indeterminate.Checked += Changed;
         indeterminate.Unchecked += Changed;
         ReportProgress(bar);
+        ReportRing(ring);
     }
 
     private void ReportProgress(ProgressBar bar) =>
         ((TextBlock)ProgressReadout!).Text = bar.IsIndeterminate
             ? "Indeterminate: a third of the row, and it stays put."
             : $"{bar.Value:0} of {bar.Maximum:0}.";
+
+    private void ReportRing(FluentProgressRing ring) =>
+        ((TextBlock)RingReadout!).Text = ring.IsIndeterminate
+            ? "Ring: indeterminate, a half circle carried round by a frame loop."
+            : $"Ring: {ring.Value:0} of {ring.Maximum:0}, an arc of {ring.CurrentSweepAngle:0} degrees.";
 
     private void WireMenus()
     {

@@ -252,6 +252,7 @@ public class AstraResourceKeyTests
     [InlineData("ThemeResources/PipsPager.jalxaml")]
     [InlineData("ThemeResources/BreadcrumbBar.jalxaml")]
     [InlineData("ThemeResources/ProgressBar.jalxaml")]
+    [InlineData("ThemeResources/ProgressRing.jalxaml")]
     public void Transcribed_control_rows_are_read_by_a_template(string file)
     {
         var dictionaries = AstraDictionaries();

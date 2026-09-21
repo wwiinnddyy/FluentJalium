@@ -608,6 +608,19 @@
                   <TextBlock Text="The filled bar is three DIP tall and the rail behind it one, which is upstream's own geometry; dragging the slider moves the end of the fill because the control sizes that part and the template only hands it a band to land in. Checking indeterminate is honest about this runtime: the block stops moving, because the slide upstream animates has no route here." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
                 </StackPanel>
               </Border>
+              <TextBlock Text="Progress ring" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <StackPanel Orientation="Horizontal">
+                    <fluent:FluentProgressRing x:Name="SampleProgressRing" IsIndeterminate="False" Value="40" />
+                    <fluent:FluentProgressRing x:Name="SpinningRing" Margin="20,0,0,0" />
+                    <fluent:FluentProgressRing x:Name="BigRing" IsIndeterminate="False" Value="40" Width="64" Height="64" Margin="20,0,0,0" />
+                    <fluent:FluentProgressRing x:Name="QuietRing" IsActive="False" Margin="20,0,0,0" />
+                  </StackPanel>
+                  <TextBlock x:Name="RingReadout" Text="Ring: 40 of 100." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,12,0,0" />
+                  <TextBlock Text="This runtime has no ProgressRing and no animated-visual player, so the ring is a type of ours that draws its own arc: radius and stroke come out of the two Lottie canvases upstream ships (they differ, and the ring keeps that), a determinate arc is regenerated whenever the value moves, and the spin is a frame loop writing the arc's start angle - an animation clock never reaches a transform here. The second ring is indeterminate, the third is the same control at 64 DIP, and the fourth is inactive: it holds its place and paints nothing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
             </StackPanel>
 
             <StackPanel x:Name="MenusPage">

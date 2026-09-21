@@ -1780,3 +1780,44 @@ Gallery 的表格另加 `HeadersVisibility='Column'`。回归：`The_row_header_
 6. **Trigger 的 setter 里 `{TemplateBinding}` 是真会解析的**，把 `MinHeight` 改成 7 后两个轴向的带子都变成 7；
    `"Auto"` 与 `"NaN"` 两种写法都能落到"未设置"哨兵。这条给"一个模板同时服务两个朝向"留了声明式通路，
    不必回到代码里改写部件。
+
+## S1-p：画一条弧有四条路，三条是死的——进度环量出的七条账（阶段 6 第二段，2026-09-21）
+
+上游 ProgressRing 的外观整个在一份 Lottie 资产里，26.10.9 既没有 `ProgressRing` 也没有播放器（census 全 ABSENT），
+所以本层的环得自己算几何。算之前先把"用什么画"量了一遍（`spike/RingProbe`，转录
+`docs/astra/adaptation/s1p-ring-raw.txt`），量出来的东西不止影响这一条控件：
+
+1. **`StrokeDashArray` 被存下来，也被忽略。** 形状上写 `StrokeDashArray="20 200"`，属性读回是 `[20, 200]`、
+   `StrokeDashCap` 读回 `Round`，可墨量与完全不写 dash 的整圈**逐行相同**（556 像素、bbox 50x50）；
+   再把 `StrokeDashOffset` 写成 0 / 40 / 95，三张捕获一模一样。跨控件意义：这层没有"用虚线截出一段"的画法，
+   任何环形进度、刻度带、虚线描边都得走真几何。
+2. **markup 里的 geometry 集合根本不填充。** `<Path.Data><PathGeometry><PathFigure><ArcSegment/></PathFigure>…`
+   与显式 `<PathFigure.Segments>` 两种写法都把 `Data` 立成了 `PathGeometry`，但 `Figures.Count` 读回 **0**，捕获无墨；
+   同一份图形用 `Data="M 30,5 A 25,25 0 1 1 29.9,5"` 字符串就出墨（620 像素 / 54x54），用代码
+   `new PathGeometry { Figures.Add… Segments.Add… }` 也出墨（90° 弧与字符串版同为 169 像素）。
+   这是 S1-j"属性名不校验"的兄弟条款：**元素名也不校验**，`Path.Data` 那条链解析得过、对象也造出来，只是空的。
+   跨控件意义直接压在阶段 6 的图标族上：上游 `PathIcon`/`Symbol` 的几何全是元素式 `<Path.Data>` 写法，
+   照抄就是零墨——要么改字符串，要么在代码里造。
+3. **迷你语言只有基类能解析。** `Geometry.Parse(string)` 在，`PathGeometry.Parse` 与 `StreamGeometry.Parse`
+   都 ABSENT；`Geometry.Bounds`（readonly `Rect`）、`GetFlattenedPathGeometry()`、`GetWidenedPathGeometry(Pen)`
+   全在，所以"一条弧画到哪儿"除了像素还有一层可断言的读回面（本层用 `Bounds` 与 `Figures[0].StartPoint` 钉角度与半径）。
+   另记一条坑：空几何的 `Bounds` 读回是 `Rect.Empty`，它的宽高**不是有限数**（断言里 `double.IsFinite` 当场判假），
+   所以"没画东西"要断 `Figures` 为空或 `Bounds.IsEmpty`，别拿有限性去断。
+4. **静态赋值的变换会被应用，动画时钟不推它**（补 S1-o 第 4 条的另一半）。给 `Ellipse` 挂
+   `RotateTransform{Angle=90,CenterX=25,CenterY=25}`，bbox 从 44x50 换成 51x43、180° 再换回 43x50 且整体位移；
+   同一个 `AngleProperty` 挂 `Forever` 的 `DoubleAnimation`，三个采样点仍是 0。合起来是"能画不能动"：
+   凡是要动的东西，都得由 `CompositionTarget.Rendering` 一帧一帧直写——本层的 `ProgressRingAnimator` 就是这么一台。
+5. **`HoldEnd` 的表在 `BeginAnimation(dp, null)` 之后还留在屏幕上。** 停掉时钟后，部件读回的本地值仍是 markup 那个数，
+   可捕获里它的 bbox 与墨量停在动画末值（同一枚 `Ellipse` 从 556 像素 / 50x50 变到 812 像素 / 44x50）。
+   这条给仓库里既有的写法补了理由——`Motion/NavigationIndicatorAnimator.cs` 从一开始就显式
+   `FillBehavior = Stop`——而且是给"只挂不摘"的动画定性的：不写 Stop 的表会在交还之后继续说话。
+6. **`RangeBase` 在这层是公开抽象基类**（`protected` 构造，`OnValueChanged` / `OnMinimumChanged` /
+   `OnMaximumChanged` 三个 protected virtual，值域外还白送 `SmallChange`/`LargeChange`），`ProgressBar` 正是它派生。
+   但上游 `ProgressRing` 是 `Control` + 自声明的 Minimum/Maximum/Value（`ProgressRing.idl:17`），
+   所以本层跟上游而不是跟邻居：多出来的那两个 change 属性不进公开面。
+7. **零长度弧不是空图。** `StrokeStartLineCap`/`StrokeEndLineCap=Round` 的 0° 弧仍在起点留下 2 个色像素，
+   于是"0 %"必须交回一个没有 figure 的 `PathGeometry`，否则像素断言会把"没有进度"读成"有一粒进度"。
+
+还有一条属于移植纪律而不是运行时：短名 `ProgressRingForeground` / `ProgressRingBackground` **不是空的**——
+运行时自己的字典已经回答了它们（census 读到 `ProgressRingForeground = SolidColorBrush(#FF1E793F)`）。
+扣住某个上游键时先用 census 确认这个名字在运行时到底存不存在，别把"我们没发布"写成"这个名字没被回答"。

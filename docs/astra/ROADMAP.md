@@ -1479,3 +1479,79 @@ S1-m 量到"能继承"不等于"该继承"，这一段就是那个判据的正�
 上游 Error/Paused 两个状态在这一层根本没有驱动属性（`ShowError`/`ShowPaused` 读不到），因此 11 个 VisualState 只映射成 1 条 Trigger；
 `TemplateSettings`（`IndicatorLengthDelta`、`Container*AnimationPosition`、`ClipRect`）在本层没有对应物，
 所以"裁切窗口"这条上游机制无法复刻；高对比那一组上游行没进本层键账。
+
+## 阶段 6 第二段：ProgressRing 落地——弧要自己算，旋转只能交给帧循环（2026-09-21）
+
+目标里这一条标了"自有"，实测支持它：`spike/ProgressProbe` 模式 `census` 报 `ProgressRing` 在 26.10.9 缺席，
+连 `AnimatedVisualPlayer` 与 Lottie 那套也没有对应物——上游模板里能放的东西，这一层一样都放不进去。
+基型跟着上游走而不是跟着"进度条是 RangeBase 的后代"走：审计确认上游 `ProgressRing : Control` 自带
+`Minimum`/`Maximum`/`Value` 三枚自有 DP，所以本层也是 `Control` + 自有量程（运行时里 `RangeBase` 确实公开，
+但把它当基型是一种"顺手继承实现细节"，与上游不符）。
+
+这一段真正的产出是 `spike/RingProbe` 的七条账（`adaptation/00` §S1-p），因为它们决定了几何只能怎么写：
+
+1. **画一条弧有四条路，三条是死的**。markup 里 `<Path.Data><PathGeometry><PathFigure><ArcSegment>` 两种写法
+   都能实例化，但 `Figures.Count` 读回 **0**、一个像素不印——要素名和属性名一样不被校验（S1-j 的姊妹账）。
+   字符串 `Data="M … A …"` 会印，代码 `new PathGeometry(){Figures={…}}` 也印且与字符串同像素数。
+   后果直接砸在下一阶段：`SymbolIcon`/`FontIcon`/`PathIcon` 族里上游那批**要素写法**的几何不能照抄。
+2. **虚线描边是存而不用**。`StrokeDashArray="20 200"` 逐字读回 `[20,200]`、`LineCap` 也在，画面上与不写虚线
+   **逐行相同**；`StrokeDashOffset` 写 0/40/95 三次捕获**字节全等**。上游 `ProgressRing` 的 `IsIndeterminate`
+   在别的框架里常靠虚线做旋转错觉，这条路在本层直接不存在。
+3. **"能画不能动"补了一维**。静态 `RotateTransform` 是**生效**的（界宽 44x50 → 90° 后 51x43 → 180° 后 43x50），
+   而 `Forever` 的 `AngleProperty` 动画永不走表——与 S1-o 第 4 条合成一条完整结论：变换能画、不能动。
+4. **`HoldEnd` 的残值会活过 `BeginAnimation(dp, null)`**：本地值读回 markup 里那个数，画面却停在动画终值
+   （同一个椭圆 556/50x50 → 812/44x50）。这条 retro-justifies `NavigationIndicatorAnimator` 里的
+   `FillBehavior.Stop`，不是巧合。
+5. **零长度弧 + 圆帽仍会印 2 个像素**，所以 0% 必须交回空 `PathGeometry` 而不是"宽度为 0 的弧"。
+6. `Geometry.Parse(string)` 在，`PathGeometry.Parse`/`StreamGeometry.Parse` 不在；`Rect.Empty` 的 Extent 不是有限值，
+   空几何要断 `Figures` 空或 `IsEmpty`，不能断 `Width`。
+7. 命名纪律：`Path` 在这台运行时与 `System.IO.Path` 同名（编译期要别名），`Grid.GetValue(Control.BackgroundProperty)`
+   这种"借别类型的 DP 读"在 Jalium 里读回 null——DP 身份绑声明类型，读回必须写元素自己的属性。
+
+几何数字来自两份 Lottie 资产**公布出来**的参数，且两态各一套、没有被抹平（ModernWpf 是同一套 determinate
+数字画两态）：determinate 半径 `8×1.77/32`、描边 `1.5×1.77/32`；indeterminate 半径 `7×5/80`、描边 `1.5×5/80`、
+恒定 180°（`TrimEnd=0.5`）；一圈 `900°/2 s`。起点 `-90` 与封顶 `359.9` 明确记成 ModernWpf 的发明（上游
+`Rotation` 是 -0.008°，路径起点由 Lottie 二进制决定，本仓库没有能读它的工具）；它的
+`IndeterminateStartAngle=305`、`Sweep=160`、`1.6 s` 三个数在参考仓库 A 全文 0 命中，**一个都没抄**。
+旋转最后写在弧的起始角里而不是变换上——不是因为变换被证明更差（第 3 条只证明静态变换能画），
+而是第一版把这条误当成空画面的原因，改完之后没有再做对照实验，所以"支点落在哪"作为 Known Gap 6 留着。
+
+**自己的 bug 由自己的用例抓出来**：`IndeterminateRadiusFactor` 写成 `7 * 5 / 80`，整数除法得 0，
+不确定环只印 3 个像素。修法 `7d * 5 / 80`；更重要的是先把归因撤回——我最初把空画面写成"变换支点问题"，
+那条主张已经连根删掉，换成了 Known Gap 6 的"仍未量"。
+
+键账：上游 `ProgressRing_themeresources.xaml` 3 个键名 / 7 个站点，本层发布 **2**、扣住 **1**
+（`ProgressRingStrokeThickness` 是 `x:Double` 行——S1-o 第 5 条的硬解析错——且上游 `grep` 显示**没有任何模板读它**，
+两头都不成立）。HighContrast 那一组重指向仍留在调色板层（`HighContrast.map`），与其他控件同一条账。
+状态映射：上游 3 个 VisualState → 本层 1 条 Trigger（`IsActive=False` → `LayoutRoot.Opacity=0`）；
+`Inactive` 的第二条设置 `AccessibilityView=Raw` 无处可写，所以**不活动的环还在无障碍树里**——这是可证明的差别，
+写在 Known Gap 5，不当"未测"处理。
+
+四类证据分开记（`audits/progress-ring.md` §7 是同内容的展开）：
+1. 构建：`Manifest.txt` 57→**59** 份字典（新增 2 份），三个工程重出 dll。
+2. 行为：新增 `AstraProgressRingTests` **30** 条——上游 12 条 setter、两条别名 `Assert.Same`、部件契约与
+   "单 `PathFigure` 挂 `ArcSegment`"、五档进度 → 0/90/180/270/359.9、五档 `IsLargeArc`、量程改写、退化量程交回空几何、
+   不确定态恒 180° 且不读 Value、因子在 32 与 64 两种盒子上各读一次、帧循环用**前后差**而不是阈值、
+   `IsActive=False` → `Opacity=0`、2 发布 + 7 扣住的 theory。
+   **A/B 有牙**（提交前复跑）：把 `Name="ProgressRingArc"` 改名（`grep -rn` 先确认全仓 1 处、改后 `grep -c` 读回 0）
+   → **16 红 / 14 绿**；还原 → 同一过滤器 **30/30 绿**。
+3. 视觉：四条像素主张全部读实测量——半环 vs 整环比值 `whole > half*1.4`；0% 与不活动印 **0** 个强调色像素，
+   且同帧 `PaintedPixels>0` 当白卡守门（否则"零墨"与"没截到图"不可分）；不确定态墨点 40~320；品牌绿 0；
+   Light↔Dark 直方图不同。Gallery：Status 页加四枚环卡（确定态/自转/64 DIP/不活动）+ 读数，
+   `-Page status` "closed cleanly in 5.8 s；1 page(s) mounted and closed；no Gallery process left."，全 10 页 6.1 s 干净退出；
+   目录加 1 行 `FluentJalium.Controls.FluentProgressRing`（`parity: own-type`，4 条证据路径 + 9 条 gap）。
+   **故意不截屏**，所以这一页只主张 markup 入树不崩。
+4. 硬件输入：**仍为零**。环照抄 `IsHitTestVisible=False`/`IsTabStop=False` 并各钉一条断言，因此没有输入臂可测——
+   这不等于指针路径已验证（任务 #13 依旧是全仓库欠账）。
+
+**闸口读数（第二段，串行 `tools/Test-AstraGates.ps1`，跑一遍）**：**exit 0** 一次通过——Debug **0 警告 / 0 错误**；
+整套 **1275/1275 通过、0 失败、0 跳过**（5 m 6 s；比上一段 1244 多 31 = 新控件 30 条 + 消费点闸口那份新字典 1 条）；
+调色板三行 `checked=True`（本批零改动）；清单 `keys.md is current: 1256 canonical lines.`；`All Astra gates passed.`
+闸口跑在一处**注释订正**之前（模板注释误称控件还写 `RenderTransform`），订正只动注释、随后单跑环的 30 条全绿。
+
+仍欠：不确定态的**尾部收窄**没做——上游一圈里同时把 `TrimStart` 从 0 推到 0.5，本层是恒定 180° 弧在转；
+两份 Lottie 资产本体不进本仓库，外观是从资产公布的数字重建的近似而非同一渲染源；
+`ProgressRingTemplateSettings` 三行没有绑定面；`ProgressRingStrokeThickness` 不发；
+**`CompositionTarget.Rendering` 这条通路已经量通并且在本段用上了，因此上一段"进度条不确定态做不出来"的前提部分失效——
+但本段没有顺手去接那根线**（`ProgressBar` 的 `IsIndeterminate` 至今仍是静图，Known Gap 1 原样保留，
+不用相邻证据结清）；变换支点归属未量（Known Gap 6）。
