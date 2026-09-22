@@ -57,7 +57,7 @@ try {
     Invoke-Step "build page pixel gate ($Configuration)" {
         dotnet build tools/AstraPagePixels -c $Configuration
     }
-    Invoke-Step 'gallery page pixels (13 pages x light, dark)' {
+    Invoke-Step 'gallery page pixels (13 pages x light, dark, high contrast)' {
         & (Join-Path $root "tools\AstraPagePixels\bin\$Configuration\net10.0-windows\AstraPagePixels.exe")
     }
     if (-not $SkipPalette) {

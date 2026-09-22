@@ -31,14 +31,41 @@ internal static class Program
     private static readonly Color DarkBase = Color.FromRgb(0x20, 0x20, 0x20);
 
     /// <summary>
+    /// What the high-contrast branch paints behind a page: upstream maps SolidBackgroundFillColorBaseBrush onto
+    /// SystemColorWindowColor, and this runtime answers #1C1C1E for that slot. Measured, not copied from a spec.
+    /// </summary>
+    private static readonly Color HighContrastBase = Color.FromRgb(0x1C, 0x1C, 0x1E);
+
+    /// <summary>Upstream's "no value authored yet" placeholder. It must never reach a shipped frame.</summary>
+    private static readonly Color UpstreamPlaceholder = Color.FromRgb(0xFF, 0x00, 0xFF);
+
+    private static readonly FluentThemeVariant[] Variants =
+    [
+        FluentThemeVariant.Light,
+        FluentThemeVariant.Dark,
+        FluentThemeVariant.HighContrast,
+    ];
+
+    /// <summary>
     /// Floors under the minima of the 2026-09-22 <c>--report</c> run of the shown window (26 legs):
     /// window-lit 848,082..848,166 of 848,166, own base fill 197,022..257,809, slot painted 182,017..1,531,859,
-    /// slot colours 48..404, empty slot 1 colour and 0 lit pixels.
+    /// slot colours 48..404, empty slot 1 colour and 0 lit pixels. The 2026-09-23 run that added the
+    /// high-contrast variant (39 legs) holds the same minima and adds hc base 742,619..827,751 of 848,166 -
+    /// that variant flattens the palette onto four platform colours, so its slot colour count drops to 41
+    /// (<c>materials</c>), which is why <see cref="MinSlotDistinctColors"/> stays at 40 rather than rising.
     /// </summary>
     private const int MinPaintedPixels = 800_000;
     private const int MinBaseFillPixels = 150_000;
     private const int MinSlotPaintedPixels = 150_000;
     private const int MinSlotDistinctColors = 40;
+
+    /// <summary>
+    /// The high-contrast frame is nearly all one colour, so a shared floor is blind to the thing worth catching
+    /// there: measured, flipping SolidBackgroundFillColorBaseBrush off its platform slot leaves the window-colour
+    /// block at 545,604..620,896 px across the 13 pages that otherwise paint 742,619..827,751, and a 150,000
+    /// floor lets all 13 through. 700,000 sits under that clean minimum, and the same mutation then fails 13 of 13.
+    /// </summary>
+    private const int MinHighContrastBaseFillPixels = 700_000;
 
     [STAThread]
     private static int Main(string[] args)
@@ -67,7 +94,7 @@ internal static class Program
         Pump(30);
 
         var failures = new List<string>();
-        foreach (var variant in new[] { FluentThemeVariant.Light, FluentThemeVariant.Dark })
+        foreach (var variant in Variants)
         {
             FluentThemeManager.ApplyTheme(variant);
             foreach (var id in pages)
@@ -91,7 +118,7 @@ internal static class Program
 
         window.Close();
         foreach (var failure in failures) Console.Error.WriteLine(failure);
-        Console.WriteLine($"{(failures.Count == 0 ? "PASS" : "FAIL")} {pages.Count} pages x 2 variants" +
+        Console.WriteLine($"{(failures.Count == 0 ? "PASS" : "FAIL")} {pages.Count} pages x {Variants.Length} variants" +
             (report ? " (report only)" : $", {failures.Count} offender(s)"));
         return failures.Count == 0 ? 0 : 1;
     }
@@ -99,11 +126,23 @@ internal static class Program
     private static void Report(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot)
     {
         Console.WriteLine($"{id} {variant}: stable={whole.Stable}/{slot.Stable} painted={Painted(whole.Histogram)} " +
-            $"base={Count(whole.Histogram, BaseOf(variant))} other-base={Count(whole.Histogram, BaseOf(Other(variant)))} " +
-            $"green={Count(whole.Histogram, BrandFocusGreen)} | slot {slot.Histogram.Count} colours " +
+            $"{string.Join(' ', BaseFills.Select(fill => $"{FillName(fill.Variant)}={Count(whole.Histogram, fill.Base)}"))} " +
+            $"placeholder={Count(whole.Histogram, UpstreamPlaceholder)} green={Count(whole.Histogram, BrandFocusGreen)} | slot {slot.Histogram.Count} colours " +
             $"{Painted(slot.Histogram)}px over {emptySlot.Histogram.Count} colours {Painted(emptySlot.Histogram)}px " +
-            $"(slot {slot.Width}x{slot.Height})");
+            $"(slot {slot.Width}x{slot.Height}) | top {Top(whole.Histogram)}");
     }
+
+    private static string FillName(FluentThemeVariant variant) => variant switch
+    {
+        FluentThemeVariant.Dark => "dark-base",
+        FluentThemeVariant.HighContrast => "hc-base",
+        _ => "light-base",
+    };
+
+    /// <summary>The frame's six largest colour blocks, so a new variant's base fill can be read off a measurement.</summary>
+    private static string Top(Dictionary<uint, int> histogram) =>
+        string.Join(" ", histogram.OrderByDescending(static entry => entry.Value).Take(6)
+            .Select(static entry => $"#{entry.Key >> 16 & 0xFF:X2}{entry.Key >> 8 & 0xFF:X2}{entry.Key & 0xFF:X2}:{entry.Value}"));
 
     private static void Judge(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot,
         List<string> failures)
@@ -111,11 +150,21 @@ internal static class Program
         if (!whole.Stable) failures.Add($"{id} {variant}: the frame never settled");
         if (Painted(whole.Histogram) < MinPaintedPixels)
             failures.Add($"{id} {variant}: only {Painted(whole.Histogram)} of the frame is lit");
-        if (Count(whole.Histogram, BaseOf(variant)) < MinBaseFillPixels)
-            failures.Add($"{id} {variant}: the variant's own base fill covers {Count(whole.Histogram, BaseOf(variant))} pixels");
-        if (Count(whole.Histogram, BaseOf(Other(variant))) != 0)
-            failures.Add($"{id} {variant}: the other variant's base fill is still in the frame " +
-                $"({Count(whole.Histogram, BaseOf(Other(variant)))} pixels)");
+        var baseFloor = variant == FluentThemeVariant.HighContrast ? MinHighContrastBaseFillPixels : MinBaseFillPixels;
+        if (Count(whole.Histogram, BaseOf(variant)) < baseFloor)
+            failures.Add($"{id} {variant}: the variant's own base fill covers {Count(whole.Histogram, BaseOf(variant))} pixels, under {baseFloor}");
+        foreach (var (other, otherBase) in BaseFills.Where(fill => fill.Variant != variant))
+        {
+            if (Count(whole.Histogram, otherBase) != 0)
+                failures.Add($"{id} {variant}: {FillName(other)} fill is still in the frame " +
+                    $"({Count(whole.Histogram, otherBase)} pixels)");
+        }
+
+        // What #61 broke without anything noticing: upstream's "no value authored yet" placeholder resolving through
+        // the platform-slot aliases and painting the whole high-contrast palette #FF00FF. The value table can only
+        // catch that for the keys it reads; this catches it for whatever actually reaches the screen.
+        if (Count(whole.Histogram, UpstreamPlaceholder) != 0)
+            failures.Add($"{id} {variant}: {Count(whole.Histogram, UpstreamPlaceholder)} pixels of upstream's #FF00FF placeholder");
         if (Count(whole.Histogram, BrandFocusGreen) != 0)
             failures.Add($"{id} {variant}: {Count(whole.Histogram, BrandFocusGreen)} pixels of the framework's brand green");
 
@@ -187,10 +236,14 @@ internal static class Program
     private static int Count(Dictionary<uint, int> histogram, Color color) =>
         histogram.GetValueOrDefault((uint)(color.R << 16 | color.G << 8 | color.B));
 
-    private static Color BaseOf(FluentThemeVariant variant) => variant == FluentThemeVariant.Dark ? DarkBase : LightBase;
+    private static Color BaseOf(FluentThemeVariant variant) => BaseFills.First(fill => fill.Variant == variant).Base;
 
-    private static FluentThemeVariant Other(FluentThemeVariant variant) =>
-        variant == FluentThemeVariant.Dark ? FluentThemeVariant.Light : FluentThemeVariant.Dark;
+    private static readonly (FluentThemeVariant Variant, Color Base)[] BaseFills =
+    [
+        (FluentThemeVariant.Light, LightBase),
+        (FluentThemeVariant.Dark, DarkBase),
+        (FluentThemeVariant.HighContrast, HighContrastBase),
+    ];
 
     /// <summary>The panel the Gallery mounts pages on, through its code-behind's own private view.</summary>
     private static Panel PageHostOf(MainWindow window) =>

@@ -4112,5 +4112,65 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 同一天 #61 那批的全量跑（`spike/SystemColorProbe/gate-61b.log`，退出码 0，1574/1574）就是这段文字落地时的树状态读数，
 这一段也随之进了那次提交（`fd96ea7`）而不是单独一批——事后追补的只有这段说明。
 
+## #82 可量的那一半（目标项 6）：逐页像素闸补上第三档 HighContrast——#61 那片洋红能藏这么久，就是因为这个闸只跑两档（2026-09-23）
+
+#61 段末尾写下的是"高对比一档**没有任何像素证据**"。值表那条闸（101 键逐键取值）守得住它自己读的那些键，
+守不住"整屏塌成一个颜色"这件事——那正是 #61 的形状。所以这一批把 `tools/AstraPagePixels` 从两档推到三档。
+
+### 仪器改形（只改这个进程，产品代码一行没动）
+
+| 位置 | 改动 | 为什么 |
+|---|---|---|
+| `Variants` | Light / Dark / **HighContrast** 三档，逐页两次的形状不变（装好的页 vs 掏空的槽） | 判据形状与两档一致，才谈得上"同一件事在 HC 档也守着" |
+| `HighContrastBase = #1C1C1E` | 新加，且**从 `--report` 量出来**，不是抄规格 | 上游 map 行 `SolidBackgroundFillColorBaseBrush=SystemColorWindowColor`（`ThemeResources/HighContrast.map:62`），本运行时那一槽答 `#1C1C1E` |
+| 三条新判据 | 三档各自的底色必须在场；**两档外来的**底色必须 0 像素；`#FF00FF` 占位符必须 0 像素 | 原来只有"另一档"一条（两档时才成立），三档得逐个外来者都查；占位符那条是 #61 的直接出口 |
+| `MinHighContrastBaseFillPixels = 700_000` | HC 一档自己的地板，Light/Dark 仍 150,000 | 见下节 M2：共享地板对 HC 是瞎的，理由不是猜的，是突变量出来的 |
+| `top` 打印 | `--report` 打每帧最大的六个色块 | 新档的期望底色只能这样读出来；留着，下一档要加时不必再造仪器 |
+
+### 三档全量的 --report 读数（39 条腿，`spike/SystemColorProbe/hc-bases.log`）
+
+- 自己的底色：Light `197,022..257,809`、Dark `198,596..257,809`、**HC `742,619..827,751`**（帧共 848,166 像素，
+  也就是 HC 一帧有 87%..98% 是同一个颜色）。
+- 两档外来的底色：39 条腿全部 `0`。品牌绿：39 条腿全部 `0`。`#FF00FF` 占位符：39 条腿全部 `0`。
+- HC 的槽内颜色数掉到 **41**（`materials`，同一页 Light 48 / Dark 49），而槽内墨迹仍有 `338,832` 像素。
+  "高对比本就该是一片平色"这件事第一次在像素上被量到，所以 `MinSlotDistinctColors` 保持 40 而不是抬高——
+  抬到 48 会把正确的 HC 帧判成缺陷。
+
+### 牙齿：一条直接命中 #61，一条先证明"我原来的地板是瞎的"
+
+- **M1**：把 `ThemeResources/Light.jalxaml:164` 的 `SystemColorWindowColorBrush` 改回**改前的字面 `#FF00FF`**
+  （即 #61 那一刻那一行的样子）。结果 `FAIL 13 pages x 3 variants, 26 offender(s)`——26 条**全在 HC 档**
+  （每页两条：`own base fill covers 0 pixels` 与 `807033 pixels of upstream's #FF00FF placeholder`），
+  Light/Dark 的 26 条腿一条不红（`spike/SystemColorProbe/teeth-hc-m1.log`）。两件事就此钉住：信号确实是 HC 这条腿带的，
+  而 #61 那个缺陷不是"值表里的数不对"，它确实到了屏幕。
+- **M2（先是一次不算牙齿的读数）**：把 `HighContrast.map:62` 指到 `SystemColorButtonFaceColor`。
+  第一跑 **13 条腿全绿**：窗口色块从 `807,034` 掉到 `610,023`，仍高于共享地板 `150,000`。单行映射错位只搬走一小块
+  底色，其余表面行仍指向同一个槽——这条当时**不能**算 HC 档的牙齿，写下来免得日后拿它充数。
+  给 HC 一个自己的地板（`700_000`，压在实测最小值 `742,619` 之下）之后重跑同一突变：
+  `FAIL 13 pages x 3 variants, 13 offender(s)`，逐页窗口色块 `545,604..620,896`（`teeth-hc-m2b.log`）。
+  两次跑都在原地还原（`git checkout --`，工作树对这两个文件已确认干净）。
+- 仍然不主张：`HighContrast.map` **逐行**对错归 `Sync-AstraPalette.ps1 -Check` 与独立命名槽的值测点
+  （#61 段里那条区分在这档同样成立——像素档看的是"到不到屏幕"，看不了"这行指的槽对不对"）。
+
+### 非主张与仍然挂着的账
+
+- HC 档**有像素证据了**，但它量的是"这台主机上框架答出来的那八个槽到了屏幕"，不是"真高对比用户看到的颜色"：
+  `GetSysColor` 与框架槽没有一个相等、本机 high contrast 依旧关着（`SM_HIGCONTRASTMODE=0x1E`，bit 0 清）。
+  #82 剩下的是那半条路线判断（要不要自己 P/Invoke 直读平台色，还是整个交给框架的通道）+ 一个真 HC 环境的复测，
+  继续挂账，本批不动产品代码。
+- HC 档**没有基线可比**：Light/Dark 那两档另有 #58/#59/#60 补的"暗色断言要配不透明底"一类的定点像素主张，
+  这一档新加的只有绝对形状判据（底色在场、外来者缺席、占位符缺席），不含与历史帧的差分。
+- 硬件输入：本批为零——逐页档只导航与捕获，不注入指针。
+
+### #82 的串行闸口读数（2026-09-23，`spike/SystemColorProbe/gate-82.log`）——全绿，管道退出码 0
+
+同一套六步：Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 11 秒**（测试总数没动，本批一条测点都没加）
+→ 逐页像素闸 **`PASS 13 pages x 3 variants, 0 offender(s)`**（原来那行的 `x 2` 是本批改的，闸口步骤名也跟着改成
+`gallery page pixels (13 pages x light, dark, high contrast)`）→ 三档调色板 `checked=True` →
+`keys.md is current: 1312 canonical lines.`。产品代码与键清单零变动，本批只动 `tools/AstraPagePixels` 与闸口步骤名。
+
+三档全绿里有一条顺带量到、尚未查因的读数：`status` 那一页的槽内稳定性在 Light/Dark 是 `stable=True/False`（#78 的环），
+到 HighContrast 变成 `True/True`，同一页同一槽。这只说明那一档下这个测点不再逐帧变墨，**不**说明环停了——#78 仍挂着。
+
 
 
