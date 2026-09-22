@@ -2575,3 +2575,10 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 消息是 `The following constructor parameters did not present matching fixture data`——包括**原本绿的**漂移闸，
 因为类构造失败会带走整类。补 `[Collection(AstraThemeRuntimeCollection.Name)]` 后 9/9。
 这条对 #47/#35 那族也有用：整类同刻同因失败，不是 flake，别按 flake 记。
+
+### 缺口①批次的闸口读数（补记）
+
+`9d86e12` 之后：build `0 警告 / 0 错误`，整套 **1491/1491**（0 失败 0 跳过、7 m 12 s，多的 2 条就是两档 token
+解析腿），调色板三档 `checked=True`，`keys.md is current: 1301 canonical lines.`，`All Astra gates passed.`，
+`GATE-EXIT=0`。至此 #10 的三页 + Tokens 页的清单/解析两条闸都在全量下绿；仍欠的是"每页渲染到像素"与
+Motion 补间的驱动证据。
