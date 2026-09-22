@@ -218,10 +218,15 @@ public sealed class AstraProgressRingTests
         {
             // A frame loop's evidence is a difference between two reads, never a threshold on one: how much time
             // elapses between two settles is not fixed, so the only stable claim is "it moved while running and it
-            // did not while stopped".
+            // did not while stopped". The two shapes carry different preconditions, and the rates measured here say
+            // why: while the ring spins the pump delivers 144 frames inside one settle budget, so a movement claim
+            // can simply demand elapsed render time and get it; once the loop stops the scene is static, the
+            // framework stops raising Rendering, and asking a stopped ring for 24 frames delivers 19 before the
+            // budget expires. A floor on the stationary legs would therefore be a floor on a state that is correct
+            // by design - those two legs report the count instead of requiring one.
             var ring = Ring(50);
             var before = Start(ring);
-            PixelHarness.Settle(24);
+            SettleMoved("the spin leg");
             Assert.NotEqual(before, Start(ring));
 
             ring.IsIndeterminate = false;
@@ -230,13 +235,14 @@ public sealed class AstraProgressRingTests
             // The determinate arc is anchored at 12 o'clock, and switching to it zeroes the spin.
             Assert.Equal(16d, Start(ring).X, 1);
             var anchored = Start(ring);
-            PixelHarness.Settle(24);
-            Assert.Equal(anchored, Start(ring));
+            var heldStill = PixelHarness.Settle(24);
+            Assert.True(anchored == Start(ring),
+                $"the determinate arc moved while nothing should animate it (frames delivered while it held: {heldStill})");
 
             ring.IsIndeterminate = true;
             PixelHarness.Settle(8);
             var restarted = Start(ring);
-            PixelHarness.Settle(24);
+            SettleMoved("the restart leg");
             Assert.NotEqual(restarted, Start(ring));
 
             // Going inactive stops the loop rather than rewinding it, which is what upstream's Stop() on the
@@ -244,8 +250,9 @@ public sealed class AstraProgressRingTests
             ring.IsActive = false;
             PixelHarness.Settle(6);
             var held = Start(ring);
-            PixelHarness.Settle(24);
-            Assert.Equal(held, Start(ring));
+            var heldInactive = PixelHarness.Settle(24);
+            Assert.True(held == Start(ring),
+                $"the inactive ring's arc moved after the loop stopped (frames delivered while it held: {heldInactive})");
         });
     }
 
@@ -382,6 +389,23 @@ public sealed class AstraProgressRingTests
     public void Rows_this_layer_has_no_way_to_publish_are_absent(string key)
     {
         _fixture.Run(() => Assert.Null(Resource(key)));
+    }
+
+    /// <summary>
+    /// Settles until the rendered time a movement claim needs has actually gone by, and refuses the claim when it
+    /// never does. This is #47's ring member: <see cref="PixelHarness.Settle"/> stops on its wall-clock budget as
+    /// well as on its frame count, so a loaded sequential run can hand back no frames at all, and "the arc did not
+    /// move" then measures the harness rather than the control. Two frames is the floor because what the claim
+    /// needs is elapsed render time, not a particular count - a spinning ring delivers far more than that
+    /// (measured: 24 and up), while a static scene delivers what the watchdog allows.
+    /// </summary>
+    private static void SettleMoved(string leg, int atLeast = 2)
+    {
+        var delivered = PixelHarness.SettleFrames(atLeast);
+        Assert.True(delivered >= atLeast,
+            $"{leg} claims the arc moved across rendered time, and the pump delivered {delivered} frame(s) of the " +
+            $"{atLeast} this claim asks for - short of that the two reads sit inside no elapsed render time, so the " +
+            "run measures the harness rather than the ring (#47's instrument shape)");
     }
 
     private static FluentProgressRing Ring(

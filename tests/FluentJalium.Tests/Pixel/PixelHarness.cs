@@ -479,8 +479,34 @@ internal static class PixelHarness
     /// Such a transition animates the dependency value itself, so mid-flight <c>Border.Width</c> reports an
     /// interpolated length and <c>Background</c> reports a brand-new interpolated brush rather than the
     /// palette instance (docs/astra/adaptation/12).
+    /// <para>
+    /// The return value is how many frames <em>arrived</em>, which is not what the argument asks for: the pump
+    /// also stops when its wall-clock budget expires, so a call for 24 frames can deliver one on a loaded
+    /// machine. That is #47's other member - a claim of the shape "the value changed across 24 frames" is
+    /// measuring a stalled pump when the delivery is nought - so a caller that compares two reads takes them
+    /// through <see cref="SettleFrames"/> instead.
+    /// </para>
     /// </summary>
-    internal static void Settle(int frames = 30) => Pump(frames);
+    internal static int Settle(int frames = 30) => Pump(frames);
+
+    /// <summary>
+    /// Pumps until at least <paramref name="minimum"/> real frames have been delivered, up to the same
+    /// three-round budget a capture gives its settle question, and reports the count it reached. Used where the
+    /// claim is about two reads taken across rendered time: with nothing rendered in between the comparison is
+    /// not about the subject at all, and a stalled pump deserves an instrument's own failure rather than a
+    /// control's.
+    /// </summary>
+    internal static int SettleFrames(int minimum)
+    {
+        var delivered = 0;
+        var deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * SettleBudgetMilliseconds / 1000;
+        while (delivered < minimum && Stopwatch.GetTimestamp() < deadline)
+        {
+            delivered += Pump(minimum - delivered);
+        }
+
+        return delivered;
+    }
 
     private static Sample CaptureRaw(Visual target, int width, int height)
     {
