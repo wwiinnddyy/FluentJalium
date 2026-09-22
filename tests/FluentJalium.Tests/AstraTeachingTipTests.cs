@@ -414,12 +414,15 @@ public sealed class AstraTeachingTipTests : IDisposable
             tip.Closed += (_, _) => closed++;
             Assert.False(OpenedPopup()!.IsOpen);
 
+            // No pump anywhere in this fact. The state and both event counts are written by the property change
+            // itself: <c>FluentTeachingTip.OnIsOpenChanged</c> calls <c>ApplyOpenState()</c>, which writes
+            // <c>_popup.IsOpen</c>, and then raises <c>Opened</c>/<c>Closed</c> on the same call stack - and
+            // spike/PopupLadderProbe S14 reads exactly that at rung 0 (popup up, child built, opened=1) and back
+            // down in the closing write (closed=1). Waiting here only exposed the popup to #47's closers.
             tip.IsOpen = true;
-            PixelHarness.Settle();
             Assert.True(OpenedPopup()!.IsOpen);
 
             tip.IsOpen = false;
-            PixelHarness.Settle();
             Assert.Multiple(
                 () => Assert.Equal(1, opened),
                 () => Assert.Equal(1, closed),

@@ -88,3 +88,56 @@
    hidden + 4 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
    hidden + 8 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
    hidden +20 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+
+=== S11  ComboBox.IsDropDownOpen = true -> toggle, popup width, the overlay graft ===
+   open + 0 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+   open + 1 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+   open + 2 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+   open + 4 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+   open + 8 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+   open +20 frame(s): combo.IsDropDownOpen=True toggle.IsChecked=True popup.Width=220 overlay.PART_PopupBorder=there overlay.PART_ScrollViewer=there
+
+=== S12  NumberBox(Compact).Focus() -> UpDownPopup.IsOpen, and the switch to Inline closes it ===
+   focus + 0 frame(s): focused=True popup.IsOpen=True
+   focus + 1 frame(s): focused=True popup.IsOpen=True
+   focus + 2 frame(s): focused=True popup.IsOpen=True
+   focus + 4 frame(s): focused=True popup.IsOpen=True
+   focus + 8 frame(s): focused=True popup.IsOpen=True
+   focus +20 frame(s): focused=True popup.IsOpen=True
+   to-inline + 0 frame(s): popup.IsOpen=False inlineSpinners=Visible
+   to-inline + 1 frame(s): popup.IsOpen=False inlineSpinners=Visible
+   to-inline + 2 frame(s): popup.IsOpen=False inlineSpinners=Visible
+   to-inline + 4 frame(s): popup.IsOpen=False inlineSpinners=Visible
+   to-inline + 8 frame(s): popup.IsOpen=False inlineSpinners=Visible
+   to-inline +20 frame(s): popup.IsOpen=False inlineSpinners=Visible
+
+=== S13  UpDownPopup.IsOpen = true -> the popup's own child as a surface ===
+   child + 0 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+   child + 1 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+   child + 2 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+   child + 4 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+   child + 8 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+   child +20 frame(s): PopupContentRoot radius=8,8,8,8 border=1,1,1,1 Background=NumberBoxPopupBackground BorderBrush=NumberBoxPopupBorderBrush
+
+=== S14  FluentTeachingTip.IsOpen = true -> PART_Popup.IsOpen, its child, and the Opened count ===
+   show + 0 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   show + 1 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   show + 2 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   show + 4 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   show + 8 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   show +20 frame(s): tip.IsOpen=True popup.IsOpen=True child=Border opened=1 closed=0
+   hide + 0 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+   hide + 1 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+   hide + 2 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+   hide + 4 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+   hide + 8 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+   hide +20 frame(s): tip.IsOpen=False popup.IsOpen=False opened=1 closed=1
+
+=== S15  ComboBox opened -> the toggle's glyph Data, and a generated item under the graft ===
+     resting glyph Data=M 0,3 L 6,9 L 12,3
+   open + 0 frame(s): glyph Data=M 0,3 L 6,9 L 12,3 item=there wrapping=NoWrap text.ActualHeight=0 item.ActualHeight=0
+   open + 1 frame(s): glyph Data=M 0,3 L 6,9 L 12,3 item=there wrapping=NoWrap text.ActualHeight=19.8 item.ActualHeight=35.8
+   open + 2 frame(s): glyph Data=M 0,3 L 6,9 L 12,3 item=there wrapping=NoWrap text.ActualHeight=19.8 item.ActualHeight=35.8
+   open + 4 frame(s): glyph Data=M 0.014571881642556909,2.971031489107873 L 5.985498219314637,8.999964949521402 L 12.014431679728167,3.0290386118493218 item=there wrapping=NoWrap text.ActualHeight=19.8 item.ActualHeight=35.8
+   open + 8 frame(s): glyph Data=M 1.131850205671062,1.3846866216934828 L 5.127504607543181,8.870322593392878 L 12.613140579242577,4.87466819152076 item=there wrapping=NoWrap text.ActualHeight=19.8 item.ActualHeight=35.8
+   open +20 frame(s): glyph Data=M 12.613140579242577,7.125331808479239 L 5.12750460754318,3.1296774066071213 L 1.1318502056710624,10.615313378306517 item=there wrapping=NoWrap text.ActualHeight=19.8 item.ActualHeight=35.8

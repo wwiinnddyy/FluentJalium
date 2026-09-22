@@ -1,3 +1,4 @@
+using FluentJalium.Controls;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
@@ -55,6 +56,11 @@ internal static class Program
         S8_SuggestionDropdown();
         S9_SurfaceSurvivesClose();
         S10_ItemSkinSurvivesHide();
+        S11_ComboBoxDropdown();
+        S12_NumberBoxSpinnerPopup();
+        S13_SpinnerPopupChild();
+        S14_TeachingTipPopup();
+        S15_ComboGlyphAndItem();
 
         _host.Close();
         Pump(4);
@@ -293,6 +299,137 @@ internal static class Program
                 return $"item.Template is ours={ours} parent={item.VisualParent?.GetType().Name ?? "null"}";
             }));
         }
+    }
+
+    /// <summary>#79's four remaining shapes, measured the same way: the combo (three tests read its dropdown after
+    /// a 30-frame pump), the compact NumberBox's spinner popup, that popup's own child as a surface, and our
+    /// TeachingTip's popup.</summary>
+    private static void S11_ComboBoxDropdown()
+    {
+        Section("S11  ComboBox.IsDropDownOpen = true -> toggle, popup width, the overlay graft");
+        var combo = new ComboBox { ItemsSource = new[] { "one", "two", "three" }, SelectedIndex = 1 };
+        Place(combo, 220, 32);
+        Pump(8);
+        Ladder("open", () => combo.IsDropDownOpen = true, () =>
+        {
+            var toggle = Named(combo, "PART_ToggleButton") as ToggleButton;
+            var popup = Named(combo, "PART_Popup") as Popup;
+            return $"combo.IsDropDownOpen={combo.IsDropDownOpen} toggle.IsChecked={toggle?.IsChecked?.ToString() ?? "no-part"} " +
+                   $"popup.Width={(popup is null ? "no-part" : $"{popup.Width}")} " +
+                   $"overlay.PART_PopupBorder={(Named(_host, "PART_PopupBorder") is null ? "null" : "there")} " +
+                   $"overlay.PART_ScrollViewer={(Named(_host, "PART_ScrollViewer") is null ? "null" : "there")}";
+        });
+        combo.IsDropDownOpen = false;
+        Pump(6);
+    }
+
+    private static void S12_NumberBoxSpinnerPopup()
+    {
+        Section("S12  NumberBox(Compact).Focus() -> UpDownPopup.IsOpen, and the switch to Inline closes it");
+        var box = new NumberBox { SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact };
+        Place(box, 220, 32);
+        Pump(8);
+        var popup = Named(box, "UpDownPopup") as Popup;
+        Ladder("focus", () => box.Focus(), () =>
+            $"focused={box.IsKeyboardFocusWithin} popup.IsOpen={popup?.IsOpen}");
+        Ladder("to-inline", () => box.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline, () =>
+            $"popup.IsOpen={popup?.IsOpen} inlineSpinners={(Named(box, "InlineSpinners") is { } part ? part.Visibility.ToString() : "no-part")}");
+    }
+
+    private static void S13_SpinnerPopupChild()
+    {
+        Section("S13  UpDownPopup.IsOpen = true -> the popup's own child as a surface");
+        var box = new NumberBox { Value = 3, SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact };
+        Place(box, 220, 32);
+        Pump(8);
+        var popup = Named(box, "UpDownPopup") as Popup ?? throw new InvalidOperationException("no UpDownPopup");
+        Ladder("child", () => popup.IsOpen = true, () =>
+        {
+            if (popup.Child is not Border border)
+            {
+                return $"child={popup.Child?.GetType().Name ?? "null"}";
+            }
+
+            return $"{border.Name} radius={border.CornerRadius} border={border.BorderThickness} " +
+                   $"Background={Key(border.Background, "NumberBoxPopupBackground")} " +
+                   $"BorderBrush={Key(border.BorderBrush, "NumberBoxPopupBorderBrush")}";
+        });
+        popup.IsOpen = false;
+        Pump(6);
+    }
+
+    private static void S14_TeachingTipPopup()
+    {
+        Section("S14  FluentTeachingTip.IsOpen = true -> PART_Popup.IsOpen, its child, and the Opened count");
+        var anchor = new Border
+        {
+            Width = 100,
+            Height = 40,
+            Background = new SolidColorBrush(Color.FromRgb(0x80, 0x80, 0x80)),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            Margin = new Thickness(300, 300, 0, 0),
+        };
+        var tip = new FluentTeachingTip { Title = "T", Subtitle = "S", Content = "C", Target = anchor };
+        var opened = 0;
+        var closed = 0;
+        tip.Opened += (_, _) => opened++;
+        tip.Closed += (_, _) => closed++;
+        var surface = new Grid();
+        surface.Children.Add(anchor);
+        surface.Children.Add(tip);
+        Place(surface, 820, 620);
+        Pump(8);
+        var popup = Named(tip, "PART_Popup") as Popup;
+        Ladder("show", () => tip.IsOpen = true, () =>
+            $"tip.IsOpen={tip.IsOpen} popup.IsOpen={popup?.IsOpen} child={(popup?.Child is null ? "null" : popup.Child.GetType().Name)} " +
+            $"opened={opened} closed={closed}");
+        Ladder("hide", () => tip.IsOpen = false, () =>
+            $"tip.IsOpen={tip.IsOpen} popup.IsOpen={popup?.IsOpen} opened={opened} closed={closed}");
+    }
+
+    /// <summary>The two combo reads this batch has not yet measured: the toggle's glyph, which a state trigger
+    /// rewrites, and the generated item under the grafted surface - one test asks the first, another the second
+    /// plus a measured height. Both sit behind a 30-frame pump today.</summary>
+    private static void S15_ComboGlyphAndItem()
+    {
+        Section("S15  ComboBox opened -> the toggle's glyph Data, and a generated item under the graft");
+        var combo = new ComboBox { ItemsSource = new[] { "one", "two", "three" }, SelectedIndex = 1 };
+        Place(combo, 220, 32);
+        Pump(8);
+        var toggle = Named(combo, "PART_ToggleButton");
+        var glyph = toggle is null ? null : Named(toggle, "DropDownGlyph");
+        Note($"     resting glyph Data={Safe(() => DataOf(glyph!))}");
+        Ladder("open", () => combo.IsDropDownOpen = true, () =>
+        {
+            var border = Named(_host, "PART_PopupBorder");
+            var item = border is null ? null : Descendant<ComboBoxItem>(border);
+            var text = item is null ? null : Descendant<TextBlock>(item);
+            return $"glyph Data={Safe(() => DataOf(glyph!))} item={(item is null ? "null" : "there")} " +
+                   $"wrapping={(text is null ? "-" : text.TextWrapping.ToString())} text.ActualHeight={(text?.ActualHeight.ToString("0.#") ?? "-")} " +
+                   $"item.ActualHeight={(item?.ActualHeight.ToString("0.#") ?? "-")}";
+        });
+        combo.IsDropDownOpen = false;
+        Pump(6);
+    }
+
+    private static string DataOf(DependencyObject node)
+    {
+        var property = DependencyProperty.FromName(node.GetType(), "Data")
+            ?? throw new InvalidOperationException($"{node.GetType().Name} has no Data property.");
+        return node.GetValue(property)?.ToString() ?? "null";
+    }
+
+    private static T? Descendant<T>(DependencyObject root) where T : DependencyObject
+    {
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            var child = VisualTreeHelper.GetChild(root, index);
+            if (child is T match) return match;
+            if (child is not null && Descendant<T>(child) is { } deeper) return deeper;
+        }
+
+        return null;
     }
 
     // ---------- the ladder ----------

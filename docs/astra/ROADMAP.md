@@ -3952,5 +3952,50 @@ TeachingTip 的 popup：帧梯没量过这些形状，所以一条没动，另�
 ② 逐页闸里仍然只有 `status` 两档是 `stable=True/False`（Light 槽内色数 1189788px / Dark 1189783px），与第二成员
 给的解释一致：页里两枚 indeterminate 环的相位在飘，offender 判据不吃这个数，所以 PASS 成立，账在 #78。
 
+## #47 第四成员（任务 #79）：弹层族剩下的四族——三族的等待删掉，一族的等待被量出来是**动画**（目标项 5，2026-09-23）
+
+同一架帧梯（`spike/PopupLadderProbe` S11-S15）接着量剩下的四族，八档读数逐字在 `popup-ladder-probe.txt`：
+
+| 形状 | 测点在读什么 | rung 0 | 原来等几帧 |
+|---|---|---|---|
+| S11 `ComboBox.IsDropDownOpen = true` | 属性本身、`PART_ToggleButton.IsChecked`、`PART_Popup.Width`=220、覆盖层里的 `PART_PopupBorder` 与 `PART_ScrollViewer` | 全到 | 30 |
+| S12 `NumberBox(Compact).Focus()` | `IsKeyboardFocusWithin` + `UpDownPopup.IsOpen` | True / True | 30 |
+| S12 把 placement 切回 `Inline` | 同一张 popup 收回去、`InlineSpinners` 转 Visible | 同一次调用就是 False / Visible | 30 |
+| S13 `UpDownPopup.IsOpen = true` | `popup.Child` 就是 `PopupContentRoot`：8、边 1、两张刷 | 全到 | 20 |
+| S14 `FluentTeachingTip.IsOpen = true` | `PART_Popup.IsOpen`、它的 `Child`（卡片）、`Opened` 计数 =1 | 全到 | 30 |
+| S14 `... = false` | 弹层收回、`Closed` 计数 =1 | 同一次调用 | 30 |
+| S15 `ComboBox` 开启后 | 下拉箭头的 `Data` | **还是静止值**：0/1/2 帧都是 `M 0,3 L 6,9 L 12,3`，第 4、8、20 帧读到三个互不相同的插值 | 30 |
+| S15 同一时刻 | 生成的条目容器、其 `TextWrapping`、`ActualHeight` | 容器已在、`NoWrap` 已到，`ActualHeight` 是 **0**（第 1 帧起才 19.8/35.8） | 30 |
+
+于是：`AstraNumberBoxTests.A_focused_compact_numberbox_opens_its_spinner_popup` 删掉两处 settle；
+`AstraSurfaceGeometryTests.The_spinner_popup_surfaces_on_a_border_that_can_hold_its_radius` 删掉开启后那处
+（关闭后那处留着——它是收尾不是断言，写进注释）；`AstraTeachingTipTests` 那条开合事实两处全删，理由有两份：
+自家代码的铸造点 `FluentTeachingTip.OnIsOpenChanged` 先调 `ApplyOpenState()` 写 `_popup.IsOpen`，再在同一次调用里
+raise `Opened`/`Closed`（`Controls/Popup/FluentTeachingTip.cs:327-339`、`379-392`），加上 S14 的实测。
+`AstraComboBoxTests` 两条：`toggle.IsChecked` 与 `PART_Popup.Width` 搬到 rung 0，`An_open_combo_grafts...` 补上
+rung 0 的 open 主张，并把整段搬进 `try/finally`——`finally` 里关掉下拉（#47 的"自己开自己关"，此前这条开着不关）。
+
+**两条留着没删的等待，都是量出来该留的**：箭头的 `Data` 是动画插值，`NotEqual(resting, …)` 是"经过渲染时间"的
+主张，与第二成员的环同形，帧数守卫另立 #80；`ActualHeight` 在 rung 0 是 0，所以长条目那条与几何那半真的要一帧。
+
+**又一处"只读表面"的瞎测点**：把 S13 那条改成"开完立刻关再读"，它**绿**——`popup.Child` 在关闭之后仍带着名字、
+8/1 和两张刷。补 `Assert.True(popup.IsOpen)` 之后同一个突变红在
+`the write did not open the popup, so the surface below may be a stale graft.`（A/B 逐字两份：
+`spike/PopupLadderProbe/teeth-mab.log` 与 `teeth-mb2.log`）。另一半牙齿：删掉 `box.Focus()` 后 NumberBox 那条红在
+`Assert.True() Failure`，说明 rung 0 的读法仍然绑在真正的原因上。开着不关的测点普查另立 #81。
+
+**四类证据**：构建——本批只动测底座与测点，闸口读数见下段。行为：定向跑 `179/179` 绿（ComboBox + NumberBox +
+SurfaceGeometry + TeachingTip 四类，2 分 6 秒），另加两次突变各红。视觉：无像素主张变动。硬件输入：仍为零——
+NumberBox 那条用的是公开 `Focus()` 调用，不是真键盘也不是真指针。
+
+### #79 的串行闸口读数（2026-09-23，`spike/PopupLadderProbe/gate-79.log`）——全绿，管道退出码 0
+
+同一套六步：Debug 构建 0 警告 0 错误 → 整套 **1573/1573 通过、0 跳过，7 分 21 秒** → 逐页像素闸
+`PASS 13 pages x 2 variants, 0 offender(s)` → 调色板 `Light/Dark 83/101 checked=True`、
+`HighContrast 101 mapped keys checked=True` → `keys.md is current: 1312 canonical lines.`。
+测试总数仍是 1573：本批删了七处 settle、补了两处 open 主张、给一条开着不关的下拉补了 `finally`，
+没有一条断言被删。上一批（`0269125`）留下的 `gate-full.log` 与本批读数是两次独立全量跑，
+`status` 两档的 `stable=True/False` 在两次里都在——那是 #78 的环，不是弹层改形带出来的。
+
 
 

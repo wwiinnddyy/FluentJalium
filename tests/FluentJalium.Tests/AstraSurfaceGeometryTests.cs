@@ -62,7 +62,13 @@ public sealed class AstraSurfaceGeometryTests : IDisposable
             // The cell writes this property on Compact + focus; writing it directly reaches the same state without
             // a pointer, and the child only realises once the popup is open.
             popup.IsOpen = true;
-            PixelHarness.Settle(20);
+            // Paired on purpose (spike/PopupLadderProbe S9's lesson, re-measured here as mutation MB): the
+            // popup's Child keeps its name, its 8/1 and both brushes after the popup is closed, so the reads
+            // below alone would say only that the surface exists somewhere.
+            Assert.True(popup.IsOpen, "the write did not open the popup, so the surface below may be a stale graft.");
+            // The child is there when the write returns (spike/PopupLadderProbe S13 reads PopupContentRoot with
+            // 8/1 and both brushes at rung 0 through all twenty frames). The pump that used to sit here was
+            // waiting for nothing this claim needs.
             // The surface is the popup's own child, so the name has to be read off it rather than looked up
             // below it - a name lookup only ever tests children (the same trap AstraTeachingTipTests documents).
             var surface = (Border)(popup.Child ?? throw new InvalidOperationException("the popup realized no child"));
@@ -73,6 +79,8 @@ public sealed class AstraSurfaceGeometryTests : IDisposable
                 () => Assert.Same(Res("NumberBoxPopupBackground"), surface.Background),
                 () => Assert.Same(Res("NumberBoxPopupBorderBrush"), surface.BorderBrush));
             popup.IsOpen = false;
+            // This pump stays: it is not an assertion, it is letting the framework finish tearing the surface out
+            // of the shared host before the next test walks the overlay.
             PixelHarness.Settle(20);
         });
     }

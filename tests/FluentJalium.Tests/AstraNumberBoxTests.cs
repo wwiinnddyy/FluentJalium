@@ -308,12 +308,14 @@ public sealed class AstraNumberBoxTests
             var popup = (Popup)Part(box, "UpDownPopup");
             Assert.False(popup.IsOpen);
 
+            // Both sides read inside the call that changes the state (spike/PopupLadderProbe S12): focus has the
+            // spinner popup up at rung 0, and switching the placement to Inline takes it down again in the same
+            // write. The pumps this used to sit behind only opened a window in which something else could
+            // deactivate the host and close a light-dismiss popup for reasons that are not this claim.
             Assert.True(box.Focus());
-            PixelHarness.Settle();
             Assert.True(popup.IsOpen);
 
             box.SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline;
-            PixelHarness.Settle();
             Assert.False(popup.IsOpen);
         });
     }

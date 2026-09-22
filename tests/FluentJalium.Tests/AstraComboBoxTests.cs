@@ -355,11 +355,16 @@ public sealed class AstraComboBoxTests
                 () => Assert.Equal(Visibility.Visible, presenter.Visibility));
 
             combo.IsDropDownOpen = true;
-            PixelHarness.Settle(30);
+            // Rung 0 (spike/PopupLadderProbe S11): the toggle has already followed the property and the popup
+            // already carries the combo's 220.
             Assert.Multiple(
                 () => Assert.True(toggle.IsChecked.GetValueOrDefault(), "the toggle did not follow IsDropDownOpen"),
-                () => Assert.NotEqual(resting, Data(glyph)),
                 () => Assert.Equal(220d, ((Popup)Part(combo, "PART_Popup")).Width));
+            // The glyph is the one row in this fact that genuinely needs rendered time: S15 read it still at the
+            // resting chevron at 0, 1 and 2 pumped frames and interpolating from the fourth up - the flip is an
+            // animation, not a state write - so the pump stays for this row alone.
+            PixelHarness.Settle(30);
+            Assert.NotEqual(resting, Data(glyph));
 
             combo.IsDropDownOpen = false;
             PixelHarness.Settle(30);
@@ -382,47 +387,63 @@ public sealed class AstraComboBoxTests
             Assert.Null(PixelHarness.Named(combo, "PART_PopupBorder"));
 
             combo.IsDropDownOpen = true;
+            // Rung 0 (spike/PopupLadderProbe S11): the write has already grafted PART_PopupBorder and
+            // PART_ScrollViewer into the host's overlay. The pump below is not waiting for that - it is waiting
+            // for the layout pass the ActualWidth/ActualHeight rows at the end read, which S15 measured as 0 at
+            // rung 0 and settled one frame later.
+            Assert.True(combo.IsDropDownOpen, "the property write did not open the dropdown.");
             PixelHarness.Settle(30);
-            var overlay = PixelHarness.HostWindow();
-            var popupBorder = PixelHarness.Named(overlay, "PART_PopupBorder")
-                ?? throw new InvalidOperationException("The open dropdown never reached the overlay layer.");
-            var scroller = PixelHarness.Named(overlay, "PART_ScrollViewer")
-                ?? throw new InvalidOperationException("The dropdown has no scroll viewer to inherit.");
+            try
+            {
+                var overlay = PixelHarness.HostWindow();
+                var popupBorder = PixelHarness.Named(overlay, "PART_PopupBorder")
+                    ?? throw new InvalidOperationException("The open dropdown never reached the overlay layer.");
+                var scroller = PixelHarness.Named(overlay, "PART_ScrollViewer")
+                    ?? throw new InvalidOperationException("The dropdown has no scroll viewer to inherit.");
 
-            Assert.Multiple(
-                () => Assert.Same(Res("ComboBoxDropDownBackground"), Get(popupBorder, "Background")),
-                () => Assert.Same(Res("ComboBoxDropDownBorderBrush"), Get(popupBorder, "BorderBrush")),
-                () => Assert.Equal(new CornerRadius(8), Get(popupBorder, "CornerRadius")),
-                () => Assert.Equal(new Thickness(1), Get(popupBorder, "BorderThickness")),
-                () => Assert.Equal(new Thickness(0), Get(popupBorder, "Padding")),
-                () => Assert.Same(Res("ComboBoxDropDownForeground"), Get(scroller, "Foreground")),
-                () => Assert.Equal(504d, Get(scroller, "MaxHeight")),
-                () => Assert.Equal(new Thickness(0, -0.5, 0, -1), Get(popupBorder, "Margin")),
-                // The hole the running Gallery showed: the runtime sizes the popup's own window to the combo
-                // but measures the surface inside it against infinity, so a short item list painted a narrow
-                // card and left the rest of that window unpainted.
-                () => Assert.Equal(combo.ActualWidth, popupBorder.MinWidth),
-                () => Assert.Equal(combo.ActualWidth, popupBorder.ActualWidth),
-                // The bar mode decides whether the row column keeps the surface's own width: Auto reserves
-                // 12 DIP of layout width on the right only, so an overflowing dropdown put its rows 25 DIP
-                // from the surface's left edge and 36.6 from its right (page-selection.png). Hidden costs
-                // nothing and still scrolls, which is what the pane menu host already does.
-                () => Assert.Equal(ScrollBarVisibility.Hidden, (ScrollBarVisibility)Get(scroller, "VerticalScrollBarVisibility")),
-                () => Assert.Equal(popupBorder.ActualWidth - 2, scroller.ActualWidth, 0.01));
+                Assert.Multiple(
+                    () => Assert.Same(Res("ComboBoxDropDownBackground"), Get(popupBorder, "Background")),
+                    () => Assert.Same(Res("ComboBoxDropDownBorderBrush"), Get(popupBorder, "BorderBrush")),
+                    () => Assert.Equal(new CornerRadius(8), Get(popupBorder, "CornerRadius")),
+                    () => Assert.Equal(new Thickness(1), Get(popupBorder, "BorderThickness")),
+                    () => Assert.Equal(new Thickness(0), Get(popupBorder, "Padding")),
+                    () => Assert.Same(Res("ComboBoxDropDownForeground"), Get(scroller, "Foreground")),
+                    () => Assert.Equal(504d, Get(scroller, "MaxHeight")),
+                    () => Assert.Equal(new Thickness(0, -0.5, 0, -1), Get(popupBorder, "Margin")),
+                    // The hole the running Gallery showed: the runtime sizes the popup's own window to the combo
+                    // but measures the surface inside it against infinity, so a short item list painted a narrow
+                    // card and left the rest of that window unpainted.
+                    () => Assert.Equal(combo.ActualWidth, popupBorder.MinWidth),
+                    () => Assert.Equal(combo.ActualWidth, popupBorder.ActualWidth),
+                    // The bar mode decides whether the row column keeps the surface's own width: Auto reserves
+                    // 12 DIP of layout width on the right only, so an overflowing dropdown put its rows 25 DIP
+                    // from the surface's left edge and 36.6 from its right (page-selection.png). Hidden costs
+                    // nothing and still scrolls, which is what the pane menu host already does.
+                    () => Assert.Equal(ScrollBarVisibility.Hidden, (ScrollBarVisibility)Get(scroller, "VerticalScrollBarVisibility")),
+                    () => Assert.Equal(popupBorder.ActualWidth - 2, scroller.ActualWidth, 0.01));
 
-            var presenter = PixelHarness.Descendant<ItemsPresenter>(popupBorder)
-                ?? throw new InvalidOperationException("The dropdown has no items presenter to place.");
-            var item = PixelHarness.Descendant<ComboBoxItem>(popupBorder)
-                ?? throw new InvalidOperationException("The open dropdown carries no generated item.");
-            Assert.Multiple(
-                () => Assert.Equal(new Thickness(0, 4), Get(presenter, "Margin")),
-                () => Assert.Same(Res("ComboBoxItemBackground"), Get(Part(item, "LayoutRoot"), "Background")),
-                () => Assert.Equal(new Thickness(11, 5, 11, 7), item.Padding),
-                // Upstream insets the whole row from the dropdown edge (ComboBox_themeresources.xaml:614,
-                // Margin="5,2,5,2" on the template root), so the highlight stops 5 short of the border and the
-                // 11 padding lives inside that. Read off the arranged surface, not off the markup.
-                () => Assert.Equal(Math.Round(item.ActualWidth - 10), Math.Round(Part(item, "LayoutRoot").ActualWidth)),
-                () => Assert.Equal(Math.Round(item.ActualHeight - 4), Math.Round(Part(item, "LayoutRoot").ActualHeight)));
+                var presenter = PixelHarness.Descendant<ItemsPresenter>(popupBorder)
+                    ?? throw new InvalidOperationException("The dropdown has no items presenter to place.");
+                var item = PixelHarness.Descendant<ComboBoxItem>(popupBorder)
+                    ?? throw new InvalidOperationException("The open dropdown carries no generated item.");
+                Assert.Multiple(
+                    () => Assert.Equal(new Thickness(0, 4), Get(presenter, "Margin")),
+                    () => Assert.Same(Res("ComboBoxItemBackground"), Get(Part(item, "LayoutRoot"), "Background")),
+                    () => Assert.Equal(new Thickness(11, 5, 11, 7), item.Padding),
+                    // Upstream insets the whole row from the dropdown edge (ComboBox_themeresources.xaml:614,
+                    // Margin="5,2,5,2" on the template root), so the highlight stops 5 short of the border and the
+                    // 11 padding lives inside that. Read off the arranged surface, not off the markup.
+                    () => Assert.Equal(Math.Round(item.ActualWidth - 10), Math.Round(Part(item, "LayoutRoot").ActualWidth)),
+                    () => Assert.Equal(Math.Round(item.ActualHeight - 4), Math.Round(Part(item, "LayoutRoot").ActualHeight)));
+            }
+            finally
+            {
+                // A test that opens a surface owns closing it (#47): left standing on the shared host's overlay
+                // this dropdown is one more light-dismiss root for whatever next closes them all - and, per
+                // spike/PopupLadderProbe S9, one more graft a later walk of the tree can mistake for its own.
+                combo.IsDropDownOpen = false;
+                PixelHarness.Settle(10);
+            }
         });
     }
 
