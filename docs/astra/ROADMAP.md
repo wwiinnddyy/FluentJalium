@@ -2836,3 +2836,79 @@ TextOnAccent   #FFFFFFFF   #FFFFFFFF   TextOnAccentFillColorPrimaryBrush #FFFFFF
 **测点 1492 → 1495 = +3**，正是新参数化事实的三条腿；`TextDisabled` 三个名字都不发行，所以既有禁用墨迹那族事实**一条没翻**
 （全量里照旧绿即反证）。这一批的产出是"量清 + 更正一处方向性误判 + 把 `TextDisabled` 立成下一轮"，不是发行；
 `FrameworkRetints.jalxaml` 仍停在四行。
+
+## #12 A2 别名层第三轮·再续：实测给 `TextPrimary` 找到了读者，同时削掉了 `TextDisabled` 的依据
+
+上一手留的话是"`TextDisabled` 是下一轮该发的那一个，去实测读者"。这一手去测了，**方向是反的：真正有读者的是
+`TextPrimary`，而 `TextDisabled` 连上一手引的那条依据都没测到**。
+在 26.10.9 出货运行时上挂自绘 `MenuItem`、往 `Application.Resources` 装哨兵笔刷、逐次读框架自己的解析结果
+（`MenuItem.ResolvePrimaryTextBrush`，非公开方法；反射**只在测试装配里用**，AGENTS.md 禁的是出货代码反射私有字段）：
+
+```
+启用态:  基准=#FF1D1D1F | +TextDisabled:#FF1D1D1F | +OneTextDisabled:#FF1D1D1F | +TextPrimary:SENTINEL
+禁用态:  基准=#FF1D1D1F | +TextPrimary:SENTINEL
+```
+
+- **`TextPrimary` 有实证读者，而且是改不动的那种**。`MenuItem` 存了模板却从不实例化，墨色走 `OnRender` 自绘 +
+  按名现查（与 `ControlBorderFocused` 那轮的 `ResolveFocusedBorderBrush` 同一形状）：装 `TextPrimary` 哨兵，它就跟；
+  名字不装，它落框架投影 `#FF1D1D1F`。按 `efda4ff` 定下的唯一判据（"有没有一个改不动、又确实按这个名字取值的出货读者"），
+  这一行现在是**该发**——而且发它是**提纯度**（把按名取值的表面从 macOS 不透灰推向 WinUI 字面 `#E4000000`），
+  不是拉离 1:1。`efda4ff` 那条测点自己写了 tripwire："若哪天冒出读者，发它是提纯而非弄脏"——**读者冒出来了，
+  这是它按设计响的第一次**。
+- **`TextDisabled`：上一手那条"它是下一轮该发的"目前没有实证支撑，但也不能判死**。参考树记的 `Menu.cs:1172` /
+  `MenuFlyoutItem.cs:208`（先试 `OneTextDisabled` 再试 `TextDisabled`）在我测的这条路径上**没有对应行为**：
+  `MenuItem` 置禁用后 `ResolvePrimaryTextBrush` 的结果**一动不动**（仍 `#FF1D1D1F`），装 `TextDisabled` 或
+  `OneTextDisabled` 哨兵也不跟。**这条判据只覆盖这一个方法**——我没有普查 `MenuItem` 是否另有禁用墨的解析入口，
+  所以"自绘菜单不读禁用名"是实测，"`TextDisabled` 没有出货读者"**不是**（本轮没资格下这句）。
+  而且有一条未解释的线索指向这里有活：出货运行时上禁用 `TextBox` 的前景是 `#FFAEAEB2`，与 `TextDisabled` 的 Light
+  投影**同色**，而 `#FFAEAEB2` 正是我们够不到的那条框架本地值。所以 `TextDisabled` 欠的不是"再测一次菜单"，
+  是一次**按名 vs 走 `ThemeColors`** 的判别（哨兵法，`ControlBorderFocused`/本批同款）：如果那片禁用墨是按名读的，
+  发这行才既修表面又提纯度；如果是直接读 `ThemeColors`，那它就是 `jalium-theme-pipeline-constraints` 记过的那类
+  "名字撞车不是钩子"，进 Known Gaps。**下一轮做这个判别，本轮不发。**
+- **产出只有一条常驻事实 + 一处更正，没有新行**。`FrameworkRetints.jalxaml` 仍停在四行。测点方法
+  `TextPrimary_is_a_theme_tracking_framework_name_the_layer_leaves_alone` 改名为
+  `TextPrimary_projects_a_framework_ink_awaiting_its_row`——旧名"the layer leaves alone"讲的是一个已被推翻的判据，
+  留着会把下一手误导回去；注释同时写明：**发行那天这条事实的色值断言会变红，那是行落地、不是回归**。
+
+- **构建**：全量 `0 警告 / 0 错误`。
+- **行为**：新常驻测点 `A_self_drawn_menu_item_reads_the_primary_text_name`（本类 13 → **14 条**）。
+  **牙齿**：若 26.10.9 换成不按名现查（比如改成缓存/改读别的名字），`ReferenceEquals(sentinel, …)` 那条红并且
+  失败信息直接说明"别名行够不到东西"；若框架哪天让禁用态改读 `TextDisabled`，本事实的禁用腿不成立——它没测禁用，
+  所以不会假绿也不会假红，那一条仍归 `TextDisabled` 自己的普查。
+- **视觉**：零既有像素主张变化。**没有**捕获任何显示中的菜单：反射只证明"名字被按次查询"，不证明像素，
+  弹层/自绘面的真指针像素仍是 #13 的账。
+- **硬件输入**：不动。
+- **清单/漂移**：`keys.md` 不变（仍 1301）；三档 `checked=True`。
+- **不声称**：① 没有对**其余** `Resolve*Brush` 自绘读者做穷尽普查（只测了 `MenuItem` 这一处的这一条解析），
+  因此本批对 `TextPrimary` 是"量到了读者、该发"，对 `TextDisabled` 只是"**这一条路径**不读它"，两者不对称，别把后者当前者用；
+  ② 没有量 `TextPrimary` 别名行的**爆炸半径**——发行之余哪些既有事实会翻，是发行那一轮要产出的清单，本轮不预判；
+  ③ 发行不在本批；④ 反射读到的解析结果**不是像素**，`MenuItem` 禁用墨到底画在哪、由哪个入口决定，本批没有捕获。
+
+### 这一手该发的那行：`TextPrimary → TextFillColorPrimaryBrush`（下一步，独立闸口批）
+
+按目标那句"每轮：三形读取普查 → 列出将被重写的事实 → 发布行 → `Report-AstraResourceKeys.ps1` → 全量闸口"，
+前三步已经走完（普查=上面两行哨兵读数；被重写的事实=已知至少 `TextPrimary_projects_a_framework_ink_awaiting_its_row`
+的 Light/Dark 色值两对，其余要在 `A_retint_row_follows_the_theme_flip` 加 `TextPrimary` 两腿后由全量闸口报出来）。
+发行单独成批，因为别名层的既往教训是**爆炸半径要一次一清**（`SurfaceBackground`/`ControlBorder` 那轮全套像素主张
+一格没动，是因为先量过；不是因为安全）。
+
+### 再续批（读者证明）的串行闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1` 串行跑完（`spike/GalleryRender/gate-menureader.log`，脚本自记 **`GATE-EXIT=0`**）：
+build `0 警告 / 0 错误` → 整套 **1496/1496**（0 失败 0 跳过、7 m 31 s）→ 页像素闸 **`PASS 13 pages x 2 variants,
+0 offender(s)`** → 调色板三档 `checked=True` → `keys.md is current: 1301 canonical lines.`（本批不发布公开键）
+→ 末行 `All Astra gates passed.`。
+
+**测点 1495 → 1496 = +1**，就是新那条读者事实；`FrameworkRetints.jalxaml` 没动，所以像素主张与键清单两条都不该变，
+读回来的确没变（页闸 0 offender、`keys.md` 仍 1301）。
+
+一处**时序上的如实交代**，别糊过去：闸口的 build 步在**本批最后一次编辑之前**就跑完了。那次编辑只改了两行**注释**
+（把 `TextPrimary_projects_...` 里"别名行覆盖的是一个已经就是我们的墨"这句**方向反了**的话改成实测版），
+没有改任何可执行代码，所以 1496 那个二进制的行为与提交树一致。为了让提交的字节也被编译验证过，
+我在闸后又单独 build 了一次（`0 警告 / 0 错误`）并把本类重跑（**14/14 绿**）。也就是说：
+**全量闸口跑的是行为等价的树，注释增量由 build + 本类focused 覆盖**，不是"整条闸在最终字节上绿过"。
+
+顺带记一条**页闸读数里的不稳定**，属于 #47/#35 那一族而不是本批引入的：`status Dark: stable=True/False`
+——13 页 × 两档里只有 status 的暗色第二拍判为不稳，但两拍的 `colours/over` 与 `painted` 完全一致
+（`1189783px over 1 colours 0px`）， offender 仍 0，所以闸判 PASS。本批没碰 status 族也没碰页闸，
+这条在 `cc3d802` 之前的日志里是不是常发**未查**，留给 #47/#35 那一次机制普查，别在这里当成新回归、也别当成旧账已清。

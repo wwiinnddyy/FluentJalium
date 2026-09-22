@@ -166,19 +166,18 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// The <c>TextPrimary</c> name, measured on 26.10.9 in both variants. The framework publishes <c>TextPrimary</c>
-    /// as a live app-level resource that tracks <see cref="Application"/> to an opaque near-black (#FF1D1D1F light /
-    /// #FFF5F5F7 dark) which is <em>not</em> our shipped WinUI-literal token <c>TextFillColorPrimaryBrush</c>
-    /// (#E4000000 / #FFFFFFFF) - a distinct object and a distinct colour. So unlike <c>ControlBorderFocused</c> (whose
-    /// framework projection is the wrong brand-green and which has a proven reader), aliasing here would move a
-    /// name-reader <em>toward</em> 1:1, not away. The row is therefore withheld purely for lack of a demonstrated
-    /// reader: the one surface we never restyle, a <see cref="Label"/>, paints a third framework default
-    /// (#FF6E6E73 / #FFD1D1D6), matching neither the name nor the twin, so there is nothing the row could reach that
-    /// re-templating cannot already fix. If a shipped control starts consuming the name, the row earns its evidence
-    /// round; the tracked colour below is the baseline that decision revisits.
+    /// The <c>TextPrimary</c> projection, measured on 26.10.9 in both variants: a live app-level resource that tracks
+    /// <see cref="Application"/> to an opaque near-black (#FF1D1D1F light / #FFF5F5F7 dark) which is <em>not</em> our
+    /// shipped WinUI-literal token <c>TextFillColorPrimaryBrush</c> (#E4000000 / #FFFFFFFF) - a distinct object and a
+    /// distinct colour. This is the value an alias row would replace. The row is now <em>warranted</em>, not withheld
+    /// for lack of a reader: <see cref="A_self_drawn_menu_item_reads_the_primary_text_name" /> proved a self-drawn,
+    /// non-retemplatable surface (MenuItem) reads the name per call, and aliasing to the token moves that reader
+    /// toward 1:1 (the same shape as ControlBorderFocused). This fact records the pre-row projection as the baseline
+    /// the row will overwrite; when the row ships, the projection reads back as the token and this fact's colour
+    /// assertions are expected to change - which is the row landing, not a regression.
     /// </summary>
     [Fact]
-    public void TextPrimary_is_a_theme_tracking_framework_name_the_layer_leaves_alone()
+    public void TextPrimary_projects_a_framework_ink_awaiting_its_row()
     {
         _fixture.Run(() =>
         {
@@ -195,11 +194,12 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                 var darkLabel = ColorOf(InkedForeground());
 
                 Assert.Multiple(
-                    // The name is occupied and already tracks the theme to the palette primary ink.
+                    // The name is occupied and tracks the theme, but to the framework's own opaque near-black -
+                    // a macOS-flavoured ink this library never ships.
                     () => Assert.Equal(Color.FromRgb(0x1D, 0x1D, 0x1F), lightRow),
                     () => Assert.Equal(Color.FromRgb(0xF5, 0xF5, 0xF7), darkRow),
-                    // It is a distinct object from the transcribed WinUI twin (#E4000000 / #FFFFFFFF), so an alias
-                    // row would overwrite a value that is already our ink rather than wire up a missing lever.
+                    // It is a distinct object from the transcribed WinUI twin (#E4000000 / #FFFFFFFF), so an alias row
+                    // would replace a framework ink that is *not* 1:1 with the value that is - purity up, not down.
                     () => Assert.NotEqual(lightRow, lightTwin),
                     () => Assert.Equal(Color.FromArgb(0xE4, 0x00, 0x00, 0x00), lightTwin),
                     () => Assert.Equal(Color.FromRgb(0xFF, 0xFF, 0xFF), darkTwin),
@@ -259,7 +259,62 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         });
     }
 
+    /// <summary>
+    /// The non-retemplatable reader that <c>TextPrimary</c>'s "no demonstrated reader" verdict was missing. A
+    /// <see cref="MenuItem"/> is self-drawn (its <c>OnRender</c> resolves text colour by name, and the menu batch found
+    /// no instantiable template to replace), so the framework's own name lookup is the only lever over its ink — and
+    /// that lever is live for <c>TextPrimary</c>: <c>ResolvePrimaryTextBrush</c> returns the <c>TextPrimary</c>
+    /// projection, and installing a sentinel under <c>TextPrimary</c> in <c>Application.Resources</c> makes the same
+    /// call return that sentinel, so the resolver reads the name per call, exactly like <c>ControlBorderFocused</c>'s
+    /// focused-border path. Proving this is what makes a <c>TextPrimary → TextFillColorPrimaryBrush</c> alias row
+    /// warranted (it moves MenuItem text from the opaque #FF1D1D1F projection to our WinUI-literal token); the row
+    /// itself is a separate, blast-radius-gated step and is not shipped by this fact.
+    /// </summary>
+    [Fact]
+    public void A_self_drawn_menu_item_reads_the_primary_text_name()
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            try
+            {
+                var item = new MenuItem();
+                var resting = ResolveMenuItemPrimaryText(item);
+                // The resolver's resting value is the framework's TextPrimary projection...
+                Assert.Equal(ColorOf(application.TryFindResource("TextPrimary")), Assert.IsType<SolidColorBrush>(resting).Color);
+                // ...and it follows whatever an application-level entry under that name holds.
+                var sentinel = new SolidColorBrush(Probe);
+                application.Resources["TextPrimary"] = sentinel;
+                try
+                {
+                    Assert.True(ReferenceEquals(sentinel, ResolveMenuItemPrimaryText(item)),
+                        "MenuItem.ResolvePrimaryTextBrush did not follow an installed TextPrimary entry, so the name "
+                        + "is not read per call on this runtime and an alias row would reach nothing");
+                }
+                finally
+                {
+                    application.Resources.Remove("TextPrimary");
+                }
+            }
+            finally
+            {
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
+        });
+    }
+
     // ---------- helpers ----------
+
+    /// <summary>MenuItem's own per-call text-colour resolution. Not public; reaching it is a test-only instrument, the
+    /// same shape as <see cref="ResolveFocusedBorder" /> — the product ban on framework reflection is unaffected.</summary>
+    private static Brush? ResolveMenuItemPrimaryText(MenuItem item)
+    {
+        var resolver = typeof(MenuItem).GetMethod("ResolvePrimaryTextBrush", BindingFlags.Instance | BindingFlags.NonPublic)
+            ?? throw new InvalidOperationException(
+                "MenuItem has no ResolvePrimaryTextBrush on this runtime, so the menu-ink reading does not describe 26.10.9");
+        return (Brush?)resolver.Invoke(item, null);
+    }
 
     /// <summary>
     /// The framework's own per-call resolution of the focused-border brush. The method is not public, and reaching it
