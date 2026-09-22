@@ -621,6 +621,21 @@ public sealed class AstraMenuTests
     /// Same question for the other menu surface that can be opened without a pointer: a <see cref="Menu"/>'s
     /// submenu. It wears 8 without being told to - the framework's own default for that path - which is why the
     /// ContextMenu setter is a fix for one surface and not a global cure.
+    /// <para>
+    /// Nothing here settles, and that is a measurement rather than a shortcut. #47 kept red-lining this test's open
+    /// read, and spike/SubmenuHostProbe named the cause: the write back to false comes from
+    /// <c>Popup.ClosePopup → MenuItem.OnSubmenuPopupClosed</c>, which fires whenever this thread's active window
+    /// changes hands or a <see cref="ContentDialog"/> opens on the window (the next test pins that one, because it
+    /// is reachable in-process). Both are outside the test, so any frames spent waiting here are exposure to an
+    /// event no assertion should be about. Two readings say the wait buys nothing: the probe's frame ladder found
+    /// the open write lands in the click call itself at every pump count from nought up, and this test now reads
+    /// the copied radius with no pump after the click at all - which is what proves the framework writes the
+    /// surface as part of opening rather than a frame later.
+    /// </para>
+    /// <para>
+    /// What is therefore not claimed: that an open submenu <em>survives</em> a focus change. It does not, and the
+    /// reading in the next test says so as a fact about the runtime.
+    /// </para>
     /// </summary>
     [Fact]
     public void A_submenu_surface_wears_upstreams_radius_from_the_framework_itself()
@@ -633,13 +648,65 @@ public sealed class AstraMenuTests
             menu.Items.Add(top);
             Mount(menu, 320, 40);
             RaiseMouseDown(top);
-            PixelHarness.Settle(30);
             Assert.Equal("True", Read(top, "IsSubmenuOpen"));
 
-            var nested = top.Items[0] as DependencyObject ?? throw new InvalidOperationException("no submenu container");
-            var surface = SurfaceOf(nested);
-            Assert.Equal(new CornerRadius(8), surface.CornerRadius);
-            Assert.Same(Res("MenuFlyoutPresenterBackground"), surface.Background);
+            try
+            {
+                var nested = top.Items[0] as DependencyObject ?? throw new InvalidOperationException("no submenu container");
+                var surface = SurfaceOf(nested);
+                Assert.Equal(new CornerRadius(8), surface.CornerRadius);
+                Assert.Same(Res("MenuFlyoutPresenterBackground"), surface.Background);
+            }
+            finally
+            {
+                // Left open, this submenu stays registered as a light-dismiss root on the shared host's overlay,
+                // where the next dialog closes it along with everything else (the probe counted nine such roots
+                // after five readings). A test that pops a surface owns closing it.
+                top.IsSubmenuOpen = false;
+            }
+        });
+    }
+
+    /// <summary>
+    /// The closer #47 met, pinned as a fact about the runtime rather than left as an intermittent red: a submenu
+    /// that is open does not outlive a <see cref="ContentDialog"/> shown on the same window. The dialog's own
+    /// resolver calls the overlay's close-every-light-dismiss-popup step, the submenu popup is light-dismiss, and
+    /// <c>MenuItem</c> writes <see cref="MenuItem.IsSubmenuOpen"/> back from that popup's <c>Closed</c> event - so
+    /// the state a menu test just established is revoked by an unrelated surface opening. Measured in
+    /// spike/SubmenuHostProbe, where one dialog closed all nine submenus the probe had left open.
+    /// <para>
+    /// This is the mechanism, not the whole account: the same write also arrives when this thread's active window
+    /// changes hands, which no test in a five-minute run can rule out from inside. What the suite can do is stay out
+    /// of it - close what it opens - and stop pretending a settle-padded read measures the click.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void A_submenu_does_not_outlive_a_dialog_shown_on_its_window()
+    {
+        _fixture.Run(() =>
+        {
+            var top = new MenuItem { Header = "edit" };
+            top.Items.Add(new MenuItem { Header = "copy" });
+            var menu = new Menu();
+            menu.Items.Add(top);
+            Mount(menu, 320, 40);
+            RaiseMouseDown(top);
+            Assert.True(top.IsSubmenuOpen);
+            PixelHarness.Settle(10);
+
+            var dialog = new ContentDialog { Title = "T", Content = "C", PrimaryButtonText = "OK" };
+            try
+            {
+                _ = dialog.ShowAsync();
+                PixelHarness.Settle(20);
+                Assert.False(top.IsSubmenuOpen,
+                    "the dialog no longer closed the menu's light-dismiss popup, so #47's account needs re-reading");
+            }
+            finally
+            {
+                dialog.Hide();
+                top.IsSubmenuOpen = false;
+            }
         });
     }
 

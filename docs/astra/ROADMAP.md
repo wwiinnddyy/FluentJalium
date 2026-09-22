@@ -3799,3 +3799,58 @@ back to resting          accent=88  distinct=39
 **这一批没有做的决定**：日历族在 Gallery 里没有页面、我们也没有一条它的样式行——它今天完全是框架自绘的样子。
 WinUI 3 在这一 commit 里没有 `Calendar`/`TimePicker` 控件，`DatePicker` 是 `CalendarView` 之上的弹层，
 所以"要不要按上游重做这一族"是一次带 parity 判定的选型，不是本批的读数能替它决定的。
+
+## #47 第一成员结清：子菜单读回的关闭是**窗口级**的，不是竞态（目标项 5，2026-09-23）
+
+一句话成因：`MenuItem.IsSubmenuOpen` 由子菜单自己那张 `Popup` 的 `Closed` 事件回写，而 26.10.9 里有两条通路会
+关掉宿主窗口覆盖层上**所有** light-dismiss 弹层——开 `ContentDialog`（`ContentDialog.cs:343` 直接调
+`OverlayLayer.CloseLightDismissPopups()`），以及这根 UI 线程的 active 窗口换人
+（`WindowInputDispatcher.CloseLightDismissPopupsOnDeactivate`）。两条都不在测点手里。那条红读的不是"点击有没有生效"，
+而是"点完之后再等 30 帧，期间有没有别的东西抢焦点"——一个我们控制不了、也不属于这条主张的问题。
+
+### 探针：`spike/SubmenuHostProbe`，一个进程、一根宿主、七次读法
+
+仪器是一处派生元数据：`MenuItem.IsSubmenuOpenProperty.OverrideMetadata(typeof(ProbeMenuItem), …)`，
+每次写入记下 `旧->新` 与前六帧调用栈。基线 P 绿（框架自己的回调照旧跑）证明仪器没有替换它。
+读数逐字在 `submenu-host-probe.txt`：
+
+| 读法 | 形状 | 子菜单读回 |
+|---|---|---|
+| P 基线 | 只亮着宿主 | True |
+| F 弹层拆窗 | `MenuFlyout.ShowAt` + `Hide`（它自己的顶层窗口建了又毁）之后 | True |
+| N 邻居开合 | 第二个 `Window` 开→关（#35 那句 `active=0` 的形状）之后 | True |
+| A 前台在别处 | `active=宿主` 而 `foreground` 是别的进程 | True |
+| 帧梯 | 挂载后 0/1/2/3/4/6 帧再点 | 六档全 True |
+| **D 弹窗压过** | 子菜单开着时 `ContentDialog.ShowAsync()` | **False** |
+| **E 换 active 窗口** | 子菜单开着时另一个窗口拿走 active | **False** |
+| G 弹层重叠拆窗 | 子菜单开着时弹层建了又毁（不重新挂宿主） | True |
+
+D 与 E 的回写栈逐字同形：`MenuItem.set_IsSubmenuOpen <- MenuItem.OnSubmenuPopupClosed <- Popup.OnClosed <-
+Popup.ClosePopup`。也就是说"关掉"发生在弹层自己身上，菜单只是听从它。N 与 G 一起把"我们的弹层拆窗会害死邻居"
+这条排除了——**能害死的只有抢走 active 窗口这件事本身**。D 顺带量出一件账：那一次弹窗关掉了探针此前五轮
+攒下的**九张**还开着的子菜单——每个测点开而不关的弹层都常驻在共享宿主的覆盖层上，等着下一次被全局关闭。
+
+### 因此改的是判据的形状，不是它的强度
+
+- `A_submenu_surface_wears_upstreams_radius_from_the_framework_itself`：`IsSubmenuOpen` 挪到**点击同一次调用里**读，
+  30 帧 settle 整段删掉（帧梯与"不 settle 也读得到抄出来的半径"两次实测支持），并补 `finally` 关掉自己那张弹层。
+  主张一字未减：仍然是"合成 MouseDown 打开了子菜单"加"框架把 8 和我们的两张刷抄在它自建的 `Border` 上"。
+- 新增 `A_submenu_does_not_outlive_a_dialog_shown_on_its_window`：把 D 钉成出货事实——子菜单活不过同窗口上开的弹窗。
+  这条将来若红，说明框架的关闭策略变了，#47 的整段账要重读。
+
+### 四类证据与不声称
+
+构建：见闸口段。行为：两次定向跑——把 8 改成 4 必红（`Expected: 4,4,4,4 / Actual: 8,8,8,8`，证那条断言真的在
+读框架抄出来的格子），改回并去掉 settle 后 1/1 绿，新那条 1/1 绿。视觉：**没有新增像素主张**，本批没动任何样式。
+硬件输入：仍为零，`RaiseMouseDown` 走的是公开路由事件门，探针也没动真指针。
+
+**不声称**：① E 那一类外部焦点变化在真实闸口里既造不出也排不掉——本批只做到"我们这条子菜单测点不再依赖它"。
+同一种暴露还挂在弹层族其余测点上，而且更宽：`FlyoutBase.IsOpen` 不是一份存着的旗，它写的是
+`_popup?.IsOpen == true`（`Primitives/FlyoutBase.cs:97`），所以 `AstraMenuTests` 里那两条"ShowAt 之后它是开的"、
+`AstraAppBarTests` 的溢出条、`AstraAutoSuggestBoxTests` 的建议列表，读的同样是"这一拍里有没有人抢走焦点"——
+本批没有替它们改形，账继续挂在 #47 名下；② 没声称"弹窗关掉所有 light-dismiss 弹层"是错的还是故意的——它是上游
+WinUI 的语义（flyout 让位于内容对话框），本批只把它读成事实；③ #47 名下的其余成员（ProgressRing 两帧同值弧、
+页闸 status 槽内色数飘）**不在这一条因果里**（那两条是"帧到底有没有来"的形状，不是"状态被别人收回"的形状），
+账继续开着。
+
+
