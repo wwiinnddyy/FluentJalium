@@ -2523,3 +2523,12 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 ② 每页可渲染到像素仍未做，卡在一个未决设计：测试工程只引用 `src/FluentJalium`、不引用 Gallery（`WinExe` +
 `internal` 类型），要么给页内容建一个可共享的工厂，要么把渲染自证放进 Gallery 自己的启动参数里。
 ③ 这一页的 parity 不是 `Catalog.json` 的 controls 行——tokens 不是控件，硬造一行会让目录闸变成假账。
+
+### #10 第一段的闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1` 在含 Tokens 页的 `be73b3e` 上串行跑完：build `0 个警告 / 0 个错误`，整套 **1489/1489**
+（0 失败 0 跳过，7 m 33 s，多的那 1 条就是 `AstraGalleryTokenTests`），调色板三档 `checked=True`，
+`keys.md is current: 1301 canonical lines.`，末行 `All Astra gates passed.`，脚本自己写的 `GATE-EXIT=0`。
+所以 Tokens 页不只在自己那类绿：目录闸的"每页都要有宿主与 id""页里的控件必须入库或豁免""bin 下 Catalog.json 与源一致"
+三条在顺序全量下都跟着过了。上一节写下的三条不声称（逐 token 运行时断言、每页渲染到像素、tokens 不占 controls 行）
+不因这次绿而改变。
