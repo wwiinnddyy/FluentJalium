@@ -165,6 +165,56 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         });
     }
 
+    /// <summary>
+    /// The <c>TextPrimary</c> name, measured on 26.10.9 in both variants, is the opposite situation from
+    /// <c>ControlBorderFocused</c> above - which is why the A2 layer takes no row there. The framework already
+    /// publishes <c>TextPrimary</c> as a live app-level resource that tracks <see cref="Application"/> to the palette
+    /// primary ink (#FF1D1D1F light / #FFF5F5F7 dark), so the name is occupied: an alias would overwrite a value that
+    /// is already our ink, not install a missing lever. And it reaches nothing this library cannot fix by other means:
+    /// a <see cref="Label"/> we never restyles paints a third framework default (#FF6E6E73 / #FFD1D1D6), matching
+    /// neither the name nor the transcribed twin <c>TextFillColorPrimaryBrush</c> (#E4000000 / #FFFFFFFF), so there is
+    /// no demonstrated reader the row could serve. If the tracked colour stops matching on a future runtime, the name
+    /// has drifted off the theme and the row earns its evidence round again.
+    /// </summary>
+    [Fact]
+    public void TextPrimary_is_a_theme_tracking_framework_name_the_layer_leaves_alone()
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            try
+            {
+                var lightRow = ColorOf(application.TryFindResource("TextPrimary"));
+                var lightTwin = ColorOf(FluentThemeManager.GetBrush("TextFillColorPrimaryBrush"));
+                var lightLabel = ColorOf(InkedForeground());
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+                var darkRow = ColorOf(application.TryFindResource("TextPrimary"));
+                var darkTwin = ColorOf(FluentThemeManager.GetBrush("TextFillColorPrimaryBrush"));
+                var darkLabel = ColorOf(InkedForeground());
+
+                Assert.Multiple(
+                    // The name is occupied and already tracks the theme to the palette primary ink.
+                    () => Assert.Equal(Color.FromRgb(0x1D, 0x1D, 0x1F), lightRow),
+                    () => Assert.Equal(Color.FromRgb(0xF5, 0xF5, 0xF7), darkRow),
+                    // It is a distinct object from the transcribed WinUI twin (#E4000000 / #FFFFFFFF), so an alias
+                    // row would overwrite a value that is already our ink rather than wire up a missing lever.
+                    () => Assert.NotEqual(lightRow, lightTwin),
+                    () => Assert.Equal(Color.FromArgb(0xE4, 0x00, 0x00, 0x00), lightTwin),
+                    () => Assert.Equal(Color.FromRgb(0xFF, 0xFF, 0xFF), darkTwin),
+                    // The one surface we never restyles reads neither the name nor the twin: a third default ink.
+                    () => Assert.Equal(Color.FromRgb(0x6E, 0x6E, 0x73), lightLabel),
+                    () => Assert.NotEqual(lightRow, lightLabel),
+                    () => Assert.NotEqual(lightTwin, lightLabel),
+                    () => Assert.Equal(Color.FromRgb(0xD1, 0xD1, 0xD6), darkLabel));
+            }
+            finally
+            {
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
+        });
+    }
+
     // ---------- helpers ----------
 
     /// <summary>
@@ -189,4 +239,15 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         SolidColorBrush solid => $"{brush.GetType().Name} #{solid.Color.A:X2}{solid.Color.R:X2}{solid.Color.G:X2}{solid.Color.B:X2}",
         _ => brush.GetType().Name,
     };
+
+    private static Color ColorOf(object? brush) => Assert.IsType<SolidColorBrush>(brush).Color;
+
+    /// <summary>The foreground a <see cref="Label"/> this library never restyles resolves to, built under whatever
+    /// theme variant is currently applied (a built-but-not-shown element keeps what it resolved at build time).</summary>
+    private static Brush InkedForeground()
+    {
+        var label = new Label { Content = "Reading" };
+        PixelHarness.Build(label, 200, 40);
+        return label.Foreground;
+    }
 }

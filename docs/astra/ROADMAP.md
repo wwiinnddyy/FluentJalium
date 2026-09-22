@@ -2718,3 +2718,65 @@ host 484x364 box=260 open=True containers=5 itemsHosts=11
 不带时间戳），要按成本决策的话先给 `Invoke-Step` 加计时再谈。
 测点数仍是 1491：这条闸**不在测试装配里**，所以"测点没增"这一次不代表"没新证据"——它带的是自己那 26 条腿的读数，
 两件事分开记才不会看错（这也是为什么全量绿不等于页级主张成立）。
+
+## #12 A2 别名层第三轮（`TextPrimary`）：不发行的理由被实测**反过来**了
+
+目标这一手写着"给 `TextPrimary` 发行（会重写 `AstraMenuTests` 的像素主张）"。起手按老规矩做三形读取普查，
+结果**否掉了这个前提本身**，所以这一轮没有新行进 `ThemeResources/FrameworkRetints.jalxaml`——它停在四行
+（`AccentBrush`/`ControlBorderFocused`/`SurfaceBackground`/`ControlBorder`），净变化只有测试装配里多一条常驻事实。
+连那句括号里的担忧也没有落点：`AstraMenuTests.cs` 里 `grep` 到 `TextPrimary`/`TextFillColor`/`1D1D1F`/`6E6E73`/
+`Foreground` **全 0 命中**，菜单族的像素主张从不按这个名字写，所以无论发不发都不会"重写"它——下一轮别再照目标原文去找这条不存在的主张。
+
+- **源树侧确实像该发**：`TextPrimary` 在参考树有 8 处按名读点（上面的名次表），这是"看着可发"的全部依据。
+- **出货侧量下来恰好相反**。`adaptation/08-themecolors-raw.txt` 第 52 行把 `TextPrimary` 记成
+  `tc TextPrimary = #FFFFFFFF | app-resource=SolidColorBrush`——也就是说框架自己就把这个名字**投影成应用级资源**，
+  不是"树上没人发、我们补一行"。在一个装了 Astra 门面的活进程里两档各读一次（本轮实测，权威压过那张 harvest 表）：
+
+  ```
+  Light: TextPrimary=#FF1D1D1F  twin(TextFillColorPrimaryBrush)=#E4000000  同实例=否  Label前景=#FF6E6E73
+  Dark:  TextPrimary=#FFF5F5F7  twin=#FFFFFFFF                              同实例=否  Label前景=#FFD1D1D6
+  ```
+
+  三件事一次定死：① 这个名字**不是空的**，它随 `Application.ThemeMode` 翻档，而且翻到的正是**我们的调色板主文本墨**
+  （`#FF1D1D1F`/`#FFF5F5F7`）；② 它和我们逐字照抄上游的 twin `TextFillColorPrimaryBrush` 是**不同实例、不同色**
+  （twin 是 WinUI 字面 `#E4000000`/`#FFFFFF`）；③ 我们**从不重模板**的那个原生 `Label` 读的是**第三种**框架默认墨
+  （`#FF6E6E73`/`#FFD1D1D6`），既不是名字值也不是 twin 值。
+- **因此发行是负收益，不是零收益**：`<StaticResource TextPrimary → TextFillColorPrimaryBrush>` 会把框架那支**已经等于我们
+  调好的墨**的投影，改写成更生的 WinUI 字面 `#E4000000`——朝 1:1 复刻的反方向走。这与 `ControlBorderFocused` 那一轮正好
+  相反：那里的框架投影是**错的品牌绿** `#FF1E793F`、且有实证过的读者 `ResolveFocusedBorderBrush`，所以覆盖是修 bug；
+  这里投影已经对、且没量到读者，覆盖只会弄脏。**别名层进不进一个名字，判据不是"源树读了几次"，是"框架投影值是不是错的、
+  且有一个我们改不动的表面真的按这个名字取值"**——`TextPrimary` 两条都不满足。
+- **我自己的前提也错了一次，如实记**：本想在测试里钉一条"这个名字没有出货读者"的 tripwire，写成了
+  `Assert.Null(TryFindResource("TextPrimary"))`。第一次跑就红在 `Actual: SolidColorBrush(#FF1D1D1F)`——我先前那条
+  "名字处处不出现"的记忆是**错的**（同一批早先的探针读数 `row=SolidColorBrush #E4000000` 本来就已经非空，是我把它记成了"缺席"）。
+  改成把**实测的四对色值**钉成断言，而不是钉一个我以为成立的缺席。
+
+- **构建**：全量 `0 警告 / 0 错误`。
+- **行为**：新常驻测点 `AstraFrameworkNameResolutionTests.TextPrimary_is_a_theme_tracking_framework_name_the_layer_leaves_alone`
+  把上面两档六支色值 + `TextPrimary ≠ twin` 全进断言，本类 **10/10 绿**（原 9 条 + 这一条）。
+  **牙齿**：若将来真给 `TextPrimary` 发了别名行，查表拿到的就是 twin → `Assert.Equal(#1D1D1F, lightRow)` 与
+  `Assert.NotEqual(lightRow, lightTwin)` 两条一起红；若哪天框架不再按 `ThemeMode` 翻这个名字，Dark 那条 `#F5F5F7` 红。
+  也就是"该不该回头评估这个名字"从注释变成会响的门。
+- **视觉**：本批**零既有像素主张变化**（不发行，就没有东西被重写）。
+- **硬件输入**：不动输入路径。
+- **清单/漂移**：`keys.md` 不变（本批不发布公开键，仍 1301 canonical lines）；三档 `checked=True`。
+
+### 本批的串行闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1` 在含本批改动的树上串行跑完（`spike/GalleryRender/gate-textprimary.log`）：build
+`0 警告 / 0 错误` → 整套 **1492/1492**（0 失败 0 跳过、7 m 26 s）→ 页像素闸 **`PASS 13 pages x 2 variants, 0 offender(s)`**
+→ 调色板三档 `checked=True`（Light/Dark 各 83 源色 101 刷；HighContrast 101 映射键，3 条上游强调 elevation 键因调色板无对应而按住）
+→ `keys.md is current: 1301 canonical lines.` → 末行 **`All Astra gates passed.`**。
+
+**测点 1491 → 1492 恰好 +1**，就是本批新那条常驻事实——也就是这条"翻主题到 Dark 再翻回 Light"的共享夹具测点
+**没有污染任何后续类**（这条闸的既有教训是夹具态泄漏会成批弄红，+1 无附带红正是它的反证）。
+一处如实记下、别糊过去：我给闸日志追加的 `GATE-EXIT=$LASTEXITCODE` 那行**是空的**——`$LASTEXITCODE` 是 PowerShell
+变量、外层是 bash，取不到值。所以"整个脚本跑完了"的证据是末行 `All Astra gates passed.`（`$ErrorActionPreference='Stop'`
+下任一 `Invoke-Step` 非零都会先中止、打不出这行），不是那行空 echo。
+
+`08-themecolors-raw.txt` 这张表**只当线索、不当结论**：它表头写 Light，可 71 行 `tc` 值全是暗色档
+（白字、`WindowBackground=#FF1E1E1E`），与活进程读数系统性相反——归因未做（多半是 harvest 抓的是
+`ThemeColors` 结构体的另一套底值，不是应用级投影色），但结论不依赖它：本轮用的是活进程里按 `ThemeMode` 现读的值。
+不声称：① 没有对**全部**出货按名读者做穷尽普查（只测了 `Label` 一处原生文本控件；源树那 8 处读点在 26.10.9 的 IL 里
+是否都还在、是否都跑在我们改不动的面上，没查）——但这条不影响"不发"的判定，因为**发反而会弄脏**那条已经成立；
+② `TextSecondary`/`TextDisabled`/`TextOnAccent` 各自要不要发行仍按同一判据单独量，本轮不替它们下结论。
