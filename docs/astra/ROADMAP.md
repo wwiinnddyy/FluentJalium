@@ -2343,10 +2343,20 @@ disabled 的表格单元与菜单项**没有**单独断言（框架在无头主�
 **普查口径本身错了半边（下一轮之前先读这条）**：判"这个名字够不够得到"不能只 grep `Resolve*Brush`。控制代码里
 按名字查资源的另一条通路是 `TryFindResource("名")`，`src/managed/Jalium.UI.Controls` 里共 **107 处**，
 名次与上表不同：`TextSecondary` 10、`AccentBrush` 9、`TextPrimary` 8、`ControlBorder` 7、`TextPlaceholder` 6、
-`ControlBorderFocused` 6、`SurfaceBackground` 4，另有本批此前完全没记到的名字 `TextPlaceholder`、
-`FocusStrokeColorOuterBrush`/`FocusStrokeColorInnerBrush`（**这两个是 WinUI token 名**）、`SelectionBackground`、
+`ControlBorderFocused` 6、`SurfaceBackground` 4，另有本批此前没记到的名字 `TextPlaceholder`、`SelectionBackground`、
 `ControlBackground`、`CommandBarBackground`、`MenuFlyoutPresenterBackground`/`BorderBrush`、`WindowBackground`、
 `TitleBarGlyph`。**口径修正：可达性按"`TryFindResource` 或 `Resolve*Brush` 或标记 `{ThemeResource}`"三条并集算。**
+
+（自我更正，同一天）上面这一句初稿还把 `FocusStrokeColorOuterBrush` / `FocusStrokeColorInnerBrush` 算成"框架控件代码在读的名字"，
+那是**归属错**：按 `FocusStrokeColor` grep `src/managed` 命中 **0**，这两个名字只出现在框架自带的
+`FocusedBorderThemeTests.cs:33-34` 里，以 `app.Resources.TryGetValue("FocusStrokeColorOuterBrush", …)` 的形式被断言。
+**但这句更正对本层是利好而不是利空**：框架的测试**要求宿主主题层提供这两个 token**，也就是"焦点环的两支刷由应用字典负责"
+是上游写进测试的契约——而 `audits/keys.md` 显示 Astra 已经画了：Light `#E4000000`/`#B3FFFFFF`、Dark 反向
+`#FFFFFF`/`#B3000000`，高对比档逐键映射到 `SystemColorWindowTextColor`/`SystemColorWindowColor`（清单第 446-447 行），
+消费点在 `Styles/Common.jalxaml`、`Styles/Inputs.jalxaml`、`Styles/Navigation.jalxaml` 的焦点框 `Border` 上
+（`grep` 三个文件均命中；**逐处计数未做**，上面这条清单是 head 截断的输出，别当全量）。
+所以焦点环**不需要**别名层：它是我们的模板画的、用我们的 token。**留给别名层的只有框架自己那圈焦点描边**
+（`ControlBorderFocused` 走的是框架控件代码路径，与本层已重模板的控件无关）。
 
 `ControlBorderFocused` 的专项更正：上一段那条"六族是 `.cctor` 一次性取值、别名可能整族吃不到"的警告**撤回**。
 读消费形状即可判定（`AutoCompleteBox.cs:27`/`:1328`、`DatePicker.cs:248`/`:612`、`NumberBox.cs:60`/`:1363`、
