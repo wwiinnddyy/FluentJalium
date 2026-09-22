@@ -2976,3 +2976,79 @@ label-ink(基准)=#FF6E6E73 | row(基准)          探针=0  灰字=38  top=#000
 同一份日志里 `status Dark` 第二回 `stable=True/False`，且这一页的 slot 读数在两次运行之间从 293 变成 295，
 而这两批之间 `src/` 一格没动。也就是说这条不稳定**不来自本批**，而且它的抖动面比"某一拍不稳"更宽（同树同码两跑不同数）。
 仍归 #47/#35 那族，本批不追；这里记下来是为了让那一族开工时知道**基线读数本身会漂**，别把漂当成回归。
+
+## #12 A2 别名层第四轮：`TextSecondary → TextFillColorSecondaryBrush` 发行，这是这一层第一次改动**出货像素**
+
+上一批点名的三条必红事实全部兑现，兑现的方式比预想的更有意思，所以逐条记。`ThemeResources/FrameworkRetints.jalxaml`
+从四行变成五行。
+
+- **红在哪、为什么红**（发行后第一次跑两个受影响类：**8 条腿红**，`spike/GalleryRender/publish-secondary1.log`）：
+  - `AstraMenuTests.The_controls_paint_their_own_rule_and_text_and_our_rows_reach_neither` 红在
+    `Assert.Equal(0, text.Count(ChevronSentinel))`，**Actual: 38**。这条的主张被**反过来了**：过去量到的是
+    "我们改 `TextFillColorSecondaryBrush` 到不了自绘文字"，现在同一支哨兵**到了**——因为名字被别名到调色板实例，
+    `OverrideBrush` 挪的就是那个实例。这正是 A2 这一层存在的理由，所以改的是**主张本身**：事实更名为
+    `The_alias_layer_reaches_the_rows_own_text_while_our_rows_still_reach_the_rule`，分隔线那半仍然成立
+    （装哨兵进去 `Count(SeparatorSentinel)=0`），文字这半从"够不到"改成"通过名字够到了"。
+  - `AstraMenuTests.The_sub_items_own_paint_follows_the_theme` 红在 `light capture is empty: #000000x9120`——
+    **这一条我上一批没点到名**。原因不是判据错，而是我的普查方法有洞：我按色值 `grep 6E6E73|D1D1D6` 找落点，
+    这条事实是**比较两拍**而不是写死颜色，所以字面上没有可 grep 的值。教训写进下面的方法账。
+- **半透明墨在黑色宿主上等于没有墨**：token 是 `#9E000000`，压在这台 harness 的默认底（黑）上合成结果就是黑，
+  9120/9120 像素全黑。这不是"变暗了一点"，是**主张从可证伪变成不可证伪**。修法照 #59/#60 那两批的既有仪器：
+  两档各配自己的不透明底板（`PixelHarness.Backdrop`），断言 `PixelHarness.Over` 算出来的合成值，
+  不写死我手算的数、也不写回刷自己的字节。`AstraFrameworkNameResolutionTests` 的 flyout 像素事实同一处理。
+- **其余五条腿**：`A_retint_row_follows_the_theme_flip` 补 `TextSecondary` 两腿（两档都读到调色板实例本身）；
+  `A_remaining_text_name_is_a_live_projection_but_not_our_token` 的 `TextSecondary` 腿**删除**而不是改判——它三条主张
+  （非空、不同实例、不同色）如今每条都按设计为假，留着就是拿一条永久假的事实守一个已经落地的决定；同一仪器在
+  flip 两腿 + flyout 像素三腿 + `Label` 一条事实上覆盖得更好，这件事写在被删那条腿的注释里，没有静默消失。
+  `TextPrimary_projects_...` 的两条 `Label` 腿改成 token 值（`#9E000000`/`#C5FFFFFF`）。
+- **牙齿不是口头保证**：把这一行临时改名再跑一次两个类（`spike/GalleryRender/publish-ab.log`），
+  **9 条腿红**，含 flyout 像素事实的全部三条腿（连阴性腿也红，因为底板基准色就是它守的）、flip 两腿、
+  `Label` 事实、`TextPrimary` 事实、两条 menus 事实。也就是说上面每一条改判后的主张都**真的**依赖这五行里的第五行，
+  不是一组怎么跑都绿的断言。
+
+- **构建**：`0 警告 / 0 错误`（中途一次 `CS0246`：`Sample` 是 `PixelHarness` 的嵌套类型，helper 返回类型要写全）。
+- **行为**：受影响两类 **128/128 绿**（127 → 128：flip +2 腿、remaining-text −1 腿）。
+- **视觉**：这是 A2 层**第一次**让出货像素移动——菜单行文字与所有我们不改模板的原生文本面，从框架不透灰
+  变成 WinUI 半透字面值。证据是 `AstraMenuTests` 与 `AstraFrameworkNameResolutionTests` 里那几条**逐像素计数**
+  的事实（含底板合成值），**不是**任何截图主张。**这一条我先前写的话要更正**：我本来打算说"这次移动的可见性由
+  #63 的页闸两档全拍覆盖"，实测**恰好相反**——页闸在发行前后对 menus 页给的是**一模一样**的读数
+  （`menus Light slot 80 colours 335672px over 1 colours 0px`、`menus Dark slot 48 colours 335671px …`，
+  两次运行逐字节相同）。原因是 #50：文本字形到不了捕获，所以"行文字换了墨"这件事在这台仪器上**根本看不见**。
+  页闸能证的仍然只有表面身份/半径/绿味那几类，它既没证伪也没证实这一行。
+  也没有真指针/键盘输入证据（#13 仍欠）。
+- **硬件输入**：不动。
+- **清单/漂移**：`FrameworkRetints.jalxaml` 四行 → 五行；`keys.md` 1301 → **1302**（新增
+  `| StaticResource | `TextSecondary` | `TextFillColorSecondaryBrush` |` 一行，token 层 777 → 778）。
+  这一族是**第四个落点、也是我上一批没点名的一个**：`AstraPublicKeysInventoryTests` 两条事实
+  （逐键名册 + 文档里的 Totals 行）会因任何新公开键红，属于目标那句"`Report-AstraResourceKeys.ps1`"本来就预告过的
+  一类——它是**清单**账不是**像素**账，重新生成即结清，不需要改判任何主张。
+- **方法账（这轮学的一条）**：按**色值** grep 只能找到写死颜色的主张；**比较两拍**、**数极值**、
+  **算合成色**这三类像素主张没有可 grep 的字面值，只能用"改一次、看谁红"来枚举。以后发行前的爆炸半径普查，
+  以 A/B 红名单为准，色值 grep 只作为预筛。
+
+### TextSecondary 发行批的串行闸口读数（补记，2026-09-22）
+
+第一跑**是红的**，而且红得有价值（`spike/GalleryRender/gate-textsecondary.log`，包装器 `GATE-EXIT=1`）：
+build `0 警告 / 0 错误` → 整套 **1499/1501，2 条失败**，两条都是
+`Resources.AstraPublicKeysInventoryTests`（逐键名册 + 文档 Totals 行），也就是新公开键该引起的**清单**账，
+不是行为回归。闸口在 test 步就中止，页闸/调色板/键清单三步没跑。
+`tools/Report-AstraResourceKeys.ps1` 重新生成后 diff 干净：`keys.md` 1301 → 1302，`FrameworkRetints.jalxaml`
+段 4 rows → 5 rows，token 层 777 → 778，只多出 `TextSecondary` 那一行。
+
+第二跑全绿（`spike/GalleryRender/gate-textsecondary2.log`，包装器自记 **`GATE-EXIT=0`**）：build
+`0 警告 / 0 错误` → 整套 **1501/1501**（0 失败 0 跳过、7 m 19 s）→ 页闸 `PASS 13 pages x 2 variants,
+0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1302 canonical lines.` → 末行
+`All Astra gates passed.`。
+
+两处如实标注，别让读的人以为我藏了：
+1. **测点 1500 → 1501 = +1**，来自 flip 的 +2 腿减掉被删的那条 `TextSecondary` 腿。发行没有弄红任何**别的**类——
+   第一批 8 条红全部落在点名范围内（两个受影响类），第二批 2 条红是清单账，合起来这批的移动面就是这些。
+2. 这条闸的**后台任务通知写的是 "exit code 0"，而真实管道退出码是 1**。判断依据只能是包装器自己 echo 的
+   `GATE-EXIT=` 和日志末行，不是调度器的完成通知（这是既有教训"通知会撒谎"的又一次命中，不是新事）。
+
+和上一批同样的时序如实记一次：第二跑全绿之后，我又改了 `FrameworkRetints.jalxaml` 里那段的**注释正文**
+（把"行文字那半被反过来"这件事写进行证据注释），并补了本文最后两条订正。所以 `GATE-EXIT=0` 那次编进去的
+是注释增量之前的字典。为让提交的字节被验证过，改后重新 `dotnet build` 整套（`0 警告 / 0 错误`，Jalxaml
+源生成器能吃下这段注释）并把三个受影响类重跑（`AstraFrameworkNameResolutionTests` + `AstraMenuTests` +
+`AstraPublicKeysInventoryTests`，**130/130 绿**）。也就是说：全量闸口跑的是行为等价的树，注释增量由
+build + 这三类覆盖，不是"整条闸在最终字节上绿过"。

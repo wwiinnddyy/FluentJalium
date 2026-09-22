@@ -141,6 +141,8 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     [InlineData("SurfaceBackground", "SolidBackgroundFillColorBaseBrush", FluentThemeVariant.Dark)]
     [InlineData("ControlBorder", "ControlStrokeColorDefaultBrush", FluentThemeVariant.Light)]
     [InlineData("ControlBorder", "ControlStrokeColorDefaultBrush", FluentThemeVariant.Dark)]
+    [InlineData("TextSecondary", "TextFillColorSecondaryBrush", FluentThemeVariant.Light)]
+    [InlineData("TextSecondary", "TextFillColorSecondaryBrush", FluentThemeVariant.Dark)]
     public void A_retint_row_follows_the_theme_flip_to_the_variant_it_declares(string frameworkName, string twinKey, FluentThemeVariant variant)
     {
         _fixture.Run(() =>
@@ -207,12 +209,13 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                     () => Assert.NotEqual(lightRow, lightTwin),
                     () => Assert.Equal(Color.FromArgb(0xE4, 0x00, 0x00, 0x00), lightTwin),
                     () => Assert.Equal(Color.FromRgb(0xFF, 0xFF, 0xFF), darkTwin),
-                    // The one surface we never restyles reads neither this name nor its twin. What it does read is
-                    // TextSecondary's value, and A_native_label_resolves_its_ink_from_the_same_name proves the name.
-                    () => Assert.Equal(Color.FromRgb(0x6E, 0x6E, 0x73), lightLabel),
+                    // The one surface we never restyles reads neither this name nor its twin. Since the A2 layer
+                    // aliased TextSecondary it reads that token, which is the value asserted here; the name that
+                    // governs it is pinned by A_native_label_resolves_its_ink_from_the_same_name.
+                    () => Assert.Equal(Color.FromArgb(0x9E, 0x00, 0x00, 0x00), lightLabel),
                     () => Assert.NotEqual(lightRow, lightLabel),
                     () => Assert.NotEqual(lightTwin, lightLabel),
-                    () => Assert.Equal(Color.FromRgb(0xD1, 0xD1, 0xD6), darkLabel));
+                    () => Assert.Equal(Color.FromArgb(0xC5, 0xFF, 0xFF, 0xFF), darkLabel));
             }
             finally
             {
@@ -222,17 +225,22 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// The three remaining palette-family text names the A2 layer was asked to consider, measured the same way as
-    /// <c>TextPrimary</c>. All three are live framework projections (non-null, app-level) and all three are a *different
-    /// object* from the shipped WinUI-literal token of the same meaning: the framework hands out opaque macOS-flavoured
-    /// greys (and a constant white for <c>TextOnAccent</c>) where our palette ships translucent WinUI values that flip
-    /// by variant. That divergence is why these stay candidates rather than rows: publishing <c>name → token</c> would
-    /// move any name-reader *toward* 1:1, so the only thing holding the row back is the absence of a demonstrated
-    /// reader we cannot already re-template — not a fidelity cost. If a shipped control starts consuming one of these
-    /// names, the row is worth shipping; the measured colours below are the baseline that decision revisits.
+    /// The palette-family text names the A2 layer was asked to consider that are still NOT published, measured as
+    /// live framework projections: each is a non-null app-level entry and a *different object* from the shipped
+    /// WinUI-literal token of the same meaning - the framework hands out opaque macOS-flavoured greys (and a constant
+    /// white for <c>TextOnAccent</c>) where our palette ships translucent WinUI values that flip by variant. That
+    /// divergence is why these stay candidates rather than rows: publishing <c>name → token</c> would move any
+    /// name-reader *toward* 1:1, so the only thing holding a row back is the absence of a demonstrated reader we
+    /// cannot already re-template - not a fidelity cost. If a shipped control starts consuming one of these names, the
+    /// row is worth shipping; the measured colours below are the baseline that decision revisits.
+    ///
+    /// This theory used to carry a <c>TextSecondary</c> leg. That leg was deleted rather than re-pinned when the row
+    /// shipped, because every claim it made is now false by design and the same instrument covers the published case
+    /// better: <see cref="A_retint_row_follows_the_theme_flip_to_the_variant_it_declares" /> pins the name to the
+    /// palette instance in both variants, and
+    /// <see cref="The_flyout_rows_own_text_is_painted_from_the_secondary_text_name" /> pins what it paints.
     /// </summary>
     [Theory]
-    [InlineData("TextSecondary", "TextFillColorSecondaryBrush", 0x6E, 0x6E, 0x73, 0xD1, 0xD1, 0xD6)]
     [InlineData("TextDisabled", "TextFillColorDisabledBrush", 0xAE, 0xAE, 0xB2, 0x63, 0x63, 0x66)]
     [InlineData("TextOnAccent", "TextOnAccentFillColorPrimaryBrush", 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)]
     public void A_remaining_text_name_is_a_live_projection_but_not_our_token(
@@ -310,18 +318,16 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// The first A2 candidate whose name-driven resolution is proven all the way to PIXELS rather than to a
-    /// reflection reading. A <see cref="MenuFlyoutSubItem"/> paints its own row text (the ghost batch found the
-    /// control's label unreachable from a template), and what it paints is <c>TextSecondary</c>: installing a probe
-    /// brush under that name in <c>Application.Resources</c> replaces the whole glyph run - the grey drops to zero
-    /// pixels and the probe colour takes 38, on a 240x38 row. Removing it restores the baseline exactly, so the
-    /// flip is a live per-call lookup and not a one-time resolution.
+    /// The reader that earned the fifth row in <c>ThemeResources/FrameworkRetints.jalxaml</c>, proven at the PIXEL
+    /// rather than at the dictionary. A <see cref="MenuFlyoutSubItem"/> paints its own row text (the ghost batch found
+    /// the control's label unreachable from a template), and the name it paints from is <c>TextSecondary</c>: a probe
+    /// brush installed under that name replaces the whole glyph run, while probes under the neighbouring names leave
+    /// it on the value the shipped row forwards.
     ///
-    /// The two negative legs are the same instrument aimed at the neighbouring names: a probe under
-    /// <c>TextPrimary</c> or <c>TextDisabled</c> leaves this row text alone, which is what separates the three names
-    /// this layer was asked about. It also fixes the order the rows should ship in: <c>TextSecondary</c> is the one
-    /// with a demonstrated visible reader, while <c>TextPrimary</c>'s reader is so far proven only through
-    /// <see cref="A_self_drawn_menu_item_reads_the_primary_text_name" /> and reaches no pixel here.
+    /// Both branches are captured on an opaque plate, because the row's token is translucent (#9E000000) and a capture
+    /// on nothing composites it onto the black harness host and reports no ink at all - measured after the row, 9120 of
+    /// 9120 pixels black - which would make this a vacuous pass rather than a reading. The colour claimed is therefore
+    /// the composite <see cref="PixelHarness.Over" /> predicts, not the brush's own bytes.
     /// </summary>
     [Theory]
     [InlineData("TextSecondary", true)]
@@ -333,24 +339,26 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         {
             var application = Application.Current!;
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var sub = new MenuFlyoutSubItem { Text = "sub" };
-            PixelHarness.Build(sub, 240, 38);
+            var host = PixelHarness.Backdrop(new MenuFlyoutSubItem { Text = "sub" }, PixelHarness.LightPage);
+            PixelHarness.Build(host, 240, 38);
             PixelHarness.Settle(20);
 
-            var resting = PixelHarness.Render(sub, 240, 38);
+            var token = Assert.IsType<SolidColorBrush>(FluentThemeManager.GetBrush("TextFillColorSecondaryBrush"));
+            var rowInk = PixelHarness.Over(PixelHarness.LightPage, token.Color);
+            var resting = PixelHarness.Render(host, 240, 38);
             var sentinel = new SolidColorBrush(Probe);
             application.Resources[frameworkName] = sentinel;
             try
             {
                 PixelHarness.Settle(10);
-                var painted = PixelHarness.Render(sub, 240, 38);
+                var painted = PixelHarness.Render(host, 240, 38);
                 Assert.Multiple(
-                    // The instrument reads what the menu batch reads: an inked row, and no probe ink in it yet.
-                    () => Assert.True(resting.Count(FrameworkSecondaryInk) > PaintedFloor,
+                    // The instrument reads an inked row on the plate, and no probe ink in it yet.
+                    () => Assert.True(resting.Count(rowInk) > PaintedFloor,
                         $"the row's own text did not reach pixels before the probe; top={resting.Top(4)}"),
                     () => Assert.Equal(0, resting.Count(Probe)),
                     // Whether the name is on the paint path is decided by the same two counts after the probe lands.
-                    () => Assert.Equal(isRead ? 0 : resting.Count(FrameworkSecondaryInk), painted.Count(FrameworkSecondaryInk)),
+                    () => Assert.Equal(isRead ? 0 : resting.Count(rowInk), painted.Count(rowInk)),
                     () => Assert.True(isRead ? painted.Count(Probe) > PaintedFloor : painted.Count(Probe) == 0,
                         $"expected {frameworkName} to{(isRead ? "" : " not")} reach the row text; top={painted.Top(4)}"));
             }
@@ -363,10 +371,11 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
 
     /// <summary>
     /// The same name on a surface this library never restyles at all: a native <see cref="Label"/> resolves its
-    /// foreground from <c>TextSecondary</c> too, so the projection measured in
-    /// <see cref="TextPrimary_projects_a_framework_ink_awaiting_its_row" /> as "a third default ink" is not a third
-    /// mechanism - it is this name's value, reached by lookup. A built control keeps what it resolved at build time,
-    /// so the probe has to be installed before the element is built for the reading to mean anything.
+    /// foreground from <c>TextSecondary</c>, which is why the shipped row reaches a control that carries no style of
+    /// ours. Before the row this ink was the framework's opaque <c>#FF6E6E73</c>; it is now the palette instance the
+    /// row forwards, and the probe leg is what shows the value still arrives through a per-call lookup rather than a
+    /// load-time substitution. A built control keeps what it resolved at build time, so the probe has to be installed
+    /// before the element is built for the reading to mean anything.
     /// </summary>
     [Fact]
     public void A_native_label_resolves_its_ink_from_the_same_name()
@@ -375,9 +384,11 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         {
             var application = Application.Current!;
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var token = Assert.IsType<SolidColorBrush>(FluentThemeManager.GetBrush("TextFillColorSecondaryBrush"));
             try
             {
-                Assert.Equal(FrameworkSecondaryInk, ColorOf(InkedForeground()));
+                // The row forwards the palette instance itself, so the Label's ink is that object, not a copy of it.
+                Assert.Same(token, InkedForeground());
 
                 application.Resources["TextSecondary"] = new SolidColorBrush(Probe);
                 var probed = InkedForeground();
@@ -391,17 +402,12 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
             finally
             {
                 application.Resources.Remove("TextSecondary");
-                Assert.Equal(FrameworkSecondaryInk, ColorOf(InkedForeground()));
+                Assert.Same(token, InkedForeground());
             }
         });
     }
 
     // ---------- helpers ----------
-
-    /// <summary>The grey 26.10.9 paints a flyout row's own text in under the light theme, and the ink a native
-    /// <see cref="Label"/> resolves to. Same value on both surfaces, which is what the two facts above claim
-    /// comes from one name.</summary>
-    private static readonly Color FrameworkSecondaryInk = Color.FromRgb(0x6E, 0x6E, 0x73);
 
     /// <summary>The pixel floor <see cref="AstraMenuTests"/> uses for "this ink is really painted", measured here at
     /// 38 pixels on a 240x38 row, so the floor is the menu batch's own and not a number picked for this file.</summary>

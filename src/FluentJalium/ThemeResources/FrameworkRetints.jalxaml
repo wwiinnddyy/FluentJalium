@@ -54,4 +54,25 @@
        asserted, not assumed, by AstraFrameworkNameResolutionTests.A_retint_row_follows_the_theme_flip_to_the_variant_it_declares. -->
   <StaticResource x:Key="SurfaceBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
   <StaticResource x:Key="ControlBorder" ResourceKey="ControlStrokeColorDefaultBrush" />
+
+  <!-- Third segment of the same layer, and the first row here whose reader is proven at the PIXEL rather than at the
+       dictionary or the reflection log. Instrument: install a probe brush under the name in Application.Resources,
+       capture, count colours. Measured on 26.10.9 - a MenuFlyoutSubItem paints its own row text from TextSecondary
+       (38 pixels of the framework grey become 38 pixels of the probe, and come back exactly when the probe is
+       removed), and a native Label, which this library never restyles at all, resolves its Foreground from that same
+       name. Probes under TextPrimary and TextDisabled move neither surface, which is why this is the one of the three
+       that earns a row now and not the other two. Alias rather than redefine, for the standing reason: the palette
+       twin TextFillColorSecondaryBrush carries the WinUI literal (#9E000000 Light / #C5FFFFFF Dark, translucent)
+       where the framework's own value is an opaque macOS-flavoured grey (#FF6E6E73 / #FFD1D1D6), so forwarding the
+       palette instance moves the surface toward 1:1 and keeps it following ApplyAccent and RefreshPalette. The rows
+       this reaches are exactly the ones no template of ours can: the row's text is the control's own OnRender output
+       (docs/astra/audits/menus.md, the ghost batch), and a Label has no style of ours at all. Pinned by
+       AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name and
+       A_native_label_resolves_its_ink_from_the_same_name. What the row cost is the same evidence read the other way:
+       the menu batch had a fact asserting our palette override reaches NEITHER the row's text nor its rule. The text
+       half inverted - an override of this palette row now inks the control's own paint - so that fact is renamed and
+       re-pinned onto the composited token value (AstraMenuTests.The_alias_layer_reaches_the_rows_own_text_while_
+       our_rows_still_reach_the_rule), and its theme-flip sibling now captures each variant on an opaque plate because
+       the token, unlike the grey it replaced, is translucent. -->
+  <StaticResource x:Key="TextSecondary" ResourceKey="TextFillColorSecondaryBrush" />
 </ResourceDictionary>

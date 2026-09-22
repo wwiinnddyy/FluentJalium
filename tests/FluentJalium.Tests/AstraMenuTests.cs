@@ -847,14 +847,15 @@ public sealed class AstraMenuTests
     }
 
     /// <summary>
-    /// Both halves of the ghost fix in one pixel reading, and the second half is the honest one: the row's
-    /// text is the control's own paint, so it appears in a crop that holds no label of ours - and overriding
-    /// the palette rows that paint names does not move it, which is the same unreachable resolution
-    /// spike/MenuProbe pass 4 measured for the rest of the menu chrome. Our withdrawn separator row paints
-    /// nothing at all now, which is what leaves one line instead of two.
+    /// Both halves of the ghost fix in one pixel reading, with the second half re-pinned by the A2 alias layer
+    /// (docs/astra/ROADMAP.md #12). The row's text is the control's own paint, so it still appears in a crop that
+    /// holds no label of ours - but it is no longer unreachable: <c>TextSecondary</c> is aliased onto our palette, so
+    /// overriding that palette row moves the control's own text, which is precisely what the layer exists to buy.
+    /// What stays unreachable is the separator, drawn from resources of the control's own that no name of ours feeds
+    /// (the same reading spike/MenuProbe pass 4 took for the rest of the menu chrome).
     /// </summary>
     [Fact]
-    public void The_controls_paint_their_own_rule_and_text_and_our_rows_reach_neither()
+    public void The_alias_layer_reaches_the_rows_own_text_while_our_rows_still_reach_the_rule()
     {
         _fixture.Run(() =>
         {
@@ -873,9 +874,12 @@ public sealed class AstraMenuTests
                 Assert.Equal(0, line.Count(SeparatorSentinel));
 
                 var text = PixelHarness.Render(sub, 240, 38);
-                Assert.Equal(0, text.Count(ChevronSentinel));
-                Assert.True(text.Count(FrameworkRowText) > 8,
-                    $"the control's own row text did not reach pixels; top={text.Top(6)}");
+                Assert.Multiple(
+                    // The palette override arrives: the framework looked its name up and got the instance we moved.
+                    () => Assert.True(text.Count(ChevronSentinel) > 8,
+                        $"the alias layer did not carry the palette override into the row's own text; top={text.Top(4)}"),
+                    // And the framework's own grey is gone from the crop it used to ink.
+                    () => Assert.Equal(0, text.Count(FrameworkRowText)));
             }
             finally
             {
@@ -887,22 +891,24 @@ public sealed class AstraMenuTests
 
     /// <summary>
     /// The theme flip has to be asked of something that actually paints, and a text-only subject writes no
-    /// pixels here. What carries the claim now is the row's own paint: 26.10.9 draws the sub-item's label and
-    /// chevron itself from palette rows whose light and dark values differ, so the two captures cannot match.
+    /// pixels here. What carries the claim is the row's own paint, which the framework resolves from a name the A2
+    /// layer aliases onto <c>TextFillColorSecondaryBrush</c>. That token is translucent, so a capture on nothing
+    /// reports the light branch as page-coloured ink - measured, #9E000000 over the black host leaves 9120 of 9120
+    /// pixels black - and the claim would be unfalsifiable rather than merely dim. Each branch is therefore taken on
+    /// its own opaque plate and asserted at the composite <see cref="PixelHarness.Over" /> predicts, not at the
+    /// brush's own bytes.
     /// </summary>
     [Fact]
     public void The_sub_items_own_paint_follows_the_theme()
     {
         _fixture.Run(() =>
         {
-            var sub = new MenuFlyoutSubItem { Text = "sub" };
-            PixelHarness.Build(sub, 240, 38);
-            PixelHarness.Settle(30);
-
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
-            var light = PixelHarness.Render(sub, 240, 38);
+            var lightInk = PixelHarness.Over(PixelHarness.LightPage, SecondaryTokenColour());
+            var light = RowOnPlate(PixelHarness.LightPage);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
-            var dark = PixelHarness.Render(sub, 240, 38);
+            var darkInk = PixelHarness.Over(PixelHarness.DarkPage, SecondaryTokenColour());
+            var dark = RowOnPlate(PixelHarness.DarkPage);
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
             // Upstream gives a menu flyout item a transparent surface, so the falsifiable pixel claim here is the
@@ -913,12 +919,28 @@ public sealed class AstraMenuTests
             PixelHarness.AssertNoSurfaceLands(
                 new MenuFlyoutSubItem { Text = "sub" }, PixelHarness.DarkPage, 240, 38, "the sub item's surface");
 
-            Assert.True(light.PaintedPixels > 0, $"light capture is empty: {light.Top(6)}");
-            Assert.True(dark.PaintedPixels > 0, $"dark capture is empty: {dark.Top(6)}");
-            Assert.NotEqual(light.Top(2), dark.Top(2));
-            Assert.Equal(0, dark.Count(BrandEmerald));
+            Assert.Multiple(
+                () => Assert.True(light.Count(lightInk) > 8,
+                    $"the light branch did not land {PixelHarness.Hex(lightInk)} over its plate; top={light.Top(6)}"),
+                () => Assert.True(dark.Count(darkInk) > 8,
+                    $"the dark branch did not land {PixelHarness.Hex(darkInk)} over its plate; top={dark.Top(6)}"),
+                () => Assert.NotEqual(light.Top(2), dark.Top(2)),
+                () => Assert.Equal(0, dark.Count(BrandEmerald)));
         });
     }
+
+    /// <summary>The row's own paint captured on an opaque page, which is the only way a translucent ink can be
+    /// counted at all (see <see cref="The_sub_items_own_paint_follows_the_theme"/>).</summary>
+    private static PixelHarness.Sample RowOnPlate(Color plate)
+    {
+        var host = PixelHarness.Backdrop(new MenuFlyoutSubItem { Text = "sub" }, plate);
+        PixelHarness.Build(host, 240, 38);
+        PixelHarness.Settle(30);
+        return PixelHarness.Render(host, 240, 38);
+    }
+
+    private static Color SecondaryTokenColour() =>
+        Assert.IsType<SolidColorBrush>(FluentThemeManager.GetBrush("TextFillColorSecondaryBrush")).Color;
 
     // ---------- helpers ----------
 
