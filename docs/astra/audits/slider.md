@@ -144,5 +144,5 @@ IsSnapToTickEnabled, TrackMode, SegmentGap, TrackBrush, ThumbBrush`，
 
 仍不声称：拇指悬出 2 DIP 在真窗口里是否被相邻控件裁掉——Inputs 页这次捕获成功（`spike/VisualQA/out/inputs.png`，
 PrintWindow，dpi=168），但三条 Slider 都在折叠线以下：整页扫 880 列宽找不到一段 ≥120 px 的强调色轨道，
-所以滑块的视觉半边本批**没有**像素证据，只有上面的排布读数；留给任务 #13 的滚动/直挂通路。`SliderFocus` 的落点仍与上游的
-`FocusVisualMargin="-14,-6,-14,-6"` 不同形（我们是模板内一圈描边）。
+所以滑块的视觉半边本批**没有**像素证据，只有上面的排布读数；留给任务 #13 的滚动/直挂通路。`SliderFocus` 部件已经不在了（2026-09-22 起环挂在 `FocusVisualStyle` 上，竖排由 `Orientation` 那一格换成 `FocusVisualSliderVerticalStyle`，见 `audits/focus-visual.md`），它的落点仍与上游的
+`FocusVisualMargin="-14,-6,-14,-6"` 不同形（我们是环自己模板里的一圈描边）。

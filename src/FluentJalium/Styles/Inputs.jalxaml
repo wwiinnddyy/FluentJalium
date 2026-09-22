@@ -11,6 +11,7 @@
                     xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
 
   <Style x:Key="FluentToggleSwitchStyle" TargetType="controls:FluentToggleSwitch">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="Width" Value="48" />
     <Setter Property="Height" Value="32" />
     <Setter Property="MinWidth" Value="0" />
@@ -34,8 +35,6 @@
                       TransitionProperty="Width, Height, Background" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" />
             </Grid>
           </Grid>
-          <Border Name="SwitchFocus" BorderThickness="2" Margin="1" CornerRadius="4"
-                  Opacity="0" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" IsHitTestVisible="False" />
         </Grid>
         <ControlTemplate.Triggers>
           <Trigger Property="IsChecked" Value="True">
@@ -98,16 +97,12 @@
             <Setter TargetName="Knob" Property="Height" Value="14" />
             <Setter TargetName="ThumbHost" Property="TransitionDuration" Value="0:0:0" />
           </Trigger>
-          <Trigger Property="IsKeyboardFocused" Value="True">
-            <Setter TargetName="SwitchFocus" Property="Opacity" Value="1" />
-          </Trigger>
           <Trigger Property="IsEnabled" Value="False">
             <Setter TargetName="SwitchTrack" Property="Background" Value="{ThemeResource ControlAltFillColorDisabledBrush}" />
             <Setter TargetName="SwitchTrack" Property="BorderBrush" Value="{ThemeResource ControlStrongStrokeColorDisabledBrush}" />
             <Setter TargetName="Knob" Property="Background" Value="{ThemeResource TextFillColorDisabledBrush}" />
             <Setter TargetName="Knob" Property="Width" Value="12" />
             <Setter TargetName="Knob" Property="Height" Value="12" />
-            <Setter TargetName="SwitchFocus" Property="Opacity" Value="0" />
           </Trigger>
           <MultiTrigger>
             <MultiTrigger.Conditions>
@@ -142,6 +137,7 @@
        that belongs to no palette (adaptation/12). The thumb squeeze really is animated upstream, so Width and
        Height keep their transition. -->
   <Style x:Key="DefaultSliderStyle" TargetType="Slider">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualSliderStyle}" />
     <Setter Property="MinHeight" Value="32" />
     <Setter Property="MinWidth" Value="32" />
     <Setter Property="IsMoveToPointEnabled" Value="True" />
@@ -184,8 +180,6 @@
                            Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="{ThemeResource ControlFastAnimationDuration}" />
                 </Border>
               </Grid>
-              <Border Name="SliderFocus" Grid.RowSpan="3" Margin="0,2" BorderThickness="2" CornerRadius="4" Opacity="0"
-                      IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
             </Grid>
           </Border>
           <ControlTemplate.Triggers>
@@ -223,9 +217,6 @@
               <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
               <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
             </Trigger>
-            <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
-            </Trigger>
             <Trigger Property="IsEnabled" Value="False">
               <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundDisabled}" />
               <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
@@ -235,13 +226,15 @@
               <Setter TargetName="BottomTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
               <Setter TargetName="SliderInnerThumb" Property="Width" Value="12" />
               <Setter TargetName="SliderInnerThumb" Property="Height" Value="12" />
-              <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
     </Setter>
     <Style.Triggers>
       <Trigger Property="Orientation" Value="Vertical">
+        <!-- The vertical layout's ring hugged the other axis (2,0 against 0,2), and FocusVisualStyle is a
+             property rather than a template part, so the swap lives in this cell rather than in a second part. -->
+        <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualSliderVerticalStyle}" />
         <Setter Property="Template">
           <ControlTemplate TargetType="Slider">
               <Border Name="SliderContainer" Background="{ThemeResource SliderContainerBackground}" Padding="{TemplateBinding Padding}">
@@ -273,8 +266,6 @@
                                Fill="{ThemeResource SliderThumbBackground}" TransitionProperty="Width, Height" TransitionDuration="{ThemeResource ControlFastAnimationDuration}" />
                     </Border>
                   </Grid>
-                  <Border Name="SliderFocus" Grid.ColumnSpan="3" Margin="2,0" BorderThickness="2" CornerRadius="4" Opacity="0"
-                          IsHitTestVisible="False" BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" />
                 </Grid>
               </Border>
               <ControlTemplate.Triggers>
@@ -312,9 +303,6 @@
                   <Setter TargetName="SliderInnerThumb" Property="Width" Value="10" />
                   <Setter TargetName="SliderInnerThumb" Property="Height" Value="10" />
                 </Trigger>
-                <Trigger Property="IsKeyboardFocused" Value="True">
-                  <Setter TargetName="SliderFocus" Property="Opacity" Value="1" />
-                </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                   <Setter TargetName="SliderContainer" Property="Background" Value="{ThemeResource SliderContainerBackgroundDisabled}" />
                   <Setter TargetName="PART_Track" Property="Background" Value="{ThemeResource SliderTrackFillDisabled}" />
@@ -324,7 +312,6 @@
                   <Setter TargetName="RightTickBar" Property="Fill" Value="{ThemeResource SliderTickBarFillDisabled}" />
                   <Setter TargetName="SliderInnerThumb" Property="Width" Value="12" />
                   <Setter TargetName="SliderInnerThumb" Property="Height" Value="12" />
-                  <Setter TargetName="SliderFocus" Property="Opacity" Value="0" />
                 </Trigger>
               </ControlTemplate.Triggers>
             </ControlTemplate>
@@ -342,6 +329,7 @@
        Cells are upstream's CommonStates x CheckStates plus the dot size it animates (12 rest, 14 hover, 10
        press, 14 disabled). Not ported: the PressedCheckGlyph squeeze and the two-ellipse crossfade. -->
   <Style x:Key="DefaultRadioButtonStyle" TargetType="RadioButton">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualCheckStyle}" />
     <Setter Property="MinWidth" Value="120" /><Setter Property="FontSize" Value="14" />
     <Setter Property="Foreground" Value="{ThemeResource RadioButtonForeground}" />
     <Setter Property="Background" Value="{ThemeResource RadioButtonBackground}" />
@@ -366,8 +354,6 @@
                           Margin="{TemplateBinding Padding}"
                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-        <Border Name="RadioFocus" Grid.ColumnSpan="2" Margin="-2,1" BorderThickness="2" CornerRadius="4"
-                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False" />
       </Grid>
       <ControlTemplate.Triggers>
         <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="False" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundPointerOver}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPointerOver}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillPointerOver}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPointerOver}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /></MultiTrigger>
@@ -375,9 +361,8 @@
         <Trigger Property="IsChecked" Value="True"><Setter Property="Foreground" Value="{ThemeResource RadioButtonForeground}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackground}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrush}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFill}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStroke}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFill}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeChecked}" /><Setter TargetName="RadioDot" Property="Width" Value="12" /><Setter TargetName="RadioDot" Property="Height" Value="12" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></Trigger>
         <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundPointerOver}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPointerOver}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPointerOver}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillPointerOver}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokePointerOver}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPointerOver}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedPointerOver}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
         <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsPressed" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundPressed}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundPressed}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushPressed}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillPressed}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokePressed}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillPressed}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedPressed}" /><Setter TargetName="RadioDot" Property="Width" Value="10" /><Setter TargetName="RadioDot" Property="Height" Value="10" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
-        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundDisabled}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushDisabled}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillDisabled}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillDisabled}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioFocus" Property="Opacity" Value="0" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundDisabled}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushDisabled}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseFillDisabled}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillDisabled}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /></Trigger>
         <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsChecked" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource RadioButtonForegroundDisabled}" /><Setter TargetName="RadioRoot" Property="Background" Value="{ThemeResource RadioButtonBackgroundDisabled}" /><Setter Property="BorderBrush" Value="{ThemeResource RadioButtonBorderBrushDisabled}" /><Setter TargetName="RadioRing" Property="Background" Value="{ThemeResource RadioButtonOuterEllipseCheckedFillDisabled}" /><Setter TargetName="RadioRing" Property="BorderBrush" Value="{ThemeResource RadioButtonOuterEllipseCheckedStrokeDisabled}" /><Setter TargetName="RadioDot" Property="Fill" Value="{ThemeResource RadioButtonCheckGlyphFillDisabled}" /><Setter TargetName="RadioDot" Property="Stroke" Value="{ThemeResource RadioButtonCheckGlyphStrokeCheckedDisabled}" /><Setter TargetName="RadioDot" Property="Width" Value="14" /><Setter TargetName="RadioDot" Property="Height" Value="14" /><Setter TargetName="RadioDot" Property="Opacity" Value="1" /></MultiTrigger>
-        <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="RadioFocus" Property="Opacity" Value="1" /></Trigger>
       </ControlTemplate.Triggers>
     </ControlTemplate></Setter>
   </Style>

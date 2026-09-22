@@ -91,7 +91,7 @@
 | `Disabled` | 模板格 `IsEnabled=False`：4 个值（前景、头描边、箭头描边、箭头底盘描边） |
 | `Checked*` 四态 | 与对应非 Checked 态别名同一实例；展开由 `IsExpanded` 格只改写头圆角 |
 | `Indeterminate*` | 不适用（头不是 ToggleButton） |
-| 焦点 | 控件级 `IsKeyboardFocused` 驱动 `FocusOutline`（上游靠头按钮自身） |
+| 焦点 | 控件级 `FocusVisualStyle={ThemeResource FocusVisualRingStyle}`，门是框架的 `ShowFocusCues`（上游靠头按钮自身）。2026-09-22 改，原来是控件级 `IsKeyboardFocused` 驱动 `FocusOutline`，鼠标点同样抬（`audits/focus-visual.md`） |
 
 ## 4. 四类证据
 

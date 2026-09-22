@@ -51,6 +51,9 @@ ThemeResources/RatingControl.jalxaml
 # Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
 # whose readers are the framework's own templates rather than ours (see its header comment).
 ThemeResources/FrameworkRetints.jalxaml
+# The four keyboard focus rings, as FocusVisualStyle values rather than template parts. Declared first among the
+# style dictionaries because every family below reads them through {ThemeResource}.
+Styles/FocusVisuals.jalxaml
 Styles/Common.jalxaml
 Styles/Inputs.jalxaml
 Styles/TextInput.jalxaml

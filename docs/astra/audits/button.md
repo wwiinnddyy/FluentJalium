@@ -41,7 +41,7 @@
 | `Disabled` | `Trigger IsEnabled=False` | `ButtonBackgroundDisabled`、`ButtonForegroundDisabled`、`ButtonBorderBrushDisabled` |
 | `CommonStates/Normal` | 样式本体（无触发器） | `ButtonBackground`、`ButtonForeground`、`ButtonBorderBrush` |
 | `AnimatedIcon.State` | **无法映射**：`AnimatedIcon` 这个名字在 26.10.9 的 61 个 dll 里查不到 | — |
-| 焦点框 | 模板里的 `FocusOutline` Border + `Trigger IsKeyboardFocused=True`（我们自绘，因为系统焦点框没有对应属性） | `FocusStrokeColorOuterBrush`/`Inner` |
+| 焦点框 | 2026-09-22 改：样式里 `FocusVisualStyle={ThemeResource FocusVisualRingStyle}`，环本体在 `Styles/FocusVisuals.jalxaml`。原来是模板里的 `FocusOutline` Border + `Trigger IsKeyboardFocused=True`——那一格鼠标点也满足，所以点击出环（`audits/focus-visual.md`） | `FocusStrokeColorOuterBrush`/`Inner`（两枚令牌未变） |
 | `BackgroundTransition` | `Border.TransitionProperty="Background, BorderBrush"` + `TransitionDuration=0:0:0.083`（**字面量**，B5 要键化） | — |
 
 ## setter 逐项处置（上游有、我们有没有）
@@ -188,7 +188,7 @@ SetCursorPos(按钮中心) → UIElement.IsMouseOver=True → 样式触发器（
 2. `BackgroundSizing=InnerBorderEdge` 无对应属性：1px 边框与内容的相对位置与上游不同。
 3. elevation 边框（4 行）用实底近似上游 3DIP 渐变，顶边/底边不会出现上游的深浅分层。
 4. `AnimatedIcon` 状态图标整条缺失：内容里有 `SymbolIcon`/`FontIcon` 的按钮不会有换帧动画。
-5. 系统焦点框缺失，我们自绘的 `FocusOutline` 与上游 `FocusVisualMargin=-3` 的框不逐位一致。
+5. 系统焦点框的属性缺失，我们把自绘的环交给框架自己的焦点视觉（`FocusVisualStyle`，门是 `FocusVisualManager.ShowFocusCues`），偏移进环的模板，因为本运行时不公开 `FocusVisualMargin`。与上游 `FocusVisualMargin=-3` 的框仍不逐位一致。（2026-09-22 改，`audits/focus-visual.md`）
 6. `MinWidth=0`/`MinHeight=32` 是我们自加的约束，上游样式没有。
 7. `ContentTransitions`、`TransitionDuration` 仍是字面量（B5 未完成）。
 8. **三态通路已量穿**（原为"12 条 `ToggleButton*Indeterminate*` 键声明了但无消费点"）：

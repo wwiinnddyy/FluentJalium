@@ -1,0 +1,70 @@
+<!-- The keyboard focus ring, handed to the framework's own focus visual instead of a part inside each template.
+
+     Every ring in this library was a double Border inside the control template, resting at Opacity 0 and raised by
+     <Trigger Property="IsKeyboardFocused" Value="True">. Measured on 26.10.9 (spike/FocusCueProbe, mode cue): a
+     pointer click takes keyboard focus on this runtime too, so that condition is true on both input paths and
+     clicking a control drew the ring WinUI reserves for keyboard navigation. WinUI gates on FocusState - only
+     Keyboard raises the rectangle (microsoft-ui-xaml @19e3bdc3 dxaml/xcp/core/core/elements/UIElement.cpp:6437-6490
+     and dxaml/xcp/core/core/dll/focusmgr.cpp:2704-2752). This runtime's equivalent is public:
+     Jalium.UI.Controls.FocusVisualManager.ShowFocusCues, which a mouse press sets false and Tab / the arrow keys /
+     Home / End / PageUp / PageDown set true, and which materialises FrameworkElement.FocusVisualStyle through
+     FocusVisualAdorner in the window's adorner layer. Mode visual of the same probe measured the hand-off working
+     end to end: 0 focus-visual visuals before focus, 2 while the cue is on, 0 again after a pointer press.
+     This is the route docs/astra/ROADMAP.md planned as B6.
+
+     What is deliberately unchanged: the two stroke tokens, the 2px + 1px double ring, the 4/2 radii and the per
+     family offsets. Those are the pixels this library has been shipping, and this change is about who decides when
+     the ring shows, not about what it looks like.
+
+     Two mechanical notes:
+       - The offsets move from the ring Border's Margin in the control template to the same Margin inside these
+         templates, because the adorner is arranged at the adorned element's own bounds (measured 200x44 for a
+         200x44 button) and this runtime publishes no FocusVisualMargin (mode api: ABSENT).
+       - The IsEnabled=False cell that used to hide each ring is gone: FocusVisualManager.AttachAdorner refuses an
+         element that is not enabled, so the framework already keeps a disabled control ring-free. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="FocusVisualRingStyle" TargetType="Control">
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Control">
+        <Border Margin="1" BorderThickness="2" CornerRadius="4" IsHitTestVisible="False"
+                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}">
+          <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <!-- The check and radio boxes carry their box inset from the label row, so their ring sat at -2,1. -->
+  <Style x:Key="FocusVisualCheckStyle" TargetType="Control" BasedOn="{StaticResource FocusVisualRingStyle}">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Control">
+        <Border Margin="-2,1" BorderThickness="2" CornerRadius="4" IsHitTestVisible="False"
+                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}">
+          <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <!-- Slider has two layouts, and each ring hugged a different axis of the track row. -->
+  <Style x:Key="FocusVisualSliderStyle" TargetType="Control" BasedOn="{StaticResource FocusVisualRingStyle}">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Control">
+        <Border Margin="0,2" BorderThickness="2" CornerRadius="4" IsHitTestVisible="False"
+                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}">
+          <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style x:Key="FocusVisualSliderVerticalStyle" TargetType="Control" BasedOn="{StaticResource FocusVisualRingStyle}">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Control">
+        <Border Margin="2,0" BorderThickness="2" CornerRadius="4" IsHitTestVisible="False"
+                BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}">
+          <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</ResourceDictionary>

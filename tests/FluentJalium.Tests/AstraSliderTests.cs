@@ -94,6 +94,8 @@ public sealed class AstraSliderTests
     /// The state map, read off the hydrated templates. Two claims per cell: the condition resolved to a real
     /// property (the keyed-template defect left every one of these null), and the setters carry upstream's row
     /// for that state. Order is part of the claim - the disabled cell has to come last to beat hover.
+    /// Upstream's FocusStates row is deliberately absent from the list: the ring is a FocusVisualStyle property
+    /// now, not a cell, which is what stops a pointer click from drawing it (AstraFocusVisualTests).
     /// </summary>
     [Fact]
     public void Both_slider_templates_carry_one_cell_per_upstream_state()
@@ -102,7 +104,7 @@ public sealed class AstraSliderTests
         {
             var horizontal = Cells(HorizontalTemplate());
             var vertical = Cells(VerticalTemplate());
-            var states = new[] { "TickPlacement", "TickPlacement", "TickPlacement", "IsMouseOver", "IsMouseCaptured", "AreAnyTouchesCaptured", "IsKeyboardFocused", "IsEnabled" };
+            var states = new[] { "TickPlacement", "TickPlacement", "TickPlacement", "IsMouseOver", "IsMouseCaptured", "AreAnyTouchesCaptured", "IsEnabled" };
 
             Assert.Equal(states, horizontal.Select(static cell => cell.Property!.Name));
             Assert.Equal(states, vertical.Select(static cell => cell.Property!.Name));
@@ -122,7 +124,6 @@ public sealed class AstraSliderTests
                 AssertCell(cells, "AreAnyTouchesCaptured", On,
                     ("SliderContainer", "Background", "SliderContainerBackgroundPressed"),
                     ("SliderInnerThumb", "Fill", "SliderThumbBackgroundPressed"));
-                AssertCell(cells, "IsKeyboardFocused", On, ("SliderFocus", "Opacity", null));
                 AssertCell(cells, "IsEnabled", Off,
                     ("SliderContainer", "Background", "SliderContainerBackgroundDisabled"),
                     ("PART_Track", "Background", "SliderTrackFillDisabled"),
@@ -271,29 +272,28 @@ public sealed class AstraSliderTests
                 () => Assert.Same(Res("SliderTickBarFillDisabled"), Get(Part(slider, "TopTickBar"), "Fill")),
                 () => Assert.Same(Res("SliderTickBarFillDisabled"), Get(Part(slider, "BottomTickBar"), "Fill")),
                 () => Assert.Same(Res("SliderContainerBackgroundDisabled"), Get(Part(slider, "SliderContainer"), "Background")),
-                () => Assert.Equal(12d, (double)Get(Part(slider, "SliderInnerThumb"), "Width")),
-                () => Assert.Equal(0d, (double)Get(Part(slider, "SliderFocus"), "Opacity")));
+                () => Assert.Equal(12d, (double)Get(Part(slider, "SliderInnerThumb"), "Width")));
         });
     }
 
     /// <summary>
-    /// The second keyboard-focus read-back in the repository, and the one that was impossible until the frame
-    /// pump was fixed: focusing a slider starts no animation, so the old watchdog never released the frame and
-    /// the fixture died at 60 seconds rather than reporting the state.
+    /// The keyboard-focus read-back moved off the template: the ring is a FocusVisualStyle, and the two layouts
+    /// each need the one whose offset fits them, so what is provable here is that the orientation cell really
+    /// swaps the property. This was also the second focus read-back in the repository and the one that was
+    /// impossible until the frame pump was fixed - focusing a slider starts no animation, so the old watchdog
+    /// never released the frame and the fixture died at 60 seconds rather than reporting the state.
     /// </summary>
     [Fact]
-    public void A_focused_slider_raises_its_focus_ring()
+    public void A_slider_carries_the_ring_that_fits_its_orientation()
     {
         _fixture.Run(() =>
         {
-            var slider = Mount(new Slider { Value = 50 });
-            var ring = Part(slider, "SliderFocus");
-            Assert.Equal(0d, (double)Get(ring, "Opacity"));
+            var horizontal = Mount(new Slider { Value = 50 });
+            Assert.Null(PixelHarness.Named(horizontal, "SliderFocus"));
+            Assert.Same(Res("FocusVisualSliderStyle"), horizontal.FocusVisualStyle);
 
-            Assert.True(slider.Focus(), "Focus() refused the slider in the host window.");
-            PixelHarness.Settle();
-            Assert.True(slider.IsKeyboardFocused);
-            Assert.Equal(1d, (double)Get(ring, "Opacity"));
+            var vertical = Mount(new Slider { Value = 50, Orientation = Orientation.Vertical });
+            Assert.Same(Res("FocusVisualSliderVerticalStyle"), vertical.FocusVisualStyle);
         });
     }
 
@@ -343,7 +343,9 @@ public sealed class AstraSliderTests
 
     private ControlTemplate VerticalTemplate() =>
         (SliderStyle().Triggers.Cast<object>().OfType<Trigger>().First()
-            .Setters.Cast<object>().OfType<Setter>().First().Value as ControlTemplate)
+            .Setters.Cast<object>().OfType<Setter>()
+            .Select(static setter => setter.Value as ControlTemplate)
+            .First(static template => template is not null))
         ?? throw new InvalidOperationException("the Orientation cell's Template setter holds no template");
 
     /// <summary>Mounts a slider in the shown host, optionally flipping enum properties first.</summary>

@@ -273,8 +273,10 @@ public sealed class AstraSplitButtonTests
     }
 
     /// <summary>
-    /// Focus lands on the control and not on either half, so the ring is the root's. Without this the whole
-    /// split button would be the only member of the family that shows nothing on the keyboard.
+    /// Focus lands on the control and not on either half, so the ring belongs to the root - and the root's ring
+    /// is a FocusVisualStyle now, not a part, so a pointer click cannot raise it. Before this the halves each
+    /// carried their own FocusOutline part and the primary half's was the one a name lookup found, which is
+    /// why the read had to walk the template root; with the parts gone the lookup itself was the claim.
     /// </summary>
     [Fact]
     public void The_shared_focus_ring_reaches_a_split_button()
@@ -282,13 +284,8 @@ public sealed class AstraSplitButtonTests
         _fixture.Run(() =>
         {
             var split = Mount(new SplitButton { Content = "split" }, 220, 36);
-            var ring = RootRing(split);
-            Assert.Equal(0d, ring.Opacity);
-
-            Assert.True(split.Focus());
-            PixelHarness.Settle(20);
-            Assert.True(split.IsKeyboardFocused);
-            Assert.Equal(1d, ring.Opacity);
+            Assert.Null(PixelHarness.Named(split, "FocusOutline"));
+            Assert.Same(Res("FocusVisualRingStyle"), split.FocusVisualStyle);
         });
     }
 
@@ -533,29 +530,6 @@ public sealed class AstraSplitButtonTests
     /// in this file needs a synthetic pointer and none of them touches the user's desktop.
     /// </summary>
     private static void Invoke(Button button) => ((IInvokeProvider)new ButtonAutomationPeer(button)).Invoke();
-
-    /// <summary>
-    /// The root's own ring. Both halves come from the shared layout style and each carries a part named
-    /// FocusOutline, so the first hit by name is the primary half's - which never focuses, because upstream
-    /// keeps the focus on the control. This walks the template root's children instead.
-    /// </summary>
-    private static Border RootRing(SplitButton split)
-    {
-        if (VisualTreeHelper.GetChild(split, 0) is not Panel root)
-        {
-            throw new InvalidOperationException("The split button's template root is not a panel.");
-        }
-
-        foreach (var child in root.Children)
-        {
-            if (child is Border { Name: "FocusOutline" } border)
-            {
-                return border;
-            }
-        }
-
-        throw new InvalidOperationException("The split button's template root carries no FocusOutline.");
-    }
 
     private static FrameworkElement Part(DependencyObject root, string name) =>
         PixelHarness.Named(root, name) ?? throw new InvalidOperationException($"No part named {name} in the built tree.");

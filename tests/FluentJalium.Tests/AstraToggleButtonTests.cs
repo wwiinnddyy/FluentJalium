@@ -363,19 +363,15 @@ public sealed class AstraToggleButtonTests
     [Fact]
     public void The_shared_focus_ring_reaches_a_toggle_too()
     {
-        // The layout style is shared with Button, so the ring cell is not this control's markup - but the
-        // implicit toggle style is the one that inherits it, and a BasedOn that lost the template would
-        // leave a keyboard user with no ring on exactly the control the Gallery tabs to.
+        // The layout style is shared with Button, so the ring is not this control's markup - but the implicit
+        // toggle style is the one that inherits it, and a BasedOn that lost the property would leave a
+        // keyboard user with no ring on exactly the control the Gallery tabs to. It reads the FocusVisualStyle
+        // now rather than a part, because the ring left the template with the rest of them.
         _fixture.Run(() =>
         {
             var toggle = Mount(new ToggleButton { Content = "toggle" });
-            var ring = (Border)Part(toggle, "FocusOutline");
-            Assert.Equal(0d, ring.Opacity);
-
-            Assert.True(toggle.Focus());
-            PixelHarness.Settle(20);
-            Assert.True(toggle.IsKeyboardFocused);
-            Assert.Equal(1d, ring.Opacity);
+            Assert.Null(PixelHarness.Named(toggle, "FocusOutline"));
+            Assert.Same(FluentThemeManager.GetStyle("FocusVisualRingStyle"), toggle.FocusVisualStyle);
         });
     }
 

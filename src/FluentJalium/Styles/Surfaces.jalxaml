@@ -9,6 +9,7 @@
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
   <Style x:Key="ExpanderStyle" TargetType="Expander">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <!-- Upstream sets IsTabStop=False because its header is a ToggleButton that takes focus instead. Here the
          header stays a plain Border - the control installs its own MouseDown toggle on PART_HeaderBorder, so a
          ToggleButton in that spot would toggle twice - and the Expander is the focusable element, so the ring
@@ -83,14 +84,8 @@
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
           </Border>
-          <Border Name="FocusOutline" Grid.RowSpan="2" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
         <ControlTemplate.Triggers>
-          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
           <!-- Upstream filters the header's corners with a converter so the seam between header and content is
                square; the cell below is the same shape written as a value. -->
           <Trigger Property="IsExpanded" Value="True"><Setter TargetName="PART_HeaderBorder" Property="CornerRadius" Value="4,4,0,0" /></Trigger>

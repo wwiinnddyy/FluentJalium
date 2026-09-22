@@ -12,6 +12,7 @@
   </Style>
 
   <Style x:Key="ButtonLayoutStyle" TargetType="ButtonBase">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="MinWidth" Value="0" /><Setter Property="MinHeight" Value="32" />
     <Setter Property="Padding" Value="{StaticResource ButtonPadding}" /><Setter Property="FontSize" Value="14" />
     <Setter Property="FontWeight" Value="Normal" />
@@ -33,15 +34,7 @@
                               ContentStringFormat="{TemplateBinding ContentStringFormat}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
           </Border>
-          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
-        <ControlTemplate.Triggers>
-          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
-        </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>
   </Style>
@@ -158,6 +151,7 @@
     </Style.Triggers>
   </Style>
   <Style x:Key="SplitButtonSecondaryButtonStyle" TargetType="Button">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="Background" Value="{ThemeResource SplitButtonBackground}" />
     <Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrush}" />
     <Setter Property="BorderThickness" Value="0,1,1,1" />
@@ -179,14 +173,8 @@
                   Stroke="{ThemeResource SplitButtonForegroundSecondary}" StrokeThickness="1.25"
                   HorizontalAlignment="Right" VerticalAlignment="Center" />
           </Border>
-          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
         <ControlTemplate.Triggers>
-          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
           <!-- The chevron is a part, so a style cell cannot reach it; upstream writes the same three values
                from its SecondaryPointerOver / SecondaryPressed / Disabled state setters. -->
           <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource SplitButtonForegroundPointerOver}" /></Trigger>
@@ -202,6 +190,10 @@
     </Style.Triggers>
   </Style>
   <Style x:Key="SplitButtonStyle" TargetType="SplitButton">
+    <!-- Focus lands on the control, not on either half (both are IsTabStop=False), so the ring belongs to the
+         root rather than to a half's own layout style. Upstream asks the system to draw it with
+         FocusVisualMargin=-1; here the ring is a FocusVisualStyle, so the margin rides inside that template. -->
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="Background" Value="{ThemeResource SplitButtonBackground}" />
     <Setter Property="Foreground" Value="{ThemeResource SplitButtonForeground}" />
     <Setter Property="BorderBrush" Value="{ThemeResource SplitButtonBorderBrush}" />
@@ -236,19 +228,7 @@
                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
           <Border Name="Divider" Grid.Column="1" Background="{ThemeResource SplitButtonBorderBrushDivider}" />
           <Button Name="SecondaryButton" Grid.Column="2" Style="{StaticResource SplitButtonSecondaryButtonStyle}" />
-          <!-- Focus lands on the control, not on either half (both are IsTabStop=False), so the ring belongs
-               to the root rather than to a half's own layout style. Upstream asks the system to draw it with
-               FocusVisualMargin=-1; this runtime has no system ring, so it is self-drawn like the rest of
-               the family. -->
-          <Border Name="FocusOutline" Grid.ColumnSpan="3" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
-        <ControlTemplate.Triggers>
-          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
-        </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>
   </Style>
@@ -262,6 +242,7 @@
        (spike/SplitButtonProbe section A scans 3129 exported names); plain Button has no Flyout property and
        SplitButton always paints a primary half, so the gap is the control, not the paint. -->
   <Style x:Key="DefaultDropDownButtonStyle" TargetType="controls:FluentDropDownButton" BasedOn="{StaticResource ButtonLayoutStyle}">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="Background" Value="{ThemeResource ButtonBackground}" />
     <Setter Property="Foreground" Value="{ThemeResource ButtonForeground}" />
     <Setter Property="BorderBrush" Value="{ThemeResource ButtonBorderBrush}" />
@@ -285,14 +266,8 @@
                     HorizontalAlignment="Right" VerticalAlignment="Center" Margin="8,0,0,0" />
             </Grid>
           </Border>
-          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
         <ControlTemplate.Triggers>
-          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusOutline" Property="Opacity" Value="1" /></Trigger>
-          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="FocusOutline" Property="Opacity" Value="0" /></Trigger>
           <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource DropDownButtonForegroundSecondaryPointerOver}" /></Trigger>
           <Trigger Property="IsPressed" Value="True"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource DropDownButtonForegroundSecondaryPressed}" /></Trigger>
           <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Chevron" Property="Stroke" Value="{ThemeResource ButtonForegroundDisabled}" /></Trigger>

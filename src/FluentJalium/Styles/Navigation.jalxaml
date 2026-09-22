@@ -12,6 +12,7 @@
        button's: they are read by NavigationBackButton.xaml:26-52, and this control builds no back button, so
        publishing them here would name a surface nobody draws (audits/navigation.md §2). -->
   <Style x:Key="FluentNavigationPaneToggleButtonStyle" TargetType="Button">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <!-- PaneToggleButtonWidth=40 / PaneToggleButtonHeight=36 are upstream's own numbers, but x:Double rows are
          unparseable in this reader, so the pair rides as literals. -->
     <Setter Property="Width" Value="40" />
@@ -32,10 +33,6 @@
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                               Content="{TemplateBinding Content}" />
           </Border>
-          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
-          </Border>
         </Grid>
         <ControlTemplate.Triggers>
           <Trigger Property="IsMouseOver" Value="True">
@@ -47,18 +44,13 @@
           <Trigger Property="IsEnabled" Value="False">
             <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundDisabled}" />
           </Trigger>
-          <Trigger Property="IsKeyboardFocused" Value="True">
-            <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
-          </Trigger>
-          <Trigger Property="IsEnabled" Value="False">
-            <Setter TargetName="FocusOutline" Property="Opacity" Value="0" />
-          </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>
   </Style>
 
   <Style x:Key="FluentNavigationItemStyle" TargetType="local:FluentNavigationItem">
+    <Setter Property="FocusVisualStyle" Value="{ThemeResource FocusVisualRingStyle}" />
     <Setter Property="MinWidth" Value="0" />
     <!-- NavigationViewItemOnLeftMinHeight is an x:Double row (:217), so the 36 rides as a literal. -->
     <Setter Property="MinHeight" Value="36" />
@@ -107,10 +99,6 @@
                 </ContentPresenter.Resources>
               </ContentPresenter>
             </Grid>
-          </Border>
-          <Border Name="FocusOutline" Margin="1" BorderThickness="2" CornerRadius="4"
-                  BorderBrush="{ThemeResource FocusStrokeColorOuterBrush}" Opacity="0" IsHitTestVisible="False">
-            <Border BorderThickness="1" CornerRadius="2" BorderBrush="{ThemeResource FocusStrokeColorInnerBrush}" />
           </Border>
         </Grid>
         <ControlTemplate.Triggers>
@@ -166,12 +154,6 @@
             <Setter TargetName="Root" Property="Background" Value="{ThemeResource NavigationViewItemBackgroundSelectedDisabled}" />
             <Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForegroundSelectedDisabled}" />
           </MultiTrigger>
-          <Trigger Property="IsKeyboardFocused" Value="True">
-            <Setter TargetName="FocusOutline" Property="Opacity" Value="1" />
-          </Trigger>
-          <Trigger Property="IsEnabled" Value="False">
-            <Setter TargetName="FocusOutline" Property="Opacity" Value="0" />
-          </Trigger>
         </ControlTemplate.Triggers>
       </ControlTemplate>
     </Setter>

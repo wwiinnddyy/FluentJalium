@@ -92,27 +92,23 @@ public sealed class AstraButtonTests
     }
 
     /// <summary>
-    /// The keyboard-focus cell only became reachable when the shared surface template moved out of the
-    /// dictionary and into the style: while it was a keyed resource the reader left <c>Trigger.Property</c>
-    /// unresolved, so a focused button kept its ring at Opacity 0 and nothing on screen ever said it had
-    /// focus. The gate State_cells_are_not_written_into_a_keyed_template_resource keeps that shape from
-    /// coming back (docs/astra/audits/slider.md records the measurement).
+    /// The ring left the template. A focused button used to raise a part named FocusOutline through an
+    /// <c>IsKeyboardFocused</c> cell - a condition a pointer click also satisfies on this runtime, which is why
+    /// clicking drew the keyboard ring. It now rides on FocusVisualStyle, the property the framework's own
+    /// focus-cue gate draws (AstraFocusVisualTests holds the behaviour half). Reading the settled value is the
+    /// arrival proof here: the setter names that style through {ThemeResource}, and a lost lookup comes back
+    /// null rather than the style. The implicit route matters too - no style key is set in this test.
     /// </summary>
     [Fact]
-    public void A_focused_button_raises_its_focus_ring()
+    public void A_button_carries_its_ring_on_the_focus_visual_and_not_in_its_template()
     {
         _fixture.Run(() =>
         {
             var button = new Button { Content = "button", Width = 120, Height = 32 };
             PixelHarness.Build(button, 120, 32);
-            var ring = (Border)(PixelHarness.Named(button, "FocusOutline")
-                ?? throw new InvalidOperationException("The button template built no FocusOutline part."));
-            Assert.Equal(0d, ring.Opacity);
 
-            Assert.True(button.Focus(), "Focus() refused the button in the host window.");
-            PixelHarness.Settle();
-            Assert.True(button.IsKeyboardFocused);
-            Assert.Equal(1d, ring.Opacity);
+            Assert.Null(PixelHarness.Named(button, "FocusOutline"));
+            Assert.Same(FluentThemeManager.GetStyle("FocusVisualRingStyle"), button.FocusVisualStyle);
         });
     }
 

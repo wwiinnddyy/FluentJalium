@@ -108,7 +108,7 @@
 | `PrimaryBackgroundGrid` / `SecondaryBackgroundGrid` 两个兄弟节点承载底色 | 每个半区自己的 `Surface` | 兄弟节点要按"哪个半区被悬停"换色，而本运行时读不到那个内部标志（S1/S2）；把填充交给半区自身，就能用原生 `Button` 的 `IsMouseOver`/`IsPressed` 得到**互相独立**的两半 |
 | `PrimaryButtonBorder` / `SecondaryButtonBorder` 两条覆盖网格 | 半区自己的 `BorderThickness`（`1,1,0,1` 与 `0,1,1,1`）+ 圆角 `4,0,0,4` / `0,4,4,0` | 同一批像素，少两个节点；两侧字面量与上游模板里的字面量一致 |
 | `AnimatedIcon` + `FontIconSource` 回退（`E96E`，8px） | `Path` 折线 `M 0,1.5 L 5,6.5 L 10,1.5`，12×12，`StrokeThickness=1.25` | 本运行时无 `AnimatedIcon`；沿用 ComboBox 的箭头画法（`audits/button.md` 缺口 4） |
-| `UseSystemFocusVisuals=True` + `FocusVisualMargin=-1` | 根上的自绘 `FocusOutline`（`Grid.ColumnSpan=3`） | 本运行时无系统焦点框。焦点落在控件上而非半区（两个半区 `IsTabStop=False`），所以环属于根；判据只能取根的那一个，因为按名字找到的第一个 `FocusOutline` 属于主半区（测试里用 `RootRing`） |
+| `UseSystemFocusVisuals=True` + `FocusVisualMargin=-1` | 根上的 `FocusVisualStyle={ThemeResource FocusVisualRingStyle}`（环本体在 `Styles/FocusVisuals.jalxaml`） | 本运行时不公开系统焦点框的属性，但公开它的门：`FocusVisualManager.ShowFocusCues`。焦点落在控件上而非半区（两个半区 `IsTabStop=False`），所以环属于根。2026-09-22 改：以前那是根上的自绘 `FocusOutline`（`Grid.ColumnSpan=3`），按名字找到的第一个属于主半区、测试得用 `RootRing()` 绕开，部件与助手都已删（`audits/focus-visual.md`） |
 | `Grid.Resources` 内隐式 `Button` 样式 | 两个显式 keyed 样式 | S4 |
 | `SplitButtonPadding` 经控件 → 主半区 | 同一个行同时写在控件与主半区样式上 | 上游把它绑给主半区；这里控件上也留一份，读回的 `Padding` 才是应用者覆盖的那条 |
 

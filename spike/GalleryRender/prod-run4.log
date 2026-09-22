@@ -1,0 +1,235 @@
+wrote C:\git\Jalium\FluentJalium\spike\FocusCueProbe\bin\Debug\net10.0-windows\focuscue-product.txt (234 lines)
+DefaultButtonStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x44 desired=200,44 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Button actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x44 desired=8,8 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x44 desired=200,44 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Button actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x44 desired=8,8 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+DefaultDropDownButtonStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x44 desired=200,44 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentDropDownButton actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x44 desired=8,8 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x44 desired=200,44 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentDropDownButton actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x44 desired=8,8 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+SplitButtonStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=SplitButton actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x44 desired=200,44 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=SplitButton actual=200x44 rendered=200,44
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x44 desired=8,8 rendered=200,44 visible=True subject=200x44 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+DefaultCheckBoxStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=1, basedOn=Control) identity=no/FocusVisualCheckStyle/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=120x32 desired=120,32 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=CheckBox actual=120x32 rendered=120,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=120x32 desired=2,8 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=120x32 desired=120,32 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=CheckBox actual=120x32 rendered=120,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=120x32 desired=2,8 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+DefaultRadioButtonStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=1, basedOn=Control) identity=no/FocusVisualCheckStyle/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=120x32 desired=120,32 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=RadioButton actual=120x32 rendered=120,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=120x32 desired=2,8 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=120x32 desired=120,32 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=RadioButton actual=120x32 rendered=120,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=120x32 desired=2,8 rendered=120,32 visible=True subject=120x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=-2,1,-2,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+DefaultSliderStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=1, basedOn=Control) identity=no/no/FocusVisualSliderStyle/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x32 desired=200,32 rendered=200,32 visible=True subject=200x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Slider actual=200x32 rendered=200,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=0,2,0,2 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x32 desired=6,10 rendered=200,32 visible=True subject=200x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=0,2,0,2 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x32 desired=200,32 rendered=200,32 visible=True subject=200x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Slider actual=200x32 rendered=200,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=0,2,0,2 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x32 desired=6,10 rendered=200,32 visible=True subject=200x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=0,2,0,2 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+DefaultSliderStyle.vertical
+  FocusVisualStyle=Style(TargetType=Control, setters=1, basedOn=Control) identity=no/no/no/FocusVisualSliderVerticalStyle
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=32x200 desired=32,200 rendered=32,200 visible=True subject=32x200 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Slider actual=32x200 rendered=32,200
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=2,0,2,0 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=32x200 desired=10,6 rendered=32,200 visible=True subject=32x200 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=2,0,2,0 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=32x200 desired=32,200 rendered=32,200 visible=True subject=32x200 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Slider actual=32x200 rendered=32,200
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=2,0,2,0 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=32x200 desired=10,6 rendered=32,200 visible=True subject=32x200 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=2,0,2,0 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+FluentToggleSwitchStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=48x32 desired=48,32 rendered=48,32 visible=True subject=48x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentToggleSwitch actual=48x32 rendered=48,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=48x32 desired=8,8 rendered=48,32 visible=True subject=48x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=48x32 desired=48,32 rendered=48,32 visible=True subject=48x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentToggleSwitch actual=48x32 rendered=48,32
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=48x32 desired=8,8 rendered=48,32 visible=True subject=48x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+ExpanderStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x48 desired=200,48 rendered=200,48 visible=True subject=200x48 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Expander actual=200x48 rendered=200,48
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x48 desired=8,8 rendered=200,48 visible=True subject=200x48 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=200x48 desired=200,48 rendered=200,48 visible=True subject=200x48 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Expander actual=200x48 rendered=200,48
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=200x48 desired=8,8 rendered=200,48 visible=True subject=200x48 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+FluentNavigationItemStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=62.626953125x36 desired=62.626953125,36 rendered=62.626953125,36 visible=True subject=62.626953125x36 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentNavigationItem actual=62.626953125x36 rendered=62.626953125,36
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=62.626953125x36 desired=8,8 rendered=62.626953125,36 visible=True subject=62.626953125x36 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=62.626953125x36 desired=62.626953125,36 rendered=62.626953125,36 visible=True subject=62.626953125x36 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=FluentNavigationItem actual=62.626953125x36 rendered=62.626953125,36
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=62.626953125x36 desired=8,8 rendered=62.626953125,36 visible=True subject=62.626953125x36 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+FluentNavigationPaneToggleButtonStyle
+  FocusVisualStyle=Style(TargetType=Control, setters=3, basedOn=none) identity=FocusVisualRingStyle/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=40x36 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Button actual=40x36 rendered=40,36
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=40x36 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualAdorner margin=0,0,0,0 size=40x36 desired=40,36 rendered=40,36 visible=True subject=40x36 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=Button actual=40x36 rendered=40,36
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  ring: FocusVisualHost margin=0,0,0,0 size=40x36 desired=8,8 rendered=40,36 visible=True subject=40x36 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=2,2,2,2 radius=4,4,4,4 margin=1,1,1,1 stroke=SolidColorBrush sameAsPalette=True inner=thickness=1,1,1,1 radius=2,2,2,2 sameAsInnerPalette=True
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+(nothing handed over: ComboBox)
+  FocusVisualStyle=null identity=no/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=160x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=ComboBox actual=160x32 rendered=160,32
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualHost margin=0,0,0,0 size=0x0 desired=0,0 rendered=0,0 visible=True subject=160x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualAdorner margin=0,0,0,0 size=160x32 desired=160,32 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=ComboBox actual=160x32 rendered=160,32
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualHost margin=0,0,0,0 size=160x32 desired=6,6 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree
+(nothing handed over: TextBox)
+  FocusVisualStyle=null identity=no/no/no/no
+  template parts named *Focus*: [] (empty means none)
+  Focus()                 : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals while Focus() holds: 0
+  after Tab               : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=True ourRingOpacity=(no ring part read)
+  focus-visual visuals after Tab: 2
+  ring: FocusVisualAdorner margin=0,0,0,0 size=160x32 desired=160,32 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=TextBox actual=160x32 rendered=160,32
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualHost margin=0,0,0,0 size=160x32 desired=6,6 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualAdorner margin=0,0,0,0 size=160x32 desired=160,32 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualAdorner < AdornerLayer < Window] adornee=TextBox actual=160x32 rendered=160,32
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  ring: FocusVisualHost margin=0,0,0,0 size=160x32 desired=6,6 rendered=160,32 visible=True subject=160x32 parents=[FocusVisualHost < FocusVisualAdorner < AdornerLayer < Window]
+    Border thickness=3,3,3,3 radius=4,4,4,4 margin=0,0,0,0 stroke=SolidColorBrush sameAsPalette=True inner=none
+  after pointer press     : IsKeyboardFocused=True IsKeyboardFocusWithin=True ShowFocusCues=False ourRingOpacity=(no ring part read)
+  focus-visual visuals after the pointer press: 0
+  ring: no focus-visual element in the tree

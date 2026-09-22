@@ -3236,3 +3236,79 @@ build `0 警告 / 0 错误` → 整套 **1535/1535**（0 失败 0 跳过、7 m 3
 "控件自己的表面没到页面上"——而消息里打印的直方图明明白白有 8296 个表面像素。同一仪器在不同跑序里指向不同腿，
 这是 #47/#35 那族的形状（顺序相关），不是本批别名行的后果：本批两跑里该类其余腿都绿。
 不据此声称已归因，机制账仍挂在 #47/#35。
+
+## 缺陷批（用户可见）：鼠标点击也出焦点环——12 处环从模板搬到 `FocusVisualStyle`，门换成框架自己的 `ShowFocusCues`（2026-09-22）
+
+用户报的形状：**点一下控件出现的选中框，和 Tab 键选中时一模一样**。这不是某族的格子写错，是判据选错了属性——
+库里 12 处环全部写在控件模板里（`FocusOutline`/`SwitchFocus`/`CheckFocus`/`RadioFocus`/`SliderFocus`），静息
+`Opacity=0`，由 `Trigger Property="IsKeyboardFocused" Value="True"` 抬起。而这个运行时**鼠标点击同样拿走键盘焦点**，
+所以那一格在两条输入路径上都成立。改前的一行读数（`spike/FocusCueProbe`，mode `cue`）就是缺陷本身：
+
+```
+Focus()  : IsKeyboardFocused=True  ShowFocusCues=False ourRingOpacity=1
+```
+
+上游问的是"焦点是怎么来的"（`FocusState` 四值，环只为 `Keyboard` 画：`UIElement.cpp:6437-6490`、
+`focusmgr.cpp:2704-2752`），我们问的是"有没有键盘焦点"。这个运行时把上游那个判据公开了：
+`Jalium.UI.Controls.FocusVisualManager.ShowFocusCues`——鼠标按下置假，`Tab`/方向键/`Home`/`End`/`PageUp`/`PageDown`
+置真，并由 `FocusVisualAdorner` 把 `FrameworkElement.FocusVisualStyle` 实例化到窗口的装饰层。这就是目标里
+B6 早先记下的那条路（`adaptation/00` 的"焦点视觉"一行）。审计与全部读数在 `audits/focus-visual.md`。
+
+**产品侧**：新增 `Styles/FocusVisuals.jalxaml`（四个键：`FocusVisualRingStyle` 双描边、`FocusVisualCheckStyle`
+偏移 `-2,1`、`FocusVisualSliderStyle` `0,2`、`FocusVisualSliderVerticalStyle` `2,0`，后三个 `BasedOn` 第一个），
+12 处环 Border 与其抬环格子删除，主人各加一行 `FocusVisualStyle={ThemeResource …}`。刻意不动的是像素本身：
+两枚 `FocusStroke*` 令牌、2px+1px 双环、半径 4/2、各族偏移——这批改的是"谁决定环什么时候出"。三处机械后果：
+偏移进环自己的模板（`FocusVisualMargin` 在本运行时**不存在**，`api` 读数 `ABSENT`）；竖排 Slider 的环改由
+`Orientation` 那一格换键（以前那是第二个部件）；每枚环的 `IsEnabled=False` 格子删除，依据是
+`FocusVisualManager.AttachAdorner` 本身就拒绝未启用的要素。
+
+**四类证据分开记**：
+
+- 构建：`0 警告 / 0 错误`（闸口那一跑，见下）。
+- 行为：11 个挂载对象逐族三读（mode `product`，`spike/GalleryRender/prod-run3.log`）——`Focus()` 后
+  `ShowFocusCues=False` 且窗口里焦点视觉要素 **0**；Tab 后 `True`、要素 **2**、环的两枚描边与调色板**同一实例**、
+  粗细 2/1、半径 4/2、`Margin` 各族各自值；再按一次鼠标后回到 `False`/**0**。adornee 每族都等于控件自己
+  （200x44 的 Button 得 200x44）。
+- 视觉：新增一正一负两条墨测点——环样式在 120x32 的浅底上不透明地打出外/内两枚描边的合成色；同尺寸静息
+  Button 的外描边合成色 **0 像素**。负向只断外描边：内描边 `#B3FFFFFF` 落在浅底是 `#FCFCFC`，实测与 Button
+  自己的填充撞色（一片 3840 像素里有 1486 个同色），只有外描边那枚暗色可归因给环。
+- 硬件输入：**没有**。上面所有事件都是进程内 `RaiseEvent`，按目标第 4 条不做屏幕坐标注入。老账不变。
+
+**测点 1535 → 1554 = +19**：新类 `AstraFocusVisualTests` 19 条（12 条到达性含 Slider 两向、1 条全字典源码扫、
+4 条几何、1 条鼠标路径行为、1 条墨迹正/负）。另有 6 条老测点因为写死了旧语义而必须改判：Button/ToggleButton/
+SplitButton/Slider 四条抬环测点改成"环在 `FocusVisualStyle` 上、模板里没有那个部件"，Slider 的状态表去掉
+`IsKeyboardFocused` 那一行，禁用 Slider 那条去掉 `SliderFocus.Opacity` 一腿；顺带删掉 SplitButton 测试里
+`RootRing()` 那个"按名字找到的第一个环属于主半区"的助手——部件没了，它绕的开锁也不需要了。
+`VerticalTemplate()` 从"取格子第一个 setter"改成"按值类型取 Template setter"：环的 setter 插在 Template 之前，
+按位置取会拿错——这是改判时唯一的非语义连带。
+
+**不声称**：① 不声称键盘导航真能看见环——`ShowFocusCues` 只有框架内部按键路径会置真，而 `KeyEventArgs` 的公开
+构造要一个拿不到的 `PresentationSource`（探针走内部 6 参构造，诊断专用，不进测点），所以测点里只有"门关着"这一半，
+Tab 那一半是探针读数；② 不声称与 WinUI 的环逐位一致——上游偏移走 `FocusVisualMargin`，我们没有那个属性；
+③ 未给 ComboBox/TextBox/列表项等没有环的族加环，它们键盘态下由框架自带的 `DefaultFocusVisualStyle` 负责，
+读数记在下面（3px 单圈），形状是否要统一是另一批；④ 高对比档下环的映射没重测。
+
+**测到但归到别处的两件事**：adorner 第一遍排布在 4 族读出 `0x0`，补一次布局趟后全部等于 adornee 边界——仪器的
+时序假象，真实窗口必然再走一趟；环住在窗口装饰层、在元素裁剪框之外，所以"环在第几像素"这类页级断言要窗口级
+捕获，这条挂在 #63 的机器账上，不当成本批已结。
+
+### 焦点环批的串行闸口读数（2026-09-22）
+
+`tools/Test-AstraGates.ps1`（`spike/GalleryRender/gate-focusvisual.log`，包装器自记 **`GATE-EXIT=0`**）：
+build `0 警告 / 0 错误`（24 s）→ 整套 **1554/1554**（0 失败 0 跳过、**11 m 21 s**）→ 页闸 `PASS 13 pages x 2
+variants, 0 offender(s)` → 三档 `checked=True`（Light/Dark 各 83 源色 101 刷，HC 101 映射 + 3 条上游键因调色板
+无对应而按住）→ `keys.md is current: 1312 canonical lines.`（68 个字典，样式行 156 → 160）→ `All Astra gates passed.`。
+
+**测点 1535 → 1554 = +19**，全部来自新类；整套时长 7 m 18 s → 11 m 21 s，增量来自新类的两条墨测点与 12 次挂载，
+不是回归——闸口仍然只跑一遍。
+
+页闸这一跑的不稳定读数照实记：26 行里 24 行 `stable=True/True`，`status` 页两档仍读 `True/False`——与上一批
+同一形状、同一族（#47/#35），本批的环只在有焦点时画，页面渲染时全场无焦点，不据此声称已归因。
+
+**顺手量到的一条新事实，改的是"没给我们环的族现在长什么样"**：ComboBox 与 TextBox 两族（我们没写
+`FocusVisualStyle`，读回 `null`）在 Tab 之后照样出现焦点视觉——框架自带的 `DefaultFocusVisualStyle` 被实例化，
+形状是**一圈 3px 单描边**、半径 4、没有内圈，描边实例与我们的 `FocusStrokeColorOuterBrush` 同一个对象
+（`spike/GalleryRender/prod-run4.log`）。这条不是本批引入的：改之前这两族也没有模板环，装饰层同样会画它。
+于是有一笔新账浮出来——**那批控件的键盘框是 3px 单圈，而 WinUI 的标准焦点框正是我们那枚 2px+1px 双圈**。
+本批不动它：判据已经对了，形状要逐族对着上游 `UseSystemFocusVisuals` 与 `FocusVisualMargin` 审一遍再改，
+挂在 A 类视觉余账（与 #21/#23 同族），不混进缺陷批。

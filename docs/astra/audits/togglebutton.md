@@ -99,7 +99,7 @@ Background + BorderBrush + **Foreground**，我们的格子只写了前两个，
 ## 2. 结构处置：模板复用，格子放在样式里
 
 - **模板**沿用 `ButtonLayoutStyle` 的共享模板（`Grid` → `Surface` Border → `ContentPresenter`，
-  外加自绘 `FocusOutline`），不复制上游的单 `ContentPresenter` 根。
+  外加 2026-09-22 之前的自绘 `FocusOutline`，该环现已搬到 `FocusVisualStyle` 上），不复制上游的单 `ContentPresenter` 根。
   这是形状差异而非颜色差异，记在 §5 第 2 条。
 - **状态格子放在样式而不是模板**：上游 12 态在模板的 VSM 里。放在样式侧的代价是 S4
   （与上游的优先序相反），收益是自带模板的应用仍然能拿到状态格子上游键名。
@@ -178,7 +178,7 @@ Task #13（真指针像素通路）继续欠着。
    既是 parity 偏差也是"刚换状态时读到的不是调色板实例"的身份风险（动效批处理）。
 6. `BackgroundSizing=OuterBorderEdge` 无对应属性。
 7. elevation 描边（4 行）用实底近似上游 3DIP 渐变，顶/底边不会分层。
-8. 自绘 `FocusOutline` ≠ 上游系统焦点框 + `FocusVisualMargin=-3`。
+8. 自绘环 ≠ 上游系统焦点框 + `FocusVisualMargin=-3`：2026-09-22 起环挂在 `FocusVisualStyle` 上、由框架 `ShowFocusCues` 门决定出不出（`audits/focus-visual.md`），形状与两枚令牌未变。
 9. `Pressed`、键盘（空格/回车）、触摸三条输入通路的像素未证（§4 硬件输入）。
 10. 文字色仍走"建树 + 读回实例"，不能用像素断（Button 批第 9 条框架限制）。
 11. 上屏逐位一致未证；高对比逐键断言、减动效键化属于并行工作流，未在本批。

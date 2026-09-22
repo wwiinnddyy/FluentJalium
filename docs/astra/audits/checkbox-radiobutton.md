@@ -73,7 +73,7 @@ CheckBox 上游只有一个 `CombinedStates` 组、12 个状态，每格写同�
 | `CheckedNormal` | `Trigger IsChecked=True` | `*Checked` |
 | `CheckedPointerOver` / `CheckedPressed` / `CheckedDisabled` | `Multi[IsChecked=True, {IsMouseOver,IsPressed,IsEnabled=False}]` | `*Checked{PointerOver,Pressed,Disabled}` |
 | `Indeterminate{Normal,PointerOver,Pressed,Disabled}` | `Trigger`/`Multi[IsChecked={x:Null}, …]` | `*Indeterminate{,PointerOver,Pressed,Disabled}` |
-| 焦点框 | `Trigger IsKeyboardFocused=True` → `CheckFocus.Opacity` | `FocusStrokeColorOuterBrush` |
+| 焦点框 | 2026-09-22 改：样式里 `FocusVisualStyle={ThemeResource FocusVisualCheckStyle}`（偏移 `-2,1` 搬进环的模板），出不出由框架的 `ShowFocusCues` 决定。原来是 `Trigger IsKeyboardFocused=True` → `CheckFocus.Opacity`，鼠标点同样抬（`audits/focus-visual.md`） | `FocusStrokeColorOuterBrush` |
 
 RadioButton 上游是两个正交组：`CommonStates`（Normal/PointerOver/Pressed/Disabled，写环 + 点 + 根 +
 标签，并动画 `CheckGlyph.Width/Height` 12→14→10→14）与 `CheckStates`（Checked 做 4 个部件的
