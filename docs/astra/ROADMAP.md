@@ -2380,6 +2380,20 @@ DatePicker / NumberBox / PasswordBox / TextBox 五族逐个钉**实例同一性*
 一次读数：`发布别名行 → 挂载并聚焦一个 TextBox → 读焦点描边是不是我们那支实例`。这一步没做，`ControlBorderFocused`
 就仍然只是"最该先做的那一个"，不是"已结清的那一个"。
 
+**2026-09-22 补测：这一手已在 26.10.9 上做了（`tests/FluentJalium.Tests/AstraFrameworkNameResolutionTests.cs`，2/2 绿）。**
+仪器不发布产品行：在测试里往 `Application.Current.Resources` 插一支哨兵刷 `#112233`、按家族调框架私有
+`ResolveFocusedBorderBrush`、同一次派发里 `Remove`（留着会给共享宿主后面的每个类换色）。读数：
+TextBox / PasswordBox / NumberBox / AutoCompleteBox **四族全部返回我们那支实例**（`ReferenceEquals` 成立），
+把哨兵撤掉则回落到框架自己的绿。结论落地为一条判据：**26.10.9 的焦点描边确实是"按名字现查、`.cctor` 那支只当
+`??` 兜底"**，别名层这条杠杆是真的，与源树形状一致。
+
+三条限制照实写：(1) 这测的是**解析路径**，不是像素——没挂载、没聚焦、没读 `PART_OuterBorder.BorderBrush`，
+"焦点框在屏幕上变成我们的颜色"仍由"重模板把这条线排除掉"的既有事实负责；(2) 回落那条只断到"G ∈ {0x72, 0x79, 0x80}"
+这种松度，**具体是哪支绿没记下来**，别把它当色值账；(3) 反射只出现在测试里（AGENTS.md 禁的是产品代码反射框架私有成员，
+`AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection` 仍管着产品侧），而且它按**方法名**找——
+将来上游改名会让这条红，那是有意的告警不是脆弱。这一批**只加了测点，没发布任何别名行**，所以整套串行闸口未重跑：
+新类使测试类计数 1479 → 1481 未经全量验证，`keys.md` 不变（没有新发布的键）。
+
 ## 判据批：别名单元吃不到 sentinel（补进 #56，2026-09-21 已提交）
 
 见"前景审计余账批（#56）"第 1 条：`OverrideBrush` 经 `GetBrush` 只认生成调色板，别名键直接 `KeyNotFoundException`；
