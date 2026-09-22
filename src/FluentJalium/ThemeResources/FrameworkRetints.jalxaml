@@ -75,4 +75,20 @@
        our_rows_still_reach_the_rule), and its theme-flip sibling now captures each variant on an opaque plate because
        the token, unlike the grey it replaced, is translucent. -->
   <StaticResource x:Key="TextSecondary" ResourceKey="TextFillColorSecondaryBrush" />
+
+  <!-- Fifth segment, and the weakest-evidenced row in this file: keep reading before reusing its shape.
+       The reader is a self-drawn one - MenuItem never instantiates the template it stores, so its ink is decided by
+       Jalium.UI.Controls' own per-call lookup (docs/astra/audits/menus.md), and the only lever over that ink is the
+       name. Measured on 26.10.9 with a probe brush installed under TextPrimary: MenuItem.ResolvePrimaryTextBrush
+       returns the probe (AstraFrameworkNameResolutionTests.A_self_drawn_menu_item_reads_the_primary_text_name), so the
+       lookup is live rather than cached, which is the precondition this layer has used for every row.
+       What is NOT measured is a pixel. The TextSecondary row above was proven by counting colours in a capture;
+       this one is proven by reading a resolver's return value, and every attempt to photograph a built MenuItem
+       came back uniform #000000 - the same wall #50 documents for glyph ink. So this row buys name-resolution-level
+       purity for a surface whose pixels this test bed cannot see yet, and it is written down as such rather than
+       described as a visual fix. Alias, not redefine, for the standing reason: the two names resolve to one instance,
+       which is the instance FluentThemeManager.ApplyAccent, OverrideBrush and RefreshPalette move.
+       Solidity: TextFillColorPrimaryBrush is a SolidColorBrush in both variants (#E4000000 / #FFFFFFFF), so the
+       freeze-on-a-gradient case documented above does not apply here. -->
+  <StaticResource x:Key="TextPrimary" ResourceKey="TextFillColorPrimaryBrush" />
 </ResourceDictionary>

@@ -3046,9 +3046,55 @@ build `0 警告 / 0 错误` → 整套 **1499/1501，2 条失败**，两条都�
 2. 这条闸的**后台任务通知写的是 "exit code 0"，而真实管道退出码是 1**。判断依据只能是包装器自己 echo 的
    `GATE-EXIT=` 和日志末行，不是调度器的完成通知（这是既有教训"通知会撒谎"的又一次命中，不是新事）。
 
-和上一批同样的时序如实记一次：第二跑全绿之后，我又改了 `FrameworkRetints.jalxaml` 里那段的**注释正文**
-（把"行文字那半被反过来"这件事写进行证据注释），并补了本文最后两条订正。所以 `GATE-EXIT=0` 那次编进去的
-是注释增量之前的字典。为让提交的字节被验证过，改后重新 `dotnet build` 整套（`0 警告 / 0 错误`，Jalxaml
-源生成器能吃下这段注释）并把三个受影响类重跑（`AstraFrameworkNameResolutionTests` + `AstraMenuTests` +
-`AstraPublicKeysInventoryTests`，**130/130 绿**）。也就是说：全量闸口跑的是行为等价的树，注释增量由
-build + 这三类覆盖，不是"整条闸在最终字节上绿过"。
+和上一批同样的时序如实记一次：`GATE-EXIT=0` 那次全绿跑完之后，我又改了 `FrameworkRetints.jalxaml` 里
+`TextSecondary` 那段的**注释正文**（把"行文字那半被反过来"写进行证据注释），并补了上面两条订正。所以那次闸
+编进去的是注释增量之前的字典。为让提交的字节被验证过，改后重新 `dotnet build` 整套（`0 警告 / 0 错误`，
+Jalxaml 源生成器吃得下这段注释）并把三个受影响类重跑（Name Resolution + Menu + PublicKeysInventory，
+**130/130 绿**）。也就是说：全量闸口跑的是行为等价的树，注释增量由 build + 这三类覆盖，
+不是"整条闸在最终字节上绿过"。
+
+## #12 A2 别名层第五轮：`TextPrimary → TextFillColorPrimaryBrush` 发行——证据等级比上一行低，这事先写在行注释里
+
+`FrameworkRetints.jalxaml` 第五行 → 第六行。这一行**有读者、没有像素证人**：`MenuItem` 自绘、按名现查
+（`8f36012` 量到），但每一张拍下来的 `MenuItem` 都是整幅 `#000000`（#50 那堵字形的墙）。所以它买的是
+**按名解析层的纯度**，不是一处看得见的外观修正——这句话写进了行注释本身，而不是只写在账本里，
+免得下一只手把它的形状当成"像素证过的行"来复用。
+
+- **爆炸半径比上一行小得多，而且第一红是仪器自己的错**（`spike/GalleryRender/publish-primary1.log`，
+  单条红：`Expected: #E4000000 / Actual: #FFFFFFFF`）。原因值得单独记：
+  **`Assert.Multiple` 把所有 lambda 推迟到块尾执行，而调色板是就地重染同一个实例**——所以跨档"举着刷子"等于
+  举着最后一个档的颜色。per-variant 的色值主张必须**在读取当下把 `Color`（结构体）快照下来**，不能存 brush 引用。
+  这条不是这一行造成的，是这台仪器一直如此、我第一次这样写。订正后新增两条正向读数：
+  `Same(lightTwin, darkTwin)`（别名转发的确实是调色板那只活对象，两档共用一实例）与
+  `Same(lightTwin, MenuItem 解析器返回值)`（**这一行真的够到框架自己那个改不动的读者**）。
+- **`TextPrimary_projects_...` 那条"发行前基线"事实是替换、不是改判**：发行后那个基线**从查表里再也读不到了**
+  （名字被别名占了），留着断言就是断言一件无法再观测的事。旧值 `#FF1D1D1F`/`#FFF5F5F7` 退到本账本存底，
+  测点换成与 `ControlBorderFocused` 同形的 `The_published_row_moves_the_frameworks_primary_text_name_onto_our_ink`。
+  另外两腿 `Label` 色值改为"仍读 secondary token"——两个名字必须还可分辨。
+- **`AstraForegroundRoutingTests` 那 12 条腿的牙齿重验过一次，方法是换目标而不是删行**
+  （`spike/GalleryRender/ab-primary-teeth.log`）：把 resting 格子的键换成 `MenuFlyoutSubItemForegroundDisabled`
+  之后，两条腿立刻读成 `#5C000000`（Light）/ `#5DFFFFFF`（Dark），也就是**格子换了、像素跟着换**，主张还活着。
+  为什么不删行来验：**发了别名之后"删行"这条反事实本身会失效**——格子不在时控件回落到继承来的墨，
+  而那墨如今正是别名转发的同一实例，删了也不红。这是"修复把检验仪器一起改掉"的一个实例：
+  以后验别名行的牙齿要用**换目标**，不能用**删格子**。
+
+- **构建**：`0 警告 / 0 错误`。**行为**：受影响三类 **152/152 绿**。
+- **视觉**：**本行零像素主张**（如上，`MenuItem` 拍不出墨）。#63 页闸与本行无关，它看不见文本墨。
+- **硬件输入**：不动。
+- **清单/漂移**：`keys.md` 1302 → **1303**（新增 `TextPrimary` 一行，retints 段 5 → 6 rows）。
+- **不声称**：① 不声称这一行改变了任何看得见的地方；② 没有对 `TextPrimary` 做像素级普查（做不出来）；
+  ③ `TextDisabled` / `TextOnAccent` 仍无读者、`CaptionFontSize` 仍是 Known Gap，本轮不替它们改判。
+
+### TextPrimary 发行批的串行闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1`（`spike/GalleryRender/gate-textprimary.log`，包装器自记 **`GATE-EXIT=0`**）：
+build `0 警告 / 0 错误` → 整套 **1503/1503**（0 失败 0 跳过、7 m 9 s）→ 页闸 `PASS 13 pages x 2 variants,
+0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1303 canonical lines.` → `All Astra gates passed.`。
+
+**测点 1501 → 1503 = +2**：换掉的那条基线事实与新的 `The_published_row_...` 相互抵掉，净增的是 flip 那两条
+`TextPrimary` 腿。**这一跑是在最终字节上跑的**（上一批那种"闸后又改注释"的时序问题这次没有发生：
+行注释与订正都在闸前写完，闸后只动了本账本这份不被编译的文档）。
+
+最后钉一次口径，因为这一行恰好是那种"换别的方法就验不动"的：本行的证据止于"框架自己的解析器返回我们那只实例"，
+**没有任何一条断言说它长得好看了**；`MenuItem` 的可见墨仍归 #50/#13 的账。下一次谁要把这行的形状当模板，
+先读行注释里那句"证据等级比上一行低"。
