@@ -2582,3 +2582,64 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 解析腿），调色板三档 `checked=True`，`keys.md is current: 1301 canonical lines.`，`All Astra gates passed.`，
 `GATE-EXIT=0`。至此 #10 的三页 + Tokens 页的清单/解析两条闸都在全量下绿；仍欠的是"每页渲染到像素"与
 Motion 补间的驱动证据。
+
+## #10 缺口②：页级像素闸建起来了、13/13 绿、牙齿验过，但**没有落地**——它一进顺序全量就弄红 3 条既有测点
+
+先前把这一项写成"未决设计"的两个理由，实测都不成立：
+
+- **"测试工程不引用 Gallery"**：加上 `<ProjectReference …FluentJalium.Gallery.csproj />` 就能编译。耦合只在测试侧，
+  产品侧的禁令不受影响；`MainWindow` 与 `NavigateToPage`/`SetStartPage` 本来就是公开的，反射一处都不需要。
+- **"要渲染就得真 Show 窗口"**：恰恰不能。`PixelHarness` 全部捕获都走它自己那唯一一台宿主窗口，而**同一线程上只有
+  第一个被 Show 的窗口收得到渲染帧**（harness 自己的记录），第二个真窗口只会得到全黑。于是不 Show：构造
+  `MainWindow` → `NavigateToPage(pageId)` → `PixelHarness.Render((FrameworkElement)window.Content!, 1100, 820)`，
+  `Place` 会把这棵内容树临时搬到 harness 的宿主里。窗口因此不会走 `Closed`，它的主题订阅在整个 run 里留着——13 份，
+  代价写在注释里而不是藏起来。
+
+闸本身是 `AstraGalleryRenderTests.Every_gallery_page_paints_a_fluent_surface_in_both_variants`：页 id 由**另一个**
+`Catalog.json` 读取器枚举（不是 Gallery 自己那份，理由同目录闸：两个读者必须对上），每条腿在同一窗口里对 Light/Dark
+各拍两张——挂页一张、`ContentHost.Children.Clear()` 后一张。底板那张是**这个闸真正的牙齿**：只看页数/色彩数无法区分
+"这一页画了东西"和"导航面板画了东西"。
+
+`PageHost` 通过代码后置自己那个私有 `ContentHost` 视图读到；反射只在测试装配里，`AstraGateTests` 那条产品侧禁令没动。
+
+**阈值全部量出来，不是挑出来的。** 2026-09-22 的探路跑（13 页 × 2 档 × (页, 空底板) = 52 帧，1100×820）：
+每帧 `Stable=True`；非黑像素 901,927..902,000（满帧 902,000）；本页档底色 208,720..268,600、空底板
+208,720..208,722；去重色彩页 25(materials/Dark)..178(selection/Dark) 对空底板 19..24；`#1E793F` 品牌绿 52 帧全 0。
+断言贴在下界：非黑 ≥900,000、本档底色 ≥200,000、Dark 里 Light 底板 == 0（这就是"翻主题翻到页身上"的那条）、
+页数**严格大于**同窗口空底板页数。
+
+- **单独跑是绿的，且有牙齿**：`--filter ~AstraGalleryRenderTests` **13/13 通过、2 m 9 s**；把 `Children.Clear()`
+  改成永不执行（让"底板"退化成同一张页图）→ **13/13 全红**，红在具名那条上，消息带着量值
+  （`light 64 colours against 64, dark 80 against 80`）；改回即绿。**承重的是"页 > 空底板"这一条**，
+  其余四条在 A/B 下照旧绿——别把它们当门牙。
+- **但它破坏了顺序全量，所以当天就撤了**。加上这条闸之后的整套串行闸口：**1500 通过 / 4 失败**（1504），
+  `GATE-EXIT=1`。4 条红是 `AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has`
+  与 `AstraAutoSuggestBoxTests` 的三条建议列表测点。用三类一起单进程复现（本闸 + 那两个类）拿到同样的 4 红，
+  116 通过——**不是我改的东西碰巧红了，是这条闸放进去才红的**；同一批测点在 3fb4302 的全量里是 1491/1491 绿。
+- **其中 1 条的机制已经量清**：`PixelHarness.EnsureHost` 只会把共享宿主窗口**长大、从不缩回**，而 1100x820 的页捕获
+  把它撑到 1150x877，后面所有弹层的摆放都是照这块屏幕矩形算的——本类的 `Dispose` 把宿主的 Width/Height 还回去之后，
+  TeachingTip 那条**立刻回绿**。这是 harness 的一条真实约束，值得单独记住：任何比 884x684 更大的捕获都会污染后续几何。
+- **剩下 3 条的机制没找到**。一个假设被实测排除，另一个只当候选记着：① "旧内容留在宿主里、按名字找部件会找到 Gallery 的那一个"——
+  探路测点（`spike/GalleryRender/probe-a.log`、`probe-b.log`）在"先拍一张 Gallery 页 + 还原宿主"之后
+  仍只数到 `containers=1`、`Border 260x41.78 min=260 visible=True`，与不拍的那条腿一模一样；
+  ② "档位被带走"——**没测过**，只记在这里当候选：本类 `Dispose` 显式回到 Light，且两档 26 帧各自的底色都对得上，
+  所以翻档通路本身是通的。红的读数是
+  `container.MinWidth 0`（应为 260）与 `container.ActualWidth 98.06`（应为 260），还有一条
+  `Assert.Same` 拿到的是**禁用文字**色（一次 #FF636366＝Dark 的 TextDisabled、一次 #FFAEAEB2＝Light 的）——
+  即找到的那个 item 不是它自己弹出的那一个，但*为什么*不是还没量出来。
+- **处置**：类与 `ProjectReference` 都从工作树撤了；闸的完整实现留在 `spike/GalleryRender/AstraGalleryRenderTests.cs.parked`
+  （不在任何工程里，不会被编译；它那份 Dispose 里的宿主还原按上面量到的事实写着——还**没有**跑过绿，见下一段）。
+  下一批要接这一步，**先解这条交互**再落地，起手就带着上面那个已排除的假设，别重走。
+  测量数据（52 帧那组上下界）照抄在下面，重新实现时不必再探一遍：非黑像素 901,927..902,000；
+  本档底色 208,720..268,600；底板 208,720..208,722；去重色彩 25..178 对底板 19..24；品牌绿 52 帧全 0；
+  每页每档都要拍，成本 2 m 9 s。
+- **仍未声称**：页内几何与间距、"哪一块表面多出来的"、与 WinUI Gallery 的像素对齐——一条都没有；字形不打印（#50）
+  在这条闸上是已知上限（纯文本页过不了"严格大于底板"）。
+
+### 撤回之后的闸口读数（补记，2026-09-22）
+
+撤掉 `AstraGalleryRenderTests` 与测试工程对 Gallery 的 `ProjectReference` 之后重跑串行闸口：build `0 警告 / 0 错误`，
+整套 **1491/1491**（0 失败 0 跳过、7 m 0 s），调色板三档 `checked=True`（Light 83 源色 / 101 刷、Dark 同、
+HighContrast 101 映射键），`keys.md is current: 1301 canonical lines.`，`All Astra gates passed.`，`GATE-EXIT=0`。
+测点数与 `9d86e12` 那次读数同值（1491），也就是**回到本页批开始前的基线**，工作树里没有留下半条闸。
+"每页可渲染到像素"因此仍是 #10 未结的缺口，改由任务 #63 记账。

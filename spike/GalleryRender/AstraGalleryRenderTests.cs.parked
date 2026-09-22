@@ -1,0 +1,157 @@
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
+using FluentJalium.Gallery;
+using FluentJalium.Tests.Pixel;
+using FluentJalium.Themes;
+using Jalium.UI;
+using Jalium.UI.Controls;
+using Jalium.UI.Media;
+using Xunit;
+
+namespace FluentJalium.Tests.Gallery;
+
+/// <summary>
+/// "Every gallery page can be rendered to pixels" - the claim the smoke tool never covered, because
+/// <c>tools/Test-AstraGallerySmoke.ps1</c> only proves a window appeared and closed. Here each page the catalog lists
+/// is mounted in the real <see cref="MainWindow" /> and rasterised twice per variant: once as the page, once with the
+/// same window's page host emptied. The second capture is what makes the gate answer "did this page add this paint"
+/// instead of only "did a Fluent-shaped frame appear", which the chrome alone would satisfy.
+///
+/// Page ids come from Catalog.json through a reader that is deliberately not the Gallery's own: a gate that
+/// enumerated the pages by hand would pass the day someone adds a page nobody captured.
+///
+/// The window is never shown. <see cref="PixelHarness" /> captures through the one host window it already owns, and
+/// only the first shown window on a thread receives rendered frames, so a second real window could only answer
+/// "black"; <c>NavigateToPage</c> is public and mounts a page without a Show.
+///
+/// Thresholds are measurements, not judgements. The 2026-09-22 probe run captured 13 pages x 2 variants x (page,
+/// empty host) = 52 frames at 1100x820: every page frame stable; non-black pixels 901,927..902,000 of 902,000; the
+/// variant's own base fill 208,720..268,600 on a page and 208,720..208,722 on the empty host; distinct colours
+/// 25 (materials, Dark) ..178 (selection, Dark) against 19..24 for the empty host in both variants; brand green 0 in
+/// all 52. One known limit is carried by the colour-count claim rather than hidden from it: text glyphs print no ink
+/// in any capture route on this runtime (task #50), so a page whose entire content is glyphs cannot clear it.
+/// </summary>
+[Collection(AstraThemeRuntimeCollection.Name)]
+public sealed class AstraGalleryRenderTests : IDisposable
+{
+    /// <summary>The framework's focused-border green, the colour this library is not allowed to paint with.</summary>
+    private static readonly Color BrandFocusGreen = Color.FromRgb(0x1E, 0x79, 0x3F);
+
+    /// <summary>The 26.10.9 dark base fill, as this capture measured it on all 13 pages.</summary>
+    private static readonly Color DarkPage = Color.FromRgb(0x20, 0x20, 0x20);
+
+    private static readonly JsonSerializerOptions SerializerOptions = new() { PropertyNameCaseInsensitive = true };
+
+    private readonly AstraThemeRuntimeFixture _fixture;
+
+    /// <summary>
+    /// The shared pixel host is given back exactly as this class found it, because two of its properties are
+    /// process-wide state other tests read. Size: <c>EnsureHost</c> only ever grows the window, and the 1100x820
+    /// capture left it at 1150x877, which is the screen rect later popups place against - measured, restoring
+    /// Width/Height is what made the TeachingTip placement flip green again. Content: measured NOT the cause of the
+    /// three suggestion-list facts that still go red here (a host-window walk for "SuggestionsContainer" after this
+    /// restore reports containers=1, min=260, same as with no capture at all), so the line below is hygiene, not
+    /// that fix. The open question is tracked as task #63 and written up in docs/astra/ROADMAP.md, "#10 缺口②".
+    /// </summary>
+    private double _hostWidth;
+    private double _hostHeight;
+
+    public AstraGalleryRenderTests(AstraThemeRuntimeFixture fixture)
+    {
+        _fixture = fixture;
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var host = PixelHarness.HostWindow();
+            _hostWidth = host.Width;
+            _hostHeight = host.Height;
+        });
+    }
+
+    public void Dispose() => _fixture.Run(() =>
+    {
+        var host = PixelHarness.HostWindow();
+        host.Width = _hostWidth;
+        host.Height = _hostHeight;
+        host.Content = new Grid();
+        FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+    });
+
+    [Theory]
+    [MemberData(nameof(CatalogPages))]
+    public void Every_gallery_page_paints_a_fluent_surface_in_both_variants(string pageId)
+    {
+        var captures = new Dictionary<FluentThemeVariant, (PixelHarness.Sample Page, PixelHarness.Sample Plate)>();
+        _fixture.Run(() =>
+        {
+            foreach (var variant in new[] { FluentThemeVariant.Light, FluentThemeVariant.Dark })
+            {
+                FluentThemeManager.ApplyTheme(variant);
+                // One gallery window per page, both variants captured from it. It is never shown, so the Close
+                // handler that drops its theme subscription never runs and the tree stays rooted for the run -
+                // 13 of them, which is the cost of asking the real window instead of a stand-in.
+                var window = new MainWindow();
+                window.NavigateToPage(pageId);
+                var content = (FrameworkElement)window.Content!;
+                var page = PixelHarness.Render(content, 1100, 820);
+                PageHostOf(window).Children.Clear();
+                captures[variant] = (page, PixelHarness.Render(content, 1100, 820));
+            }
+        });
+
+        var (light, lightPlate) = captures[FluentThemeVariant.Light];
+        var (dark, darkPlate) = captures[FluentThemeVariant.Dark];
+        Assert.Multiple(
+            () => Assert.True(light.Stable && dark.Stable,
+                $"{pageId} never settled: light {light.Rounds} rounds, dark {dark.Rounds}"),
+            () => Assert.True(light.PaintedPixels >= 900_000 && dark.PaintedPixels >= 900_000,
+                $"{pageId} left the frame unlit: light {light.PaintedPixels}, dark {dark.PaintedPixels} of 902000"),
+            () => Assert.Equal(0, light.Count(BrandFocusGreen) + dark.Count(BrandFocusGreen)),
+            // The theme flip has to reach the page itself: the light base fill covers ~208k pixels of the frame in
+            // Light and not one of them survives into Dark.
+            () => Assert.True(
+                light.Count(PixelHarness.LightPage) >= 200_000 && dark.Count(DarkPage) >= 200_000 &&
+                dark.Count(PixelHarness.LightPage) == 0,
+                $"{pageId} does not flip with the theme: light base {light.Count(PixelHarness.LightPage)}, " +
+                $"dark base {dark.Count(DarkPage)}, light base measured in dark {dark.Count(PixelHarness.LightPage)}; " +
+                $"light top={light.Top(6)}, dark top={dark.Top(6)}"),
+            () => Assert.True(
+                light.DistinctColors > lightPlate.DistinctColors && dark.DistinctColors > darkPlate.DistinctColors,
+                $"{pageId} printed nothing the empty host does not already print: light {light.DistinctColors} colours " +
+                $"against {lightPlate.DistinctColors}, dark {dark.DistinctColors} against {darkPlate.DistinctColors}; " +
+                $"page top={light.Top(6)}, empty host top={lightPlate.Top(6)}"));
+    }
+
+    public static TheoryData<string> CatalogPages()
+    {
+        var data = new TheoryData<string>();
+        var path = Path.Combine(RepositoryRoot(), "samples", "FluentJalium.Gallery", "Catalog.json");
+        var catalog = JsonSerializer.Deserialize<Catalog>(File.ReadAllText(path), SerializerOptions)
+            ?? throw new InvalidOperationException($"{path} parsed to nothing, so no page can be captured.");
+        Assert.False(catalog.Pages.Length == 0, "Catalog.json lists no pages, so this gate would pass vacuously.");
+        foreach (var page in catalog.Pages) data.Add(page.Id);
+        return data;
+    }
+
+    private sealed record Catalog(Page[] Pages);
+
+    private sealed record Page(string Id, string Title, string Host);
+
+    /// <summary>
+    /// The panel the Gallery mounts pages on, read through the code-behind's own private view of it. Test-side only:
+    /// the reflection ban is on product code
+    /// (AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection).
+    /// </summary>
+    private static Panel PageHostOf(MainWindow window) =>
+        (Panel)(typeof(MainWindow).GetProperty("ContentHost", BindingFlags.Instance | BindingFlags.NonPublic)?
+            .GetValue(window) ?? throw new InvalidOperationException("MainWindow lost its ContentHost view of the page panel."));
+
+    private static string RepositoryRoot()
+    {
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "FluentJalium.slnx")))
+            directory = directory.Parent;
+        return directory?.FullName ?? throw new InvalidOperationException("Cannot locate the repository root.");
+    }
+}

@@ -93,9 +93,12 @@ show delay, auto-hide and placement are framework behavior, unmeasured
 
 ## 这些证据不支持什么
 
-1. **不支持"每一页都画对了"**。冒烟只看到 Overview 一页。新加的 Toggle/Repeat/Hyperlink 家族卡、
-   Overview 里那张内嵌 ScrollViewer + 静置 ToolTip 的表面卡，**可见结果没有被目视确认过**，
-   也没有断言。E4 要在进程内逐页渲染，那才是每页的证据。
+1. **不支持"每一页都画对了"（仍未结，2026-09-22 试过并把结果记在 `ROADMAP.md` 的"#10 缺口②"）**。冒烟只看到
+   Overview 一页，新加的家族卡与内嵌表面卡既没目视也没有断言。当天确实把逐页像素闸建起来了并且单独 13/13 绿
+   （`Catalog.json` 的 13 页逐页在真 `MainWindow` 里挂载、Light/Dark 各拍一张，再卸载该页拍一张同窗口底板，
+   断言"挂页的颜色数严格多于不挂页"），但它一进顺序全量就把 `AstraAutoSuggestBoxTests` 的三条建议列表测点弄红，
+   机制没查到，于是整条闸被撤出工作树（实现留在 `spike/GalleryRender/AstraGalleryRenderTests.cs.parked`）。
+   所以"每页渲染到像素"至今**没有断言**，只有那份记录在案的 52 帧测量。
 2. **屏幕坐标点击不可用，且有风险**。本轮一次冒烟脚本想用 `SetCursorPos`+`mouse_event`
    点"Open buttons"，但 `BringWindowToTop`/`SetForegroundWindow` 在 Windows 前景锁下不保证生效，
    截图证明那个矩形里当时盖着用户另一个窗口 —— 点击落到了别人的应用上。
