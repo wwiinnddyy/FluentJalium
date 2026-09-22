@@ -2295,3 +2295,38 @@ carrier 不是一处：菜单族与两个表格容器把行写在**自己**身�
 disabled 的表格单元与菜单项**没有**单独断言（框架在无头主机的禁用盖章只在 CheckBox/RadioButton/列表行/组合框行上量过）；
 高对比档下这些 carrier 走不走映射，仍只在逐键闸那一层（#61 余账）。
 
+## A2 别名层（#12）：量到了"别名行够得到框架绘制"，但本批不落地——下面是逐名字的账
+
+试做内容：把 S1-i 普查里"Astra 没定义、框架自己读"的名字按 `<StaticResource x:Key=名 ResourceKey=我们的刷子>`
+接进 `ThemeResources/FrameworkRetints.jalxaml`（那里原先只有 `AccentBrush` 一行，是 DataGrid 批为结品牌绿开的先例）。
+别名而不是重定义，是为了两侧同实例——`ApplyAccent`/`OverrideBrush` 那支刷才还带着它们走。
+**这批整体撤回，未提交**：逐名字的 blast radius 没量完，半收的状态比不收更糟。已量到的记在这里，下一批直接接手。
+
+- **机制已证**：框架那支禁用墨是**按名字现取**的，不是硬编码常量——`Menu.cs:1172`、`Calendar.cs:1000`、
+  `Primitives/TextBoxBase.cs:3032`、`MenuFlyoutItem.cs:208`（先试 `OneTextDisabled` 再试 `TextDisabled`）都走
+  `ResolveThemeBrush(名, <框架兜底>, …)`。所以发布别名行能改到**我们不能重模板**的绘制。
+- `TextDisabled`（→ `TextFillColorDisabledBrush`）一次翻掉**五条**别人的老账：表格宿主禁用
+  （`#FFAEAEB2` → `#5C000000`，且第一次读数在 20 帧内还停在常态 `#E4000000`——这格要 ~40 帧才沉底）、
+  禁用 `TextBox` 的墨（`AstraTextInputTests:229` 的 `Assert.NotSame` 反了）、
+  CheckBox / RadioButton / ListBox 行三处禁用标签（共用字段 `FrameworkDisabledText`）。
+  新墨在 Fluent 侧是对的（正是我们禁用格子要的值），但"三条同族事实 + 两条表格/文本框事实"要逐条改名、
+  重测、并把"框架拥有禁用墨"这句老结论在文档里一起结掉——不是一轮闸口能收的账。
+- `TextPrimary` / `TextSecondary` 不止改一个控件：撤掉 `TextDisabled`、只留 6 个名字后，串行闸口仍剩 **2 条红**，
+  都在 `AstraMenuTests`——`The_controls_paint_their_own_rule_and_text_and_our_rows_reach_neither` 与
+  `The_sub_items_own_paint_follows_the_theme`，两处像素主张从 `0` 格变 **`38` 格**（框架自绘的菜单箭头/分隔改跟
+  我们的主题走；38 正是 #50 那批量到的子项箭头墨）。也就是"我们的行到哪为止"这条边界要按别名层重写。
+- 已备好、可直接复用的部分：`ControlBorderFocused`（框架值 `#FF1E793F` 品牌绿，挂在 `PART_OuterBorder.BorderBrush`
+  的 `IsKeyboardFocused` 格）结清用例 `The_frameworks_focused_border_name_no_longer_resolves_to_brand_emerald`
+  与 7 对别名的 `Assert.Same` 理论都写测过（`0 个警告 / 0 个错误`，三表类 107/107 绿），随撤回一起回到工作树外，
+  下一批照这段重写即可；`keys.md` 那 6–7 行是**框架的名字**、不是 WinUI token，进清单只为让漂移闸看得住这一层。
+- `CaptionFontSize` 是 `Double`，本运行时标记带不了类型化数值行（S1-n：`x:Double` 元素名不可解析），
+  无论这批收不收都留在 Known Gap。
+- 下一批的开工顺序（就是这批学到的形状）：**一个名字一轮**——先按该名字全库 grep 读点、把会被改写的既有事实列全、
+  再发布别名行、再跑闸口；不要一次发七个。
+
+## 判据批：别名单元吃不到 sentinel（补进 #56，2026-09-21 已提交）
+
+见"前景审计余账批（#56）"第 1 条：`OverrideBrush` 经 `GetBrush` 只认生成调色板，别名键直接 `KeyNotFoundException`；
+改打别名指向的调色板刷或 mount 后翻档，carrier 一律不动。
+
+
