@@ -85,19 +85,43 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     [Fact]
-    public void Without_an_application_entry_the_family_falls_back_to_the_frameworks_own_green()
+    public void A_published_row_cannot_be_uninstalled_at_top_level_so_the_frameworks_green_is_unreachable()
     {
-        // The other half of the same lever: the value the lookup did NOT find, which is what every surface reading
-        // this project has called brand emerald measures through. Pinned as the fallback so a later release that
-        // stops reading the name cannot pass the fact above by coincidence.
+        // Rewritten the day the row shipped: this fact used to read the framework's own fallback, and publishing
+        // ThemeResources/FrameworkRetints.jalxaml's row made that reading unconstructible - the name arrives through a
+        // dictionary the manifest merges, so removing a top-level entry leaves the row in force. That is the fact now
+        // pinned: the brand-green fallback is out of reach for any application-level write, and what the resolver
+        // returns is the palette accent instance itself (#FF0078D4 in this host, where ApplyAccent(null) leaves the
+        // palette at the system accent - measured, not inferred). Instance identity is why the row aliases instead of
+        // redefining: ApplyAccent and OverrideBrush keep moving the focused border after this.
         _fixture.Run(() =>
         {
             Application.Current!.Resources.Remove(FocusedBorderName);
-            var resolved = Assert.IsType<SolidColorBrush>(ResolveFocusedBorder(typeof(TextBox)));
-            Assert.NotEqual(Probe, resolved.Color);
-            Assert.True(resolved.Color.G == 0x72 || resolved.Color.G == 0x79 || resolved.Color.G == 0x80,
-                $"the fallback focused border reads {Describe(resolved)}, which is not the accent green this batch "
-                + "measured - re-read which value the shipped ThemeColors property returns before this claim is reused");
+            var accent = FluentThemeManager.GetBrush("AccentFillColorDefaultBrush");
+            var resolved = ResolveFocusedBorder(typeof(TextBox));
+            Assert.Multiple(
+                () => Assert.Same(accent, resolved),
+                () => Assert.NotEqual(Color.FromRgb(0x1E, 0x79, 0x3F), ((SolidColorBrush)resolved).Color),
+                () => Assert.NotEqual(Color.FromRgb(0x20, 0x72, 0x45), ((SolidColorBrush)resolved).Color),
+                () => Assert.Equal(Describe(accent), Describe(resolved)));
+        });
+    }
+
+    [Fact]
+    public void The_published_row_moves_the_frameworks_focused_border_name_onto_our_accent()
+    {
+        // What ThemeResources/FrameworkRetints.jalxaml actually ships for this name, read without installing anything:
+        // the framework's brand-green fallback must be gone from the lookup, and the value that replaces it must be
+        // the same instance ApplyAccent and OverrideBrush move - otherwise the focused border follows the accent at
+        // startup and drifts off it the moment the app retints.
+        _fixture.Run(() =>
+        {
+            Application.Current!.Resources.Remove(FocusedBorderName);
+            var accent = FluentThemeManager.GetBrush("AccentFillColorDefaultBrush");
+            var published = Application.Current!.TryFindResource(FocusedBorderName);
+            Assert.NotNull(published);
+            Assert.Same(accent, published);
+            Assert.Same(accent, ResolveFocusedBorder(typeof(TextBox)));
         });
     }
 

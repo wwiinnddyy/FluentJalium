@@ -2429,3 +2429,32 @@ build `0 个警告 / 0 个错误`、整套 **1481/1481**（0 失败 0 跳过，7
 两个候选因此都记下，未择一：A) 发实色别名（先结掉"品牌绿不许出现在我们树上"这条硬约束，承认环为偏差）；
 B) 发渐变别名（先量 `LinearGradientBrush` 行在 26.10.9 标记里到底落不落，再谈几何外推）。
 本批**未发布任何行**，两案都要过一次整套串行闸口；起点基线仍是 `d7259b2` 的 1481/1481。
+
+## A2 别名层第一段落地（#12）：`ControlBorderFocused` 一行发布，品牌绿焦点框从查表里退场
+
+按"一个名字一轮"发了**一个**名字：`ThemeResources/FrameworkRetints.jalxaml` 加
+`<StaticResource x:Key="ControlBorderFocused" ResourceKey="AccentFillColorDefaultBrush" />`。
+twin 不用新决策——上游同一个构造（`TextControlBorderBrushFocused` → `TextControlElevationBorderFocusedBrush`，
+`controls/dev/CommonStyles/TextBox_themeresources.xaml:57/101/164` @`19e3bdc`）是**渐变**，而
+`ThemeResources/TextBox.jalxaml:21-33` 早已为同一理由（别名后面挂渐变会冻在 Light 那档，因为
+`FluentThemeManager.RefreshPalette` 只原地重染 `SolidColorBrush`）把自己的行接成 `AccentFillColorDefaultBrush`；
+这一行只是把那一次决定延到框架读的名字上，环的偏差记在一处而不是两处。
+
+- **构建**：`tools/Test-AstraGates.ps1` 全量 `0 个警告 / 0 个错误`。
+- **行为**：新增/改共 3 条（`AstraFrameworkNameResolutionTests`）——四族按名现查（哨兵刷）、发布后顶层 Remove 撤不下
+  合并进来的行且解析值 **就是** 调色板强调色那一支实例（`Assert.Same`，本机读数 `#FF0078D4` = `ApplyAccent(null)`
+  下调色板停在系统强调色）、`TryFindResource` 与 `GetBrush` 同实例。
+  **A/B 有牙**：把那行临时改指 `ControlStrokeColorDefaultBrush` → 恰好 2 条"发布"事实红、探针那条绿
+  （它不依赖指向哪支）；还原后复验绿，突变零残留（`git diff` 只剩本批的 18 行插入）。
+- **视觉**：本批无像素断言——测的是解析路径，焦点框在屏幕上的墨仍由"重模板把这条线排除在我们树上"的既有事实管。
+- **硬件输入**：不动输入路径（焦点由反射调用与属性驱动，无真指针）。
+- **清单**：`keys.md` 1298 → **1299** 行（框架的名字，不是 WinUI token，进清单只为让漂移闸看得住这一层）；
+  调色板三档 `checked=True`；整套 **1482/1482、0 跳过、7 m 27 s**，末行 `All Astra gates passed.`。
+
+不声称：第一次全量跑里 `AstraFlyoutCornerTests.The_suggestions_surface…` 报过一次红
+（`The suggestion list never reached the overlay layer`，不是颜色变化）。单跑该类 **两次 3/3 绿**，
+带本批改动的第二次全量也绿，所以它**未复现**；把它归进 #35/#47/#23 那族"顺序跑时 overlay/宿主取不到"的
+flake 是**假设，未证**——机制仍未结，别当已排除。`DatePicker`/`TimePicker` 这一族没进断言（本机没有可挂载验证的
+稳定通路，且我们不改它们模板），别名对它们的实际效果只由源树消费形状支持；
+26.10.9 权威上"焦点框像素真的换色"仍无断言（#50 那族限制之外的另一手：需要真键盘焦点）。
+下一轮名字候选与代价照旧列在上面那张普查表里。

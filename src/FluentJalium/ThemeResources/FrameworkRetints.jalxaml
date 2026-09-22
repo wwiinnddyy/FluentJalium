@@ -22,4 +22,22 @@
        name - which is what AstraDataGridTests.The_selected_row_fills_through_the_frameworks_own_name pins for the
        grid, and what the palette drift gate covers for the rest. -->
   <StaticResource x:Key="AccentBrush" ResourceKey="AccentFillColorDefaultBrush" />
+
+  <!-- Found by the A2 alias-layer batch. The runtime paints a focused control's outer border with this name, and on
+       26.10.9 the value it falls back to is brand green (ThemeColors.ControlBorderFocused is an expression-bodied
+       property returning Color.FromRgb(32,114,69); #FF1E793F measured off the grid host's PART_OuterBorder under the
+       IsKeyboardFocused cell, s1i-datagrid-tokens-raw.txt §J) - the colour this library is not allowed to show.
+       The lever was measured on the authority rather than inherited from the reference tree: the six text families
+       (TextBox, PasswordBox, NumberBox, AutoCompleteBox, DatePicker, TimePicker) resolve the name per call with the
+       static only as the ?? fallback, which is what
+       tests/FluentJalium.Tests/AstraFrameworkNameResolutionTests.cs pins with an installed probe brush.
+       Solid, not upstream's gradient, deliberately: WinUI's twin for the same construct is
+       TextControlElevationBorderFocusedBrush, a LinearGradientBrush (TextBox_themeresources.xaml:57/101/164 at
+       19e3bdc, stops SystemAccentColorLight2 / Dark1 over ControlStrokeColorDefault), and a gradient parked behind an
+       alias row freezes on the Light stops because FluentThemeManager.RefreshPalette re-tints SolidColorBrush
+       instances in place. ThemeResources/TextBox.jalxaml:21-33 already recorded that reasoning and made the same
+       substitution for our own row (TextControlBorderBrushFocused -> AccentFillColorDefaultBrush); this line extends
+       that one decision to the name the framework reads, so the elevation ring is a documented deviation in exactly
+       one place rather than two. Controls this library restyles are unaffected - their templates ask for Astra rows. -->
+  <StaticResource x:Key="ControlBorderFocused" ResourceKey="AccentFillColorDefaultBrush" />
 </ResourceDictionary>
