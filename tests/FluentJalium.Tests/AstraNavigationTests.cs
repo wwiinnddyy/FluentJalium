@@ -225,42 +225,51 @@ public sealed class AstraNavigationTests
     }
 
     /// <summary>
-    /// Pixels, and only the composited route claims anything here: the selected fill is a translucent subtle
-    /// brush over the pane surface, and a direct element capture drops the alpha of a brush that rides through a
-    /// TransitionProperty layer (PixelHarness remarks).
+    /// The selected pill is a translucent subtle brush over the pane, so the claim needs a composited route. It used
+    /// to take that route through <c>Host()</c>, and that is what made it wobble: the first capture through the shown
+    /// window is not comparable with a later one (the same pair read 30 054 and 16 624 changed pixels across two runs
+    /// of this file, because the window's own backdrop settles in between). Wrapping the view in an opaque page and
+    /// rendering it costs the window nothing here - the pill lands on the page as <c>Over(page, subtle)</c> - and both
+    /// captures become independent, so the claim can stop being a delta and name the colour instead.
     /// </summary>
     [Fact]
     public void Selecting_a_pane_item_moves_pixels_without_a_brand_green()
     {
         _fixture.Run(() =>
         {
-            // Host() parents the subject into the harness window itself, so this view must not have gone through
-            // Build() first - a logical child with a parent throws rather than moving.
-            var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
-            var item = new FluentNavigationItem { Content = "Overview" };
-            view.MenuItems.Add(item);
-            view.MenuItems.Add(new FluentNavigationItem { Content = "Buttons" });
-            view.SelectedItem = item;
-            var selected = PixelHarness.Host(view, 400, 420);
-            view.SelectedItem = null;
-            var resting = PixelHarness.Host(view, 400, 420);
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var plate = PixelHarness.LightPage;
+            var subtle = Assert.IsType<SolidColorBrush>(Brush("SubtleFillColorSecondaryBrush")!).Color;
+            var pill = PixelHarness.Over(plate, subtle);
 
-            // A colour delta, not a whole-histogram diff: the first capture through the host window is not
-            // comparable with a later one (measured across two runs of this file: the same pair of captures read
-            // 30 054 and 16 624 changed pixels, because the host's own backdrop settles between them). The pill's
-            // colour is SubtleFillColorSecondary at 5.54% over the pane's #F3F3F3 = #EAEAEA, and that key counts
-            // 8 220 pixels when the whole class runs and 7 993 when this test runs alone (the item is 232x36, so
-            // the pill area is 8 352 minus margins and corners); the resting capture holds none of it. 6 000 is
-            // under the lower reading, and docs/astra/adaptation/s1k-navigation-raw.txt carries both.
-            var pill = selected.Count(PillOverPane) - resting.Count(PillOverPane);
-            Assert.Multiple(
-                () => Assert.True(selected.Stable,
-                    $"the pane never settled: {selected.Subject} spent {selected.Rounds} rounds in {selected.CaptureMilliseconds} ms; "
-                    + $"resting {resting.Rounds} rounds in {resting.CaptureMilliseconds} ms"),
-                () => Assert.True(pill > 6000,
-                    $"selecting added {pill} pixels of the pill colour; selected {selected.Top(4)} resting {resting.Top(4)}"),
-                () => Assert.Equal(0, selected.Count(BrandEmerald)));
+            var selected = PaneOnPage(select: true, plate);
+            var resting = PaneOnPage(select: false, plate);
+
+            Assert.True(selected.Stable && resting.Stable,
+                $"a pane never settled: selected {selected.Rounds} rounds / resting {resting.Rounds} rounds");
+            Assert.True(selected.Count(pill) > 6_000,
+                $"the selected pill painted {selected.Count(pill)} pixels of {pill} over {plate}; top={selected.Top(4)}");
+            Assert.Equal(0, resting.Count(pill));
+            Assert.Equal(0, selected.Count(BrandEmerald));
         });
+    }
+
+    /// <summary>A fresh two-item pane, optionally with the first item selected, captured on an opaque page.</summary>
+    private static PixelHarness.Sample PaneOnPage(bool select, Color plate)
+    {
+        var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
+        var item = new FluentNavigationItem { Content = "Overview" };
+        view.MenuItems.Add(item);
+        view.MenuItems.Add(new FluentNavigationItem { Content = "Buttons" });
+        if (select)
+        {
+            view.SelectedItem = item;
+        }
+
+        var host = PixelHarness.Backdrop(view, plate);
+        PixelHarness.Build(host, 400, 420);
+        PixelHarness.Settle(60);
+        return PixelHarness.Render(host, 400, 420);
     }
 
     /// <summary>
@@ -372,9 +381,6 @@ public sealed class AstraNavigationTests
     }
 
     private static readonly Color BrandEmerald = Color.FromRgb(0x20, 0x72, 0x45);
-
-    /// <summary>SubtleFillColorSecondary at 5.54% over the pane's #F3F3F3 - the selected pill as the window shows it.</summary>
-    private static readonly Color PillOverPane = Color.FromRgb(0xEA, 0xEA, 0xEA);
 
     /// <summary>An open pane with two items, laid out and settled; the first one is handed back unselected.</summary>
     private static FluentNavigationView Pane(out FluentNavigationItem item)
