@@ -39,6 +39,8 @@ public partial class MainWindow : Window
         {
             [(FluentNavigationItem)OverviewItem!] = (FrameworkElement)OverviewPage!,
             [(FluentNavigationItem)TokensItem!] = (FrameworkElement)TokensPage!,
+            [(FluentNavigationItem)MaterialsItem!] = (FrameworkElement)MaterialsPage!,
+            [(FluentNavigationItem)MotionItem!] = (FrameworkElement)MotionPage!,
             [(FluentNavigationItem)ButtonsItem!] = (FrameworkElement)ButtonsPage!,
             [(FluentNavigationItem)InputsItem!] = (FrameworkElement)InputsPage!,
             [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
@@ -51,6 +53,8 @@ public partial class MainWindow : Window
         };
         _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
         _pageIds[(FluentNavigationItem)TokensItem!] = "tokens";
+        _pageIds[(FluentNavigationItem)MaterialsItem!] = "materials";
+        _pageIds[(FluentNavigationItem)MotionItem!] = "motion";
         _pageIds[(FluentNavigationItem)ButtonsItem!] = "buttons";
         _pageIds[(FluentNavigationItem)InputsItem!] = "inputs";
         _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
@@ -74,6 +78,7 @@ public partial class MainWindow : Window
         WireCommandBar();
         WireAppearance();
         WireTokens();
+        WireMotion();
         SetAccessibleNames();
 
         ProfileChoice.SelectedItem = ProfileChoice.Items[0];
@@ -137,6 +142,51 @@ public partial class MainWindow : Window
         readout.Text = missing.Count == 0
             ? $"{TokenCatalog.BrushTokens.Length} palette tokens resolved, {host.Children.Count} painted, none missing."
             : $"{host.Children.Count} of {TokenCatalog.BrushTokens.Length} tokens painted; unresolved: {string.Join(", ", missing)}";
+    }
+
+    /// <summary>
+    /// Runs the three published duration rows side by side. Each bar carries
+    /// <c>TransitionProperty="Width"</c> and a <c>TransitionDuration</c> taken from its own resource row, so the
+    /// click below writes a new Width and the framework animates it over that row's time - the one property shape this
+    /// runtime ticks, which is why nothing here moves a transform. The readout reports what the rows resolve to right
+    /// now rather than what this file says they should be, so the page also shows reduce-motion rewriting the live row.
+    /// </summary>
+    private void WireMotion()
+    {
+        var bars = new[] { (Border)MotionFasterBar!, (Border)MotionFastBar!, (Border)MotionPaneBar! };
+        var wide = false;
+        ((Button)MotionBeatButton!).Click += (_, _) =>
+        {
+            wide = !wide;
+            foreach (var bar in bars)
+            {
+                bar.Width = wide ? 460 : 120;
+            }
+
+            WriteMotionReadout();
+        };
+
+        WriteMotionReadout();
+    }
+
+    private void WriteMotionReadout()
+    {
+        var rows = new[]
+        {
+            "ControlFasterAnimationDuration",
+            "ControlFastAnimationDuration",
+            "SplitViewPaneAnimationOpenDuration",
+        };
+        var parts = new List<string>();
+        foreach (var key in rows)
+        {
+            parts.Add(Application.Current?.TryFindResource(key) is { } value
+                ? $"{key} = {value}"
+                : $"{key} unresolved");
+        }
+
+        parts.Add(FluentThemeManager.ReduceMotion ? "reduce motion on" : "reduce motion off");
+        ((TextBlock)MotionReadout!).Text = string.Join("   ·   ", parts);
     }
 
     private void WireButtons()

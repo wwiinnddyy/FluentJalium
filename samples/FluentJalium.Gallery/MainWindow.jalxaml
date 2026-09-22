@@ -19,6 +19,12 @@
         <fluent:FluentNavigationItem x:Name="TokensItem" Content="Tokens" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Color" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MaterialsItem" Content="Materials" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Globe" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MotionItem" Content="Motion" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="CalculatorAnimation" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
         <fluent:FluentNavigationItem x:Name="ButtonsItem" Content="Buttons" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="TouchPointer" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
@@ -69,6 +75,60 @@
         <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
           <!-- The constructor retains these pages and attaches only the current one. -->
           <Grid x:Name="PageHost" Margin="24,8,24,24" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <StackPanel x:Name="MotionPage">
+              <TextBlock Text="Motion" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Three durations are published as resource rows, and this page runs them side by side on the one property shape this runtime actually animates: a Double dependency property on the element itself." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <Button x:Name="MotionBeatButton" Content="Beat" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" />
+                  <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="250" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ControlFasterAnimationDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+                    <Border x:Name="MotionFasterBar" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource ControlFasterAnimationDuration}" />
+                    <TextBlock Grid.Row="1" Text="ControlFastAnimationDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <Border x:Name="MotionFastBar" Grid.Row="1" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource ControlFastAnimationDuration}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="2" Text="SplitViewPaneAnimationOpenDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <Border x:Name="MotionPaneBar" Grid.Row="2" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource SplitViewPaneAnimationOpenDuration}" Margin="0,8,0,0" />
+                  </Grid>
+                  <TextBlock x:Name="MotionReadout" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="The bars move their Width rather than a transform because a transform never ticks on this runtime, and the row stays a Duration so a theme flip re-resolves it; the reduce-motion switch is on the Settings page and is deliberately not duplicated here, since it rewrites the live row for the whole application and two switches over one global would only be able to disagree." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            </StackPanel>
+            <StackPanel x:Name="MaterialsPage">
+              <TextBlock Text="Materials" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="What this runtime can actually compose, shown as nested fills rather than as a list of names: an alpha layer is only a layer because of what sits behind it, so the ramp below paints the base, then the layer over it, then the card over that, and the stroke on the card is the same alpha token doing its work against two different backgrounds." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Background="{StaticResource SolidBackgroundFillColorBaseBrush}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <Border Background="{StaticResource LayerFillColorDefaultBrush}" Padding="16">
+                    <StackPanel>
+                      <TextBlock Text="SolidBackgroundFillColorBaseBrush  →  LayerFillColorDefaultBrush (#80FFFFFF)" Style="{StaticResource CaptionTextBlockStyle}" />
+                      <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" Padding="16" Margin="0,12,0,0">
+                        <StackPanel>
+                          <TextBlock Text="CardBackgroundFillColorDefaultBrush (#B3FFFFFF) with CardStrokeColorDefaultBrush (#0F000000) on its edge" Style="{StaticResource CaptionTextBlockStyle}" />
+                          <TextBlock Text="The stroke reads darker over the base than over the card, which is the point: an alpha stroke has no single colour, and that is why the ramp has to be nested to be read at all." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Where a floating surface cannot composite" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Border Background="{StaticResource CardStrokeColorDefaultSolidBrush}" Height="44" Margin="0,0,0,8" />
+                  <TextBlock Text="Element-level material is not available on 26.10.9: the runtime ships no AcrylicBrush, MicaBrush or RevealBrush type at all (the shipped-type inventory in docs/astra/adaptation/s0v-runtime-type-inventory-raw.txt), so a floating surface here is a solid fill plus an alpha stroke, and CardStrokeColorDefaultSolidBrush is the #EBEBEB twin used where a border cannot composite over what it floats on. Window-level backdrop is a different story and is real - WindowBackdropType = None / Auto / Mica / Acrylic / MicaAlt, measured in docs/astra/adaptation/01-jalium-control-census.md:146 - which is why the switch for it sits on the Settings page, over the one surface that can actually take it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
             <StackPanel x:Name="TokensPage">
               <TextBlock Text="Tokens" Style="{StaticResource TitleTextBlockStyle}" />
               <TextBlock Text="Every fill this gallery paints comes from one palette of 101 brush tokens, and this page is the whole set at once: the swatches are built from the canonical key inventory, so a token that no longer resolves shows up as a hole in the grid and is named in the readout below." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />

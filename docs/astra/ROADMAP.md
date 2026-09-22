@@ -2532,3 +2532,29 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 所以 Tokens 页不只在自己那类绿：目录闸的"每页都要有宿主与 id""页里的控件必须入库或豁免""bin 下 Catalog.json 与源一致"
 三条在顺序全量下都跟着过了。上一节写下的三条不声称（逐 token 运行时断言、每页渲染到像素、tokens 不占 controls 行）
 不因这次绿而改变。
+
+## #10 第二段：Materials 与 Motion 两页落地，三个系统页齐了
+
+页形状与 Tokens 一致（`PageHost` 子元素 + 导航项 + `_pages`/`_pageIds` + `Catalog.json` pages 行），两页都不新造宿主、
+不新增控件类型，所以目录差集闸不必改。
+
+- **Materials**：层与高程按"能合成"的方式画——base → `LayerFillColorDefaultBrush` → card → alpha 描边**嵌套**呈现
+  （α 层没有独立颜色，脱离底就不可读），另一张卡说清边界：本运行时**没有** `AcrylicBrush`/`MicaBrush`/`RevealBrush`
+  类型（`adaptation/s0v-runtime-type-inventory-raw.txt` 的 shipped-type 清单），所以浮起面只能是实色 + α 描边，
+  `CardStrokeColorDefaultSolidBrush`（#EBEBEB）就是描边不能合成时用的实色 twin；窗口级背衬是另一回事且真实存在
+  （`WindowBackdropType = None/Auto/Mica/Acrylic/MicaAlt`，`adaptation/01-jalium-control-census.md:146`），
+  开关留在真正吃得到它的 Settings 页，不在此重复。
+- **Motion**：三条已发布的 `Duration` 行（`ControlFasterAnimationDuration` 83 ms、`ControlFastAnimationDuration`
+  167 ms、`SplitViewPaneAnimationOpenDuration` 200 ms）各挂一支 bar，`TransitionProperty="Width"` +
+  `TransitionDuration="{StaticResource 行名}"`，点 "Beat" 写新 Width 让框架按各自时长补间——走的是本运行时**唯一会 tick
+  的属性形状**（元素上的 Double DP），不碰 transform（transform 从不动）。读数条报的是三行**此刻解析到的值**与
+  `FluentThemeManager.ReduceMotion` 状态，不是文件里写的期望值，所以减动效改写活行时页面自己会跟着变。
+  减动效开关**故意不在这页复制一份**：它是应用级全局、两个开关只会互相说谎。
+- **构建**：`dotnet build samples/FluentJalium.Gallery` `0 个警告 / 0 个错误`（导航图标 `Symbol="Globe"`、
+  `Symbol="CalculatorAnimation"` 都在这一步验掉，不是猜的枚举名）。
+- **视觉/输入**：`Test-AstraGallerySmoke.ps1 -Page tokens,materials,motion` 三页各自真启动、导航、优雅关闭
+  （16.8 / 14.4 / 12.1 s），无残留进程。
+
+不声称：① 冒烟不点 "Beat"，所以 Motion 页的补间**没被驱动过**——那条路径的行为凭据仍只有 `AstraMotionTests` 的树上读数，
+页面只是把它可视化；② "每页可渲染到像素"这一条仍未结（卡在同一个未决设计：测试工程不引用 Gallery），
+三页齐不等于这一项完成；③ Materials 页的 α 合成主张是"看得到"级别的证据，不是断言——没有针对该页的像素读数。
