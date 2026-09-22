@@ -107,3 +107,14 @@ show delay, auto-hide and placement are framework behavior, unmeasured
    的自适应只在 `SizeChanged` 里跑，而 `AdaptPane` 第一次进来时 `_lastNarrow` 为空且
    `IsPaneOpen` 无本地值 → 不应用自动态）。这条**只有一张截图，没有断言，不当结论**，
    归到导航批（D 段）里查。
+
+## 这份文件里的"17"是当天的实测值，不是现值（2026-09-22 标注）
+
+第 18 行那句"隐式样式宇宙是 17 个"是闸口**第一次跑那天**数出来的（当天还报过 `17 restyled, 16 catalogued`，
+第 21 行），第 78 行的 "3 of 17 restyled types" 是 parity 条在**那一天**的读数。两者都不是今天的数：今天
+`Catalog.json` 是 **13 页 / 60 条控件行**（2026-09-22 数出来的：`pages` 数组 13 项，含新加的 Tokens、Materials、
+Motion；`controls` 数组 60 项），隐式样式类型数随每批补样式一直在长。
+
+隐式样式类型数**故意不往这份文档里抄**：闸口
+`AstraGalleryCatalogTests.The_catalog_covers_every_type_astra_restyles_implicitly` 每次都从产品字典现算并做双向差集，
+抄一个常数到这里只会再次变成一条看起来权威的过期数字。要当下的值就跑那条测点，或看它的失败消息。
