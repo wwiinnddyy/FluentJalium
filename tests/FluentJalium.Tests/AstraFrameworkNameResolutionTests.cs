@@ -4,6 +4,7 @@ using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Markup;
 using Jalium.UI.Media;
 using Xunit;
 
@@ -530,6 +531,122 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                     .Value as ControlTemplate),
                 () => Assert.Equal(0, VisualTreeHelper.GetChildrenCount(subject)));
         });
+    }
+
+    /// <summary>
+    /// The carrier question the last colour round left unanswered, measured on this layer's own row shape. The #12 gap
+    /// table's <c>CaptionFontSize</c> entry was closed as "Known Gap, no Double carrier" on the strength of
+    /// <see cref="AstraTypographyTests.A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not" />
+    /// - but that fact measures a row that carries a <em>literal</em>, and no row in
+    /// <c>ThemeResources/FrameworkRetints.jalxaml</c> has ever carried a literal: every shipped row is a
+    /// <c>StaticResource</c> redirect. A redirect needs no number, so the earlier verdict was reasoning from the wrong
+    /// experiment, and this is the right one: a redirect row does carry a number, all the way to a mounted
+    /// <c>TextBlock.FontSize</c>. The leg below reads 9 on keys of its own; the same redirect aimed at the real
+    /// framework names, run in <c>spike/OnAccentProbe</c> mode <c>carrier</c>, moved a mounted <c>FontSize</c> from the
+    /// projected 10 to <c>SmallFontSize</c>'s 8 and back to 10 once the row was removed.
+    ///
+    /// What the same reading gives back is the reason not to publish: the row holds a <em>copy</em> taken while it was
+    /// parsed. Moving the source to 5 leaves the alias on 9, so a <c>CaptionFontSize</c> row would freeze the framework's
+    /// caption size against whatever drives its projection, where the seven brush rows stay live because a brush is a
+    /// reference and <c>ApplyAccent</c>/<c>OverrideBrush</c> retint the instance the row forwarded. Both legs run on keys
+    /// of this class's own so no framework name is installed in the shared host.
+    /// </summary>
+    [Fact]
+    public void A_redirect_row_carries_a_number_to_a_live_font_size_and_freezes_it_there()
+    {
+        const string Source = "AstraFrameworkNameResolutionTests.NumericSource";
+        const string Aliased = "AstraFrameworkNameResolutionTests.NumericAlias";
+        _fixture.Run(() =>
+        {
+            var resources = Application.Current!.Resources;
+            resources[Source] = 9d;
+            var alias = (ResourceDictionary)XamlReader.Parse(
+                "<ResourceDictionary xmlns='http://schemas.jalium.ui/2024' " +
+                "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+                $"<StaticResource x:Key='{Aliased}' ResourceKey='{Source}' />" +
+                "</ResourceDictionary>")!;
+            var consumer = (ResourceDictionary)XamlReader.Parse(
+                "<ResourceDictionary xmlns='http://schemas.jalium.ui/2024' " +
+                "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+                "<Style x:Key='S' TargetType='TextBlock'>" +
+                $"<Setter Property='FontSize' Value='{{ThemeResource {Aliased}}}' /></Style>" +
+                "</ResourceDictionary>")!;
+            var merged = resources.MergedDictionaries;
+            merged.Add(alias);
+            merged.Add(consumer);
+            try
+            {
+                // The row resolved during the parse: the alias entry is already the number, not a deferred reference.
+                Assert.Equal(9d, Assert.IsType<double>(alias[Aliased]));
+
+                var first = MountSize((Style)consumer["S"]!);
+                resources[Source] = 5d;
+                var second = MountSize((Style)consumer["S"]!);
+                Assert.Multiple(
+                    () => Assert.Equal(9d, first),
+                    // A live alias would follow the source; the measured shape is a copy, which is the cost a published
+                    // numeric row would pay against the framework's own typography driver.
+                    () => Assert.Equal(9d, second),
+                    () => Assert.Equal(5d, Assert.IsType<double>(Application.Current!.TryFindResource(Source))));
+            }
+            finally
+            {
+                merged.Remove(consumer);
+                merged.Remove(alias);
+                resources.Remove(Source);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Why the row is still not published even though the carrier exists: a redirect has to point at something of ours,
+    /// and this layer has no number to point at. The name is a live <c>Double</c> projection (with a sibling
+    /// <c>SmallFontSize</c> that a redirect could nominally borrow), the upstream key a Fluent transcription would
+    /// answer to resolves to nothing, <c>ThemeColors</c> carries no member for it (so no read of it is outside the
+    /// layer's reach), and <c>SystemFonts.CaptionFontSize</c> reports a third number that an application-level entry
+    /// does not move - measured in <c>spike/OnAccentProbe</c>'s <c>carrier</c> leg, where installing a redirect under the
+    /// framework name left <c>SystemFonts</c> on 12 while a mounted <c>FontSize</c> followed to 8.
+    /// </summary>
+    [Fact]
+    public void The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to()
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            var caption = Assert.IsType<double>(application.TryFindResource("CaptionFontSize"));
+            var small = Assert.IsType<double>(application.TryFindResource("SmallFontSize"));
+            var colors = FrameworkType("Jalium.UI.Controls.Themes.ThemeColors");
+            var systemFonts = FrameworkType("Jalium.UI.SystemFonts");
+            var member = TypeMember(systemFonts, "CaptionFontSize")
+                ?? throw new InvalidOperationException(
+                    "SystemFonts exposes no CaptionFontSize on this runtime, so the third caption number this reading "
+                    + "claims is not a fact about 26.10.9");
+
+            Assert.Multiple(
+                () => Assert.True(caption > 0d, $"the framework projected {caption} for its own caption size"),
+                () => Assert.NotEqual(caption, small),
+                // The upstream name this library transcribes from has no answer at all on this runtime: the census
+                // found zero reads of CaptionTextBlockFontSize, and no row of ours is published under it.
+                () => Assert.Null(application.TryFindResource("CaptionTextBlockFontSize")),
+                () => Assert.Null(TypeMember(colors, "CaptionFontSize")),
+                // A number the layer cannot move: the projection and SystemFonts disagree while both are live.
+                () => Assert.NotEqual(caption, Convert.ToDouble(ReadMember(member), System.Globalization.CultureInfo.InvariantCulture)));
+        });
+    }
+
+    private static object? ReadMember(object member) => member switch
+    {
+        PropertyInfo property => property.GetValue(null),
+        FieldInfo field => field.GetValue(null),
+        _ => throw new InvalidOperationException($"{member.GetType().Name} is neither a property nor a field"),
+    };
+
+    private static double MountSize(Style style)
+    {
+        var block = new TextBlock { Text = "size", Style = style };
+        PixelHarness.Build(block, 240, 40);
+        PixelHarness.Settle(12);
+        return block.FontSize;
     }
 
     private const string OnAccentName = "TextOnAccent";

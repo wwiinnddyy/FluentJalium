@@ -131,4 +131,38 @@
        reason and shipped once four built labels demonstrated it. Pinned by AstraFrameworkNameResolutionTests
        .The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink; the blank calendar family
        is its own account (ROADMAP #70), not a reason to publish an alias. -->
+
+  <!-- Measured and deliberately NOT shipped: the name CaptionFontSize, the last entry in the #12 gap table. Recorded
+       here because the reason written for it in the third round was wrong, and a wrong reason is worse than no reason.
+       That round closed it as "no Double carrier" on the strength of AstraTypographyTests
+       .A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not - but that fact measures a row
+       carrying a LITERAL, and no row in this file has ever carried a literal: every one of them is a StaticResource
+       redirect, which needs no number. Re-measured in spike/OnAccentProbe (carrier mode) and re-pinned by
+       AstraFrameworkNameResolutionTests.A_redirect_row_carries_a_number_to_a_live_font_size_and_freezes_it_there: a
+       redirect row does carry a number, all the way to a mounted TextBlock.FontSize (10 to 9, back to 10 when the row is
+       removed). So the carrier is not the obstacle. Three other readings are:
+       (1) The census is not empty either - 26.10.9 loads the string in 13 places: one publisher
+       (ThemeManager.BuildTypographyDictionary, which projects 12/10/8 for body/caption/small), two inside SystemFonts,
+       and ten inside seven compiled framework dictionary builders (Containers, DataGrid, DockLayout, MenusToolbars,
+       Primitives, TabControl, TitleBar). Two of those are confirmed reads on the shipped markup rather than inference:
+       the DataGrid batch dumped the framework's own template and read PART_SortIndicator's FontSize=
+       {ThemeResource CaptionFontSize}=10 (audits/datagrid.md), and the TitleBar builder's literal run is
+       FontSize , CaptionFontSize , FontFamily , BodyFontFamily - a title-bar caption this library does not re-template
+       (the shell is reached through brush names only, audits/window-shell.md). So unlike TextOnAccent this name does
+       paint where our markup cannot reach. What is NOT measured: which of the ten sites is a read and which a local
+       write - an ldstr resolves to a builder, not to a style key or a property.
+       (2) What it lacks instead is a destination. A row here forwards a framework name to an Astra token; this library
+       publishes no numeric token at all - the seven upstream size keys resolve to nothing
+       (AstraTypographyTests.An_upstream_size_row_is_not_published), and pointing CaptionFontSize at another framework
+       number would be an invention, not a transcription.
+       (3) A numeric row would also be dead in a way the seven above are not: the redirect holds a copy taken while the
+       row was parsed, so moving the source leaves the alias behind, while a brush row stays live because ApplyAccent and
+       OverrideBrush retint the instance the row forwarded. A CaptionFontSize row would therefore freeze the framework's
+       caption size against its own typography driver, and would still not cover the whole read set: SystemFonts.
+       CaptionFontSize reports a third number (12 against the projected 10) that an application-level entry does not
+       move. ThemeColors carries no member for the name, so nothing here is outside the layer's reach by shape 3.
+       Pinned by AstraFrameworkNameResolutionTests.The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to.
+       The 12/10/8 projection against WinUI's own type scale is a real deviation on the framework-drawn
+       surfaces this list names, and it is ROADMAP #72 - a size question that needs a source number and a pixel, not an
+       alias row borrowed to hide it. -->
 </ResourceDictionary>

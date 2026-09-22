@@ -42,6 +42,17 @@ namespace OnAccentProbe;
 ///   style    - is the calendar family simply unstyled in this host? prints whether the framework's own theme
 ///             dictionary is merged, and each family's implicit-by-type style with its setter list, which is where the
 ///             missing Control.Template cell shows up.
+///   numbers  - the same three-shape census for the framework's numeric and typography names (CaptionFontSize and its
+///             family), plus what each name resolves to at app scope and with what CLR type. This is the last name in
+///             the #12 gap table, and the ledger's standing verdict on it ("Known Gap, no carrier", #12 third round)
+///             was written from the carrier rule alone: nobody censused the name itself on 26.10.9, and one audit
+///             (audits/datagrid.md) already records a framework template reading FontSize={ThemeResource
+///             CaptionFontSize}. So the census runs before the verdict is repeated.
+///   carrier  - the carrier question measured in the shape the alias layer actually uses: hydrate a
+///             &lt;StaticResource x:Key ResourceKey&gt; row whose target is a Double, merge it, and read what a mounted
+///             TextBlock's FontSize becomes. Adaptation/13 measured the literal-number row (&lt;sys:Double&gt; reads
+///             back 0, &lt;x:Double&gt; fails the parse); it never measured a redirect-only row, which needs no number
+///             literal at all and is therefore a different shape.
 ///
 /// Diagnostic-only: raises no real input, opens its own windows, writes nothing into the user's profile.
 /// </summary>
@@ -62,6 +73,24 @@ internal static class Program
         "SurfaceBackground",
         "AccentBrush",
         "ControlBorderFocused",
+    ];
+
+    /// <summary>
+    /// The names the typography projection publishes (ThemeManager.BuildTypographyDictionary in the reference tree), the
+    /// upstream name this library would have to answer to (CaptionTextBlockFontSize, from the #64 transcription), and
+    /// TextOnAccent as the calibration: the brush-name census found 24 reads of it on 26.10.9, so a run that reports 0
+    /// for that one is a broken instrument, not a name nobody reads.
+    /// </summary>
+    private static readonly string[] NumberTargets =
+    [
+        "CaptionFontSize",
+        "BodyFontSize",
+        "SmallFontSize",
+        "DisplayFontFamily",
+        "BodyFontFamily",
+        "MonoFontFamily",
+        "CaptionTextBlockFontSize",
+        "TextOnAccent",
     ];
 
     /// <summary>Candidate surfaces: name, assembly-qualified type, and how to make the on-accent state appear.</summary>
@@ -95,11 +124,13 @@ internal static class Program
 
         var results = mode switch
         {
-            "il" => Il(),
+            "il" => Il(Targets),
             "resolver" => Resolver(application),
             "calendar" => SelectedDay(application),
             "style" => Styling(application),
             "reader" => Reader(application),
+            "numbers" => Numbers(application),
+            "carrier" => Carrier(application),
             _ => new[] { $"unknown mode {mode}" },
         };
 
@@ -109,7 +140,7 @@ internal static class Program
         return 0;
     }
 
-    private static string[] Il()
+    private static string[] Il(string[] targets)
     {
         Say("=== 1. every ldstr that loads one of the target names, on the shipped assemblies ===");
         var assemblies = AppDomain.CurrentDomain.GetAssemblies()
@@ -119,6 +150,7 @@ internal static class Program
         Say($"assemblies: {string.Join(", ", assemblies.Select(static assembly => assembly.GetName().Name))}");
 
         var perTarget = new Dictionary<string, int>();
+        var holders = new Dictionary<string, HashSet<string>>();
         foreach (var assembly in assemblies)
         {
             foreach (var type in Types(assembly))
@@ -126,7 +158,7 @@ internal static class Program
                 foreach (var member in Members(type))
                 {
                     var literals = Literals(member);
-                    var matched = literals.Where(static text => Targets.Contains(text, StringComparer.Ordinal)).ToList();
+                    var matched = literals.Where(text => targets.Contains(text, StringComparer.Ordinal)).ToList();
                     if (matched.Count == 0)
                     {
                         continue;
@@ -135,6 +167,13 @@ internal static class Program
                     foreach (var name in matched)
                     {
                         perTarget[name] = perTarget.GetValueOrDefault(name) + 1;
+                        if (!holders.TryGetValue(name, out var holding))
+                        {
+                            holding = new HashSet<string>();
+                            holders[name] = holding;
+                        }
+
+                        holding.Add(type.FullName ?? type.Name);
                     }
 
                     Say($"HIT {assembly.GetName().Name}!{type.FullName}.{Name(member)} -> {string.Join(" | ", matched)}");
@@ -144,10 +183,12 @@ internal static class Program
         }
 
         Say("");
-        Say("=== 2. per-target hit count (0 means no by-name read in code on this runtime) ===");
-        foreach (var target in Targets)
+        Say("=== 2. per-target hit count (0 means no by-name read in code on this runtime) and which types hold it ===");
+        foreach (var target in targets)
         {
-            Say($"{target,-24} {perTarget.GetValueOrDefault(target)}");
+            var found = holders.GetValueOrDefault(target);
+            Say($"{target,-26} {perTarget.GetValueOrDefault(target),3}  in "
+                + (found is null ? "-" : Trim(string.Join(", ", found.Order()), 400)));
         }
 
         Say("");
@@ -171,7 +212,7 @@ internal static class Program
             }
 
             Say($"holder {found.FullName}:");
-            foreach (var target in Targets)
+            foreach (var target in targets)
             {
                 var property = found.GetProperty(target, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
                 var field = found.GetField(target, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
@@ -490,6 +531,199 @@ internal static class Program
         }
 
         return Lines.ToArray();
+    }
+
+    /// <summary>
+    /// The last name in the #12 gap table, censused the way the six shipped rows were: shapes one and two out of the IL
+    /// pass, shape three out of the static-member probe, and then the carrier question the earlier rounds answered from
+    /// a rule instead of a measurement ("numeric rows have no carrier" — measured for a row that carries a literal, in
+    /// AstraTypographyTests.A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not).
+    /// </summary>
+    private static string[] Numbers(Application application)
+    {
+        foreach (var line in Il(NumberTargets))
+        {
+            Say(line);
+        }
+
+        Say("");
+        Say("### 3b. which static holder exposes the name directly — a read an alias row cannot redirect ###");
+        foreach (var target in NumberTargets)
+        {
+            var sites = new List<string>();
+            foreach (var holder in new[] { "ThemeColors", "SystemFonts", "ThemeManager", "SystemParameters" })
+            {
+                var type = HeldBy(holder);
+                if (type is null)
+                {
+                    sites.Add($"{holder}=absent");
+                    continue;
+                }
+
+                var property = type.GetProperty(target, PublicStatic);
+                var field = type.GetField(target, PublicStatic);
+                if (property is null && field is null)
+                {
+                    sites.Add($"{holder}=-");
+                    continue;
+                }
+
+                try
+                {
+                    var value = property?.GetValue(null) ?? field?.GetValue(null);
+                    sites.Add($"{holder}:{(property is not null ? "prop" : "field")}={Describe(value)}");
+                }
+                catch (Exception error)
+                {
+                    sites.Add($"{holder}:threw {error.GetType().Name}");
+                }
+            }
+
+            Say($"{target,-26} {string.Join("  ", sites)}");
+        }
+
+        Say("");
+        Say("### 4. what the name resolves to at application scope, and with what CLR type ###");
+        foreach (var target in NumberTargets)
+        {
+            Say($"{target,-26} {Describe(application.TryFindResource(target))}");
+        }
+
+        return Lines.ToArray();
+    }
+
+    /// <summary>
+    /// The carrier question for a numeric name, measured in the only row shape this layer has ever shipped: a
+    /// <c>StaticResource</c> redirect, which needs no number literal and so is not covered by the measured death of the
+    /// <c>sys:Double</c> row. A style that asks for <c>{ThemeResource CaptionFontSize}</c> is mounted three times —
+    /// before the redirect, with it merged, and after it is removed — so the difference is attributable to the row and
+    /// not to the known disturbance that merging anything into application scope causes.
+    /// </summary>
+    private static string[] Carrier(Application application)
+    {
+        Say("=== does a StaticResource alias row carry a Double to a live FontSize? ===");
+        Say($"app scope: CaptionFontSize={Describe(application.TryFindResource("CaptionFontSize"))} "
+            + $"SmallFontSize={Describe(application.TryFindResource("SmallFontSize"))} "
+            + $"TextBlock.FontSize default={new TextBlock().FontSize}");
+        // The code reader the census found inside SystemFonts does not report the app-scope value — 12 against a
+        // projected 10 — so whether a redirect row moves that reader is a separate question from whether it moves a
+        // {ThemeResource} consumer.
+        Say($"SystemFonts.CaptionFontSize at rest : {SystemCaption()}");
+        Say($"resting            : {MountFontSize(application, "no alias row")}");
+
+        ResourceDictionary? alias = null;
+        try
+        {
+            alias = (ResourceDictionary)XamlReader.Parse(
+                "<ResourceDictionary xmlns='http://schemas.jalium.ui/2024' " +
+                "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+                "<StaticResource x:Key='CaptionFontSize' ResourceKey='SmallFontSize' />" +
+                "</ResourceDictionary>")!;
+            Say($"parsed row           : {Describe(alias["CaptionFontSize"])} (keys={alias.Count})");
+        }
+        catch (Exception error)
+        {
+            Say($"parsed row           : threw {error.GetType().Name}: {Trim(error.Message, 240)}");
+        }
+
+        if (alias is not null)
+        {
+            var merged = application.Resources.MergedDictionaries;
+            merged.Add(alias);
+            Say($"with alias merged    : {MountFontSize(application, "alias merged")} "
+                + $"SystemFonts.CaptionFontSize={SystemCaption()}");
+
+            // Is the row a live alias or a copy taken at parse time? A Double is a value type, so the row has to have
+            // copied it — measured rather than assumed, because the same shape for a Brush copies an instance whose
+            // colour ApplyAccent and OverrideBrush move in place, and the difference decides what a published numeric
+            // row would do to a later ApplyTypography(size) call.
+            application.Resources["SmallFontSize"] = 6d;
+            Say($"after retargeting the source to 6: CaptionFontSize={Describe(application.TryFindResource("CaptionFontSize"))} "
+                + $"SmallFontSize={Describe(application.TryFindResource("SmallFontSize"))} "
+                + $"(a live alias would follow, a copy would not)");
+            merged.Remove(alias);
+            Say($"after alias removed  : {MountFontSize(application, "alias removed")}");
+        }
+
+        return Lines.ToArray();
+    }
+
+    private static string MountFontSize(Application application, string leg)
+    {
+        var styled = (ResourceDictionary)XamlReader.Parse(
+            "<ResourceDictionary xmlns='http://schemas.jalium.ui/2024' " +
+            "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+            "<Style x:Key='S' TargetType='TextBlock'>" +
+            "<Setter Property='FontSize' Value='{ThemeResource CaptionFontSize}' /></Style>" +
+            "</ResourceDictionary>")!;
+        var merged = application.Resources.MergedDictionaries;
+        merged.Add(styled);
+        var block = new TextBlock { Text = "carrier", Style = (Style)styled["S"]! };
+        var panel = new StackPanel();
+        panel.Children.Add(block);
+        var window = new Window
+        {
+            Title = "OnAccentProbe.Carrier",
+            Content = panel,
+            Width = 300,
+            Height = 160,
+            WindowStartupLocation = WindowStartupLocation.Manual,
+            Left = 380,
+            Top = 220,
+        };
+        window.Show();
+        Pump(12);
+        window.UpdateLayout();
+        Pump(4);
+        var size = block.FontSize;
+        var resolved = Describe(application.TryFindResource("CaptionFontSize"));
+        window.Close();
+        Pump(4);
+        merged.Remove(styled);
+        return $"leg={leg} FontSize={size} app-resolves={resolved}";
+    }
+
+    private static readonly BindingFlags PublicStatic =
+        BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy;
+
+    private static Type? HeldBy(string shortName)
+    {
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (!(assembly.GetName().Name ?? string.Empty).StartsWith("Jalium.UI", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            foreach (var type in Types(assembly))
+            {
+                if (type.Name == shortName)
+                {
+                    return type;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string SystemCaption()
+    {
+        var type = HeldBy("SystemFonts");
+        var property = type?.GetProperty("CaptionFontSize", PublicStatic);
+        if (property is null)
+        {
+            return "no SystemFonts.CaptionFontSize";
+        }
+
+        try
+        {
+            return Describe(property.GetValue(null));
+        }
+        catch (Exception error)
+        {
+            return "threw " + error.GetType().Name;
+        }
     }
 
     private static string[] Reader(Application application)

@@ -85,6 +85,10 @@ ModernWpf 未新增语义键，全部是补官方模板要求的别名（该文�
 框架那份样式读 **11 个 token 名**，Astra 目前只定义其中 2 个（`LayerFillColorAltBrush`、
 `SubtleFillColorSecondaryBrush`）：`SurfaceBackground`、`TextPrimary`、`TextSecondary`、`TextDisabled`、
 `ControlBorder`、`ControlBorderFocused`、`AccentBrush`、`TextOnAccent`、`CaptionFontSize` 九条没有。
+（**这句话的时态是本次审计当天。**#12 别名层随后发行了七行 `FrameworkRetints.jalxaml`，上面九个名字里
+七条已被转发接管；剩下的两条不通是量过的决定，不是漏账——`TextOnAccent` 有读者但没有面上墨，
+`CaptionFontSize` 有读者也有面但没有 Astra 数值可指。逐名的账与读数在 `ROADMAP.md` 的"#12 A2 别名层"各轮，
+杠杆形状与两种行（字面 / 转发）的差别见 `src/FluentJalium/ThemeResources/FrameworkRetints.jalxaml` 末尾两段注释。）
 
 **撞名确实能换色**（A2 别名层第一次拿到实测边界）：`FluentThemeManager.Apply` 前后各读一次同一支网格，
 `LayerFillColorAltBrush` 从框架 `#FF3A3A3C` 翻成我们的 `#0DFFFFFF`、`SubtleFillColorSecondaryBrush` 翻成

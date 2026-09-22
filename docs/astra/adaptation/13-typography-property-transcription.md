@@ -114,8 +114,15 @@ route-coderow-string: resolves=String=18     -> FontSize=14
 照样落得上。
 
 于是七个上游键名（`CaptionTextBlockFontSize` … `DisplayTextBlockFontSize`）在这层只能继续空缺，
-`A_upstream_size_row_is_not_published` 逐名钉住。这和 `adaptation/01:149` 那句"`x:Double` 进不了字典"
+`An_upstream_size_row_is_not_published` 逐名钉住。这和 `adaptation/01:149` 那句"`x:Double` 进不了字典"
 是同一件事，现在有了逐项读数和一条 `A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not`。
+
+**边界（#12 第八轮补，2026-09-22）**：本节坏的是**把数字写进标记**这一形。转发形
+（`<StaticResource x:Key="A" ResourceKey="B"/>`，也就是别名层出货的全部形状）不在这一形里——实测能带住数字并
+落到挂载 `FontSize` 上，代价是它带的是解析期那一份快照，源改了别名不跟。产品侧读数与测试名见
+`ROADMAP.md` 的"#12 A2 别名层第八轮"与 `AstraFrameworkNameResolutionTests
+.A_redirect_row_carries_a_number_to_a_live_font_size_and_freezes_it_there`。也就是说：结论三封住的是
+"标记里造一个数字"，没有封住"下面那条路（代码种数字）一旦开了，标记里能不能按名字转发它"。
 
 ## 结论四：一个想清楚再做的选择，没做
 

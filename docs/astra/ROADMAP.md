@@ -2319,8 +2319,12 @@ disabled 的表格单元与菜单项**没有**单独断言（框架在无头主�
   的 `IsKeyboardFocused` 格）结清用例 `The_frameworks_focused_border_name_no_longer_resolves_to_brand_emerald`
   与 7 对别名的 `Assert.Same` 理论都写测过（`0 个警告 / 0 个错误`，三表类 107/107 绿），随撤回一起回到工作树外，
   下一批照这段重写即可；`keys.md` 那 6–7 行是**框架的名字**、不是 WinUI token，进清单只为让漂移闸看得住这一层。
-- `CaptionFontSize` 是 `Double`，本运行时标记带不了类型化数值行（S1-n：`x:Double` 元素名不可解析），
-  无论这批收不收都留在 Known Gap。
+- `CaptionFontSize` 是 `Double`，本运行时标记带不了**字面**数值行（`<x:Double>` 让整份字典解析失败、`<sys:Double>`
+  读回 0：§S0-b、§S1-r、`adaptation/13` 结论三。这一句先前引的是"S1-n：`x:Double` 元素名不可解析"——**引错节**，
+  S1-n 讲的是 `ContentControl` 派生的自有类型不展开模板），无论这批收不收都不发行。
+  **【第八轮更正】**这句现在只剩一半是对的：本层出货的全部形状是 `<StaticResource>` **转发**行，
+  转发不需要字面量，实测能把数字带到挂载 `FontSize` 上。所以这一行不发的真理由不是"没载体"，
+  换成三条量出来的理由，见"#12 A2 别名层第八轮"。
 - 下一批的开工顺序（就是这批学到的形状）：**一个名字一轮**——先按该名字全库 grep 读点、把会被改写的既有事实列全、
   再发布别名行、再跑闸口；不要一次发七个。
 
@@ -2812,10 +2816,15 @@ TextOnAccent   #FFFFFFFF   #FFFFFFFF   TextOnAccentFillColorPrimaryBrush #FFFFFF
   （WinUI 把它用在选中药丸/开关/Calendar 的反色文字上，而这些我们要么自绘要么还没上：Calendar/DatePicker 不在 60 行宇宙里）。
   所以按同一把尺：**没量到读者 → 暂缓**；等哪天进 Calendar 族或实测到某面读它，这一轮的行是**提纯度**的活。
   它的恒白投影已被那条事实钉住（Dark 腿 `#FFFFFFFF` + `NotEqual(dark, darkTwin)` 就是这条怪的证人）。
-- **`CaptionFontSize`：Known Gap，无载体**。它不是 `ThemeColors` 笔刷而是字号，本 reader 解析不了 `x:Double`/`sys:Double`
-  资源行（`jalium-xaml-and-test-gotchas` 与 #54 已各自实测过这条静默丢弃），所以连"能不能按名字投影"都无从谈起——
+- **`CaptionFontSize`：Known Gap，无载体**——**这条的理由在第八轮被量翻了，判断留着、理由换掉**，原文保留在这里以免
+  看不出账本走过什么弯：当时写的是"它不是 `ThemeColors` 笔刷而是字号，本 reader 解析不了 `x:Double`/`sys:Double`
+  资源行（`jalium-xaml-and-test-gotchas` 与 #54 已各自实测过这条静默丢弃），所以连'能不能按名字投影'都无从谈起——
   没有可断的活行，写进 Known Gaps，不硬造消费点。**别名层这条杠杆只吃 Brush 形名字；字号/Thickness 等没有框架按名
-  现查的读者，就不在 A2 的射程内。**
+  现查的读者，就不在 A2 的射程内。**"。第八轮的两处更正：① 死的是**字面**数值行，本层出货的形状是
+  `<StaticResource>` 转发行，实测能把数字带到挂载 `FontSize` 上，"只吃 Brush 形名字"这句不成立；
+  ② "`CaptionFontSize` 没有框架按名现查的读者"也不成立——26.10.9 上它有 13 处按名站点，含两处确认的
+  `{ThemeResource}` 读者。**不发行仍然成立**，真理由变成三条别的：没有 Astra 数值可指、转发行是解析期快照、
+  `SystemFonts` 那个数字针不动。全部读数在"#12 A2 别名层第八轮"。
 
 - **构建**：全量 `0 警告 / 0 错误`。
 - **行为**：新参数化事实 3 条腿（`AstraFrameworkNameResolutionTests` 13/13 绿）。**牙齿**：给任一名字发 `name→token`
@@ -3391,3 +3400,89 @@ variants, 0 offender(s)` → 三档 `checked=True`（Light/Dark 各 83 源色 10
 页闸那两句"槽没清空"是**新形状**：它报的是基线帧没被清干净，不是页面画错——与 #63 结清的宿主交互、
 #47/#35 那族"整套顺序跑才红"同源，挂进 #47 的机制账，不在这里当已归因。
 `status` 页两档仍读 `True/False`，与上一批同形状、同族。
+
+## #12 A2 别名层第八轮：`CaptionFontSize`——**上一轮给的理由是错的**，量完仍然不发行，理由换成三条实的（2026-09-22）
+
+gap 表里最后一个名字。目标给它写的预判是"无 `Double` 载体 → Known Gap"，第三轮那句"别名层这条杠杆只吃 Brush 形名字；
+字号/Thickness 等没有框架按名现查的读者"就是它的账面。本轮去复核，先复核出一件事：**那条定案所依据的实验量错了对象**。
+`AstraTypographyTests.A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not` 钉的是"标记里写
+**字面数字**"这一形，而这一层从来没有发过字面行——出货的七行全是 `<StaticResource x:Key ResourceKey>` **转发**行，
+转发根本不需要数字。于是先把"转发行能不能带住一个数字"量出来，再谈发行。仪器仍是 `spike/OnAccentProbe`，
+新增 `numbers`（三形普查）与 `carrier`（载体与到达）两条腿，读数全部出自装载中的 26.10.9 程序集。
+
+- **载体不是障碍（这一条推翻第三轮那句的字面意思）**：`carrier` 腿在应用作用域并进一行 `CaptionFontSize → SmallFontSize`，
+  一个把 setter 写成 `FontSize={ThemeResource CaptionFontSize}` 的样式挂上窗口后读回 **10 → 8**，撤掉那行又回 **10**；
+  并且行在 `XamlReader.Parse` 那一刻就已经是 `Double 8`（解析期就地转发，不是延迟引用）。死掉的仍然只有两种字面行：
+  `<x:Double>` 让整份字典解析失败、`<sys:Double>` 解析通过但值归零（§S0-b、§S1-r、`adaptation/13` 结论三）。
+- **形一（代码按名查）**：`ldstr "CaptionFontSize"` 在出货程序集里 **13 处**。1 处是投影发布者
+  `ThemeManager.BuildTypographyDictionary`（body **12** / caption **10** / small **8**），2 处在 `Jalium.UI.SystemFonts` 里
+  （`get_CaptionFontSizeKey`、`TryGetResource`），其余 10 处在七个编译字典的 Build 方法里：Containers、DataGrid、
+  DockLayout、MenusToolbars、Primitives、TabControl、TitleBar。
+- **形二（编译标记按名读）至少两处不是字符串猜出来的**：`audits/datagrid.md` 记着框架自己模板的 `PART_SortIndicator`
+  带 `FontSize={ThemeResource CaptionFontSize}`=`10`（从 `ControlTemplate.VisualTreeXaml` 抄的），而 TitleBar 那处的
+  字面量串是 `FontSize , CaptionFontSize , FontFamily , BodyFontFamily`——窗口外壳这一层本库只按刷子名挂钩、
+  **不换它的模板**（`audits/window-shell.md`）。所以这个名字与 `TextOnAccent` 正好互补：那个是"有读者、没有面"，
+  这个是"有读者、也有我们换不掉的面"。
+- **形三（直读静态成员）不存在**：`ThemeColors` 没有 `CaptionFontSize` 成员（其余五个排印名也没有），
+  所以"别名行盖不住某条直读"这种歧义在这里不会发生。
+
+**决定：仍然不发行，但理由换成三条量出来的。**
+
+1. **没有可指的目标。** 这一层每一行都是"框架名 → Astra 令牌"，而本库**一个数值令牌都没有**：七个上游尺寸键名
+   解析结果为空（`An_upstream_size_row_is_not_published` 逐名钉着，IL 普查里 `CaptionTextBlockFontSize` **0 处读**）。
+   把 `CaptionFontSize` 转发到另一个框架数字（`SmallFontSize`=8）是自造设计值，不是转录——违背这一层的存在理由。
+2. **数值转发行是解析期抄的一份，不是活别名。** 同一腿里把源改成 6，别名仍读 8。刷子行没这个毛病：它们转发的是
+   实例，`ApplyAccent` / `OverrideBrush` 就地改色时跟着走（这正是这层选择"别名而非重定义"的原因）。发一行数值别名
+   等于把这个名字从框架自己的排印驱动上摘下来。
+3. **覆盖率天生不全。** `SystemFonts.CaptionFontSize` 在静息与装了别名两种状态下都读 **12**，而应用作用域投影是 **10**
+   ——那是第三个数字，按名别针不动它（机制未量，只记读数）。出货七行都做到了"该名字的全部读法都走这一行"，这行做不到。
+
+两条新事实进产品测试（本类 29 → **31**）：
+
+- `AstraFrameworkNameResolutionTests.A_redirect_row_carries_a_number_to_a_live_font_size_and_freezes_it_there`——
+  用本类自己的两个键名测，**不往共享宿主里装任何框架名**；断三件事：行解析即得 9、挂载 `FontSize` 读到 9、
+  源改 5 之后再挂仍读 9。**牙齿验过**：把消费样式的 setter 从别名键改成直指源键，第二次读回 **5**，
+  那条"冻住"断言就红（`Expected: 9 / Actual: 5`）——说明"快照"这一句是别名行带的，不是挂载路径带的；
+  那次红跑同时反证了 `{ThemeResource 源}` 这条直读路是活的。
+- `…The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to`——钉投影值是 `Double`（>0）、
+  与 `SmallFontSize` 不同、上游名 `CaptionTextBlockFontSize` 解析为空、`ThemeColors` 无该成员、
+  以及 `SystemFonts.CaptionFontSize` ≠ 投影值（"针不动的第三个数字"这一条的证据）。
+- `FrameworkRetints.jalxaml` 末尾补一段"量过、故意不发行"，把上面三条理由与 13 处站点写进去，
+  并就地更正第三轮那句"无载体"；`adaptation/13` 结论三补一句边界（死的是字面行，转发行能带、但需要表里已有数字）。
+
+**新开一笔账 #72（用户可见面）**：框架投影出来的排印数字是 body **12** / caption **10** / small **8**，
+而 WinUI 的 type scale 是 Body **14** / Caption **12**（`audits/textblock-typography.md` 逐键抄过，
+我们的 `Caption` setter 落的就是上游那枚 12）。也就是说本库自己的面上是对的，偏小只出现在**框架自己画的面上**——
+刚量到的那几处：窗口标题栏标题、DockLayout 标签、Containers（toast）、放着 `DefaultFocusVisualStyle` 的 Primitives 字典。
+修法候选有现成公开口：`ThemeManager.ApplyTypography(display, body, mono[, size])`（`adaptation/01:149` 记着它可用），
+把 body 设成 14 就让投影跟上游。三枚字体名（投影的是 `Microsoft YaHei UI` / `Cascadia Code`）是同一条杠杆的另一端，
+但它们与上游 `XamlAutoFontFamily` / `MonoFontFamily` 的对应关系本库没逐键审过（#64 那份审计的上游文件只有字号与样式），
+所以算进 #72 时要先补那半份对账。**本轮不做**：它动的是全应用排印基线，要连着字体回退（#50 拿不到字形墨）
+与逐面复核一起算，是一批自己的账，不是别名层的一行。
+
+**不声称**：① 那 10 处编译字典站点里"哪几处是读、哪几处是局部写"没逐处定位——IL 普查能定到 Build 方法，
+定不到样式键与属性（只有 `audits/datagrid.md` 那条是从模板标记上直接抄到的读）；② `SystemFonts.CaptionFontSize`
+为何是 12 而投影是 10，机制未量，本轮只记两个读数；③ 不声称发一行数值别名能修好 #72 的偏差——它带不动
+`SystemFonts`，也会把投影冻在解析期那一份；④ 没有像素证据：文本字形在本运行时拿不到墨（#50），
+所以"标题栏字号偏小"这句话的证据等级是"标记 + 投影值"，不是截图；⑤ `carrier` 腿用的是本库自造的探针键与
+`SmallFontSize` 这个真实投影名，**没有**给 `CaptionFontSize` 发行，产品字典里这一行今天仍然不存在。
+
+### 第八轮的串行闸口读数（2026-09-22）——这一跑**全绿**：`spike/OnAccentProbe/gate-caption.log`
+
+`tools/Test-AstraGates.ps1`（Debug 默认配置）：restore 最新 → build `0 警告 / 0 错误`（4.5 s）→ 整套
+**1563 / 1563**（0 失败 0 跳过、7 m 20 s）→ 页闸腿 build `0 警告 / 0 错误` →
+**`PASS 13 pages x 2 variants, 0 offender(s)`** → 调色板三档 `checked=True`（Light/Dark 各 83 源色 101 刷，
+HC 101 键 + 3 条上游键因调色板无对应而按住）→ `keys.md is current: 1312 canonical lines.` →
+`All Astra gates passed.` → 包装器取到的管道退出码 **`GATE-PIPE-EXIT=0`**。
+
+**测点 1561 → 1563 = +2**，正是本批那两条新事实，一条老测点没动；`keys.md` 行数没动（本批不发行任何一行），
+这是"不发行"这类批次该有的账面目——与上一轮 `TextOnAccent` 同形。页闸 26 行里 25 行 `stable=True/True`，
+`status Dark` 仍读 `True/False`（与上一批同形状，挂 #47/#35/#63 那一族，不据此声称已归因）。上一批那两处
+"只有整套顺序跑才红"的读数（ProgressRing 两帧同值、页闸 3 offenders）这一跑都没出现，我们也没为它们改过任何东西：
+仍是未归因的顺序跑读数。
+
+**这一跑有一处必须自新的地方：它不是一次静态树验证。** build 段在 17:34:14 结束，而本批有两处文件在 test 段
+进行中落盘——`audits/datagrid.md` 的时态更正（17:36、17:37）与那条新事实的 XML 文档注释措辞（17:42）。
+前者正是 `Every_parity_claim_cites_evidence_that_exists` 这类结构闸**要读的文件**，所以这一跑的绿读的到底是
+改前还是改后那版，从日志判不出来。处置：提交后在同一棵树上再跑一遍完整闸口，第二跑才是静态树认证读数，
+补记在下一节；第一跑的读数照实留着，不冒充静态树验证。
