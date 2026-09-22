@@ -1,26 +1,77 @@
-<!-- WinUI CommonStyles/TextBlock_themeresources.xaml size hierarchy.
-     Font resolution is delegated to the operating system; no redistributed font files. -->
+<!-- WinUI typography, transcribed key for key from CommonStyles/TextBlock_themeresources.xaml (blob
+     08cbcf9cc6a9146b7d192f1f294b949dd2841cfd) at 19e3bdc3: all ten style rows, in upstream's order, each on
+     upstream's BasedOn chain (every derived style hangs off BaseTextBlockStyle, not off its sibling). What the
+     pre-Astra file published instead was six of the ten names, a chain that ran Caption off Body and
+     Subtitle/Title/LargeTitle off BodyStrong, upstream's
+     TitleLargeTextBlockStyle under the name "LargeTitleTextBlockStyle", and two Foreground rows upstream does not
+     have. Per-property host evidence - which of upstream's eight setters this runtime can express, what a block
+     carries when nothing writes one, and why the sizes are literals - is in
+     docs/astra/adaptation/13-typography-property-transcription.md; the three drops are:
+
+       TextLineBounds="Full", OpticalMarginAlignment="TrimSideBearings"
+         This runtime's TextBlock has neither member, and a Setter naming one fails the whole dictionary at load
+         ("Setter.Property 'TextLineBounds' cannot be resolved for the style target type"), so their absence is not a
+         style choice. Measured 26.10.9, spike/DoubleRowProbe mode "typography".
+       FontFamily="XamlAutoFontFamily"
+         The host has no such family and no such markup value: the literal loads and reads back as a FontFamily named
+         "XamlAutoFontFamily", which resolves to a fallback instead of to the operating-system UI font this file has
+         always delegated to. Left to the host default (measured: "Microsoft YaHei UI" on this machine).
+
+     The seven sizes ride as literals, not as upstream's seven <x:Double> rows, because a numeric resource row cannot
+     be published in markup here: <sys:Double> parses and silently loses the authored number (reads back 0, both
+     assembly spellings, in a flat dictionary and inside ThemeDictionaries), and a row that carries 0 is worse than no
+     row because every consumer still looks correct. The consuming route behind the row is alive - a Double published
+     from code reaches FontSize through {ThemeResource} - so this is a markup-side limit with a named shape, and the
+     seven upstream key names (CaptionTextBlockFontSize and its six siblings) stay unfulfilled: Known Gaps. -->
 <ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock">
+  <Style x:Key="BaseTextBlockStyle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Setter Property="LineStackingStrategy" Value="MaxHeight" />
+  </Style>
+  <Style x:Key="CaptionTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style x:Key="BodyTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontWeight" Value="Normal" />
+  </Style>
+  <Style x:Key="BodyStrongTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}" />
+  <Style x:Key="BodyLargeTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontWeight" Value="Normal" />
+    <Setter Property="FontSize" Value="18" />
+  </Style>
+  <Style x:Key="BodyLargeStrongTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="18" />
+  </Style>
+  <Style x:Key="SubtitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="20" />
+  </Style>
+  <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="28" />
+  </Style>
+  <Style x:Key="TitleLargeTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="40" />
+  </Style>
+  <Style x:Key="DisplayTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
+    <Setter Property="FontSize" Value="68" />
+  </Style>
+
+  <!-- Ours, not upstream's: WinUI publishes no implicit TextBlock style, so a block that asks for no style is the
+       framework's own in WinUI and this row's in Astra. It deliberately does not derive from BodyTextBlockStyle -
+       inheriting upstream's Base would smuggle CharacterEllipsis trimming onto every unstyled block in every
+       template in the library, and text ink is the one thing this test bed cannot photograph (#50), so that would be
+       an unverifiable change riding in on a transcription. The three setters are what the row has always effectively
+       done, written out: 14 is also this host's default (measured), wrapping is not (default NoWrap), and the pinned
+       primary ink is currently redundant - a block whose style writes no Foreground resolves the name TextPrimary,
+       which since the alias layer ships is the same instance as TextFillColorPrimaryBrush. It is kept because
+       pinning is what the row has always done, and pulling it out changes inheritance for every template text block
+       at once: a separate call to make on evidence this file cannot supply. -->
+  <Style TargetType="TextBlock">
     <Setter Property="FontSize" Value="14" />
     <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
     <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
-  <Style x:Key="CaptionTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
-    <Setter Property="FontSize" Value="12" />
-    <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
-  </Style>
-  <Style x:Key="BodyStrongTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
-    <Setter Property="FontWeight" Value="SemiBold" />
-  </Style>
-  <Style x:Key="SubtitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
-    <Setter Property="FontSize" Value="20" />
-  </Style>
-  <Style x:Key="TitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
-    <Setter Property="FontSize" Value="28" />
-  </Style>
-  <Style x:Key="LargeTitleTextBlockStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
-    <Setter Property="FontSize" Value="40" />
-  </Style>
-  <Style TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}" />
 </ResourceDictionary>

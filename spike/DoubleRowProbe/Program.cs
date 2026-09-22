@@ -27,7 +27,9 @@ namespace DoubleRowProbe;
 ///
 /// The style lives in the same dictionary as the row for the same reason.
 ///
-/// Modes: spellings (default) | pertheme (the row inside ThemeDictionaries, read under Light and Dark).
+/// Modes: spellings (default) | pertheme (the row inside ThemeDictionaries, read under Light and Dark) | typography
+/// (the eight setters upstream's BaseTextBlockStyle and its derived styles write, and what a TextBlock carries when
+/// nothing writes them).
 /// </summary>
 internal static class Program
 {
@@ -56,8 +58,17 @@ internal static class Program
             renderContext.DefaultRenderingEngine = RenderingEngine.Impeller;
             ThemeLoader.Initialize();
             var application = new Application();
+            if (_mode == "typography")
+            {
+                DetachedBaseline();
+            }
+
             FluentThemeManager.Apply(application);
-            if (_mode == "pertheme")
+            if (_mode == "typography")
+            {
+                Typography(application);
+            }
+            else if (_mode == "pertheme")
             {
                 PerTheme(application);
             }
@@ -108,6 +119,129 @@ internal static class Program
             Consume(application, label, dictionary);
             Pop(application);
         }
+    }
+
+    /// <summary>
+    /// The eight properties upstream's <c>TextBlock_themeresources.xaml</c> writes across <c>BaseTextBlockStyle</c> and
+    /// its derived styles. Asked of this runtime one at a time, because a property the host does not have destroys the
+    /// whole dictionary at load - co-loading all eight would report seven casualties for one defect.
+    /// </summary>
+    private static readonly (string Name, string Value)[] UpstreamSetters =
+    [
+        ("FontFamily", "XamlAutoFontFamily"),
+        ("FontSize", "18"),
+        ("FontWeight", "SemiBold"),
+        ("TextTrimming", "CharacterEllipsis"),
+        ("TextWrapping", "Wrap"),
+        // Probed with the value upstream does *not* use: MaxHeight is this host's default, so a read-back of
+        // MaxHeight cannot tell an applied setter from an absent one.
+        ("LineStackingStrategy", "BlockLineHeight"),
+        ("TextLineBounds", "Full"),
+        ("OpticalMarginAlignment", "TrimSideBearings"),
+    ];
+
+    /// <summary>
+    /// Before any of our layers are in: which of the eight members exist on this runtime's TextBlock at all, and what
+    /// a block carries when nothing writes it. The second half is what a transcription inherits - dropping a setter is
+    /// only free when the host default already agrees with upstream's value.
+    /// </summary>
+    private static void DetachedBaseline()
+    {
+        var names = typeof(TextBlock).GetProperties().Select(static property => property.Name).ToHashSet();
+        Note("census", "present: " + string.Join(",", UpstreamSetters.Where(s => names.Contains(s.Name)).Select(s => s.Name)));
+        Note("census", "absent: " + string.Join(",", UpstreamSetters.Where(s => !names.Contains(s.Name)).Select(s => s.Name)));
+        Note("detached", ReadSetters(new TextBlock { Text = "abc" }));
+    }
+
+    private static void Typography(Application application)
+    {
+        var mounted = Show(new TextBlock { Text = "abc" });
+        Note("mounted", ReadSetters(mounted));
+        Note("mounted.ink", InkOf(mounted, application));
+
+        foreach (var (name, value) in UpstreamSetters)
+        {
+            Probe(application, $"setter-{name}", $"<Setter Property=\"{name}\" Value=\"{value}\" />");
+        }
+
+        // Three routes the size ramp could ride, each landing on the same FontSize: a literal in the setter, a
+        // sys:Double row beside the style, and a Double published from code after the merge. The literal is the
+        // control - if it does not land either, the consuming route is dead and no conclusion about rows is available.
+        Probe(application, "route-literal", "<Setter Property=\"FontSize\" Value=\"18\" />");
+        Probe(application, "route-sysrow", "<Setter Property=\"FontSize\" Value=\"{ThemeResource R}\" />", row: "<sys:Double x:Key=\"R\">18</sys:Double>");
+        Probe(application, "route-coderow", "<Setter Property=\"FontSize\" Value=\"{ThemeResource R}\" />", codeRow: 18d);
+        Probe(application, "route-coderow-string", "<Setter Property=\"FontSize\" Value=\"{ThemeResource R}\" />", codeRowText: "18");
+    }
+
+    /// <summary>Loads a one-style dictionary in production shape and reports what the mounted block ends up carrying.</summary>
+    private static void Probe(Application application, string label, string setter, string row = "", double? codeRow = null, string? codeRowText = null)
+    {
+        var file = Path.Combine(_out, $"{Sanitize(label)}.jalxaml");
+        File.WriteAllText(file,
+            $"<ResourceDictionary {Root} {SysCoreLib}>{row}" +
+            $"<Style x:Key=\"S\" TargetType=\"TextBlock\">{setter}</Style></ResourceDictionary>");
+        try
+        {
+            using var stream = File.OpenRead(file);
+            if (XamlReader.Load(stream) is not ResourceDictionary dictionary)
+            {
+                Note(label, "LOAD -> null");
+                return;
+            }
+
+            application.Resources.MergedDictionaries.Add(dictionary);
+            if (codeRow is double number)
+            {
+                application.Resources["R"] = number;
+            }
+
+            if (codeRowText is string text)
+            {
+                application.Resources["R"] = text;
+            }
+
+            var block = Show(new TextBlock { Text = "abc", Style = dictionary["S"] as Style });
+            Note(label, $"resolves={Read(Peek(application.Resources, "R"))} -> {ReadSetters(block)} ink={InkOf(block, application)}");
+            Pop(application);
+        }
+        catch (Exception exception)
+        {
+            Note(label, "LOAD-FAIL " + exception.GetType().Name + ": " + Trim(exception.InnerException?.Message ?? exception.Message));
+        }
+    }
+
+    private static string ReadSetters(TextBlock block) => string.Join(" ", UpstreamSetters
+        .Select(static s => s.Name)
+        .Where(static name => typeof(TextBlock).GetProperty(name) is not null)
+        .Select(name => $"{name}={typeof(TextBlock).GetProperty(name)!.GetValue(block)}"));
+
+    /// <summary>
+    /// The ink a block ends up carrying. Every probe below writes no Foreground, so this is the question a
+    /// transcription of upstream's shape raises: upstream's eleven typography styles set no ink at all, and dropping
+    /// ours hands the decision to whatever the host resolves. Reported as the colour plus identity against the two
+    /// names our alias layer publishes, because "some brush" and "our primary token" are different answers.
+    /// </summary>
+    private static string InkOf(TextBlock block, Application application)
+    {
+        var brush = block.Foreground;
+        var colour = brush as SolidColorBrush;
+        return $"{(colour is null ? brush?.GetType().Name ?? "null" : colour.Color.ToString())}"
+            + $" primary-token={ReferenceEquals(brush, FluentThemeManager.GetBrush("TextFillColorPrimaryBrush"))}"
+            + $" TextPrimary-name={ReferenceEquals(brush, application.TryFindResource("TextPrimary"))}"
+            + $" TextSecondary-name={ReferenceEquals(brush, application.TryFindResource("TextSecondary"))}";
+    }
+
+    /// <summary>Mounts one control in a shown window, pumps, closes it, and hands the control back for reading.</summary>
+    private static TextBlock Show(TextBlock block)
+    {
+        var host = new Grid { Width = 240, Height = 60 };
+        host.Children.Add(block);
+        var window = new Window { Content = host, Width = 240, Height = 60 };
+        window.Show();
+        Pump();
+        window.Close();
+        Pump();
+        return block;
     }
 
     private static void PerTheme(Application application)

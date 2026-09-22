@@ -3098,3 +3098,87 @@ build `0 警告 / 0 错误` → 整套 **1503/1503**（0 失败 0 跳过、7 m 9
 最后钉一次口径，因为这一行恰好是那种"换别的方法就验不动"的：本行的证据止于"框架自己的解析器返回我们那只实例"，
 **没有任何一条断言说它长得好看了**；`MenuItem` 的可见墨仍归 #50/#13 的账。下一次谁要把这行的形状当模板，
 先读行注释里那句"证据等级比上一行低"。
+
+## 目标项 3：排印层从 `ported` 推到 `audited`——十个键逐字抄，两处宿主没有成员，七个数字只能空着（2026-09-22）
+
+隐式样式宇宙里最后一条 `ported` 行是 `TextBlock` → `ThemeResources/Typography.jalxaml`，gap 写的是
+"字号阶梯没有逐键对齐上游"。对齐之前有一件事必须先量而不是先猜：上游
+`CommonStyles/TextBlock_themeresources.xaml`（`19e3bdc3`）那八个 setter 里有几个本运行时能表达，
+以及那七个 `x:Double` 字号行到底能不能带住数字。仪器沿用 `spike/DoubleRowProbe`，加 `typography` 模式
+（每个属性**单独成字典**——一个宿主没有的成员会让整份字典加载失败，八个一起放就分不清是谁），
+读数全量落在 `adaptation/13`。
+
+- **六个属性落得上、两个宿主没成员**：`TextLineBounds` / `OpticalMarginAlignment` 在 26.10.9 的
+  `TextBlock` 上反射不到成员，写成 setter 直接 `XamlParseException`，所以删掉它们不是风格选择；
+  `XamlAutoFontFamily` 那个值更阴——属性存在、加载不报错，读回来是一个**名字叫 `XamlAutoFontFamily` 的族**，
+  落到 fallback 而不是系统 UI 字体，于是这条也删，并在文档里写明它"看起来正确"的那一面。
+  留下的四条（`FontWeight`/`TextTrimming`/`TextWrapping`/`LineStackingStrategy`）里只有 `LineStacking` 的
+  上游值恰好等于宿主默认（`MaxHeight`），读回分不出"落上了"和"没这条"，所以它只进形状断言不进到达断言，
+  探它的时候改用宿主不用的 `BlockLineHeight`。
+- **链形与键名一次改完**：旧文件六个键、链是 `Caption`→`Body`、`Subtitle`/`Title`/`LargeTitle`→`BodyStrong`，
+  且把上游 `TitleLargeTextBlockStyle` 叫成 `LargeTitleTextBlockStyle`。现在十个键逐个挂 `Base`，
+  补 `Base`/`BodyLarge`/`BodyLargeStrong`/`Display` 四个，改名那条**零消费点**（`src`/`samples`/`tests`/`tools` 全量
+  反查），所以直接改、不留别名。全库产品样式里没有任何一条继承排印样式（只有 `Typography.jalxaml` 自己），
+  爆炸半径是 Gallery 的 522 处引用（`Body`/`BodyStrong`/`Caption`/`Subtitle`/`Title` = 146/2/211/128/35 行）
+  + 隐式 `TextBlock` 行；权威 blob 记在文件头（`08cbcf9c…` @`19e3bdc3`）。
+- **删掉我们自造的两条 `Foreground`，墨还是我们的**：上游 `Body`/`Caption` 都不写墨。删掉之后一个
+  样式不写 `Foreground` 的块读回 `TextFillColorPrimaryBrush` 那一个实例（宿主按 `TextPrimary` 现查，
+  而别名层已把那个名字指向我们的令牌）。**这是这批唯一的用户可见变色**：`CaptionTextBlockStyle`
+  在 Gallery 211 处从次级灰变初级墨，这才是上游的 Caption；某页真需要次级灰应由那页点名，不由共享样式替全库决定。
+- **七个数字仍然发不出去，而且理由换了一个更准的**：不是"数值令牌没用"，是**这份 reader 把 markup 里的数字读成 0**
+  （`x:Double` 直接加载失败、`sys:Double`/`sys:Int32` 归零、`sys:String` 保住文本却过不到 Double 属性），
+  而 `{ThemeResource}` → setter → DP 这段路是活的——**同一个 key 由 C# 放 `18d` 就落到 `FontSize=18`**。
+  所以"C# 种这七行"是可做的，本批**明确不做**并把三条理由写进 `adaptation/13` 结论四（代码侧目前只有
+  `MergedDictionaries.Add` 整份并入这一条路，种单行会开新机制；`keys.md` 从 `.jalxaml` 生成，代码种的行会漏账；
+  这七个数不随主题变，字面量与行承载的值相同）。代价照实记：按名字查 `BodyTextBlockFontSize` 的消费方查不到东西。
+
+**测点 +31**，`AstraTypographyTests` 一个新类两条 Theory 分开钉：**形状**（每个样式的 setter 名单逐字等于上游那份，
+多一条少一条都红）与**到达**（挂载后读回 `FontSize`/`FontWeight`/`TextTrimming`/`TextWrapping`）。
+牙口是四处临时改坏验的：`Base` 字重拍平 → 7 条到达红（靠继承拿粗体的样式一起红，正好证明继承链在跑）、
+`Caption` 12→13 → 1 条到达红、给 `Caption` 塞回 `Foreground` → 1 条形状红 + 墨迹事实红、给 `Base` 塞
+`FontFamily` → 1 条形状红；全部改回后与原文件字节相同。
+
+- **构建**：`0 警告 / 0 错误`。**行为**：新类单跑 **31/31**（含上面那轮改坏的RED清单）。
+- **视觉**：**本行零像素主张**——#50 已量死文本字形在任何捕获通路都不落墨，所以这批全部是依赖属性层的主张，
+  没有一条断言说"它长得好看了"；Gallery 那 211 处变色只能靠目视，未被任何闸口覆盖。
+- **硬件输入**：不动。
+- **改了一条治理规则**：`Catalog.json` 的 `audited` 定义原本硬写"至少一条像素断言"。这条在文本行上是
+  **不可满足**的——#50 已经量死文本字形在任何捕获通路都不落墨，规则写下时那件事还没测。定义改成"像素断言，
+  或在像素断言**可证明到不了**（而非没做）时，给出证明它的读数（这里就是 #50）＋活元素上的依赖属性到达读数"。
+  改规则与受益行同批提交，理由摆在这里：这是一条会永久禁止一个已被测明无法达成的状态的规则，不是为过关而放宽门槛。
+  `ported` 的定义不动，宇宙计数从 `47 audited / 1 ported` 变成 **48 audited / 0 ported**。
+- **清单**：`keys.md` 1303 → **1307**（`Typography.jalxaml` 段 7 → 11 rows）。目录里 `TextBlock` 行
+  `ported` → `audited`，gap 换成三条真账（七个数值行、字体回退未量、像素侧受 #50）+ 一条明说隐式 `TextBlock`
+  行是我们自己的。`adaptation/01` 那句"`x:Double` 进不了字典"补了指向 `adaptation/13` 的读数出处。
+  逐键对账表另成一份 `audits/textblock-typography.md`——第一版只写了 `adaptation/13`，被目录闸
+  `Every_parity_claim_cites_evidence_that_exists` 弄红（`audited` 行必须引一份 `docs/astra/audits/` 下的上游
+  审计 + 一份测试）。这条结构要求是对的，不是门槛太严：能力账（宿主能不能表达）与逐键账（上游那一行进没进来）
+  不是一回事，第一版把两件事塞进了一个文件，红这一枪该挨。
+- **不声称**：① 不声称这十个样式与 WinUI 在屏幕上逐像素一致（无字形墨）；② 不声称 `LineStackingStrategy`
+  那一行有到达证据（宿主默认与上游同值，形状断言是它能承载的全部）；③ 隐式 `TextBlock` 行仍钉主墨并全局
+  `Wrap`，这两条是我们替上游多做的，改它需要一批能看见文本的仪器；④ 七个上游数值键名未兑现，不拿
+  "字面量值相同"当兑现。
+
+### 排印转录批的串行闸口读数（2026-09-22）
+
+`tools/Test-AstraGates.ps1`（`spike/GalleryRender/gate-typography2.log`，包装器自记 **`GATE-EXIT=0`**）：
+build `0 警告 / 0 错误` → 整套 **1534/1534**（0 失败 0 跳过、7 m 18 s）→ 页闸 `PASS 13 pages x 2 variants,
+0 offender(s)` → 三档 `checked=True`（Light/Dark 各 83 源色 101 刷，HC 101 映射 + 3 条上游键因调色板无对应而按住）
+→ `keys.md is current: 1307 canonical lines.` → `All Astra gates passed.`。
+
+**测点 1503 → 1534 = +31**，全部来自新类，一条老测点都没动——这一批改的是排印层，而排印层的键没有任何产品样式消费。
+
+**第一跑在 11:50 停在 test 段**（`gate-typography.log`，1 条红：`Every_parity_claim_cites_evidence_that_exists`），
+原因就是上面"清单"那条讲的证据文件归错目录；补 `audits/textblock-typography.md` 后重跑才是这一份读数。
+中途还有一次假红值得记：只重建测试工程时
+`The_gallery_project_carries_the_catalog_it_reads` 会红，因为它把 `Catalog.json` 与
+`samples/FluentJalium.Gallery/bin/<cfg>/**` 里那份**运行期真读的**副本逐字节比对——改了目录就要连 Gallery 一起建。
+这条与 #47/#35 那族无关，是本地局部重建的形状，闸口内部一律全量建所以不会撞上。
+
+页闸这一跑的不稳定读数照实记：`status` 页两档 `stable=True/False`（其余 24 条 `True/True`），
+这一族归 #47/#35 的机制账，本批不追，也不因为它是老账就把"0 offender"读成"逐页像素已结清"。
+
+**这批的真正产出不是那 31 条，而是三条以前写错或没写的边界**：① 上游那八个 setter 里两个宿主没有成员、
+一个值是本运行时不认的标记（`XamlAutoFontFamily` 会静默变成一个不存在的族名）；② "数值令牌进不来"要改成
+"markup 进不来、代码进得来"，这决定了以后想兑现那七个键名该往哪走；③ `audited` 图例里那句"至少一条像素断言"
+在文本行上是不可满足的，改定义这件事与受益行同批提交并摆出理由，不留成一条永远不会有人达标的死规则。

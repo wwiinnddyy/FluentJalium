@@ -146,7 +146,7 @@ native Slider   Light bg=#37000000 -> Dark bg=#28FFFFFF                         
 | 材质 Material | `WindowBackdropType = {None, Auto, Mica, Acrylic, MicaAlt}`，窗口级公开可用 | 窗口背衬**有** |
 | 元素级 Acrylic/Reveal | `Jalium.UI.Media` 里 `AcrylicBrush`/`MicaBrush`/`RevealBrush` **全部不存在**；只有 Solid/Linear/Radial | 元素级亚克力与 Reveal **做不到**，浮动层只能用不透明实色（与 inkcanvas 的选择一致） |
 | 图标 Icons | `SymbolIcon` 文档自陈"mirrors WinUI's SymbolIcon"，取 Segoe 图标字体；`Symbol` 枚举 **764** 个成员 | 原生图标路**可用**，且不依赖出问题的 FluentSystemIcons；仍需逐码点验 cmap |
-| 排版 Typography | `ThemeManager.ApplyTypography(display, body, mono[, size])` 公开；当前实测落在 `Microsoft YaHei UI` / `Cascadia Code` / bodySize 12 | 公开可设为 Segoe UI Variable；**但 `x:Double` 进不了字典**，`Type*` 样式的字号只能内联字面量 |
+| 排版 Typography | `ThemeManager.ApplyTypography(display, body, mono[, size])` 公开；当前实测落在 `Microsoft YaHei UI` / `Cascadia Code` / bodySize 12 | 公开可设为 Segoe UI Variable；**但 `x:Double` 进不了字典**，`Type*` 样式的字号只能内联字面量——逐项读数与"哪几个 setter 宿主根本没有成员"见 `adaptation/13` |
 | 动效 Motion | 无公开系统减弱动画 API（只有 `LinuxDesktopPortal.TryReadReducedMotion` 被文档提到）；`TransitionDuration` 可主题化（实测 0.167↔0.333） | 令牌级动效**能**做；跟随系统开关**不能**声称支持 |
 | 无障碍接触 Exposure | 无高对比公开入口（见 00 文档） | **做不到**，需显式刷子重映射 |
 
