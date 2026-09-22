@@ -78,9 +78,16 @@
 
 ## 7 Known Gaps（不声称清单）
 
-1. 探针没有 subject 行、因此**未测**的 7 个模板 owner：`AppBarToggleButton`、`DataGridCell`、`DataGridColumnHeader`、
-   `MenuBarItem`、`MenuFlyoutItem`、`MenuFlyoutSubItem`、`ToggleMenuFlyoutItem`。菜单项与表格单元是文本最密集的
-   两处，它们的前景只由第 5 节的"键必解析"闸覆盖，没有"到达部件"的读数。
+1. ~~探针没有 subject 行、因此**未测**的 7 个模板 owner~~ —— **已结 6 个**（2026-09-21 余账批，ROADMAP"前景审计余账批"）：
+   `AppBarToggleButton`（carrier 是具名部件 `LabelText`）、`DataGridCell`、`DataGridColumnHeader`、`MenuBarItem`、
+   `MenuFlyoutSubItem`、`ToggleMenuFlyoutItem` 现在各有两档"到达 carrier"的读数，`MenuFlyoutItem` 早在 #55 就有。
+   留下的部分是：这六条只到 **carrier**，carrier 若是控件自身（菜单项、表格单元）则"标签真以该色画出"仍不在断言里
+   （#50），且 6 个 owner 只有 2 个状态格被量（勾选、列头禁用），hover/pressed 行照旧归真指针通路（#13）。
+1b. sentinel 通路在**别名单元**上不可用（本批量出）：`FluentThemeManager.OverrideBrush` 经 `GetBrush` 只认生成调色板，
+   对 `DataGridRowForeground` 这类别名键直接 `KeyNotFoundException`；改打它别名指向的调色板刷，或 mount 之后翻档，
+   carrier 一律不动（`#E4000000` 原地不动，6/6）。可判定的写法只剩"在该档下 mount、两档各一条"，
+   而它的牙由 A/B 证明：抽掉 `Styles/Menus.jalxaml:288` 只有 `menu-bar-item` 两档红，回落值是继承墨
+   （`#FF1D1D1F` / `#FFF5F5F7`）不是默认黑——所以"等于令牌"才是干活的那条。
 2. 5 处具名声明在实测树上取不到：`FluentTeachingTip.TitleTextBlock`/`SubtitleTextBlock`（提示未真正弹出）、
    `FluentTabViewItem.IconHost`、`FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`。
 3. 兄弟图元判底用的是"重叠布局面板 + 尺寸同阶"的启发式，不是几何命中（本运行时没有可用的跨要素变换读数），

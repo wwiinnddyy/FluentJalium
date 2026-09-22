@@ -2,6 +2,8 @@ using FluentJalium.Tests.Pixel;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Data;
 using Jalium.UI.Media;
 using Xunit;
 
@@ -235,7 +237,163 @@ public sealed class AstraForegroundRoutingTests : IDisposable
         });
     }
 
+    // ---------- the owners the audit left unread ----------
+
+
+    /// <summary>
+    /// The six template owners whose foreground rows the audit had no subject row for
+    /// (docs/astra/audits/foreground.md 7.1). Each leg names the element the shipped row actually points at, which
+    /// is not one element for all of them: the flyout item family and the two grid containers carry the row on
+    /// themselves and paint their label from that value, while the app bar toggle button's label is a named template
+    /// part. Every one of these tokens is a transcribed alias row over the same palette brush.
+    ///
+    /// Two sentinel instruments were tried first and both are unavailable here, which is the finding worth keeping.
+    /// (1) <c>OverrideBrush</c> cannot aim at an alias key at all - <c>GetBrush</c> reads the generated palette only,
+    /// so it throws <c>KeyNotFoundException</c> for <c>DataGridRowForeground</c> and the other five. (2) Overriding
+    /// the *palette* brush the alias points at leaves the carrier on the light colour, and so does flipping the
+    /// variant after the element is mounted: measured, six for six, #E4000000 stays #E4000000 through both. That is
+    /// the shown-window broadcast rule - a mounted-but-not-shown element keeps the brushes it resolved when it was
+    /// built. So the falsifiable instrument is the one below: mount **under** the variant being read, and take the
+    /// two variants as two legs. Withholding one shipped row is what proves the reading means something: with the
+    /// <c>MenuBarItem</c> row removed the two legs go red and the item falls back to the ink it inherits from the
+    /// harness host (#FF1D1D1F light, #FFF5F5F7 dark) - not to the property default, which is why the equality
+    /// against the token is the assertion doing the work and the black check is only a sanity floor.
+    /// </summary>
+    [Theory]
+    [InlineData("appbar-toggle", "AppBarToggleButtonForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("appbar-toggle", "AppBarToggleButtonForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("data-grid-cell", "DataGridRowForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("data-grid-cell", "DataGridRowForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("data-grid-header", "DataGridColumnHeaderForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("data-grid-header", "DataGridColumnHeaderForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("menu-bar-item", "MenuBarItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("menu-bar-item", "MenuBarItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("menu-flyout-sub-item", "MenuFlyoutSubItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("menu-flyout-sub-item", "MenuFlyoutSubItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("toggle-menu-flyout-item", "MenuFlyoutItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
+    [InlineData("toggle-menu-flyout-item", "MenuFlyoutItemForeground", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    public void An_owners_resting_foreground_row_lands_on_the_carrier_that_paints_its_text(string owner, string key, string aliases, FluentThemeVariant variant)
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(variant);
+            try
+            {
+                var carrier = CarrierOf(owner);
+                var landed = ForegroundOf(carrier);
+                var palette = Assert.IsType<SolidColorBrush>(FluentThemeManager.GetBrush(aliases));
+
+                Assert.Multiple(
+                    // The token must still be the palette brush itself: a transcribed alias row, not a copied colour.
+                    () => Assert.True(ReferenceEquals(palette, Application.Current!.TryFindResource(key)),
+                        $"{key} does not resolve to the {aliases} instance it is transcribed as aliasing."),
+                    () => Assert.Equal(ToColour(aliases), landed),
+                    () => Assert.NotEqual(Colors.Black, landed));
+            }
+            finally
+            {
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The checked label row of an <c>AppBarToggleButton</c>: the one state of these seven owners that is reachable
+    /// without a pointer, and the one that a same-colour reading could never tell apart, because the resting and
+    /// checked tokens are different colours by design.
+    /// </summary>
+    [Fact]
+    public void The_checked_row_of_an_app_bar_toggle_button_moves_its_label()
+    {
+        _fixture.Run(() =>
+        {
+            var button = Mount(new AppBarToggleButton { Label = "Like", IsChecked = false });
+            var label = LabelText(button);
+            var resting = ForegroundOf(label);
+
+            button.IsChecked = true;
+            PixelHarness.Settle(20);
+
+            Assert.Multiple(
+                () => Assert.Equal(ToColour("AppBarToggleButtonForeground"), resting),
+                () => Assert.Equal(ToColour("AppBarToggleButtonForegroundChecked"), ForegroundOf(label)));
+        });
+    }
+
+    /// <summary>
+    /// Where a disabled grid header's row stops: the template writes it on the header itself, so the header takes it,
+    /// and the text the header's content presenter generates keeps what it inherited when it was built - the same
+    /// stop the NumberBox header fact above measures. Pinned as a reading rather than written as a claim about pixels.
+    /// </summary>
+    [Fact]
+    public void A_disabled_column_header_takes_its_row_on_the_carrier_the_template_names()
+    {
+        _fixture.Run(() =>
+        {
+            var header = (DataGridColumnHeader)CarrierOf("data-grid-header");
+            var resting = ForegroundOf(header);
+
+            header.IsEnabled = false;
+            PixelHarness.Settle(20);
+
+            Assert.Multiple(
+                () => Assert.Equal(ToColour("DataGridColumnHeaderForeground"), resting),
+                () => Assert.Equal(ToColour("DataGridColumnHeaderForegroundDisabled"), ForegroundOf(header)));
+        });
+    }
+
     // ---------- helpers ----------
+
+    /// <summary>Mounts one of the seven owners and hands back the element a foreground row of its style writes.</summary>
+    private static FrameworkElement CarrierOf(string owner) => owner switch
+    {
+        "appbar-toggle" => LabelText(Mount(new AppBarToggleButton { Label = "Like", IsChecked = false })),
+        "data-grid-cell" => GridCell(),
+        "data-grid-header" => GridHeader(),
+        "menu-bar-item" => MenuBarItemOf(),
+        "menu-flyout-sub-item" => Mount(new MenuFlyoutSubItem { Text = "sub" }),
+        "toggle-menu-flyout-item" => Mount(new ToggleMenuFlyoutItem { Text = "toggle" }),
+        _ => throw new InvalidOperationException($"Unknown owner '{owner}' - extend this switch, do not skip the owner."),
+    };
+
+    private static FrameworkElement LabelText(AppBarToggleButton button) =>
+        PixelHarness.Named(button, "LabelText") ?? throw new InvalidOperationException("the app bar template put no LabelText on it");
+
+    private static FrameworkElement GridCell() =>
+        PixelHarness.Descendant<DataGridCell>(MountedGrid()) ?? throw new InvalidOperationException("the grid realised no cell");
+
+    private static FrameworkElement GridHeader() =>
+        PixelHarness.Descendant<DataGridColumnHeader>(MountedGrid()) ?? throw new InvalidOperationException("the grid realised no header");
+
+    private static FrameworkElement MenuBarItemOf()
+    {
+        var bar = new MenuBar { Width = 240, Height = 34 };
+        bar.Items.Add(new MenuBarItem { Title = "view" });
+        PixelHarness.Build(bar, 240, 34);
+        PixelHarness.Settle(30);
+        return PixelHarness.Descendant<MenuBarItem>(bar) ?? throw new InvalidOperationException("the menu bar realised no item");
+    }
+
+    /// <summary>A freshly mounted one-column grid. Not cached: a header a later fact disables must not leak into it.</summary>
+    private static DataGrid MountedGrid()
+    {
+        var grid = new DataGrid { Width = 420, Height = 160, AutoGenerateColumns = false };
+        grid.Columns.Add(new DataGridTextColumn { Header = "Alpha", Width = 160, Binding = new Binding("Name") });
+        grid.ItemsSource = new List<Row> { new("Row 1", 1) };
+        PixelHarness.Build(grid, 440, 200);
+        PixelHarness.Settle(60);
+        return grid;
+    }
+
+    private sealed record Row(string Name, int Value);
+
+    /// <summary>The foreground a carrier holds, read off the carrier itself - the three spellings of this DP are one object.</summary>
+    private static Color ForegroundOf(FrameworkElement carrier) => carrier switch
+    {
+        Control control => ColourOf(control.Foreground),
+        TextBlock text => ColourOf(text.Foreground),
+        _ => throw new InvalidOperationException($"{carrier.GetType().Name} carries no Foreground to read."),
+    };
 
     private static T Mount<T>(T control) where T : FrameworkElement
     {

@@ -2265,3 +2265,33 @@ VisualState 改写）照旧不在范围内，签入表也只到调色板这一�
 宿主窗口那条路本身没有变好或变坏——只是这条主张不再依赖它，`Host()` 首帧不可比这条限制照旧写在 `adaptation/06`，
 其他仍走 `Host()` 的用例（如窗口外壳那批）没被这次改动覆盖；未选态只断"这一色为 0"，没断"未选态自己画了什么"；
 药丸的**位置**（选中第一项应落在第一行）本批没有量，只量了墨的**量**。
+
+## 前景审计余账批（#56）：6 个没有 subject 行的 owner 补上"到达"读数——并量出别名键打不进 sentinel
+
+`audits/foreground.md` 7.1 挂着 7 个 owner："前景只由键解析闸覆盖，没有到达部件的读数"。本批把它们接进
+`AstraForegroundRoutingTests`：新增 14 条（6 个 owner × 两档 = 12，加 `AppBarToggleButton` 勾选态、列头禁用态）。
+carrier 不是一处：菜单族与两个表格容器把行写在**自己**身上、标签由控件 `OnRender` 按该值画，
+`AppBarToggleButton` 的标签是具名部件 `LabelText`（勾选行换到 `AppBarToggleButtonForegroundChecked`）。
+
+1. **两种 sentinel 通路都不可用，这是本批的量出项**：(a) `OverrideBrush` 根本打不到别名键——`GetBrush` 只读生成调色板，
+   于是 `DataGridRowForeground` 等 6 个全部 `KeyNotFoundException`；(b) 改打它别名指向的 `TextFillColorPrimaryBrush`、
+   或者**挂好之后**再翻档，六条全数停在 `#E4000000`。后者就是"广播只到已上屏窗口的根"那条老账的另一面：
+   已 mount 未上屏的要素保留建它时解析到的刷实例。所以可判定的仪器只剩一种——**在该档下 mount**，两档各一条。
+2. **A/B 有牙**：抽掉 `Styles/Menus.jalxaml:288` 那行 `MenuBarItemForeground`，只有 `menu-bar-item` 两档红，
+   且回落值是**继承墨** `#FF1D1D1F`（暗 `#FFF5F5F7`）而不是属性默认黑——所以干活的是"等于令牌"这条，
+   `!= Colors.Black` 只是地板。该行改回后 22/22 绿，`git diff` 对该文件为空。
+3. **同色盲区没有被本批消掉**：这 6 条 carrier 全落在同一个 `TextFillColorPrimaryBrush` 上，等值断言能证明
+   "这一格到了 carrier"，证明不了"这一格与其他同色格互不相同"。别名身份那条（`ReferenceEquals(palette, 键解析结果)`）
+   钉的是"逐字转录的别名行、不是抄色"，这条同时是 #12 的前置事实。
+
+四类证据：**构建**——串行闸口（整套顺序跑）**1479/1479、0 失败 0 跳过、7 m 15 s、管道退出 0**，末行
+`All Astra gates passed.`，`0 个警告 / 0 个错误`，调色板三档 `checked=True`，`keys.md is current: 1298 canonical lines.`
+（比上一批 1465 多 14 条＝本批新增，键不变）；**行为**22 条（含 8 条老账不回归）；**视觉**本批全是树上读数，没有像素断言——
+理由仍是 #50 字形不打印，而 carrier==控件自身是菜单项/表格单元能拿到的最强读数；**硬件输入**本批不动输入路径
+（勾选与禁用都用属性驱动，hover/press 行照旧归 #13）。
+
+不声称：只量了 2 个状态格（勾选、列头禁用），其余 5 个 owner 的 hover/pressed/disabled 行没测；
+`audits/foreground.md` 7.2 那 5 处具名取不到、7.6 那 228 条状态 Setter 的落格，本批不结；
+disabled 的表格单元与菜单项**没有**单独断言（框架在无头主机的禁用盖章只在 CheckBox/RadioButton/列表行/组合框行上量过）；
+高对比档下这些 carrier 走不走映射，仍只在逐键闸那一层（#61 余账）。
+
