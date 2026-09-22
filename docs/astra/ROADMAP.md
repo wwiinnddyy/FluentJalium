@@ -2502,3 +2502,24 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 不等于那片表面现在跟上了 `#202020`；要结它得在暗色下对那块表面重新成像。`TextOnAccent` 仍按上一节的判定停在
 "先量它铺在哪支强调填充上"；`TextPrimary`/`TextSecondary`/`TextDisabled` 的代价（2 + 5 条事实）照旧记在普查表旁，
 每一轮都要一起改，不许放松旧断言混过去。
+
+## #10 第一段：Gallery 的 Tokens 系统页落地（色板网格 + 缺失键诊断），差集闸不动
+
+页契约先摸清再动手（`MainWindow.jalxaml` 的 `PageHost` 子元素 + `.cs` 的 `_pages`/`_pageIds` 两处字典 +
+`Catalog.json` 的 `pages` 条目 + `WireTokens()`），所以这一页是按现成形状加的，不是新造一套宿主。
+
+- **构建**：`dotnet build samples/FluentJalium.Gallery` `0 个警告 / 0 个错误`（`Symbol="Color"` 与
+  `Application.Current.TryFindResource` 的用法都在这一步验过，不是猜的）。
+- **行为**：新测点 `AstraGalleryTokenTests.The_grid_the_tokens_page_paints_is_the_palette_the_kernel_publishes`——
+  自己解析 `keys.md` 的 Light 块 `SolidColorBrush` 行，自己正则解析生成的 `TokenCatalog.cs`，两-reader 双向 + 顺序
+  比对（与目录闸同一个立场：两个读者必须各自独立，否则会同向漂移）。Gallery 全类 **7/7 绿**。
+  token 数组**由脚本从清单生成**、不手抄（101 个），生成方式写在文件注释里，闸口管得住重生成后的漂移。
+- **视觉**：`Test-AstraGallerySmoke.ps1 -Page tokens` 真启动、导航到该页、优雅关闭，18.8 s，无残留进程。
+  **但这一页还没有像素断言**：冒烟只证明窗口出现并关闭，不证明 101 个 swatch 全上了色。
+- **硬件输入**：本页无可交互控件（纯展示 + 代码构建），不动输入路径。
+
+不声称：①"每个 token 真的解析出刷"目前没有运行时逐条断言——页上的诊断行会把没解析的键**点名**给人看，
+但没人读那行也算绿；要结它得在主题运行时测点里逐 token `TryFindResource` 断非空（两档各一次）。
+② 每页可渲染到像素仍未做，卡在一个未决设计：测试工程只引用 `src/FluentJalium`、不引用 Gallery（`WinExe` +
+`internal` 类型），要么给页内容建一个可共享的工厂，要么把渲染自证放进 Gallery 自己的启动参数里。
+③ 这一页的 parity 不是 `Catalog.json` 的 controls 行——tokens 不是控件，硬造一行会让目录闸变成假账。

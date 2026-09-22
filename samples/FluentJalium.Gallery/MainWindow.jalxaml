@@ -16,6 +16,9 @@
         <fluent:FluentNavigationItem x:Name="OverviewItem" Content="Overview" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Home" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="TokensItem" Content="Tokens" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Color" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
         <fluent:FluentNavigationItem x:Name="ButtonsItem" Content="Buttons" Style="{StaticResource FluentNavigationItemStyle}">
           <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="TouchPointer" /></fluent:FluentNavigationItem.Icon>
         </fluent:FluentNavigationItem>
@@ -66,6 +69,17 @@
         <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
           <!-- The constructor retains these pages and attaches only the current one. -->
           <Grid x:Name="PageHost" Margin="24,8,24,24" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <StackPanel x:Name="TokensPage">
+              <TextBlock Text="Tokens" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Every fill this gallery paints comes from one palette of 101 brush tokens, and this page is the whole set at once: the swatches are built from the canonical key inventory, so a token that no longer resolves shows up as a hole in the grid and is named in the readout below." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <WrapPanel x:Name="TokenSwatchHost" />
+                  <TextBlock x:Name="TokenReadout" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Switch the theme on the Settings page and come back: the fills move because each name resolves to one instance the facade re-tints in place, which is also why the aliases the framework's own dictionaries read follow the same switch." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            </StackPanel>
             <StackPanel x:Name="OverviewPage">
               <TextBlock Text="FluentJalium" Style="{StaticResource TitleTextBlockStyle}" />
               <TextBlock Text="Explore familiar Windows controls, built on Jalium." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />

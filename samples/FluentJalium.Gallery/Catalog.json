@@ -8,6 +8,7 @@
   },
   "pages": [
     { "id": "overview", "title": "Overview", "host": "OverviewPage" },
+    { "id": "tokens", "title": "Tokens", "host": "TokensPage" },
     { "id": "buttons", "title": "Buttons", "host": "ButtonsPage" },
     { "id": "inputs", "title": "Inputs", "host": "InputsPage" },
     { "id": "selection", "title": "Selection", "host": "SelectionPage" },

@@ -38,6 +38,7 @@ public partial class MainWindow : Window
         _pages = new Dictionary<FluentNavigationItem, FrameworkElement>
         {
             [(FluentNavigationItem)OverviewItem!] = (FrameworkElement)OverviewPage!,
+            [(FluentNavigationItem)TokensItem!] = (FrameworkElement)TokensPage!,
             [(FluentNavigationItem)ButtonsItem!] = (FrameworkElement)ButtonsPage!,
             [(FluentNavigationItem)InputsItem!] = (FrameworkElement)InputsPage!,
             [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
@@ -49,6 +50,7 @@ public partial class MainWindow : Window
             [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
         };
         _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
+        _pageIds[(FluentNavigationItem)TokensItem!] = "tokens";
         _pageIds[(FluentNavigationItem)ButtonsItem!] = "buttons";
         _pageIds[(FluentNavigationItem)InputsItem!] = "inputs";
         _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
@@ -71,6 +73,7 @@ public partial class MainWindow : Window
         WireMenus();
         WireCommandBar();
         WireAppearance();
+        WireTokens();
         SetAccessibleNames();
 
         ProfileChoice.SelectedItem = ProfileChoice.Items[0];
@@ -96,6 +99,44 @@ public partial class MainWindow : Window
             FluentThemeManager.Changed -= ApplyAppearance;
             Navigation.SelectionChanged -= OnNavigationChanged;
         };
+    }
+
+    /// <summary>
+    /// Builds the palette grid on the Tokens page from <see cref="TokenCatalog" />, one card per brush token, filled
+    /// with what that name resolves to at this moment so a theme switch repaints the whole set, and names every token
+    /// that resolves to nothing in the readout. The page has no other state to wire: the diagnostics exist precisely so
+    /// a missing row is visible on screen instead of as a swatch someone has to recognise as blank.
+    /// </summary>
+    private void WireTokens()
+    {
+        var host = (WrapPanel)TokenSwatchHost!;
+        var readout = (TextBlock)TokenReadout!;
+        var outline = Application.Current?.TryFindResource("ControlStrokeColorDefaultBrush") as Brush;
+        var missing = new List<string>();
+
+        foreach (var key in TokenCatalog.BrushTokens)
+        {
+            if (Application.Current?.TryFindResource(key) is not Brush brush)
+            {
+                missing.Add(key);
+                continue;
+            }
+
+            var card = new StackPanel { Width = 116, Margin = new Thickness(0, 0, 8, 12) };
+            card.Children.Add(new Border
+            {
+                Height = 44,
+                Background = brush,
+                BorderBrush = outline,
+                BorderThickness = new Thickness(1),
+            });
+            card.Children.Add(new TextBlock { Text = key, FontSize = 10, Margin = new Thickness(0, 4, 0, 0) });
+            host.Children.Add(card);
+        }
+
+        readout.Text = missing.Count == 0
+            ? $"{TokenCatalog.BrushTokens.Length} palette tokens resolved, {host.Children.Count} painted, none missing."
+            : $"{host.Children.Count} of {TokenCatalog.BrushTokens.Length} tokens painted; unresolved: {string.Join(", ", missing)}";
     }
 
     private void WireButtons()
