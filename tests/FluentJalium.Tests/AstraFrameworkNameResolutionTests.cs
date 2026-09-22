@@ -235,9 +235,9 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     /// cannot reach any other way. For <c>TextOnAccent</c> that bar is now half-cleared and the other half is what
     /// holds the row: <see cref="The_on_accent_name_is_read_by_name_per_call_by_the_families_that_hold_it" /> shows
     /// three live per-call readers, and
-    /// <see cref="The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink" /> shows that
-    /// the families behind them build no visual tree on this runtime, so there is no ink for a row to move yet. The
-    /// measured colours below are the baseline that decision revisits.
+    /// <see cref="The_calendar_family_has_no_template_cell_and_builds_no_elements_to_write_onto" /> shows that
+    /// behind them there is no element to write onto - the family paints itself, and what its readers return is glyph
+    /// ink, which #50 keeps out of every capture. The measured colours below are the baseline that decision revisits.
     ///
     /// This theory used to carry a <c>TextSecondary</c> leg and then a <c>TextDisabled</c> leg. Both were deleted
     /// rather than re-pinned when their rows shipped, because every claim in this fact is false by design for a
@@ -498,21 +498,29 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// Shape two and the reason no row ships this round. The name is read in six compiled framework dictionaries
+    /// Shape two, and what it does and does not say. The name is read in six compiled framework dictionaries
     /// (Calendar, DataGrid, TreeDataGrid, Dialogs, TitleBar, ToggleControls - the IL census in
     /// <c>spike/OnAccentProbe</c> lists them by generated builder), and every one of those families is one this library
     /// re-templates, so those reads ask a question our own markup never asks. What is left are the three code readers
-    /// above, and they sit on surfaces that do not build at all on this runtime: the calendar family resolves an
-    /// implicit style with ten property cells and no <c>Control.Template</c> cell, and a built one holds zero visual
-    /// children, while a <see cref="Button"/> built through the same harness in the same turn holds a tree. So there is
-    /// no ink for the row to move today, and "a live reader with no surface" is recorded as the reason rather than
-    /// shipped on the strength of the lever alone - the same bar <c>TextDisabled</c> had to clear with four built labels.
+    /// above, and they sit on a family that carries no <c>Control.Template</c> cell and builds no elements at all:
+    /// a built calendar holds zero visual children where a <see cref="Button"/> built through the same harness in the
+    /// same turn holds a tree.
+    ///
+    /// That shape is NOT "nothing paints", and this fact used to be named as if it were. The family draws itself in
+    /// <c>OnRender</c> and does print a face - see
+    /// <see cref="AstraCalendarFamilyTests.A_self_drawn_family_member_prints_a_face_without_a_visual_tree" />, which
+    /// measures 80k+ surface pixels and 39 distinct colours for a 300x300 calendar, and
+    /// <see cref="AstraCalendarFamilyTests.A_selected_day_reaches_pixels_on_a_control_that_has_no_parts_to_write_onto" />,
+    /// which shows a state arriving as pixels. So the reason this row stays un-issued is not a missing surface but
+    /// what the name carries: every one of its readers returns the selected-day TEXT brush, and glyph ink is #50's
+    /// wall - measured in <c>spike/CalendarProbe</c>, where installing a probe under <c>TextOnAccent</c> moved 0
+    /// pixels of a calendar while the same install under <c>AccentBrush</c> moved its 88 accent pixels.
     /// </summary>
     [Theory]
     [InlineData(typeof(Calendar))]
     [InlineData(typeof(DatePicker))]
     [InlineData(typeof(TimePicker))]
-    public void The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink(Type family)
+    public void The_calendar_family_has_no_template_cell_and_builds_no_elements_to_write_onto(Type family)
     {
         _fixture.Run(() =>
         {

@@ -3721,3 +3721,81 @@ holder: Jalium.UI.Managed
 这一批改的是一个调用，不是键。
 **视觉侧如实记**：投影值与依赖属性读数成立，字族与文字墨迹都没有新证据（#50 仍挡），
 所以"页面看起来更接近上游"这句不由本批说；逐页像素计数在改动前后都通过同一判据，本批没有把它当视觉证明。
+
+## #70 判掉：日历族不是"不渲染"，是"自绘"——顺带更正 #69 的理由
+
+### 这条账错在哪
+
+#70 是上一轮（#69 `TextOnAccent`）当场开出来的："装上去之后走一圈视觉树，Calendar / DatePicker / TimePicker
+都是 0 个子节点，而同一轮同一个 harness 里的 Button 有 4 个"，于是记成"在出货应用里 `new DatePicker()` 什么都不画"。
+这一次补上了当时缺的那条腿——**像素捕获**——结论反过来：
+
+```
+=== spike/CalendarProbe（模式 draw / select，Light，300x300）===
+Calendar      children=0 distinct=39  #F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #0078D4=88
+DatePicker    children=0 distinct=15  #F3F3F3=88560 #D8D8D8=1128 #828282=124 …
+TimePicker    children=0 distinct=30  #F3F3F3=88604 #D8D8D8=1128 …
+Grid baseline children=0 distinct=1   #000000=90000（同一 harness 同一轮的空面）
+```
+
+三个成员都在画一整张脸，只是**没有可视子节点**——它们在 `OnRender` 里自绘。参考树里
+`Jalium.UI.Controls/Calendar.cs:768` 就是 `OnRender`，:776 的注释还写着"`CalendarItemStyle` normally consumed by
+`PART_CalendarItem`，本控件直接读样式格子"。所以 `tree=0` 分不开"自绘"与"空白"，而这个区别这个库已经被
+`ScrollBar` 骗过一次（`adaptation/06` 第 4 条）。**判据规则**：说一个控件"不渲染"，必须同时给出子节点数**和**
+一张像素直方图；只数树的那条读数是仪表读数，不是被试读数。
+
+### 一个正向收获：我们的别名行真的到达自绘面
+
+同一轮里往应用作用域插一枚探针刷再捕获：
+
+- 名字 `AccentBrush` → 日历那 **88** 个像素从 `#0078D4` 变成 `#112233`；
+- 名字 `TextOnAccent` → **0** 个像素变化。
+
+`AccentBrush` 正是 `FrameworkRetints.jalxaml` 已经发行的一行，所以这不是新能力，而是**第一次量到**它落到了一片
+我们没有任何模板块的表面上的像素。而 `TextOnAccent` 的 0 变化有因可循：它的三个读者返回的都是"选中日的**文字**刷"，
+文字墨迹过不了 #50 那道墙。
+
+### 因此 #69 的理由要更正（判断不变，理由换掉）
+
+`TextOnAccent` 仍然不发行，但**不是**因为"日历族不建树、所以没有墨可动"——那句话现在被量翻了。真正的理由是：
+这片表面有墨，可这个名只画字，而字在本仓库任何捕获通路里都没有墨（#50）。已同步改掉三处：
+`FrameworkRetints.jalxaml` 的那段"Measured and deliberately NOT shipped"、常驻事实的名字
+（`The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink` →
+`The_calendar_family_has_no_template_cell_and_builds_no_elements_to_write_onto`，名字不再声称"没有墨"），
+以及它的注释与引用。
+
+### 新的读数：状态能到像素，而禁用不改变选中块
+
+```
+resting                  accent=88  distinct=39
+SelectedDate=2026-09-15  accent=648 distinct=47
+and disabled             accent=648 distinct=46  页面 #F3F3F3→#F2F2F7、#ECECEC→#ECECF0、#000000 136→100
+back to resting          accent=88  distinct=39
+```
+
+固定月份 + 固定选中日，因此这四个数不依赖系统时钟。可读出的三件事：
+①状态**能**到达一个没有部件的控件（88 → 648，且可逆）；②禁用确实重画了整张脸（页面与网格线色都动），
+说明不是"没重新渲染"；③**选中的那一块在禁用态一点没变暗**——上游的禁用日历会把选中填充压下去。
+这条是新的用户可见偏差候选，开成 **#76**：自绘值由控件自己解析，我们既没有格子也没有部件可写，
+能做的只有名字，而这个名走的恰好是看不见的文字层。
+
+### 出货
+
+- `tests/FluentJalium.Tests/AstraCalendarFamilyTests.cs`（新类，5 条）：
+  ①三成员 theory"画了脸而没有树"（含空 Grid 基线那条，防止颜色计数被误读成结构）；
+  ②选中日到达像素且清得回去；③禁用保持满饱和选中块（把偏差钉住，将来要么按 #76 改掉要么让这条红）。
+  三条都不声称文字：`#50` 仍挡字形墨迹。
+- `spike/CalendarProbe/`（探针与两份读数 `calendar-draw.txt` / `calendar-select.txt`）。
+- `FrameworkRetints.jalxaml` 与 `AstraFrameworkNameResolutionTests` 的上述更正。
+- 判掉 #70；#69 的判断保留、理由改写；新开 #76。
+
+**闸口**：`tools/Test-AstraGates.ps1` 串行一趟（日志 `spike/CalendarProbe/gate-calendar-fix.log`），
+`GATE-PIPE-EXIT=0`，末行 `All Astra gates passed.`。逐段：build 0 警告 0 错误；全量测试
+`失败: 0，通过: 1572，总计: 1572`（上一批 1567，本批 +5 条日历族事实）；逐页像素 `PASS 13 pages x 2 variants,
+0 offender(s)`；三档调色板 `checked=True`；`keys.md is current: 1312 canonical lines`——本批没有发行也没有撤下
+任何一行，改的是两处注释与一处测试名。**四类证据分开记**：本批的出货是"测试基座 + 文档更正"，行为证据是那三张
+直方图与 88→648 的状态增量（Debug 与 Release 定向跑都是 5/5 绿），构建证据是闸口的 build 段，
+视觉证据**没有新增**（自绘面的样子我们一字未改），硬件输入证据同样没有（探针不动真指针）。
+**这一批没有做的决定**：日历族在 Gallery 里没有页面、我们也没有一条它的样式行——它今天完全是框架自绘的样子。
+WinUI 3 在这一 commit 里没有 `Calendar`/`TimePicker` 控件，`DatePicker` 是 `CalendarView` 之上的弹层，
+所以"要不要按上游重做这一族"是一次带 parity 判定的选型，不是本批的读数能替它决定的。
