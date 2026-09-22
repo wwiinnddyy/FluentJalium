@@ -1,0 +1,40 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.42
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:02.40]     FluentJalium.Tests.Resources.AstraResourceKeyTests.Every_referenced_key_is_declared [FAIL]
+  失败 FluentJalium.Tests.Resources.AstraResourceKeyTests.Every_referenced_key_is_declared [24 ms]
+  错误消息:
+   Undeclared resource references:
+ThemeResources/Dark.jalxaml: SystemColorButtonFaceColor
+ThemeResources/Dark.jalxaml: SystemColorButtonTextColor
+ThemeResources/Dark.jalxaml: SystemColorGrayTextColor
+ThemeResources/Dark.jalxaml: SystemColorHighlightColor
+ThemeResources/Dark.jalxaml: SystemColorHighlightTextColor
+ThemeResources/Dark.jalxaml: SystemColorHotlightColor
+ThemeResources/Dark.jalxaml: SystemColorWindowColor
+ThemeResources/Dark.jalxaml: SystemColorWindowTextColor
+ThemeResources/Light.jalxaml: SystemColorButtonFaceColor
+ThemeResources/Light.jalxaml: SystemColorButtonTextColor
+ThemeResources/Light.jalxaml: SystemColorGrayTextColor
+ThemeResources/Light.jalxaml: SystemColorHighlightColor
+ThemeResources/Light.jalxaml: SystemColorHighlightTextColor
+ThemeResources/Light.jalxaml: SystemColorHotlightColor
+ThemeResources/Light.jalxaml: SystemColorWindowColor
+ThemeResources/Light.jalxaml: SystemColorWindowTextColor
+  堆栈跟踪:
+     at FluentJalium.Tests.Resources.AstraResourceKeyTests.Every_referenced_key_is_declared() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Resources\AstraResourceKeyTests.cs:line 46
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)

@@ -2191,6 +2191,12 @@ Gallery 的 Motion 系统页仍未建（#10 剩余部分）。
 后果写进了用例的 remarks：**这条逐键断言钉的是"哪个键接到哪个系统色槽"的接线，不是用户最终看见的颜色值**；
 "高对比下窗口文字该是白"这种值主张必须拿真平台色，本套件做不到（与 #13 同一条欠账）。
 
+> **更正（2026-09-23，#61）：** 上面那句"这台主机没有把平台系统色填进来，未设置的槽就是洋红"是错的。
+> 洋红是 `ThemeResources/Light.jalxaml:158-165` 与 `Dark.jalxaml:158-165` 那八行上游占位符本身，而 Jalium 解
+> `SystemColors.<Slot>` 时先读同名的 `<Slot>Brush` 资源（`spike/SystemColorProbe` 量出来：往我们那格写颜色，
+> `SystemColors` 就跟着答），所以是我们自己的格子冒充了系统色，八个槽全塌成 `#FFFF00FF`。
+> 当时"换两条腿看不出来"的 A/B 结论也是同一原因的后果。修法与新的读数在本文件末尾的 #61 段。
+
 四类证据：**构建**见下闸口读数；**行为**+1 条逐键用例，含"翻主题真动了调色板"的到达腿；**视觉**本批没有像素断言
 （高对比档下没有任何一条用例拿到过墨——#50 未结，且现在多一条已知限制：主机连平台系统色都没有）；
 **硬件输入**本批不动输入路径。
@@ -3996,6 +4002,111 @@ NumberBox 那条用的是公开 `Focus()` 调用，不是真键盘也不是真�
 测试总数仍是 1573：本批删了七处 settle、补了两处 open 主张、给一条开着不关的下拉补了 `finally`，
 没有一条断言被删。上一批（`0269125`）留下的 `gate-full.log` 与本批读数是两次独立全量跑，
 `status` 两档的 `stable=True/False` 在两次里都在——那是 #78 的环，不是弹层改形带出来的。
+
+## #61（目标项 6）：高对比那片洋红不是"这台主机没平台色"，是**我们自己那行占位符在冒充系统色**（2026-09-23）
+
+仪器是新写的 `spike/SystemColorProbe`，逐字读数在 `spike/SystemColorProbe/system-color-probe.txt`。它一次读四样：
+Win32 `GetSysColor`、框架 `SystemColors.<Slot>`、我们调色板那一格 `GetBrush(key)`、以及
+`TryFindResource("<Slot>")` / `TryFindResource("<Slot>Brush")`，四个主题态各读一遍。
+
+**决定性的一条不是"谁等于谁"，而是拿生产写入路线问的**：`FluentThemeManager.OverrideBrush("SystemColorWindowTextColorBrush", X)`
+之后 `SystemColors.WindowTextColor` 就答 `X`，八个槽全部 `moved=True`，`ours=ours`（`TryFindResource` 返回的就是我们那格的同一个对象）。
+Jalium 解 `SystemColors.<Slot>` 走 `ResolveColor(brushResourceKey, colorResourceKey, ColorFromSysColor(index))`
+（`Jalium.UI.Controls/SystemColors.cs:306-316`），**先查名为 `<Slot>Brush` 的资源，再查 `<Slot>`，最后才碰平台**——
+而我们调色板正好占着这八个名字。改前改后的四档读数还另给出一条优先级实证：高对比一档
+`<Slot>` 这个 Color 键已经变成 `#FF1D1D1F`，框架答出来的仍是 `<Slot>Brush` 那格的 `#FFF5F5F7`，所以刷子的确排在颜色键之前。
+
+于是 #57 当时记下的原因是错的，这里更正：那句"这台主机没把平台系统色填进来，未设置的槽就是洋红"
+（本文件 2187-2190 行）把我们自己的哨兵读成了平台的空缺。Astra 清单没合并时框架答的是
+`#FF1C1C1E / #FFF5F5F7 / #FF1E793F / …`，洋红从没进过这条链——它来自 `Light.jalxaml:158-165` 与 `Dark.jalxaml:158-165`
+那八行（生成器 `Sync-AstraPalette.ps1:40` 写的），而高对比重刷时把 `SystemColors.<Slot>` 抄进每一格，抄到的正是自己那行洋红。
+改前的读数：**`ApplyTheme(HighContrast)` 之后八槽全塌成 `#FFFF00FF`，`TextFillColorPrimaryBrush` 也就是 `#FFFF00FF`**——
+不是"某两槽恰好同值"，是**整张高对比调色板刷成一个颜色**。
+
+上游那两行也没抄错：`Common_themeresources_any.xaml:178`（Light）与 `:406`（Default）确实把八行写成字面 `#FF00FF`，
+只有 HighContrast 分支（`:509`）用 `{ThemeResource SystemColor<Slot>}`。在 WinUI 里这个命名空间只在高对比有意义，占位符无害；
+在这个运行时里它就是平台通道本身。**逐字转录在这一行会造出用户可见的缺陷**，所以这是一处必须的适配偏离，不是偷懒。
+
+| 位置 | 改动 | 为什么 |
+|---|---|---|
+| `tools/Sync-AstraPalette.ps1` | 键在 `SystemColor*` 命名空间里的行，不论上游写字面还是写引用，一律发 `{ThemeResource SystemColor<Slot>}`（带实测理由的注释） | 那八格不再持有自己的颜色。`keys.md` 里 16 行（Light/Dark 各 8）因此从 `#FF00FF` 变成这个别名形状，总行数仍 1312 |
+| `Themes/FluentThemeManager.cs` | 删掉 `SetSystemBrushes()` 与 `SystemBrushKeys` | 它就是把"平台槽"抄成"我们那格"的那一步，抄完别名就冻在抄来的值上 |
+| 同一文件 `ApplyHighContrastPalette()` | 跳过 `SystemColor*` 八行 | 这三处改完之后八槽在四个态都答框架自己的值，不再塌成洋红。**但要写清留住的是什么**：`RefreshPalette` 每一档仍会把别名当时解出的颜色**抄**进调色板那一格，所以格子里是"上一次重刷时框架槽的值"，不是一条会自己跟着平台动的活引用——高对比一档实测：那格仍答 Light 时解出的 `#FFF5F5F7`，而框架自己的 `SystemColorWindowTextColor` 颜色键当时已经是 `#FF1D1D1F`。"不经过一次重刷的平台变化能不能跟"本机测不了（没有可切的高对比方案），这条也进 #82 |
+
+### 牙齿：两条突变，一条"看着像牙齿但其实不是"
+
+- 把 `ThemeResources/HighContrast.map` 的 `TextFillColorPrimaryBrush` 指到 `SystemColorHighlightColor` →
+  独立命名槽的 `High_contrast_maps_semantic_roles_to_system_colors` 红在 `AstraThemeRuntimeTests.cs:202`。
+  **改之前同样的突变是绿的**，那正是 #57 记下的"换了两个槽看不出来"。
+- 把八行改回字面 `#FF00FF` → `Every_high_contrast_row_drives_its_own_brush` 红在
+  `8 palette brushes carry upstream's #FF00FF placeholder (SystemColorButtonFaceColorBrush, …)`。
+- 不算牙齿的一条，写下来免得再上当：把某行指到**恰好同值**的另一槽（`SystemColorWindowTextColor` → `SystemColorButtonTextColor`，
+  本机两者都是 `#FFF5F5F7`）仍然绿。逐键那条循环的期望值来自**同一张表**，所以它只证明"重刷到达了每一格"，
+  证不了"这行指的槽对"；表的对错归 `Sync-AstraPalette.ps1 -Check`。这条区分已经写进测试的 doc 注释。
+  同一原因下新加的"八槽不许塌成一个值"计数（本机解出七个不同值，地板放在 4）守的是仪器本身，不是映射。
+
+### 闸口先红了一次：别名把框架自有的名字交给了消费点反查
+
+第一次全量跑（`spike/SystemColorProbe/gate-61.log`）在测试步就红：`AstraResourceKeyTests.Every_referenced_key_is_declared`
+列出 16 条 `ThemeResources/Light.jalxaml: SystemColorWindowTextColor` 这样的名单——八行别名指向的**颜色键不是我们声明的**。
+这条闸口报得对，别把它读成误报：改之前那八行写字面值，谁也不引用，所以这个名字集合是本批新引入的。
+
+修法不是放宽"引用了没声明的名字也算过"。改成两半，合起来正好是本批的结论——**平台通道可以读，不可以占**：
+
+- 正半：`FrameworkColourSlots` 名册收下这八个名字，且只收这八个。把一条别名指到 `SystemColorWindowTextColours`
+  （多打一个 `o`）仍然红在那条引用上（突变 T1）。
+- 反半（新事实 `No_platform_system_colour_slot_is_ours_to_declare`，测试总数因此 1573 → 1574）：我们在任何 Astra 字典里
+  声明这八个名字中的任何一个都红。临时往 `ThemeResources/FrameworkRetints.jalxaml` 加一行
+  `<Color x:Key="SystemColorWindowColor">FF112233</Color>` 就红在
+  `Astra declares platform colour slots, so it owns what SystemColors.<Slot> answers for the whole process:
+  ThemeResources/FrameworkRetints.jalxaml: SystemColorWindowColor`（突变 T2，跑完即还原）。
+
+### 非主张与 Known Gap（余账另立 #82）
+
+- **平台那一半仍未落地**：八个 `GetSysColor` 值没有一个等于框架答出来的值（`#A0A0A0` 对 `#F5F5F7`、
+  `#0078D4` 对品牌绿 `#1E793F`、`#000000` 对 `#1C1C1E`），也就是这个运行时在这台机器上根本不读平台。
+  "高对比最终给用户看什么颜色"依旧不主张。且 Win32 那列里 `COLOR_WINDOW` 与 `COLOR_WINDOWTEXT` 都答 `#000000`，
+  即使换成 P/Invoke 也不是能照抄的答案——这条正是 #82 要判的岔路。
+- 本机 high contrast 是关的：`GetSystemMetrics(SM_HIGCONTRASTMODE) = 0x1E`，bit 0 清。
+  `SystemParametersInfo(SPI_GETHIGHCONTRAST)` 必须 `uiParam = 0`，传 `cbSize` 会 `ok=False err=87`——
+  第一次读数就是被这个仪器错误带偏的（三条 SPI 变体一起打，才看清哪个参数是对的）。
+- 高对比一档**没有任何像素证据**：逐页像素闸只跑 Light/Dark 两档。本批四类证据里"视觉"这一格是空的，
+  构建/行为两格有读数（见下）。
+
+### #61 的串行闸口读数（2026-09-23，`spike/SystemColorProbe/gate-61b.log`）——全绿，管道退出码 0
+
+第一跑（`gate-61.log`）红在测试步，就是上节那条消费点反查；改完形状后的这一跑才是本批出口。同一套六步：
+Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 41 秒** → 逐页像素闸
+`PASS 13 pages x 2 variants, 0 offender(s)` → 调色板 `Light/Dark 83/101 checked=True`、
+`HighContrast 101 mapped keys checked=True`（那条"上游键因为我们调色板没这格而扣住"的清单仍是
+`AccentControlElevationBorderBrush CircleElevationBorderBrush ControlElevationBorderBrush` 三个，本批没动它）
+→ `keys.md is current: 1312 canonical lines.`。
+
+两个数各自说明一件事：**测试总数 1573 → 1574**，涨的正是反查那一半（`No_platform_system_colour_slot_is_ours_to_declare`），
+本批没有删掉任何断言。**键清单仍是 1312 行**——16 行（Light/Dark 各 8）的内容从 `#FF00FF` 换成
+`{ThemeResource SystemColor<Slot>}` 形状，声明的名字集合一个没变，所以别名不会给公开键清单加债。
+
+四类证据仍然缺两格：视觉——逐页闸那 0 个 offender 是 Light/Dark 两档的读数，高对比一档没有像素通道（#82）；
+本批八行在 Light/Dark 下仍只答框架自己那八槽的值，所以两档出货像素未变，`status` 两档的
+`stable=True/False` 与上一批 `gate-79.log` 里一样在，那是 #78 的环。硬件输入——本批为零，探针只调
+`OverrideBrush` 与 `FluentThemeManager.Apply`，不注入指针也不敲键盘。
+
+## #47 余账（任务 #81）：开弹层的测点普查——三条"没关"全部不成立，本族唯一的真泄漏已在 #79 补掉（2026-09-23）
+
+仪器是一次性的 node 脚本（不入库）：按 `[Fact]/[Theory]` 切段，数每段里"开"的写法
+（`IsDropDownOpen/IsSubmenuOpen/IsOpen = true`、`ShowAt(`、`Open(`、`ShowAsync(`）与"关"的写法
+（对应 `= false`、`Hide(`、`Close(`、`finally {`）各几次。全库 **20** 条测点含开弹层写法，**17** 条自身就关，
+脚本只把三条标红；三条逐条读体之后**都不成立**：
+
+| 被标红的测点 | 为什么不算泄漏 |
+|---|---|
+| `AstraTeachingTipTests.A_tip_holds_no_layout_room_and_still_realizes_its_card` | 第 235 行把 tip 登进类级 `_opened` 名单，`DisposeAsync`（同文件 49-54 行）逐个关掉"还开着"的那些——收尾在夹具，不在测点体内 |
+| `AstraContentDialogTests.A_button_of_our_template_reports_through_the_controls_own_events_and_ends_the_operation` | 测点自己点掉主按钮，并把收尾钉成断言：`closed == 1`、`Visibility == Collapsed`（403-412 行）。这条不是"假设它关了"，是"验它关了" |
+| `AstraContentDialogTests.A_dialog_already_in_the_tree_refuses_to_open` | `ShowAsync()` 同步抛 `InvalidOperationException`，弹窗从未进 overlay host，没有东西要关 |
+
+于是 #47 这条欠账结掉：**本族唯一的真泄漏就是 `An_open_combo_grafts…` 那条开着不关的下拉，#79 已补 `finally`**。
+仪器的盲区记下来免得下次重犯：按写入次数扫，既看不见①这种"登记给夹具收尾"，也看不见②这种"由被验的行为自己收尾"，
+所以脚本的红名单必须逐条读体才能定；反过来说，一条既没登进 `_opened`、体内也没关、也没断言收尾的写法才是真候选。
 
 
 

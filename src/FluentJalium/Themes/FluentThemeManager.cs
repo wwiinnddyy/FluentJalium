@@ -249,7 +249,6 @@ public static class FluentThemeManager
             }
             else _palette![entry.Key] = entry.Value;
         }
-        SetSystemBrushes();
         if (IsHighContrast) ApplyHighContrastPalette();
         else if (_accent is { } accent)
         {
@@ -350,16 +349,6 @@ public static class FluentThemeManager
         else throw new KeyNotFoundException($"Palette is missing {key}");
     }
 
-    private static void SetSystemBrushes()
-    {
-        foreach (var (key, name) in SystemBrushKeys)
-        {
-            var color = SystemColor(name);
-            if (_palette![key] is SolidColorBrush brush) { brush.Color = color; brush.Opacity = 1; }
-            else _palette[key] = new SolidColorBrush(color);
-        }
-    }
-
     /// <summary>The eight Win32 high-contrast colors WinUI references, plus the transparent role.</summary>
     private static Color SystemColor(string name) => name switch
     {
@@ -375,18 +364,6 @@ public static class FluentThemeManager
         _ => throw new InvalidOperationException($"Unknown Win32 system color name: {name}"),
     };
 
-    private static readonly (string Key, string Name)[] SystemBrushKeys =
-    [
-        ("SystemColorButtonFaceColorBrush", "SystemColorButtonFaceColor"),
-        ("SystemColorButtonTextColorBrush", "SystemColorButtonTextColor"),
-        ("SystemColorGrayTextColorBrush", "SystemColorGrayTextColor"),
-        ("SystemColorHighlightColorBrush", "SystemColorHighlightColor"),
-        ("SystemColorHighlightTextColorBrush", "SystemColorHighlightTextColor"),
-        ("SystemColorHotlightColorBrush", "SystemColorHotlightColor"),
-        ("SystemColorWindowColorBrush", "SystemColorWindowColor"),
-        ("SystemColorWindowTextColorBrush", "SystemColorWindowTextColor"),
-    ];
-
     /// <summary>
     /// Platform substitution: applies WinUI's own per-key high-contrast mapping, generated from the
     /// upstream HighContrast branch by tools/Sync-AstraPalette.ps1. It does not claim every WinUI
@@ -396,6 +373,14 @@ public static class FluentThemeManager
     {
         foreach (var (key, name) in HighContrastMap)
         {
+            // The eight platform-slot rows are aliases onto the framework's own colour resources, not values to
+            // resolve: SystemColors.<Slot> reads a resource named <Slot>Brush before it consults the platform, so
+            // writing a resolved colour through here is a second write over the channel every reader goes through
+            // (spike/SystemColorProbe measures that priority, and measures the collapse it caused). RefreshPalette
+            // has already copied these rows' resolved values in, so skipping them here costs nothing - and whether a
+            // row would then still follow a later platform change is unmeasured, because this host has no
+            // high-contrast scheme to switch.
+            if (key.StartsWith("SystemColor", StringComparison.Ordinal)) continue;
             if (_palette![key] is not SolidColorBrush brush) throw new InvalidOperationException($"High-contrast map targets a key that is not a brush: {key}");
             brush.Color = SystemColor(name);
             brush.Opacity = 1;

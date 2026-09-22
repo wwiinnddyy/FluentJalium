@@ -1,0 +1,65 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.85
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+
+已通过! - 失败:     0，通过:  1574，已跳过:     0，总计:  1574，持续时间: 7 m 41 s - FluentJalium.Tests.dll (net10.0)
+==> build page pixel gate (Debug)
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+  AstraPagePixels -> C:\git\Jalium\FluentJalium\tools\AstraPagePixels\bin\Debug\net10.0-windows\AstraPagePixels.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.92
+==> gallery page pixels (13 pages x light, dark)
+overview Light: stable=True/True painted=848166 base=198611 other-base=0 green=0 | slot 87 colours 607506px over 1 colours 0px (slot 788x1028)
+tokens Light: stable=True/True painted=848166 base=197487 other-base=0 green=0 | slot 268 colours 1531859px over 1 colours 0px (slot 788x2112)
+materials Light: stable=True/True painted=848166 base=256758 other-base=0 green=0 | slot 48 colours 338822px over 1 colours 0px (slot 788x618)
+motion Light: stable=True/True painted=848166 base=197024 other-base=0 green=0 | slot 67 colours 182017px over 1 colours 0px (slot 788x569)
+buttons Light: stable=True/True painted=848166 base=197033 other-base=0 green=0 | slot 130 colours 510585px over 1 colours 0px (slot 788x1046)
+inputs Light: stable=True/True painted=848166 base=197460 other-base=0 green=0 | slot 284 colours 1268083px over 1 colours 0px (slot 788x2011)
+selection Light: stable=True/True painted=848166 base=197025 other-base=0 green=0 | slot 253 colours 1409709px over 1 colours 0px (slot 788x2918)
+navigation Light: stable=True/True painted=848166 base=197032 other-base=0 green=0 | slot 156 colours 1013316px over 1 colours 0px (slot 788x1733)
+surfaces Light: stable=True/True painted=848166 base=197851 other-base=0 green=0 | slot 178 colours 965255px over 1 colours 0px (slot 788x1625)
+status Light: stable=True/False painted=848166 base=197029 other-base=0 green=0 | slot 398 colours 1189788px over 1 colours 0px (slot 788x1972)
+menus Light: stable=True/True painted=848166 base=197022 other-base=0 green=0 | slot 80 colours 335672px over 1 colours 0px (slot 788x672)
+command-bar Light: stable=True/True painted=848166 base=197846 other-base=0 green=0 | slot 53 colours 243485px over 1 colours 0px (slot 788x490)
+settings Light: stable=True/True painted=848166 base=197031 other-base=0 green=0 | slot 118 colours 288331px over 1 colours 0px (slot 788x658)
+overview Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 127 colours 607504px over 1 colours 0px (slot 788x1044)
+tokens Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 313 colours 1527225px over 1 colours 0px (slot 788x2112)
+materials Dark: stable=True/True painted=848166 base=257809 other-base=0 green=0 | slot 49 colours 338821px over 1 colours 0px (slot 788x618)
+motion Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 62 colours 182017px over 1 colours 0px (slot 788x569)
+buttons Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 92 colours 510583px over 1 colours 0px (slot 788x1046)
+inputs Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 208 colours 1268137px over 1 colours 0px (slot 788x2011)
+selection Dark: stable=True/True painted=848082 base=198598 other-base=0 green=0 | slot 223 colours 1431822px over 1 colours 0px (slot 788x2918)
+navigation Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 180 colours 1013314px over 1 colours 0px (slot 788x1733)
+surfaces Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 213 colours 965253px over 1 colours 0px (slot 788x1625)
+status Dark: stable=True/False painted=848166 base=198598 other-base=0 green=0 | slot 285 colours 1189783px over 1 colours 0px (slot 788x1972)
+menus Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 48 colours 335671px over 1 colours 0px (slot 788x672)
+command-bar Dark: stable=True/True painted=848166 base=198598 other-base=0 green=0 | slot 52 colours 243485px over 1 colours 0px (slot 788x490)
+settings Dark: stable=True/True painted=848166 base=198596 other-base=0 green=0 | slot 99 colours 288697px over 1 colours 0px (slot 788x658)
+PASS 13 pages x 2 variants, 0 offender(s)
+==> palette drift
+Light : 83 source colors, 101 resolved brushes; checked=True
+Dark : 83 source colors, 101 resolved brushes; checked=True
+HighContrast : 101 mapped keys; upstream keys held back because the palette has no entry for them [AccentControlElevationBorderBrush CircleElevationBorderBrush ControlElevationBorderBrush]; checked=True
+==> public resource key inventory
+keys.md is current: 1312 canonical lines.
+All Astra gates passed.

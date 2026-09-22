@@ -21,6 +21,21 @@ public class AstraResourceKeyTests
         @"^\{\s*(StaticResource|ThemeResource|DynamicResource)\s+(?:Key=)?([A-Za-z0-9_.]+)\s*\}$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    /// <summary>
+    /// The eight Win32 colour slots, named as the runtime names them. They are the only references this gate lets
+    /// through undeclared, and the reason is the other half of the same rule: Jalium resolves
+    /// <c>SystemColors.&lt;Slot&gt;</c> by reading a resource named <c>&lt;Slot&gt;Brush</c> first
+    /// (<c>spike/SystemColorProbe</c> measured it by writing into our own row and watching the framework answer move),
+    /// so a slot colour we declare is a platform colour we have taken over. The palette's eight alias rows must point
+    /// at these names and nothing of ours may answer them - which is what
+    /// <see cref="No_platform_system_colour_slot_is_ours_to_declare"/> pins.
+    /// </summary>
+    private static readonly HashSet<string> FrameworkColourSlots = new(StringComparer.Ordinal)
+    {
+        "SystemColorWindowColor", "SystemColorWindowTextColor", "SystemColorHighlightColor", "SystemColorHighlightTextColor",
+        "SystemColorButtonFaceColor", "SystemColorButtonTextColor", "SystemColorGrayTextColor", "SystemColorHotlightColor",
+    };
+
     [Fact]
     public void Every_referenced_key_is_declared()
     {
@@ -38,12 +53,34 @@ public class AstraResourceKeyTests
         {
             foreach (var reference in ReferencedKeys(dictionary))
             {
-                if (!declared.Contains(reference)) offenders.Add($"{name}: {reference}");
+                if (!declared.Contains(reference) && !FrameworkColourSlots.Contains(reference)) offenders.Add($"{name}: {reference}");
             }
         }
 
         offenders.Sort(StringComparer.Ordinal);
         Assert.False(offenders.Count > 0, "Undeclared resource references:" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
+    /// <summary>
+    /// The reverse leg: a slot name that appears as one of OUR declared keys means a palette or style row now answers
+    /// a platform colour, which is how the High Contrast palette ended up entirely #FF00FF. The eight alias rows this
+    /// library does ship declare the <c>&lt;Slot&gt;Brush</c> names, not the slots, so this has nothing to complain
+    /// about while the channel stays the runtime's.
+    /// </summary>
+    [Fact]
+    public void No_platform_system_colour_slot_is_ours_to_declare()
+    {
+        var ours = new List<string>();
+        foreach (var (name, dictionary) in AstraDictionaries())
+        {
+            foreach (var key in DeclaredKeys(dictionary))
+            {
+                if (FrameworkColourSlots.Contains(key)) ours.Add($"{name}: {key}");
+            }
+        }
+
+        Assert.False(ours.Count > 0,
+            $"Astra declares platform colour slots, so it owns what SystemColors.<Slot> answers for the whole process: {string.Join(", ", ours)}");
     }
 
     [Fact]

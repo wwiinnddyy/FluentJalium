@@ -175,14 +175,14 @@ Totals: 1312 keyed or implicit rows in 68 dictionaries (368 palette, 784 token, 
 | SolidColorBrush | `SurfaceStrokeColorDefaultBrush` | `#66757575` |
 | SolidColorBrush | `SurfaceStrokeColorFlyoutBrush` | `#0F000000` |
 | SolidColorBrush | `SurfaceStrokeColorInverseBrush` | `#15FFFFFF` |
-| SolidColorBrush | `SystemColorButtonFaceColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorButtonTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorGrayTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHighlightColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHighlightTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHotlightColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorWindowColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorWindowTextColorBrush` | `#FF00FF` |
+| SolidColorBrush | `SystemColorButtonFaceColorBrush` | `{ThemeResource SystemColorButtonFaceColor}` |
+| SolidColorBrush | `SystemColorButtonTextColorBrush` | `{ThemeResource SystemColorButtonTextColor}` |
+| SolidColorBrush | `SystemColorGrayTextColorBrush` | `{ThemeResource SystemColorGrayTextColor}` |
+| SolidColorBrush | `SystemColorHighlightColorBrush` | `{ThemeResource SystemColorHighlightColor}` |
+| SolidColorBrush | `SystemColorHighlightTextColorBrush` | `{ThemeResource SystemColorHighlightTextColor}` |
+| SolidColorBrush | `SystemColorHotlightColorBrush` | `{ThemeResource SystemColorHotlightColor}` |
+| SolidColorBrush | `SystemColorWindowColorBrush` | `{ThemeResource SystemColorWindowColor}` |
+| SolidColorBrush | `SystemColorWindowTextColorBrush` | `{ThemeResource SystemColorWindowTextColor}` |
 | SolidColorBrush | `SystemFillColorAttentionBackgroundBrush` | `#80F6F6F6` |
 | SolidColorBrush | `SystemFillColorAttentionBrush` | `#0078D4` |
 | SolidColorBrush | `SystemFillColorCautionBackgroundBrush` | `#FFF4CE` |
@@ -364,14 +364,14 @@ Totals: 1312 keyed or implicit rows in 68 dictionaries (368 palette, 784 token, 
 | SolidColorBrush | `SurfaceStrokeColorDefaultBrush` | `#66757575` |
 | SolidColorBrush | `SurfaceStrokeColorFlyoutBrush` | `#33000000` |
 | SolidColorBrush | `SurfaceStrokeColorInverseBrush` | `#0F000000` |
-| SolidColorBrush | `SystemColorButtonFaceColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorButtonTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorGrayTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHighlightColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHighlightTextColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorHotlightColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorWindowColorBrush` | `#FF00FF` |
-| SolidColorBrush | `SystemColorWindowTextColorBrush` | `#FF00FF` |
+| SolidColorBrush | `SystemColorButtonFaceColorBrush` | `{ThemeResource SystemColorButtonFaceColor}` |
+| SolidColorBrush | `SystemColorButtonTextColorBrush` | `{ThemeResource SystemColorButtonTextColor}` |
+| SolidColorBrush | `SystemColorGrayTextColorBrush` | `{ThemeResource SystemColorGrayTextColor}` |
+| SolidColorBrush | `SystemColorHighlightColorBrush` | `{ThemeResource SystemColorHighlightColor}` |
+| SolidColorBrush | `SystemColorHighlightTextColorBrush` | `{ThemeResource SystemColorHighlightTextColor}` |
+| SolidColorBrush | `SystemColorHotlightColorBrush` | `{ThemeResource SystemColorHotlightColor}` |
+| SolidColorBrush | `SystemColorWindowColorBrush` | `{ThemeResource SystemColorWindowColor}` |
+| SolidColorBrush | `SystemColorWindowTextColorBrush` | `{ThemeResource SystemColorWindowTextColor}` |
 | SolidColorBrush | `SystemFillColorAttentionBackgroundBrush` | `#08FFFFFF` |
 | SolidColorBrush | `SystemFillColorAttentionBrush` | `#60CDFF` |
 | SolidColorBrush | `SystemFillColorCautionBackgroundBrush` | `#433519` |
@@ -1784,4 +1784,4 @@ Totals: 1312 keyed or implicit rows in 68 dictionaries (368 palette, 784 token, 
 | Style | `DefaultRatingControlStyle` | `controls:FluentRatingControl` |
 | ImplicitStyle | *(implicit)* | `controls:FluentRatingControl` |
 
-<!-- canonical-lines=1312 sha256=73eb1fee258a59235856e77f37c7abef799b9c3b6da23690daefd4720f9272ae -->
+<!-- canonical-lines=1312 sha256=4ba47e0bf30e0330945f91cca92a45ea0f221fc08afcbb1fabe4e4bd117d9516 -->

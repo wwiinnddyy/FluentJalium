@@ -222,10 +222,37 @@ public sealed class AstraThemeRuntimeTests
     /// The per-key half. The two tests above prove the checked-in table has a row for every brush and read four of
     /// those rows; this one resolves <b>all</b> of them and compares each brush with the system colour its own row
     /// names, then requires the theme flip to have actually moved the palette - a current table that is never applied
-    /// reads green otherwise. What each row pins is the <b>wiring</b> (this key is driven by that system-colour slot), not the
-    /// slot's platform value: in the headless test host the unset slots read #FF00FF, and A/B showed swapping two of them is
-    /// invisible because this process resolves those two to the same colour. A claim about the colour a user sees has to be
-    /// made against a real platform palette, which this suite cannot do (#13).
+    /// reads green otherwise.
+    /// <para>
+    /// What each row pins is the <b>wiring</b>: this key is driven by that system-colour slot. For the comparison to
+    /// mean anything it has to be able to tell the slots apart, and until now it could not. The eight
+    /// <c>SystemColor*ColorBrush</c> rows used to carry upstream's Light/Dark placeholder literally
+    /// (<c>Common_themeresources_any.xaml:178</c> and <c>:406</c> write <c>#FF00FF</c>), and Jalium resolves
+    /// <c>SystemColors.&lt;Slot&gt;</c> by looking for a resource named <c>&lt;Slot&gt;Brush</c> <b>before</b> the platform -
+    /// <c>spike/SystemColorProbe</c> measured that priority by writing a colour into our own row and watching
+    /// <c>SystemColors.WindowTextColor</c> move with it. So all eight slots answered <c>#FFFF00FF</c>, High Contrast
+    /// painted the entire palette magenta, and swapping any two rows of the table was invisible.
+    /// </para>
+    /// <para>
+    /// Those eight rows now hold upstream's own HighContrast value-form (<c>{ThemeResource SystemColor&lt;Slot&gt;}</c>)
+    /// in every mode, and neither the palette's former publisher nor the High-contrast re-tint writes them any more, so
+    /// the colour inside one is the framework's own slot value as of the last refresh rather than a literal we authored.
+    /// Whether such a row then follows a platform change that arrives without a refresh is unmeasured - this host has no
+    /// high-contrast scheme to switch, and measured in the High Contrast state the row still answered the value the
+    /// alias resolved while the runtime was in Light (<c>#FFF5F5F7</c>) while the framework's own
+    /// <c>SystemColorWindowTextColor</c> resource had already moved to <c>#FF1D1D1F</c>.
+    /// On this host the eight slots resolve to seven distinct colours -
+    /// <c>SystemColorWindowTextColor</c> and <c>SystemColorButtonTextColor</c> answer the same. That distinction is what
+    /// gives the <i>independent</i> half of this class its teeth: <see cref="High_contrast_maps_semantic_roles_to_system_colors"/>
+    /// names four slots itself, and pointing <c>TextFillColorPrimaryBrush</c> at <c>SystemColorHighlightColor</c> in the
+    /// map now fails there, where the same mutation read green while every slot answered <c>#FFFF00FF</c>. The loop
+    /// below cannot catch a mis-pointed row at all - it compares each brush with the target the same table names - so
+    /// what it pins is that the retint reaches every key, and the map's own correctness rests on
+    /// <c>tools/Sync-AstraPalette.ps1 -Check</c>. What a real high-contrast user sees is still not claimed: this machine
+    /// has high contrast off (<c>GetSystemMetrics(SM_HIGCONTRASTMODE) = 0x1E</c>, bit 0 clear) and none of the eight
+    /// Win32 <c>GetSysColor</c> answers equals what the framework resolves, so the platform half of the value stays a
+    /// Known Gap.
+    /// </para>
     /// </summary>
     [Fact]
     public void Every_high_contrast_row_drives_its_own_brush()
@@ -234,6 +261,7 @@ public sealed class AstraThemeRuntimeTests
         {
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
             var light = FluentThemeManager.HighContrastMap.Keys.ToDictionary(key => key, BrushColor);
+            AssertNoPlaceholder(light.Keys);
 
             FluentThemeManager.ApplyTheme(FluentThemeVariant.HighContrast);
 
@@ -248,6 +276,16 @@ public sealed class AstraThemeRuntimeTests
             }
 
             var moved = FluentThemeManager.HighContrastMap.Keys.Count(key => !BrushColor(key).Equals(light[key]));
+            var current = FluentThemeManager.HighContrastMap.Keys.ToDictionary(key => key, BrushColor);
+            AssertNoPlaceholder(current.Keys);
+
+            // The collapse this row used to read through is the failure this counts against: eight slots answering
+            // one colour makes every per-row comparison above true no matter which slot a row names. Measured here
+            // are seven of eight; the floor is a guard against the collapse, not a claim about the values.
+            var targets = FluentThemeManager.HighContrastMap.Values.Distinct(StringComparer.Ordinal).ToArray();
+            var distinctSlots = targets.Select(SystemColour).Distinct().ToArray();
+            Assert.True(distinctSlots.Length >= 4,
+                $"the {targets.Length} map targets (eight system-colour slots plus Transparent) resolve to only {distinctSlots.Length} distinct colours, so the per-row comparison above cannot tell a swapped table from a correct one.");
             FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
 
             Assert.True(wrong.Count == 0,
@@ -258,6 +296,20 @@ public sealed class AstraThemeRuntimeTests
             Assert.True(moved >= 70,
                 $"the flip only moved {moved} of {FluentThemeManager.HighContrastMap.Count} palette brushes, so High Contrast is not reaching the palette.");
         });
+    }
+
+    /// <summary>
+    /// Upstream's Light/Dark placeholder for the system-colour rows. It must never reach a shipped mode here, and
+    /// the reason is stronger than "ugly": in this runtime a row named <c>SystemColor&lt;Slot&gt;Brush</c> <i>is</i>
+    /// what <c>SystemColors.&lt;Slot&gt;</c> answers, so the placeholder silently replaces a platform colour for every
+    /// reader in the process.
+    /// </summary>
+    private static void AssertNoPlaceholder(IEnumerable<string> keys)
+    {
+        var placeholder = Color.FromRgb(0xFF, 0x00, 0xFF);
+        var hit = keys.Where(key => BrushColor(key).Equals(placeholder)).ToArray();
+        Assert.True(hit.Length == 0,
+            $"{hit.Length} palette brushes carry upstream's #FF00FF placeholder ({string.Join(", ", hit.Take(6))}); in this runtime that also overwrites the system-colour slot of the same name.");
     }
 
     /// <summary>

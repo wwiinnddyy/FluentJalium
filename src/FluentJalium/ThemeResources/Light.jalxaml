@@ -155,14 +155,14 @@
   <SolidColorBrush x:Key="SurfaceStrokeColorDefaultBrush" Color="#66757575" Opacity="1" />
   <SolidColorBrush x:Key="SurfaceStrokeColorFlyoutBrush" Color="#0F000000" Opacity="1" />
   <SolidColorBrush x:Key="SurfaceStrokeColorInverseBrush" Color="#15FFFFFF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorButtonFaceColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorButtonTextColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorGrayTextColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorHighlightColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorHighlightTextColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorHotlightColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorWindowColorBrush" Color="#FF00FF" Opacity="1" />
-  <SolidColorBrush x:Key="SystemColorWindowTextColorBrush" Color="#FF00FF" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorButtonFaceColorBrush" Color="{ThemeResource SystemColorButtonFaceColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorButtonTextColorBrush" Color="{ThemeResource SystemColorButtonTextColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorGrayTextColorBrush" Color="{ThemeResource SystemColorGrayTextColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorHighlightColorBrush" Color="{ThemeResource SystemColorHighlightColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorHighlightTextColorBrush" Color="{ThemeResource SystemColorHighlightTextColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorHotlightColorBrush" Color="{ThemeResource SystemColorHotlightColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorWindowColorBrush" Color="{ThemeResource SystemColorWindowColor}" Opacity="1" />
+  <SolidColorBrush x:Key="SystemColorWindowTextColorBrush" Color="{ThemeResource SystemColorWindowTextColor}" Opacity="1" />
   <SolidColorBrush x:Key="SystemFillColorAttentionBackgroundBrush" Color="#80F6F6F6" Opacity="1" />
   <SolidColorBrush x:Key="SystemFillColorAttentionBrush" Color="#0078D4" Opacity="1" />
   <SolidColorBrush x:Key="SystemFillColorCautionBackgroundBrush" Color="#FFF4CE" Opacity="1" />

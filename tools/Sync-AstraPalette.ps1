@@ -37,9 +37,23 @@ foreach ($theme in @('Light', 'Dark')) {
             $resource = $Matches[1]
             if ($colors.ContainsKey($resource)) { $color = $colors[$resource] }
             elseif ($resource -like 'SystemAccentColor*') { $color = if ($theme -eq 'Dark') { '#60CDFF' } else { '#0078D4' } }
-            elseif ($resource -like 'SystemColor*') { $color = '#FF00FF' }
+            # Same adapter rule as the literal rows below: this namespace is the platform channel.
+            elseif ($resource -like 'SystemColor*') { $color = '{ThemeResource ' + $resource + '}' }
             else { throw "Unmapped upstream resource $resource for $key" }
         }
+        # Explicit Jalium adapter, and the one place this generator departs from a verbatim row on purpose.
+        # Upstream's Light and Default sections write the literal #FF00FF for the eight SystemColor*Brush
+        # rows (Common_themeresources_any.xaml:178 and :406); only the HighContrast branch aliases them to
+        # the real slot (:509). In WinUI that is harmless because the namespace means nothing outside High
+        # Contrast. Jalium is not WinUI here: SystemColors.<Slot> resolves by looking for a resource named
+        # <Slot>Brush before it consults the platform, so transcribing the placeholder verbatim makes
+        # #FF00FF *be* the system colour for every reader in the process - which is what made the whole
+        # High Contrast palette come out magenta. spike/SystemColorProbe measured both halves: writing a
+        # colour into our own row moved SystemColors.WindowTextColor with it, and all eight slots read
+        # #FFFF00FF once High Contrast was applied. So these rows take upstream's own HighContrast
+        # value-form in every mode: what ends up inside one is the framework's slot value, re-copied at
+        # each palette refresh, rather than a literal this generator authored.
+        if ($key -like 'SystemColor*') { $color = '{ThemeResource ' + ($key -replace 'Brush$', '') + '}' }
         $opacity = if ($node.Attribute('Opacity')) { $node.Attribute('Opacity').Value } else { '1' }
         $brushes[$key] = @($color, $opacity)
     }
