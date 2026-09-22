@@ -175,6 +175,10 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     /// toward 1:1 (the same shape as ControlBorderFocused). This fact records the pre-row projection as the baseline
     /// the row will overwrite; when the row ships, the projection reads back as the token and this fact's colour
     /// assertions are expected to change - which is the row landing, not a regression.
+    ///
+    /// One reading in here was later sharpened rather than reversed: the "third default ink" a native Label resolves
+    /// to is not an independent mechanism, it is <c>TextSecondary</c>'s value read by name, which
+    /// <see cref="A_native_label_resolves_its_ink_from_the_same_name" /> now proves with an installed probe.
     /// </summary>
     [Fact]
     public void TextPrimary_projects_a_framework_ink_awaiting_its_row()
@@ -203,7 +207,8 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                     () => Assert.NotEqual(lightRow, lightTwin),
                     () => Assert.Equal(Color.FromArgb(0xE4, 0x00, 0x00, 0x00), lightTwin),
                     () => Assert.Equal(Color.FromRgb(0xFF, 0xFF, 0xFF), darkTwin),
-                    // The one surface we never restyles reads neither the name nor the twin: a third default ink.
+                    // The one surface we never restyles reads neither this name nor its twin. What it does read is
+                    // TextSecondary's value, and A_native_label_resolves_its_ink_from_the_same_name proves the name.
                     () => Assert.Equal(Color.FromRgb(0x6E, 0x6E, 0x73), lightLabel),
                     () => Assert.NotEqual(lightRow, lightLabel),
                     () => Assert.NotEqual(lightTwin, lightLabel),
@@ -304,7 +309,103 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         });
     }
 
+    /// <summary>
+    /// The first A2 candidate whose name-driven resolution is proven all the way to PIXELS rather than to a
+    /// reflection reading. A <see cref="MenuFlyoutSubItem"/> paints its own row text (the ghost batch found the
+    /// control's label unreachable from a template), and what it paints is <c>TextSecondary</c>: installing a probe
+    /// brush under that name in <c>Application.Resources</c> replaces the whole glyph run - the grey drops to zero
+    /// pixels and the probe colour takes 38, on a 240x38 row. Removing it restores the baseline exactly, so the
+    /// flip is a live per-call lookup and not a one-time resolution.
+    ///
+    /// The two negative legs are the same instrument aimed at the neighbouring names: a probe under
+    /// <c>TextPrimary</c> or <c>TextDisabled</c> leaves this row text alone, which is what separates the three names
+    /// this layer was asked about. It also fixes the order the rows should ship in: <c>TextSecondary</c> is the one
+    /// with a demonstrated visible reader, while <c>TextPrimary</c>'s reader is so far proven only through
+    /// <see cref="A_self_drawn_menu_item_reads_the_primary_text_name" /> and reaches no pixel here.
+    /// </summary>
+    [Theory]
+    [InlineData("TextSecondary", true)]
+    [InlineData("TextPrimary", false)]
+    [InlineData("TextDisabled", false)]
+    public void The_flyout_rows_own_text_is_painted_from_the_secondary_text_name(string frameworkName, bool isRead)
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var sub = new MenuFlyoutSubItem { Text = "sub" };
+            PixelHarness.Build(sub, 240, 38);
+            PixelHarness.Settle(20);
+
+            var resting = PixelHarness.Render(sub, 240, 38);
+            var sentinel = new SolidColorBrush(Probe);
+            application.Resources[frameworkName] = sentinel;
+            try
+            {
+                PixelHarness.Settle(10);
+                var painted = PixelHarness.Render(sub, 240, 38);
+                Assert.Multiple(
+                    // The instrument reads what the menu batch reads: an inked row, and no probe ink in it yet.
+                    () => Assert.True(resting.Count(FrameworkSecondaryInk) > PaintedFloor,
+                        $"the row's own text did not reach pixels before the probe; top={resting.Top(4)}"),
+                    () => Assert.Equal(0, resting.Count(Probe)),
+                    // Whether the name is on the paint path is decided by the same two counts after the probe lands.
+                    () => Assert.Equal(isRead ? 0 : resting.Count(FrameworkSecondaryInk), painted.Count(FrameworkSecondaryInk)),
+                    () => Assert.True(isRead ? painted.Count(Probe) > PaintedFloor : painted.Count(Probe) == 0,
+                        $"expected {frameworkName} to{(isRead ? "" : " not")} reach the row text; top={painted.Top(4)}"));
+            }
+            finally
+            {
+                application.Resources.Remove(frameworkName);
+            }
+        });
+    }
+
+    /// <summary>
+    /// The same name on a surface this library never restyles at all: a native <see cref="Label"/> resolves its
+    /// foreground from <c>TextSecondary</c> too, so the projection measured in
+    /// <see cref="TextPrimary_projects_a_framework_ink_awaiting_its_row" /> as "a third default ink" is not a third
+    /// mechanism - it is this name's value, reached by lookup. A built control keeps what it resolved at build time,
+    /// so the probe has to be installed before the element is built for the reading to mean anything.
+    /// </summary>
+    [Fact]
+    public void A_native_label_resolves_its_ink_from_the_same_name()
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            try
+            {
+                Assert.Equal(FrameworkSecondaryInk, ColorOf(InkedForeground()));
+
+                application.Resources["TextSecondary"] = new SolidColorBrush(Probe);
+                var probed = InkedForeground();
+
+                Assert.Multiple(
+                    // The name reaches the property, not just the dictionary: the built element resolved the probe.
+                    () => Assert.Equal(Probe, ColorOf(probed)),
+                    // And the neighbouring name is not what carries this ink - the Label follows TextSecondary only.
+                    () => Assert.NotEqual(ColorOf(application.TryFindResource("TextPrimary")), ColorOf(probed)));
+            }
+            finally
+            {
+                application.Resources.Remove("TextSecondary");
+                Assert.Equal(FrameworkSecondaryInk, ColorOf(InkedForeground()));
+            }
+        });
+    }
+
     // ---------- helpers ----------
+
+    /// <summary>The grey 26.10.9 paints a flyout row's own text in under the light theme, and the ink a native
+    /// <see cref="Label"/> resolves to. Same value on both surfaces, which is what the two facts above claim
+    /// comes from one name.</summary>
+    private static readonly Color FrameworkSecondaryInk = Color.FromRgb(0x6E, 0x6E, 0x73);
+
+    /// <summary>The pixel floor <see cref="AstraMenuTests"/> uses for "this ink is really painted", measured here at
+    /// 38 pixels on a 240x38 row, so the floor is the menu batch's own and not a number picked for this file.</summary>
+    private const int PaintedFloor = 8;
 
     /// <summary>MenuItem's own per-call text-colour resolution. Not public; reaching it is a test-only instrument, the
     /// same shape as <see cref="ResolveFocusedBorder" /> — the product ban on framework reflection is unaffected.</summary>

@@ -2912,3 +2912,67 @@ build `0 警告 / 0 错误` → 整套 **1496/1496**（0 失败 0 跳过、7 m 3
 ——13 页 × 两档里只有 status 的暗色第二拍判为不稳，但两拍的 `colours/over` 与 `painted` 完全一致
 （`1189783px over 1 colours 0px`）， offender 仍 0，所以闸判 PASS。本批没碰 status 族也没碰页闸，
 这条在 `cc3d802` 之前的日志里是不是常发**未查**，留给 #47/#35 那一次机制普查，别在这里当成新回归、也别当成旧账已清。
+
+## #12 A2 别名层第三轮·再再续：第一次把"按名现查"量到**像素**——有像素读者的是 `TextSecondary`
+
+上一手的读者证明只到反射为止。这一手把同一个哨兵换成**渲染计数**：在 `Application.Resources` 里按名字装一支
+探针笔刷，拍 `MenuFlyoutSubItem`（240x38），数颜色。读数是这批里第一条真正到像素的（活进程、Light 档、
+`spike/GalleryRender/diag-secondary.log` / `diag-secondary2.log`，仪器已摘除）：
+
+```
+label-ink(基准)=#FF6E6E73 | row(基准)          探针=0  灰字=38  top=#000000x9082 #6E6E73x38
+                | row(+TextSecondary) 探针=38 灰字=0   label=#FF112233
+                | row(+TextPrimary)   探针=0  灰字=38  label=#FF6E6E73
+                | row(+TextDisabled)  探针=0  灰字=38  label=#FF6E6E73
+                | row(撤哨兵后)       探针=0  灰字=38  label=#FF6E6E73
+                | item(基准/+TextPrimary/+TextSecondary) 全画面只有 #000000x6400（200x32 无墨）
+```
+
+- **`TextSecondary` 是按名现查、而且它的值真的被画出来**。装哨兵把整片字形换色（38 像素全替、灰字归零），
+  撤掉精确复原，所以这不是一次性解析而是每次调用重查；同一个名字还同时决定我们**从不重模板**的原生 `Label`
+  的前景（`#FF6E6E73` → `#FF112233` → 复原）。`AstraMenuTests` 那句 `FrameworkRowText = #6E6E73` 由此**从"框架的
+  第三种墨"升格成"某个名字的投影"**——它有一个能被别名层够到的读者。
+- **上一手那条"第三种默认墨"是被精确化、不是被推翻**：`TextPrimary_projects_...` 里 Label 读到的既不是名字值也不是
+  twin 值，这句仍然成立；但"第三种"不是第三种机制，它就是 `TextSecondary` 的投影值。测点注释里把这条写明，
+  并指向新的证明事实。
+- **`TextPrimary` 的读者仍只在反射里成立，像素侧本仪器量不到**：同一枚哨兵动不了 flyout 行文字，而 `MenuItem`
+  那一拍整幅只有 `#000000`（200x32 无墨）——这与 #50"文本字形在任何捕获通路都拿不到墨"是同一堵墙。
+  所以两行的**证据等级不同**：`TextSecondary` 有像素证人，`TextPrimary` 只有解析证人。**发行顺序按证据强度排，
+  先 `TextSecondary` 再 `TextPrimary`**，上一手"TextPrimary 是该发的那一个"改成"该发，但它前面还排着一个更硬的"。
+
+- **发行 `TextSecondary → TextFillColorSecondaryBrush` 会重写哪些事实（发之前逐条点名，不靠闸口去撞）**：
+  1. `AstraMenuTests.The_controls_paint_their_own_rule_and_text_and_our_rows_reach_neither` 的
+     `text.Count(FrameworkRowText) > 8` —— 行文字从 `#6E6E73` 变成 token 的 `#9E000000` 压在本底上的合成色，
+     这条**必红**，要按合成值重钉（`PixelHarness.Over` 能算，不猜）。
+  2. `AstraFrameworkNameResolutionTests.TextPrimary_projects_...` 的 `lightLabel`/`darkLabel` 两条腿（`#6E6E73`/`#D1D1D6`）
+     与 `A_remaining_text_name_...` 的 `TextSecondary` 腿 —— 都**必红**，因为读的正是这个值。
+  3. `A_retint_row_follows_the_theme_flip` 要加 `TextSecondary` 两腿（翻档跟到各自变体）。
+  除这三处之外，`grep` 全测试工程 `6E6E73|D1D1D6` 没有第四个落点。目标那句"`TextSecondary` 会重写 `AstraMenuTests`
+  的像素主张"至此**由实测成立**（上一手我按字面去找 `AstraMenuTests` 里的 `TextSecondary` 字样，0 命中就判它没有落点——
+  那是找错了东西：这条主张是按**色值**写的，不是按键名）。
+
+- **构建**：`0 警告 / 0 错误`。
+- **行为 + 视觉**：新常驻测点 4 条腿（本类 14 → **18**）：`The_flyout_rows_own_text_is_painted_from_the_secondary_text_name`
+  （3 腿，含两条阴性对照）与 `A_native_label_resolves_its_ink_from_the_same_name`。这批的测点**本身就是像素读数**，
+  所以行为与视觉两类在这里是同一份证据，如实标注，不拆成两份充数。**牙齿**：阴性腿若哪天 `TextPrimary`/`TextDisabled`
+  开始动这片墨 → 探针计数由 0 变正 → 红；框架哪天改成一次性解析 → 复原腿的 `灰字=38` 红；名字哪天不再决定
+  `Label` 前景 → `Probe` 断言红。
+- **硬件输入**：不动。
+- **清单/漂移**：`keys.md` 不变（仍 1301，本批不发布公开键）；`FrameworkRetints.jalxaml` 仍停在四行。
+- **不声称**：① 没有证明 `TextSecondary` 是**唯一**够到像素的按名读者（其它自绘面没测）；② 暗色档没在这台仪器上拍
+  （只测了 Light 的像素翻转，Dark 只有投影色值）；③ 反射读数不是像素，`MenuItem` 那一幅是"无墨"不是"墨错了"；
+  ④ 本批发行零行。
+
+### 像素读者批的串行闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1` 在最终字节上串行跑完（`spike/GalleryRender/gate-secondarypixels.log`，
+包装器自记 **`GATE-EXIT=0`**）：build `0 警告 / 0 错误` → 整套 **1500/1500**（0 失败 0 跳过、8 m 52 s）
+→ 页像素闸 `PASS 13 pages x 2 variants, 0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1301 canonical lines.`
+→ 末行 `All Astra gates passed.`。**测点 1496 → 1500 = +4**，正是这一批的三条阴性/阳性腿加一条 `Label` 事实，
+**没有附带红**——这一条在这批特别要紧：两条新事实都会往 `Application.Resources` 按名字装笔刷再摘掉，
+而这条管线历史上"改一个应用级条目"就静默弄红过后面的 Button 像素主张（`jalium-theme-pipeline-constraints`）。
+全量里其余 1482 条照旧绿就是这层泄漏没发生的反证。
+
+同一份日志里 `status Dark` 第二回 `stable=True/False`，且这一页的 slot 读数在两次运行之间从 293 变成 295，
+而这两批之间 `src/` 一格没动。也就是说这条不稳定**不来自本批**，而且它的抖动面比"某一拍不稳"更宽（同树同码两跑不同数）。
+仍归 #47/#35 那族，本批不追；这里记下来是为了让那一族开工时知道**基线读数本身会漂**，别把漂当成回归。
