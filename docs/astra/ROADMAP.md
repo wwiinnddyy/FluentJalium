@@ -3884,5 +3884,73 @@ WinUI 的语义（flyout 让位于内容对话框），本批只把它读成事�
 `Settle` 没有逐条审过谁在拿帧数当预算——只有 ProgressRing 这四条是比较型断言，其余多是"等过渡落地"，暴露不同；
 ③ 静止腿改成"只报数不要地板"之后，一个"永远不发帧"的假静止仍然会绿——这条留给 #78 的减动效测点去堵。
 
+## #47 第三成员（任务 #77）：弹层族把"它是开着的"搬回开的那一次调用，顺带量到"关掉不等于从树上消失"（目标项 5，2026-09-23）
+
+第一成员只改了子菜单那一条，账上还挂着整族：`FlyoutBase.IsOpen` 写的是 `_popup?.IsOpen == true`（`Primitives/FlyoutBase.cs:97`），
+所以任何"开一下、等若干帧、再读它是开的"的测点，读的都是"这几帧里有没有人抢走 active 窗口或弹了对话框"。
+这一批不再猜，给每个形状量一架帧梯：`spike/PopupLadderProbe`，一个进程、一根宿主、八次开合，每次在累计
+0/1/2/4/8/20 帧处重读同一件事，读数逐字在 `popup-ladder-probe.txt`。
+
+| 形状 | 测点在读什么 | rung 0（开的那一次调用里） | 原来等几帧 |
+|---|---|---|---|
+| S1 `MenuFlyout.ShowAt` | `flyout.IsOpen` | True | 30 |
+| S2 `MenuFlyout.ShowAt` | 条目穿我们的模板、`LayoutRoot` 已建 | 都是 | 40 |
+| S3 `ContextMenu.Open(Point)` | `menu.IsOpen` + 两张刷 + 模板 | 都是 | 40 |
+| S4 `ContextMenu.Open(Point)` | 爬出条目到框架自建的 `Border`：8、1、两张刷、local 值、`MenuPopupScrollHost` | 全有 | 40 |
+| S5 开过之后再写 `CornerRadius=3` | 那张 `Border` 跟着变 3 | 同一次调用就是 3 | 10 |
+| S6 `MenuFlyout.ShowAt` | 框架内部的 `MenuFlyoutPresenter`：local 8、边 1、`Background` 为 null | 全有 | 40 |
+| S7 `CommandBar.IsOpen = true` 与合成点击省略号 | `bar.IsOpen` + `Popup.IsOpen` | 两种写法都是 True | 80 |
+| S8 `AutoCompleteBox.Text = "b"` | `IsDropDownOpen` + 覆盖层上的 `SuggestionsContainer` | 都是 | 30 |
+
+八个形状、六档帧数，没有一档出现"0 帧还读不到、晚一点才到"——弹层族里**没有一帧是这些主张的前提**。于是删掉六处
+settle（S1-S6 那六条测点），把两处状态读法搬到调用旁边（S7 的 `barIsOpen`/`popupOpened` 搬到点击同一次调用里，
+S8 的 `IsDropDownOpen` 搬到写 `Text` 同一次调用里），主张一字未减。`Settle(80)` 与 `Settle()` 仍在原位的那两处，
+服务的是几何与捕获（`ActualHeight`、窗口截图），帧梯对它们没有说话。
+
+仪器自己先错过一次：S3/S4 第一轮六档全报 `KeyNotFoundException: Resource key 'MenuFlyoutPresenterBackground' not
+found`，原因是探针拿 `FluentThemeManager.GetBrush` 去量框架自己的呈现器键；换成测点同款的
+`Application.Current.TryFindResource` 才读到值。红在仪器上，不是红在被测物上——记在这里，因为这条读法差异本身
+就是 #12 那几轮"按键名找资源"的同族。
+
+### 帧梯的第二件事：关掉，那张表面还在（S9/S10）
+
+给 S4 那条测点做一次"开完立刻 `IsOpen = false` 再读"的突变，它**绿了**——这不是好消息，是那条测点对"开着"这件事
+本来就是瞎的。量到底：
+
+| 关闭后 | 0 帧 | 4 帧 | 8 帧 | 20 帧 |
+|---|---|---|---|---|
+| S9 `ContextMenu` 的 `Border` | 8/1、刷在、`Visible`、父为 `PopupRoot` | 同 | 同 | 同，但 `VisualParent` 已是 null（整块脱离窗口，从条目仍可达） |
+| S10 藏起来的 `MenuFlyoutItem` | 模板仍是我们的那一枚 | 同 | 同 | 同 |
+
+也就是说单读一张表面从来不能证明"它此刻开着"，改形之前不能、改形之后也不能。所以只读表面的三条测点（S2/S4/S6
+对应的三条）补上同一调用里的 open 主张。A/B：同一个"开完立刻关"的突变，补主张前绿，补主张后红在
+`Open(Point) did not open the context menu, so the surface below may be a stale graft.`。另外两处突变也各自红：
+删掉 `ShowAt` 红在 `ShowAt did not open the flyout.`，删掉 `Open(Point)` 红在那条 identity 主张。
+这顺带回填了 #47 第一成员里那笔"一次弹窗关掉九张还开着的子菜单"——关掉只是把它从窗口摘走，graft 本体留在条目的
+父链上，谁都能再摸到；测点要自己关，也要自己声明它是开着的。
+
+### 这一批没有做的与不声称
+
+① ComboBox 的 `IsDropDownOpen`→覆盖层移植、NumberBox 的 `UpDownPopup`、`AstraSurfaceGeometryTests` 的同一条、
+TeachingTip 的 popup：帧梯没量过这些形状，所以一条没动，另立 #79 逐族量。② 不声称 rung 0 是跨机器的常数——它
+量的是 26.10.9 在这台机器上的调用形状；哪一天 S 系先红，说明框架把开合推后了一帧，那时该把等待加回来并把这一节
+改判，而不是把断言删掉。③ 几何类读数（`ActualHeight`、realized 子元素的尺寸）仍按帧等，帧梯只证明状态在同一次
+调用里，不证明布局跑过。
+
+**四类证据**：构建——见下段闸口读数。行为：定向跑两轮各 246/246 绿（菜单 + 命令条 + 建议框三类），三次突变各红
+（两条"没开"、一条"开完就关"）。视觉：本批**没有**像素主张变动，也没重跑视觉测点。硬件输入：仍为零，S7 用的是
+合成 `MouseDown`/`MouseUp`，探针没动真指针。
+
+### 这一批的串行闸口读数（2026-09-23，`spike/PopupLadderProbe/gate-full.log`）——全绿，管道退出码 0
+
+`tools/Test-AstraGates.ps1` 六步顺序跑完：restore（全部最新）→ Debug 构建 0 警告 0 错误 → 整套测试
+**1573/1573 通过、0 跳过，7 分 29 秒** → 逐页像素闸 `PASS 13 pages x 2 variants, 0 offender(s)` →
+调色板漂移 `Light/Dark 各 83 source colors, 101 resolved brushes, checked=True`、
+`HighContrast 101 mapped keys, checked=True` → 键清单 `keys.md is current: 1312 canonical lines.`。
+
+两条要如实记下的读数：① 测试总数仍是 1573，一条没少——本批删的是等待、补的是三处 open 主张，都在既有测点内部；
+② 逐页闸里仍然只有 `status` 两档是 `stable=True/False`（Light 槽内色数 1189788px / Dark 1189783px），与第二成员
+给的解释一致：页里两枚 indeterminate 环的相位在飘，offender 判据不吃这个数，所以 PASS 成立，账在 #78。
+
 
 

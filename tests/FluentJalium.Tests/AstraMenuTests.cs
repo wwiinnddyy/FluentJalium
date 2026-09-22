@@ -38,6 +38,29 @@ namespace FluentJalium.Tests;
 /// is what turns those claims into pixels: 1194 pure-white label pixels over the framework's own text before,
 /// zero after, with the framework layer's colours unchanged to the pixel count.
 /// </para>
+/// <para>
+/// #47's first member settled the submenu read; the rest of this file now follows the same rule, and
+/// <c>spike/PopupLadderProbe</c> is why. Every open read below used to sit behind a fixed frame pump
+/// (<c>Settle(30)</c>/<c>Settle(40)</c>). That pump is not measuring the open: <c>FlyoutBase.IsOpen</c> is
+/// <c>_popup?.IsOpen == true</c>, and the two closers the probe named (<c>ContentDialog.ShowAsync</c>'s
+/// <c>CloseLightDismissPopups()</c>, and this thread's active window changing hands) both fire while frames
+/// elapse, so a settled read asks "did anything steal focus in between". The ladder ran each open call this
+/// class makes - <c>MenuFlyout.ShowAt</c>, <c>ContextMenu.Open(Point)</c>, and a later write to
+/// <c>ContextMenu.CornerRadius</c> - and re-read at 0/1/2/4/8/20 pumped frames: at rung 0, inside the call that
+/// opens, <c>IsOpen</c> is already true, the item already wears our template, the copied Border already carries
+/// 8/1 and our two presenter rows, the internal presenter is already in the tree with its local radius, and the
+/// Border follows a later radius write to 3 in the same call. Nothing in this file pumps a frame to make an open
+/// true any more. What that does not buy: geometry that a layout pass owes (<c>ActualWidth</c>, a realized
+/// child's size) is not covered by those readings and keeps its settle where a test asks for it.
+/// </para>
+/// <para>
+/// The same probe says why an open read is now paired with every surface read. Closing does not take the surface
+/// away: eight frames after <c>IsOpen = false</c> the grafted Border still reads 8/1 with our brushes, and twenty
+/// frames on it is still reachable from the item with a null visual parent (S9); a hidden flyout's item keeps the
+/// template ours for the whole twenty (S10). A surface read alone therefore never proved the menu was up, before
+/// this batch or after it - it proves the graft exists. The open read beside it is what makes it a claim about
+/// the surface a user is looking at.
+/// </para>
 /// </summary>
 [Collection(AstraThemeRuntimeCollection.Name)]
 public sealed class AstraMenuTests
@@ -449,8 +472,10 @@ public sealed class AstraMenuTests
             var flyout = new MenuFlyout();
             flyout.Items.Add(new MenuFlyoutItem { Text = "item" });
 
+            // Read inside the call that opens it (ladder rung 0: ShowAt has already put the popup up), so the
+            // window in which another surface could take this thread's active window and close it for real is
+            // not part of the claim at all.
             flyout.ShowAt(host);
-            PixelHarness.Settle(30);
             Assert.True(flyout.IsOpen, "ShowAt did not open the flyout.");
 
             flyout.Hide();
@@ -470,11 +495,21 @@ public sealed class AstraMenuTests
             flyout.Items.Add(item);
 
             flyout.ShowAt(host);
-            PixelHarness.Settle(40);
-
-            Assert.Same(Template(FluentThemeManager.GetStyle("DefaultMenuFlyoutItemStyle")), item.Template);
-            Assert.NotNull(PixelHarness.Named(item, "LayoutRoot"));
-            flyout.Hide();
+            try
+            {
+                // The open read is not redundant here. Ladder S10: after Hide, the item keeps the template ours
+                // for at least twenty frames, so a skin read on its own says only that the row was applied - the
+                // pair is what says the flyout painted it while it was up.
+                Assert.True(flyout.IsOpen, "ShowAt did not open the flyout, so the skin read below has no surface to belong to.");
+                // No settle: at rung 0 the item is under a StackPanel already and its template is the row we
+                // published, which is the whole claim (spike/PopupLadderProbe S2).
+                Assert.Same(Template(FluentThemeManager.GetStyle("DefaultMenuFlyoutItemStyle")), item.Template);
+                Assert.NotNull(PixelHarness.Named(item, "LayoutRoot"));
+            }
+            finally
+            {
+                flyout.Hide();
+            }
         });
     }
 
@@ -545,10 +580,12 @@ public sealed class AstraMenuTests
             menu.Items.Add(new MenuItem { Header = "cut" });
 
             menu.Open(new Point(120, 120));
-            PixelHarness.Settle(40);
 
             try
             {
+                // Rung 0 (ladder S3): Open(Point) has grafted the surface and written the control's own rows
+                // before it returns, so the three reads below are about the call, not about what happened while
+                // the thread was pumping.
                 Assert.True(menu.IsOpen, "Open(Point) did not open the context menu.");
                 Assert.Same(Res("MenuFlyoutPresenterBackground"), menu.Background);
                 Assert.Same(Template(FluentThemeManager.GetStyle("DefaultContextMenuStyle")), menu.Template);
@@ -585,6 +622,12 @@ public sealed class AstraMenuTests
     /// PopupRoot &gt; Border &gt; MenuPopupScrollHost into the host window's overlay, and that Border - which is
     /// not in any template of ours - wears our two presenter rows and our radius as <em>local</em> values.
     /// Before the setter existed the same read came back 14,14,14,14 while the control read 0,0,0,0.
+    /// <para>
+    /// Taken at rung 0, in the same call as the open (ladder S4: the graft, the local radius and the scroll host
+    /// are all there before <c>Open</c> returns). The earlier version of this test pumped 40 frames first, which
+    /// only ever added a window in which something else could close the popup - #47's mechanism, read the other
+    /// way round: here it would not have made a true thing false so much as made the wait meaningless.
+    /// </para>
     /// </summary>
     [Fact]
     public void A_context_menu_surface_is_the_frameworks_border_wearing_our_rows_and_upstreams_radius()
@@ -595,9 +638,13 @@ public sealed class AstraMenuTests
             menu.Items.Add(new MenuItem { Header = "cut" });
             menu.Items.Add(new MenuItem { Header = "copy" });
             menu.Open(new Point(120, 120));
-            PixelHarness.Settle(40);
             try
             {
+                // Not decoration: ladder S9 closed the menu right after opening it and every read below still came
+                // back the same - the grafted Border stays under its PopupRoot for at least eight frames and is
+                // still reachable from the item (detached) at twenty. The open read is what ties them to a
+                // surface that is up.
+                Assert.True(menu.IsOpen, "Open(Point) did not open the context menu, so the surface below may be a stale graft.");
                 var surface = SurfaceOf(menu.Items[0] as DependencyObject);
                 Assert.True(menu.CornerRadius == surface.CornerRadius,
                     $"the framework did not copy the control's radius: control={menu.CornerRadius} surface={surface.CornerRadius}");
@@ -752,9 +799,10 @@ public sealed class AstraMenuTests
             var flyout = new MenuFlyout();
             flyout.Items.Add(new MenuFlyoutItem { Text = "cut" });
             flyout.ShowAt(anchor);
-            PixelHarness.Settle(40);
             try
             {
+                // Rung 0 again (ladder S6): the presenter, its local 8 and its 1 DIP edge are written by the
+                // open call itself, so the 40 frames this used to wait bought only the risk named in #47.
                 Assert.Equal("True", Read(flyout, "IsOpen"));
                 var presenter = PresenterOf(flyout.Items[0] as DependencyObject);
                 Assert.Equal(new CornerRadius(8), (CornerRadius)ReadDP(presenter, "CornerRadius")!);
@@ -777,6 +825,11 @@ public sealed class AstraMenuTests
     /// itself), so the arc cannot be sampled from here and the corner staircase is evidenced by
     /// <c>spike/FlyoutSurfaceProbe</c> frames instead. What does not depend on that layout is the copy contract:
     /// the framework writes our radius and our 1 DIP edge onto the Border it builds, not onto ours.
+    /// <para>
+    /// Both reads are taken at rung 0 (ladders S4 and S5): the surface is there when <c>Open</c> returns, and it
+    /// carries the new 3 as soon as the control's property is written. The 40 and 10 frames this used to pump sat
+    /// between the write and the read, and no claim below needs them.
+    /// </para>
     /// </summary>
     [Fact]
     public void The_copied_surface_takes_the_radius_and_the_edge_it_is_told_to_take()
@@ -786,15 +839,14 @@ public sealed class AstraMenuTests
             var menu = new ContextMenu();
             menu.Items.Add(new MenuItem { Header = "cut" });
             menu.Open(new Point(120, 120));
-            PixelHarness.Settle(40);
             try
             {
+                Assert.True(menu.IsOpen, "Open(Point) did not open the context menu, so the surface below may be a stale graft.");
                 var surface = SurfaceOf(menu.Items[0] as DependencyObject);
                 Assert.Equal(new CornerRadius(8), surface.CornerRadius);
                 Assert.Equal(new Thickness(1), surface.BorderThickness);
                 Assert.Equal((CornerRadius)TryRes("OverlayCornerRadius")!, menu.CornerRadius);
                 menu.CornerRadius = new CornerRadius(3);
-                PixelHarness.Settle(10);
                 Assert.Equal(new CornerRadius(3), surface.CornerRadius);
             }
             finally

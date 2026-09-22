@@ -105,13 +105,18 @@ public sealed class AstraAutoSuggestBoxTests
             var box = Mounted();
             box.ItemsSource = Enumerable.Range(0, 24).Select(static index => $"Item {index:00}").ToArray();
             box.Text = "I";
+            // The open is read in the same call that causes it (spike/PopupLadderProbe S8: at rung 0
+            // IsDropDownOpen is already true and SuggestionsContainer is already grafted into the host's
+            // overlay), so no #47-shaped window sits between "filtered" and "opened". The settle below stays for
+            // the other half: the four geometry rows are what a layout pass owes, and ActualHeight read before
+            // one would say nothing about the ceiling.
+            Assert.True(box.IsDropDownOpen, "the dropdown did not open on a filtering edit");
             PixelHarness.Settle();
 
             var container = (Border)PopupPart("SuggestionsContainer");
             var scroller = (ScrollViewer)PopupPart("PART_DropDownScrollViewer");
             var host = PopupPart("PART_DropDownItemsHost");
             Assert.Multiple(
-                () => Assert.True(box.IsDropDownOpen, "the dropdown did not open on a filtering edit"),
                 () => Assert.Equal(200d, box.MaxDropDownHeight),
                 // The ceiling is on the list, and the card carries none of its own: with 374 on the card the
                 // list could never fill it.

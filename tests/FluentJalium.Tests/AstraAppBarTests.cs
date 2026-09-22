@@ -284,11 +284,15 @@ public sealed class AstraAppBarTests
             RaiseMouse(more!, UIElement.MouseUpEvent);
             more!.ReleaseMouseCapture();
             bar.IsOpen = true;
-            PixelHarness.Settle(80);
-            var after = PixelHarness.Chrome(host);
+            // The two open reads come first, inside the call that opens (spike/PopupLadderProbe S7: both a direct
+            // write to IsOpen and a synthetic click on the ellipsis have the Popup up at rung 0). The 80 frames
+            // below stay - the capture needs rendered time - but the claim "the bar opened its overflow" no
+            // longer waits through a window in which #47's closers can take the popup back down.
             var popup = FindChild<Popup>(bar);
             var popupOpened = popup?.IsOpen ?? false;
             var barIsOpen = bar.IsOpen;
+            PixelHarness.Settle(80);
+            var after = PixelHarness.Chrome(host);
             var difference = after.Count(SentinelLime) - before.Count(SentinelLime);
             FluentThemeManager.OverrideBrush("AcrylicInAppFillColorDefaultBrush", null);
 

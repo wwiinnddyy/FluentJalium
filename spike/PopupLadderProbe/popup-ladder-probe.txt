@@ -1,0 +1,90 @@
+
+=== S1  MenuFlyout.ShowAt -> flyout.IsOpen ===
+   IsOpen + 0 frame(s): flyout.IsOpen=True
+   IsOpen + 1 frame(s): flyout.IsOpen=True
+   IsOpen + 2 frame(s): flyout.IsOpen=True
+   IsOpen + 4 frame(s): flyout.IsOpen=True
+   IsOpen + 8 frame(s): flyout.IsOpen=True
+   IsOpen +20 frame(s): flyout.IsOpen=True
+     after Hide: flyout.IsOpen=False
+
+=== S2  MenuFlyout.ShowAt -> the item wears our template ===
+   skin + 0 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+   skin + 1 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+   skin + 2 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+   skin + 4 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+   skin + 8 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+   skin +20 frame(s): item.Template is ours=True Named(LayoutRoot)=there realized=StackPanel
+
+=== S3  ContextMenu.Open(Point) -> IsOpen, and the control wears our rows ===
+   identity + 0 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+   identity + 1 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+   identity + 2 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+   identity + 4 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+   identity + 8 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+   identity +20 frame(s): menu.IsOpen=True Background=MenuFlyoutPresenterBackground Template=ControlTemplate
+
+=== S4  ContextMenu.Open(Point) -> the copied surface, read by climbing out of the item ===
+   surface + 0 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+   surface + 1 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+   surface + 2 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+   surface + 4 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+   surface + 8 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+   surface +20 frame(s): radius=8,8,8,8 border=1,1,1,1 Background=MenuFlyoutPresenterBackground localRadius=True scrollHost=there
+
+=== S5  after the surface is up, menu.CornerRadius = 3 -> the copied surface ===
+   re-copy + 0 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+   re-copy + 1 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+   re-copy + 2 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+   re-copy + 4 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+   re-copy + 8 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+   re-copy +20 frame(s): control=3,3,3,3 surface=3,3,3,3 (surface at open was 8,8,8,8)
+
+=== S6  MenuFlyout.ShowAt -> the flyout's own presenter ===
+   presenter + 0 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+   presenter + 1 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+   presenter + 2 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+   presenter + 4 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+   presenter + 8 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+   presenter +20 frame(s): MenuFlyoutPresenter radius=8,8,8,8 border=1,1,1,1 localRadius=True Background=null host=there
+
+=== S7  CommandBar.IsOpen = true -> bar.IsOpen and its Popup.IsOpen ===
+     ellipsis button realized: True
+   open + 0 frame(s): bar.IsOpen=True popup=IsOpen=True
+   open + 1 frame(s): bar.IsOpen=True popup=IsOpen=True
+   open + 2 frame(s): bar.IsOpen=True popup=IsOpen=True
+   open + 4 frame(s): bar.IsOpen=True popup=IsOpen=True
+   open + 8 frame(s): bar.IsOpen=True popup=IsOpen=True
+   open +20 frame(s): bar.IsOpen=True popup=IsOpen=True
+     ... and the same read after a synthetic click on the ellipsis
+   click + 0 frame(s): bar.IsOpen=True popup=IsOpen=True
+   click + 1 frame(s): bar.IsOpen=True popup=IsOpen=True
+   click + 2 frame(s): bar.IsOpen=True popup=IsOpen=True
+   click + 4 frame(s): bar.IsOpen=True popup=IsOpen=True
+   click + 8 frame(s): bar.IsOpen=True popup=IsOpen=True
+   click +20 frame(s): bar.IsOpen=True popup=IsOpen=True
+
+=== S8  AutoCompleteBox.Text = "b" -> IsDropDownOpen and the popup's parts ===
+   dropdown + 0 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+   dropdown + 1 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+   dropdown + 2 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+   dropdown + 4 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+   dropdown + 8 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+   dropdown +20 frame(s): box.IsDropDownOpen=True SuggestionsContainer=there text=b
+     after closing: box.IsDropDownOpen=False SuggestionsContainer=gone
+
+=== S9  ContextMenu opened then closed - how long the copied surface stays in the tree ===
+   closed + 0 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=PopupRoot
+   closed + 1 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=PopupRoot
+   closed + 2 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=PopupRoot
+   closed + 4 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=PopupRoot
+   closed + 8 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=PopupRoot
+   closed +20 frame(s): menu.IsOpen=False surface radius=8,8,8,8 bg=set visibility=Visible parent=null
+
+=== S10  MenuFlyout shown then hidden - how long the item keeps our template ===
+   hidden + 0 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+   hidden + 1 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+   hidden + 2 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+   hidden + 4 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+   hidden + 8 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
+   hidden +20 frame(s): flyout.IsOpen=False item.Template is ours=True parent=StackPanel
