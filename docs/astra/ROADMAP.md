@@ -2458,3 +2458,22 @@ flake 是**假设，未证**——机制仍未结，别当已排除。`DatePicke
 稳定通路，且我们不改它们模板），别名对它们的实际效果只由源树消费形状支持；
 26.10.9 权威上"焦点框像素真的换色"仍无断言（#50 那族限制之外的另一手：需要真键盘焦点）。
 下一轮名字候选与代价照旧列在上面那张普查表里。
+
+## #12 差距表：剩下 6 个名字在 26.10.9 上各读成什么（量完即摘仪器，不留故意红的测点）
+
+一次性仪器：`Application.TryFindResource(框架名)` 与候选 twin 比**实例**，红消息带真实色值；跑一轮取数后从
+`AstraFrameworkNameResolutionTests` 移除（闸口里不许住着一堆"预期红"）。框架那一层是**一整套 iOS 灰**，不是 WinUI
+Fluent 值——所以别名层的价值是实的，但每个名字要单独判：
+
+| 名字 | Light 实测 | Dark 实测 | 候选 twin（我们的值） | 判定 |
+|---|---|---|---|---|
+| `SurfaceBackground` | `#FFFFFFFF` | `#FF2C2C2E` | `SolidBackgroundFillColorBaseBrush` `#FFF3F3F3` / `#FF202020` | 真差距，第二轮 |
+| `ControlBorder` | `#FFD2D2D7` | `#FF48484A` | `ControlStrokeColorDefaultBrush` `#0F000000` / `#12FFFFFF` | 真差距（我们是带 alpha 的），第二轮 |
+| `TextPrimary` | `#FF1D1D1F` | `#FFF5F5F7` | `TextFillColorPrimaryBrush` `#E4000000` / `#FFFFFFFF` | 真差距，代价已知：`AstraMenuTests` 两条 0→38 格 |
+| `TextSecondary` | 未取到（输出截断） | `#FFD1D1D6` | `TextFillColorSecondaryBrush` `#9E000000` / `#C5FFFFFF` | Dark 侧真差距；Light 读数补测后再判 |
+| `TextDisabled` | `#FFAEAEB2` | `#FF636366` | `TextFillColorDisabledBrush` `#5C000000` / `#5DFFFFFF` | 真差距，代价最大：五条禁用墨老账要一起改 |
+| `TextOnAccent` | 未取到（输出截断） | `#FFFFFFFF` | `TextOnAccentFillColorPrimaryBrush` `#FF000000`(Dark) | **不盲接**：框架在 Dark 用白字、我们的 twin 是黑字，对不对取决于它当时铺在哪支强调填充上；要先量"这个名字被读的那些表面实际填充是哪支刷"，否则别名会把反色文字接到反了的值上 |
+
+两条未取到的 Light 读数**不猜**：`TextSecondary[Light]` 与 `TextOnAccent[Light]` 在下一轮补测。
+`ControlBorderFocused` 已在第一段发布（`bfca518`），不在表内。第二轮的范围因此定为 `SurfaceBackground` +
+`ControlBorder`（差距实、无已知事实依赖框架那两支灰），`TextOnAccent` 挪到"先量表面填充"之后。
