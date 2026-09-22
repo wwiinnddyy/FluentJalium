@@ -93,12 +93,13 @@ show delay, auto-hide and placement are framework behavior, unmeasured
 
 ## 这些证据不支持什么
 
-1. **不支持"每一页都画对了"（仍未结，2026-09-22 试过并把结果记在 `ROADMAP.md` 的"#10 缺口②"）**。冒烟只看到
-   Overview 一页，新加的家族卡与内嵌表面卡既没目视也没有断言。当天确实把逐页像素闸建起来了并且单独 13/13 绿
-   （`Catalog.json` 的 13 页逐页在真 `MainWindow` 里挂载、Light/Dark 各拍一张，再卸载该页拍一张同窗口底板，
-   断言"挂页的颜色数严格多于不挂页"），但它一进顺序全量就把 `AstraAutoSuggestBoxTests` 的三条建议列表测点弄红，
-   机制没查到，于是整条闸被撤出工作树（实现留在 `spike/GalleryRender/AstraGalleryRenderTests.cs.parked`）。
-   所以"每页渲染到像素"至今**没有断言**，只有那份记录在案的 52 帧测量。
+1. **"每一页都画对了"现在有了断言，但只在独立进程里**（2026-09-22 结，见 `ROADMAP.md` 的"#10 缺口②第二次尝试"）。
+   冒烟当年只看到 Overview 一页。逐页像素闸第一版做在共享测试宿主里，单独 13/13 绿、A/B 有牙齿，却把
+   `AstraAutoSuggestBoxTests` 三条建议列表测点弄红：根因是**每渲染一页，那页模板 realize 出的下拉子树会留在宿主
+   窗口的覆盖层**，而该族测点从同一窗口按 `Name` 找部件、第一个命中的就是 Gallery 的（实测 `containers=5`、
+   `min=0`、`98.07x41.78`）。所以闸搬到 `tools/AstraPagePixels`（一次性进程、真 Show、每页每档拍整窗 + 页槽 + 空槽），
+   由 `tools/Test-AstraGates.ps1` 串进全量。仍未被它支持的：页内几何与间距、逐页指纹（两页内容互换它不会红）、
+   与 WinUI 截图的比对，以及纯文本页——字形不打印（#50），那种页过不了"槽内 ≥40 色"。
 2. **屏幕坐标点击不可用，且有风险**。本轮一次冒烟脚本想用 `SetCursorPos`+`mouse_event`
    点"Open buttons"，但 `BringWindowToTop`/`SetForegroundWindow` 在 Windows 前景锁下不保证生效，
    截图证明那个矩形里当时盖着用户另一个窗口 —— 点击落到了别人的应用上。

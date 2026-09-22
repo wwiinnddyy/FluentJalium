@@ -2619,17 +2619,18 @@ Motion 补间的驱动证据。
 - **其中 1 条的机制已经量清**：`PixelHarness.EnsureHost` 只会把共享宿主窗口**长大、从不缩回**，而 1100x820 的页捕获
   把它撑到 1150x877，后面所有弹层的摆放都是照这块屏幕矩形算的——本类的 `Dispose` 把宿主的 Width/Height 还回去之后，
   TeachingTip 那条**立刻回绿**。这是 harness 的一条真实约束，值得单独记住：任何比 884x684 更大的捕获都会污染后续几何。
-- **剩下 3 条的机制没找到**。一个假设被实测排除，另一个只当候选记着：① "旧内容留在宿主里、按名字找部件会找到 Gallery 的那一个"——
+- **剩下 3 条的机制当时没找到**（下一节结掉）。一个假设被实测排除，另一个只当候选记着：① "旧内容留在宿主里、按名字找部件会找到 Gallery 的那一个"——
   探路测点（`spike/GalleryRender/probe-a.log`、`probe-b.log`）在"先拍一张 Gallery 页 + 还原宿主"之后
   仍只数到 `containers=1`、`Border 260x41.78 min=260 visible=True`，与不拍的那条腿一模一样；
-  ② "档位被带走"——**没测过**，只记在这里当候选：本类 `Dispose` 显式回到 Light，且两档 26 帧各自的底色都对得上，
-  所以翻档通路本身是通的。红的读数是
+  ② "档位被带走"——当时**没测过**，只记成候选；现在已被后面的节否证（根因是覆盖层里嫁接着的部件，与档位无关）。
+  红的读数是
   `container.MinWidth 0`（应为 260）与 `container.ActualWidth 98.06`（应为 260），还有一条
   `Assert.Same` 拿到的是**禁用文字**色（一次 #FF636366＝Dark 的 TextDisabled、一次 #FFAEAEB2＝Light 的）——
   即找到的那个 item 不是它自己弹出的那一个，但*为什么*不是还没量出来。
-- **处置**：类与 `ProjectReference` 都从工作树撤了；闸的完整实现留在 `spike/GalleryRender/AstraGalleryRenderTests.cs.parked`
+- **处置**：类与 `ProjectReference` 都从工作树撤了；闸的完整实现曾留在 `spike/GalleryRender/AstraGalleryRenderTests.cs.parked`
   （不在任何工程里，不会被编译；它那份 Dispose 里的宿主还原按上面量到的事实写着——还**没有**跑过绿，见下一段）。
   下一批要接这一步，**先解这条交互**再落地，起手就带着上面那个已排除的假设，别重走。
+  （后来：这条"在共享宿主进程里逐页拍"的路线在下一节被判死，`.parked` 文件随之删除，只留这里的记述与两份探路日志。）
   测量数据（52 帧那组上下界）照抄在下面，重新实现时不必再探一遍：非黑像素 901,927..902,000；
   本档底色 208,720..268,600；底板 208,720..208,722；去重色彩 25..178 对底板 19..24；品牌绿 52 帧全 0；
   每页每档都要拍，成本 2 m 9 s。
@@ -2643,3 +2644,77 @@ Motion 补间的驱动证据。
 HighContrast 101 映射键），`keys.md is current: 1301 canonical lines.`，`All Astra gates passed.`，`GATE-EXIT=0`。
 测点数与 `9d86e12` 那次读数同值（1491），也就是**回到本页批开始前的基线**，工作树里没有留下半条闸。
 "每页可渲染到像素"因此仍是 #10 未结的缺口，改由任务 #63 记账。
+
+## #10 缺口②第二次尝试：机制查到了，闸搬到独立进程 `tools/AstraPagePixels`
+
+### 机制：宿主窗口不是被"撑大"坏的，是被"按名字找部件"这条读法坏的
+
+上一节记的"宿主尺寸只涨不缩"只是四条红里的**一条**（TeachingTip 翻侧）。另外三条建议列表测点的根因，用一次
+自包含探路量出来了（`spike/GalleryRender/probe2.log`）：在**同一进程**里渲染 6 张 Gallery 页（3 页 × 两档）之后，
+从共享宿主窗口按名字找部件得到
+
+```
+host 484x364 box=260 open=True containers=5 itemsHosts=11
+  container 98.07x41.78 min=0   visible=True      <- 4 个是 Gallery 页留下的
+  container 260x41.78  min=260  visible=True      <- 这条测点自己要的那一个
+```
+
+也就是：每渲染一页，那页模板里 realize 出来的下拉子树就被嫁接到宿主窗口的**覆盖层**（overlay layer），
+它不是 `Window.Content` 的子节点——所以把 `host.Content` 换成新 Grid 也带不走它（上一节那个"排除"因此是对的、
+也是不完整的：内容层清得掉，覆盖层清不掉）。而建议列表那族测点正是从宿主窗口按 `Name` 深度优先找部件，
+**第一个命中**就是 Gallery 留下的 98.07/`min=0` 那一个，于是断言读到 0 与 98.06。
+
+试过并把这条路走死的一件事：在 `Dispose` 里调 `PixelHarness.ReleaseHost()` 关掉宿主重建一台。它确实解掉那三条
+（覆盖层随窗口一起没了），但把**更糟**的带回来——同一批三类合跑变成 **20 红**（TeachingTip 一族 7 条整片红），
+正是记忆里"在同一条 UI 线程上 Show/Close 窗口会毁掉后续弹层断言"的那族：关掉持有激活的窗口把 Win32 激活句柄留在 0。
+结论：**这条闸不能住在共享宿主的进程里**，不是阈值问题，也不是尺寸问题。
+
+### 落地：一次性进程，拍"整窗"与"页槽"两张，再拿空槽当底板
+
+`tools/AstraPagePixels/`（Exe，故意**不**进 `FluentJalium.slnx`，由 `tools/Test-AstraGates.ps1` 单独 build + run，
+进程名也进了闸口脚本的清理名单）。它真 `Show()` 出出货的 `MainWindow`（设计尺寸 1100x820，内容实测 848,166 px），
+每页每档拍三张：
+
+1. **整窗**（`window.Content`）：承托"底色翻档"和品牌绿两条全局主张；
+2. **页槽**（`PageHost` 那块 Grid，788x490..2918）：页面自己画进自己格子里多少；
+3. **空槽**（把该页从槽里摘下后再拍同一块）：底板。断言"槽内色彩数 **严格大于** 空槽"，并且**空槽必须真的没墨**
+   （`Painted(emptySlot) == 0`）——后者是这条闸的牙齿：底板一旦失效，比较就变成自证。
+
+测量（26 条腿，`--report`，`spike/GalleryRender/pagepixels-slot.log`）：整窗点亮像素 848,082..848,166；本档底色
+197,022..257,809；**另一档底色在整窗里恒为 0**（这就是 Light↔Dark 真的翻到页身上）；品牌绿 26 帧全 0；
+槽内色彩 48..404、槽内点亮 182,017..1,531,859；空槽恒 1 色 0 墨。门限贴在下界：≥800,000 / ≥150,000 /
+≥150,000 / ≥40 色。落帧用真的重试循环（最多 10 轮 × 12 帧），每轮泵 900 ms 封顶——静态场景不再发
+`CompositionTarget.Rendering`，第一版给了 20 s 预算，结果 5 条腿就吃掉 400 s 超时。
+
+一处形状问题如实记下，别当已通过：**槽是滚动范围、不是视口**，所以 Status 页那两档的槽**永远不落帧**
+（`stable=True/False`）——ProgressRing 在折叠线以下一直在 tick，而整窗那张因为它在视口外所以是稳的。
+因此"稳定"只对**视口**主张，槽只按"画了多少"判定，不拿稳定性当门槛。
+
+### 四类证据与牙齿
+
+- **构建**：`dotnet build tools/AstraPagePixels` `0 警告 / 0 错误`（探针工程独立）。
+- **行为**：26 条腿各自导航到页、拍完摘下再挂回，摘/挂用 `ContentHost.Children`（经代码后置自己的私有视图读到），
+  不改 Gallery 任何一行产品代码。
+- **像素**：上面那组上下界逐条进断言；`--report` 与断言模式同一套读数。
+- **输入**：**无**。这一批仍然不碰真指针，hover/press 的像素通路仍欠（任务 #13）。
+- **A/B（承重条验过）**：把"摘下该页"改成永不执行 → 退出码 1，**26 条** `the slot was not actually emptied`
+  加 **26 条** `printed nothing its empty slot does not already print`，其余断言照旧绿。改回即 `PASS 13 pages x 2 variants, 0 offender(s)`。
+  承重的是"槽 > 空槽"与"空槽无墨"这一对；整窗那四条是全局护栏，单独拿它们当门牙会看错。
+
+### 这条闸不声称的事
+
+① 没有逐页指纹：只说"这页往自己格子里画了东西、比空格子多"，不说画的是不是**该页的那些**控件——
+把两页内容互换它不会红（要指纹得给每页签一个色/面积表，未做）；② 无几何与间距主张（页内控件画在哪儿、
+离边多远一概没量，#21/#23 的账照旧）；③ 字形不打印（#50）在这条闸上仍是上限：纯文本页过不了"≥40 色"；
+④ 不与 WinUI 截图比对；⑤ 入场动画状态（`FluentThemeManager.Enter`）没被驱动，减动效对页面的影响也没量。
+
+### 带这条闸的串行闸口读数（补记，2026-09-22）
+
+`tools/Test-AstraGates.ps1` 加了 "build page pixel gate" 与 "gallery page pixels (13 pages x light, dark)" 两步之后
+串行跑完（`spike/GalleryRender/gate-pagepixels.log`）：build `0 警告 / 0 错误` → 整套 **1491/1491**（0 失败 0 跳过、
+7 m 4 s）→ 页像素闸 **`PASS 13 pages x 2 variants, 0 offender(s)`** → 调色板三档 `checked=True`
+（Light 83 源色 / 101 刷、Dark 同、HighContrast 101 映射键）→ `keys.md is current: 1301 canonical lines.` →
+`All Astra gates passed.` → `GATE-EXIT=0`。整轮墙钟约 12 分钟（08:29:07→08:40:53）；两步各自多久没量（闸日志只打顺序、
+不带时间戳），要按成本决策的话先给 `Invoke-Step` 加计时再谈。
+测点数仍是 1491：这条闸**不在测试装配里**，所以"测点没增"这一次不代表"没新证据"——它带的是自己那 26 条腿的读数，
+两件事分开记才不会看错（这也是为什么全量绿不等于页级主张成立）。

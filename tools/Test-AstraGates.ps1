@@ -3,7 +3,9 @@
   Runs the Astra verification sequence serially, in the order that fails fastest.
 .DESCRIPTION
   Orchestration only. The assertions themselves live in tests/FluentJalium.Tests, so a
-  developer who skips this script still gets the same gates from `dotnet test`.
+  developer who skips this script still gets the same gates from `dotnet test`. The one
+  exception is the gallery page pixel gate, which is a process of its own (tools/AstraPagePixels)
+  because it cannot run inside the shared test host - see the step below for why.
 
   Builds must not run in parallel: concurrent project builds lock shared Jalium obj files.
   Stale testhost and Gallery processes hold FluentJalium*.dll in the output folders, which
@@ -22,7 +24,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 
-foreach ($name in 'testhost', 'FluentJalium.Gallery', 'FluentJalium.Tests') {
+foreach ($name in 'testhost', 'FluentJalium.Gallery', 'FluentJalium.Tests', 'AstraPagePixels') {
     Get-Process -Name $name -ErrorAction SilentlyContinue | Where-Object {
         $_.Path -and $_.Path.StartsWith($root, [System.StringComparison]::OrdinalIgnoreCase)
     } | Stop-Process -Force
@@ -46,6 +48,17 @@ try {
     Invoke-Step "build ($Configuration)" { dotnet build FluentJalium.slnx -c $Configuration --no-restore }
     Invoke-Step 'test suite (structure, resource keys, theme runtime)' {
         dotnet test tests/FluentJalium.Tests -c $Configuration --no-build --no-restore
+    }
+
+    # The page-level pixel gate runs as its own process on purpose: rendering the Gallery inside the shared
+    # test host leaves each page's dropdown subtree grafted in that host's overlay layer, and the suite
+    # resolves popup parts by name from the same window (docs/astra/ROADMAP.md, "#10 缺口②").
+    # Restored on its own because the probe project is deliberately outside FluentJalium.slnx.
+    Invoke-Step "build page pixel gate ($Configuration)" {
+        dotnet build tools/AstraPagePixels -c $Configuration
+    }
+    Invoke-Step 'gallery page pixels (13 pages x light, dark)' {
+        & (Join-Path $root "tools\AstraPagePixels\bin\$Configuration\net10.0-windows\AstraPagePixels.exe")
     }
     if (-not $SkipPalette) {
         Write-Host '==> palette drift'

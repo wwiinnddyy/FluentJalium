@@ -1,0 +1,41 @@
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:22.47]     FluentJalium.Tests.Gallery.TempGalleryInteractionProbe2.Probe [FAIL]
+  失败 FluentJalium.Tests.Gallery.TempGalleryInteractionProbe2.Probe [19 s]
+  错误消息:
+   inputs Light: page 32/508400/155076 plate 22/508400/154640
+inputs Dark: page 46/508400/0 plate 20/508400/0
+selection Light: page 87/508400/154642 plate 22/508400/154640
+selection Dark: page 86/508391/0 plate 20/508400/0
+surfaces Light: page 39/508400/154642 plate 22/508400/154640
+surfaces Dark: page 38/508400/0 plate 20/508400/0
+host 484x364 box=260 open=True containers=5 itemsHosts=11
+  container 98.07x41.78 min=0 visible=True
+  container 98.07x41.78 min=0 visible=True
+  container 98.07x41.78 min=0 visible=True
+  container 98.07x41.78 min=0 visible=True
+  container 260x41.78 min=260 visible=True
+  itemsHost 0x12 visible=True
+  itemsHost 98.07x35.78 visible=True
+  itemsHost 0x12 visible=True
+  itemsHost 98.07x35.78 visible=True
+  itemsHost 0x12 visible=True
+  itemsHost 98.07x35.78 visible=True
+  itemsHost 0x12 visible=True
+  itemsHost 98.07x35.78 visible=True
+  itemsHost 0x12 visible=True
+  itemsHost 260x35.78 visible=True
+  itemsHost 246x12 visible=True
+  堆栈跟踪:
+     at FluentJalium.Tests.Gallery.TempGalleryInteractionProbe2.<>c__DisplayClass3_0.<Probe>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Gallery\TempGalleryInteractionProbe2.cs:line 70
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.Gallery.TempGalleryInteractionProbe2.Probe() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Gallery\TempGalleryInteractionProbe2.cs:line 29
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 19 s - FluentJalium.Tests.dll (net10.0)
