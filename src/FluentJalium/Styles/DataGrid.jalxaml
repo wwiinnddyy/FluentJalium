@@ -151,7 +151,10 @@
                  Visibility), so a state cell here could never win - see adaptation/00's precedence rule. What the
                  template owns is the typeface and the size, and since the glyph the control picks is a text
                  character and not a Segoe Fluent Icons codepoint, the family is left to inherit. The size is the
-                 runtime's own CaptionFontSize (10), not upstream's 8, which was measured against a font glyph. -->
+                 runtime's own CaptionFontSize (10), not upstream's 8, which was measured against a font glyph.
+                 That 10 is the projection as it stood when this row was transcribed; ROADMAP #72 moved the framework's
+                 body size to 14 and the name now answers 12. The literal stays at 10 on purpose: the row is a fitted
+                 glyph, and re-widening it is a visual change this batch makes no pixel evidence for (#50). -->
             <TextBlock Name="PART_SortIndicator" Grid.Column="1" FontSize="10" Margin="4,4,2,4" VerticalAlignment="Center" Visibility="Collapsed" />
           </Grid>
         </Border>

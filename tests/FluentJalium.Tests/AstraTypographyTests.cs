@@ -218,6 +218,62 @@ public sealed class AstraTypographyTests
         });
     }
 
+    /// <summary>
+    /// The framework's own type scale, read at application scope: a template this library does not own asks for a size
+    /// by name (<c>{ThemeResource CaptionFontSize}</c> in the shipped DataGrid and TitleBar builders, #12's census), and
+    /// the name is projected by <c>ThemeManager.ApplyTypography</c>, which <see cref="FluentThemeManager" /> calls with
+    /// upstream's body size during install. The two upstream numbers are 14 and 12
+    /// (microsoft-ui-xaml @19e3bdc3, dxaml/xcp/dxaml/themes/generic.xaml:13280 and :13283); the runtime's own default
+    /// projection was 12/10/8. <c>SmallFontSize</c> is the framework's derivation (body minus four) and has no upstream
+    /// row to answer to - it is named here because the driver moves it, so an unlisted drift would be invisible.
+    /// </summary>
+    [Theory]
+    [InlineData("BodyFontSize", 14d)]
+    [InlineData("CaptionFontSize", 12d)]
+    [InlineData("SmallFontSize", 10d)]
+    public void The_framework_type_scale_projects_from_upstreams_body_size(string key, double expected)
+    {
+        _fixture.Run(() => Assert.Equal(expected, Assert.IsType<double>(Application.Current!.TryFindResource(key))));
+    }
+
+    /// <summary>
+    /// The same claim as an arrival reading, because a dictionary row is not what a template consumes: a mounted
+    /// <c>TextBlock</c> whose only size row is <c>{ThemeResource BodyFontSize}</c> reads 14. The second leg is the
+    /// invariant this batch was actually for - the projection and this host's own <c>TextBlock</c> default, which
+    /// disagreed by two before (14 against 12), now agree, so a size named and a size inherited are the same number.
+    /// Read at the dependency-property level only; #50 still blocks any pixel claim about text.
+    /// </summary>
+    [Fact]
+    public void A_size_asked_for_by_name_arrives_as_upstreams_number_and_matches_the_inherited_one()
+    {
+        var styled = (ResourceDictionary)XamlReader.Parse(
+            "<ResourceDictionary xmlns='http://schemas.jalium.ui/2024' " +
+            "xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml'>" +
+            "<Style x:Key='S' TargetType='TextBlock'>" +
+            "<Setter Property='FontSize' Value='{ThemeResource BodyFontSize}' /></Style>" +
+            "</ResourceDictionary>")!;
+
+        _fixture.Run(() =>
+        {
+            var merged = Application.Current!.Resources.MergedDictionaries;
+            merged.Add(styled);
+            try
+            {
+                var named = Mount(new TextBlock { Text = "named", Style = (Style)styled["S"]! });
+                var inherited = Mount(new TextBlock { Text = "inherited" });
+
+                Assert.Multiple(
+                    () => Assert.Equal(14d, named.FontSize),
+                    () => Assert.Equal(14d, inherited.FontSize),
+                    () => Assert.Equal(inherited.FontSize, named.FontSize));
+            }
+            finally
+            {
+                merged.RemoveAt(merged.Count - 1);
+            }
+        });
+    }
+
     private static TextBlock Mount(TextBlock block)
     {
         PixelHarness.Build(block, 240, 40);

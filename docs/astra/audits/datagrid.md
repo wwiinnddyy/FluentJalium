@@ -79,7 +79,7 @@ ModernWpf 未新增语义键，全部是补官方模板要求的别名（该文�
 | 行 / 列头带 | 30 / 34 |
 | 单元格 padding / 列头 padding | `10,5,10,5` / `10,7,6,7` |
 | `PART_ResizeGrip` | 8x34，**`IsHitTestVisible=False`**（可见分隔来自 `PART_HeaderBorder` 的 `bt=0,0,1,0`） |
-| `PART_SortIndicator` | 空串（由代码填），`FontSize={ThemeResource CaptionFontSize}`=`10` |
+| `PART_SortIndicator` | 空串（由代码填），`FontSize={ThemeResource CaptionFontSize}`=`10`（该名字答的是框架当时的投影值；#72 之后答 12，我们这一行按量好的字形留在字面 10） |
 | 框架 `GridSplitter` | 类型在（`GridSplitter : Thumb`，DP：`DragIncrement`/`KeyboardIncrement`/`PreviewStyle`/`ResizeBehavior`/`ResizeDirection`/`ShowsPreview`），但表格模板里不用它 |
 
 框架那份样式读 **11 个 token 名**，Astra 目前只定义其中 2 个（`LayerFillColorAltBrush`、

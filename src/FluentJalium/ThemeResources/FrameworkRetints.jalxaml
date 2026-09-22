@@ -142,7 +142,9 @@
        redirect row does carry a number, all the way to a mounted TextBlock.FontSize (10 to 9, back to 10 when the row is
        removed). So the carrier is not the obstacle. Three other readings are:
        (1) The census is not empty either - 26.10.9 loads the string in 13 places: one publisher
-       (ThemeManager.BuildTypographyDictionary, which projects 12/10/8 for body/caption/small), two inside SystemFonts,
+       (ThemeManager.BuildTypographyDictionary, which projects body/caption/small from whatever body size it is given -
+       12/10/8 out of the box, 14/12/10 with the call FluentThemeManager.Apply now makes, ROADMAP #72), two inside
+       SystemFonts,
        and ten inside seven compiled framework dictionary builders (Containers, DataGrid, DockLayout, MenusToolbars,
        Primitives, TabControl, TitleBar). Two of those are confirmed reads on the shipped markup rather than inference:
        the DataGrid batch dumped the framework's own template and read PART_SortIndicator's FontSize=
@@ -159,10 +161,13 @@
        row was parsed, so moving the source leaves the alias behind, while a brush row stays live because ApplyAccent and
        OverrideBrush retint the instance the row forwarded. A CaptionFontSize row would therefore freeze the framework's
        caption size against its own typography driver, and would still not cover the whole read set: SystemFonts.
-       CaptionFontSize reports a third number (12 against the projected 10) that an application-level entry does not
+       CaptionFontSize reports a number (12) that an application-level entry does not
        move. ThemeColors carries no member for the name, so nothing here is outside the layer's reach by shape 3.
        Pinned by AstraFrameworkNameResolutionTests.The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to.
-       The 12/10/8 projection against WinUI's own type scale is a real deviation on the framework-drawn
+       The 12/10/8 projection against WinUI's own type scale was a real deviation on the framework-drawn
        surfaces this list names, and it is ROADMAP #72 - a size question that needs a source number and a pixel, not an
-       alias row borrowed to hide it. -->
+       alias row borrowed to hide it. #72 settled it that way: the source number is upstream's 14
+       (generic.xaml:13280), the driver is the framework's public ApplyTypography call, and the projected caption has
+       since become 12 - upstream's caption number, generic.xaml:13283 - which is why no row of this file needs the name
+       any more. -->
 </ResourceDictionary>

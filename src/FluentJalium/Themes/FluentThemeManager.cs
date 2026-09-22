@@ -1,6 +1,7 @@
 using System.Collections;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Themes;
 using Jalium.UI.Media;
 using Jalium.UI.Media.Animation;
 using Microsoft.Win32;
@@ -29,6 +30,14 @@ public static class FluentThemeManager
     private static int _threadId;
     private static bool _reduceMotion;
     private static Color? _accent;
+
+    /// <summary>
+    /// The body size the framework is asked to project its type scale from. Upstream sets control content and the body
+    /// text style to 14 and the caption text style to 12 (microsoft-ui-xaml @19e3bdc3,
+    /// dxaml/xcp/dxaml/themes/generic.xaml:36 / :13280 / :13283); 26.10.9 projects 12/10/8 from a body of 12 while its
+    /// own <c>TextBlock</c> default is already 14, so the projection is the half that disagrees.
+    /// </summary>
+    private const double UpstreamBodyFontSize = 14d;
 
     /// <summary>The style dictionaries loaded in dependency order, after the palette. Read from Themes/Manifest.txt.</summary>
     public static IReadOnlyList<string> DictionaryNames => Manifest ??= ReadManifest();
@@ -99,6 +108,17 @@ public static class FluentThemeManager
             if (_motion is null) throw new InvalidOperationException($"The Astra manifest does not carry {MotionDictionary}, so ReduceMotion would have nothing to rewrite.");
             CaptureMotionDesigns();
             ApplyMotionKeys();
+
+            // The last step of the install, and it has to be a step: a {ThemeResource BodyFontSize} consumer that is
+            // already built does not re-resolve when the framework swaps its typography dictionary (a block mounted
+            // before the call kept reading 12 afterwards - spike/TypoProbe), so the swap belongs here, before any
+            // application control exists. The families are handed straight back, because this call exists to move one
+            // number and not to choose a typeface; SystemFonts keeps its own sizes either way.
+            ThemeManager.ApplyTypography(
+                ThemeManager.CurrentDisplayFontFamily,
+                ThemeManager.CurrentBodyFontFamily,
+                ThemeManager.CurrentMonospaceFontFamily,
+                UpstreamBodyFontSize);
         }
         catch
         {

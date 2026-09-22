@@ -3627,3 +3627,97 @@ Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = ... })`），它在一
 只把通路和读数留在 spike 里并如实记账，没有擅自把反射搬进闸口套件——搬不搬，等用户裁定。
 
 **闸口**：本批只动 `spike/`，没有碰 `src/` 或 `tests/`，因此不跑串行闸口；下次真正改产品代码时一并跑。
+
+## #72 框架排印投影：按名要到的 12/10/8 与上游的 14/12
+
+### 先复核这条账的前提，结果前提要改写
+
+#71 收尾时给这一条写的账是"12/10/8 这族投影与 WinUI 自己的字号阶不一致，是框架自绘面上的真实偏差"。
+两头都重测了。
+
+上游权威读数，取自 pin 的那一份 `dxaml/xcp/dxaml/themes/generic.xaml`：`:36` `ControlContentThemeFontSize=14`、
+`:13280` `BodyTextBlockStyle` 的 `FontSize=14`、`:13283` `CaptionTextBlockStyle` 的 `FontSize=12`。
+（顺带记一句来源差别：`controls/dev/CommonStyles/TextBlock_themeresources.xaml:20` 把 caption 指向
+`CaptionTextBlockFontSize` 这个 `StaticResource`，那个数值行不在同一份文件里，所以逐字数字只认 generic.xaml 那三行。）
+
+偏差**不是**"我们面上的文字全是 12"。`spike/TypoProbe` 的 `raw` 腿完全不装 Astra 清单，读到的是：
+
+```
+raw  TextBlock() default FontSize   14
+raw  mounted (no style) FontSize    14
+raw  Button content presenter       14 (TextBlock in the template, Button.FontSize=14)
+raw  app.BodyFontSize               double 12
+raw  app.CaptionFontSize            double 10
+raw  app.SmallFontSize              double 8
+```
+
+也就是这台宿主的**默认字号本来就是 14**，与上游一致；只有**按名字要字号的消费者**拿到 12/10/8。
+所以 #72 真正的前提是：框架自己的默认值和它自己的排印投影互相矛盾，凡按名取值的地方取到了偏小的一侧——
+而上游这一层按名读取的面（`#12` 普查到的十个编译点里，DataGrid 与 TitleBar 两处已确认是读）正是这类消费者。
+`raw` 腿还顺带结清了归属：这两件事都跟本库无关，我们的清单装与不装，那六个读数一字不差。
+
+### 能改它的是框架的一个公开调用，不是又一行别名
+
+`census` 腿读 26.10.9 加载中的程序集（不是那棵可能更新的兄弟源码树）：
+
+```
+holder: Jalium.UI.Managed
+  method ApplyTypography(String display, String body, String mono) -> Void
+  method ApplyTypography(String display, String body, String mono, Double bodyFontSize) -> Void
+  property Double CurrentBodyFontSize = 12
+```
+
+它的语义是换掉框架自己的 typography 字典再 `ForceThemeRefresh`，投影公式为 body / body-2 / body-4，
+所以 body=14 直接给出 14/12/10：上游那两个数各就各位，第三个（small）是框架自己的推导值，
+这一 commit 上游没有 Small 行可对照，如实记成"框架推导"而不是"转录"。
+
+一个过程记录：`SmallFontSize` 这个字面量在 8 MB 的 `Jalium.UI.Managed.dll` 上 `grep -a` 读不到（同一把尺子读到
+`CaptionFontSize` 与 `ApplyTypography` 各一处），而运行时按名取得到 8。二进制 grep 在这一层不是证据，
+运行时读数才是——本批不据那条 grep 下任何结论，探针也不再用它做判据。
+
+### 两条实测边界，第一条决定了代码放哪儿
+
+1. **顺序就是全部**：`reach-after` 腿里先挂上去的那块 `TextBlock`，在调用之后仍然读 12；同一轮新挂的读 14。
+   一次调用不会把已经建好的消费者拉过来。`FluentThemeManager.Apply` 的契约正好是"创建 Application 之后、
+   构造应用控件之前"，所以这一手放在 install 末尾、`NotifyChanged()` 之前，宿主按契约走就必然在它之前建树。
+2. **`SystemFonts` 不跟**：调用前后 `CaptionFontSize`/`MessageFontSize` 都停在 12，它不吃应用级驱动。
+
+另外 `reach-before`（先调用、后装清单）与 `reach-after` 两序都给出 14/12/10，且
+`TextPrimary / TextSecondary / SurfaceBackground / ControlBackground / BodyTextBlockStyle` 五读在两序里都不变——
+这一次框架刷新不会把别名层冲掉。字族三个名原样传回，前后都是 `Microsoft YaHei UI` / `Cascadia Code`。
+
+### 出货
+
+- `src/FluentJalium/Themes/FluentThemeManager.cs`：`UpstreamBodyFontSize = 14` 常量（带三行上游出处），
+  加 install 末尾那一次 `ThemeManager.ApplyTypography(...)`。全程只用公开 API，无反射、无逐窗修补。
+- `tests/FluentJalium.Tests/AstraTypographyTests.cs`：`The_framework_type_scale_projects_from_upstreams_body_size`
+  三条名字断言（14/12/10），加 `A_size_asked_for_by_name_arrives_as_upstreams_number_and_matches_the_inherited_one`
+  ——按名要到的 14 与继承来的 14 相等，这一对从前的差就是 #72 的全部内容。两者都是依赖属性级读数，
+  不声称像素（#50 仍然挡着文字墨迹）。
+- `tests/FluentJalium.Tests/AstraFrameworkNameResolutionTests.cs`：#71 那条"投影与 `SystemFonts` 互相矛盾"的
+  见证腿**被这一手换掉了**——caption 现在 12，与 `SystemFonts.CaptionFontSize` 的 12 巧合了，这对名字再也
+  证明不了"够得着一个读者、够不着另一个"。换锚成"驱动到的 14（`ThemeManager.CurrentBodyFontSize`）对
+  `SystemFonts.MessageFontSize` 没到的 12"，并把"为什么换"写进注释与断言里（其中一条正面断言就是这对
+  数字现在相等），免得下一个读的人以为旧见证还成立。
+- 三处注释里的过期数字随之校正：`ThemeResources/FrameworkRetints.jalxaml`（投影叙述与 #72 收尾一句）、
+  `Styles/DataGrid.jalxaml`（`PART_SortIndicator` 的字面 10 是"抄写当时的投影值"，名字现在答 12，这一行按
+  量好的字形留在 10——那是视觉决定，本批没有为它改动的像素证据）。
+
+### 这一批没有做
+
+- **字族偏差没动**：这台宿主投影的是 `Microsoft YaHei UI`，上游的排印是 Segoe UI Variable 一族。本批刻意把三个
+  族名原样传回。"该用哪个字族、缺字怎么兜底"是独立一笔，而且 #50/#62 还没给出文字墨迹判据，现在换字族等于
+  闭眼改视觉。
+- 没有新增或删改资源键：`keys.md` 应当一字不动（这一批改的是一个调用，不是一行键）。
+- 已知缺口新增一条：**应用级排印驱动够不到 `SystemFonts`**，因此任何直接读 `SystemFonts.*` 的框架代码不在
+  #72 的修法覆盖范围内（实测：调用后仍 12）。
+
+**闸口**：`tools/Test-AstraGates.ps1` 串行一趟，`GATE-PIPE-EXIT=0`，末行 `All Astra gates passed.`。
+逐段读数：restore/build 0 警告 0 错误；全量测试 `失败: 0，通过: 1567，总计: 1567`（本批 +4 条：三条投影名与一条到达）；
+逐页像素 `PASS 13 pages x 2 variants, 0 offender(s)`——其中 `status` 两档第二趟稳定位读回 `False`，本批之前已有的
+八份闸口日志（`spike/GalleryRender/gate-*.log`）同一列同样是 `stable=True/False`、同一格 1189788px，前文 :3501
+那段就记着这件事，所以它不是本批带来的；判据不放它过去也不因本批改变；调色板三档 `checked=True`
+（高对比照旧挂回三条上游名）；键清单 `keys.md is current: 1312 canonical lines`——如预期一字未动，
+这一批改的是一个调用，不是键。
+**视觉侧如实记**：投影值与依赖属性读数成立，字族与文字墨迹都没有新证据（#50 仍挡），
+所以"页面看起来更接近上游"这句不由本批说；逐页像素计数在改动前后都通过同一判据，本批没有把它当视觉证明。

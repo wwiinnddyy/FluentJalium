@@ -603,9 +603,16 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     /// and this layer has no number to point at. The name is a live <c>Double</c> projection (with a sibling
     /// <c>SmallFontSize</c> that a redirect could nominally borrow), the upstream key a Fluent transcription would
     /// answer to resolves to nothing, <c>ThemeColors</c> carries no member for it (so no read of it is outside the
-    /// layer's reach), and <c>SystemFonts.CaptionFontSize</c> reports a third number that an application-level entry
-    /// does not move - measured in <c>spike/OnAccentProbe</c>'s <c>carrier</c> leg, where installing a redirect under the
+    /// layer's reach), and <c>SystemFonts.CaptionFontSize</c> reports a number that an application-level entry does not
+    /// move - measured in <c>spike/OnAccentProbe</c>'s <c>carrier</c> leg, where installing a redirect under the
     /// framework name left <c>SystemFonts</c> on 12 while a mounted <c>FontSize</c> followed to 8.
+    ///
+    /// ROADMAP #72 rewrote the last leg of that argument. <c>FluentThemeManager</c> now drives the framework's own
+    /// typography, so the projection is 14/12/10 and the caption pair this test once used as its witness has
+    /// <em>coincided</em> (12 against 12) - it can no longer show an entry that reaches one reader and not the other.
+    /// The witness is therefore read from the pair that still disagrees: the driver value application code did reach
+    /// (<c>ThemeManager.CurrentBodyFontSize</c>, 14) against the system message size it did not (12), which is the same
+    /// shape of fact with a different pair of names.
     /// </summary>
     [Fact]
     public void The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to()
@@ -621,6 +628,14 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                 ?? throw new InvalidOperationException(
                     "SystemFonts exposes no CaptionFontSize on this runtime, so the third caption number this reading "
                     + "claims is not a fact about 26.10.9");
+            var message = TypeMember(systemFonts, "MessageFontSize")
+                ?? throw new InvalidOperationException(
+                    "SystemFonts exposes no MessageFontSize on this runtime, so the disagreement leg has no witness");
+            var driver = TypeMember(FrameworkType("Jalium.UI.Controls.Themes.ThemeManager"), "CurrentBodyFontSize")
+                ?? throw new InvalidOperationException(
+                    "ThemeManager exposes no CurrentBodyFontSize on this runtime, so #72's driver is not the member this "
+                    + "reading names");
+            var driven = Convert.ToDouble(ReadMember(driver), System.Globalization.CultureInfo.InvariantCulture);
 
             Assert.Multiple(
                 () => Assert.True(caption > 0d, $"the framework projected {caption} for its own caption size"),
@@ -629,8 +644,12 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
                 // found zero reads of CaptionTextBlockFontSize, and no row of ours is published under it.
                 () => Assert.Null(application.TryFindResource("CaptionTextBlockFontSize")),
                 () => Assert.Null(TypeMember(colors, "CaptionFontSize")),
-                // A number the layer cannot move: the projection and SystemFonts disagree while both are live.
-                () => Assert.NotEqual(caption, Convert.ToDouble(ReadMember(member), System.Globalization.CultureInfo.InvariantCulture)));
+                // The consequence of #72, stated as a fact rather than left to go stale: the projection and the system
+                // number now agree for the caption, so the caption pair proves nothing about reach.
+                () => Assert.Equal(caption, Convert.ToDouble(ReadMember(member), System.Globalization.CultureInfo.InvariantCulture)),
+                // What still proves it: a number the application-level driver moved, against a system number it left.
+                () => Assert.Equal(14d, driven),
+                () => Assert.NotEqual(driven, Convert.ToDouble(ReadMember(message), System.Globalization.CultureInfo.InvariantCulture)));
         });
     }
 

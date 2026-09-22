@@ -1,0 +1,16 @@
+=== no FluentJalium manifest installed: framework defaults only ===
+FluentThemeManager.IsInitialized=False
+  mounted 'raw': keys in the probe dictionary=1
+  raw     app.BodyFontSize                double 12
+  raw     app.CaptionFontSize             double 10
+  raw     app.SmallFontSize               double 8
+  raw     app.ControlContentThemeFontSize null
+  raw     app.BodyFontFamily              FontFamily 'Microsoft YaHei UI'
+  raw     app.MonoFontFamily              FontFamily 'Cascadia Code'
+  raw     app.DisplayFontFamily           FontFamily 'Microsoft YaHei UI'
+  raw     TextBlock() default FontSize   14
+  raw     mounted (no style) FontSize    14
+  raw     mounted via BodyFontSize       12
+  raw     Button content presenter       14 (TextBlock in the template, Button.FontSize=14)
+  raw     SystemFonts.CaptionFontSize    12
+  raw     SystemFonts.MessageFontSize    12
