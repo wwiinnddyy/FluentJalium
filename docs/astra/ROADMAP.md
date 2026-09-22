@@ -3476,9 +3476,11 @@ HC 101 键 + 3 条上游键因调色板无对应而按住）→ `keys.md is curr
 `All Astra gates passed.` → 包装器取到的管道退出码 **`GATE-PIPE-EXIT=0`**。
 
 **测点 1561 → 1563 = +2**，正是本批那两条新事实，一条老测点没动；`keys.md` 行数没动（本批不发行任何一行），
-这是"不发行"这类批次该有的账面目——与上一轮 `TextOnAccent` 同形。页闸 26 行里 25 行 `stable=True/True`，
-`status Dark` 仍读 `True/False`（与上一批同形状，挂 #47/#35/#63 那一族，不据此声称已归因）。上一批那两处
-"只有整套顺序跑才红"的读数（ProgressRing 两帧同值、页闸 3 offenders）这一跑都没出现，我们也没为它们改过任何东西：
+这是"不发行"这类批次该有的账面目——与上一轮 `TextOnAccent` 同形。页闸的 `stable` 读数本批两跑都是
+26 行里 24 行 `True/True`、`status` 页两档（Light 与 Dark）`True/False`；第一跑小结当时写作"25 行稳、只有
+`status Dark` 飘"，那是**只看日志尾部窗口**得到的错判，认证跑把两跑的完整 26 行都 grep 出来才发现 Light 那条
+也在飘（更正记在下面认证小节，方法教训是：一行"飘的是哪几页"要 grep 全量，不能从 tail 里数）。
+上一批那两处"只有整套顺序跑才红"的读数（ProgressRing 两帧同值、页闸 3 offenders）这一跑都没出现，我们也没为它们改过任何东西：
 仍是未归因的顺序跑读数。
 
 **这一跑有一处必须自新的地方：它不是一次静态树验证。** build 段在 17:34:14 结束，而本批有两处文件在 test 段
@@ -3486,3 +3488,29 @@ HC 101 键 + 3 条上游键因调色板无对应而按住）→ `keys.md is curr
 前者正是 `Every_parity_claim_cites_evidence_that_exists` 这类结构闸**要读的文件**，所以这一跑的绿读的到底是
 改前还是改后那版，从日志判不出来。处置：提交后在同一棵树上再跑一遍完整闸口，第二跑才是静态树认证读数，
 补记在下一节；第一跑的读数照实留着，不冒充静态树验证。
+
+### 第八轮的认证跑（2026-09-22，`9c99f30` 之后）——静态树全绿：`spike/OnAccentProbe/gate-caption2.log`
+
+同一棵树上（工作树对已提交内容零差异）重跑整条序列：restore 最新 → build `0 警告 / 0 错误`（5.8 s）→
+整套 **1563 / 1563**（0 失败 0 跳过、7 m 6 s）→ 页闸腿 build `0 警告 / 0 错误`（4.2 s）→
+**`PASS 13 pages x 2 variants, 0 offender(s)`** → 三档 `checked=True`（Light/Dark 各 83 源色 101 刷，
+HC 101 键 + 3 条上游键因调色板无对应而按住）→ `keys.md is current: 1312 canonical lines.` →
+`All Astra gates passed.` → 包装器 **`GATE-PIPE-EXIT=0`**。这一跑才是本批的静态树认证读数。
+
+**给 #47 的那族多一个可复现的形状**：页闸 26 行里 24 行 `stable=True/True`，飘的两行是 **`status` 页的 Light 与
+Dark 两条**，而且两跑都是这两条——不是随机分布。逐条对得上：`status Light` 主色像素两跑都是 1189788px、
+槽内色数一跑 401 一跑 397，`status Dark` 同形（主色 1189783px 两跑相同，色数 284 与 288），
+"另一基线色 0px"两跑一致。也就是飘的是**槽里数出多少种颜色**，不是页面画错——本批没有碰这一页，
+也不据此归因，只把"每次都是同一页同一维度"这条观察记进 #47。
+（第一跑的小结把这件事写成了"只有 Dark 飘"，那是从日志尾部窗口数出来的，更正见上一节末。）
+
+静态树这一条也核过：跑前 HEAD 就是 `9c99f30`，跑的过程中没有任何被跟踪文件被改（本节的字与 `gate-caption2.log`
+是跑完之后才落的），并行会话在这段窗口里没有新提交。
+
+**#12 到此结清**：别名层的 gap 表全部判完——发行 7 行（`AccentBrush`、`ControlBorderFocused`、`SurfaceBackground`、
+`ControlBorder`、`TextSecondary`、`TextPrimary`、`TextDisabled`），量过而故意不发行 2 名（`TextOnAccent`：读者在、
+面上无墨，见第七轮；`CaptionFontSize`：读者与面都在、但没有可指的本库数值，见第八轮），`keys.md` 停在
+1312 canonical lines。这一层此后只在两种情况下重开：某个名字新量到改不动的读者，或运行时加了
+`ThemeColors` 成员（那是 `The_on_accent_name_has_no_theme_colors_member…` 那条会红的时候）。
+目标项 2 的账因此清空，本库还欠的是别的三件事：#70（日历族不建树）、#72（框架排印投影偏小）、
+以及焦点环形状的余账 #68。
