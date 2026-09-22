@@ -2324,6 +2324,30 @@ disabled 的表格单元与菜单项**没有**单独断言（框架在无头主�
 - 下一批的开工顺序（就是这批学到的形状）：**一个名字一轮**——先按该名字全库 grep 读点、把会被改写的既有事实列全、
   再发布别名行、再跑闸口；不要一次发七个。
 
+### 逐名字读点普查（按上面那条规则做的第一轮 grep，只读、未发布任何别名行）
+
+**测量基座要先声明**：计数来自 sibling 源树 `../Jalium.UI`（AGENTS.md：参考用、可能比运行时权威 26.10.9 新），
+"代码现取"= 该名字出现在 `Resolve*Brush(名, …)` 里的次数，"标记读取"= 框架 `.jalxaml` 里以名字读它的次数。
+`AccentBrush` 那条 58 读/12 文件的账是**发布字典**上量的，与这张表不同基座，不能横向比大小。
+
+| 名字 | 代码现取 | 标记读取 | 发布别名要付的账 |
+|---|---|---|---|
+| `SurfaceBackground` | 1 `ResolveApplicationBrush` + 2 `ResolvePopupBrush` | 8 | 窗口/弹层背衬一起翻，`audits/window-shell.md` 与 flyout 那批"我们的行到哪为止"要重读 |
+| `TextPrimary` | 9 `ResolveThemeBrush` + 2 `ResolvePopupBrush` + 1 `ResolveMenuBrush` + 1 `ResolveCalendarBrush` | 19 | 全库墨色，表里最大的一格；已实测它会改写 `AstraMenuTests` 两条像素主张（0 → 38 格） |
+| `TextSecondary` | 4 `ResolveThemeBrush` + 4 `ResolveCalendarBrush` + 1 `ResolveMenuBrush` | 14 | 日历与菜单两处框架自绘的次级文本一起跟 |
+| `TextOnAccent` | 2 `ResolveThemeBrush` + 1 `ResolveCalendarBrush` | 8 | 与 `AccentBrush` 成对：反色文字只有跟着强调色走才成立 |
+| `ControlBorder` | 3 `ResolveThemeBrush` + 3 `ResolvePopupBrush` + 1 `ResolveApplicationBrush` | 18 | 描边族；已被我们重模板的控件不读它，弹层那族读 |
+| `ControlBorderFocused` | **无** | 14 | 见下面单独一条——它比"纯标记、最好别名"要糟 |
+| `TextDisabled` | 4 处现取（`Menu.cs:1172`、`Calendar.cs:1000`、`Primitives/TextBoxBase.cs:3032`、`MenuFlyoutItem.cs:208`） | 未单独量 | 本批已量：一次翻掉五条老账，见上一节 |
+
+`ControlBorderFocused` 的警告单列：它在源树**没有** `Resolve*Brush` 读点，看起来是最容易别名的一个，但
+`docs/astra/adaptation/02-ceiling-raw-output.txt` 量到 `AutoCompleteBox` / `DatePicker` / `NumberBox` /
+`PasswordBox` / `TextBox` / `TimePicker` 六族的 **`.cctor -> get_ControlBorderFocused`**——值被**取进静态字段一次**，
+不是画的时候现取。静态初值取决于"类型先初始化"还是"我们的字典先并进来"，所以别名行对这一族**可能整族吃不到**
+（也可能只在首次读取之后才生效）。这条还没测，下一批动这个名字之前先按"发布别名 → 挂载 → 读焦点描边"逐族量一次，
+把吃得到/吃不到写死再决定发布。目前的处理是 DataGrid / TreeDataGrid **换宿主模板**让这条焦点线根本不在我们的树上
+（`audits/treedatagrid.md`），别名批不能假设这一步可以省。
+
 ## 判据批：别名单元吃不到 sentinel（补进 #56，2026-09-21 已提交）
 
 见"前景审计余账批（#56）"第 1 条：`OverrideBrush` 经 `GetBrush` 只认生成调色板，别名键直接 `KeyNotFoundException`；
