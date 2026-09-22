@@ -1,0 +1,71 @@
+=== app-scope resolution of each target name, resting vs with a probe installed ===
+TextOnAccent             resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+TextPrimary              resting=SolidColorBrush ##E4000000 instance=0x3D24EC4
+TextSecondary            resting=SolidColorBrush ##9E000000 instance=0x1AE0000
+TextDisabled             resting=SolidColorBrush ##5C000000 instance=0x23F59D6
+ControlBorder            resting=SolidColorBrush ##0F000000 instance=0x3070B1C
+SurfaceBackground        resting=SolidColorBrush ##FFF3F3F3 instance=0xB0140D
+AccentBrush              resting=SolidColorBrush ##FF0078D4 instance=0x8916C7
+ControlBorderFocused     resting=SolidColorBrush ##FF0078D4 instance=0x8916C7
+
+=== mounted surfaces: probe brush installed under TextOnAccent, read by instance identity ===
+Calendar         scope[Calendar] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+DatePicker       scope[DatePicker] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+TimePicker       scope[TimePicker] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+SwipeControl     scope[SwipeControl] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+TitleBar         scope[TitleBar] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+CheckBox         scope[CheckBox] state=checked ischecked=True istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+RadioButton      scope[RadioButton] state=checked ischecked=True istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+ToggleButton     scope[ToggleButton] state=checked ischecked=True istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+ToggleSwitch     scope[ToggleSwitch] state=checked ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+Button           scope[Button] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+Expander         scope[Expander] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+ComboBox         scope[ComboBox] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+MenuItem         scope[MenuItem] state=resting ischecked=False istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+ContentDialog    scope[ContentDialog] state=resting ischecked= istoggled=
+                  name-in-scope resting=SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+
+--- probe installed under TextOnAccent at application scope ---
+Calendar         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+DatePicker       name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+TimePicker       name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+SwipeControl     name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+TitleBar         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+CheckBox         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+RadioButton      name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+ToggleButton     name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+ToggleSwitch     name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+Button           name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+Expander         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+ComboBox         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+MenuItem         name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+ContentDialog    name-in-scope with probe=SolidColorBrush ##FF112233 instance=0x2CAB994
+
+--- re-mounted with the probe already in place, walked for the probe INSTANCE ---
+Calendar         probePaintedElements=0 -
+DatePicker       probePaintedElements=0 -
+TimePicker       probePaintedElements=0 -
+SwipeControl     probePaintedElements=0 -
+TitleBar         probePaintedElements=0 -
+CheckBox         probePaintedElements=0 -
+RadioButton      probePaintedElements=0 -
+ToggleButton     probePaintedElements=0 -
+ToggleSwitch     probePaintedElements=0 -
+Button           probePaintedElements=0 -
+Expander         probePaintedElements=0 -
+ComboBox         probePaintedElements=0 -
+MenuItem         probePaintedElements=0 -
+ContentDialog    probePaintedElements=0 -

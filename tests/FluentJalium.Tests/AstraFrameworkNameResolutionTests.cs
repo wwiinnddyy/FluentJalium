@@ -3,6 +3,7 @@ using FluentJalium.Tests.Pixel;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
 using Jalium.UI.Media;
 using Xunit;
 
@@ -229,10 +230,13 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     /// live framework projections: each is a non-null app-level entry and a *different object* from the shipped
     /// WinUI-literal token of the same meaning - the framework hands out opaque macOS-flavoured greys (and a constant
     /// white for <c>TextOnAccent</c>) where our palette ships translucent WinUI values that flip by variant. That
-    /// divergence is why these stay candidates rather than rows: publishing <c>name → token</c> would move any
-    /// name-reader *toward* 1:1, so the only thing holding a row back is the absence of a demonstrated reader we
-    /// cannot already re-template - not a fidelity cost. If a shipped control starts consuming one of these names, the
-    /// row is worth shipping; the measured colours below are the baseline that decision revisits.
+    /// divergence is why publishing is a decision rather than a formality, and the standing bar is a reader this layer
+    /// cannot reach any other way. For <c>TextOnAccent</c> that bar is now half-cleared and the other half is what
+    /// holds the row: <see cref="The_on_accent_name_is_read_by_name_per_call_by_the_families_that_hold_it" /> shows
+    /// three live per-call readers, and
+    /// <see cref="The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink" /> shows that
+    /// the families behind them build no visual tree on this runtime, so there is no ink for a row to move yet. The
+    /// measured colours below are the baseline that decision revisits.
     ///
     /// This theory used to carry a <c>TextSecondary</c> leg and then a <c>TextDisabled</c> leg. Both were deleted
     /// rather than re-pinned when their rows shipped, because every claim in this fact is false by design for a
@@ -409,6 +413,143 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
             }
         });
     }
+
+    /// <summary>
+    /// The last colour name in the #12 gap table, and the round that answers the question the goal put to it: which
+    /// surface does <c>TextOnAccent</c> actually paint? Shape one of the census - a by-name read that runs per call -
+    /// is here, and it holds for three families: install a probe under the name and each resolver hands back the probe
+    /// instance, then hands back the projection again once the probe is gone. Shape three is what separates this name
+    /// from the text rows already shipped: <c>ThemeColors</c> has no <c>TextOnAccent</c> member (pinned by
+    /// <see cref="The_on_accent_name_has_no_theme_colors_member_so_every_read_of_it_is_a_lookup" />), so unlike
+    /// <c>TextDisabled</c> - whose framework grey and name projection coincide in value, which cost that row a round -
+    /// there is no direct static read here that an alias could miss. What the row still does not have is a surface: see
+    /// <see cref="The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink" />. That is why
+    /// the name stays unpublished while its lever is measured, and why this class keeps the probe install/remove inside
+    /// one dispatcher turn: nothing ships this name, so a leftover entry would be an unrecorded retint.
+    /// </summary>
+    [Theory]
+    [InlineData(typeof(Calendar), "ResolveSelectedTextBrush")]
+    [InlineData(typeof(CalendarDayButton), "ResolveSelectedForegroundBrush")]
+    [InlineData(typeof(DataGridRowHeader), "ResolveSelectionIndicatorBrush")]
+    public void The_on_accent_name_is_read_by_name_per_call_by_the_families_that_hold_it(Type family, string resolverName)
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var control = (Control)Activator.CreateInstance(family)!;
+            var resolver = family.GetMethod(resolverName, BindingFlags.Instance | BindingFlags.NonPublic)
+                ?? throw new InvalidOperationException(
+                    $"{family.Name} has no {resolverName} on this runtime, so the IL census that named it does not "
+                    + "describe 26.10.9 and this family needs a different instrument");
+
+            var resting = Assert.IsType<SolidColorBrush>(resolver.Invoke(control, null));
+            var projection = Assert.IsType<SolidColorBrush>(application.TryFindResource(OnAccentName));
+            var probe = new SolidColorBrush(Probe);
+            application.Resources[OnAccentName] = probe;
+            Brush? followed;
+            Brush? restored;
+            try
+            {
+                followed = Assert.IsType<SolidColorBrush>(resolver.Invoke(control, null));
+            }
+            finally
+            {
+                application.Resources.Remove(OnAccentName);
+                restored = Assert.IsType<SolidColorBrush>(resolver.Invoke(control, null));
+            }
+
+            Assert.Multiple(
+                // The resting value is the framework's own projection, and it is white in both variants - the literal
+                // our palette does not carry, which is what made this name a candidate at all.
+                () => Assert.Same(projection, resting),
+                () => Assert.Equal(Color.FromRgb(0xFF, 0xFF, 0xFF), resting.Color),
+                // The read is per call: the resolver returns the installed instance, not a copy of its old value.
+                () => Assert.True(ReferenceEquals(probe, followed),
+                    $"{family.Name}.{resolverName}() returned {Describe(followed)} with a probe installed, so the name "
+                    + "is not the lever for this family and a row would reach nothing here"),
+                () => Assert.Same(resting, restored));
+        });
+    }
+
+    /// <summary>
+    /// The census shape that decides how complete an alias row could be. <c>TextPrimary</c>, <c>TextSecondary</c>,
+    /// <c>TextDisabled</c> and <c>ControlBorderFocused</c> are all also static members of the framework's own
+    /// <c>ThemeColors</c>, so a surface reading <c>ThemeColors.TextDisabled</c> directly is outside the reach of
+    /// whatever the name resolves to - the reason <c>TextDisabled</c>'s value coincidence had to be untangled by a
+    /// probe rather than by a colour comparison. <c>TextOnAccent</c> has no such member, so a row for it would cover
+    /// every read the runtime makes of the name. Pinned as a fact because the claim is about the shipped assembly: a
+    /// later version that adds the member reintroduces the ambiguity, and this is where that would show up.
+    /// </summary>
+    [Fact]
+    public void The_on_accent_name_has_no_theme_colors_member_so_every_read_of_it_is_a_lookup()
+    {
+        _fixture.Run(() =>
+        {
+            var colors = FrameworkType("Jalium.UI.Controls.Themes.ThemeColors");
+            Assert.Null(colors.GetProperty("TextOnAccent", BindingFlags.Public | BindingFlags.Static));
+            Assert.Null(colors.GetField("TextOnAccent", BindingFlags.Public | BindingFlags.Static));
+            foreach (var name in new[] { "TextPrimary", "TextSecondary", "TextDisabled", "ControlBorderFocused" })
+            {
+                Assert.NotNull(TypeMember(colors, name));
+            }
+        });
+    }
+
+    /// <summary>
+    /// Shape two and the reason no row ships this round. The name is read in six compiled framework dictionaries
+    /// (Calendar, DataGrid, TreeDataGrid, Dialogs, TitleBar, ToggleControls - the IL census in
+    /// <c>spike/OnAccentProbe</c> lists them by generated builder), and every one of those families is one this library
+    /// re-templates, so those reads ask a question our own markup never asks. What is left are the three code readers
+    /// above, and they sit on surfaces that do not build at all on this runtime: the calendar family resolves an
+    /// implicit style with ten property cells and no <c>Control.Template</c> cell, and a built one holds zero visual
+    /// children, while a <see cref="Button"/> built through the same harness in the same turn holds a tree. So there is
+    /// no ink for the row to move today, and "a live reader with no surface" is recorded as the reason rather than
+    /// shipped on the strength of the lever alone - the same bar <c>TextDisabled</c> had to clear with four built labels.
+    /// </summary>
+    [Theory]
+    [InlineData(typeof(Calendar))]
+    [InlineData(typeof(DatePicker))]
+    [InlineData(typeof(TimePicker))]
+    public void The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink(Type family)
+    {
+        _fixture.Run(() =>
+        {
+            var calibration = new Button { Content = "calibrate" };
+            PixelHarness.Build(calibration, 120, 32);
+            Assert.True(VisualTreeHelper.GetChildrenCount(calibration) > 0,
+                "the walk itself found no tree even for a button, so a zero below says nothing about this family");
+
+            var subject = (Control)Activator.CreateInstance(family)!;
+            var implicitStyle = Assert.IsType<Style>(Application.Current!.TryFindResource(family));
+            PixelHarness.Build(subject, 320, 280);
+
+            Assert.Multiple(
+                () => Assert.Null(implicitStyle.Setters.Cast<object>().OfType<Setter>()
+                    .FirstOrDefault(static setter => setter.Property == Control.TemplateProperty)?
+                    .Value as ControlTemplate),
+                () => Assert.Equal(0, VisualTreeHelper.GetChildrenCount(subject)));
+        });
+    }
+
+    private const string OnAccentName = "TextOnAccent";
+
+    private static Type FrameworkType(string full)
+    {
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (assembly.GetType(full, throwOnError: false) is { } found)
+            {
+                return found;
+            }
+        }
+
+        throw new InvalidOperationException($"{full} is not in the loaded runtime, so this reading has no authority");
+    }
+
+    private static object? TypeMember(Type holder, string name) =>
+        holder.GetProperty(name, BindingFlags.Public | BindingFlags.Static)
+        ?? (object?)holder.GetField(name, BindingFlags.Public | BindingFlags.Static);
 
     // ---------- helpers ----------
 

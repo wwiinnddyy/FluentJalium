@@ -3312,3 +3312,82 @@ variants, 0 offender(s)` → 三档 `checked=True`（Light/Dark 各 83 源色 10
 于是有一笔新账浮出来——**那批控件的键盘框是 3px 单圈，而 WinUI 的标准焦点框正是我们那枚 2px+1px 双圈**。
 本批不动它：判据已经对了，形状要逐族对着上游 `UseSystemFocusVisuals` 与 `FocusVisualMargin` 审一遍再改，
 挂在 A 类视觉余账（与 #21/#23 同族），不混进缺陷批。
+
+## #12 A2 别名层第七轮：`TextOnAccent` 三形读者全量到，**但不发行**——它今天没有一片面上墨（2026-09-22）
+
+目标里给这一轮的问题是"先量它到底画在哪片面上"。答案是：**名字活着、读法活着、面上没有。**
+所以这一轮出货的是判据与三条新事实，不是一行别名。仪器 `spike/OnAccentProbe`（四条腿，跑完留档），
+下面每个读数都出自装载中的 26.10.9 程序集，不来自 `/c/git/Jalium/Jalium.UI` 参考树。
+
+- **仪器的第一次读数是假的。** 直接对 `tests/.../Jalium.UI.Controls.dll` 逐名 grep：八个名字全部 `ascii=0 utf16=0`。
+  一致的零说明的是量具——那个 55 KB 的 dll 是类型转发壳，实现体在 8 MB 的 `Jalium.UI.Managed.dll`；
+  且 `#US` 堆里字符串是 UTF-16，纯 ASCII grep 本来就找不到。换文件 + 双编码重跑才有数（`grep-name.py` 留在 spike 里，
+  就是为了让下一个人不把"零命中"当成"没有读者"）。
+- **形一（代码按名查，每次查）**：IL 里 `ldstr "TextOnAccent"` 用在表面上的成员共四个——
+  `Calendar.ResolveSelectedTextBrush`、`Primitives.CalendarDayButton.ResolveSelectedForegroundBrush`、
+  `Primitives.DataGridRowHeader.ResolveSelectionIndicatorBrush`、`SwipeControl.ResolveSwipeItemForeground`（带一个参数，
+  本轮没调用，照实记为未量）。另有 `Themes.ThemeManager.BuildHighContrastVariant` 用它做高对比投影——那是投影的
+  来源，不是读者。前三个进产品测试：装 `#FF112233` 探针后返回**探针实例**，撤掉回到静息那枚投影实例
+  （`#FFFFFFFF`，两档同色）。杠杆是活的。
+- **形三（`ThemeColors` 直读）在这个名字上不存在**：`ThemeColors` 有 `TextPrimary` / `TextSecondary` /
+  `TextDisabled` / `ControlBorder` / `ControlBorderFocused` 五个静态 `Color`，独独没有 `TextOnAccent`。
+  也就是说 `TextDisabled` 那一轮为此多花一整轮的"同色分不开两条路"在这里不会发生——**别名一旦发行就能盖住全部读法**。
+- **形二（编译进字典的 `{ThemeResource}` 读）有六处**：`_Dict_..._Calendar_jalxaml.Build`、`DataGrid`、`Dialogs`、
+  `TitleBar`、`ToggleControls`、`TreeDataGrid`。除日历族外的五族本库都有自己的模板，我们的标记从不问这个名字
+  → 那五处空转（逐族的自有模板证据在它各自的审计里，见本节末）。`DataGridRowHeader` 单独说一句：
+  它的模板是我们写的（`Styles/DataGrid.jalxaml` 的 `DefaultDataGridRowHeaderStyle`），只有一圈边框，
+  没有选择指示器部件，所以它那个读者的返回值到不了像素。
+- **剩下的读者落在一片不存在的面上。** `Calendar` / `DatePicker` / `TimePicker` 按类型解析到的隐式样式有
+  **10 个属性格子、没有 `Control.Template` 格子**，`PixelHarness.Build` 之后 `VisualTreeHelper.GetChildrenCount` = **0**；
+  同一条跑、同一挂载路径下的 `Button` 有 4 个子元素（Grid/Border/ContentPresenter/TextBlock），所以零不是量具瞎。
+  框架自带字典确实并进来了（`Application.TryFindResource("DefaultFocusVisualStyle")` 解析得到 `Style`），
+  因此这不是"我们没并上游字典"造成的。
+
+**决定：不发行。** 这一层的存在理由写在 `ThemeResources/FrameworkRetints.jalxaml` 第一行——"框架用自己的名字画了
+一片本库不该出现的颜色，而读它的标记换不掉"。`TextOnAccent` 三条里只中了第三条：颜色对不上（常量白，不随档翻，
+也不等于我们那枚 `#FFFFFF`/`#000000` 两档翻的令牌），但今天**没有一片它画得出的面**。`TextDisabled` 那一轮为了同样
+的"有杠杆没读者"多等了一轮，等到四张生成的标签才发行；这里反过来，读者有了、面没有，那就一样不发行。
+不发行的判断和它的证据都落到产品测试里，别的名字回来看这条时不必重跑普查：
+
+- `AstraFrameworkNameResolutionTests.The_on_accent_name_is_read_by_name_per_call_by_the_families_that_hold_it`
+  ——三个族一行，探针实例进、投影实例回，缺成员就抛"这个读数不描述 26.10.9"。
+- `…The_on_accent_name_has_no_theme_colors_member_so_every_read_of_it_is_a_lookup`——钉住形三在这个名字上不存在，
+  同时钉住另外四个名字**有**直读成员（将来谁给 `ThemeColors` 加了 `TextOnAccent`，这条会红，那条歧义就回来了）。
+- `…The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink`——三族一行，
+  同一跑里先建 `Button` 校准（子节点 >0 才继续），再断言隐式样式里没有 `Control.Template` 格子且挂载后子节点为 0。
+  已有的 `A_remaining_text_name_is_a_live_projection_but_not_our_token` 头部改口：卡住这行的不再是"没量到读者"，
+  是"读者身后没有面"。
+- `FrameworkRetints.jalxaml` 末尾加了一段"量过、故意不发行"的注释，把四个成员名、六处字典持有者、
+  `ThemeColors` 无成员、日历族 0 子节点这四件事一次性写清，附回本节的测试名。
+
+**新开一笔账 #70（用户可见面）**：一个装好本库的应用里 `new DatePicker()` / `TimePicker` / `Calendar` 画不出任何东西。
+这条与本行是同一个测量的两面，但它是缺陷不是判据缺口，所以单独开账：要查清是框架 `Calendar.jalxaml` 的 `Template`
+格子在这条编译路径上被静默丢弃（本库已知的"未知标记扩展静默丢"形状），还是这一族非要显式给样式；然后按 WinUI 的
+`CalendarDatePicker` / `DatePicker` / `TimePicker` 走九步出口或提上游复现。**本轮不动它**——只改别名层的行决策
+不等于修好了日历族，两件事的证据类型也不同。
+
+**不声称**：① 没有像素证据说这行会改什么，本轮也不声称"日历族的白墨是错的"——它没墨；②
+`SwipeControl.ResolveSwipeItemForeground` 带参数，本轮没调用，所以第四个读者的按名性**未量**；③ 五处字典读"空转"
+是从"这些族本库有自有模板"推到的，逐处反查的证据是那些族各自的审计（`audits/datagrid.md`、
+`audits/treedatagrid.md`、`audits/content-dialog.md`、`audits/window-shell.md`、`audits/checkbox-radiobutton.md` +
+`audits/togglebutton.md`），不是本轮新测；④ `TextOnAccent` 在高对比下的投影走 `BuildHighContrastVariant`，本轮没读那条的实例归属。
+
+### 第七轮的串行闸口读数（2026-09-22）——**这一批没有一次整套跑完全绿**，每一处红单独重跑都绿
+
+- **跑一**：restore 最新、build `0 警告 / 0 错误`（5 s），测试腿 `1 / 1561` 红在
+  `AstraProgressRingTests.The_spin_moves_the_arc_and_stops_with_the_ring`（`Assert.NotEqual` 两帧读数相同：
+  `3.5300895651817044,22.364065818925017`，第 240 行那次"重启后该转"的读取），后面的腿因此没跑。
+- **A/B**：单测该类 30/30 绿；把新类与它合跑 59/59 绿两次。新类只往共享宿主里多挂了三个**子节点为 0** 的控件，
+  找不到它与那次动画读数之间的机制。
+- **跑二**：测试腿 **1561/1561 全绿**，7 m 25 s；页闸腿 `FAIL 13 pages x 2 variants, 3 offender(s)`——
+  `buttons Dark: the slot was not actually emptied (1431822 lit pixels left)`、
+  `buttons Dark: the page printed nothing its empty slot does not already print (92 colours against 223)`、
+  `navigation Dark: the slot was not actually emptied (1013314 lit pixels left)`。
+  同一条腿单独再跑：`PASS 13 pages x 2 variants, 0 offender(s)`。
+- **剩余两腿（单独跑）**：调色板三档 `checked=True`（Light/Dark 各 83 源色 101 刷，HC 101 键）；
+  键清单 `keys.md is current: 1312 canonical lines`——**行数没动**，这正是"本轮不发行"该有的账面目。
+
+照实说的结论：**本批不声称串行闸口全绿**，只声称每一处红在单独重跑时都绿，且本批只动了注释、文档与测试。
+页闸那两句"槽没清空"是**新形状**：它报的是基线帧没被清干净，不是页面画错——与 #63 结清的宿主交互、
+#47/#35 那族"整套顺序跑才红"同源，挂进 #47 的机制账，不在这里当已归因。
+`status` 页两档仍读 `True/False`，与上一批同形状、同族。

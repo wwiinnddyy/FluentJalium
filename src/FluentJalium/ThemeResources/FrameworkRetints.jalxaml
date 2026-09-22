@@ -114,4 +114,21 @@
        enumerated by running the suite rather than by grepping literals: every fact that pinned "the framework owns
        the disabled label colour" flips to ours, which is that row landing, not a regression. -->
   <StaticResource x:Key="TextDisabled" ResourceKey="TextFillColorDisabledBrush" />
+
+  <!-- Measured and deliberately NOT shipped: the name TextOnAccent. Recorded here so the next reader does not run the
+       census twice. On 26.10.9 the lever is real and unusually clean - Calendar.ResolveSelectedTextBrush,
+       CalendarDayButton.ResolveSelectedForegroundBrush and DataGridRowHeader.ResolveSelectionIndicatorBrush each return
+       a probe brush installed under the name (so the read is per call, like every other row here). Its read shape is
+       also cleaner than the text rows above: ThemeColors carries no TextOnAccent member (it does carry TextPrimary,
+       TextSecondary, TextDisabled, ControlBorder and ControlBorderFocused), so there is no direct static read an alias
+       would miss here - the ambiguity that cost the TextDisabled row a round cannot arise for this name.
+       What it lacks is a surface. Five of the six compiled framework reads (the DataGrid, TreeDataGrid, Dialogs,
+       TitleBar and ToggleControls builders) sit in families this library re-templates, so our markup never asks that
+       name; the sixth is Calendar, and the calendar family builds nothing here - Calendar / DatePicker / TimePicker
+       resolve an implicit style of ten property cells with no Control.Template cell at all, giving zero visual children
+       where a Button built the same way in the same turn builds a tree. A row would therefore move no ink today, which
+       is the bar this file has used since its first line - the TextDisabled row waited one round for exactly the same
+       reason and shipped once four built labels demonstrated it. Pinned by AstraFrameworkNameResolutionTests
+       .The_calendar_family_carries_no_template_cell_in_this_host_so_the_name_reaches_no_ink; the blank calendar family
+       is its own account (ROADMAP #70), not a reason to publish an alias. -->
 </ResourceDictionary>

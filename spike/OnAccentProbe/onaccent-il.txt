@@ -1,0 +1,340 @@
+=== 1. every ldstr that loads one of the target names, on the shipped assemblies ===
+assemblies: Jalium.UI.Managed, Jalium.UI.Xaml
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Colors_jalxaml.Build [static] -> TextPrimary | TextPrimary | TextSecondary | TextSecondary | TextDisabled | TextDisabled | TextOnAccent | TextOnAccent | AccentBrush | AccentBrush | ControlBorder | ControlBorder | ControlBorderFocused | ControlBorderFocused | SurfaceBackground | SurfaceBackground | TextPrimary | TextPrimary | TextSecondary | TextSecondary | TextDisabled | TextDisabled | TextOnAccent | TextOnAccent | AccentBrush | AccentBrush | ControlBorder | ControlBorder | ControlBorderFocused | ControlBorderFocused | SurfaceBackground | SurfaceBackground | TextPrimary | TextPrimary | TextSecondary | TextSecondary | TextDisabled | TextDisabled | ControlBorder | ControlBorder | ControlBorderFocused | ControlBorderFocused | SurfaceBackground | SurfaceBackground | AccentBrush | AccentBrush | TextOnAccent | TextOnAccent
+     full literals: Key , Dark , TextFillColorPrimary , #F5F5F7 , TextFillColorSecondary , #D1D1D6 , TextFillColorTertiary , #AEAEB2 , TextFillColorDisabled , #636366 , TextFillCol...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Button_jalxaml.Build [static] -> TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , ControlBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Calendar_jalxaml.Build [static] -> ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | AccentBrush | TextOnAccent | TextSecondary | TextOnAccent | ControlBorderFocused | TextDisabled | TextPrimary | AccentBrush | AccentBrush | TextOnAccent | TextDisabled | TextSecondary | TextOnAccent | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder
+     full literals: Property , IsMouseOver , True , BorderBrush , Value , ControlBorderHover , Triggers , IsKeyboardFocusWithin , ControlBorderFocused , IsEnabled , False , Backgro...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Containers_jalxaml.Build [static] -> ControlBorder | TextPrimary | TextPrimary | TextPrimary | ControlBorder | TextPrimary | ControlBorder | TextDisabled | TextPrimary | ControlBorder | ControlBorder | TextPrimary | AccentBrush
+     full literals: Property , BorderBrush , Value , ControlBorder , Foreground , TextPrimary , Padding , 14,10,14,10 , CornerRadius , 12 , MinHeight , 52 , ToastForeground , 14 , ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml.Build [static] -> TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorder | ControlBorder | ControlBorderFocused | TextOnAccent | TextPrimary | AccentBrush | TextPrimary | TextPrimary
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml.Build [static] -> TextDisabled | AccentBrush | TextOnAccent | AccentBrush | SurfaceBackground | TextPrimary
+     full literals: Key , ContentDialogAccentButtonStyle , Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , AccentBrush , TextOnAccent , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DiffViewer_jalxaml.Build [static] -> TextDisabled | ControlBorderFocused
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DockLayout_jalxaml.Build [static] -> TextPrimary | TextPrimary | TextPrimary | TextDisabled | TextSecondary | AccentBrush | TextPrimary
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , DockContentBackground , TabStripBackground , DockTabStripBackground , TabStripBord...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_HexEditor_jalxaml.Build [static] -> TextDisabled | ControlBorderFocused
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_JsonTreeViewer_jalxaml.Build [static] -> TextDisabled
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Markdown_jalxaml.Build [static] -> TextPrimary | TextPrimary | TextPrimary | TextPrimary | TextPrimary | TextPrimary | TextSecondary | ControlBorder | TextPrimary | TextPrimary | TextPrimary | TextSecondary | TextPrimary | TextPrimary | TextPrimary | TextSecondary | TextSecondary | TextSecondary
+     full literals: Property , IsEnabled , False , Opacity , 0.65 , Triggers , Background , Value , LayerFillColorDefaultBrush , Foreground , TextPrimary , BorderBrush , SurfaceStr...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml.Build [static] -> ControlBorderFocused | TextPrimary | TextSecondary | ControlBorder | TextPrimary | TextPrimary | TextPrimary | TextDisabled | TextPrimary | TextPrimary | TextPrimary | TextPrimary | TextPrimary | TextPrimary
+     full literals: Property , IsEnabled , False , Foreground , Value , AppBarButtonForegroundDisabled , Opacity , 0.56 , Triggers , IsCompact , True , MinHeight , 36 , Background ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Navigation_jalxaml.Build [static] -> TextPrimary | TextDisabled | TextPrimary | TextSecondary | ControlBorder | TextPrimary
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , HorizontalContentAlignment , Stretch , VerticalConte...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Primitives_jalxaml.Build [static] -> SurfaceBackground | TextSecondary | ControlBorder | TextSecondary | ControlBorder | TextPrimary | ControlBorder | TextSecondary | TextPrimary | ControlBorder
+     full literals: Key , DefaultFocusVisualStyle , Property , IsHitTestVisible , False , Focusable , BorderBrush , Value , FocusStrokeColorOuterBrush , BorderThickness , 3 , Templ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_PropertyGrid_jalxaml.Build [static] -> AccentBrush | AccentBrush | TextDisabled | AccentBrush | TextDisabled
+     full literals: Key , PropertyGridToolbarButtonStyle , Property , IsMouseOver , True , Foreground , Value , TextFillColorPrimaryBrush , Triggers , Background , SubtleFillColorT...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_RangeControls_jalxaml.Build [static] -> AccentBrush | AccentBrush | ControlBorder | AccentBrush | AccentBrush | ControlBorderFocused | ControlBorderFocused | TextSecondary | TextPrimary | ControlBorder | ControlBorderFocused
+     full literals: Property , Background , Value , SliderTrack , Foreground , AccentBrush , ProgressBrush , BorderBrush , ControlBorder , BorderThickness , 0 , CornerRadius , 999 ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ScrollBar_jalxaml.Build [static] -> TextDisabled | TextPrimary
+     full literals: Key , ScrollBarLineButtonStyle , Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , Transparent , BorderBrush , BorderTh...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_SelectionControls_jalxaml.Build [static] -> TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TabControl_jalxaml.Build [static] -> ControlBorderFocused | TextDisabled | TextPrimary | TextPrimary | TextPrimary | TextPrimary | ControlBorderFocused | TextDisabled | TextSecondary
+     full literals: Property , IsKeyboardFocused , True , TabStripBorderBrush , Value , ControlBorderFocused , Triggers , IsEnabled , False , Background , ControlBackgroundDisabled...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Terminal_jalxaml.Build [static] -> TextDisabled | ControlBorderFocused
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , TerminalBackground , TerminalForeground , BorderBrush , SurfaceStroke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TextControls_jalxaml.Build [static] -> TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | TextPrimary | ControlBorderFocused | TextPrimary | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | TextPrimary | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | TextPrimary | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | TextPrimary | ControlBorderFocused | ControlBorderFocused | TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | TextPrimary | TextDisabled | ControlBorder | TextPrimary | TextSecondary
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TitleBar_jalxaml.Build [static] -> TextOnAccent | TextDisabled
+     full literals: Property , Background , Value , TitleBarBackground , Foreground , TitleBarText , FontSize , CaptionFontSize , FontFamily , BodyFontFamily , FontWeight , Medium ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml.Build [static] -> TextOnAccent | TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorderFocused | TextDisabled | TextPrimary | TextOnAccent | ControlBorderFocused | TextDisabled
+     full literals: Property , IsChecked , True , Foreground , Value , TextOnAccent , Triggers , IsEnabled , False , TextDisabled , Background , ControlBackground , TextPrimary , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml.Build [static] -> TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorder | ControlBorder | ControlBorderFocused | TextOnAccent | TextPrimary | AccentBrush
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeView_jalxaml.Build [static] -> TextDisabled | SurfaceBackground | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | ControlBorder | ControlBorderFocused | TextDisabled | TextPrimary | TextDisabled | TextPrimary
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Windows_jalxaml.Build [static] -> TextPrimary | TextPrimary | TextPrimary
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , {x:Null}
+HIT Jalium.UI.Managed!Jalium.UI.Navigation.NavigationWindow.CreateNavigationBar -> ControlBorder
+     full literals: ← , → , ↻ , LayerFillColorDefaultBrush , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.AutoCompleteBox.ResolveFocusedBorderBrush -> ControlBorderFocused
+     full literals: ControlBorderFocused
+HIT Jalium.UI.Managed!Jalium.UI.Controls.AutoCompleteBox.ResolveSelectedSuggestionBackground -> AccentBrush
+     full literals: AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.AutoCompleteBox.ResolveDropDownBackground -> SurfaceBackground
+     full literals: SurfaceBackground , ControlBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.AutoCompleteBox.ResolveDropDownBorderBrush -> ControlBorder
+     full literals: ControlBorder , MenuFlyoutPresenterBorderBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.DrawNavigationButton -> TextSecondary
+     full literals: HighlightBackground , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.DrawDayHeaders -> TextSecondary
+     full literals: Su , Mo , Tu , We , Th , Fr , Sa , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.DrawDayCell -> AccentBrush | AccentBrush | TextDisabled | TextSecondary
+     full literals: HighlightBackground , AccentBrush , TextDisabled , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.DrawPeriodCell -> AccentBrush | TextSecondary
+     full literals: AccentBrush , HighlightBackground , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.ResolvePrimaryTextBrush -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.ResolveSelectedTextBrush -> TextOnAccent
+     full literals: TextOnAccent
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ColorPicker.ResolveForegroundBrush -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ColorPicker.ResolveBorderBrush -> ControlBorder
+     full literals: ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.CommandBar.ResolveBackgroundBrush -> SurfaceBackground
+     full literals: CommandBarBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.CommandBar.ResolveOverflowBackgroundBrush -> SurfaceBackground
+     full literals: CommandBarOverflowBackground , CommandBarBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.CommandBar.ResolveBorderBrush -> ControlBorder
+     full literals: CommandBarBorderBrush , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ContextMenu.ResolvePopupBackgroundBrush -> SurfaceBackground
+     full literals: MenuFlyoutPresenterBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ContextMenu.ResolvePopupBorderBrush -> ControlBorder
+     full literals: MenuFlyoutPresenterBorderBrush , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DataGrid.StartColumnDrag -> AccentBrush
+     full literals:  , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DatePicker.EnsurePopup -> SurfaceBackground | ControlBorder
+     full literals: SurfaceBackground , ControlBackground , ControlBorder , MenuFlyoutPresenterBorderBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DatePicker.ResolveFocusedBorderBrush -> ControlBorderFocused
+     full literals: ControlBorderFocused
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DatePicker.ResolveSecondaryTextBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DockItem.ResolveActiveTextBrush -> TextPrimary
+     full literals: OneTabActiveText , OneTextPrimary , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DockItem.ResolveInactiveTextBrush -> TextSecondary
+     full literals: OneTabInactiveText , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DockItem.ResolveIndicatorBrush -> AccentBrush
+     full literals: OneTabActiveBorder , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DockLayout.ResolveAccentBrush -> AccentBrush
+     full literals: OneAccentPrimary , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.DockTabPanel.ResolveAccentBrush -> AccentBrush
+     full literals: OneTabActiveBorder , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveForegroundBrush -> TextPrimary
+     full literals: EditorSyntaxPlainText , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveCaretBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveLineNumberForegroundBrush -> TextSecondary
+     full literals: TextSecondary , TextFillColorSecondaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveImeCompositionTextBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveImeCompositionUnderlinePen -> AccentBrush | ControlBorderFocused
+     full literals: AccentBrush , ControlBorderFocused
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveFoldingGuidePen -> ControlBorder
+     full literals: OneEditorIndentGuide , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.ResolveFoldingChevronPen -> TextSecondary | AccentBrush
+     full literals: TextSecondary , OneEditorIndentGuide , OneBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawSingleCharacterHighlight -> AccentBrush
+     full literals: OneAccentSubtle , SelectionBackground , OneBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawScopeGuides -> ControlBorder | AccentBrush
+     full literals: OneEditorIndentGuide , ControlBorder , OneBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawFoldedSectionHoverTooltip -> TextPrimary
+     full literals: OnePopupText , TextPrimary , OnePopupBackground , TooltipBackground , OnePopupBorder , TooltipBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawScopeGuideHoverTooltip -> TextPrimary
+     full literals: OnePopupText , TextPrimary , OnePopupBackground , TooltipBackground , OnePopupBorder , TooltipBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawFoldedSectionHints -> ControlBorder | AccentBrush
+     full literals: OneSurfaceDefault , ControlBackground , OneSurfaceSelected , SelectionBackground , OneBorderDefault , ControlBorder , OneBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.CreateFoldedSectionHintLayout -> TextSecondary
+     full literals: OneTextSecondary , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.EditControl.DrawMinimapHoverTooltip -> TextPrimary
+     full literals: Cascadia Code , OnePopupText , TextPrimary , OnePopupBackground , TooltipBackground , OnePopupBorder , TooltipBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.IconElement.GetEffectiveForeground -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Label.ResolveEffectiveForegroundBrush -> TextSecondary | TextPrimary
+     full literals: TextSecondary , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuItem.OnRender -> TextDisabled | TextSecondary
+     full literals: TextDisabled , Segoe UI Symbol , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuItem.ResolvePrimaryTextBrush -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuBarItem.ResolveForegroundBrush -> TextPrimary
+     full literals: OneTextPrimary , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuFlyoutItem.OnRender -> TextDisabled | TextSecondary
+     full literals: OneSurfaceHover , MenuFlyoutItemBackgroundHover , OneTextDisabled , TextDisabled , Segoe MDL2 Assets , OneTextSecondary , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuFlyoutItem.ResolveForegroundBrush -> TextPrimary
+     full literals: OnePopupText , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.MenuFlyoutSubItem.OnRender -> TextSecondary
+     full literals: OneTextSecondary , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.NavigationViewItemHeader.ResolveForegroundBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.NavigationViewItemSeparator.ResolveBackgroundBrush -> ControlBorder
+     full literals: ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.NumberBox.ResolveFocusedBorderBrush -> ControlBorderFocused
+     full literals: ControlBorderFocused
+HIT Jalium.UI.Managed!Jalium.UI.Controls.NumberBox.ResolveSecondaryTextBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.PasswordBox.ResolveFocusedBorderBrush -> ControlBorderFocused | AccentBrush
+     full literals: ControlBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.PasswordBox.ResolveSecondaryTextBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ProgressBar.ResolveProgressBrush -> AccentBrush
+     full literals: AccentBrushDisabled , AccentFillColorDisabledBrush , AccentBrush , AccentFillColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.PropertyGrid.ResolveSelectionAccentBrush -> AccentBrush
+     full literals: AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.RichTextBox.ResolveDocumentForegroundBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.RichTextBox.ResolveCaretBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Split.ResolveDraggingBrush -> AccentBrush
+     full literals: OneTabActiveBorder , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.SwipeControl.ResolveSwipeItemBackground -> AccentBrush
+     full literals: AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.SwipeControl.ResolveSwipeItemForeground -> TextOnAccent | TextPrimary
+     full literals: TextOnAccent , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TabItem.ResolvePrimaryTextBrush -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TabItem.ResolveSecondaryTextBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Terminal.RenderCursor -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TextBox.get_FocusBorderBrush -> AccentBrush
+     full literals: AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TextBox.ResolveFocusedBorderBrush -> ControlBorderFocused | AccentBrush
+     full literals: ControlBorderFocused , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.BuildPopup -> AccentBrush | TextPrimary | SurfaceBackground | ControlBorder
+     full literals: ✓ , AccentBrush , TextPrimary , SurfaceBackground , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.CreateSeparator -> ControlBorder
+     full literals: ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.CreateTimeItem -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.ResolveFocusedBorderBrush -> ControlBorderFocused
+     full literals: ControlBorderFocused
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.ResolveSecondaryTextBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TimePicker.ResolveSelectedItemBackground -> AccentBrush
+     full literals: AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.ToggleMenuFlyoutItem.ResolveCheckGlyphBrush -> TextPrimary
+     full literals: TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TreeDataGrid.WrapWithTreeIndentation -> TextSecondary
+     full literals: M 841.90,426.67 L 273.07,0 A 170.67,170.67,0,0,0,0,136.53 V 989.87 A 170.67,170.67,0,0,0,273.07,1126.40 L 841.90,699.73 A 170.67,170.67,0,0,0,841.90,426.67 Z , ...
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TreeDataGrid.StartColumnDrag -> AccentBrush
+     full literals:  , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.TreeSelector.CreateTagChip -> ControlBorder | TextSecondary
+     full literals: ControlBackgroundHover , ControlBorder , × , TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.PopulateAccentDictionary [static] -> AccentBrush
+     full literals: SystemAccentColor , SystemAccentColorLight1 , SystemAccentColorLight2 , SystemAccentColorLight3 , SystemAccentColorDark1 , SystemAccentColorDark2 , SystemAccent...
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.BuildHighContrastVariant [static] -> AccentBrush | TextOnAccent
+     full literals: SystemAccentColor , SystemAccentColorLight1 , SystemAccentColorLight2 , SystemAccentColorLight3 , SystemAccentColorDark1 , SystemAccentColorDark2 , SystemAccent...
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveSelectedBackgroundBrush -> AccentBrush
+     full literals: AccentBrush , AccentFillColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveTodayRingPen -> AccentBrush
+     full literals: AccentBrush , AccentFillColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveBlackedOutForegroundBrush -> TextDisabled
+     full literals: TextDisabled , TextFillColorDisabledBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveInactiveForegroundBrush -> TextSecondary
+     full literals: TextSecondary , TextFillColorSecondaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveSelectedForegroundBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveDefaultForegroundBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveStrikePen -> TextDisabled
+     full literals: TextDisabled , TextFillColorDisabledBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarItem.ResolveBackgroundBrush -> SurfaceBackground
+     full literals: SurfaceBackground , ControlBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarItem.ResolveDayOfWeekHeaderBrush -> TextSecondary
+     full literals: TextSecondary , TextFillColorSecondaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridColumnHeader.ResolveDefaultBackgroundBrush -> SurfaceBackground
+     full literals: ControlBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridColumnHeader.ResolveForegroundBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridColumnHeader.ResolveSeparatorBrush -> ControlBorder
+     full literals: ControlBorder , DividerStrokeColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridColumnHeader.ResolveBottomBorderPen -> ControlBorder
+     full literals: ControlBorder , DividerStrokeColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSelectedBackgroundBrush -> AccentBrush
+     full literals: AccentBrush , AccentFillColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveDefaultBackgroundBrush -> SurfaceBackground
+     full literals: ControlBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSeparatorBrush -> ControlBorder
+     full literals: ControlBorder , DividerStrokeColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSelectionIndicatorBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DocumentPageView.ResolveBorderPen -> ControlBorder
+     full literals: ControlBorder , DividerStrokeColorDefaultBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.FlyoutBase.ResolvePopupBackgroundBrush -> SurfaceBackground
+     full literals: MenuFlyoutPresenterBackground , TooltipBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.FlyoutBase.ResolvePopupBorderBrush -> ControlBorder
+     full literals: MenuFlyoutPresenterBorderBrush , TooltipBorder , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.SegmentedTrackBar.OnRender -> AccentBrush
+     full literals: SliderTrack , AccentBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.StatusBarItem.ResolveForegroundBrush -> TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveCaretBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveTextForegroundBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuBackgroundBrush -> SurfaceBackground
+     full literals: MenuFlyoutPresenterBackground , SurfaceBackground
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuBorderBrush -> ControlBorder
+     full literals: MenuFlyoutPresenterBorderBrush , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuForegroundBrush -> TextPrimary
+     full literals: TextPrimary , TextFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuDisabledForegroundBrush -> TextDisabled
+     full literals: TextDisabled , TextFillColorDisabledBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuShortcutForegroundBrush -> TextSecondary
+     full literals: TextSecondary , TextFillColorSecondaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TextBoxBase.ResolveContextMenuSeparatorBrush -> ControlBorder
+     full literals: MenuFlyoutPresenterBorderBrush , ControlBorder
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.TickBar.ResolveTickBrush -> TextSecondary | TextSecondary
+     full literals: TextSecondary
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> ControlBorder | ControlBorder | ControlBorder
+     full literals: Name , PART_OuterBorder , Background , BorderBrush , BorderThickness , RowDefinitions , PART_ColumnHeadersBorder , LayerFillColorAltBrush , PART_ColumnHeadersSc...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> ControlBorder
+     full literals: Name , PART_RowBorder , Background , BorderBrush , ControlBorder , PART_CellsPanel
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> ControlBorder
+     full literals: Name , PART_CellBorder , Background , BorderBrush , ControlBorder , Padding
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__3 -> ControlBorder | TextSecondary
+     full literals: Name , PART_HeaderBorder , Background , BorderBrush , ControlBorder , Padding , ColumnDefinitions , PART_SortIndicator , Foreground , TextSecondary , FontSize ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextPrimary
+     full literals: Name , PART_Root , PART_Overlay , Background , SmokeFillColorDefaultBrush , PART_DialogCard , BackdropEffect , BorderBrush , BorderThickness , CornerRadius , Co...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_JsonTreeViewer_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> TextSecondary
+     full literals: Name , RootBorder , Background , BorderBrush , BorderThickness , CornerRadius , RowDefinitions , LayerFillColorAltBrush , PART_ToolBar , PART_ExpandAllButton , ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> AccentBrush
+     full literals: Name , Root , Background , CornerRadius , Padding , IconPresenter , Content , Icon , LabelText , Text , Label , FontSize , CaptionFontSize , Foreground , Checke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Navigation_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> ControlBorder | ControlBorder
+     full literals: Name , PART_RootGrid , ColumnDefinitions , PART_PaneContainer , Background , PaneBackground , RowDefinitions , PART_PaneHeaderHost , PART_PaneScrollViewer , PAR...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Navigation_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> AccentBrush | TextSecondary
+     full literals: Name , PART_ItemBorder , Background , CornerRadius , ColumnDefinitions , PART_SelectionIndicator , Fill , AccentBrush , PART_IndentSpacer , PART_Chevron , Data ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_PropertyGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> AccentBrush
+     full literals: Name , RootBorder , Background , PART_HeaderBorder , HeaderBackground , ColumnDefinitions , PART_Chevron , Data , M333.414 23.989 l557.904 393.923 c58.785 42.21...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_SelectionControls_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> TextDisabled | SurfaceBackground | ControlBorder
+     full literals: Name , PART_MainBorder , TransitionProperty , BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderThickness , Padding , RelativeSource , {RelativeS...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_SelectionControls_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextSecondary
+     full literals: Name , ToggleSurface , TransitionProperty , None , PART_DropDownGlyph , Data , M 733.87,841.90 L 1160.54,273.07 A 170.67,170.67,0,0,0,1024.00,0 H 170.67 A 170.6...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_SelectionControls_jalxaml+<>c__DisplayClass1_0.<Build>b__5 -> SurfaceBackground | ControlBorder
+     full literals: Name , PART_OuterBorder , TransitionProperty , BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderThickness , CornerRadius , RowDefinitions , PART...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_SelectionControls_jalxaml+<>c__DisplayClass1_0.<Build>b__7 -> TextSecondary
+     full literals: Name , PART_HeaderBorder , TransitionProperty , None , Background , BorderBrush , BorderThickness , Padding , ColumnDefinitions , PART_SortIndicator , Foregroun...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TextControls_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextSecondary | TextSecondary
+     full literals: Name , OuterBorder , TransitionProperty , BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderThickness , CornerRadius , PART_LayoutRoot , ColumnDe...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TextControls_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> SurfaceBackground | ControlBorder
+     full literals: Name , OuterBorder , TransitionProperty , BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderThickness , CornerRadius , PART_ContentHost , Margin ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextOnAccent | TextOnAccent
+     full literals: Name , RootBorder , CheckBoxBorder , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , BorderThickness ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> TextOnAccent
+     full literals: Name , RootBorder , OuterCircle , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , PressedOverlay , Fil...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__3 -> TextSecondary
+     full literals: Name , PART_Header , Content , Header , FontFamily , FontSize , FontWeight , FontStyle , Foreground , PART_SwitchTrack , Background , OffBackground , BorderBrus...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> ControlBorder
+     full literals: Name , PART_OuterBorder , Background , BorderBrush , BorderThickness , RowDefinitions , PART_ColumnHeadersBorder , LayerFillColorAltBrush , PART_ColumnHeadersSc...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> ControlBorder
+     full literals: Name , PART_RowBorder , Background , BorderBrush , ControlBorder , PART_CellsPanel
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeView_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextSecondary | TextSecondary | TextSecondary
+     full literals: Name , PART_TriggerBorder , Background , BorderBrush , BorderThickness , CornerRadius , Padding , ColumnDefinitions , PART_TagsPanel , PART_DisplayText , PART_S...
+
+=== 2. per-target hit count (0 means no by-name read in code on this runtime) ===
+TextOnAccent             24
+TextPrimary              125
+TextSecondary            59
+TextDisabled             65
+ControlBorder            81
+SurfaceBackground        39
+AccentBrush              54
+ControlBorderFocused     55
+
+=== 3. is the name ALSO a direct ThemeColors member? an alias row cannot reach that shape ===
+holder Jalium.UI.Controls.ThemeColors: absent
+holder Jalium.UI.Controls.Themes.ThemeColors:
+  TextOnAccent             property=False field=False read=null value=-
+  TextPrimary              property=True field=False read=Color value=#FFFFFFFF
+  TextSecondary            property=True field=False read=Color value=#FFB4B4B4
+  TextDisabled             property=True field=False read=Color value=#FF5A5A5A
+  ControlBorder            property=True field=False read=Color value=#FF505050
+  SurfaceBackground        property=False field=False read=null value=-
+  AccentBrush              property=False field=False read=null value=-
+  ControlBorderFocused     property=True field=False read=Color value=#FF207245

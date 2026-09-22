@@ -1,0 +1,18 @@
+=== is the framework's own theme dictionary in this host? ===
+app.TryFindResource("DefaultFocusVisualStyle") = Style Jalium.UI.Style
+app.TryFindResource("FocusVisualRingStyle") = Style Jalium.UI.Style
+app.TryFindResource("TextOnAccent") = SolidColorBrush ##FFFFFFFF instance=0x2EEDD29
+app.TryFindResource("Calendar") = null
+app.TryFindResource("DatePicker") = null
+Calendar    implicit-by-type=Style Jalium.UI.Style ownStyle=null template=null
+   setters=9 Control.Background(value=DynamicResourceReference) | TextElement.Foreground(value=DynamicResourceReference) | Control.BorderBrush(value=DynamicResourceReference) | Control.BorderThickness(value=String) | Control.Padding(value=String) | Control.CornerRadius(value=String) | UIElement.TransitionProperty(value=String) | UIElement.TransitionDuration(value=String) | UIElement.TransitionTimingFunction(value=String)
+   Template-cell=null
+DatePicker  implicit-by-type=Style Jalium.UI.Style ownStyle=null template=null
+   setters=10 Control.Background(value=DynamicResourceReference) | TextElement.Foreground(value=DynamicResourceReference) | Control.BorderBrush(value=DynamicResourceReference) | Control.BorderThickness(value=String) | Control.Padding(value=String) | Control.CornerRadius(value=String) | FrameworkElement.MinHeight(value=String) | UIElement.TransitionProperty(value=String) | UIElement.TransitionDuration(value=String) | UIElement.TransitionTimingFunction(value=String)
+   Template-cell=null
+TimePicker  implicit-by-type=Style Jalium.UI.Style ownStyle=null template=null
+   setters=10 Control.Background(value=DynamicResourceReference) | TextElement.Foreground(value=DynamicResourceReference) | Control.BorderBrush(value=DynamicResourceReference) | Control.BorderThickness(value=String) | Control.Padding(value=String) | Control.CornerRadius(value=String) | FrameworkElement.MinHeight(value=String) | UIElement.TransitionProperty(value=String) | UIElement.TransitionDuration(value=String) | UIElement.TransitionTimingFunction(value=String)
+   Template-cell=null
+Button      implicit-by-type=Style Jalium.UI.Style ownStyle=null template=null
+   setters=0 -
+   Template-cell=null
