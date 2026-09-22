@@ -2403,3 +2403,12 @@ build `0 个警告 / 0 个错误`、整套 **1481/1481**（0 失败 0 跳过，7
 改打别名指向的调色板刷或 mount 后翻档，carrier 一律不动。
 
 
+
+## 交接（回合用尽，2026-09-22）：闸口全量绿在 `d7259b2`，下一手是 ControlBorderFocused 的 twin
+
+- 已验基线：`tools/Test-AstraGates.ps1` 在 `a79887a`（含 `AstraFrameworkNameResolutionTests`）上 **1481/1481、0 跳过、
+  调色板三档 checked=True、keys.md 1298 行当前、All Astra gates passed.**；`src/ tests/ tools/` 无未提交改动。
+- 别名层仍未发布任何新行（`ThemeResources/FrameworkRetints.jalxaml` 只有 `AccentBrush`）。杠杆已证：焦点描边按名字现查。
+- 下一步第一手：查 WinUI 焦点态描边到底用哪条 token。**别再猜上游目录**：在 `../microsoft-ui-xaml`（commit `19e3bdc`，
+  只读）这份工作副本里 `dev/`、`resources/styles`、`resources/themes` 三条路径都不存在（两次 grep 均
+  `No such file or directory`，因此本会话没有拿到任何 token 读数）。先 `ls` 定布局，再 grep，再决定发布。
