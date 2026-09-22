@@ -2737,15 +2737,16 @@ host 484x364 box=260 open=True containers=5 itemsHosts=11
   Dark:  TextPrimary=#FFF5F5F7  twin=#FFFFFFFF                              同实例=否  Label前景=#FFD1D1D6
   ```
 
-  三件事一次定死：① 这个名字**不是空的**，它随 `Application.ThemeMode` 翻档，而且翻到的正是**我们的调色板主文本墨**
-  （`#FF1D1D1F`/`#FFF5F5F7`）；② 它和我们逐字照抄上游的 twin `TextFillColorPrimaryBrush` 是**不同实例、不同色**
-  （twin 是 WinUI 字面 `#E4000000`/`#FFFFFF`）；③ 我们**从不重模板**的那个原生 `Label` 读的是**第三种**框架默认墨
-  （`#FF6E6E73`/`#FFD1D1D6`），既不是名字值也不是 twin 值。
-- **因此发行是负收益，不是零收益**：`<StaticResource TextPrimary → TextFillColorPrimaryBrush>` 会把框架那支**已经等于我们
-  调好的墨**的投影，改写成更生的 WinUI 字面 `#E4000000`——朝 1:1 复刻的反方向走。这与 `ControlBorderFocused` 那一轮正好
-  相反：那里的框架投影是**错的品牌绿** `#FF1E793F`、且有实证过的读者 `ResolveFocusedBorderBrush`，所以覆盖是修 bug；
-  这里投影已经对、且没量到读者，覆盖只会弄脏。**别名层进不进一个名字，判据不是"源树读了几次"，是"框架投影值是不是错的、
-  且有一个我们改不动的表面真的按这个名字取值"**——`TextPrimary` 两条都不满足。
+  三件事：① 这个名字**不是空的**，它随 `Application.ThemeMode` 翻档，落到一支**框架自己的**不透明近黑
+  （`#FF1D1D1F`/`#FFF5F5F7`）——注意它**不是**我们出货的 token；② 我们逐字照抄上游的 twin `TextFillColorPrimaryBrush`
+  是半透 WinUI 字面（`#E4000000`/`#FFFFFFFF`），与名字投影**不同实例、不同色**；③ 我们从不重模板的那个原生 `Label`
+  读**第三种**框架默认墨（`#FF6E6E73`/`#FFD1D1D6`），既不是名字值也不是 twin 值。
+- **不发行的理由只剩"没有实证读者"——这一句更正我本批先前的一处判断**：投影 `#FF1D1D1F` 并非我们的 token，
+  `#E4000000` 才是 WinUI 字面、才是 1:1 的目标；所以 `<StaticResource TextPrimary → TextFillColorPrimaryBrush>`
+  会把按这个名字取值的表面**推向** 1:1，而不是拉离。先前把它写成"改朝 1:1 的反方向"是**反了**。这与 `ControlBorderFocused`
+  那轮不同（那轮框架投影是**错的品牌绿** `#FF1E793F` 且有实证读者 `ResolveFocusedBorderBrush`，覆盖既修 bug 又提纯度）。
+  别名层进不进一个名字，判据只有一条：**有没有一个我们改不动、又确实按这个名字取值的出货读者**。`TextPrimary` 目前只量到
+  `Label` 这一处文本面、而它读第三种墨——没有读者，所以暂不发；**哪天冒出读者，发它是提纯度、不是弄脏**。
 - **我自己的前提也错了一次，如实记**：本想在测试里钉一条"这个名字没有出货读者"的 tripwire，写成了
   `Assert.Null(TryFindResource("TextPrimary"))`。第一次跑就红在 `Actual: SolidColorBrush(#FF1D1D1F)`——我先前那条
   "名字处处不出现"的记忆是**错的**（同一批早先的探针读数 `row=SolidColorBrush #E4000000` 本来就已经非空，是我把它记成了"缺席"）。
@@ -2761,7 +2762,7 @@ host 484x364 box=260 open=True containers=5 itemsHosts=11
 - **硬件输入**：不动输入路径。
 - **清单/漂移**：`keys.md` 不变（本批不发布公开键，仍 1301 canonical lines）；三档 `checked=True`。
 
-### 本批的串行闸口读数（补记，2026-09-22）
+### TextPrimary 单条批次（提交 `efda4ff`）的闸口读数（补记，2026-09-22）
 
 `tools/Test-AstraGates.ps1` 在含本批改动的树上串行跑完（`spike/GalleryRender/gate-textprimary.log`）：build
 `0 警告 / 0 错误` → 整套 **1492/1492**（0 失败 0 跳过、7 m 26 s）→ 页像素闸 **`PASS 13 pages x 2 variants, 0 offender(s)`**
@@ -2778,5 +2779,60 @@ host 484x364 box=260 open=True containers=5 itemsHosts=11
 （白字、`WindowBackground=#FF1E1E1E`），与活进程读数系统性相反——归因未做（多半是 harvest 抓的是
 `ThemeColors` 结构体的另一套底值，不是应用级投影色），但结论不依赖它：本轮用的是活进程里按 `ThemeMode` 现读的值。
 不声称：① 没有对**全部**出货按名读者做穷尽普查（只测了 `Label` 一处原生文本控件；源树那 8 处读点在 26.10.9 的 IL 里
-是否都还在、是否都跑在我们改不动的面上，没查）——但这条不影响"不发"的判定，因为**发反而会弄脏**那条已经成立；
+是否都还在、是否都跑在我们改不动的面上，没查）——这是"不发"的**唯一依据**：没有实证读者；若查到读者，发这行是提纯而非弄脏。
 ② `TextSecondary`/`TextDisabled`/`TextOnAccent` 各自要不要发行仍按同一判据单独量，本轮不替它们下结论。
+
+## #12 A2 别名层第三轮·续：余下三个文本名 + `CaptionFontSize`，按同一把尺各量一次
+
+`efda4ff` 的 `TextPrimary` 定了尺（"有没有一个改不动、又按这个名字取值的出货读者"）之后，这一手把余下三个
+palette-family 文本名各量一次（活进程、两档、`TryFindResource(name)` vs 我们的 token），读数全部进了一条参数化事实
+`A_remaining_text_name_is_a_live_projection_but_not_our_token`（本类从 10 条增至 **13 条**，多的 3 条腿就是它）：
+
+```
+name           Light 投影   Dark  投影   我们的 token(Light/Dark)                 同实例
+TextSecondary  #FF6E6E73   #FFD1D1D6   TextFillColorSecondaryBrush #9E000000/#C5FFFFFF   否
+TextDisabled   #FFAEAEB2   #FF636366   TextFillColorDisabledBrush  #5C000000/#5DFFFFFF   否
+TextOnAccent   #FFFFFFFF   #FFFFFFFF   TextOnAccentFillColorPrimaryBrush #FFFFFF/#000000  否
+```
+
+- **`TextSecondary` / `TextDisabled`：投影都量到，但决策不是一条**。两者都是随档翻的不透明 macOS 味灰阶、与我们半透
+  WinUI 字面 token **不同实例不同色**——且**发 `name→token` 是把读者推向 1:1，不是拉离**（token 才是 WinUI 字面）。所以
+  "发不发"只取决于**有没有一个我们改不动、又按这个名字取值的读者**，而不是"投影对不对"。
+  - `TextSecondary`：本批只在 `Label` 这类面上看，读到的是第三种默认墨、不是这个名字 → **没有量到自绘读者，暂缓**（未穷尽）。
+  - `TextDisabled`：**不同——它是下一轮该发的那一个**。菜单批已把 `MenuItem` 判成"存模板却不实例化、只走 `OnRender`
+    自绘 + `Resolve*Brush`"，即我们**重不了模板**；而参考树 census 记着框架按名字读 `TextDisabled`
+    （`Menu.cs:1172`、`MenuFlyoutItem.cs:208` 先试 `OneTextDisabled` 再试 `TextDisabled`）。"参考树"不是 26.10.9 权威，
+    所以**这一条要在出货运行时实测**（挂一个禁用的自绘 `MenuItem`、装哨兵 `TextDisabled`、看它跟不跟），不是照抄树。
+    目标那句"`TextDisabled` 翻 5 条禁用墨迹事实"到这里才真正对上：一旦发行了，那 5 条从框架不透灰变成我们 WinUI 半透值，
+    是**预期内的重钉**（#56 批的 retint 爆炸半径同款），不是回避理由。**本轮不发它，把它作为独立一轮：实测读者 → 发行 → 重钉。**
+- **`TextOnAccent`：形状不同，仍暂缓，但记清楚它怪在哪**。它**不在** `08` 那张 71 行 `ThemeColors` 投影表里
+  （源未归因，多半来自比 71 更广的框架资源面），可活进程里 `TryFindResource("TextOnAccent")` 非空，而且是
+  **恒白**（Light/Dark 都 `#FFFFFFFF`），而我们的 token 是白/黑随档翻（`#FFFFFF`/`#000000`）。也就是说：谁按这个名字
+  取值，在 Dark 下会拿到**恒定白**而非我们的档敏感值——这正是"强调底上文字"该翻没翻的隐患。但**本批没量到任何控件读它**
+  （WinUI 把它用在选中药丸/开关/Calendar 的反色文字上，而这些我们要么自绘要么还没上：Calendar/DatePicker 不在 60 行宇宙里）。
+  所以按同一把尺：**没量到读者 → 暂缓**；等哪天进 Calendar 族或实测到某面读它，这一轮的行是**提纯度**的活。
+  它的恒白投影已被那条事实钉住（Dark 腿 `#FFFFFFFF` + `NotEqual(dark, darkTwin)` 就是这条怪的证人）。
+- **`CaptionFontSize`：Known Gap，无载体**。它不是 `ThemeColors` 笔刷而是字号，本 reader 解析不了 `x:Double`/`sys:Double`
+  资源行（`jalium-xaml-and-test-gotchas` 与 #54 已各自实测过这条静默丢弃），所以连"能不能按名字投影"都无从谈起——
+  没有可断的活行，写进 Known Gaps，不硬造消费点。**别名层这条杠杆只吃 Brush 形名字；字号/Thickness 等没有框架按名
+  现查的读者，就不在 A2 的射程内。**
+
+- **构建**：全量 `0 警告 / 0 错误`。
+- **行为**：新参数化事实 3 条腿（`AstraFrameworkNameResolutionTests` 13/13 绿）。**牙齿**：给任一名字发 `name→token`
+  别名行 → 该腿读到的就是 token → 具名的 Light/Dark 色值断言与 `NotSame(row,twin)` 一起红；`TextOnAccent` 那条若哪天
+  框架不再恒白（开始随档翻），Dark 腿 `#FFFFFFFF` 红。
+- **视觉**：零既有像素主张变化（三个都不发）。
+- **硬件输入**：不动。
+- **清单/漂移**：`keys.md` 不变（仍 1301，本批不发布公开键）；`FrameworkRetints.jalxaml` 停在四行不变。
+
+### 第三轮·续的串行闸口读数（补记，2026-09-22）
+
+修掉一条新引入的 `CS8603`（`InkedForeground` 返回类型改 `Brush?`，出货全库唯一一处可能返回 null 的 helper）之后，
+`tools/Test-AstraGates.ps1` 在含本批改动的树上串行跑完（`spike/GalleryRender/gate-textnames.log`）：build
+`0 警告 / 0 错误` → 整套 **1495/1495**（0 失败 0 跳过、6 m 57 s）→ 页像素闸 **`PASS 13 pages x 2 variants, 0 offender(s)`**
+→ 调色板三档 `checked=True` → `keys.md is current: 1301 canonical lines.`（本批不发布公开键）→ 末行
+`All Astra gates passed.` → 脚本自记 **`GATE-EXIT=0`**（这回用 bash `$?` 取的真实退出码，不是上次那行空的 `$LASTEXITCODE`）。
+
+**测点 1492 → 1495 = +3**，正是新参数化事实的三条腿；`TextDisabled` 三个名字都不发行，所以既有禁用墨迹那族事实**一条没翻**
+（全量里照旧绿即反证）。这一批的产出是"量清 + 更正一处方向性误判 + 把 `TextDisabled` 立成下一轮"，不是发行；
+`FrameworkRetints.jalxaml` 仍停在四行。

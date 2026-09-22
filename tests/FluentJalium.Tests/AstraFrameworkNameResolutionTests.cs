@@ -166,15 +166,16 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     }
 
     /// <summary>
-    /// The <c>TextPrimary</c> name, measured on 26.10.9 in both variants, is the opposite situation from
-    /// <c>ControlBorderFocused</c> above - which is why the A2 layer takes no row there. The framework already
-    /// publishes <c>TextPrimary</c> as a live app-level resource that tracks <see cref="Application"/> to the palette
-    /// primary ink (#FF1D1D1F light / #FFF5F5F7 dark), so the name is occupied: an alias would overwrite a value that
-    /// is already our ink, not install a missing lever. And it reaches nothing this library cannot fix by other means:
-    /// a <see cref="Label"/> we never restyles paints a third framework default (#FF6E6E73 / #FFD1D1D6), matching
-    /// neither the name nor the transcribed twin <c>TextFillColorPrimaryBrush</c> (#E4000000 / #FFFFFFFF), so there is
-    /// no demonstrated reader the row could serve. If the tracked colour stops matching on a future runtime, the name
-    /// has drifted off the theme and the row earns its evidence round again.
+    /// The <c>TextPrimary</c> name, measured on 26.10.9 in both variants. The framework publishes <c>TextPrimary</c>
+    /// as a live app-level resource that tracks <see cref="Application"/> to an opaque near-black (#FF1D1D1F light /
+    /// #FFF5F5F7 dark) which is <em>not</em> our shipped WinUI-literal token <c>TextFillColorPrimaryBrush</c>
+    /// (#E4000000 / #FFFFFFFF) - a distinct object and a distinct colour. So unlike <c>ControlBorderFocused</c> (whose
+    /// framework projection is the wrong brand-green and which has a proven reader), aliasing here would move a
+    /// name-reader <em>toward</em> 1:1, not away. The row is therefore withheld purely for lack of a demonstrated
+    /// reader: the one surface we never restyle, a <see cref="Label"/>, paints a third framework default
+    /// (#FF6E6E73 / #FFD1D1D6), matching neither the name nor the twin, so there is nothing the row could reach that
+    /// re-templating cannot already fix. If a shipped control starts consuming the name, the row earns its evidence
+    /// round; the tracked colour below is the baseline that decision revisits.
     /// </summary>
     [Fact]
     public void TextPrimary_is_a_theme_tracking_framework_name_the_layer_leaves_alone()
@@ -215,6 +216,49 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         });
     }
 
+    /// <summary>
+    /// The three remaining palette-family text names the A2 layer was asked to consider, measured the same way as
+    /// <c>TextPrimary</c>. All three are live framework projections (non-null, app-level) and all three are a *different
+    /// object* from the shipped WinUI-literal token of the same meaning: the framework hands out opaque macOS-flavoured
+    /// greys (and a constant white for <c>TextOnAccent</c>) where our palette ships translucent WinUI values that flip
+    /// by variant. That divergence is why these stay candidates rather than rows: publishing <c>name → token</c> would
+    /// move any name-reader *toward* 1:1, so the only thing holding the row back is the absence of a demonstrated
+    /// reader we cannot already re-template — not a fidelity cost. If a shipped control starts consuming one of these
+    /// names, the row is worth shipping; the measured colours below are the baseline that decision revisits.
+    /// </summary>
+    [Theory]
+    [InlineData("TextSecondary", "TextFillColorSecondaryBrush", 0x6E, 0x6E, 0x73, 0xD1, 0xD1, 0xD6)]
+    [InlineData("TextDisabled", "TextFillColorDisabledBrush", 0xAE, 0xAE, 0xB2, 0x63, 0x63, 0x66)]
+    [InlineData("TextOnAccent", "TextOnAccentFillColorPrimaryBrush", 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)]
+    public void A_remaining_text_name_is_a_live_projection_but_not_our_token(
+        string frameworkName, string twinKey, byte lr, byte lg, byte lb, byte dr, byte dg, byte db)
+    {
+        _fixture.Run(() =>
+        {
+            var application = Application.Current!;
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            try
+            {
+                var light = Assert.IsType<SolidColorBrush>(application.TryFindResource(frameworkName));
+                var lightTwin = FluentThemeManager.GetBrush(twinKey);
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+                var dark = Assert.IsType<SolidColorBrush>(application.TryFindResource(frameworkName));
+                var darkTwin = Assert.IsType<SolidColorBrush>(FluentThemeManager.GetBrush(twinKey));
+                Assert.Multiple(
+                    () => Assert.Equal(Color.FromRgb(lr, lg, lb), light.Color),
+                    () => Assert.Equal(Color.FromRgb(dr, dg, db), dark.Color),
+                    // Projection is a distinct object from our token in both variants...
+                    () => Assert.NotSame(light, lightTwin),
+                    // ...and in Dark at least a distinct colour too (TextOnAccent's twin goes #000000 under its white).
+                    () => Assert.NotEqual(dark.Color, darkTwin.Color));
+            }
+            finally
+            {
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
+        });
+    }
+
     // ---------- helpers ----------
 
     /// <summary>
@@ -244,7 +288,7 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
 
     /// <summary>The foreground a <see cref="Label"/> this library never restyles resolves to, built under whatever
     /// theme variant is currently applied (a built-but-not-shown element keeps what it resolved at build time).</summary>
-    private static Brush InkedForeground()
+    private static Brush? InkedForeground()
     {
         var label = new Label { Content = "Reading" };
         PixelHarness.Build(label, 200, 40);
