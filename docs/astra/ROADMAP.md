@@ -2412,3 +2412,20 @@ build `0 个警告 / 0 个错误`、整套 **1481/1481**（0 失败 0 跳过，7
 - 下一步第一手：查 WinUI 焦点态描边到底用哪条 token。**别再猜上游目录**：在 `../microsoft-ui-xaml`（commit `19e3bdc`，
   只读）这份工作副本里 `dev/`、`resources/styles`、`resources/themes` 三条路径都不存在（两次 grep 均
   `No such file or directory`，因此本会话没有拿到任何 token 读数）。先 `ls` 定布局，再 grep，再决定发布。
+
+### ControlBorderFocused 的 twin 已量到（上游 `controls/dev/…/TextBox_themeresources.xaml`，commit `19e3bdc`）
+
+链条：`TextControlBorderBrushFocused` →（`StaticResource`）→ **`TextControlElevationBorderFocusedBrush`**，
+后者**不是实色**，是一支 `LinearGradientBrush MappingMode="Absolute" StartPoint="0,0" EndPoint="0,2"` +
+`ScaleTransform ScaleY="-1" CenterY=0.5`，两个 `GradientStop` **都在 Offset 1.0**：一支
+`{ThemeResource SystemAccentColorLight2}`（Light，第 62 行）/ `SystemAccentColorDark1`（Dark，第 169 行），
+另一支 `{StaticResource ControlStrokeColorDefault}`（第 63/107/170 行）。也就是 WinUI 焦点框的真身在 2 DIP 带上做
+"强调色底环 + 常态描边"的分层，不是单色。
+
+**这条读数直接改变 #12 那一行的做法**：`<StaticResource x:Key="ControlBorderFocused" ResourceKey=某实色>` 无论指向哪支
+实色都是**偏离上游**（框架侧接受的是 `Brush`，实色能过解析、拿不到环）。上游忠实转录要写一支同样几何的渐变行——
+而渐变行在本运行时的可达性还没测（`adaptation/00` S1-r 只结清过 `x:Double`/`x:Int32` 无载体，`LinearGradientBrush`
+元素行未验），且 `MappingMode=Absolute` 的 2 DIP 假设是按文本框边框尺寸设计的，套到 `PART_OuterBorder` 上是另一次外推。
+两个候选因此都记下，未择一：A) 发实色别名（先结掉"品牌绿不许出现在我们树上"这条硬约束，承认环为偏差）；
+B) 发渐变别名（先量 `LinearGradientBrush` 行在 26.10.9 标记里到底落不落，再谈几何外推）。
+本批**未发布任何行**，两案都要过一次整套串行闸口；起点基线仍是 `d7259b2` 的 1481/1481。
