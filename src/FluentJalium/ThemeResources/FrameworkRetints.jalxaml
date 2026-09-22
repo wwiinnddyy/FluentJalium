@@ -40,4 +40,18 @@
        that one decision to the name the framework reads, so the elevation ring is a documented deviation in exactly
        one place rather than two. Controls this library restyles are unaffected - their templates ask for Astra rows. -->
   <StaticResource x:Key="ControlBorderFocused" ResourceKey="AccentFillColorDefaultBrush" />
+
+  <!-- Second segment of the same layer, chosen from the gap table in docs/astra/ROADMAP.md (#12) rather than from a
+       name list: these two framework names carry the runtime's own iOS-flavoured grey set, which reads as a seam
+       against the surfaces this library paints. Measured on 26.10.9 - SurfaceBackground #FFFFFFFF (Light) /
+       #FF2C2C2E (Dark) against our SolidBackgroundFillColorBaseBrush #FFF3F3F3 / #FF202020; ControlBorder #FFD2D2D7 /
+       #FF48484A against our ControlStrokeColorDefaultBrush #0F000000 / #12FFFFFF. The framework reads both names in
+       code as well as in its own dictionaries (6 and 7 name lookups plus 18 and 8 markup reads), and every one of
+       those sites is a surface this library cannot re-template - popups and application-level fills - so the name is
+       the only lever. What these rows must NOT do is freeze: a StaticResource alias forwards the instance the palette
+       holds, and the theme flip re-tints SolidColorBrush instances in place (Themes/FluentThemeManager.cs
+       RefreshPalette), which is why the gradient behind an alias is a documented deviation above. That property is
+       asserted, not assumed, by AstraFrameworkNameResolutionTests.A_retint_row_follows_the_theme_flip_to_the_variant_it_declares. -->
+  <StaticResource x:Key="SurfaceBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
+  <StaticResource x:Key="ControlBorder" ResourceKey="ControlStrokeColorDefaultBrush" />
 </ResourceDictionary>

@@ -2477,3 +2477,28 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 两条未取到的 Light 读数**不猜**：`TextSecondary[Light]` 与 `TextOnAccent[Light]` 在下一轮补测。
 `ControlBorderFocused` 已在第一段发布（`bfca518`），不在表内。第二轮的范围因此定为 `SurfaceBackground` +
 `ControlBorder`（差距实、无已知事实依赖框架那两支灰），`TextOnAccent` 挪到"先量表面填充"之后。
+
+## A2 别名层第二段（#12）：`SurfaceBackground` + `ControlBorder` 发布，全套像素主张一格没动
+
+按上面差距表挑的两个名字（不是按清单顺序）：框架那两支是 `#FFFFFFFF`/`#FF2C2C2E` 与 `#FFD2D2D7`/`#FF48484A`，
+接成我们的 `SolidBackgroundFillColorBaseBrush`（`#FFF3F3F3`/`#FF202020`）与
+`ControlStrokeColorDefaultBrush`（`#0F000000`/`#12FFFFFF`）。
+
+- **构建**：全量 `0 个警告 / 0 个错误`。
+- **行为**：新测点 `A_retint_row_follows_the_theme_flip_to_the_variant_it_declares` 6 条腿（3 个已发布名字 × 两档），
+  断的不是"能解析"而是**别名转发的就是调色板当下那支实例** + 在两档里都是 `SolidColorBrush` —— 也就是
+  "别名会不会冻在建字典那一档"从假设变成断言（渐变那条冻结偏差是同一个机制的反例，写在
+  `ThemeResources/FrameworkRetints.jalxaml` 的注释里）。
+  **A/B 有牙**：把 `ControlBorder` 临时改指 `SolidBackgroundFillColorBaseBrush` → 恰好它的 Light/Dark 两条腿红、
+  其余 7 条绿；还原后 9/9 绿，`git diff` 只剩本批 14 行插入，无突变残留。
+- **视觉**：本批**没有任何既有像素主张变化**——1488/1488 里包含暗色表面、弹层半径、表格族底那批断言，全部原样绿。
+  这既说明我们已断言到的表面都不读这两个框架名字（都被自己模板接管），也是一条**未覆盖警告**：
+  框架用这两个名字画的那些面**还没有像素断言**，所以"接上了"目前只有树上读数。
+- **硬件输入**：不动输入路径。
+- **清单/漂移**：`keys.md` 1299 → **1301**；三档 `checked=True`；整套 **1488/1488、0 跳过、8 m 41 s**，末行
+  `All Astra gates passed.`。
+
+不声称：#58（"暗色下表格族那片表面仍是白的"）**不随本批结**——那处的读数是按既有断言原样绿推出来的，
+不等于那片表面现在跟上了 `#202020`；要结它得在暗色下对那块表面重新成像。`TextOnAccent` 仍按上一节的判定停在
+"先量它铺在哪支强调填充上"；`TextPrimary`/`TextSecondary`/`TextDisabled` 的代价（2 + 5 条事实）照旧记在普查表旁，
+每一轮都要一起改，不许放松旧断言混过去。

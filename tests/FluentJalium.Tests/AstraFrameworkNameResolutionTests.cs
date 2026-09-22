@@ -125,6 +125,46 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
         });
     }
 
+    /// <summary>
+    /// The published retint rows, in both variants, read as the instance the palette holds for their twin and at the
+    /// colour that variant declares. The instance half is what makes ApplyAccent and OverrideBrush keep working
+    /// through the framework's name; the colour half is the part that could silently break: a StaticResource alias
+    /// forwards one object, so if the theme flip ever stopped re-tinting that object in place the name would freeze on
+    /// the variant that happened to be active at load - which is the exact failure the gradient deviation above
+    /// documents for non-solid brushes. One leg per variant, applied before the read, because a built-but-not-shown
+    /// element keeps whatever it resolved at build time.
+    /// </summary>
+    [Theory]
+    [InlineData("ControlBorderFocused", "AccentFillColorDefaultBrush", FluentThemeVariant.Light)]
+    [InlineData("ControlBorderFocused", "AccentFillColorDefaultBrush", FluentThemeVariant.Dark)]
+    [InlineData("SurfaceBackground", "SolidBackgroundFillColorBaseBrush", FluentThemeVariant.Light)]
+    [InlineData("SurfaceBackground", "SolidBackgroundFillColorBaseBrush", FluentThemeVariant.Dark)]
+    [InlineData("ControlBorder", "ControlStrokeColorDefaultBrush", FluentThemeVariant.Light)]
+    [InlineData("ControlBorder", "ControlStrokeColorDefaultBrush", FluentThemeVariant.Dark)]
+    public void A_retint_row_follows_the_theme_flip_to_the_variant_it_declares(string frameworkName, string twinKey, FluentThemeVariant variant)
+    {
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(variant);
+            try
+            {
+                var twin = FluentThemeManager.GetBrush(twinKey);
+                var published = Application.Current!.TryFindResource(frameworkName);
+                Assert.True(ReferenceEquals(twin, published),
+                    $"{frameworkName} [{variant}] is not the {twinKey} instance its row names - the alias forwarded an "
+                    + "object the palette no longer uses, i.e. it froze at load");
+                // Solid in both variants: a non-solid twin behind an alias is the freeze case the gradient deviation
+                // in FrameworkRetints.jalxaml documents, so the type is part of the claim, not an implementation detail.
+                var solid = Assert.IsType<SolidColorBrush>(published);
+                Assert.Equal(Assert.IsType<SolidColorBrush>(twin).Color, solid.Color);
+            }
+            finally
+            {
+                FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            }
+        });
+    }
+
     // ---------- helpers ----------
 
     /// <summary>
