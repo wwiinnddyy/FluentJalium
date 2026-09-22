@@ -2565,3 +2565,13 @@ Fluent 值——所以别名层的价值是实的，但每个名字要单独判�
 调色板三档 `checked=True`、`keys.md is current: 1301 canonical lines.`、末行 `All Astra gates passed.`、
 脚本自记 `GATE-EXIT=0`。测点数**未增**（1489 与 Tokens 段同值）——Materials 与 Motion 两页是声明式内容 + 一个按钮，
 没带新测点，所以这次绿只证明"新页没破坏任何既有主张"，不证明它们自己正确；它们各自的凭据仍是上面写的那三条不声称。
+
+### Tokens 页的缺口①已结：101 个 token 在两档下逐一解析成 Brush 现在是断言
+
+`AstraGalleryTokenTests.Every_token_the_grid_paints_from_resolves_to_a_brush`（两档各一条腿，Gallery 类 **9/9 绿**）。
+上面"#10 第一段"那节写的不声称①（"页内诊断行没人读也算绿"）就此结掉：读数条仍给人看，但它不再是唯一会发现的途径。
+
+过程里踩了一次自己的规矩：**给测试类加 fixture 参数必须同时挂 `[Collection(...)]`**。第一次跑整类 3 条全红，
+消息是 `The following constructor parameters did not present matching fixture data`——包括**原本绿的**漂移闸，
+因为类构造失败会带走整类。补 `[Collection(AstraThemeRuntimeCollection.Name)]` 后 9/9。
+这条对 #47/#35 那族也有用：整类同刻同因失败，不是 flake，别按 flake 记。
