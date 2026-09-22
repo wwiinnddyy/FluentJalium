@@ -1,0 +1,422 @@
+=== A. pointer-shaped types (5309 Jalium types scanned) ===
+interna Jalium.UI.ContentElement+<get_TouchesCapturedWithin>d__59 : Object
+interna Jalium.UI.ContentElement+TouchCaptureRecord : ValueType
+interna Jalium.UI.Controls.Effects.TouchRippleAdorner : Adorner
+interna Jalium.UI.Controls.Effects.TouchRippleHost : Object
+interna Jalium.UI.Controls.Effects.TouchRippleRegistration : Object
+interna Jalium.UI.Controls.InkCanvas+InkCollectionStylusPlugIn : StylusPlugIn
+interna Jalium.UI.Controls.InkCanvas+TouchStrokeSession : Object
+interna Jalium.UI.Controls.Platform.AndroidTouchInput : ValueType
+interna Jalium.UI.Controls.Platform.AndroidTouchInputQueue : Object
+interna Jalium.UI.Controls.PointerInputData : ValueType
+interna Jalium.UI.Controls.PointerInputKind : Enum
+interna Jalium.UI.Controls.Primitives.PopupWindow+PointerManipulationSession : Object
+interna Jalium.UI.Controls.Win32PointerInterop : Object
+interna Jalium.UI.Controls.WindowInputDispatcher+PointerGestureTracker : Object
+interna Jalium.UI.Controls.WindowInputDispatcher+PointerManipulationSession : Object
+public  Jalium.UI.Documents.ITextPointer : -
+public  Jalium.UI.Documents.TextPointer : ContentPosition
+public  Jalium.UI.Documents.TextPointerContext : Enum
+public  Jalium.UI.Hosting.TouchModeOptions : Object
+public  Jalium.UI.Ink.EllipseStylusShape : StylusShape
+interna Jalium.UI.Ink.RealTimeInkPreviewStylusPlugIn : StylusPlugIn
+public  Jalium.UI.Ink.RectangleStylusShape : StylusShape
+public  Jalium.UI.Ink.StylusPointsReplacedEventArgs : EventArgs
+public  Jalium.UI.Ink.StylusPointsReplacedEventHandler : MulticastDelegate
+public  Jalium.UI.Ink.StylusShape : Object
+public  Jalium.UI.Ink.StylusTip : Enum
+public  Jalium.UI.Input.IInputLanguageSource : -
+public  Jalium.UI.Input.InputDevice : DispatcherObject
+public  Jalium.UI.Input.InputLanguageManager : DispatcherObject
+public  Jalium.UI.Input.InputManager : DispatcherObject
+interna Jalium.UI.Input.InputManager+NullMouseDevice : MouseDevice
+interna Jalium.UI.Input.Internal.Gestures.GestureRecognizer+PointerState : Object
+public  Jalium.UI.Input.Mouse : Object
+interna Jalium.UI.Input.Mouse+SystemMouseDevice : MouseDevice
+public  Jalium.UI.Input.MouseAction : Enum
+public  Jalium.UI.Input.MouseActionConverter : TypeConverter
+public  Jalium.UI.Input.MouseActionValueSerializer : ValueSerializer
+public  Jalium.UI.Input.MouseBinding : InputBinding
+public  Jalium.UI.Input.MouseButton : Enum
+public  Jalium.UI.Input.MouseButtonEventArgs : MouseEventArgs
+public  Jalium.UI.Input.MouseButtonEventHandler : MulticastDelegate
+public  Jalium.UI.Input.MouseButtonState : Enum
+public  Jalium.UI.Input.MouseButtonStates : ValueType
+public  Jalium.UI.Input.MouseDevice : InputDevice
+public  Jalium.UI.Input.MouseEventArgs : InputEventArgs
+public  Jalium.UI.Input.MouseEventHandler : MulticastDelegate
+public  Jalium.UI.Input.MouseGesture : InputGesture
+public  Jalium.UI.Input.MouseGestureConverter : TypeConverter
+public  Jalium.UI.Input.MouseGestureValueSerializer : ValueSerializer
+public  Jalium.UI.Input.MouseWheelEventArgs : MouseEventArgs
+public  Jalium.UI.Input.MouseWheelEventHandler : MulticastDelegate
+interna Jalium.UI.Input.NativeTouchInterop : Object
+public  Jalium.UI.Input.PointerCancelEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerCancelEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerCaptureLostEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerCaptureLostEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerDeviceType : Enum
+public  Jalium.UI.Input.PointerDownEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerDownEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerEventArgs : InputEventArgs
+public  Jalium.UI.Input.PointerEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerEvents : Object
+public  Jalium.UI.Input.PointerMoveEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerMoveEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerMovedEventArgs : PointerMoveEventArgs
+public  Jalium.UI.Input.PointerMovedEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerPoint : Object
+public  Jalium.UI.Input.PointerPointProperties : Object
+public  Jalium.UI.Input.PointerPressedEventArgs : PointerDownEventArgs
+public  Jalium.UI.Input.PointerPressedEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerReleasedEventArgs : PointerUpEventArgs
+public  Jalium.UI.Input.PointerReleasedEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerStylusDevice : Object
+interna Jalium.UI.Input.PointerTouchDevice : TouchDevice
+public  Jalium.UI.Input.PointerUpEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerUpEventHandler : MulticastDelegate
+public  Jalium.UI.Input.PointerUpdateKind : Enum
+public  Jalium.UI.Input.PointerWheelChangedEventArgs : PointerEventArgs
+public  Jalium.UI.Input.PointerWheelChangedEventHandler : MulticastDelegate
+public  Jalium.UI.Input.Stylus : Object
+public  Jalium.UI.Input.StylusButton : Object
+public  Jalium.UI.Input.StylusButtonCollection : ReadOnlyCollection`1
+public  Jalium.UI.Input.StylusButtonEventArgs : StylusEventArgs
+public  Jalium.UI.Input.StylusButtonEventHandler : MulticastDelegate
+public  Jalium.UI.Input.StylusButtonState : Enum
+public  Jalium.UI.Input.StylusDevice : InputDevice
+public  Jalium.UI.Input.StylusDeviceCollection : ReadOnlyCollection`1
+public  Jalium.UI.Input.StylusDownEventArgs : StylusEventArgs
+public  Jalium.UI.Input.StylusDownEventHandler : MulticastDelegate
+public  Jalium.UI.Input.StylusEventArgs : InputEventArgs
+public  Jalium.UI.Input.StylusEventHandler : MulticastDelegate
+public  Jalium.UI.Input.StylusPlugIns.RawStylusInput : Object
+public  Jalium.UI.Input.StylusPlugIns.RealTimeStylus : Object
+interna Jalium.UI.Input.StylusPlugIns.RealTimeStylus+StylusSession : Object
+public  Jalium.UI.Input.StylusPlugIns.RealTimeStylusProcessResult : Object
+public  Jalium.UI.Input.StylusPlugIns.StylusInputAction : Enum
+public  Jalium.UI.Input.StylusPlugIns.StylusPlugIn : Object
+public  Jalium.UI.Input.StylusPlugIns.StylusPlugInCollection : Collection`1
+public  Jalium.UI.Input.StylusPoint : ValueType
+public  Jalium.UI.Input.StylusPointCollection : Collection`1
+public  Jalium.UI.Input.StylusPointDescription : Object
+public  Jalium.UI.Input.StylusPointProperties : Object
+public  Jalium.UI.Input.StylusPointProperty : Object
+interna Jalium.UI.Input.StylusPointPropertyIds : Object
+public  Jalium.UI.Input.StylusPointPropertyInfo : StylusPointProperty
+public  Jalium.UI.Input.StylusPointPropertyUnit : Enum
+public  Jalium.UI.Input.StylusSystemGestureEventArgs : StylusEventArgs
+public  Jalium.UI.Input.StylusSystemGestureEventHandler : MulticastDelegate
+public  Jalium.UI.Input.Touch : Object
+public  Jalium.UI.Input.TouchAction : Enum
+public  Jalium.UI.Input.TouchCapabilities : Object
+public  Jalium.UI.Input.TouchDevice : InputDevice
+public  Jalium.UI.Input.TouchEventArgs : InputEventArgs
+public  Jalium.UI.Input.TouchEventHandler : MulticastDelegate
+public  Jalium.UI.Input.TouchEvents : Object
+public  Jalium.UI.Input.TouchFrameEventArgs : EventArgs
+public  Jalium.UI.Input.TouchFrameEventHandler : MulticastDelegate
+public  Jalium.UI.Input.TouchHelper : Object
+public  Jalium.UI.Input.TouchPoint : Object
+public  Jalium.UI.Input.TouchPointCollection : Collection`1
+public  Jalium.UI.Media.StyleSimulations : Enum
+interna Jalium.UI.UIElement+<get_TouchesCapturedWithin>d__787 : Object
+interna Jalium.UI.Window+PointerManipulationSession : Object
+public  Microsoft.Web.WebView2.Core.CoreWebView2MouseEventKind : Enum
+public  Microsoft.Web.WebView2.Core.CoreWebView2MouseEventVirtualKeys : Enum
+
+=== B. methods whose name says 'input arrives from inside' ===
+Jalium.UI.DependencyProperty: private SynthesizeValueTypeDefault(Type) [static]
+Jalium.UI.DragDrop: public AddGiveFeedbackHandler(DependencyObject,GiveFeedbackEventHandler) [static]
+Jalium.UI.DragDrop: public RemoveGiveFeedbackHandler(DependencyObject,GiveFeedbackEventHandler) [static]
+Jalium.UI.DragDrop: public AddPreviewGiveFeedbackHandler(DependencyObject,GiveFeedbackEventHandler) [static]
+Jalium.UI.DragDrop: public RemovePreviewGiveFeedbackHandler(DependencyObject,GiveFeedbackEventHandler) [static]
+Jalium.UI.UIElement: public add_PreviewManipulationBoundaryFeedback(EventHandler`1)
+Jalium.UI.UIElement: public remove_PreviewManipulationBoundaryFeedback(EventHandler`1)
+Jalium.UI.UIElement: public add_ManipulationBoundaryFeedback(EventHandler`1)
+Jalium.UI.UIElement: public remove_ManipulationBoundaryFeedback(EventHandler`1)
+Jalium.UI.UIElement: public add_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement: public remove_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement: protected OnGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.UIElement: protected OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs)
+Jalium.UI.UIElement: public add_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement: public remove_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement: protected OnPreviewGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.WeakEventManager: protected DeliverEvent(Object,EventArgs)
+Jalium.UI.WeakEventManager: protected DeliverEventToList(Object,EventArgs,ListenerList)
+Jalium.UI.UIElement3D: public add_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement3D: public remove_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement3D: public add_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement3D: public remove_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.UIElement3D: private OnPreviewGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.UIElement3D: private OnGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.ContentElement: public add_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.ContentElement: public remove_PreviewGiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.ContentElement: public add_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.ContentElement: public remove_GiveFeedback(GiveFeedbackEventHandler)
+Jalium.UI.ContentElement: private OnPreviewGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.ContentElement: private OnGiveFeedback(GiveFeedbackEventArgs)
+Jalium.UI.DragDropPlatform: internal RaiseLinuxGiveFeedback(DependencyObject,DragDropEffects) [static]
+Jalium.UI.OleDragSource: private DS_GiveFeedback(IntPtr,UInt32) [static]
+Jalium.UI.Window: private TryInjectSnapProxyNcMouseMessage(UInt32,IntPtr)
+Jalium.UI.Window: private SynthesizeMouseFromTouch(PlatformEvent,Point,ModifierKeys,Boolean,Boolean,UIElement,Int32)
+Jalium.UI.Window: internal InjectAndroidImeComposition(String,Int32)
+Jalium.UI.Window: internal InjectAndroidImeCommit(String)
+Jalium.UI.Window: internal InjectAndroidImeFinishComposing()
+Jalium.UI.Window: internal InjectAndroidImeDeleteSurrounding(Int32,Int32)
+Jalium.UI.Window: internal InjectAndroidImeEditorAction(TextInputReturnKeyType)
+Jalium.UI.Window: protected OnManipulationBoundaryFeedback(ManipulationBoundaryFeedbackEventArgs)
+Jalium.UI.Interop.NativeMethods: internal AndroidInjectTouch(Int32,Single,Single,Single,Int32,Int32,Int32,Int64) [static]
+Jalium.UI.Interop.NativeMethods: internal AndroidInjectKey(Int32,Int32,Int32,Int32,Int32) [static]
+Jalium.UI.Interop.NativeMethods: internal AndroidInjectChar(UInt32) [static]
+Jalium.UI.Interop.RenderTargetDrawingContext: internal get_UploadFaultInjector() [static]
+Jalium.UI.Interop.RenderTargetDrawingContext: internal set_UploadFaultInjector(Func`2) [static]
+Jalium.UI.Documents.Glyphs: public get_StyleSimulations()
+Jalium.UI.Documents.Glyphs: public set_StyleSimulations(StyleSimulations)
+Jalium.UI.Threading.DispatcherCore: private EnqueueObservedOperation(DispatcherOperation,CancellationToken)
+Jalium.UI.Threading.DispatcherCore: private EnqueueOperation(DispatcherOperation)
+Jalium.UI.Input.ManipulationDeltaEventArgs: public ReportBoundaryFeedback(ManipulationDelta)
+Jalium.UI.Input.ManipulationBoundaryFeedbackEventArgs: public get_BoundaryFeedback()
+Jalium.UI.Input.ManipulationBoundaryFeedbackEventArgs: internal set_BoundaryFeedback(ManipulationDelta)
+Jalium.UI.Input.Stylus: public GetIsTapFeedbackEnabled(DependencyObject) [static]
+Jalium.UI.Input.Stylus: public SetIsTapFeedbackEnabled(DependencyObject,Boolean) [static]
+Jalium.UI.Input.Stylus: public GetIsTouchFeedbackEnabled(DependencyObject) [static]
+Jalium.UI.Input.Stylus: public SetIsTouchFeedbackEnabled(DependencyObject,Boolean) [static]
+Jalium.UI.Controls.FontDialog: public get_AllowSimulations()
+Jalium.UI.Controls.FontDialog: public set_AllowSimulations(Boolean)
+Jalium.UI.Controls.ManipulationInertiaProcessor: private RaiseBoundaryFeedback(ManipulationDelta)
+Jalium.UI.Controls.WindowInputDispatcher: private RaiseBoundaryFeedback(UIElement,ManipulationDelta) [static]
+(total 103)
+
+=== C. On*Pointer* / On*Mouse* virtuals on element and control types ===
+Border: private OnLgWindowMouseMove(Object,MouseEventArgs)
+Border: private OnLgWindowMouseLeave(Object,MouseEventArgs)
+Border: private OnLgMouseDown(Object,MouseButtonEventArgs)
+Border: private OnLgMouseUp(Object,MouseButtonEventArgs)
+Border: private OnLgLostMouseCapture(Object,RoutedEventArgs)
+Calendar: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+Calendar: private OnMouseMoveHandler(Object,MouseEventArgs)
+Calendar: private OnMouseLeaveHandler(Object,MouseEventArgs)
+AxisChartBase: private OnMouseWheelHandler(Object,MouseWheelEventArgs)
+AxisChartBase: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+AxisChartBase: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+AxisChartBase: private OnMouseMoveHandler(Object,MouseEventArgs)
+BarChart: private OnBarChartMouseMove(Object,MouseEventArgs)
+BarChart: private OnBarChartMouseLeave(Object,MouseEventArgs)
+Heatmap: private OnHeatmapMouseMove(Object,MouseEventArgs)
+Heatmap: private OnHeatmapMouseLeave(Object,MouseEventArgs)
+LineChart: private OnLineChartMouseMove(Object,MouseEventArgs)
+LineChart: private OnLineChartMouseLeave(Object,MouseEventArgs)
+NetworkGraph: private OnGraphMouseDown(Object,MouseButtonEventArgs)
+NetworkGraph: private OnGraphMouseUp(Object,MouseButtonEventArgs)
+NetworkGraph: private OnGraphMouseMove(Object,MouseEventArgs)
+PieChart: private OnPieChartMouseMove(Object,MouseEventArgs)
+PieChart: private OnPieChartMouseLeave(Object,MouseEventArgs)
+ScatterPlot: private OnScatterMouseMove(Object,MouseEventArgs)
+ScatterPlot: private OnScatterMouseLeave(Object,MouseEventArgs)
+TreeMap: private OnTreeMapMouseMove(Object,MouseEventArgs)
+TreeMap: private OnTreeMapMouseLeave(Object,MouseEventArgs)
+ColorPicker: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+ColorPicker: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+ColorPicker: private OnMouseMoveHandler(Object,MouseEventArgs)
+ComboBox: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+ComboBox: private OnMouseMoveHandler(Object,MouseEventArgs)
+ComboBoxItem: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+ComboBoxItem: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+ComboBoxItem: private OnMouseEnterHandler(Object,MouseEventArgs)
+ComboBoxItem: private OnMouseLeaveHandler(Object,MouseEventArgs)
+ComboBoxItem: protected OnLostMouseCapture()
+Control: private OnMouseDoubleClickThunk(Object,MouseButtonEventArgs) [static]
+Control: private OnPreviewMouseDoubleClickThunk(Object,MouseButtonEventArgs) [static]
+Control: protected OnMouseDoubleClick(MouseButtonEventArgs)
+Control: protected OnPreviewMouseDoubleClick(MouseButtonEventArgs)
+DataGrid: protected OnIsMouseCapturedChanged(DependencyPropertyChangedEventArgs)
+DataGrid: protected OnMouseMove(MouseEventArgs)
+DataGrid: private OnRowMouseDown(Object,MouseButtonEventArgs)
+DatePicker: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+DevToolsWindow: private OnTargetPreviewMouseMove(Object,RoutedEventArgs)
+DevToolsWindow: private OnTargetPreviewMouseDown(Object,RoutedEventArgs)
+DevToolsWindow: private OnRulerTargetMouseMove(Object,RoutedEventArgs)
+DevToolsWindow: private OnRulerTargetMouseDown(Object,RoutedEventArgs)
+DevToolsWindow: private OnColorPickerTargetMouseDown(Object,RoutedEventArgs)
+InspectorRowContainer: private OnExpanderMouseDown(Object,MouseButtonEventArgs)
+DiffViewer: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+DiffViewer: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+DiffViewer: private OnMouseMoveHandler(Object,MouseEventArgs)
+DiffViewer: private OnMouseWheelHandler(Object,MouseWheelEventArgs)
+DockItem: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+DockItem: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+DockItem: private OnMouseMoveHandler(Object,MouseEventArgs)
+DockItem: private OnMouseLeaveHandler(Object,MouseEventArgs)
+DockItem: protected OnLostMouseCapture()
+DockItem: protected OnIsMouseOverChanged(Boolean,Boolean)
+DockTabPanel: private OnMouseWheelHandler(Object,MouseWheelEventArgs)
+DockTabPanel: private OnPanelMouseDown(Object,MouseButtonEventArgs)
+EditControl: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+EditControl: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+EditControl: private OnMouseMoveHandler(Object,MouseEventArgs)
+EditControl: private OnMouseLeaveHandler(Object,MouseEventArgs)
+EditControl: private OnMouseWheelHandler(Object,MouseWheelEventArgs)
+Expander: private OnHeaderMouseDown(Object,MouseButtonEventArgs)
+GridViewHeaderRowPresenter: protected OnMouseLeftButtonDown(MouseButtonEventArgs)
+GridViewHeaderRowPresenter: protected OnMouseMove(MouseEventArgs)
+GridViewHeaderRowPresenter: protected OnMouseLeftButtonUp(MouseButtonEventArgs)
+HexEditor: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+HexEditor: private OnMouseUpHandler(Object,MouseButtonEventArgs)
+HexEditor: private OnMouseMoveHandler(Object,MouseEventArgs)
+HexEditor: private OnMouseWheelHandler(Object,MouseWheelEventArgs)
+HyperlinkButton: protected OnMouseEnter(MouseEventArgs)
+HyperlinkButton: protected OnMouseLeave(MouseEventArgs)
+InfoBar: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+InkCanvas: private OnMouseDownHandler(Object,MouseButtonEventArgs)
+(total 300)
+
+=== D. routed events a synthetic raise could target (Pointer / Mouse in the field name) ===
+Jalium.UI.ContentElement.GotMouseCaptureEvent : public
+Jalium.UI.ContentElement.GotTouchCaptureEvent : public
+Jalium.UI.ContentElement.LostMouseCaptureEvent : public
+Jalium.UI.ContentElement.LostTouchCaptureEvent : public
+Jalium.UI.ContentElement.MouseDownEvent : public
+Jalium.UI.ContentElement.MouseEnterEvent : public
+Jalium.UI.ContentElement.MouseLeaveEvent : public
+Jalium.UI.ContentElement.MouseLeftButtonDownEvent : public
+Jalium.UI.ContentElement.MouseLeftButtonUpEvent : public
+Jalium.UI.ContentElement.MouseMoveEvent : public
+Jalium.UI.ContentElement.MouseRightButtonDownEvent : public
+Jalium.UI.ContentElement.MouseRightButtonUpEvent : public
+Jalium.UI.ContentElement.MouseUpEvent : public
+Jalium.UI.ContentElement.MouseWheelEvent : public
+Jalium.UI.ContentElement.PreviewMouseDownEvent : public
+Jalium.UI.ContentElement.PreviewMouseLeftButtonDownEvent : public
+Jalium.UI.ContentElement.PreviewMouseLeftButtonUpEvent : public
+Jalium.UI.ContentElement.PreviewMouseMoveEvent : public
+Jalium.UI.ContentElement.PreviewMouseRightButtonDownEvent : public
+Jalium.UI.ContentElement.PreviewMouseRightButtonUpEvent : public
+Jalium.UI.ContentElement.PreviewMouseUpEvent : public
+Jalium.UI.ContentElement.PreviewMouseWheelEvent : public
+Jalium.UI.ContentElement.PreviewTouchDownEvent : public
+Jalium.UI.ContentElement.PreviewTouchMoveEvent : public
+Jalium.UI.ContentElement.PreviewTouchUpEvent : public
+Jalium.UI.ContentElement.TouchDownEvent : public
+Jalium.UI.ContentElement.TouchEnterEvent : public
+Jalium.UI.ContentElement.TouchLeaveEvent : public
+Jalium.UI.ContentElement.TouchMoveEvent : public
+Jalium.UI.ContentElement.TouchUpEvent : public
+Jalium.UI.Controls.Charts.ChartBase.DataPointHoverEvent : public
+Jalium.UI.Controls.Control.MouseDoubleClickEvent : public
+Jalium.UI.Controls.Control.PreviewMouseDoubleClickEvent : public
+Jalium.UI.Input.AccessKeyManager.AccessKeyPressedEvent : public
+Jalium.UI.Input.Mouse.GotMouseCaptureEvent : public
+Jalium.UI.Input.Mouse.LostMouseCaptureEvent : public
+Jalium.UI.Input.Mouse.MouseDownEvent : public
+Jalium.UI.Input.Mouse.MouseEnterEvent : public
+Jalium.UI.Input.Mouse.MouseLeaveEvent : public
+Jalium.UI.Input.Mouse.MouseMoveEvent : public
+Jalium.UI.Input.Mouse.MouseUpEvent : public
+Jalium.UI.Input.Mouse.MouseWheelEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseDownEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseDownOutsideCapturedElementEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseMoveEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseUpEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseUpOutsideCapturedElementEvent : public
+Jalium.UI.Input.Mouse.PreviewMouseWheelEvent : public
+Jalium.UI.Input.PointerEvents.PointerCancelEvent : public
+Jalium.UI.Input.PointerEvents.PointerCaptureLostEvent : public
+Jalium.UI.Input.PointerEvents.PointerDownEvent : public
+Jalium.UI.Input.PointerEvents.PointerEnteredEvent : public
+Jalium.UI.Input.PointerEvents.PointerExitedEvent : public
+Jalium.UI.Input.PointerEvents.PointerMoveEvent : public
+Jalium.UI.Input.PointerEvents.PointerMovedEvent : public
+Jalium.UI.Input.PointerEvents.PointerPressedEvent : public
+Jalium.UI.Input.PointerEvents.PointerReleasedEvent : public
+Jalium.UI.Input.PointerEvents.PointerUpEvent : public
+Jalium.UI.Input.PointerEvents.PointerWheelChangedEvent : public
+Jalium.UI.Input.PointerEvents.PreviewPointerCancelEvent : public
+(total routed events 144)
+
+=== E. pointer-shaped dependency properties ===
+Jalium.UI.ContentElement.AreAnyTouchesCapturedProperty : public
+Jalium.UI.ContentElement.AreAnyTouchesCapturedPropertyKey : non-public
+Jalium.UI.ContentElement.AreAnyTouchesCapturedWithinProperty : public
+Jalium.UI.ContentElement.AreAnyTouchesCapturedWithinPropertyKey : non-public
+Jalium.UI.ContentElement.AreAnyTouchesDirectlyOverProperty : public
+Jalium.UI.ContentElement.AreAnyTouchesDirectlyOverPropertyKey : non-public
+Jalium.UI.ContentElement.AreAnyTouchesOverProperty : public
+Jalium.UI.ContentElement.AreAnyTouchesOverPropertyKey : non-public
+Jalium.UI.ContentElement.IsMouseCaptureWithinProperty : public
+Jalium.UI.ContentElement.IsMouseCaptureWithinPropertyKey : non-public
+Jalium.UI.ContentElement.IsMouseCapturedProperty : public
+Jalium.UI.ContentElement.IsMouseCapturedPropertyKey : non-public
+Jalium.UI.ContentElement.IsMouseDirectlyOverProperty : public
+Jalium.UI.ContentElement.IsMouseDirectlyOverPropertyKey : non-public
+Jalium.UI.ContentElement.IsMouseOverProperty : public
+Jalium.UI.ContentElement.IsMouseOverPropertyKey : non-public
+Jalium.UI.Controls.DockItem.HoverBackgroundProperty : public
+Jalium.UI.Controls.MenuItem.IsPressedProperty : public
+Jalium.UI.Controls.NavigationViewItem.IsPressedProperty : public
+Jalium.UI.Controls.Primitives.ButtonBase.IsPressedProperty : public
+Jalium.UI.Controls.Ribbon.Ribbon.MouseOverBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.Ribbon.MouseOverBorderBrushProperty : public
+Jalium.UI.Controls.Ribbon.Ribbon.PressedBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.Ribbon.PressedBorderBrushProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuButton.MouseOverBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuButton.MouseOverBorderBrushProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuButton.PressedBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuButton.PressedBorderBrushProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuItem.MouseOverBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuItem.MouseOverBorderBrushProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuItem.PressedBackgroundProperty : public
+Jalium.UI.Controls.Ribbon.RibbonMenuItem.PressedBorderBrushProperty : public
+Jalium.UI.Controls.TabItem.HoverBackgroundProperty : public
+Jalium.UI.Input.MouseBinding.MouseActionProperty : public
+Jalium.UI.Input.Stylus.IsTouchFeedbackEnabledProperty : public
+Jalium.UI.Input.TouchHelper.IsTouchInteractiveProperty : public
+Jalium.UI.UIElement.AreAnyTouchesCapturedProperty : public
+Jalium.UI.UIElement.AreAnyTouchesCapturedPropertyKey : non-public
+Jalium.UI.UIElement.AreAnyTouchesCapturedWithinProperty : public
+Jalium.UI.UIElement.AreAnyTouchesCapturedWithinPropertyKey : non-public
+Jalium.UI.UIElement.AreAnyTouchesDirectlyOverProperty : public
+Jalium.UI.UIElement.AreAnyTouchesDirectlyOverPropertyKey : non-public
+Jalium.UI.UIElement.AreAnyTouchesOverProperty : public
+Jalium.UI.UIElement.AreAnyTouchesOverPropertyKey : non-public
+Jalium.UI.UIElement.IsMouseCaptureWithinProperty : public
+Jalium.UI.UIElement.IsMouseCaptureWithinPropertyKey : non-public
+Jalium.UI.UIElement.IsMouseCapturedProperty : public
+Jalium.UI.UIElement.IsMouseCapturedPropertyKey : non-public
+Jalium.UI.UIElement.IsMouseDirectlyOverProperty : public
+Jalium.UI.UIElement.IsMouseDirectlyOverPropertyKey : non-public
+Jalium.UI.UIElement.IsMouseOverProperty : public
+Jalium.UI.UIElement.IsMouseOverPropertyKey : non-public
+Jalium.UI.UIElement.IsPressedProperty : non-public
+Jalium.UI.UIElement.IsPressedPropertyKey : non-public
+Jalium.UI.UIElement3D.AreAnyTouchesCapturedProperty : public
+Jalium.UI.UIElement3D.AreAnyTouchesCapturedPropertyKey : non-public
+Jalium.UI.UIElement3D.AreAnyTouchesCapturedWithinProperty : public
+Jalium.UI.UIElement3D.AreAnyTouchesCapturedWithinPropertyKey : non-public
+Jalium.UI.UIElement3D.AreAnyTouchesDirectlyOverProperty : public
+Jalium.UI.UIElement3D.AreAnyTouchesDirectlyOverPropertyKey : non-public
+(total dependency properties 70)
+
+=== F. event-arg and device constructors: can a test build one? ===
+Jalium.UI.Input.PointerEventArgs (public)
+   ctors: public .ctor(PointerPoint,ModifierKeys,Int32)
+   statics: 
+Jalium.UI.Input.MouseEventArgs (public)
+   ctors: public .ctor(MouseDevice,Int32) | public .ctor(MouseDevice,Int32,StylusDevice) | public .ctor(RoutedEvent) | public .ctor(RoutedEvent,Point,MouseButtonState,MouseButtonState,MouseButtonState,MouseButtonState,MouseButtonState,ModifierKeys,Int32)
+   statics: GetVisualBoundsChain
+RawPointerEventArgs: absent
+PointerRoutedEventArgs: absent
+PointerDevice: absent
+Jalium.UI.Input.MouseDevice (public)
+   ctors: protected .ctor() | protected .ctor(InputManager)
+   statics: 
+Jalium.UI.Input.PointerPoint (public)
+   ctors: public .ctor(UInt32,Point,PointerDeviceType,Boolean,PointerPointProperties,UInt64,UInt32)
+   statics: 
+PointerUpdateEventArgs: absent
+Jalium.UI.Input.InputDevice (public)
+   ctors: protected .ctor()
+   statics: 
+Jalium.UI.Input.KeyboardDevice (public)
+   ctors: protected .ctor() | protected .ctor(InputManager)
+   statics: 

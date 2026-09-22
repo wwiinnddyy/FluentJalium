@@ -3514,3 +3514,76 @@ Dark 两条**，而且两跑都是这两条——不是随机分布。逐条对�
 `ThemeColors` 成员（那是 `The_on_accent_name_has_no_theme_colors_member…` 那条会红的时候）。
 目标项 2 的账因此清空，本库还欠的是别的三件事：#70（日历族不建树）、#72（框架排印投影偏小）、
 以及焦点环形状的余账 #68。
+
+## #13 真指针通路：进程内合成指针第一次把 hover 与 press 落到像素上（目标项 4）
+
+目标项 4 要的是"hover/press 的像素通路，只做进程内合成指针，绝不做屏幕坐标注入"。这条账之前一直是红的：
+本库唯一一份 hover 像素证据出自 `spike/PointerProbe` 的 `press` 模式，而那个模式用 user32 `SetCursorPos`
+搬真实系统光标——正是被禁的那条路。这一批把进程内那条路量到底了。
+
+### 先量可达面：`surface` 与 `route` 两次普查（`spike/PointerProbe/pointer-surface.txt`、`pointer-route.txt`）
+
+普查回答的是"框架在 26.10.9 上把什么留给了进程外的测试"：
+
+- `UIElement.IsMouseOver` 的 CLR 属性**只有 getter**，DP 字段公开但 `IsMouseOverPropertyKey` 不公开，
+  写它的 `UIElement.SetIsMouseOver(Boolean)` 是 `internal`。也就是说 hover 态没有任何公开写入口——
+  这与排印层那一轮的"没有 Double 载体"是同一类墙，只不过这次的墙在读者侧。
+- `MenuItem.IsPressed` 是 `protected set`，`NavigationViewItem.IsPressed` 只有 getter，
+  `UIElement.IsPressed` 整条不公开。**按下态同样不能从库外写进触发器读的那个格子。**
+- 事件参数这一头是开的：`PointerEventArgs(.ctor(PointerPoint,ModifierKeys,Int32))`、`PointerPoint`、
+  `MouseEventArgs` 都有公开构造器。但手 `RaiseEvent` 只能命中处理器，不能让 `IsMouseOver` 变真，
+  因而到不了状态格子——这解释了为什么"发事件"从来补不上这条账。
+- 真正的门在路由器上：`Window` 的私有字段 `_inputDispatcher` 指向 `Jalium.UI.Controls.WindowInputDispatcher`
+  （类型非公开），而这个类型上挂着**公开**的 `HandleMouseMove(Point,MouseButtonStates,ModifierKeys,Int32)` /
+  `HandleMouseDown(MouseButton,Point,…,Int32 clickCount,Int32 timestamp)` / `HandleMouseUp(…)`，
+  以及 `HandleNativeCaptureChanged(IntPtr,IntPtr)`。命中的 `IInputDispatcherHost` 成员
+  （`HitTestElement`、`ActivateMousePressedChain`、`UpdateMouseOverState`、`RaiseMouseEnterChain`）
+  全在它们下游。`PlatformEvent`（`Jalium.UI.Controls.Platform.PlatformEvent`，非公开 struct，字段全公开）
+  是这条链更上游的形状，但接它要碰 `Window.OnPlatformEvent` 这种私有方法——反射面反而更大。
+
+### 通路形状：反射只用来拿实例，状态一律由框架自己写
+
+`spike/PointerProbe` 新增 `synth` 模式。它的自我约束是：**反射只做一件事**——读出 `_inputDispatcher` 这一个
+字段；之后每一步都是调用框架自己的公开 handler，`IsMouseOver`/`IsPressed` 由路由器命中测试后写，本模式
+从头到尾没有移动过系统光标（`cursor at start` 与 `cursor at end` 同为 `(1775,507)`，`unchanged=True`），
+也没有调用 `SendInput`。
+
+### 实测读数（`spike/PointerProbe/pointer-synth.txt`，两次跑读数一致）
+
+| 步 | 读数 |
+| --- | --- |
+| 不喂任何输入 | `plain` 画面 `#FF00FF x8316`（静止色），`IsMouseOver=False` |
+| 喂 move 到按钮上 | `IsMouseOver=True`，画面 `#00FF00 x8316`（悬停色铺满内区） |
+| 一次喂入能活多久 | `immediate=True / after 1 frame=False / after 6 frames=False` |
+| 按下 | `IsPressed=True`，`Background` 有效值 `#FFA500`，画面 `#FFA500 x8316`；深度读数 `immediate=True / after 1 frame=True / re-fed+4=False` |
+| 放开 | `IsPressed=False`、`IsMouseOver=True`、画面回到 `#00FF00` |
+| move 走开 | `IsMouseOver=False`，画面回到 `#FF00FF x8316` |
+
+进出都有对应像素，且静止-悬停-按下-放开-离开五个画面互不相同，所以这不是"读到旧帧"：**进程内合成指针
+能驱动 hover 与 press 的状态格子并到达像素**，这条账的技术目标达成。
+
+### 两条如实记下的边界（不许用相邻证据替代）
+
+1. **指针喂入不是持久的**：一次 `HandleMouseMove` 大约只活一帧，之后被框架自己与原生光标状态的对账覆盖。
+   所以像素必须在"按住房"（每帧之前重喂一次）下取。这是通路的真实形状，不是可绕过的噪声：任何把它做成
+   闸口测试的写法都得照做。
+2. **Click 不落地**：`HandleMouseDown` + `HandleMouseUp` 让 `IsPressed` 到了、`Background` 到了按下刷，
+   但 `Button.Click` 一次都没触发（`clicks=0`）。把手势路径上游那个 `HandleNativeCaptureChanged` 也喂了
+   （`window.Handle` 自→自）仍然不出。**结论：这条通路能给状态与像素，给不了点击行为**——原生捕获不是
+   进程内能伪造的东西。指针点击的行为证据仍归既有那批（键鼠触发的 `Invoke`/键盘路径），这一条写进
+   Known Gaps。
+
+### 顺带量到的一族新成员（默认模板的过渡）
+
+同一批喂入下，`live`（我们出货的默认模板）的 `IsMouseOver` 到了 `True`，但画面停在中途混合色
+`#E300E3 x456` / 静止色 `#FF00FF x8296`——即使按住房、~30 帧持续喂入也不走完。这不是指针没到，是
+`TransitionProperty` 的终值不落帧，与 #35/#63/#22 同族；`plain`（同一枚按钮换掉过渡层）立刻铺满悬停色，
+正好把两种解释分开。归到 #35 名下继续追。
+
+### 这一批没有做的决定
+
+通路已经能用了，但把它做成 `tests/` 里的常驻闸口需要**在读测试里反射 `Window` 的一个私有字段**，
+而 `AGENTS.md` 对"反射进框架私有字段"有一条通用禁令（该条针对产品代码，测试侧没有先例）。因此这一批
+只把通路和读数留在 spike 里并如实记账，没有擅自把反射搬进闸口套件——搬不搬，等用户裁定。
+
+**闸口**：本批只动 `spike/`，没有碰 `src/` 或 `tests/`，因此不跑串行闸口；下次真正改产品代码时一并跑。
