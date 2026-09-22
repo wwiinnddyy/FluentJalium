@@ -3580,6 +3580,46 @@ Dark 两条**，而且两跑都是这两条——不是随机分布。逐条对�
 `TransitionProperty` 的终值不落帧，与 #35/#63/#22 同族；`plain`（同一枚按钮换掉过渡层）立刻铺满悬停色，
 正好把两种解释分开。归到 #35 名下继续追。
 
+### 上一段当场被自己的下一个读数推翻（同一批，任务 #74 就此判掉）
+
+写下上面那段之后只多做了一件事：把控件自身的属性值与模板部件的属性值并排读出来（`spike/PointerProbe`
+新增 `the built tree, one row per element` 与 `the control itself while held` 两处读数，同一份喂入、同一次运行）：
+
+```
+the control itself while held: Background=#00FF00 BorderBrush=#000000 Foreground=#000000
+Grid        200x44 over=True  bg=#FFFFFF value=from-style
+  Border[Surface] 200x44 over=True bg=#FF00FF value=from-style
+    ContentPresenter 25x20 (no Background member)
+      TextBlock 25x20 over=False bg=null value=from-style
+implicit-by-type Button: triggers=0 hoverCell=none
+DefaultButtonStyle:      triggers=3 hoverCell=3 setters on Background/Foreground/BorderBrush
+```
+
+三件事同时成立，而它们合起来不指向"过渡不落帧"：
+
+1. **悬停格子确实到达**：`Button` 自己的 `Background` 有效值就是悬停刷（`#00FF00`）。
+2. `Surface` 读回 `#FF00FF` 不是"格子没写"，而是它带着 `TransitionProperty="Background"`——
+   本库早就记过这条语义（`AstraAppBarTests.cs:980` 的注释："A transitioning property can hold an
+   interpolated brush instance for the length of the transition, so the colour is the stable reading"）。
+   而"按住房"这件事本身每次喂入都会把这段过渡**重新起头**，所以它永远停在起点色；`#E300E3 x456` 是
+   那圈描边混合，不是画面主体。
+3. 那条 `implicit-by-type Button: triggers=0` 也不是缺陷：我们的隐式行是
+   `Styles/Common.jalxaml:284` 的 `<Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}" />`，
+   格子在 `BasedOn` 上，`Triggers` 集合本身按框架语义不继承——所以"按名取的样式对象触发器为空"是
+   形状，不是失效。
+
+所以 #74 判掉：**没有新缺陷**，我上一条把它挂到 #35/#63/#22 一族是读错了一个已知语义。原来的那段文字
+按惯例留在这里不删，因为它就是下一次会踩的同一个坑的形状——"部件属性值 = 静止色"看起来完全像"格子没到达"。
+
+顺带把 #13 的一处结论也校正过来：普查说"手发路由事件到不了状态格子"，这半句**过了**。同一份测试基座里
+早就有绿灯先例（`AstraAppBarTests.cs:966` 的 `RaiseMouse` = `element.RaiseEvent(new MouseButtonEventArgs(
+Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = ... })`），它在一次 Down/Up 之后断言
+`button.IsMouseOver == True` 并且**模板部件** `root.Background` 等于 PointerOver 刷——全程只用公开 API，
+没碰反射、没动光标。也就是说：闸口套件里"hover/press 状态与其到达成像"这一档**已经有公开通路**，
+不需要为它批准反射；本批 spike 的 `HandleMouse*` 通路多出来的是**位置**那一层——命中测试、进出链
+（move 走开能落回静止色）、以及按下链——以及它量到的两条边界（喂入只活一帧、`Click` 落不下来）。
+任务 #73 因此改写：问题不再是"能不能反射"，而是"要不要把位置驱动那一层也做成常驻"。
+
 ### 这一批没有做的决定
 
 通路已经能用了，但把它做成 `tests/` 里的常驻闸口需要**在读测试里反射 `Window` 的一个私有字段**，

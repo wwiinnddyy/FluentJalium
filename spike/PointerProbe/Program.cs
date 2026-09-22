@@ -946,7 +946,8 @@ internal static class Program
         else
         {
             var liveHeld = HeldCapture(liveProbe.X, liveProbe.Y, live, false);
-            Say($"   held hover, default template: IsMouseOver={live.IsMouseOver} part bg={Hex(FirstBorder(live))} {Describe(liveHeld, live)}");
+            Say($"   held hover, default template: IsMouseOver={live.IsMouseOver} part={FirstBorder(live)?.GetType().Name ?? "none"} "
+                + $"part bg={Hex((FirstBorder(live) as Border)?.Background)} {Describe(liveHeld, live)}");
             if (live.IsMouseOver)
             {
                 // The state arrived and the surface is still mid-blend after ~30 fed frames, which is the transition
@@ -956,6 +957,59 @@ internal static class Program
             }
 
             Check(liveHeld, Hover, "synthetic hover fill on the default template", failures);
+
+            // What the "not the hover colour" reading above can and cannot mean. A frozen transition is the wrong
+            // guess to start from: #22 already retired that mechanism with a 17-cell matrix, and the blend count
+            // here is identical across runs (456 px), which a mid-flight animation would not produce but a fixed
+            // piece of geometry would. So name the elements: for every node in the built button, the Background it
+            // actually resolves, whether that value is a local one (a local value outranks our style cell), and
+            // the size the pixel crop implies.
+            Say("   the built tree, one row per element:");
+            DumpTree(live, "     ", report, 0);
+
+            // The two readings that separate "the hover cell never fired" from "it fired on the control and the
+            // template paints its part from something else": the control's own resolved fill, and the style the
+            // runtime actually applies to an implicit Button (Style reads null for an implicit style, so the cells
+            // printed by name may not be the cells governing this instance).
+            Say($"   the control itself while held: Background={Hex(live.GetValue(Control.BackgroundProperty))} "
+                + $"BorderBrush={Hex(live.GetValue(Control.BorderBrushProperty))} Foreground={Hex(live.GetValue(Control.ForegroundProperty))}");
+            var applied = new List<string>();
+            Style? byType = null;
+            foreach (var key in new object[] { typeof(Button), "DefaultButtonStyle" })
+            {
+                var candidate = Application.Current!.TryFindResource(key) as Style;
+                if (key is Type)
+                {
+                    byType = candidate;
+                }
+
+                var hoverCell = candidate?.Triggers.OfType<Trigger>().FirstOrDefault(static item => item.Property.Name == "IsMouseOver");
+                applied.Add($"{(key is Type t ? $"implicit-by-type {t.Name}" : key.ToString())}: "
+                    + (candidate is null ? "absent" : $"triggers={candidate.Triggers.Count} "
+                        + $"hoverCell={(hoverCell is null ? "none" : $"{hoverCell.Setters.Count} setters on {string.Join("/", hoverCell.Setters.OfType<Setter>().Select(static s => s.Property.Name))}")}"));
+            }
+
+            applied.Add("identity check reported after the cells block below");
+            foreach (var line in applied) Say($"   {line}");
+
+            // Surface.Background resolves to the REST brush exactly, not to a blend of rest and hover, so nothing
+            // is mid-flight: the hover setter never fired. Which property the cell watches is the next question.
+            // A Button carrying an implicit style reads Style=null, so the cells come from the theme by name.
+            var cells = live.Style ?? FluentThemeManager.GetStyle("DefaultButtonStyle");
+            Say($"   cells: style={(live.Style is null ? "implicit, read via DefaultButtonStyle" : "live.Style")} "
+                + $"setters={cells.Setters.Count} triggers={cells.Triggers.Count} "
+                + $"basedOn={(cells.BasedOn?.TargetType?.Name ?? "none")}");
+            foreach (var trigger in cells.Triggers.OfType<Trigger>())
+            {
+                Say($"     cell {trigger.Property.Name} @ {trigger.Property.OwnerType?.Name ?? "?"} "
+                    + $"when={trigger.Value} setters={trigger.Setters.Count}");
+                foreach (var setter in trigger.Setters.OfType<Setter>())
+                {
+                    Say($"        writes {setter.Property.Name} -> {setter.Value}");
+                }
+            }
+
+            Say($"   is the by-type implicit style the very object DefaultButtonStyle names? {ReferenceEquals(byType, cells)}");
         }
 
         Say("");
@@ -1092,6 +1146,64 @@ internal static class Program
 
     [DllImport("user32.dll")]
     private static extern int GetSystemMetrics(int index);
+
+    /// <summary>
+    /// One row per element of a built control: the <c>Background</c> it actually resolves, whether that value sits
+    /// on the element as a local one (a local value outranks our style cell, which is the shape this library has
+    /// been bitten by before), and the size it occupies - the last of these is what ties a row to a pixel count in
+    /// the histogram, so a fixed 456 px can be pointed at the element that draws 456 px.
+    /// </summary>
+    private static void DumpTree(Visual node, string prefix, List<string> output, int depth)
+    {
+        if (depth > 8)
+        {
+            return;
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(node); index++)
+        {
+            if (VisualTreeHelper.GetChild(node, index) is not Visual child)
+            {
+                continue;
+            }
+
+            output.Add(prefix + Row(child));
+            DumpTree(child, prefix + "  ", output, depth + 1);
+        }
+    }
+
+    private static string Row(Visual node)
+    {
+        var name = node.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance)
+            ?.GetValue(node) as string;
+        var element = node as FrameworkElement;
+        var size = element is null ? "-" : $"{element.ActualWidth:0}x{element.ActualHeight:0}";
+        var background = BackgroundPropertyOf(node.GetType());
+        if (background is null || node is not DependencyObject owner)
+        {
+            return $"{node.GetType().Name}{(string.IsNullOrEmpty(name) ? string.Empty : $"[{name}]")} {size} (no Background member)";
+        }
+
+        var local = owner.ReadLocalValue(background);
+        var hovered = node is UIElement ui ? ui.IsMouseOver : false;
+        return $"{node.GetType().Name}{(string.IsNullOrEmpty(name) ? string.Empty : $"[{name}]")} {size} over={hovered} bg={Hex(owner.GetValue(background))} "
+            + (local == DependencyProperty.UnsetValue ? "value=from-style" : "value=LOCAL");
+    }
+
+    private static DependencyProperty? BackgroundPropertyOf(Type type)
+    {
+        for (Type? current = type; current is not null; current = current.BaseType)
+        {
+            var field = current.GetField("BackgroundProperty",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            if (field?.GetValue(null) is DependencyProperty property)
+            {
+                return property;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>A template with no TransitionProperty layer, parsed from markup.</summary>
     private static ControlTemplate NoTransitionTemplate() =>

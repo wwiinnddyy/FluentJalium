@@ -20,8 +20,31 @@ HOVER=ok via swept (108,240)
    how long one feed lasts: immediate=True after 1 frame=False after 6 frames=False
 
 leg 2: the real Fluent template - the style cells this library ships are the thing being measured
-   held hover, default template: IsMouseOver=True part bg=Border 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+   held hover, default template: IsMouseOver=True part=Border part bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
    state on the default template is hover; the picture above is what the template transition settles to under a held pointer, and it is not the hover colour
+   the built tree, one row per element:
+     Grid 200x44 over=True bg=#FFFFFF value=from-style
+       Border[Surface] 200x44 over=True bg=#FF00FF value=from-style
+         ContentPresenter 25x20 (no Background member)
+           TextBlock 25x20 over=False bg=null value=from-style
+   the control itself while held: Background=#00FF00 BorderBrush=#000000 Foreground=#000000
+   implicit-by-type Button: triggers=0 hoverCell=none
+   DefaultButtonStyle: triggers=3 hoverCell=3 setters on Background/Foreground/BorderBrush
+   identity check reported after the cells block below
+   cells: style=implicit, read via DefaultButtonStyle setters=3 triggers=3 basedOn=ButtonBase
+     cell IsMouseOver @ UIElement when=True setters=3
+        writes Background -> Jalium.UI.Markup.DynamicResourceReference
+        writes Foreground -> Jalium.UI.Markup.DynamicResourceReference
+        writes BorderBrush -> Jalium.UI.Markup.DynamicResourceReference
+     cell IsPressed @ UIElement when=True setters=3
+        writes Background -> Jalium.UI.Markup.DynamicResourceReference
+        writes Foreground -> Jalium.UI.Markup.DynamicResourceReference
+        writes BorderBrush -> Jalium.UI.Markup.DynamicResourceReference
+     cell IsEnabled @ UIElement when=False setters=3
+        writes Background -> Jalium.UI.Markup.DynamicResourceReference
+        writes Foreground -> Jalium.UI.Markup.DynamicResourceReference
+        writes BorderBrush -> Jalium.UI.Markup.DynamicResourceReference
+   is the by-type implicit style the very object DefaultButtonStyle names? False
 
 leg 3: HandleMouseDown - the press chain, then Click on release
    immediately after down: plain.IsPressed=True bg=#FFA500 effective=#FFA500
@@ -30,7 +53,7 @@ leg 3: HandleMouseDown - the press chain, then Click on release
    re-fed +4:     IsPressed=False 200x44 distinct=2 top=#00FF00x8316 #000000x484
 
 leg 4: HandleMouseUp - the release has to land the click through the button's own logic
-   fed HandleNativeCaptureChanged(11276228,11276228) before releasing
+   fed HandleNativeCaptureChanged(6819442,6819442) before releasing
    plain: IsPressed=False IsMouseOver=True clicks=0 200x44 distinct=2 top=#00FF00x8316 #000000x484
 
 leg 5: move away - hover has to leave, or the state was never following the pointer
