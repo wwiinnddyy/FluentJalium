@@ -2337,16 +2337,38 @@ disabled 的表格单元与菜单项**没有**单独断言（框架在无头主�
 | `TextSecondary` | 4 `ResolveThemeBrush` + 4 `ResolveCalendarBrush` + 1 `ResolveMenuBrush` | 14 | 日历与菜单两处框架自绘的次级文本一起跟 |
 | `TextOnAccent` | 2 `ResolveThemeBrush` + 1 `ResolveCalendarBrush` | 8 | 与 `AccentBrush` 成对：反色文字只有跟着强调色走才成立 |
 | `ControlBorder` | 3 `ResolveThemeBrush` + 3 `ResolvePopupBrush` + 1 `ResolveApplicationBrush` | 18 | 描边族；已被我们重模板的控件不读它，弹层那族读 |
-| `ControlBorderFocused` | **无** | 14 | 见下面单独一条——它比"纯标记、最好别名"要糟 |
+| `ControlBorderFocused` | 6 处 `TryFindResource`（见下面的更正） | 14 | 表里原写"无代码 resolver"是**错的方向**——它只是没有 `Resolve*Brush` 形状的读点 |
 | `TextDisabled` | 4 处现取（`Menu.cs:1172`、`Calendar.cs:1000`、`Primitives/TextBoxBase.cs:3032`、`MenuFlyoutItem.cs:208`） | 未单独量 | 本批已量：一次翻掉五条老账，见上一节 |
 
-`ControlBorderFocused` 的警告单列：它在源树**没有** `Resolve*Brush` 读点，看起来是最容易别名的一个，但
-`docs/astra/adaptation/02-ceiling-raw-output.txt` 量到 `AutoCompleteBox` / `DatePicker` / `NumberBox` /
-`PasswordBox` / `TextBox` / `TimePicker` 六族的 **`.cctor -> get_ControlBorderFocused`**——值被**取进静态字段一次**，
-不是画的时候现取。静态初值取决于"类型先初始化"还是"我们的字典先并进来"，所以别名行对这一族**可能整族吃不到**
-（也可能只在首次读取之后才生效）。这条还没测，下一批动这个名字之前先按"发布别名 → 挂载 → 读焦点描边"逐族量一次，
-把吃得到/吃不到写死再决定发布。目前的处理是 DataGrid / TreeDataGrid **换宿主模板**让这条焦点线根本不在我们的树上
-（`audits/treedatagrid.md`），别名批不能假设这一步可以省。
+**普查口径本身错了半边（下一轮之前先读这条）**：判"这个名字够不够得到"不能只 grep `Resolve*Brush`。控制代码里
+按名字查资源的另一条通路是 `TryFindResource("名")`，`src/managed/Jalium.UI.Controls` 里共 **107 处**，
+名次与上表不同：`TextSecondary` 10、`AccentBrush` 9、`TextPrimary` 8、`ControlBorder` 7、`TextPlaceholder` 6、
+`ControlBorderFocused` 6、`SurfaceBackground` 4，另有本批此前完全没记到的名字 `TextPlaceholder`、
+`FocusStrokeColorOuterBrush`/`FocusStrokeColorInnerBrush`（**这两个是 WinUI token 名**）、`SelectionBackground`、
+`ControlBackground`、`CommandBarBackground`、`MenuFlyoutPresenterBackground`/`BorderBrush`、`WindowBackground`、
+`TitleBarGlyph`。**口径修正：可达性按"`TryFindResource` 或 `Resolve*Brush` 或标记 `{ThemeResource}`"三条并集算。**
+
+`ControlBorderFocused` 的专项更正：上一段那条"六族是 `.cctor` 一次性取值、别名可能整族吃不到"的警告**撤回**。
+读消费形状即可判定（`AutoCompleteBox.cs:27`/`:1328`、`DatePicker.cs:248`/`:612`、`NumberBox.cs:60`/`:1363`、
+`PasswordBox.cs:219`/`:813`、`TextBox.cs:74`/`:1702`、`TimePicker.cs:143`/`:679`）：
+
+```csharp
+private static readonly SolidColorBrush s_fallbackFocusBorderBrush = new(ThemeColors.ControlBorderFocused);
+...
+return TryFindResource("ControlBorderFocused") as Brush ?? s_fallbackFocusBorderBrush;
+```
+
+`.cctor` 里那支是 **`??` 右边的兜底**，不是取值路径；`ThemeColors.ControlBorderFocused` 本身是
+`=> Color.FromRgb(32, 114, 69)`（`#207245`，与 `08-themecolors-raw.txt` 的读数一致）的表达式属性。
+更硬的凭据是**框架自带的测试** `tests/Jalium.UI.Tests/FocusedBorderThemeTests.cs`：它
+`Assert.Same(app.Resources["ControlBorderFocused"], ResolveFocusedBorderBrush(control))`，对 AutoCompleteBox /
+DatePicker / NumberBox / PasswordBox / TextBox 五族逐个钉**实例同一性**。也就是"在应用级 `Resources` 放这个名字的刷子、
+框架就照它画"是**上游自己测过的设计入口**，不是我们撞运气——A2 别名层的立场由此从"机制可用"升为"上游背书"。
+
+仍欠的一手（不许用上面这条代替）：上面全部读自 sibling 源树，`02-ceiling-raw.txt` 的 IL 账证明 26.10.9 里 `.cctor`
+那支在，但**没证明 26.10.9 的取值路径已经是 `TryFindResource ?? 兜底` 这个形状**。发布这一行之前要在 NuGet 权威上做
+一次读数：`发布别名行 → 挂载并聚焦一个 TextBox → 读焦点描边是不是我们那支实例`。这一步没做，`ControlBorderFocused`
+就仍然只是"最该先做的那一个"，不是"已结清的那一个"。
 
 ## 判据批：别名单元吃不到 sentinel（补进 #56，2026-09-21 已提交）
 
