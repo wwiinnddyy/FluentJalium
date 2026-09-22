@@ -309,6 +309,7 @@ Popup 'PART_Popup' (Placement=Bottom)      ← 框架写本地 Width，等于控
 类型是 `ComboBoxItem`。框架还会在两处写自己的值：条目容器的 `Background`（一个本地渐变，压过样式）与
 禁用态控件前景（`#FF636366`，不是我们的 `TextControlForegroundDisabled`）。这两条都只能用
 `Assert.NotSame` 钉成"已知损失"。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 
 **框架的模板里还藏着一处行为。** 用框架模板时"选中建议 → 把补全文本写进 `Text`"（上游的
 `UpdateTextOnSelect`）存在；换模板后同一操作不再写文本（聚焦、`IsTextCompletionEnabled=true` 也不写）。
@@ -1312,6 +1313,7 @@ disabled 格因此是唯一的写者。字典侧随之把 `TextControlHeaderFore
 颜色是 `#FFAEAEB2`，而所有 disabled 行要的是 `TextFillColorDisabledBrush` = `#5C000000`。本地值排在格子前面，
 `TextBlock` 上那一个我们读得到、改不动（除非再写一个本地值，那就是伪造）。所以四条 disabled 事实钉的是**测量值**，
 并在注释里点名本该生效的行名；这是"哪天框架不再盖章，就该回到 token"的四个哨位，不是四个通过。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 
 **6 · 这批唯一肉眼可见的缺陷是 ComboBox 的占位符。** 可观测性地图（不带指针就能分得开、且不被框架盖章抢走的行）：
 `CheckBox`/`RadioButton`/`ListBoxItem`/`ListViewItem` 的状态前景除了 disabled 全部别名同一支

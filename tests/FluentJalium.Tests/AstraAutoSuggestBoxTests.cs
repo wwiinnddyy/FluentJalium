@@ -408,18 +408,22 @@ public sealed class AstraAutoSuggestBoxTests
     }
 
     /// <summary>
-    /// Framework ownership again, control level: a disabled AutoCompleteBox reports the framework's own
-    /// disabled grey, not our row. Pinning the loss instead of dropping the claim.
+    /// Control level, and the reading reversed with the sixth retint row. The framework still writes its own local
+    /// Foreground onto a disabled AutoCompleteBox, so our disabled cell still loses on precedence - that loss is
+    /// unpinned today only because the same shape is pinned four times over in AstraForegroundRoutingTests and in
+    /// AstraComboBoxTests. What changed is the value the framework's write carries: it comes from the name
+    /// TextDisabled, which forwards our disabled token, so the ink on a disabled box is ours after all. Measured
+    /// before the row as the framework's own #FF636366 (audits/autosuggestbox.md §7).
     /// </summary>
     [Fact]
-    public void A_disabled_box_keeps_the_frameworks_own_disabled_text_colour()
+    public void A_disabled_box_gets_the_frameworks_local_write_but_our_disabled_ink_in_it()
     {
         _fixture.Run(() =>
         {
             var box = Mounted();
             var disabled = (Brush)Res("TextControlForegroundDisabled")!;
             box.IsEnabled = false;
-            Assert.NotSame(disabled, box.Foreground);
+            Assert.Same(disabled, box.Foreground);
             box.IsEnabled = true;
             Assert.Same(Res("TextControlForeground"), box.Foreground);
         });

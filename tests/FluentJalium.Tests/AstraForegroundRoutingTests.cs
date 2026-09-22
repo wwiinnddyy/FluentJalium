@@ -31,22 +31,32 @@ namespace FluentJalium.Tests;
 ///
 /// What the read-back then had to admit: on a disabled control this runtime stamps the generated text with a
 /// Foreground of its own, as a local value on that element, and a local value outranks every cell - so the disabled
-/// label colour is not ours to paint. Four facts below pin that reading instead of the row, and the two states this
-/// file proves end to end are the ComboBox placeholder (Secondary against Primary, correct on both sides of the
-/// selection for the first time) and the menu icon.
+/// label colour was not ours to paint. It is now, but not through a cell: the stamp resolves the framework name
+/// <c>TextDisabled</c> per call, and the sixth row in <c>ThemeResources/FrameworkRetints.jalxaml</c> forwards that
+/// name to our own disabled token, so the value the framework writes locally is ours. Four facts below read that
+/// arrival, and the two states this file proves end to end are the ComboBox placeholder (Secondary against Primary,
+/// correct on both sides of the selection for the first time) and the menu icon.
 /// </summary>
 [Collection(AstraThemeRuntimeCollection.Name)]
 public sealed class AstraForegroundRoutingTests : IDisposable
 {
     /// <summary>
-    /// What this runtime paints on the generated text of a disabled control: measured as a local value on the
-    /// text element itself (#FFAEAEB2, with the control reading the same colour and no local value of its own),
-    /// against <c>TextFillColorDisabledBrush</c> = #5C000000, which is what the published rows ask for. A local
-    /// value outranks every cell this reader has, so the disabled label colour is the framework's, not ours, for
-    /// as long as it stamps it. The four disabled facts below pin that reading rather than the token, and each one
-    /// is the place to look if a later release stops stamping.
+    /// What a disabled control's generated text is stamped with. The stamp is still a local value on the text element
+    /// - a local value outranks every cell this reader has, so none of our cells reaches it - but since the sixth
+    /// retint row the <i>value</i> is ours: the framework takes it from the name <c>TextDisabled</c>, which now
+    /// forwards <c>TextFillColorDisabledBrush</c>. Measured pre-row as #FFAEAEB2 in Light and #FF636366 in Dark, the
+    /// framework's own opaque greys; those readings are no longer constructible through the lookup, which is why they
+    /// live in docs/astra/ROADMAP.md #12 and not in an assertion. Each of the four facts below is a place to look if
+    /// the stamp ever goes back to reading a fallback.
     /// </summary>
-    private static readonly Color FrameworkDisabledText = Color.FromRgb(0xAE, 0xAE, 0xB2);
+    private static Color DisabledStamp => ToColour("TextFillColorDisabledBrush");
+
+    /// <summary>
+    /// The same arrival one level stronger than a colour: the brush the framework stamps onto the generated label of
+    /// a disabled control is the palette instance its own disabled token holds, not a copy of it. That identity is
+    /// what keeps <c>OverrideBrush</c> and a palette refresh working on disabled text after this.
+    /// </summary>
+    private static Brush DisabledStampInstance => FluentThemeManager.GetBrush("TextFillColorDisabledBrush")!;
 
     private readonly AstraThemeRuntimeFixture _fixture;
 
@@ -83,7 +93,7 @@ public sealed class AstraForegroundRoutingTests : IDisposable
     }
 
     [Fact]
-    public void A_check_box_label_takes_the_resting_row_and_the_framework_owns_the_disabled_one()
+    public void A_check_box_label_takes_the_resting_row_and_the_disabled_one_comes_from_our_token()
     {
         _fixture.Run(() =>
         {
@@ -93,13 +103,15 @@ public sealed class AstraForegroundRoutingTests : IDisposable
 
             box.IsEnabled = false;
             PixelHarness.Settle(30);
-            // Our row is #5C000000; the text reads the framework's stamp because the stamp is a local value on it.
-            Assert.Equal(FrameworkDisabledText, ((SolidColorBrush)label.Foreground!).Color);
+            // The framework still writes this itself, as a local value the cells cannot beat - but it writes our
+            // instance, because the name it takes the value from is one of our retint rows.
+            Assert.Same(DisabledStampInstance, label.Foreground);
+            Assert.Equal(DisabledStamp, ((SolidColorBrush)label.Foreground!).Color);
         });
     }
 
     [Fact]
-    public void A_radio_button_label_takes_the_resting_row_and_the_framework_owns_the_disabled_one()
+    public void A_radio_button_label_takes_the_resting_row_and_the_disabled_one_comes_from_our_token()
     {
         _fixture.Run(() =>
         {
@@ -109,12 +121,13 @@ public sealed class AstraForegroundRoutingTests : IDisposable
 
             button.IsEnabled = false;
             PixelHarness.Settle(30);
-            Assert.Equal(FrameworkDisabledText, ((SolidColorBrush)label.Foreground!).Color);
+            Assert.Same(DisabledStampInstance, label.Foreground);
+            Assert.Equal(DisabledStamp, ((SolidColorBrush)label.Foreground!).Color);
         });
     }
 
     [Fact]
-    public void A_list_box_row_label_takes_the_resting_row_and_the_framework_owns_the_disabled_one()
+    public void A_list_box_row_label_takes_the_resting_row_and_the_disabled_one_comes_from_our_token()
     {
         _fixture.Run(() =>
         {
@@ -128,7 +141,8 @@ public sealed class AstraForegroundRoutingTests : IDisposable
 
             row.IsEnabled = false;
             PixelHarness.Settle(30);
-            Assert.Equal(FrameworkDisabledText, ((SolidColorBrush)label.Foreground!).Color);
+            Assert.Same(DisabledStampInstance, label.Foreground);
+            Assert.Equal(DisabledStamp, ((SolidColorBrush)label.Foreground!).Color);
         });
     }
 
@@ -157,7 +171,8 @@ public sealed class AstraForegroundRoutingTests : IDisposable
 
             Assert.Multiple(
                 () => Assert.Equal(ToColour("ComboBoxItemForeground"), before),
-                () => Assert.Equal(FrameworkDisabledText, after));
+                () => Assert.Same(DisabledStampInstance, label.Foreground),
+                () => Assert.Equal(DisabledStamp, after));
         });
     }
 

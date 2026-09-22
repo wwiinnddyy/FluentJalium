@@ -46,6 +46,7 @@ StaysOpenOnEdit, Text`，外加 `Selector`（`SelectedIndex/SelectedItem/IsSelec
    读回 `#FFAEAEB2`（本地值），压过样式 setter 与禁用格——`TextBox.Foreground`、
    `PasswordBox.Background` 之后这张账单的第三次。后果：`ComboBoxForegroundDisabled` 只到得了
    表面与箭头，到不了文字；`ComboBoxPlaceHolderForegroundDisabled` 无处可用，所以没抄。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 6. **合上的 ComboBox 没有弹层子树。** 关闭态在控件树里找不到 `PART_PopupBorder`，打开后整块
    `PopupRoot` 出现在窗口 `OverlayLayer` 里。关于弹层表面的断言必须从宿主窗口取，不能从控件取。
 
@@ -200,4 +201,5 @@ StaysOpenOnEdit, Text`，外加 `Selector`（`SelectedIndex/SelectedItem/IsSelec
 （`AstraForegroundRoutingTests.An_unselected_combo_box_shows_the_placeholder_row_and_a_selected_one_its_own`）。
 另两条读数同时更正本审计的旧说法：条目 disabled / selected-disabled 的字色在像素上归框架
 （`#FFAEAEB2` 那枚本地值章在生成的文字上，压过格子），而本批所有换色证据一律是**属性读回**，
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 没有一条新增像素捕获——读回值不等于像素，这条限制对上面每一句都成立。

@@ -57,6 +57,7 @@
 7. **禁用态的文字颜色仍是框架的。** `IsEnabled=false` 后控件 `Foreground` 读到框架自己的 `#FF636366`，
    不是我们的 `TextControlForegroundDisabled` 实例；重新启用后回到我们的实例。断言写成 `Assert.NotSame`，
    把损失钉住而不是不提。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 8. **换掉模板之后，"选中即回填文本"这条行为就没了。** 框架模板下 `SelectedItem = filtered[0]`（聚焦、
    `IsTextCompletionEnabled=true`）会把补全文本写进 `Text`；我们的模板下同一操作 `Text` 保持原样。
    上游叫 `UpdateTextOnSelect`，没有资源行能把它找回来——要代码。本批把它写成一条断言，防止日后当巧合。

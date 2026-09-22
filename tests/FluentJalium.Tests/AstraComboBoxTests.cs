@@ -527,24 +527,30 @@ public sealed class AstraComboBoxTests
                 () => Assert.Same(Res("ComboBoxDropDownGlyphForegroundDisabled"), Get(toggle, "Foreground")),
                 () => Assert.Equal(0d, (double)Get(Part(combo, "HighlightBackground"), "Opacity")));
 
-            // The third instance of a bill this theme keeps being handed: disabling makes the framework set
-            // its OWN Foreground on the control (#FFAEAEB2, a local value), which outranks both the style
-            // setter and the disabled cell, so ComboBoxForegroundDisabled reaches the parts that read it
-            // directly and not the text of a mounted combo. Same shape as the mounted TextBox.Foreground
-            // and the resting PasswordBox.Background (audits/textbox-passwordbox.md).
-            Assert.NotSame(Res("ComboBoxForegroundDisabled"), combo.Foreground);
+            // The third instance of a bill this theme keeps being handed, now paid back: disabling still makes the
+            // framework set its OWN Foreground on the control as a local value, which outranks both the style setter
+            // and the disabled cell, so ComboBoxForegroundDisabled still does not reach the text through our lever.
+            // What changed with the sixth retint row is the value of that local write - the framework takes it from
+            // the name TextDisabled, which forwards the same disabled token our own row forwards - so the two now
+            // hand back one and the same instance and the loss is invisible on screen. Same shape as the mounted
+            // TextBox.Foreground (AstraTextInputTests); the precedence rule itself stays pinned in
+            // AstraForegroundRoutingTests, where a cell genuinely loses.
+            Assert.Same(Res("ComboBoxForegroundDisabled"), combo.Foreground);
             var presenterForeground = CellProperty(ComboTemplate(), "SelectedIndex=-1", "self", "Foreground");
 
-            // The dropped row, measured rather than assumed: the presenter carries no local value of its
-            // own, so what it shows while disabled is the control's framework-written grey reaching it by
-            // inheritance - and that inheritance outranks nothing, while our cell would have to beat the
-            // control's local value to matter. ComboBoxPlaceHolderForegroundDisabled has no lever.
+            // The dropped row, measured rather than assumed: the presenter carries no local value of its own, so what
+            // it shows while disabled is the control's framework-written Foreground reaching it by inheritance - and
+            // that inheritance outranks nothing, while our cell would have to beat the control's local value to
+            // matter. ComboBoxPlaceHolderForegroundDisabled therefore has no lever, and it stays dropped. The sixth
+            // retint row changed what the inherited value IS, not who writes it: the control's stamp now comes from
+            // the forwarded TextDisabled name, so the two are the same instance again and the missing row costs
+            // nothing observable on this leg either.
             var unselected = Mount(new ComboBox { ItemsSource = new[] { "one", "two" } });
             unselected.IsEnabled = false;
             PixelHarness.Settle(20);
             Assert.Equal(DependencyProperty.UnsetValue,
                 Part(unselected, "PART_SelectionPresenter").ReadLocalValue(presenterForeground));
-            Assert.NotSame(Res("ComboBoxForegroundDisabled"),
+            Assert.Same(Res("ComboBoxForegroundDisabled"),
                 Part(unselected, "PART_SelectionPresenter").GetValue(presenterForeground));
         });
     }
@@ -593,14 +599,17 @@ public sealed class AstraComboBoxTests
 
             item.IsEnabled = false;
             PixelHarness.Settle(20);
-            // #FFAEAEB2, not ComboBoxItemForegroundSelectedDisabled (#5C000000): a disabled control gets its text
-            // Foreground stamped as a local value by the framework, and a local value outranks every cell. The same
-            // reading is pinned in AstraForegroundRoutingTests; before the sweep this assert passed only because the
-            // cell it exercised was dead.
+            // Reversed by the sixth retint row, and the wording matters: a disabled control still gets its text
+            // Foreground stamped by the framework as a local value, and a local value still outranks every cell -
+            // our cell loses exactly as it did before. What it loses is now nothing visible, because the value the
+            // framework stamps comes from the name TextDisabled, which forwards TextFillColorDisabledBrush: the
+            // same instance ComboBoxItemForegroundSelectedDisabled's own row forwards. Before the row this read
+            // #FFAEAEB2 against the cell's #5C000000. AstraForegroundRoutingTests keeps pinning the precedence rule
+            // itself, where a cell still loses something.
             Assert.Multiple(
                 () => Assert.Same(Res("ComboBoxItemBackgroundSelectedDisabled"), Get(surface, "Background")),
-                () => Assert.Equal(Color.FromRgb(0xAE, 0xAE, 0xB2),
-                    ((SolidColorBrush)text.GetValue(foreground)!).Color));
+                () => Assert.Same(Res("ComboBoxItemForegroundSelectedDisabled"),
+                    text.GetValue(foreground)));
         });
     }
 

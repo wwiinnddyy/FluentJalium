@@ -165,6 +165,7 @@ PasswordBox 没有可用模板（框架自绘），所以三格写在 `Style.Tri
 - **不声称禁用文字色是我们的**：上游那格本身是 `#5DFEFEFE`（Light）/`#5C010101`（Dark）的 Color，我们换成
   `#5C000000` 的 `TextFillColorDisabledBrush`；更要紧的是挂树读回发现框架在禁用态给 `TextBox.Foreground`
   设了本地值 `#FFAEAEB2`，所以我们连"换成我们自己那支"都没做到（§3.5）。同理不声称 `CaretBrush` 覆盖得掉。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 - **不声称 PasswordBox 的悬停/聚焦面画对了**：它静息 `Background` 读回就是框架的 `#D9FFFFFF`，
   三格写的是 Style trigger，对本地值谁赢没有测；本段没给它任何像素断言。
 - 不声称底边线与上游逐位一致：上游是 2px 绝对坐标渐变，我们是 1px 元素 + 聚焦时加厚边框，
@@ -176,6 +177,7 @@ PasswordBox 没有可用模板（框架自绘），所以三格写在 `Style.Tri
 - 已处理（含更正）：`ComboBoxPadding` 不是自造键，是上游键被抄错了值，现已按上游 `12,5,0,7` 落回
   `ThemeResources/ComboBox.jalxaml`；`RadioButtonContentMargin` 确实是自造键，AutoSuggestBox 批已删行收尾。
 - 同类账单第三例：禁用一个挂载的 ComboBox，框架在它自己的 `Foreground` 上写 `#FFAEAEB2` 本地值，
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
   压过样式 setter 与禁用格（`audits/combobox.md` §0.5）。
 - 未归因：带文本的 TextBox 在 `Build` + 实时翻转 `IsEnabled` + `Settle` 的组合下挂满 60 秒看门狗；
   去掉文本与实时翻转后同一组断言 568 ms 通过。文本捕获贵是 `adaptation/06` 量过的，这一条没有单独定位。

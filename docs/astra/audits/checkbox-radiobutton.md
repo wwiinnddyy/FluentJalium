@@ -187,6 +187,7 @@ CheckBox 的 `Padding` 由 `CheckBoxPadding` 行驱动。
 `*CheckBackgroundStroke*` 行，所以本更正不声称任何描边像素变化；**(b)** disabled 两行的标签色不归我们，
 框架在禁用时给生成的文字盖了本地值 `#FFAEAEB2`（行要的是 `#5C000000`），本地值压过格子，
 `AstraForegroundRoutingTests` 四条 disabled 事实钉的是这个读数而不是 token。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。
 结构闸口：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`。
 
 ## 更正（属性死写批 2026-09-20，`adaptation/00` S1-g）

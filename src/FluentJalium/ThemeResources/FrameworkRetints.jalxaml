@@ -91,4 +91,27 @@
        Solidity: TextFillColorPrimaryBrush is a SolidColorBrush in both variants (#E4000000 / #FFFFFFFF), so the
        freeze-on-a-gradient case documented above does not apply here. -->
   <StaticResource x:Key="TextPrimary" ResourceKey="TextFillColorPrimaryBrush" />
+
+  <!-- Sixth segment. The question this row answers is narrower than "does anything read the name" and was the reason
+       it sat unshipped one round longer: the framework's disabled ink reads #FFAEAEB2, which is EXACTLY the value the
+       name TextDisabled projects to, so the colour alone cannot tell a by-name lookup from a direct ThemeColors read
+       - and only the first of those two is something this layer can redirect. Measured on 26.10.9 by installing a
+       probe under the name and toggling IsEnabled, on the four surfaces whose labels this library re-templates but
+       never owns the text element of: CheckBox, RadioButton, ListBoxItem and ComboBoxItem. Each generated label
+       reads resting #E4000000 (ours) while enabled, and with the probe installed its disabled stamp becomes
+       #FF112233 - the probe INSTANCE, not just the colour - then returns to #FFAEAEB2 when the probe is removed.
+       So the stamp is a local value on that element (which is why no cell of ours could ever reach it, the reading
+       #51/#55 recorded) but the VALUE it stamps is looked up by name at stamp time, and the name is this row's
+       property. Alias, not redefine: TextFillColorDisabledBrush carries the WinUI literal (#5C000000 / #5DFFFFFF,
+       translucent) where the framework's projection is an opaque macOS-flavoured grey (#FFAEAEB2 / #FF636366), so
+       forwarding the palette instance moves four real surfaces toward 1:1 and keeps them following ApplyAccent and
+       RefreshPalette. Two legs of the same measurement came back empty and are recorded as empty rather than as
+       support: a disabled TextBox offers no generated TextBlock to read at all (its ink lives in the framework's
+       text host), and a disabled DataGridColumnHeader already paints our own #5C000000 - our style row wins there, so
+       the framework never stamps it. No pixel witness exists either: a disabled MenuFlyoutItem's crop is page colour
+       edge to edge (0 pixels of the grey, 0 of the probe), the #50 wall again, so this row's grade is
+       stamp-value-level, like TextPrimary's is, not like TextSecondary's. The blast radius is by design and was
+       enumerated by running the suite rather than by grepping literals: every fact that pinned "the framework owns
+       the disabled label colour" flips to ours, which is that row landing, not a regression. -->
+  <StaticResource x:Key="TextDisabled" ResourceKey="TextFillColorDisabledBrush" />
 </ResourceDictionary>

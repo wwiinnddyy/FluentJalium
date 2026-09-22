@@ -145,6 +145,8 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     [InlineData("TextSecondary", "TextFillColorSecondaryBrush", FluentThemeVariant.Dark)]
     [InlineData("TextPrimary", "TextFillColorPrimaryBrush", FluentThemeVariant.Light)]
     [InlineData("TextPrimary", "TextFillColorPrimaryBrush", FluentThemeVariant.Dark)]
+    [InlineData("TextDisabled", "TextFillColorDisabledBrush", FluentThemeVariant.Light)]
+    [InlineData("TextDisabled", "TextFillColorDisabledBrush", FluentThemeVariant.Dark)]
     public void A_retint_row_follows_the_theme_flip_to_the_variant_it_declares(string frameworkName, string twinKey, FluentThemeVariant variant)
     {
         _fixture.Run(() =>
@@ -232,14 +234,15 @@ public sealed class AstraFrameworkNameResolutionTests : IDisposable
     /// cannot already re-template - not a fidelity cost. If a shipped control starts consuming one of these names, the
     /// row is worth shipping; the measured colours below are the baseline that decision revisits.
     ///
-    /// This theory used to carry a <c>TextSecondary</c> leg. That leg was deleted rather than re-pinned when the row
-    /// shipped, because every claim it made is now false by design and the same instrument covers the published case
-    /// better: <see cref="A_retint_row_follows_the_theme_flip_to_the_variant_it_declares" /> pins the name to the
-    /// palette instance in both variants, and
-    /// <see cref="The_flyout_rows_own_text_is_painted_from_the_secondary_text_name" /> pins what it paints.
+    /// This theory used to carry a <c>TextSecondary</c> leg and then a <c>TextDisabled</c> leg. Both were deleted
+    /// rather than re-pinned when their rows shipped, because every claim in this fact is false by design for a
+    /// published name and the same instrument covers the published case better:
+    /// <see cref="A_retint_row_follows_the_theme_flip_to_the_variant_it_declares" /> pins each name to the palette
+    /// instance in both variants, and for <c>TextDisabled</c> the reader itself is a live control's generated label -
+    /// four facts in <c>AstraForegroundRoutingTests</c> read the stamp back as our instance on a disabled
+    /// CheckBox / RadioButton / ListBoxItem / ComboBoxItem.
     /// </summary>
     [Theory]
-    [InlineData("TextDisabled", "TextFillColorDisabledBrush", 0xAE, 0xAE, 0xB2, 0x63, 0x63, 0x66)]
     [InlineData("TextOnAccent", "TextOnAccentFillColorPrimaryBrush", 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF)]
     public void A_remaining_text_name_is_a_live_projection_but_not_our_token(
         string frameworkName, string twinKey, byte lr, byte lg, byte lb, byte dr, byte dg, byte db)

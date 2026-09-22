@@ -3182,3 +3182,57 @@ build `0 警告 / 0 错误` → 整套 **1534/1534**（0 失败 0 跳过、7 m 1
 一个值是本运行时不认的标记（`XamlAutoFontFamily` 会静默变成一个不存在的族名）；② "数值令牌进不来"要改成
 "markup 进不来、代码进得来"，这决定了以后想兑现那七个键名该往哪走；③ `audited` 图例里那句"至少一条像素断言"
 在文本行上是不可满足的，改定义这件事与受益行同批提交并摆出理由，不留成一条永远不会有人达标的死规则。
+
+## #12 A2 别名层第六轮：`TextDisabled → TextFillColorDisabledBrush` 发行——它翻掉五条"禁用墨不归我们"的事实（2026-09-22）
+
+任务 #65 卡在同一个问题上：这一层每个名字发行之前都要答"谁在按名查"，而 `TextDisabled` 的读者一直没量到。
+前四轮的量法是"装探针→看像素/看属性"，对这个名字失效，因为**它的读数与不发行时的读数同色**：
+`#FFAEAEB2`（Light）既是框架那个名字的投影，也可能是 `ThemeColors` 直读的结果，颜色本身分不开这两条路。
+
+- **分开它们的是实例，不是颜色。** 临时仪器（一次性诊断类，跑完即删）把一枚 `#FF112233` 探针刷装到
+  `Application.Resources["TextDisabled"]` 上，再禁用 CheckBox / RadioButton / ListBoxItem / ComboBoxItem：
+  四张生成的标签前景全部变成探针，且**就是探针那个实例**；撤掉探针回到 `#FFAEAEB2`。
+  结论：框架盖章时**每次按名查**，与 `ControlBorderFocused`、`TextPrimary` 同一条路 → 别名行有读者，该发行。
+- **两条空腿照实记，不当证据用。** ① `TextBox` 没有生成的 `TextBlock` 可读，它的前景是框架写在**控件自己**
+  身上的本地值（同一条名，同一个结果：`Assert.NotSame` 从此读 `Assert.Same`）；② 禁用的
+  `DataGridColumnHeader` 在发行前就已经画我们的 `#5C000000`，这一路不产生"读者"证据。
+- **发行**：`ThemeResources/FrameworkRetints.jalxaml` 第六段，`keys.md` 1307 → **1308**（7 段 → 8 段别名行）。
+- **翻账清单**（十条断言换向 + 三处事实改名 + 八段文档改判）：
+  `AstraForegroundRoutingTests` 四条 disabled 事实（名也从"the framework owns the disabled one"改成
+  "comes from our token"）、`AstraTextInputTests` 的禁用 TextBox、`AstraComboBoxTests` 的禁用控件与
+  选中-禁用条目两处、`AstraDataGridTests` 的禁用宿主、`AstraAutoSuggestBoxTests` 的禁用盒（这条是**全量闸口
+  才抓到的**：我先跑的过滤集没含这个类，事实名 `A_disabled_box_keeps_the_frameworks_own_disabled_text_colour`
+  已整体改写）、`AstraFrameworkNameResolutionTests` 把 `TextDisabled` 从"未发行的活投影"里删掉并补两条
+  两档跟随主题的行腿。文档侧在 `adaptation/00`、`audits/{combobox,listbox,listview,checkbox-radiobutton,
+  textbox-passwordbox,autosuggestbox}.md` 各挂一条带日期的改判注，历史读数保留。
+- **优先级这件事没有翻。** 框架仍然在禁用时写本地值，本地值仍然压过我们所有格子；翻掉的是"那个值是谁的"，
+  不是"谁赢"。所以 `AstraDataGridTests` 里"宿主禁用不落子元素格子"那条 `NotSame` 照旧红不了也照旧留着，
+  `AstraComboBoxTests` 里"占位符禁用行没有杠杆"的结论也照旧——只是这根杠杆的两端现在同值，看不见差别。
+- **新增一条判据**：别名行的到达证明必须是**实例同一性**（`Assert.Same(我们的 token, 框架写下的那个值)`），
+  颜色相等不足以区分"按名查"与"同名巧合"。上一轮 `TextPrimary` 的"证据等级比上一行低"就低在这里，
+  这一轮把 `Assert.Same` 做成了四条事实的主断言。
+- **四类证据**：构建——见下节闸口读数；行为——挂载控件的 DP 读回（含实例同一性）；视觉——**零条**，
+  一枚禁用 `MenuFlyoutItem` 的裁片从头到尾是页面色（#50 字形墨不打印），所以这一级的证据只到"值到达"；
+  硬件输入——无。
+- **不声称**：① 不声称任何禁用墨像素；② `ListViewItem` 那一路本批**未复量**，其审计里的 `#FFAEAEB2`
+  读数原样保留（不据邻居证据改口）；③ 不声称 `AutoCompleteBox` 建议项底色因此可主题化（那是框架本地渐变，
+  与本轮无关）；④ 不声称上游那档 Color 数值被逐位复刻——我们转发的是自己调色板里那支 WinUI 字面值。
+
+### TextDisabled 发行批的串行闸口读数（2026-09-22）
+
+`tools/Test-AstraGates.ps1`（`spike/GalleryRender/gate-textdisabled2.log`，包装器自记 **`GATE-EXIT=0`**）：
+build `0 警告 / 0 错误` → 整套 **1535/1535**（0 失败 0 跳过、7 m 32 s）→ 页闸 `PASS 13 pages x 2 variants,
+0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1308 canonical lines.` → `All Astra gates passed.`。
+测点总数与上一批同为 1535：这一批只换向断言、不新增测点（四条 Same 换向 + 两档主题腿补进既有 Theory）。
+
+**第一跑停在 test 段，1 条红**（`gate-textdisabled.log`，1535 中 1 红）：
+`AstraAutoSuggestBoxTests.A_disabled_box_keeps_the_frameworks_own_disabled_text_colour`。
+我先跑的过滤集（ForegroundRouting / TextInput / ComboBox / DataGrid / FrameworkNameResolution）已经把十条红全部
+抓到并钉好，漏了这一类——**这一条正好把"过滤集等于爆炸半径"这个想法证伪了**：改名换向这类账要由全量闸口收尾，
+不能由我按名字猜出来的子集收尾。补钉后才是上面这一份读数。
+
+**`AstraTextInkTests` 那族的不稳定照实记**：整套第一跑红过 `A_buttons_text_owes_it_no_pixels(Dark)`，
+单独重跑时同一批腿又换成 `A_buttons_text_owes_it_no_pixels(Light)` 红、菜单腿全绿，且红消息是
+"控件自己的表面没到页面上"——而消息里打印的直方图明明白白有 8296 个表面像素。同一仪器在不同跑序里指向不同腿，
+这是 #47/#35 那族的形状（顺序相关），不是本批别名行的后果：本批两跑里该类其余腿都绿。
+不据此声称已归因，机制账仍挂在 #47/#35。

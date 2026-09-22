@@ -141,4 +141,5 @@ CommonStates 六格（287-346）**只写两样**：`BorderBackground` 的 Fill+O
 写到 `ListViewItem` 自己身上，标签由生成的 `TextBlock` 继承取到；行名与行值一字未动，键清单不变。
 不声称这 5 条改变了像素：这些状态字色除 disabled 全别名同一支 `TextFillColorPrimaryBrush`，换点读回相同；
 disabled 那一条另有框架在生成的文字上盖的本地值（`#FFAEAEB2`）挡在前面。
+  **（2026-09-22 边界）** 同一路由的名字改判发生在 CheckBox / RadioButton / ListBoxItem / ComboBoxItem 四类生成标签上；ListViewItem 这一条**本批未复量**，不据邻居证据改口，所以这里保留原读数。
 闸口：`AstraGateTests.State_cells_name_properties_the_template_parts_actually_have`。

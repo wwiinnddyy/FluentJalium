@@ -221,12 +221,14 @@ public sealed class AstraTextInputTests
             Assert.Same(_fixture.Application.TryFindResource("TextControlBorderBrushDisabled"), border.BorderBrush);
             Assert.Same(_fixture.Application.TryFindResource("TextControlBorderBrushDisabled"), edge.Background);
 
-            // Measured, and not what the cell asks for: our trigger writes TextControlForegroundDisabled
-            // (#5C000000) into the control's Foreground, and the reading off the mounted box comes back the
-            // framework's own disabled grey (#FFAEAEB2). The native defaults we hand back to Jalium set that
-            // locally, and a local value outranks a template trigger - so the disabled text colour is not
-            // ours, and the key on the setter is not enough to claim it.
-            Assert.NotSame(_fixture.Application.TryFindResource("TextControlForegroundDisabled"), box.Foreground);
+            // Measured, and it reads the other way than it did before the sixth retint row: our trigger writes
+            // TextControlForegroundDisabled (#5C000000) into the control's Foreground, and the framework still
+            // overwrites that with a local value of its own - a local value outranks a template trigger, so the
+            // disabled text colour is still not delivered by our cell. What changed is the value the framework's
+            // own write carries: it takes it from the name TextDisabled, which now forwards our disabled token, so
+            // the instance on the mounted box is the palette's. The precedence loss is real and invisible here;
+            // it is pinned where it still costs something, in AstraForegroundRoutingTests.
+            Assert.Same(_fixture.Application.TryFindResource("TextControlForegroundDisabled"), box.Foreground);
         });
     }
 

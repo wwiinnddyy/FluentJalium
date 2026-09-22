@@ -118,3 +118,4 @@ select/gutter/itemstyle/theme/itemtmpl/attach）。
 同批的 TreeView 度量（S1-e 第 7 条）是本更正的出处，列表族当时留的任务 #31 现已结。
 限制照记：状态字色除 disabled 全别名同一支 `TextFillColorPrimaryBrush`，所以换点读回相同、
 本批不声称这 6 条改变了像素；disabled 那一条被框架在生成的文字上盖的本地值（`#FFAEAEB2`）挡住，不归我们。
+  **（2026-09-22 改判，第六段别名行）** 框架那次本地写入取值走的名字是 `TextDisabled`，而 `ThemeResources/FrameworkRetints.jalxaml` 已把它转发到 `TextFillColorDisabledBrush`：本地值仍然是本地值、仍然压过格子，但它的内容现在是我们的那支。读回证据在 `AstraForegroundRoutingTests`（四类生成标签，`Assert.Same`）、`AstraTextInputTests`、`AstraComboBoxTests`、`AstraDataGridTests`、`AstraAutoSuggestBoxTests`。像素侧仍无证据（#50 字形墨不打印）。

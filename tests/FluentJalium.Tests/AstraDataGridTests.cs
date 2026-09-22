@@ -381,8 +381,10 @@ public sealed class AstraDataGridTests : IDisposable
     /// Two losses, both measured rather than assumed. A disabled host does not carry its IsEnabled down to the
     /// cells and headers on this runtime, so the disabled cells of those styles can only be proven by disabling the
     /// element in its own right; and the host's own Foreground is a LOCAL write the framework makes when it is
-    /// disabled (#FFAEAEB2, the same bill TextBox, ComboBox and NumberBox paid - adaptation/00's precedence rule),
-    /// which outranks our cell. Both are pinned here instead of dropped, and audits/datagrid.md §4 names them.
+    /// disabled (the same bill TextBox, ComboBox and NumberBox paid - adaptation/00's precedence rule), which
+    /// outranks our cell. Since the sixth retint row that local write carries our disabled token, because the name
+    /// the framework resolves it from is one we forward, so the host leg is now correct on screen while the cell leg
+    /// still is not. Both are pinned here instead of dropped, and audits/datagrid.md §4 names them.
     /// </summary>
     [Fact]
     public void A_disabled_element_takes_the_disabled_rows_while_a_disabled_host_only_moves_the_frameworks_local()
@@ -411,11 +413,14 @@ public sealed class AstraDataGridTests : IDisposable
             Assert.Multiple(
                 // Host IsEnabled does reach the children's own IsEnabled...
                 () => Assert.False(cell.IsEnabled),
-                // ...but our disabled cells do not then land on the host path: the framework writes its own
-                // #FFAEAEB2 locally, and the cell keeps the resting brush our style set.
+                // ...but our disabled cells do not then land on the host path: the framework writes its own Foreground
+                // locally on the host, and the cell keeps the resting brush our style set. On the host itself the
+                // local write now carries our instance (the sixth retint row forwards the name the framework reads),
+                // so this leg is the one that still costs something: the cell's ink stays at rest.
                 () => Assert.NotSame(Brush("DataGridRowForegroundDisabled"), cell.Foreground),
-                () => Assert.NotSame(Brush("DataGridRowForegroundDisabled"), grid.Foreground),
-                () => Assert.Equal(Color.FromRgb(0xAE, 0xAE, 0xB2), Assert.IsType<SolidColorBrush>(grid.Foreground).Color));
+                () => Assert.Same(Brush("DataGridRowForegroundDisabled"), grid.Foreground),
+                () => Assert.Equal(Assert.IsType<SolidColorBrush>(Brush("TextFillColorDisabledBrush")).Color,
+                    Assert.IsType<SolidColorBrush>(grid.Foreground).Color));
             grid.IsEnabled = true;
             PixelHarness.Settle(20);
         });
