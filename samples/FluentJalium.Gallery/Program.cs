@@ -3,6 +3,7 @@ using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Interop;
 using Jalium.UI.Markup;
+using Jalium.UI.Threading;
 
 namespace FluentJalium.Gallery;
 
@@ -17,12 +18,31 @@ internal static class Program
 
         var application = new Application();
         FluentThemeManager.Apply(application);
+
+        // TEMPORARY DIAGNOSTIC, NOT FOR COMMIT: pin the start theme before the first frame, then flip on a live window.
+        var startTheme = Environment.GetEnvironmentVariable("ASTRA_START_THEME");
+        if (startTheme == "light") FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+        if (startTheme == "dark") FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+
         var window = new MainWindow();
         var startPage = Option(args, "--page");
         if (startPage != null) window.SetStartPage(startPage);
         application.MainWindow = window;
         window.Show();
         window.Activate();
+
+        if (Environment.GetEnvironmentVariable("ASTRA_FLIP_MS") is { } flip && int.TryParse(flip, out var flipMs))
+        {
+            var target = Environment.GetEnvironmentVariable("ASTRA_FLIP_TO") == "light"
+                ? FluentThemeVariant.Light
+                : FluentThemeVariant.Dark;
+            var timer = new DispatcherTimer(
+                TimeSpan.FromMilliseconds(flipMs), DispatcherPriority.Background,
+                (_, _) => FluentThemeManager.ApplyTheme(target),
+                Dispatcher.CurrentDispatcher);
+            timer.Start();
+        }
+
         return application.Run();
     }
 

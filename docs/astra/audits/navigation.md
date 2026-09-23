@@ -107,7 +107,7 @@
 ## 5 · 四类证据
 
 - **构建**：串行闸口 `tools/Test-AstraGates.ps1`（本批末尾一次），`docs/astra/adaptation/s1k-navigation-raw.txt` 收了读数。
-- **行为/结构**：`AstraNavigationTests` 78 例（4 例原有布局契约 + 74 例本批）：
+- **行为/结构**：`AstraNavigationTests` 80 例（4 例原有布局契约 + 74 例本批 + 2 例 #94）：
   19+1 条键逐名"已发布"、45+5 条逐名"不得发布"、别名**同一实例**（8 条 `Assert.Same`）、
   半径读回（条目 + 模板 `Root`，且 ≠ `ControlCornerRadius`）、`NavigationViewItemButtonMargin` 落到 `item.Margin`、
   指示条几何钉在动画器常数上（`NavigationIndicatorAnimator.RestingHeight` == 模板 16 == 上游行 16）、
@@ -115,6 +115,7 @@
   写的时候踩到两条闸口外的账：见下面"两条 harness 读数"。
 - **像素**：选中行相对未选中的**同一个色键增量** 8 220 px（`#EAEAEA` = SubtleFillColorSecondary 5.54% 叠在 pane 的
   `#F3F3F3` 上），阈值取 6 000；品牌绿 `#207245` 0 px；指示条那 1×8 那个点采样到的就是强调色刷的 RGB。
+  #94 另加两条：实时换档把条目的墨交给图标（删掉交付那一行即红），图标自带前景时不被覆盖（去掉判据即红）。
 - **视觉/Gallery**：`Catalog.json` 两条 `NavigationView`/`NavigationItem` 行改指本审计并补齐 gaps；
   Gallery 侧栏就是这个控件本身，`Test-AstraGallerySmoke.ps1` 跑 `navigation` 页干净关窗。
 
@@ -130,8 +131,8 @@
    （并行任务 #13 还没通）。
 2. **圆角只量到属性，没量到像素**：`Root` 边框的 `CornerRadius` 读回 8，8 DIP 圆角在角上真的把填充留出去了，
    这一条没有采样（`PixelAt` 的角点采样在下一批补，宁可不写也不猜）。
-3. **图标是否跟着前景状态变色没读**：继承链把 `Foreground` 带到标签是量过的（原有 no-wrap 那条），
-   到 `SymbolIcon` 内部没有读。
+3. **图标是否跟着前景状态变色**：条目前景换档时图标不重着色这条已经读到像素并修掉了（#94，见 §10）；
+   仍未读的是 hover / pressed 状态下图标跟不跟标签一起变（§10 的测点只覆盖 Light↔Dark）。
 4. **pane 背衬是纯色不是亚克力**：上游 `NavigationViewDefaultPaneBackground`=`AcrylicInAppFillColorDefaultBrush`；
    本批不接（材质摸底未做），差一层透明/模糊。
 5. **高对比未测**：本层的别名向下指到 `HighContrast.map` 已重映射的 token，但导航这一族在 HC 下的读数一次都没量。
@@ -151,3 +152,41 @@ parts=0`；`s0y-outstanding-names.txt:16`：`templateLock=Void:null-or-void`，1
 没有这个原生类型"，这句在 NavigationView 上不成立），改写 `audited`，并把这条判断连它的读数写在 §9，
 而不是留在标签里当结论。
 
+## 10 · 用户可见缺陷 #94：实时换档时侧栏图标不重新着色
+
+用户报的现象：浅色下侧栏图标不是黑的，切到深色这些图标还是黑的。两边都对上了，只是方向相反——
+**图标停在它第一次落笔那一档的墨上**，标签照常换，图标不动。
+
+读数分三层，各占一类证据：
+
+1. **解析层（不是缺陷）**：从派生类调 `GetEffectiveForeground()`，在一棵活树上挂载 Light、翻 Dark、再翻回 Light，
+   三次读到的都是**当前档**的刷（`#E4000000` / `#FFFFFFFF` / `#E4000000`），而图标自己的 `Foreground` 一直是
+   `<null>`（`spike/NavIconRecolor/probe-ink.log`）。也就是说框架那条"沿视觉树上溯到某个 `Control` 的 `Foreground`"
+   是通的，答案一直是对的。
+2. **像素层（缺陷在这）**：进程内 `RenderTargetBitmap` 看不见它——它重跑一遍渲染，拿到的永远是当前档。
+   只有抓屏能回答"用户看见什么"。`spike/NavIconRecolor/shoot.ps1` 把 Gallery 的起始档钉在开窗之前，
+   再在活窗口上翻档，两次抓屏按图标列（物理 x 349-415、y 200-610，只有 pane 底色、选中胶囊与字形墨）数颜色：
+
+   | 腿 | pane 底色 | 字形墨 | 判读 |
+   |---|---|---|---|
+   | 无修法：Light 起手、未翻档 | `#F3F3F3` 21567 | `#1A1A1A` 463 | 挂载时是对的 |
+   | 无修法：同一窗口实时翻到 Dark | `#202020` 21563 | `#030303` 463、`#0B0B0B` 129 | **深色 pane 上一片黑墨** |
+   | 有修法：Light → Dark | `#F3F3F3` / `#202020` | `#1A1A1A` 463 → `#FFFFFF` 545 | 跟档 |
+   | 有修法：Dark → Light | `#202020` / `#F3F3F3` | `#FFFFFF` 545 → `#1A1A1A` 463 | 跟档 |
+
+   早一版脚本把起始档放在 `window.Show()` 之后才应用，于是首帧是 Dark，六枚图标全部量到 `#FFFFFF` 636 落在
+   `#F3F3F3` 的 pane 上——同一个缺陷的反方向。两条腿的计数逐行对得上（`545 / 127 / 119 / 103 / 91 / 89`），
+   这说明量的确实是同一批像素。
+3. **机制**：`IconElement` 只在**自己**的 `Foreground` 变化时 `InvalidateVisual()`；换档改的是条目的属性，
+   图标没有属性变化就没有重绘，屏幕上留着上一次落笔的墨。所以修法不是"补一次 `InvalidateVisual()`"，
+   而是把条目的墨交给图标的 `Foreground`——这条运行时里只有"值变了"这一条路既换值又标脏，而且留下一个
+   读得到的值给回归事实（`Controls/Navigation/FluentNavigationItem.cs:OnIconChanged`）。图标自带前景时不覆盖：
+   那是本地值，上游也让它优先。
+
+突变见证（`spike/NavIconRecolor/teeth.sh`，两条事实各自只被自己的突变弄红）：交付那一行换成空块 →
+只有换档那条红，报 "the pane icon carries `<null>` while its item moved to `#E4000000`"；去掉"图标自带墨"的判据 →
+只有保留那条红。每一腿都打印测试工程输出目录里 `FluentJalium.dll` 的 sha1，证明跑的就是重建后的那份。
+
+一条踩过的坑要留字：第一次做这个 A/B 时只 `dotnet build src/FluentJalium` 再用 `dotnet test --no-build` 跑，
+测试进程加载的还是上一版 `FluentJalium.dll`，突变根本没进被测进程，于是把一条有牙的事实读成了哑的。
+要刷新生效的是**测试工程**的构建，且必须有"消费到的 DLL 变了"的见证。

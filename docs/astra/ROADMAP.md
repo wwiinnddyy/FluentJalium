@@ -4293,10 +4293,12 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 ### (b) 该干还没干的那批：不是"做不到"，别混进 (a)
 
 #8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#62 的上游复现提报、#68/#73/#75/#76 的修法本身、
-#80 的帧数守卫、#82 的读取路线定案，以及 #56 那支量完之后**换进去**的三条：`TabView.jalxaml:38`、`:71` 两行禁用格
-（7.6c 的判据对它们是**预测**，本批仍没量）、同文件 `:203` 那两格选中前景已由 #91 出事实并转入"已量到"
-（`audits/foreground.md` 7.6f）、hover / pressed 那六行照旧等真指针通路（#13），
-以及 #89 那条"模板触发器里的禁用前景格改不动"的修法。
+#80 的帧数守卫、#82 的读取路线定案，以及 #56 那支量完之后**换进去**的几条：`TabView.jalxaml:38` 那行禁用格
+（7.6c 的判据对它是**预测**，#92 也没量到——它的载体只在溢出时实现）、同文件 `:203` 那两格选中前景已由 #91 出事实
+并转入"已量到"（`audits/foreground.md` 7.6f）、`:210` 两行部件禁用格与 `:71` 已由 #92 量到（`:71` 判成死格，
+要不要清它是另一次决定）、hover / pressed 那六行照旧等真指针通路（#13）、
+#89 那条"模板触发器里的禁用前景格改不动"的修法，以及 #94 修完侧栏之后**没量**的其余图标宿主（#95：
+`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178` 的 `IconHost`）。
 
 ### 这一节自己的 Known Gap
 
@@ -4705,3 +4707,48 @@ All Astra gates passed.   GATE-EXIT=0
 2. **测点数 1589 里含 #92 那 2 条**（`:210` 两行部件禁用格）；上一节写的"本批不占闸口"从此作废。
 3. 这一跑没有给任何**视觉**主张加证据：页闸判的是"我们的令牌上了屏 / 框架强调绿没上屏 / 上游占位符没上屏"，
    不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
+
+## #94（用户报的可见缺陷）侧栏图标实时换档不重着色：墨停在第一次落笔那一档，修法是把条目的墨交给图标（2026-09-23）
+
+用户的原话是"浅色下侧栏图标不是黑色，切深色这些图标还是黑色的"。两边都复现到了，而且**是同一个缺陷的两个方向**：
+图标上的墨冻在**它第一次落笔那一档**，标签照常换档。`audits/navigation.md` §10 收了三层读数，一句结论：
+`IconElement` 那条"沿视觉树上溯到祖先 `Control` 的 `Foreground`"的解析**一直是对的**（派生类探针在活树上三读
+`#E4000000` / `#FFFFFFFF` / `#E4000000`，`spike/NavIconRecolor/probe-ink.log`），坏在**没人让图标重绘**——
+框架只在图标自己的 `Foreground` 变化时 `InvalidateVisual()`，而换档改的是条目的属性。
+
+### 为什么修法不是补一次 `InvalidateVisual()`
+
+这条运行时里"值变了"是唯一既换值又标脏的路；只标脏的话屏幕上或许对了，但没有任何可回归读到的值——
+一个断言如果只能靠抓屏证伪，它守不住任何东西。所以 `FluentNavigationItem.OnIconChanged` 把条目的 `Foreground`
+用一条 `RelativeSource` 之外的显式绑定交给图标（`TextInput.jalxaml:210` 是这种祖先绑定的先例），
+并且**只在图标自己没有本地前景时**交——上游也让图标自带的墨优先。
+
+### 四类证据
+
+- **构建**：`dotnet build samples/FluentJalium.Gallery` 与 `dotnet build tests/FluentJalium.Tests` 各 `0 个警告 / 0 个错误`。
+- **行为**：`AstraNavigationTests` 78 → **80** 例（`A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to`
+  与 `A_pane_icon_that_arrives_with_its_own_ink_keeps_it`），两条各被自己的突变弄红：交付那行换成空块 → 只红换档那条
+  （报 `carries <null> while its item moved to #E4000000`）；去掉"图标自带墨"的判据 → 只红保留那条。
+  仪器 `spike/NavIconRecolor/mutate.py` + `teeth.sh`，每腿打印测试输出目录里 `FluentJalium.dll` 的 sha1 当"突变确实进了被测进程"的见证。
+- **视觉（抓屏，唯一能看见这缺陷的通路）**：`spike/NavIconRecolor/{shoot.ps1,hist.ps1,ab-pixels.md}`。
+  图标列逐色计数：无修法时 Light 起手 `#1A1A1A` 463（挂载就对）、同一窗口翻到 Dark 后 `#030303` 463 落在 `#202020` 的 pane 上
+  （**用户报的那一片黑**）；有修法两条腿 `#1A1A1A` 463 ↔ `#FFFFFF` 545 双向跟档。进程内 `RenderTargetBitmap` 看不见它——
+  它重跑一遍渲染，拿到的永远是当前档，所以 #50 那条"字形量不到墨"的账与这里的"屏幕看得见"并不冲突。
+- **硬件输入**：零，全用 `FluentThemeManager.ApplyTheme` 驱动。
+
+### 一处方法账（这条把上一轮的错判翻回来了）
+
+上一轮同一对修法与事实的 A/B 得到"事实是哑的"，原因是**只重建了 `src/FluentJalium` 就用 `dotnet test --no-build` 跑**：
+测试进程加载的是上一版 `FluentJalium.dll`，突变根本没进被测进程。要刷新的是**消费方**（测试工程）的构建，
+并且要有"消费到的 DLL 变了"的见证；缺这一条，一次突变实验可以把有牙的事实读成没牙，也可以把没牙的读成有牙。
+
+### Known Gaps
+
+1. **其余图标宿主没量**（#95）：`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178`
+   的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
+   按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
+   + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
+2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
+3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
+4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
+   但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。

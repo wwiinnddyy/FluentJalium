@@ -380,6 +380,76 @@ public sealed class AstraNavigationTests
         _fixture.Run(() => Assert.Null(Application.Current!.TryFindResource(key)));
     }
 
+    [Fact]
+    public void A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to()
+    {
+        // The reported defect: flipping the running app between Light and Dark re-tinted the pane labels and left the
+        // icons painted with the previous theme's ink. A fresh mount per variant cannot see that, because Jalium's
+        // IconElement resolves a missing foreground by walking to an ancestor Control at draw time and nothing
+        // invalidates it when the answer changes - so this flips the theme on one live tree. What the fix hands over
+        // is the item's own ink (Controls/Navigation/FluentNavigationItem.cs), and the reading below is that value,
+        // not the glyph: whether the icon prints is the screen measurement in spike/NavIconRecolor.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var icon = new SymbolIcon { Symbol = Symbol.Home };
+            var view = PaneWithIcon(out var item, icon);
+            AssertIcon(icon, item, "light");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            PixelHarness.Settle(60);
+            AssertIcon(icon, item, "dark");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            PixelHarness.Settle(60);
+            AssertIcon(icon, item, "back to light");
+
+            Assert.NotNull(view);
+        });
+    }
+
+    [Fact]
+    public void A_pane_icon_that_arrives_with_its_own_ink_keeps_it()
+    {
+        // Upstream lets an icon override the item, and the hand-off must not fight that: the ink set on the icon
+        // itself is a local value, and the fix leaves a local value alone.
+        _fixture.Run(() =>
+        {
+            var ink = new SolidColorBrush(Color.FromRgb(0x33, 0x66, 0x99));
+            var icon = new SymbolIcon { Symbol = Symbol.Home, Foreground = ink };
+            PaneWithIcon(out var item, icon);
+            Assert.Same(ink, icon.Foreground);
+
+            item.IsSelected = true;
+            PixelHarness.Settle(30);
+            Assert.Same(ink, icon.Foreground);
+        });
+    }
+
+    /// <summary>Mounts an open pane whose first item carries <paramref name="icon"/>; the item comes back.</summary>
+    private static FluentNavigationView PaneWithIcon(out FluentNavigationItem item, IconElement icon)
+    {
+        var view = new FluentNavigationView { Width = 400, Height = 420, IsPaneOpen = true };
+        item = new FluentNavigationItem { Content = "Overview", Icon = icon };
+        view.MenuItems.Add(item);
+        view.MenuItems.Add(new FluentNavigationItem { Content = "Buttons" });
+        PixelHarness.Build(view, 400, 420);
+        PixelHarness.Settle(60);
+        return view;
+    }
+
+    /// <summary>The icon has to carry the item's ink by instance, so a stale or missing hand-off cannot pass.</summary>
+    private static void AssertIcon(IconElement icon, FluentNavigationItem item, string when)
+    {
+        Assert.True(
+            ReferenceEquals(item.Foreground, icon.Foreground),
+            $"{when}: the pane icon carries {Hex(icon.Foreground)} while its item moved to {Hex(item.Foreground)} - " +
+            "the icon is not being handed the item's ink, so it keeps whatever it last drew.");
+    }
+
+    private static string Hex(Brush? brush) =>
+        brush is SolidColorBrush solid ? PixelHarness.Hex(solid.Color) : brush?.GetType().Name ?? "<null>";
+
     private static readonly Color BrandEmerald = Color.FromRgb(0x20, 0x72, 0x45);
 
     /// <summary>An open pane with two items, laid out and settled; the first one is handed back unselected.</summary>
