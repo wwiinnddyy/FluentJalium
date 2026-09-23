@@ -20,7 +20,11 @@ param(
     [string] $Strip = '20,154,400,410',
     [int] $BeforeMs = 2500,
     [int] $AfterMs = 9500,
-    [string] $OutDir = 'spike/NavIconRecolor'
+    [string] $OutDir = 'spike/NavIconRecolor',
+    # Grab any process that honours the same three ASTRA_* variables, not just the Gallery: this grabber is the
+    # one path that reads glyph ink off the screen, so a one-off probe window should be measurable with it too.
+    [string] $Exe = '',
+    [string[]] $Arg = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -84,14 +88,17 @@ $root = (Resolve-Path "$PSScriptRoot/../..").Path
 Set-Location $root
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
-$exe = Join-Path $root 'samples/FluentJalium.Gallery/bin/Debug/net10.0-windows/FluentJalium.Gallery.exe'
-if (-not (Test-Path $exe)) { throw "missing $exe - build the Gallery first" }
+$exe = if ($Exe -ne '') { $Exe } else {
+    Join-Path $root 'samples/FluentJalium.Gallery/bin/Debug/net10.0-windows/FluentJalium.Gallery.exe'
+}
+if (-not (Test-Path $exe)) { throw "missing $exe - build it first" }
 
 $env:ASTRA_START_THEME = $StartTheme
 $env:ASTRA_FLIP_TO = $FlipTo
 $env:ASTRA_FLIP_MS = "$FlipMs"
 $argList = @()
-if ($Page -ne '') { $argList = @('--page', $Page) }
+if ($Arg.Count -gt 0) { $argList = $Arg }
+elseif ($Page -ne '') { $argList = @('--page', $Page) }
 $proc = Start-Process -FilePath $exe -ArgumentList $argList -PassThru
 
 function Grab([string] $tag, [string] $out, [int] $pid_, [int] $paneWidth, [int] $paneHeight) {

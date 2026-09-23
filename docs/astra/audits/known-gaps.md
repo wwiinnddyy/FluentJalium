@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-987 lines collected from 53 sections across 46 documents.
+988 lines collected from 53 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -1056,7 +1056,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 173 lines
+## ROADMAP.md - 174 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1243,5 +1243,6 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4884` - 一棵干净树会被读成"突变还在树上"，而把那条输出再交给一个 grep 只会得到 `Binary file (standard input) matches`：
 - `ROADMAP.md:4885` - 既拿不到行，也诚实地说不了"没有"。现在三处 preflight 统一成 `--binary-files=without-match` 加
 - `ROADMAP.md:4886` - `--include='*.cs' --include='*.jalxaml'`，只查突变可能住的源码。
+- `ROADMAP.md:4906` - Known Gaps 里，下一手就是量它（`spike/PagePixelsPlateDiag/`）。顺带把"槽宽在两跑之间变"这句话按盘上的文件收紧：
 
-<!-- canonical-lines=987 sha256=27a300b8b8acb4c30af73157c9bc6fcaab900520c9bc1997e130a8c1cacccaa1 -->
+<!-- canonical-lines=988 sha256=32c9a6be828ac899d5a4a77a7f2ea1ffe52f7155623771f64da8b4ffd07c6ad6 -->

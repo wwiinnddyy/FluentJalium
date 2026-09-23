@@ -4267,7 +4267,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | **最新一次（`spike/NavIconRecolor/gate-94b.log`，提交 `3f66093` 的树）：没有全绿** —— 套件步红 1 条（`失败: 1，通过: 1590，总计: 1591`，红的是 `AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has`，即 `gate-88c` 那个成员），管道自己打印 `GATE-EXIT=1` 并停在套件步。闸口后四步在同一片干净树上单独跑过：页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`、调色板 `-Check` 退出 0、`keys.md is current: 1312 canonical lines.`、`known-gaps.md is current: 937 canonical lines.`。**最近一次整条管道全绿仍是 `gate-92.log`（1589 条）**，形状照旧别丢：页闸红 9 条（`gate-88.log`）/ 套件红 Rating 1 条（`gate-88b.log`）/ 套件红 TeachingTip 1 条（`gate-88c.log`、`gate-94b.log`）/ 页闸红 materials-HighContrast 2 条（`gate-91.log`），被点名的测点单跑都绿（`pixels-solo-1.log`、`solo-teachingtip.log` 74/74，另加 `spike/NavIconRecolor/pair-nav-teachingtip.log` 154/154）——**一次全绿没有解释其中任何一条**：页闸槽宽在跑与跑之间 980/788 跳的机制仍未量，#47/#90 原样挂着（日志按批留在 `spike/SystemColorProbe/gate-*.log`、`spike/ForegroundArrival/gate-*.log` 与 `spike/NavIconRecolor/gate-94*.log`；三档调色板与两份清单每次改动后各自 `-Check` 当场对过）
+| 串行闸口 | **最新一次（`spike/NavIconRecolor/gate-95b.log`，提交 `09ec267` 的树）：整条管道全绿** —— 步骤依次是 restore、build（Debug，`0 个警告 / 0 个错误`）、套件 `失败: 0，通过: 1594，总计: 1594`（8 m 26 s）、页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`、调色板漂移三档 `checked=True`、`keys.md is current: 1312 canonical lines.`、`known-gaps.md is current: 987 canonical lines.`，末尾打印 `All Astra gates passed.`，管道自己交出 `gate-exit=0`。套件总数只能引管道打印的那一行：本批先前那句"预期 1593"是拿类别计数做加法算出来的，而 `[Theory]` 的 case 也要计进去——两类别跑的执行数在 `mut-95b.log` 的基线腿里是 115。**形状别丢**：这之前五次顺序跑各红在一步——页闸红 9 条（`gate-88.log`）/ 套件红 Rating 1 条（`gate-88b.log`）/ 套件红 TeachingTip 1 条（`gate-88c.log`、`gate-94b.log`）/ 页闸红 `materials HighContrast` 2 条（`gate-91.log`）/ 套件红本批自己的 `VisualTreeHelper` 一条（`gate-95.log`），被点名的测点单跑都绿。这一次全绿**不解释其中任何一条**：页闸槽宽仍在跑与跑之间跳（这跑读到 788），#47/#90/#93 原样挂着（日志按批留在 `spike/SystemColorProbe/gate-*.log`、`spike/ForegroundArrival/gate-*.log` 与 `spike/NavIconRecolor/gate-9*.log`；三档调色板与两份清单每次改动后各自 `-Check` 当场对过） |
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
 | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
@@ -4892,4 +4892,19 @@ AGENTS.md 的三条之一："walk the visual tree to restyle live controls"。�
 `Forbidden implementation pattern: src/FluentJalium/Controls/IconInk.cs: VisualTreeHelper`。
 **这条不是 flake，也不是别人的账**——本批第一版的机制就是那条闸点名禁止的形状。处置是换路（见上面"交付形状"），
 换完多出 `onceonly` 那条腿与一条新事实；后续提交必须重跑整条管道，本节的"全绿"字样在这份读数打印出来之前不存在。
+
+**那句话现在作废，用的是管道打印的数**（`09ec267` 的树，`spike/NavIconRecolor/gate-95b.log`）：
+套件 `失败: 0，通过: 1594，总计: 1594`（8 m 26 s）、页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`、
+调色板三档 `checked=True`、`keys.md is current: 1312 canonical lines.`、`known-gaps.md is current: 987 canonical lines.`，
+末尾 `All Astra gates passed.`，管道自己交出 `gate-exit=0`。这是**带着 #94+#95 两批测点的树第一次整条管道全绿**
+（`gate-94b.log` 那跑红在 `AstraTeachingTipTests` 那条既有成员上）。两件事要留在账上：
+
+1. 套件总数只引管道打印的那一行。本节先前把"预期 1593"写进了心里并打算据此核对——那是拿 `80→81` 与 `32→34`
+   做加法算的，而 `[Theory]` 的 case 也计入总数，所以那个推测数一开口就是错的；类别的执行数以 `mut-95b.log`
+   基线腿的 `通过: 115，总计: 115` 为准。
+2. 一次全绿不解释任何一条既有形状：`materials HighContrast` 那两条也没在这一跑露面，#90/#93 的机制仍未量，原样挂在
+   Known Gaps 里，下一手就是量它（`spike/PagePixelsPlateDiag/`）。顺带把"槽宽在两跑之间变"这句话按盘上的文件收紧：
+   四次整条跑（`gate-91`、`gate-92`、`gate-94c-pixels`、`gate-95b`）**每一腿都读 788**、整帧 lit 约 848k；
+   `spike/ForegroundArrival/pixels-report-2.log` 那一跑**39 条腿全读 1000**、整帧 lit 1219308。也就是说变的是
+   整跑窗口状态、不是跑内的某几页——先前心里那个"上一跑 980"在这些日志里没有出处，不能写进账。
 
