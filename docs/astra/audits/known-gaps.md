@@ -1134,37 +1134,37 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4289` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
 ### 这一节自己的 Known Gap
 
-- `ROADMAP.md:4302` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
-- `ROADMAP.md:4303` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
-- `ROADMAP.md:4323` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
-- `ROADMAP.md:4408` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+- `ROADMAP.md:4303` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4304` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4324` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+- `ROADMAP.md:4409` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
 ### Known Gap（这条做不到，不写进断言）
 
-- `ROADMAP.md:4461` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
-- `ROADMAP.md:4462` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
-- `ROADMAP.md:4463` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
-- `ROADMAP.md:4471` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+- `ROADMAP.md:4462` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+- `ROADMAP.md:4463` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+- `ROADMAP.md:4464` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+- `ROADMAP.md:4472` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
 ### Known Gap
 
-- `ROADMAP.md:4524` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
-- `ROADMAP.md:4525` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
-- `ROADMAP.md:4526` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
-- `ROADMAP.md:4527` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
-- `ROADMAP.md:4528` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
-- `ROADMAP.md:4529` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
-- `ROADMAP.md:4530` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
-- `ROADMAP.md:4531` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
-- `ROADMAP.md:4532` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
-- `ROADMAP.md:4533` - hover / pressed 行照旧归真指针通路（#13）。
-- `ROADMAP.md:4534` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
-- `ROADMAP.md:4544` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
-- `ROADMAP.md:4581` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
+- `ROADMAP.md:4525` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
+- `ROADMAP.md:4526` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
+- `ROADMAP.md:4527` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
+- `ROADMAP.md:4528` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
+- `ROADMAP.md:4529` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
+- `ROADMAP.md:4530` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
+- `ROADMAP.md:4531` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
+- `ROADMAP.md:4532` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
+- `ROADMAP.md:4533` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
+- `ROADMAP.md:4534` - hover / pressed 行照旧归真指针通路（#13）。
+- `ROADMAP.md:4535` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4545` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+- `ROADMAP.md:4582` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
 ### Known Gaps
 
-- `ROADMAP.md:4623` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
-- `ROADMAP.md:4624` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
-- `ROADMAP.md:4625` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
-- `ROADMAP.md:4626` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
-- `ROADMAP.md:4633` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
+- `ROADMAP.md:4624` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
+- `ROADMAP.md:4625` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
+- `ROADMAP.md:4626` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
+- `ROADMAP.md:4627` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
+- `ROADMAP.md:4634` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
 
-<!-- canonical-lines=910 sha256=4043c8762c1aac448eee73c82a29494858904aaa16fb9a7ac07709220d8e6884 -->
+<!-- canonical-lines=910 sha256=cd543df041b8bbfb38d1390f76de9595535574b0eeb7547dbdc4d3d33fec97a5 -->

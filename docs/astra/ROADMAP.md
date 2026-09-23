@@ -4267,7 +4267,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | build `0 警告 0 错误` → **1587 / 1587，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`（**但 2026-09-23 连着三次顺序跑各红一步：一次红在页闸 9 条、一次红在套件 1 条（Rating）、第三次红在套件 1 条（TeachingTip），三次把那三条单拎出来都绿，到现在没拿到一次全绿顺序读数**，见 #88 的串行闸口条、#91 末行与 #47/#90） → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新三跑 `gate-88.log`、`gate-88b.log`、`gate-88c.log`，页闸单跑对照 `spike/ForegroundArrival/pixels-solo-1.log`，套件单跑对照 `spike/ForegroundArrival/solo-teachingtip.log`） |
+| 串行闸口 | 已打印的部分：build `0 警告 0 错误`；套件这一档打印过 `1585 / 1585，0 失败 0 跳过`（`gate-88.log`），#91 加 2 条之后第一次顺序跑过整档：`已通过! 失败: 0，通过: 1587，总计: 1587`（`gate-91.log`）；**但同一跑的页级像素仍红**——`FAIL 13 pages x 3 variants, 2 offender(s)`，两条都在 `materials HighContrast`（`the slot was not actually emptied (337249 lit pixels left)` 与 `printed nothing its empty slot does not already print (41 colours against 93)`），闸口就此停住，调色板与两份清单没跑到。四跑合起来的形状：红在页闸 9 条 / 套件 Rating 1 条 / 套件 TeachingTip 1 条 / 页闸 2 条，被点名的测点单跑都绿（`pixels-solo-1.log`、`solo-teachingtip.log` 74/74），**至今没有一次全绿的顺序读数**，机制仍未量（#47/#90） | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新四跑 `gate-88.log`、`gate-88b.log`、`gate-88c.log`、`gate-91.log`；单跑对照 `pixels-solo-1.log`、`solo-teachingtip.log`）；三档调色板与两份清单本批各自 `-Check` 当场对过：`checked=True` ×3、`keys.md is current: 1312 canonical lines.`、`known-gaps.md is current: 910 canonical lines.` |
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
 | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
@@ -4634,3 +4634,15 @@ not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carri
 - **视觉**：零新增像素断言（理由见 Known Gap 3）。
 - **硬件输入**：零。两条事实全用 `SelectedIndex` 驱动。
 - **串行闸口**：见本节末行的补记。
+- **补记（闸口读数，2026-09-23）**：`tools/Test-AstraGates.ps1 -Configuration Debug` 第四跑（`spike/ForegroundArrival/gate-91.log`）
+  是本支第一次**顺序跑过套件**的一跑：`已通过! - 失败: 0，通过: 1587，已跳过: 0，总计: 1587，持续时间: 7 m 32 s`，
+  其后进入页级像素那一步。归因要说清两件事：① 这一跑的测点集是提交 `ea5bb6b` 那棵树（构建在 04:28，比本批 #92 的三条
+  测点早 6 分钟），所以 1587 = 1585 + 本批 2 条；② 页闸那一步此前在 `gate-88.log` 红过 9 条、单跑绿，这一跑它打印的是
+  什么仍以下一行为准——**一跑绿不结 #90**：那族的形状是"同一支树、三次顺序跑、红在三处、单跑都绿"，机制（页闸拿到的
+  宿主槽宽在跑与跑之间是 980 还是 788）**仍没量出来**，一次全绿只是把它从"每次都有红"改成"这次没有"。
+  同跑的下一步又红在页闸：`FAIL 13 pages x 3 variants, 2 offender(s)`，两条都在**同一页同一档**
+  （`materials HighContrast: the slot was not actually emptied (337249 lit pixels left)` 与
+  `the page printed nothing its empty slot does not already print (41 colours against 93)`），闸口就此停住，
+  调色板与两份清单没跑到（本批那三项各自 `-Check` 当场量过，见上）。所以 #90 那族今天的样子是：
+  **四次顺序跑——红在页闸 9 条 / 套件 Rating / 套件 TeachingTip / 页闸 materials 2 条**，套件这一档第一次全绿，
+  页闸那一档四次里红两次；被点名的这些测点单跑都绿。#90 的机制照旧未量，不因为一次套件全绿就改判。
