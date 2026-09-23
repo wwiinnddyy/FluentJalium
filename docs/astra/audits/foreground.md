@@ -112,3 +112,47 @@
    同一棵树三种尺子）：`TargetName` 写入 569 行、`Property="Foreground"` 的 Setter 237 行（其中 29 行两者皆是）、
    全库 `<Setter>` 1507 行。第 4 节第 3 条当年数的 228 是**当时那棵树**的 `Property="Foreground"` 计数，
    其后各批又添了行，现在同尺子是 237。
+6b. 上面那条"没测被画上"在 2026-09-23 #88 结掉四个 owner，但**结出来的不是"都画上了"**：四条事实落在
+   `AstraStateCellArrivalTests`，每条配两种突变（把那一格删掉 / 把它改指另一支刷），十个突变各一次重建一轮测点（4 删 + 4 改指 + 2 复合），
+   每次 revert 后 `git diff` 对相关样式文件为空（`spike/ForegroundArrival/mut-{point,cell,mask}-*.log`）。
+   逐格读数（Light，控件自身的 `Foreground`）：
+
+   | owner / 那一格 | 格子住在哪 | 删掉 | 改指成白（`AccentButtonForeground`） | 谁在写 |
+   |---|---|---|---|---|
+   | `SubtleButtonForegroundDisabled`（`Common.jalxaml:68`） | `Style.Triggers` | 4/4 恒绿 | 只本条红，读到 `#FFFFFFFF` | **我们这格**压得过框架那次写 |
+   | `RepeatButtonForegroundDisabled`（`Common.jalxaml:102`） | `Style.Triggers` | 恒绿 | 只本条红，读到 `#FFFFFFFF` | 同上 |
+   | `CheckBoxForegroundUncheckedDisabled`（`Selection.jalxaml:39`） | `ControlTemplate.Triggers` | 恒绿 | **也恒绿** | 只有框架那次写（见下） |
+   | `CheckBoxForegroundChecked`（`Selection.jalxaml:33`） | `ControlTemplate.Triggers` | 恒绿 | 只本条红，读到 `#5C000000` | **我们这格** |
+
+   两格同状态、同属性，只因住在不同层就一个能压过框架的写、一个不能——这是本批量出来的不对称，不是推断。
+   而"删掉恒看不见"在禁用格上还多了一层理由：把 `TextDisabled` 这个名字改指二级墨（`#9E000000`）之后，
+   抽掉自己那格的按钮与勾选框**才**跟着读到 `#9E000000`（`mut-mask-subtlecellmask.log`、
+   `mut-mask-checkboxcellmask.log`，各只红自己那一条）。所以 #12 那条"框架从名字 `TextDisabled` 现查禁用墨"
+   的通路不止长在生成标签上，控件自身的 `Foreground` 也是它写的；这也是为什么第四条事实那句主张钉的是调色板刷
+   而不是别名键——钉别名会跟着突变一起动，什么都证明不了。
+6c. 承上，落在 `ControlTemplate.Triggers` 里的禁用前景格今天**改不动**：单独重写
+   `CheckBoxForegroundUncheckedDisabled`（以及同组 `…CheckedDisabled`、`…IndeterminateDisabled`）不改变任何像素，
+   上游会认这个覆盖。今天看不见是因为这三行转录的正是 `TextDisabled` 指向的那一支刷；一旦有人只改这几族键就是用户可见的失效。
+   候选修法已有证据：把该状态的 `Foreground` 行提到 `Style.Triggers`（同表前两行证明那里压得过）。
+   本批没动产品标记，改动登记成 #89。同一条判据**不外推**：`TabView.jalxaml:38`、`:71` 两行也是模板触发器，
+   但本批只量到 CheckBox 一个 owner，那两处照旧是"只测了键能解析"。
+6d. 普查的尺子本身在本批错过一次，先记下来：`spike/StateCellCensus/census.py` 第一版只认 `<Trigger>` 与
+   `<ConditionGroup>`，而库里的多条件格子写成 `<MultiTrigger><MultiTrigger.Conditions><Condition …/>`——
+   `<Trigger` 匹配不上 `<MultiTrigger`、`ConditionGroup` 匹配不上 `Condition`，开合两头都不匹配，
+   所以**带勾选条件的 39 行是整批缺席**，不是被错分。修好后同尺子是 **176 条状态格子、91 条无指针可驱动、
+   37 条的键名在测点里没出现过**，其中"无指针 × 无读者"13 条。这条弱信号也要一起记：`readers=` 判的是
+   "键名字面量在测点里出现过"，本批那条勾选框事实**故意**不写键名（它钉的是调色板刷，理由在 7.6b），
+   于是普查把那一行仍报成"无读者"——它能提示"要不要看第二眼"，不是到达性的证据。
+6e. 那 13 行逐条处置（能不能出事实，取决于该行转录的刷与"没有这格时读到的刷"是不是同一支）：
+
+   | 那一行 | 位置 | 转录到 | 能否出事实 | 处置 |
+   |---|---|---|---|---|
+   | `CheckBoxForegroundUncheckedDisabled` | `Selection.jalxaml:39` | 禁用刷 | 删、改指都看不见 | 本批事实 + 复合突变（7.6b） |
+   | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
+   | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
+   | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
+   | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
+   | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
+   | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
+   | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
+

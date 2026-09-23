@@ -4267,7 +4267,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | build `0 警告 0 错误` → **1576 / 1576，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)` → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log`（最新一批 `gate-85.log`） |
+| 串行闸口 | build `0 警告 0 错误` → **1585 / 1585，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`（**但 2026-09-23 #88 连着两次顺序跑各红一步：一次红在页闸 9 条、一次红在套件 1 条，两次单跑都绿，本批没拿到一次全绿顺序读数**，见 #88 的串行闸口条与 #47/#90） → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新两批 `gate-88.log`、`gate-88b.log`，页闸单跑对照 `spike/ForegroundArrival/pixels-solo-1.log`） |
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
 | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
@@ -4278,7 +4278,8 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 - **#21** 剩余视觉差（弹层与表面的半径、烟幕层）：`audits/content-dialog.md:94`、`audits/infobar.md:125`
 - **#47** 顺序跑时的外部焦点变化既造不出也排不掉：`ROADMAP.md:3853`（本批把标记补进原句）；同族另一条
   "子菜单在进程内根本开不了"本来就在 `audits/menu-flyout.md:141`
-- **#56** 228 条状态 Setter 只测到"键能解析"、5 处未命名部件：`audits/foreground.md:97`、`audits/foreground.md:91`
+- ~~**#56**~~ 这条已从"量不到"改成"量过了"（2026-09-23 #87/#88）：五处具名部件全有读者（`audits/foreground.md` 7.2
+  第 2 条整条作废），状态格子的分母与逐条处置在 `audits/foreground.md` 7.6d/7.6e；剩下的两半已移进 (b)
 - **#62** 字形不打印，差分表只覆盖 4 个主体 / 3 条通路：`audits/icon-family.md:135`
 - **#68** 键盘框在库里现在有两套形状（交环的 12 处是 2px+1px 双圈，其余 3px 单圈）：`audits/focus-visual.md:152`
 - **#73** 位置驱动指针档与 `Click` 不可达：`ROADMAP.md:3580`
@@ -4291,8 +4292,10 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 
 ### (b) 该干还没干的那批：不是"做不到"，别混进 (a)
 
-#8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#56 七个 owner 的到达性、#62 的上游复现提报、
-#68/#73/#75/#76 的修法本身、#80 的帧数守卫、#82 的读取路线定案。
+#8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#62 的上游复现提报、#68/#73/#75/#76 的修法本身、
+#80 的帧数守卫、#82 的读取路线定案，以及 #56 量完之后新添的两条：`TabViewItemHeaderForegroundSelected` 与
+`TabViewItemIconForegroundSelected` 两格（删行就看得见，`audits/foreground.md` 7.6e）、
+#89 那条"模板触发器里的禁用前景格改不动"的修法。
 
 ### 这一节自己的 Known Gap
 
@@ -4475,3 +4478,94 @@ not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carri
   这一跑跑在**文档定稿之前**：它之后本段只多了这几行闸口读数（纯文档改动，产品码与测点一行未动），
   改完立刻重跑两个清单 `-Check` 到定点（`known-gaps.md is current: 831 canonical lines.` /
   `keys.md is current: 1312 canonical lines.`），所以"清单跟着树走"这一条仍是当场量过的，不是推断。
+
+## #88（目标项 6 的 #56 余账）状态格子的落格读数：同一条禁用墨，住在 Style.Triggers 压得过框架的写，住在 ControlTemplate.Triggers 压不过（2026-09-23）
+
+`audits/foreground.md` 7.6 挂着"状态格子的 Setter 只测了键能解析，没测该状态下这一格确实被画上"。第 6 段那批把
+分母说清了（`Property="Foreground"` 的 Setter 237 行），本批先给分母补上正确的尺子（普查第一版漏计全部多条件格子，
+修好后是 176 条状态格子 / 91 条无指针可驱动 / 13 条"无指针且键名没读者"），再按那 13 条挑四条开量。四条事实落到
+`AstraStateCellArrivalTests`，每条配两种突变。量出来的不是"都画上了"，是一条 precedence 分界：禁用墨这一格在样式
+触发器里压得过框架自己那次写，在模板触发器里压不过——而两边今天都看不见，因为两处转录的正是框架那次写指向的同一支刷。
+
+### 交付形状
+
+| 位置 | 干什么 | 为什么是这个形状 |
+|---|---|---|
+| `tests/FluentJalium.Tests/AstraStateCellArrivalTests.cs` 新 4 条 | 三格（Subtle / RepeatButton / CheckBox 禁用）+ 一条 CheckBox `IsChecked=True`，读的都是**控件自身**的 `Foreground` | 这几格全部不写 `TargetName`，写在标签上就答的是另一个问题（禁用标签带框架局部值，#12） |
+| `spike/StateCellCensus/census.py` + `census-2026-09-23.txt` | 176 条状态格子逐条记 owner / 载体 / 条件 / 令牌 / 有没有读者 | "该给谁补事实"要能排序；本批就地修过它一次（第一版漏掉全部 `<MultiTrigger>` 格子，39 行缺席）；已知粗处：owner 取"最后见到的 TargetType"，嵌套样式会串 |
+| `spike/ForegroundArrival/mutate.py` 改版 | 突变前把目标文件按字节存盘，revert 后要求 `git diff --quiet` 判干净；一个突变可以是两处编辑 | 旧写法靠"拿改后的串再换回来"，遇到**删除型**突变要搜空串（处处皆中）→ 还原失败、突变留在树里污染后面每一轮：本批第一版 `repeatpoint` 就是这么读出"两条全红"的假耦合 |
+| 同上 `subtlecellmask` / `checkboxcellmask` | 抽掉自己那格 + 把框架读的那个名字改指别的键 | 只有这一种突变能回答"删了看不见，那是谁在写" |
+
+### 读数：四格 × 两种突变（Light，每轮一次重建，revert 后样式文件对 HEAD 干净）
+
+| 那一格 | 住在哪 | 删掉 | 改指成白（`AccentButtonForeground`） | 谁在写 |
+|---|---|---|---|---|
+| `SubtleButtonForegroundDisabled`（`Common.jalxaml:68`） | `Style.Triggers` | 4/4 恒绿 | 只本条红，读到 `#FFFFFFFF` | **我们这格**赢过框架那次写 |
+| `RepeatButtonForegroundDisabled`（`Common.jalxaml:102`） | `Style.Triggers` | 恒绿 | 只本条红，读到 `#FFFFFFFF` | 同上 |
+| `CheckBoxForegroundUncheckedDisabled`（`Selection.jalxaml:39`） | `ControlTemplate.Triggers` | 恒绿 | **也恒绿** | 只有框架那次写 |
+| `CheckBoxForegroundChecked`（`Selection.jalxaml:33`） | `ControlTemplate.Triggers` | 恒绿 | 只本条红，读到 `#5C000000` | **我们这格** |
+
+两种复合突变（抽格 + 把 `TextDisabled` 改指二级墨）各只红自己那一条，控件读到 `#9E000000`
+（`spike/ForegroundArrival/mut-mask-*.log`）。日志按 `mut-{point,cell,mask}-<名>.log` 存，逐轮记录见
+`build-<名>.log`。
+
+### 这批改口的三条
+
+1. #12 那句"框架从名字 `TextDisabled` 现查禁用墨"原来只在**生成的文本要素**上量过；本批在**控件自身的
+   `Foreground`** 上也量到了（两格复合突变各红各的）。这不改 #12 的发行，只把它的作用面从标签扩到控件。
+2. "删了看不见"在禁用格上有两个不同的理由，本批把它们分开了：一是 #87 那条（那行转录的正是默认墨），
+   二是这条（框架从 `TextDisabled` 现查，同一支刷）。第二个理由能造出**改不动的覆盖点**，所以它是一条缺陷候选，
+   不是仪器的边界。
+3. 模板触发器并不是"写不到控件自身"——`CheckBoxForegroundChecked` 那一格改指就红。别把上一批对禁用格的读数
+   外推成"模板格子是死写"。
+
+### Known Gap
+
+1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
+   单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
+   本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
+2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
+   `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
+   不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
+3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
+   4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
+   2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
+   hover / pressed 行照旧归真指针通路（#13）。
+4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
+
+### 四类证据
+
+- **构建**：`dotnet build tests/FluentJalium.Tests -c Debug` `0 个警告 / 0 个错误`（中间一次 CS1061：`Mount` 返回
+  `Control` 而测点要设 `IsChecked`，把 helper 改成泛型 `Mount<T>`；门禁要 0 警告）。
+- **行为**：新 4 条测点，干净树单跑 `4/4`；突变矩阵共 10 轮（4 删 + 4 改指 + 2 复合，其中 `repeatpoint` 那轮的
+  旧读数作废并按新仪器重跑），每轮以 revert + `git diff --quiet` 收尾，跑完 `git status --porcelain src` 为空。
+  普查脚本同批修过一次（多条件格子整批漏计），改后重跑 `census-2026-09-23.txt`：176 / 91 / 37 / 13。
+  测点总数 1581 → 1585。
+- **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+- **硬件输入**：零。四条事实全用 `IsEnabled` / `IsChecked` 驱动，不经指针。
+- **串行闸口**：`tools/Test-AstraGates.ps1 -Configuration Debug`，日志 `spike/ForegroundArrival/gate-88.log`。
+  连跑两次，两次红在**不同的那一步**，本批没有拿到一次全绿的顺序读数——按事实记，不拿单跑绿顶替：build `0 警告 0 错误`
+  → **1585 / 1585，0 失败 0 跳过**（7 m 34 s，
+  比上一批多 4 条，正是本批那 4 条测点）→ 页级像素闸 **`FAIL 13 pages x 3 variants, 9 offender(s)`**，
+  后面三档调色板与两份清单没跑到。9 条全在 Dark（8 条）与 HighContrast（1 条），报的是"空槽没清空 / 该档底色只盖住
+  57386 px（阈值 150000）/ 92 色对 92 色"这一族读法。产品标记本批一行未动（十个突变各自 revert 后 `git diff`
+  干净），跑完单独再跑一次同一支 `AstraPagePixels.exe`：`PASS 13 pages x 3 variants, 0 offender(s)`
+  （`spike/ForegroundArrival/pixels-solo-1.log`）。两跑之间能对上的硬线索是**槽宽本身变了**：同一页在红的那跑是
+  `command-bar HighContrast slot 980x490`、`settings … 980x642`、`menus … 980x641`，在绿的那跑是
+  `788x490`、`788x658`、`788x672`。所以页闸拿到的宿主窗口宽度不是常量，底色覆盖数与"槽有没有清空"都是按它算的——
+  这解释得通为什么 9 条全是"少了/多了底色"而不是颜色错（`green=0`、`placeholder=0` 在两跑里都成立）。
+  结论按事实记：这是 **#47 那族"只有整套顺序跑才红"的又一个成员**（另立 #90 量机制），机制假设（顺序跑之后宿主停在
+  另一个尺寸）**还没量**，本批不据一次单跑绿就把闸口改成"重跑一次算了"。
+  - 紧接着第二次完整顺序跑（`gate-88b.log`）**红在另一步**：套件 1584 通过 / **1 失败**——
+    `AstraRatingControlTests.An_unset_row_crops_every_foreground_item_to_nothing`（`Expected: 0` / `Actual: 17`，
+    套件第 3 分 48 秒处），闸口就此停住，页闸与调色板、两份清单都没跑到。那条测点是 #52 就有的老测点，与本批无关；
+    当场把它与本批 4 条一起单跑，**5/5 全绿**。所以两次顺序跑的共同形状还是"只有整套跑才红、单跑就绿"，
+    本批**没有拿到一次全绿的顺序读数**，这条就按这句话记。
+  - 同一时间这台盒子不空：11:53:57 / 11:54:02 有其他仓库留下的 MSBuild 节点、12:05:29 起
+    `C:\git\LanDesktop\LanMountainDesktop` 的测试在跑（`Win32_Process` 读数，本地时刻 UTC+8）。这只记成"当时不空"，
+    **没有被量成机制**——本批既不说"是别人抢了机器所以红"，也不据此放宽任何判据。
+  - 清单与调色板的定点和页闸无关，本批各自用 `-Check` 当场量过：`Report-AstraResourceKeys.ps1 -Check` →
+    `keys.md is current: 1312 canonical lines.`、`Report-AstraKnownGaps.ps1 -Check` →
+    `known-gaps.md is current: 881 canonical lines.`（本段定稿后再跑一次到定点，见下一行的自检）。
+
+

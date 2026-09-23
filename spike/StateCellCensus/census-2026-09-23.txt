@@ -1,0 +1,178 @@
+read    AppBarButton               LabelText              IsEnabled=False                    AppBarButtonForegroundDisabled                 AppBar.jalxaml:101 readers=AstraAppBarTests.cs
+read ptr AppBarButton               LabelText              IsMouseOver=True                   AppBarButtonForegroundPointerOver              AppBar.jalxaml:91 readers=AstraAppBarTests.cs
+read ptr AppBarButton               LabelText              IsPressed=True                     AppBarButtonForegroundPressed                  AppBar.jalxaml:96 readers=AstraAppBarTests.cs
+read    AppBarToggleButton         LabelText              IsChecked=True                     AppBarToggleButtonForegroundChecked            AppBar.jalxaml:165 readers=AstraAppBarTests.cs,AstraForegroundRoutingTests.cs
+read    AppBarToggleButton         LabelText              IsEnabled=False                    AppBarToggleButtonForegroundDisabled           AppBar.jalxaml:170 readers=AstraAppBarTests.cs
+read ptr AppBarToggleButton         LabelText              IsMouseOver=True                   AppBarToggleButtonForegroundPointerOver        AppBar.jalxaml:153 readers=AstraAppBarTests.cs
+read ptr AppBarToggleButton         LabelText              IsPressed=True                     AppBarToggleButtonForegroundPressed            AppBar.jalxaml:158 readers=AstraAppBarTests.cs
+read    AutoCompleteBox            (self)                 IsEnabled=False                    TextControlForegroundDisabled                  AutoSuggestBox.jalxaml:96 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    AutoCompleteBox            (self)                 IsKeyboardFocusWithin=True         TextControlForegroundFocused                   AutoSuggestBox.jalxaml:90 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read ptr AutoCompleteBox            (self)                 IsMouseOver=True                   TextControlForegroundPointerOver               AutoSuggestBox.jalxaml:84 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    Button                     (self)                 IsEnabled=False                    BreadcrumbBarDisabledForegroundBrush           BreadcrumbBar.jalxaml:33 readers=AstraBreadcrumbBarTests.cs
+read    Button                     (self)                 IsEnabled=False                    AccentButtonForegroundDisabled                 Common.jalxaml:58 readers=AstraButtonTests.cs
+read    Button                     (self)                 IsEnabled=False                    SplitButtonForegroundDisabled                  Common.jalxaml:150 readers=AstraSplitButtonTests.cs
+read    Button                     (self)                 IsEnabled=False                    NavigationViewItemForegroundDisabled           Navigation.jalxaml:45 readers=AstraNavigationTests.cs
+read    Button                     (self)                 IsEnabled=False                    PipsPagerNavigationButtonForegroundDisabled    PipsPager.jalxaml:63 readers=AstraPipsPagerTests.cs
+read    Button                     (self)                 IsEnabled=False                    PipsPagerSelectionIndicatorForegroundDisabled  PipsPager.jalxaml:145 readers=AstraPipsPagerTests.cs
+NONE    Button                     (self)                 IsEnabled=False                    TabViewButtonForegroundDisabled                TabView.jalxaml:38 readers=-
+NONE    Button                     (self)                 IsEnabled=False                    TabViewButtonForegroundDisabled                TabView.jalxaml:71 readers=-
+read    Button                     (self)                 IsKeyboardFocusWithin=True         BreadcrumbBarFocusForegroundBrush              BreadcrumbBar.jalxaml:32 readers=AstraBreadcrumbBarTests.cs
+NONE ptr Button                     (self)                 IsMouseCaptureWithin=True          TabViewButtonForegroundPressed                 TabView.jalxaml:37 readers=-
+NONE ptr Button                     (self)                 IsMouseCaptureWithin=True          TabViewItemHeaderCloseButtonForegroundPressed  TabView.jalxaml:70 readers=-
+read ptr Button                     (self)                 IsMouseOver=True                   BreadcrumbBarHoverForegroundBrush              BreadcrumbBar.jalxaml:28 readers=AstraBreadcrumbBarTests.cs
+NONE ptr Button                     (self)                 IsMouseOver=True                   AccentButtonForegroundPointerOver              Common.jalxaml:56 readers=-
+read ptr Button                     (self)                 IsMouseOver=True                   SplitButtonForegroundPointerOver               Common.jalxaml:148 readers=AstraSplitButtonTests.cs
+NONE ptr Button                     (self)                 IsMouseOver=True                   PipsPagerNavigationButtonForegroundPointerOver PipsPager.jalxaml:50 readers=-
+read ptr Button                     (self)                 IsMouseOver=True                   PipsPagerSelectionIndicatorForegroundPointerOver PipsPager.jalxaml:131 readers=AstraPipsPagerTests.cs
+NONE ptr Button                     (self)                 IsMouseOver=True                   TabViewButtonForegroundPointerOver             TabView.jalxaml:36 readers=-
+NONE ptr Button                     (self)                 IsMouseOver=True                   TabViewItemHeaderCloseButtonForegroundPointerOver TabView.jalxaml:69 readers=-
+read ptr Button                     (self)                 IsPressed=True                     BreadcrumbBarPressedForegroundBrush            BreadcrumbBar.jalxaml:29 readers=AstraBreadcrumbBarTests.cs
+NONE ptr Button                     (self)                 IsPressed=True                     AccentButtonForegroundPressed                  Common.jalxaml:57 readers=-
+read ptr Button                     (self)                 IsPressed=True                     SplitButtonForegroundPressed                   Common.jalxaml:149 readers=AstraSplitButtonTests.cs
+NONE ptr Button                     (self)                 IsPressed=True                     PipsPagerNavigationButtonForegroundPressed     PipsPager.jalxaml:55 readers=-
+read ptr Button                     (self)                 IsPressed=True                     PipsPagerSelectionIndicatorForegroundPressed   PipsPager.jalxaml:138 readers=AstraPipsPagerTests.cs
+read    ButtonBase                 (self)                 IsEnabled=False                    ButtonForegroundDisabled                       Common.jalxaml:48 readers=AstraButtonTests.cs
+read    ButtonBase                 (self)                 IsEnabled=False                    SubtleButtonForegroundDisabled                 Common.jalxaml:68 readers=AstraStateCellArrivalTests.cs
+NONE ptr ButtonBase                 (self)                 IsMouseOver=True                   ButtonForegroundPointerOver                    Common.jalxaml:46 readers=-
+NONE ptr ButtonBase                 (self)                 IsMouseOver=True                   SubtleButtonForegroundPointerOver              Common.jalxaml:66 readers=-
+read ptr ButtonBase                 (self)                 IsPressed=True                     ButtonForegroundPressed                        Common.jalxaml:47 readers=AstraButtonTests.cs
+NONE ptr ButtonBase                 (self)                 IsPressed=True                     SubtleButtonForegroundPressed                  Common.jalxaml:67 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked=False+IsMouseOver=True   CheckBoxForegroundUncheckedPointerOver         Selection.jalxaml:31 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked=False+IsPressed=True     CheckBoxForegroundUncheckedPressed             Selection.jalxaml:32 readers=-
+read    CheckBox                   (self)                 IsChecked=True                     CheckBoxForegroundChecked                      Selection.jalxaml:33 readers=AstraStateCellArrivalTests.cs
+NONE    CheckBox                   (self)                 IsChecked=True+IsEnabled=False     CheckBoxForegroundCheckedDisabled              Selection.jalxaml:40 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked=True+IsMouseOver=True    CheckBoxForegroundCheckedPointerOver           Selection.jalxaml:34 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked=True+IsPressed=True      CheckBoxForegroundCheckedPressed               Selection.jalxaml:35 readers=-
+NONE    CheckBox                   (self)                 IsChecked={x:Null}                 CheckBoxForegroundIndeterminate                Selection.jalxaml:36 readers=-
+NONE    CheckBox                   (self)                 IsChecked={x:Null}+IsEnabled=False CheckBoxForegroundIndeterminateDisabled        Selection.jalxaml:41 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked={x:Null}+IsMouseOver=True CheckBoxForegroundIndeterminatePointerOver     Selection.jalxaml:37 readers=-
+NONE ptr CheckBox                   (self)                 IsChecked={x:Null}+IsPressed=True  CheckBoxForegroundIndeterminatePressed         Selection.jalxaml:38 readers=-
+NONE    CheckBox                   (self)                 IsEnabled=False                    CheckBoxForegroundUncheckedDisabled            Selection.jalxaml:39 readers=-
+read    ComboBox                   (self)                 IsEnabled=False                    ComboBoxForegroundDisabled                     Selection.jalxaml:109 readers=AstraComboBoxTests.cs
+read    ComboBox                   (self)                 IsKeyboardFocused=True             ComboBoxForegroundFocused                      Selection.jalxaml:103 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 IsKeyboardFocused=True+IsMouseCaptureWithin=True ComboBoxForegroundFocusedPressed               Selection.jalxaml:106 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 IsMouseCaptureWithin=True          ComboBoxForegroundPressed                      Selection.jalxaml:100 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 IsMouseOver=True                   ComboBoxForegroundPointerOver                  Selection.jalxaml:97 readers=AstraComboBoxTests.cs
+read    ComboBox                   (self)                 SelectedIndex=-1                   ComboBoxPlaceHolderForeground                  Selection.jalxaml:96 readers=AstraComboBoxTests.cs,AstraForegroundRoutingTests.cs
+read    ComboBox                   (self)                 SelectedIndex=-1+IsKeyboardFocused=True ComboBoxPlaceHolderForegroundFocused           Selection.jalxaml:104 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 SelectedIndex=-1+IsKeyboardFocused=True+IsMouseCaptureWithin=True ComboBoxPlaceHolderForegroundFocusedPressed    Selection.jalxaml:107 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 SelectedIndex=-1+IsMouseCaptureWithin=True ComboBoxPlaceHolderForegroundPressed           Selection.jalxaml:101 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   (self)                 SelectedIndex=-1+IsMouseOver=True  ComboBoxPlaceHolderForegroundPointerOver       Selection.jalxaml:98 readers=AstraComboBoxTests.cs
+read    ComboBox                   PART_ToggleButton      IsEditable=True                    ComboBoxEditableDropDownGlyphForeground        Selection.jalxaml:108 readers=AstraComboBoxTests.cs
+read    ComboBox                   PART_ToggleButton      IsEnabled=False                    ComboBoxDropDownGlyphForegroundDisabled        Selection.jalxaml:109 readers=AstraComboBoxTests.cs
+read    ComboBox                   PART_ToggleButton      IsKeyboardFocused=True             ComboBoxDropDownGlyphForegroundFocused         Selection.jalxaml:103 readers=AstraComboBoxTests.cs
+read ptr ComboBox                   PART_ToggleButton      IsKeyboardFocused=True+IsMouseCaptureWithin=True ComboBoxDropDownGlyphForegroundFocusedPressed  Selection.jalxaml:106 readers=AstraComboBoxTests.cs
+read    DataGrid                   (self)                 IsEnabled=False                    DataGridRowForegroundDisabled                  DataGrid.jalxaml:71 readers=AstraDataGridTests.cs
+read    DataGridCell               (self)                 IsEnabled=False                    DataGridRowForegroundDisabled                  DataGrid.jalxaml:113 readers=AstraDataGridTests.cs
+read    DataGridCell               (self)                 IsEnabled=False                    DataGridRowForegroundDisabled                  DataGrid.jalxaml:118 readers=AstraDataGridTests.cs
+read    DataGridCell               (self)                 IsSelected=True                    DataGridRowSelectedForeground                  DataGrid.jalxaml:117 readers=AstraDataGridTests.cs
+read    DataGridColumnHeader       (self)                 IsEnabled=False                    DataGridColumnHeaderForegroundDisabled         DataGrid.jalxaml:166 readers=AstraDataGridTests.cs,AstraForegroundRoutingTests.cs
+read    Expander                   (self)                 IsEnabled=False                    ExpanderHeaderDisabledForeground               Surfaces.jalxaml:103 readers=AstraExpanderInfoBarTests.cs
+read ptr Expander                   (self)                 IsMouseOver=True                   ExpanderHeaderForegroundPointerOver            Surfaces.jalxaml:96 readers=AstraExpanderInfoBarTests.cs
+read    HyperlinkButton            (self)                 IsEnabled=False                    HyperlinkButtonForegroundDisabled              Common.jalxaml:115 readers=AstraButtonTests.cs
+read ptr HyperlinkButton            (self)                 IsMouseOver=True                   HyperlinkButtonForegroundPointerOver           Common.jalxaml:113 readers=AstraButtonTests.cs
+read ptr HyperlinkButton            (self)                 IsPressed=True                     HyperlinkButtonForegroundPressed               Common.jalxaml:114 readers=AstraButtonTests.cs
+read    MenuFlyoutItem             (self)                 IsEnabled=False                    MenuFlyoutItemForegroundDisabled               Menus.jalxaml:87 readers=AstraForegroundRoutingTests.cs,AstraMenuTests.cs
+read ptr MenuFlyoutItem             (self)                 IsMouseOver=True                   MenuFlyoutItemForegroundPointerOver            Menus.jalxaml:86 readers=AstraMenuTests.cs
+read    MenuFlyoutSubItem          (self)                 IsEnabled=False                    MenuFlyoutSubItemForegroundDisabled            Menus.jalxaml:178 readers=AstraMenuTests.cs
+read ptr MenuFlyoutSubItem          (self)                 IsMouseOver=True                   MenuFlyoutSubItemForegroundPointerOver         Menus.jalxaml:177 readers=AstraMenuTests.cs
+read    MenuItem                   (self)                 IsEnabled=False                    MenuFlyoutItemForegroundDisabled               Menus.jalxaml:336 readers=AstraForegroundRoutingTests.cs,AstraMenuTests.cs
+read    NumberBox                  (self)                 IsEnabled=False                    TextControlForegroundDisabled                  TextInput.jalxaml:272 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    NumberBox                  (self)                 IsKeyboardFocusWithin=True         TextControlForegroundFocused                   TextInput.jalxaml:265 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read ptr NumberBox                  (self)                 IsMouseOver=True                   TextControlForegroundPointerOver               TextInput.jalxaml:259 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    NumberBox                  HeaderContentPresenter IsEnabled=False                    TextControlHeaderForegroundDisabled            TextInput.jalxaml:271 readers=AstraForegroundRoutingTests.cs,AstraNumberBoxTests.cs
+read    PasswordBox                (self)                 IsEnabled=False                    TextControlForegroundDisabled                  TextInput.jalxaml:89 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    PasswordBox                (self)                 IsKeyboardFocused=True             TextControlForegroundFocused                   TextInput.jalxaml:84 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read ptr PasswordBox                (self)                 IsMouseOver=True                   TextControlForegroundPointerOver               TextInput.jalxaml:79 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read ptr RadioButton                (self)                 IsChecked=False+IsMouseOver=True   RadioButtonForegroundPointerOver               Inputs.jalxaml:359 readers=AstraSelectionTests.cs
+read ptr RadioButton                (self)                 IsChecked=False+IsPressed=True     RadioButtonForegroundPressed                   Inputs.jalxaml:360 readers=AstraSelectionTests.cs
+read    RadioButton                (self)                 IsChecked=True                     RadioButtonForeground                          Inputs.jalxaml:361 readers=AstraForegroundRoutingTests.cs,AstraSelectionTests.cs
+read    RadioButton                (self)                 IsChecked=True+IsEnabled=False     RadioButtonForegroundDisabled                  Inputs.jalxaml:365 readers=AstraSelectionTests.cs
+read ptr RadioButton                (self)                 IsChecked=True+IsMouseOver=True    RadioButtonForegroundPointerOver               Inputs.jalxaml:362 readers=AstraSelectionTests.cs
+read ptr RadioButton                (self)                 IsChecked=True+IsPressed=True      RadioButtonForegroundPressed                   Inputs.jalxaml:363 readers=AstraSelectionTests.cs
+read    RadioButton                (self)                 IsEnabled=False                    RadioButtonForegroundDisabled                  Inputs.jalxaml:364 readers=AstraSelectionTests.cs
+read    RepeatButton               (self)                 IsEnabled=False                    RepeatButtonForegroundDisabled                 Common.jalxaml:102 readers=AstraStateCellArrivalTests.cs
+read ptr RepeatButton               (self)                 IsMouseOver=True                   RepeatButtonForegroundPointerOver              Common.jalxaml:100 readers=AstraButtonTests.cs
+read ptr RepeatButton               (self)                 IsMouseOver=True                   TextControlButtonForegroundPointerOver         TextInput.jalxaml:133 readers=AstraNumberBoxTests.cs
+read ptr RepeatButton               (self)                 IsPressed=True                     RepeatButtonForegroundPressed                  Common.jalxaml:101 readers=AstraButtonTests.cs
+read ptr RepeatButton               (self)                 IsPressed=True                     TextControlButtonForegroundPressed             TextInput.jalxaml:138 readers=AstraNumberBoxTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    ListBoxItemForegroundDisabled                  ListBoxes.jalxaml:85 readers=AstraListBoxTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    NavigationViewItemForegroundDisabled           Navigation.jalxaml:126 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    NavigationViewItemForegroundSelectedDisabled   Navigation.jalxaml:155 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    ComboBoxItemForegroundDisabled                 Selection.jalxaml:162 readers=AstraComboBoxTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    TabViewItemHeaderForegroundDisabled            TabView.jalxaml:210 readers=AstraTabViewTests.cs
+read    TextBlock                  (self)                 IsEnabled=False                    TreeViewItemForegroundDisabled                 TreeViews.jalxaml:167 readers=AstraTreeViewTests.cs
+read    TextBlock                  (self)                 IsEnabled=False+IsSelected=True    ComboBoxItemForegroundSelectedDisabled         Selection.jalxaml:163 readers=AstraComboBoxTests.cs
+read    TextBlock                  (self)                 IsEnabled=True                     NavigationViewItemForegroundSelectedPointerOver Navigation.jalxaml:138 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsEnabled=True                     NavigationViewItemForegroundSelectedPressed    Navigation.jalxaml:147 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsHighlighted=True                 ComboBoxItemForegroundPointerOver              Selection.jalxaml:156 readers=AstraComboBoxTests.cs
+read ptr TextBlock                  (self)                 IsMouseCaptureWithin=True          ListBoxItemForeground                          ListBoxes.jalxaml:81 readers=AstraForegroundRoutingTests.cs,AstraListBoxTests.cs
+read ptr TextBlock                  (self)                 IsMouseCaptureWithin=True          ListViewItemForegroundPressed                  ListViews.jalxaml:114 readers=AstraListViewTests.cs
+read ptr TextBlock                  (self)                 IsMouseCaptureWithin=True          ComboBoxItemForegroundPressed                  Selection.jalxaml:157 readers=AstraComboBoxTests.cs
+NONE ptr TextBlock                  (self)                 IsMouseCaptureWithin=True          TabViewItemHeaderForegroundPressed             TabView.jalxaml:199 readers=-
+read ptr TextBlock                  (self)                 IsMouseCaptureWithin=True          TreeViewItemForegroundPressed                  TreeViews.jalxaml:163 readers=AstraTreeViewTests.cs
+read ptr TextBlock                  (self)                 IsMouseOver=True                   ListBoxItemForeground                          ListBoxes.jalxaml:80 readers=AstraForegroundRoutingTests.cs,AstraListBoxTests.cs
+read ptr TextBlock                  (self)                 IsMouseOver=True                   ListViewItemForegroundPointerOver              ListViews.jalxaml:113 readers=AstraListViewTests.cs
+read ptr TextBlock                  (self)                 IsMouseOver=True                   NavigationViewItemForegroundPointerOver        Navigation.jalxaml:118 readers=AstraNavigationTests.cs
+read ptr TextBlock                  (self)                 IsMouseOver=True                   ComboBoxItemForegroundPointerOver              Selection.jalxaml:155 readers=AstraComboBoxTests.cs
+NONE ptr TextBlock                  (self)                 IsMouseOver=True                   TabViewItemHeaderForegroundPointerOver         TabView.jalxaml:198 readers=-
+read ptr TextBlock                  (self)                 IsMouseOver=True                   TreeViewItemForegroundPointerOver              TreeViews.jalxaml:162 readers=AstraTreeViewTests.cs
+read ptr TextBlock                  (self)                 IsPressed=True                     NavigationViewItemForegroundPressed            Navigation.jalxaml:122 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsSelected=True                    ListBoxItemForeground                          ListBoxes.jalxaml:82 readers=AstraForegroundRoutingTests.cs,AstraListBoxTests.cs
+read    TextBlock                  (self)                 IsSelected=True                    ListViewItemForegroundSelected                 ListViews.jalxaml:115 readers=AstraListViewTests.cs
+read    TextBlock                  (self)                 IsSelected=True                    NavigationViewItemForegroundSelected           Navigation.jalxaml:114 readers=AstraNavigationTests.cs
+read    TextBlock                  (self)                 IsSelected=True                    ComboBoxItemForegroundSelected                 Selection.jalxaml:158 readers=AstraComboBoxTests.cs
+NONE    TextBlock                  (self)                 IsSelected=True                    TabViewItemHeaderForegroundSelected            TabView.jalxaml:203 readers=-
+read    TextBlock                  (self)                 IsSelected=True                    TreeViewItemForegroundSelected                 TreeViews.jalxaml:164 readers=AstraTreeViewTests.cs
+read    TextBlock                  (self)                 IsSelected=True+IsEnabled=False    TreeViewItemForegroundSelectedDisabled         TreeViews.jalxaml:168 readers=AstraTreeViewTests.cs
+read    TextBlock                  (self)                 IsSelected=True+IsHighlighted=True ComboBoxItemForegroundSelectedPointerOver      Selection.jalxaml:160 readers=AstraComboBoxTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseCaptureWithin=True ListBoxItemForeground                          ListBoxes.jalxaml:84 readers=AstraForegroundRoutingTests.cs,AstraListBoxTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseCaptureWithin=True ListViewItemForegroundSelectedPressed          ListViews.jalxaml:117 readers=AstraListViewTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseCaptureWithin=True ComboBoxItemForegroundSelectedPressed          Selection.jalxaml:161 readers=AstraComboBoxTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseCaptureWithin=True TreeViewItemForegroundSelectedPressed          TreeViews.jalxaml:166 readers=AstraTreeViewTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseOver=True   ListBoxItemForeground                          ListBoxes.jalxaml:83 readers=AstraForegroundRoutingTests.cs,AstraListBoxTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseOver=True   ListViewItemForegroundSelectedPointerOver      ListViews.jalxaml:116 readers=AstraListViewTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseOver=True   ComboBoxItemForegroundSelectedPointerOver      Selection.jalxaml:159 readers=AstraComboBoxTests.cs
+read ptr TextBlock                  (self)                 IsSelected=True+IsMouseOver=True   TreeViewItemForegroundSelectedPointerOver      TreeViews.jalxaml:165 readers=AstraTreeViewTests.cs
+NONE    TextBlock                  CloseButton            IsEnabled=False                    TabViewItemHeaderDisabledCloseButtonForeground TabView.jalxaml:210 readers=-
+NONE ptr TextBlock                  CloseButton            IsMouseCaptureWithin=True          TabViewItemHeaderPressedCloseButtonForeground  TabView.jalxaml:199 readers=-
+NONE ptr TextBlock                  CloseButton            IsMouseOver=True                   TabViewItemHeaderPointerOverCloseButtonForeground TabView.jalxaml:198 readers=-
+NONE    TextBlock                  CloseButton            IsSelected=True                    TabViewItemHeaderSelectedCloseButtonForeground TabView.jalxaml:203 readers=-
+NONE    TextBlock                  IconHost               IsEnabled=False                    TabViewItemIconForegroundDisabled              TabView.jalxaml:210 readers=-
+NONE ptr TextBlock                  IconHost               IsMouseCaptureWithin=True          TabViewItemIconForegroundPressed               TabView.jalxaml:199 readers=-
+NONE ptr TextBlock                  IconHost               IsMouseOver=True                   TabViewItemIconForegroundPointerOver           TabView.jalxaml:198 readers=-
+NONE    TextBlock                  IconHost               IsSelected=True                    TabViewItemIconForegroundSelected              TabView.jalxaml:203 readers=-
+read    TextBox                    (self)                 IsEnabled=False                    TextControlForegroundDisabled                  TextInput.jalxaml:54 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    TextBox                    (self)                 IsKeyboardFocusWithin=True         TextControlForegroundFocused                   TextInput.jalxaml:48 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read ptr TextBox                    (self)                 IsMouseOver=True                   TextControlForegroundPointerOver               TextInput.jalxaml:42 readers=AstraAutoSuggestBoxTests.cs,AstraNumberBoxTests.cs,AstraTextInputTests.cs
+read    ToggleButton               (self)                 IsChecked=True                     ToggleButtonForegroundChecked                  Common.jalxaml:84 readers=AstraToggleButtonTests.cs
+read    ToggleButton               (self)                 IsChecked=True+IsEnabled=False     ToggleButtonForegroundCheckedDisabled          Common.jalxaml:88 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsChecked=True+IsMouseOver=True    ToggleButtonForegroundCheckedPointerOver       Common.jalxaml:85 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsChecked=True+IsPressed=True      ToggleButtonForegroundCheckedPressed           Common.jalxaml:86 readers=AstraToggleButtonTests.cs
+read    ToggleButton               (self)                 IsChecked={x:Null}                 ToggleButtonForegroundIndeterminate            Common.jalxaml:89 readers=AstraToggleButtonTests.cs
+read    ToggleButton               (self)                 IsChecked={x:Null}+IsEnabled=False ToggleButtonForegroundIndeterminateDisabled    Common.jalxaml:92 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsChecked={x:Null}+IsMouseOver=True ToggleButtonForegroundIndeterminatePointerOver Common.jalxaml:90 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsChecked={x:Null}+IsPressed=True  ToggleButtonForegroundIndeterminatePressed     Common.jalxaml:91 readers=AstraToggleButtonTests.cs
+read    ToggleButton               (self)                 IsEnabled=False                    ToggleButtonForegroundDisabled                 Common.jalxaml:87 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsMouseOver=True                   ToggleButtonForegroundPointerOver              Common.jalxaml:82 readers=AstraToggleButtonTests.cs
+read ptr ToggleButton               (self)                 IsPressed=True                     ToggleButtonForegroundPressed                  Common.jalxaml:83 readers=AstraToggleButtonTests.cs
+read    ToggleMenuFlyoutItem       (self)                 IsEnabled=False                    MenuFlyoutSubItemForegroundDisabled            Menus.jalxaml:133 readers=AstraMenuTests.cs
+read ptr ToggleMenuFlyoutItem       (self)                 IsMouseOver=True                   MenuFlyoutItemForegroundPointerOver            Menus.jalxaml:132 readers=AstraMenuTests.cs
+read    TreeDataGrid               (self)                 IsEnabled=False                    DataGridRowForegroundDisabled                  TreeDataGrid.jalxaml:64 readers=AstraDataGridTests.cs
+read    controls:FluentBreadcrumbBarItem (self)                 IsEnabled=False                    BreadcrumbBarDisabledForegroundBrush           BreadcrumbBar.jalxaml:83 readers=AstraBreadcrumbBarTests.cs
+read    controls:FluentBreadcrumbBarItem (self)                 IsLastItem=True                    BreadcrumbBarCurrentNormalForegroundBrush      BreadcrumbBar.jalxaml:80 readers=AstraBreadcrumbBarTests.cs
+read    controls:FluentDropDownButton (self)                 IsEnabled=False                    ButtonForegroundDisabled                       Common.jalxaml:280 readers=AstraButtonTests.cs
+NONE ptr controls:FluentDropDownButton (self)                 IsMouseOver=True                   ButtonForegroundPointerOver                    Common.jalxaml:278 readers=-
+read ptr controls:FluentDropDownButton (self)                 IsPressed=True                     ButtonForegroundPressed                        Common.jalxaml:279 readers=AstraButtonTests.cs
+read    controls:FluentInfoBar     IconGlyph              Severity=Error                     InfoBarErrorSeverityIconForeground             Surfaces.jalxaml:193 readers=AstraExpanderInfoBarTests.cs
+NONE    controls:FluentInfoBar     IconGlyph              Severity=Success                   InfoBarSuccessSeverityIconForeground           Surfaces.jalxaml:205 readers=-
+NONE    controls:FluentInfoBar     IconGlyph              Severity=Warning                   InfoBarWarningSeverityIconForeground           Surfaces.jalxaml:199 readers=-
+read    controls:FluentRadioButtons (self)                 IsEnabled=False                    RadioButtonsHeaderForegroundDisabled           RadioButtons.jalxaml:31 readers=AstraRadioButtonsTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=Disabled         RatingControlDisabledSelectedForeground        RatingControl.jalxaml:81 readers=AstraRatingControlTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=Placeholder      RatingControlPlaceholderForeground             RatingControl.jalxaml:72 readers=AstraRatingControlTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=PointerOverPlaceholder RatingControlPointerOverPlaceholderForeground  RatingControl.jalxaml:75 readers=AstraRatingControlTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=PointerOverSet   RatingControlSelectedForeground                RatingControl.jalxaml:69 readers=AstraRatingControlTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=PointerOverUnselected RatingControlPointerOverUnselectedForeground   RatingControl.jalxaml:78 readers=AstraRatingControlTests.cs
+read    controls:FluentRatingControl ForegroundContentPresenter ActiveRatingState=Set              RatingControlSelectedForeground                RatingControl.jalxaml:66 readers=AstraRatingControlTests.cs
+
+state-cell Foreground rows: 176; pointer-free: 91; with a reader somewhere in tests: 139; without: 37

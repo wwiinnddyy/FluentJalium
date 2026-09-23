@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-831 lines collected from 48 sections across 46 documents.
+881 lines collected from 49 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -315,7 +315,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/focus-visual.md:154` - 双圈，得逐族对着上游审 `UseSystemFocusVisuals` 与 `FocusVisualMargin`（上游确实有族显式关掉系统框，例如
 - `audits/focus-visual.md:155` - ContentDialog 的按钮），不属于本批"只换判据、不动像素"的范围。挂在视觉余账（与 #21/#23 同族）。
 
-## audits/foreground.md - 34 lines
+## audits/foreground.md - 72 lines
 
 ### 7 Known Gaps（不声称清单）
 
@@ -353,6 +353,44 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:112` - 同一棵树三种尺子）：`TargetName` 写入 569 行、`Property="Foreground"` 的 Setter 237 行（其中 29 行两者皆是）、
 - `audits/foreground.md:113` - 全库 `<Setter>` 1507 行。第 4 节第 3 条当年数的 228 是**当时那棵树**的 `Property="Foreground"` 计数，
 - `audits/foreground.md:114` - 其后各批又添了行，现在同尺子是 237。
+- `audits/foreground.md:115` - 6b. 上面那条"没测被画上"在 2026-09-23 #88 结掉四个 owner，但**结出来的不是"都画上了"**：四条事实落在
+- `audits/foreground.md:116` - `AstraStateCellArrivalTests`，每条配两种突变（把那一格删掉 / 把它改指另一支刷），十个突变各一次重建一轮测点（4 删 + 4 改指 + 2 复合），
+- `audits/foreground.md:117` - 每次 revert 后 `git diff` 对相关样式文件为空（`spike/ForegroundArrival/mut-{point,cell,mask}-*.log`）。
+- `audits/foreground.md:118` - 逐格读数（Light，控件自身的 `Foreground`）：
+- `audits/foreground.md:120` - | owner / 那一格 | 格子住在哪 | 删掉 | 改指成白（`AccentButtonForeground`） | 谁在写 |
+- `audits/foreground.md:122` - | `SubtleButtonForegroundDisabled`（`Common.jalxaml:68`） | `Style.Triggers` | 4/4 恒绿 | 只本条红，读到 `#FFFFFFFF` | **我们这格**压得过框架那次写 |
+- `audits/foreground.md:123` - | `RepeatButtonForegroundDisabled`（`Common.jalxaml:102`） | `Style.Triggers` | 恒绿 | 只本条红，读到 `#FFFFFFFF` | 同上 |
+- `audits/foreground.md:124` - | `CheckBoxForegroundUncheckedDisabled`（`Selection.jalxaml:39`） | `ControlTemplate.Triggers` | 恒绿 | **也恒绿** | 只有框架那次写（见下） |
+- `audits/foreground.md:125` - | `CheckBoxForegroundChecked`（`Selection.jalxaml:33`） | `ControlTemplate.Triggers` | 恒绿 | 只本条红，读到 `#5C000000` | **我们这格** |
+- `audits/foreground.md:127` - 两格同状态、同属性，只因住在不同层就一个能压过框架的写、一个不能——这是本批量出来的不对称，不是推断。
+- `audits/foreground.md:128` - 而"删掉恒看不见"在禁用格上还多了一层理由：把 `TextDisabled` 这个名字改指二级墨（`#9E000000`）之后，
+- `audits/foreground.md:129` - 抽掉自己那格的按钮与勾选框**才**跟着读到 `#9E000000`（`mut-mask-subtlecellmask.log`、
+- `audits/foreground.md:130` - `mut-mask-checkboxcellmask.log`，各只红自己那一条）。所以 #12 那条"框架从名字 `TextDisabled` 现查禁用墨"
+- `audits/foreground.md:131` - 的通路不止长在生成标签上，控件自身的 `Foreground` 也是它写的；这也是为什么第四条事实那句主张钉的是调色板刷
+- `audits/foreground.md:132` - 而不是别名键——钉别名会跟着突变一起动，什么都证明不了。
+- `audits/foreground.md:133` - 6c. 承上，落在 `ControlTemplate.Triggers` 里的禁用前景格今天**改不动**：单独重写
+- `audits/foreground.md:134` - `CheckBoxForegroundUncheckedDisabled`（以及同组 `…CheckedDisabled`、`…IndeterminateDisabled`）不改变任何像素，
+- `audits/foreground.md:135` - 上游会认这个覆盖。今天看不见是因为这三行转录的正是 `TextDisabled` 指向的那一支刷；一旦有人只改这几族键就是用户可见的失效。
+- `audits/foreground.md:136` - 候选修法已有证据：把该状态的 `Foreground` 行提到 `Style.Triggers`（同表前两行证明那里压得过）。
+- `audits/foreground.md:137` - 本批没动产品标记，改动登记成 #89。同一条判据**不外推**：`TabView.jalxaml:38`、`:71` 两行也是模板触发器，
+- `audits/foreground.md:138` - 但本批只量到 CheckBox 一个 owner，那两处照旧是"只测了键能解析"。
+- `audits/foreground.md:139` - 6d. 普查的尺子本身在本批错过一次，先记下来：`spike/StateCellCensus/census.py` 第一版只认 `<Trigger>` 与
+- `audits/foreground.md:140` - `<ConditionGroup>`，而库里的多条件格子写成 `<MultiTrigger><MultiTrigger.Conditions><Condition …/>`——
+- `audits/foreground.md:141` - `<Trigger` 匹配不上 `<MultiTrigger`、`ConditionGroup` 匹配不上 `Condition`，开合两头都不匹配，
+- `audits/foreground.md:142` - 所以**带勾选条件的 39 行是整批缺席**，不是被错分。修好后同尺子是 **176 条状态格子、91 条无指针可驱动、
+- `audits/foreground.md:143` - 37 条的键名在测点里没出现过**，其中"无指针 × 无读者"13 条。这条弱信号也要一起记：`readers=` 判的是
+- `audits/foreground.md:144` - "键名字面量在测点里出现过"，本批那条勾选框事实**故意**不写键名（它钉的是调色板刷，理由在 7.6b），
+- `audits/foreground.md:145` - 于是普查把那一行仍报成"无读者"——它能提示"要不要看第二眼"，不是到达性的证据。
+- `audits/foreground.md:146` - 6e. 那 13 行逐条处置（能不能出事实，取决于该行转录的刷与"没有这格时读到的刷"是不是同一支）：
+- `audits/foreground.md:148` - | 那一行 | 位置 | 转录到 | 能否出事实 | 处置 |
+- `audits/foreground.md:150` - | `CheckBoxForegroundUncheckedDisabled` | `Selection.jalxaml:39` | 禁用刷 | 删、改指都看不见 | 本批事实 + 复合突变（7.6b） |
+- `audits/foreground.md:151` - | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
+- `audits/foreground.md:152` - | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
+- `audits/foreground.md:153` - | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
+- `audits/foreground.md:154` - | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
+- `audits/foreground.md:155` - | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
+- `audits/foreground.md:156` - | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
+- `audits/foreground.md:157` - | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
 
 ## audits/icon-family.md - 13 lines
 
@@ -968,7 +1006,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 105 lines
+## ROADMAP.md - 117 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1070,18 +1108,32 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4257` - - 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
 - `ROADMAP.md:4261` - 一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
 - `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份...
-- `ROADMAP.md:4288` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
+- `ROADMAP.md:4289` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
 ### 这一节自己的 Known Gap
 
-- `ROADMAP.md:4299` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
-- `ROADMAP.md:4300` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
-- `ROADMAP.md:4320` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
-- `ROADMAP.md:4405` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+- `ROADMAP.md:4302` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4303` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4323` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+- `ROADMAP.md:4408` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
 ### Known Gap（这条做不到，不写进断言）
 
-- `ROADMAP.md:4458` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
-- `ROADMAP.md:4459` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
-- `ROADMAP.md:4460` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
-- `ROADMAP.md:4468` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+- `ROADMAP.md:4461` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+- `ROADMAP.md:4462` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+- `ROADMAP.md:4463` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+- `ROADMAP.md:4471` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+### Known Gap
 
-<!-- canonical-lines=831 sha256=16979f0bc0ec9f5d1076bf80f413736dd708df4bd68a1b8007dc9ddbf5a64dbf -->
+- `ROADMAP.md:4524` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
+- `ROADMAP.md:4525` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
+- `ROADMAP.md:4526` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
+- `ROADMAP.md:4527` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
+- `ROADMAP.md:4528` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
+- `ROADMAP.md:4529` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
+- `ROADMAP.md:4530` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
+- `ROADMAP.md:4531` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
+- `ROADMAP.md:4532` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
+- `ROADMAP.md:4533` - hover / pressed 行照旧归真指针通路（#13）。
+- `ROADMAP.md:4534` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4544` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+
+<!-- canonical-lines=881 sha256=cb9c7398af69d0b62fb0217afcd34ba91d082769e1f033286f3e62bb27e31be9 -->
