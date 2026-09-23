@@ -421,4 +421,40 @@ composite #2B2B2B (token #0DFFFFFF)`；改回 → 三个相关类合跑 **75/75 
 届时把哨兵删掉、把逐控件的文本像素主张打开。#50 因此从"未测"变成"测死并已设防"，但**它仍是缺陷**（用户看不见文字），
 只是那一条属于上游渲染，不属于本仓库能改的形状。
 
+## 页闸的槽内稳定读数：把主角的运动拿掉，而不是把判据改松（#78 的另一半，2026-09-23）
+
+`tools/AstraPagePixels` 每条形腿同时报两条 `stable`：整窗那条是判据（`whole.Stable`），槽内那条只报数不判。
+`status` 页两档的槽内读数因此挂了十几批的 `True/False`，而账上给它的成因句（`ROADMAP.md:3883-3885`）是一句**推断**。
+这一批不再猜，给仪器加一把只动主角、不动判据的开关。
+
+- `--still` 走一遍这条腿的可视树（`VisualTreeHelper.GetChildrenCount`/`GetChild`，与测试侧 `PixelHarness` 同一套），
+  把每枚 `IsIndeterminate=true` 的 `FluentProgressRing` 换成 determinate 值——这是控件唯一一条会 `_animator.Stop()`
+  的条件（`Controls/Status/FluentProgressRing.cs:219-236`）。值本身是任意的：要验的是"这里有没有运动"，不是"画哪段弧"。
+- 每条腿报 `rings N found/M stopped`，收尾那行带 `[subject's rings stopped]`：一份改过主角的读数不许冒充出厂读数。
+  `found` 与 `stopped` 分开印是刻意的——"没停下东西"可能是这条腿本来没有环，也可能是树没走到，两个结论不能合成一个数。
+
+同一天两次 `--report`（只多/少一个开关），39 条腿逐字段对比（`spike/SystemColorProbe/compare-still.py`，
+读数 `still-base.log` / `still-on.log`）：
+
+| 读数 | 基线 | `--still` |
+|---|---|---|
+| `status Light` 槽内 | `stable=True/False`，396 色 | **`True/True`**，371 色 |
+| `status Dark` 槽内 | `stable=True/False`，286 色 | **`True/True`**，280 色 |
+| `status HighContrast` 槽内 | `True/True`，180 色 | 不变（这一档本来就稳） |
+| 其余 36 条腿 | — | **逐字段同读数**，含 `top` 那六块色 |
+
+于是 #78 的另一半结清：那两行飘的是**主角在动**，不是判据坏了——停掉唯一的运动源，两条 `False` 各自翻成 `True`，
+37 条对照腿一个字节都没变。
+
+**两处更正**：① 那句成因写的是"两枚 indeterminate 环一直在要帧"，量到的是这一页**四枚**环、其中两枚 indeterminate，
+而这两枚里只有 `SpinningRing` 真在跑循环——另一枚 `QuietRing` 是 `IsActive=false`，`UpdateMotion` 早把它停了，
+且不活动的环只靠 `Opacity=0` 退出画面（`audits/progress-ring.md` Known Gap 5），零墨的东西改不动直方图。
+开关是两枚一起停的，所以"哪一枚"这条**不是**分离实验的结论，是代码条件加零像素论证。② `status Dark` 那行报
+`4 found/0 stopped`：同一个页实例在三个变体之间复用，Light 那次写的 `IsIndeterminate` 带进了后面两档。
+所以这两行**不是两次独立复现**，是同一次突变的两份读数。
+
+**Known Gap**：这条归因是一次性读数，没做成常驻测点——没有任何测点会因"环又开始让槽内飘"而红。要让它成为主张，
+得先让页闸开始判槽内稳定，而那等于顺手放弃"页里允许有动画"这条设计判断；本批不替页闸做这个决定。
+
+
 

@@ -1,0 +1,100 @@
+total <Setter> rows: 1507
+ruler A (TargetName writes): 569
+ruler B (Property="Foreground"): 237
+ruler B that also name a target: 29
+
+ruler B per file:
+  Common.jalxaml               42
+  Selection.jalxaml            38
+  TabView.jalxaml              21
+  TextInput.jalxaml            16
+  Menus.jalxaml                15
+  AppBar.jalxaml               11
+  Navigation.jalxaml           11
+  Inputs.jalxaml                9
+  PipsPager.jalxaml             9
+  BreadcrumbBar.jalxaml         8
+  DataGrid.jalxaml              8
+  ListBoxes.jalxaml             8
+  TreeViews.jalxaml             8
+  ListViews.jalxaml             7
+  RatingControl.jalxaml         7
+  Surfaces.jalxaml              6
+  AutoSuggestBox.jalxaml        4
+  RadioButtons.jalxaml          2
+  TreeDataGrid.jalxaml          2
+  ContentDialog.jalxaml         1
+  InfoBadge.jalxaml             1
+  ProgressBar.jalxaml           1
+  ProgressRing.jalxaml          1
+  TeachingTip.jalxaml           1
+
+ruler B owners:
+  TextBlock                                        46
+  Button                                           32
+  ComboBox                                         15
+  ToggleButton                                     13
+  CheckBox                                         12
+  ButtonBase                                        8
+  RadioButton                                       8
+  RepeatButton                                      7
+  controls:FluentRatingControl                      7
+  AppBarToggleButton                                5
+  NumberBox                                         5
+  AppBarButton                                      4
+  AutoCompleteBox                                   4
+  HyperlinkButton                                   4
+  controls:FluentDropDownButton                     4
+  DataGridCell                                      4
+  TextBox                                           4
+  PasswordBox                                       4
+  controls:FluentBreadcrumbBarItem                  3
+  MenuFlyoutItem                                    3
+  ToggleMenuFlyoutItem                              3
+  MenuFlyoutSubItem                                 3
+  Expander                                          3
+  controls:FluentInfoBar                            3
+  DataGrid                                          2
+  DataGridColumnHeader                              2
+  MenuItem                                          2
+  controls:FluentRadioButtons                       2
+  TreeDataGrid                                      2
+  AppBarSeparator                                   1
+  CommandBar                                        1
+  SplitButton                                       1
+  ToolTip                                           1
+  ContentDialog                                     1
+  controls:FluentInfoBadge                          1
+  Slider                                            1
+  ListBox                                           1
+  ListBoxItem                                       1
+  ListView                                          1
+  ListViewItem                                      1
+  Menu                                              1
+  ContextMenu                                       1
+  MenuBar                                           1
+  MenuBarItem                                       1
+  local:FluentNavigationItem                        1
+  local:FluentNavigationView                        1
+  ProgressBar                                       1
+  controls:FluentProgressRing                       1
+  ComboBoxItem                                      1
+  controls:FluentTabViewItem                        1
+  controls:FluentTeachingTip                        1
+  TreeViewItem                                      1
+
+ruler B rows whose Value carries no {ThemeResource} key (literal or TemplateBinding):
+
+ruler B distinct theme keys: 189
+  ListBoxItemForeground                             6
+  TextControlForeground                             4
+  TextControlForegroundPointerOver                  4
+  TextControlForegroundFocused                      4
+  TextControlForegroundDisabled                     4
+  DataGridRowForegroundDisabled                     4
+  MenuFlyoutItemForeground                          4
+  DataGridRowForeground                             3
+  MenuBarItemForeground                             3
+  NavigationViewItemForeground                      3
+  BreadcrumbBarDisabledForegroundBrush              2
+  ButtonForeground                                  2

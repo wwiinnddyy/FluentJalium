@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-807 lines collected from 47 sections across 45 documents.
+810 lines collected from 47 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -27,6 +27,11 @@ Categorised summaries live in `ROADMAP.md`.
 - `adaptation/00-jalium-theme-capabilities.md:923` - 要么就是真做不到——按 Known Gap 记，不要留一条永不生效的格子当交代。
 - `adaptation/00-jalium-theme-capabilities.md:1235` - 代价进 Known Gaps：子行的填充比父行窄 16 DIP，而 WinUI 的行永远铺满列表宽。
 - `adaptation/00-jalium-theme-capabilities.md:1309` - 离像素还差一跳，按原样写进事实与 Known Gaps，不做相邻替代。
+
+## adaptation/06-pixel-attribution.md - 2 lines
+
+- `adaptation/06-pixel-attribution.md:451` - 且不活动的环只靠 `Opacity=0` 退出画面（`audits/progress-ring.md` Known Gap 5），零墨的东西改不动直方图。
+- `adaptation/06-pixel-attribution.md:456` - **Known Gap**：这条归因是一次性读数，没做成常驻测点——没有任何测点会因"环又开始让槽内飘"而红。要让它成为主张，
 
 ## adaptation/07-scroll-host-substitution.md - 2 lines
 
@@ -946,7 +951,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 100 lines
+## ROADMAP.md - 101 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -983,13 +988,13 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4072` - 第一次读数就是被这个仪器错误带偏的（三条 SPI 变体一起打，才看清哪个参数是对的）。
 - `ROADMAP.md:4073` - - 高对比一档**没有任何像素证据**：逐页像素闸只跑 Light/Dark 两档。本批四类证据里"视觉"这一格是空的，
 - `ROADMAP.md:4074` - 构建/行为两格有读数（见下）。
-### #83（目标项 7）：Known Gaps 全集落成一个能闸口的文档——45 篇里 46 个小节、791 行，全部生成（2026-09-23）
+### #83（目标项 7）：Known Gaps 全集落成一个能闸口的文档——发行时 45 篇里 46 个小节、791 行，全部生成（2026-09-23）
 
 - `ROADMAP.md:4177` - 纪律那句"做不到就写进 Known Gaps，不许用相邻证据替代"此前**没有可核对的总量**：非主张散在 45 篇文档里，
 - `ROADMAP.md:4178` - 谁也没法一次看全，也没人知道新批次有没有偷偷不写。这一批把它变成一份生成的清单加两道闸。
 - `ROADMAP.md:4182` - | 位置 | 干什么 | 为什么是这个形状 |
 - `ROADMAP.md:4184` - | `tools/Report-AstraKnownGaps.ps1` | 走 `docs/astra/**/*.md`，收两类行：标题带 `Known Gap` 的小节里的**每一行**，以及任何自带该标记的散文行；每行截到 200 字符并带 `file:line`；尾部 `canonical-lines` + sha256 | 与 `keys.md` 同一套哲学：文档是生成的，**过期就是缺陷...
-- `ROADMAP.md:4185` - | `docs/astra/audits/known-gaps.md` | 791 行、45 篇、46 个 Known Gaps 小节 | 一次跑出的全集，不是抽样 |
+- `ROADMAP.md:4185` - | `docs/astra/audits/known-gaps.md` | 当前树生成读数：810 行、46 篇、47 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
 - `ROADMAP.md:4186` - | `tools/Test-AstraGates.ps1` 新步 `==> known gap inventory` | `-Check` | 放在 `-SkipPalette` 之外：它读的是文档，不是调色板 |
 - `ROADMAP.md:4187` - | `AstraGateTests.The_known_gap_inventory_covers_every_document_that_states_one` | 双向比文件集：哪篇声明了缺口而清单没它，哪篇清单里有但它已不再声明 | 测点用**自己的解析器**交叉读，不等脚本跑；`-Check` 看逐字形状，测点看覆盖面，两件事不互推 |
 - `ROADMAP.md:4191` - 1. **按标记数行 → 文档不可读。** 第一版每个标记一行、每行带整条原文。`ROADMAP.md:264` 那个阶段表的单元格是一行
@@ -1054,5 +1059,6 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4299` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
 - `ROADMAP.md:4300` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
 - `ROADMAP.md:4320` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+- `ROADMAP.md:4405` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
 
-<!-- canonical-lines=807 sha256=b7322efb9ace2b6211e2f6ad52d38499fb9e6b267a1048c254475f7a6f0ad88e -->
+<!-- canonical-lines=810 sha256=e6b7e222e9254d5af8f035308660f9cdf79a2e0d62c6ac499fad952e678710c8 -->

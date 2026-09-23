@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using FluentJalium.Controls;
 using FluentJalium.Gallery;
 using FluentJalium.Themes;
 using Jalium.UI;
@@ -21,6 +22,8 @@ namespace AstraPagePixels;
 ///
 /// Exit code is the verdict: 0 = every page passed, 1 = at least one did not, 2 = the harness could not measure.
 /// Pass <c>--report</c> to print the readings without judging them, which is how the thresholds below were set.
+/// Pass <c>--still</c> to take motion out of the subject before each capture (#78); the lines then report
+/// how many rings each leg froze, so a mutated reading can never be mistaken for the shipped one.
 /// </summary>
 internal static class Program
 {
@@ -72,6 +75,8 @@ internal static class Program
     {
         var report = args.Any(static argument =>
             string.Equals(argument, "--report", StringComparison.OrdinalIgnoreCase));
+        var still = args.Any(static argument =>
+            string.Equals(argument, "--still", StringComparison.OrdinalIgnoreCase));
 
         var renderContext = RenderContext.GetOrCreateCurrent(RenderBackend.Auto);
         renderContext.DefaultRenderingEngine = RenderingEngine.Impeller;
@@ -103,6 +108,7 @@ internal static class Program
                 Pump(24);
                 var host = PageHostOf(window);
                 var pageElement = host.Children.Count > 0 ? host.Children[0] : null;
+                var frozen = still ? FreezeRings(host) : (0, 0);
                 var whole = CaptureStable((FrameworkElement)window.Content!);
                 var slot = CaptureStable(host);
 
@@ -111,7 +117,8 @@ internal static class Program
                 var emptySlot = CaptureStable(host);
                 if (pageElement is not null) host.Children.Add(pageElement);
 
-                Report(id, variant, whole, slot, emptySlot);
+                Report(id, variant, whole, slot, emptySlot, still, frozen);
+
                 if (!report) Judge(id, variant, whole, slot, emptySlot, failures);
             }
         }
@@ -119,17 +126,22 @@ internal static class Program
         window.Close();
         foreach (var failure in failures) Console.Error.WriteLine(failure);
         Console.WriteLine($"{(failures.Count == 0 ? "PASS" : "FAIL")} {pages.Count} pages x {Variants.Length} variants" +
-            (report ? " (report only)" : $", {failures.Count} offender(s)"));
+            (report ? " (report only)" : $", {failures.Count} offender(s)") +
+            (still ? " [subject's rings stopped]" : string.Empty));
         return failures.Count == 0 ? 0 : 1;
     }
 
-    private static void Report(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot)
+    private static void Report(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot,
+        bool still, (int Found, int Stopped) frozen)
     {
+        // Found and stopped are both printed: a leg that stops nothing has either no spinning ring in it, or one
+        // the walk never reached, and those two readings must not collapse into the same number.
+        var frozenNote = still ? $" rings {frozen.Found} found/{frozen.Stopped} stopped" : string.Empty;
         Console.WriteLine($"{id} {variant}: stable={whole.Stable}/{slot.Stable} painted={Painted(whole.Histogram)} " +
             $"{string.Join(' ', BaseFills.Select(fill => $"{FillName(fill.Variant)}={Count(whole.Histogram, fill.Base)}"))} " +
             $"placeholder={Count(whole.Histogram, UpstreamPlaceholder)} green={Count(whole.Histogram, BrandFocusGreen)} | slot {slot.Histogram.Count} colours " +
             $"{Painted(slot.Histogram)}px over {emptySlot.Histogram.Count} colours {Painted(emptySlot.Histogram)}px " +
-            $"(slot {slot.Width}x{slot.Height}) | top {Top(whole.Histogram)}");
+            $"(slot {slot.Width}x{slot.Height}){frozenNote} | top {Top(whole.Histogram)}");
     }
 
     private static string FillName(FluentThemeVariant variant) => variant switch
@@ -171,7 +183,9 @@ internal static class Program
         // The slot is the scroll extent, not the viewport: it carries content the user cannot see, so a page with a
         // running animation there never repeats a frame. Measured on the status page in both variants - its
         // ProgressRing ticks below the fold, and the same window capture does settle because the ring is off-screen.
-        // Stability is therefore claimed for the viewport only, and the slot is judged on what it paints.
+        // #78's half, settled by --still: stopping that ring is the only thing in the run that moves these readings
+        // (2 of 39 legs go stable, the other 37 byte-identical). Stability is therefore claimed for the viewport
+        // only, and the slot is judged on what it paints - a slot that never settles costs nothing to the verdict.
         if (slot.Width <= 0 || slot.Height <= 0) failures.Add($"{id} {variant}: the page slot has no size");
         if (Painted(emptySlot.Histogram) != 0)
             failures.Add($"{id} {variant}: the slot was not actually emptied ({Painted(emptySlot.Histogram)} lit pixels left)");
@@ -249,6 +263,41 @@ internal static class Program
     private static Panel PageHostOf(MainWindow window) =>
         (Panel)(typeof(MainWindow).GetProperty("ContentHost", BindingFlags.Instance | BindingFlags.NonPublic)?
             .GetValue(window) ?? throw new InvalidOperationException("MainWindow lost its ContentHost view."));
+
+    /// <summary>
+    /// <c>--still</c> for #78: the page gate's <c>status</c> slot never repeats a frame, and the ring is the only
+    /// member of that picture with a frame loop of its own. This leaves the instrument untouched and takes the
+    /// motion out of the subject instead - every realized spinning ring is put on a determinate value, which is
+    /// the one condition the control stops its animator on. The value is arbitrary: what is under test is elapsed
+    /// motion, not which arc gets drawn.
+    /// </summary>
+    private static (int Found, int Stopped) FreezeRings(DependencyObject root)
+    {
+        var found = 0;
+        var stopped = 0;
+        if (root is FluentProgressRing ring)
+        {
+            found++;
+            if (ring.IsIndeterminate)
+            {
+                ring.IsIndeterminate = false;
+                ring.Value = StoppedRingValue;
+                stopped++;
+            }
+        }
+
+        for (var index = 0; index < VisualTreeHelper.GetChildrenCount(root); index++)
+        {
+            if (VisualTreeHelper.GetChild(root, index) is not { } child) continue;
+            var nested = FreezeRings(child);
+            found += nested.Found;
+            stopped += nested.Stopped;
+        }
+
+        return (found, stopped);
+    }
+
+    private const double StoppedRingValue = 40;
 
     private static List<string> PageIds()
     {

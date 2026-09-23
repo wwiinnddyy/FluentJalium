@@ -4172,7 +4172,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 三档全绿里有一条顺带量到、尚未查因的读数：`status` 那一页的槽内稳定性在 Light/Dark 是 `stable=True/False`（#78 的环），
 到 HighContrast 变成 `True/True`，同一页同一槽。这只说明那一档下这个测点不再逐帧变墨，**不**说明环停了——#78 仍挂着。
 
-## #83（目标项 7）：Known Gaps 全集落成一个能闸口的文档——45 篇里 46 个小节、791 行，全部生成（2026-09-23）
+## #83（目标项 7）：Known Gaps 全集落成一个能闸口的文档——发行时 45 篇里 46 个小节、791 行，全部生成（2026-09-23）
 
 纪律那句"做不到就写进 Known Gaps，不许用相邻证据替代"此前**没有可核对的总量**：非主张散在 45 篇文档里，
 谁也没法一次看全，也没人知道新批次有没有偷偷不写。这一批把它变成一份生成的清单加两道闸。
@@ -4182,7 +4182,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 | 位置 | 干什么 | 为什么是这个形状 |
 |---|---|---|
 | `tools/Report-AstraKnownGaps.ps1` | 走 `docs/astra/**/*.md`，收两类行：标题带 `Known Gap` 的小节里的**每一行**，以及任何自带该标记的散文行；每行截到 200 字符并带 `file:line`；尾部 `canonical-lines` + sha256 | 与 `keys.md` 同一套哲学：文档是生成的，**过期就是缺陷**，`-Check` 就是主张 |
-| `docs/astra/audits/known-gaps.md` | 791 行、45 篇、46 个 Known Gaps 小节 | 一次跑出的全集，不是抽样 |
+| `docs/astra/audits/known-gaps.md` | 当前树生成读数：810 行、46 篇、47 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
 | `tools/Test-AstraGates.ps1` 新步 `==> known gap inventory` | `-Check` | 放在 `-SkipPalette` 之外：它读的是文档，不是调色板 |
 | `AstraGateTests.The_known_gap_inventory_covers_every_document_that_states_one` | 双向比文件集：哪篇声明了缺口而清单没它，哪篇清单里有但它已不再声明 | 测点用**自己的解析器**交叉读，不等脚本跑；`-Check` 看逐字形状，测点看覆盖面，两件事不互推 |
 
@@ -4335,7 +4335,8 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 - **旁证，不是证明**：同一页同一槽在 HighContrast 读到 `True/True`，而那一档把调色板压平成四个平台色，
   环的自转在那里几乎不产生计数变化。
 - **不声称**：要把"status 槽的飘就是这只环造成的"写成结论，得先把环设成 determinate（静止）在同一条腿复测一次，
-  看 `slot.Stable` 是否翻成 `True`。这一步没做，#78 的另一半（页闸的飘）因此**仍未结清**，不用上游证据顶它。
+  看 `slot.Stable` 是否翻成 `True`。这一步本批没做，#78 的另一半（页闸的飘）因此**仍未结清**，不用上游证据顶它。
+  （下一批 #86 做了这一步，两条 `False` 各自翻成 `True`，那半本账就此结清。）
 
 ### 闸口读数与硬件输入
 
@@ -4347,4 +4348,62 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 - **视觉**：本批没有新像素主张；页级像素那一行是回归读数。
 - **硬件输入**：仍为零——环不接受指针与键盘（上游 `IsHitTestVisible=False`/`IsTabStop=False`，已有测点钉住），
   这条主张不需要输入通路，也没有被输入通路证明过。
+
+## #86（目标项 5 的另一半）量掉 #78 的页闸那一半：把运动从主角身上拿掉，两条 `False` 各自翻成 `True`（2026-09-23）
+
+上一节留了一句"这一步没做"：要断言 status 槽的飘是那只环造成的，得把环设成静止再复测同一条腿。本批就是这一测，
+仪器与逐字段对比写在 `adaptation/06-pixel-attribution.md` 最后一节，这里只记账面。
+
+### 交付形状
+
+| 位置 | 干什么 | 为什么是这个形状 |
+|---|---|---|
+| `tools/AstraPagePixels` 新开关 `--still` | 每条腿捕获前走一遍可视树，把 `IsIndeterminate=true` 的环换成 determinate 值（控件唯一一条会 `_animator.Stop()` 的条件） | 只动主角不动判据：判据一行没改，`Judge` 的阈值与地板全是原样 |
+| 每行 `rings N found/M stopped`，末行 `[subject's rings stopped]` | 报"走到几枚、停下几枚"，并给被改过主角的那份读数打水印 | 两个数分开印才有解释力：`found=0` 才是"这条腿没环或树没走到"，`found=4/stopped=0` 说的是"环在、但本来就没在转（或被前一条腿改过）"；水印防的是拿突变跑当出厂读数 |
+| `spike/SystemColorProbe/compare-still.py` | 把两份 `--report` 逐字段对齐，只印差异 | shell 那两条腿自己错了两次（字段下标、`\|` 与行内 `|` 撞车），这活儿该用真解析器 |
+
+### 读数（同一天两次 `--report`，只差一个开关）
+
+| 腿 | 基线 | `--still` |
+|---|---|---|
+| `status Light` 槽内 | `True/False`，396 色 | **`True/True`**，371 色（`rings 4 found/2 stopped`） |
+| `status Dark` 槽内 | `True/False`，286 色 | **`True/True`**，280 色（`rings 4 found/0 stopped`） |
+| `status HighContrast` | `True/True`，180 色 | 不变 |
+| 其余 36 条腿 | — | 逐字段同读数，含 `top` 六块色 |
+
+这两次跑的都是 `--report`，所以末行那句 `PASS 13 pages x 3 variants (report only)` 只是报表模式的抬头，**不是**判据读数——
+`Judge` 根本没跑。判据侧本来也不看槽内稳定（只判整窗 `whole.Stable` 与那片色块），这条由下面那次串行闸口负责证明。
+
+### 两处更正，都是上一手的账
+
+1. **那句"两枚 indeterminate 环一直在要帧"（`:3883-3885`）当时是推断，且数字就错了。** 这一页有四枚环，两枚
+   indeterminate，而其中只有 `SpinningRing` 真在跑循环：另一枚 `QuietRing` 是 `IsActive=false`，`UpdateMotion`
+   早就把它停了，且不活动的环只靠 `Opacity=0` 退出画面（零墨改不动直方图）。"是哪一枚"这条**不**是分离实验的结论，
+   是代码条件加零像素论证——开关是两枚一起停的。历史句不删，改在这里。
+2. **`status Dark` 那行 `4 found/0 stopped` 说明它不是第二次复现。** 同一个页实例跨三个变体复用，Light 那次写进去的
+   `IsIndeterminate=false` 带进了 Dark 与 HighContrast。所以"两档各翻一次"要读成**一次突变的两份读数**，不是两次独立验证。
+
+### 牙齿：这把开关自己算不算一次 A/B
+
+- **对照组够宽**：36 条无环腿逐字段同读数（不是"大致相同"，是解析后每字段相等），说明开关不是一动全动的噪声源。
+- **只有该翻的翻了**：39 条腿里差异恰好 2 条，且正是基线里唯二 `slot=False` 的那两条；`status HighContrast` 本来就
+  稳，加了开关也不动——这条排掉"任何腿都会因走了树一遍而变稳"这种仪器效应。
+- **反向对照在上一批**：`gate-85.log` 的出厂跑（不带开关）里这两条腿仍是 `True/False`，本次基线跑复现出同一个数
+  （1,189,788px / 1,189,783px 与账上历史读数逐字相同），所以它不是"这次不巧才飘"。
+
+### 四类证据与非主张
+
+- **行为（串行闸口）**：`tools/Test-AstraGates.ps1 -Configuration Debug`，日志 `spike/SystemColorProbe/gate-86.log`，
+  **退出码 0**——build `0 警告 0 错误` → **1576 / 1576，0 失败 0 跳过**（9 m 15 s，测点总数没动，本批一条测点都没加）→
+  `PASS 13 pages x 3 variants, 0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1312 canonical lines.` →
+  `known-gaps.md is current: 810 canonical lines.` → `All Astra gates passed.`。
+  这一跑里 `stable=True/False` 仍然恰好两条（`status Light` / `status Dark`），也就是**出厂读数的飘本身是稳定可复现的**：
+  判据不因此变红，因为它不看槽内稳定——这正是本批把"为什么不看"从推断换成读数的原因。
+  **视觉**：本批只有一条归因主张，不新增像素断言；页闸判据一行没动。
+  **硬件输入**：零。**构建**：`tools/AstraPagePixels` 单独 build `0 警告 / 0 错误`（第一版有条 CS8604，`GetChild`
+  可空没接住，已按 `is not { } child` 收掉）。
+- **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+  ② 两枚环没做分离实验，"哪一枚"的强度低于"运动造成的"这一层；③ Light 那次翻绿依赖这台机器这一刻的相位，
+  槽内色数（396→371）也跟着变了，本批不把它当第二个主张。
+
 
