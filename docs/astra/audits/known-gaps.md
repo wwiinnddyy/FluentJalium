@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-988 lines collected from 53 sections across 46 documents.
+990 lines collected from 54 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -1056,7 +1056,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 174 lines
+## ROADMAP.md - 176 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1159,90 +1159,94 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4261` - 一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
 - `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份...
 - `ROADMAP.md:4289` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
-- `ROADMAP.md:4302` - 接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。
+- `ROADMAP.md:4303` - 接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。整条管道在这批之上的全绿读数是
 ### 这一节自己的 Known Gap
 
-- `ROADMAP.md:4306` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
-- `ROADMAP.md:4307` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
-- `ROADMAP.md:4327` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
-- `ROADMAP.md:4412` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+- `ROADMAP.md:4308` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4309` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4329` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+- `ROADMAP.md:4414` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
 ### Known Gap（这条做不到，不写进断言）
 
-- `ROADMAP.md:4465` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
-- `ROADMAP.md:4466` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
-- `ROADMAP.md:4467` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
-- `ROADMAP.md:4475` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+- `ROADMAP.md:4467` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+- `ROADMAP.md:4468` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+- `ROADMAP.md:4469` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+- `ROADMAP.md:4477` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
 ### Known Gap
 
-- `ROADMAP.md:4528` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
-- `ROADMAP.md:4529` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
-- `ROADMAP.md:4530` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
-- `ROADMAP.md:4531` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
-- `ROADMAP.md:4532` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
-- `ROADMAP.md:4533` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
-- `ROADMAP.md:4534` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
-- `ROADMAP.md:4535` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
-- `ROADMAP.md:4536` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
-- `ROADMAP.md:4537` - hover / pressed 行照旧归真指针通路（#13）。
-- `ROADMAP.md:4538` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
-- `ROADMAP.md:4548` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
-- `ROADMAP.md:4585` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
+- `ROADMAP.md:4530` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
+- `ROADMAP.md:4531` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
+- `ROADMAP.md:4532` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
+- `ROADMAP.md:4533` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
+- `ROADMAP.md:4534` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
+- `ROADMAP.md:4535` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
+- `ROADMAP.md:4536` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
+- `ROADMAP.md:4537` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
+- `ROADMAP.md:4538` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
+- `ROADMAP.md:4539` - hover / pressed 行照旧归真指针通路（#13）。
+- `ROADMAP.md:4540` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4550` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+- `ROADMAP.md:4587` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
 ### Known Gaps
 
-- `ROADMAP.md:4627` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
-- `ROADMAP.md:4628` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
-- `ROADMAP.md:4629` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
-- `ROADMAP.md:4630` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
-- `ROADMAP.md:4637` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
-- `ROADMAP.md:4671` - 1. `:38` 那行同键（滚动按钮样式）本批**没量到**：它的载体只在标签条溢出时实现，按上面那条不外推。
-- `ROADMAP.md:4672` - 2. `:71` 是不是**上游也这样**没量（上游同样有两处写这枚按钮的前景），所以本批只报"这行在我们的运行时到不了像素"，
-- `ROADMAP.md:4673` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
-- `ROADMAP.md:4674` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
-- `ROADMAP.md:4681` - - **视觉**：零新增像素断言（Known Gap 3）。
-- `ROADMAP.md:4710` - 不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
-- `ROADMAP.md:4748` - 1. **其余图标宿主没量**（#95）：`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178`
-- `ROADMAP.md:4749` - 的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
-- `ROADMAP.md:4750` - 按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
-- `ROADMAP.md:4751` - + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
-- `ROADMAP.md:4752` - **（本条由 #95 结清：普查表与接线在下一节，行号是接线前的位置。）**
-- `ROADMAP.md:4753` - 2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
-- `ROADMAP.md:4754` - 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
-- `ROADMAP.md:4755` - 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
-- `ROADMAP.md:4756` - 但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
-- `ROADMAP.md:4778` - `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
-- `ROADMAP.md:4805` - 同一条码路、而那条码路有事实"的依据，各自的像素读数与各自的事实都没有，按 #92 立的"不外推"记进 Known Gaps。
-- `ROADMAP.md:4831` - 而首帧那条事实照旧绿），原来只能写进 Known Gap 的形状因此变成有事实的形状。
-- `ROADMAP.md:4856` - 1. **菜单三处与页签一处只有机制**：普查里它们一个像素没露面，也没有各自的事实。开着的弹层翻档会不会冻，
-- `ROADMAP.md:4857` - 要等 #63 / #13 那套宿主交互通路。
-- `ROADMAP.md:4858` - 2. **"换上去的图标也补交墨"只在应用条那枚上出过事实**：`onceonly` 腿证的是"回调依赖活绑定"这件事本身，宿主是
-- `ROADMAP.md:4859` - `AppBarButton`。菜单三处与页签一处走同一对绑定，但没有各自的换图标事实。而**不从宿主 `Icon` 那一格进来的图标**
-- `ROADMAP.md:4860` - （模板自绘的 glyph、或宿主根本没有 `Icon` 属性）这条通路完全覆盖不到——那类形状得另找入口。
-- `ROADMAP.md:4861` - 3. **hover / pressed / 禁用下的图标墨**没读：本批四条事实全在 Light↔Dark 这一档上，接线只保证"图标跟宿主前景"。
-- `ROADMAP.md:4862` - 4. **高对比档**下图标跟不跟没量；页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
-- `ROADMAP.md:4863` - 5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。三次大数读数（一轮 `settings` 33755、
-- `ROADMAP.md:4864` - 一轮 `surfaces` 28325+131、出货那一版 `motion` light-in-both 1200）之后都不重演（前两次：干净树连测两轮
-- `ROADMAP.md:4865` - `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`；第三次：`motion-light.log` 里连测两轮全 `0 0`），
-- `ROADMAP.md:4866` - 而 168 与 519 每次都精确重演。`frozen.ps1` 因此加了 `-Mask` / `-Crop`，把最脏那个桶的图块留成文件，
-- `ROADMAP.md:4867` - 下次再出现大数能看而不是猜。这三次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
-- `ROADMAP.md:4868` - 那一族"只在某一次跑里现身"的新成员。
-- `ROADMAP.md:4869` - `motion` 那 1200 px 一开始**没有**图块可看：`-Crop` 只定位 dark-in-both 那组桶，而它是 light-in-both 的数，
-- `ROADMAP.md:4870` - 所以仪器先补了另一半（light 也有自己的桶与裁块），再复测。**补完之后确认过这条读数路能报**：把阈值放到
-- `ROADMAP.md:4871` - `-Light 0` 去量同一对帧，得到 `light-in-both 2307088` 与八格桶位加一张裁块——"复测读回 0"因此不是"新代码
-- `ROADMAP.md:4872` - 没跑"。而 light-in-both 本来就是更噪的那一组（白字配强调色底在两档下都近白，那是正确的墨不是冻结的墨），
-- `ROADMAP.md:4873` - 这也是为什么一组大数落在它上面时更不能靠推断结案。
-- `ROADMAP.md:4874` - 6. **仪器自己坏过两轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
-- `ROADMAP.md:4875` - 那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行——作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
-- `ROADMAP.md:4876` - 第二轮在突变器自己：一条腿的变换串里带了一个换行，"写回后再比对行表"的后置判据因此失败，而脚本对失败的处理是
-- `ROADMAP.md:4877` - **跳过这条腿**——突变已经写进文件了，于是后面两条腿各多红一条事实（看起来像跨类污染，其实是上一腿的残留）。
-- `ROADMAP.md:4878` - 现在的 `teeth95.sh` 每条腿开头先 `grep MUTANT` 做 preflight，任何 apply/build 失败都先 revert 再中止整轮，
-- `ROADMAP.md:4879` - 并且日志留断言原文而不是只留测试名——那条残留正是被"只留名字"的过滤藏住的。被污染的那一次读数写在
-- `ROADMAP.md:4880` - `mut-95b.log` 里，整条腿随后**重跑并覆盖**了它，盘上留着的是干净的那一份；`mut-95.log` 是走视觉树那一版的
-- `ROADMAP.md:4881` - 见证，那一版没出货，它的读数只算"当时那条路有牙"，不算本批的。
-- `ROADMAP.md:4882` - 第三轮在"树上还有没有突变"这个检查自己：它 `grep -arn MUTANT src/FluentJalium`，而 `-a` 把编译产物也当文本读——
-- `ROADMAP.md:4883` - 量这一族时把范围放大到 `tests`/`samples`，出货的 `System.Diagnostics.EventLog.dll` 里就有 `MUTANT` 这串字节，
-- `ROADMAP.md:4884` - 一棵干净树会被读成"突变还在树上"，而把那条输出再交给一个 grep 只会得到 `Binary file (standard input) matches`：
-- `ROADMAP.md:4885` - 既拿不到行，也诚实地说不了"没有"。现在三处 preflight 统一成 `--binary-files=without-match` 加
-- `ROADMAP.md:4886` - `--include='*.cs' --include='*.jalxaml'`，只查突变可能住的源码。
-- `ROADMAP.md:4906` - Known Gaps 里，下一手就是量它（`spike/PagePixelsPlateDiag/`）。顺带把"槽宽在两跑之间变"这句话按盘上的文件收紧：
+- `ROADMAP.md:4629` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
+- `ROADMAP.md:4630` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
+- `ROADMAP.md:4631` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
+- `ROADMAP.md:4632` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
+- `ROADMAP.md:4639` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
+- `ROADMAP.md:4673` - 1. `:38` 那行同键（滚动按钮样式）本批**没量到**：它的载体只在标签条溢出时实现，按上面那条不外推。
+- `ROADMAP.md:4674` - 2. `:71` 是不是**上游也这样**没量（上游同样有两处写这枚按钮的前景），所以本批只报"这行在我们的运行时到不了像素"，
+- `ROADMAP.md:4675` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
+- `ROADMAP.md:4676` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4683` - - **视觉**：零新增像素断言（Known Gap 3）。
+- `ROADMAP.md:4712` - 不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
+- `ROADMAP.md:4750` - 1. **其余图标宿主没量**（#95）：`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178`
+- `ROADMAP.md:4751` - 的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
+- `ROADMAP.md:4752` - 按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
+- `ROADMAP.md:4753` - + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
+- `ROADMAP.md:4754` - **（本条由 #95 结清：普查表与接线在下一节，行号是接线前的位置。）**
+- `ROADMAP.md:4755` - 2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
+- `ROADMAP.md:4756` - 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
+- `ROADMAP.md:4757` - 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
+- `ROADMAP.md:4758` - 但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
+- `ROADMAP.md:4780` - `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
+- `ROADMAP.md:4807` - 同一条码路、而那条码路有事实"的依据，各自的像素读数与各自的事实都没有，按 #92 立的"不外推"记进 Known Gaps。
+- `ROADMAP.md:4833` - 而首帧那条事实照旧绿），原来只能写进 Known Gap 的形状因此变成有事实的形状。
+- `ROADMAP.md:4858` - 1. **菜单三处与页签一处只有机制**：普查里它们一个像素没露面，也没有各自的事实。开着的弹层翻档会不会冻，
+- `ROADMAP.md:4859` - 要等 #63 / #13 那套宿主交互通路。
+- `ROADMAP.md:4860` - 2. **"换上去的图标也补交墨"只在应用条那枚上出过事实**：`onceonly` 腿证的是"回调依赖活绑定"这件事本身，宿主是
+- `ROADMAP.md:4861` - `AppBarButton`。菜单三处与页签一处走同一对绑定，但没有各自的换图标事实。而**不从宿主 `Icon` 那一格进来的图标**
+- `ROADMAP.md:4862` - （模板自绘的 glyph、或宿主根本没有 `Icon` 属性）这条通路完全覆盖不到——那类形状得另找入口。
+- `ROADMAP.md:4863` - 3. **hover / pressed / 禁用下的图标墨**没读：本批四条事实全在 Light↔Dark 这一档上，接线只保证"图标跟宿主前景"。
+- `ROADMAP.md:4864` - 4. **高对比档**下图标跟不跟没量；页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
+- `ROADMAP.md:4865` - 5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。三次大数读数（一轮 `settings` 33755、
+- `ROADMAP.md:4866` - 一轮 `surfaces` 28325+131、出货那一版 `motion` light-in-both 1200）之后都不重演（前两次：干净树连测两轮
+- `ROADMAP.md:4867` - `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`；第三次：`motion-light.log` 里连测两轮全 `0 0`），
+- `ROADMAP.md:4868` - 而 168 与 519 每次都精确重演。`frozen.ps1` 因此加了 `-Mask` / `-Crop`，把最脏那个桶的图块留成文件，
+- `ROADMAP.md:4869` - 下次再出现大数能看而不是猜。这三次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
+- `ROADMAP.md:4870` - 那一族"只在某一次跑里现身"的新成员。
+- `ROADMAP.md:4871` - `motion` 那 1200 px 一开始**没有**图块可看：`-Crop` 只定位 dark-in-both 那组桶，而它是 light-in-both 的数，
+- `ROADMAP.md:4872` - 所以仪器先补了另一半（light 也有自己的桶与裁块），再复测。**补完之后确认过这条读数路能报**：把阈值放到
+- `ROADMAP.md:4873` - `-Light 0` 去量同一对帧，得到 `light-in-both 2307088` 与八格桶位加一张裁块——"复测读回 0"因此不是"新代码
+- `ROADMAP.md:4874` - 没跑"。而 light-in-both 本来就是更噪的那一组（白字配强调色底在两档下都近白，那是正确的墨不是冻结的墨），
+- `ROADMAP.md:4875` - 这也是为什么一组大数落在它上面时更不能靠推断结案。
+- `ROADMAP.md:4876` - 6. **仪器自己坏过两轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
+- `ROADMAP.md:4877` - 那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行——作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
+- `ROADMAP.md:4878` - 第二轮在突变器自己：一条腿的变换串里带了一个换行，"写回后再比对行表"的后置判据因此失败，而脚本对失败的处理是
+- `ROADMAP.md:4879` - **跳过这条腿**——突变已经写进文件了，于是后面两条腿各多红一条事实（看起来像跨类污染，其实是上一腿的残留）。
+- `ROADMAP.md:4880` - 现在的 `teeth95.sh` 每条腿开头先 `grep MUTANT` 做 preflight，任何 apply/build 失败都先 revert 再中止整轮，
+- `ROADMAP.md:4881` - 并且日志留断言原文而不是只留测试名——那条残留正是被"只留名字"的过滤藏住的。被污染的那一次读数写在
+- `ROADMAP.md:4882` - `mut-95b.log` 里，整条腿随后**重跑并覆盖**了它，盘上留着的是干净的那一份；`mut-95.log` 是走视觉树那一版的
+- `ROADMAP.md:4883` - 见证，那一版没出货，它的读数只算"当时那条路有牙"，不算本批的。
+- `ROADMAP.md:4884` - 第三轮在"树上还有没有突变"这个检查自己：它 `grep -arn MUTANT src/FluentJalium`，而 `-a` 把编译产物也当文本读——
+- `ROADMAP.md:4885` - 量这一族时把范围放大到 `tests`/`samples`，出货的 `System.Diagnostics.EventLog.dll` 里就有 `MUTANT` 这串字节，
+- `ROADMAP.md:4886` - 一棵干净树会被读成"突变还在树上"，而把那条输出再交给一个 grep 只会得到 `Binary file (standard input) matches`：
+- `ROADMAP.md:4887` - 既拿不到行，也诚实地说不了"没有"。现在三处 preflight 统一成 `--binary-files=without-match` 加
+- `ROADMAP.md:4888` - `--include='*.cs' --include='*.jalxaml'`，只查突变可能住的源码。
+- `ROADMAP.md:4908` - Known Gaps 里，下一手就是量它（`spike/PagePixelsPlateDiag/`）。顺带把"槽宽在两跑之间变"这句话按盘上的文件收紧：
+### Known Gap
 
-<!-- canonical-lines=988 sha256=32c9a6be828ac899d5a4a77a7f2ea1ffe52f7155623771f64da8b4ffd07c6ad6 -->
+- `ROADMAP.md:4943` - 1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
+- `ROADMAP.md:4944` - 现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
+
+<!-- canonical-lines=990 sha256=b33afdfc62ff04ae4ae5c1039bc0c98bea4d004d043fa0a78b9bfef11e87065e -->

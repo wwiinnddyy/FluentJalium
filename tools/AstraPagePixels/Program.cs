@@ -114,10 +114,20 @@ internal static class Program
 
                 if (pageElement is not null) host.Children.Remove(pageElement);
                 Pump(24);
+                // #90/#93: "the slot was not actually emptied" is only a page's problem if the removal took. The child
+                // list is what that removal touches, so print it - a dirty plate read off the instrument beats one
+                // inferred from a pixel count, which is how gate-91's materials/HighContrast pair got argued about.
+                var plateChildren = host.Children.Count;
+                var plateTypes = new List<string>();
+                for (var child = 0; child < host.Children.Count; child++)
+                {
+                    plateTypes.Add(host.Children[child].GetType().Name);
+                }
+
                 var emptySlot = CaptureStable(host);
                 if (pageElement is not null) host.Children.Add(pageElement);
 
-                Report(id, variant, whole, slot, emptySlot, still, frozen);
+                Report(id, variant, whole, slot, emptySlot, still, frozen, plateChildren, string.Join(',', plateTypes));
 
                 if (!report) Judge(id, variant, whole, slot, emptySlot, failures);
             }
@@ -132,16 +142,21 @@ internal static class Program
     }
 
     private static void Report(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot,
-        bool still, (int Found, int Stopped) frozen)
+        bool still, (int Found, int Stopped) frozen, int plateChildren, string plateTypes)
     {
         // Found and stopped are both printed: a leg that stops nothing has either no spinning ring in it, or one
         // the walk never reached, and those two readings must not collapse into the same number.
         var frozenNote = still ? $" rings {frozen.Found} found/{frozen.Stopped} stopped" : string.Empty;
+        // The plate describes itself only when it is not empty, and then it says what is left on it: that is the
+        // difference between "this page paints in high contrast" and "the last leg's page is still on the host".
+        var plateNote = Painted(emptySlot.Histogram) > 0
+            ? $" | plate children {plateChildren} [{plateTypes}] top {Top(emptySlot.Histogram)}"
+            : string.Empty;
         Console.WriteLine($"{id} {variant}: stable={whole.Stable}/{slot.Stable} painted={Painted(whole.Histogram)} " +
             $"{string.Join(' ', BaseFills.Select(fill => $"{FillName(fill.Variant)}={Count(whole.Histogram, fill.Base)}"))} " +
             $"placeholder={Count(whole.Histogram, UpstreamPlaceholder)} green={Count(whole.Histogram, BrandFocusGreen)} | slot {slot.Histogram.Count} colours " +
             $"{Painted(slot.Histogram)}px over {emptySlot.Histogram.Count} colours {Painted(emptySlot.Histogram)}px " +
-            $"(slot {slot.Width}x{slot.Height}){frozenNote} | top {Top(whole.Histogram)}");
+            $"(slot {slot.Width}x{slot.Height}){frozenNote}{plateNote} | top {Top(whole.Histogram)}");
     }
 
     private static string FillName(FluentThemeVariant variant) => variant switch

@@ -4298,8 +4298,10 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 并转入"已量到"（`audits/foreground.md` 7.6f）、`:210` 两行部件禁用格与 `:71` 已由 #92 量到（`:71` 判成死格，
 要不要清它是另一次决定）、hover / pressed 那六行照旧等真指针通路（#13）、
 #89 那条"模板触发器里的禁用前景格改不动"的修法。曾经列在这里的"其余图标宿主"（#95）已结：普查表、接线与
-四条图标事实见本节末 `## #95`——折叠开关那枚是 #94 的残留，应用条那一排量到 519 px，菜单三处与页签一处
-接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。
+**五条**图标事实见本节末 `## #95`（那一节里的机制是出货的 `IconInk.Carrier` / `IconInk.Icon` 那一对绑定，不是被
+闸口拦下的走视觉树那版）——折叠开关那枚是 #94 的残留，应用条那一排量到 519 px，菜单三处与页签一处
+接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。整条管道在这批之上的全绿读数是
+`spike/NavIconRecolor/gate-95b.log`（1594/1594 + 页闸 0 offender）。
 
 ### 这一节自己的 Known Gap
 
@@ -4907,4 +4909,37 @@ AGENTS.md 的三条之一："walk the visual tree to restyle live controls"。�
    四次整条跑（`gate-91`、`gate-92`、`gate-94c-pixels`、`gate-95b`）**每一腿都读 788**、整帧 lit 约 848k；
    `spike/ForegroundArrival/pixels-report-2.log` 那一跑**39 条腿全读 1000**、整帧 lit 1219308。也就是说变的是
    整跑窗口状态、不是跑内的某几页——先前心里那个"上一跑 980"在这些日志里没有出处，不能写进账。
+
+## #93 一手：页闸的"空底板"自己报名字，判据读码先划掉一条假设（2026-09-23）
+
+`gate-91.log` 那两条同页同档的 offender（`materials HighContrast: the slot was not actually emptied (337249 lit
+pixels left)` 与 `printed nothing its empty slot does not already print (41 colours against 93)`）之前只有两种说法：
+"materials 在 HC 档的底色本来就贴阈值"，或"上一腿的页还挂在宿主上"。这一手先把**判据本身**读掉一半：
+
+- `tools/AstraPagePixels/Program.cs:205` 那条是 `Painted(emptySlot.Histogram) != 0`——**任何一个亮像素就红**，
+  没有阈值可靠。于是"贴阈值"这条假设直接出局，它不是判据松紧的问题。
+- 剩下那条 `41 colours against 93` 说的是**空底板**自己有 93 格颜色；一块干净底板只有一格填充色。
+
+所以给闸补自证：取空槽那一刻把 `host.Children` 的数量与类型名连同脏底板的顶色打进那一行（底板干净就什么都不打）。
+`Panel.Children` 走 LINQ 会 CS0411，改成索引循环——`spike/PagePixelsPlateDiag/plate-diagnostic.patch` 那份旧稿正是
+栽在这里，所以它从没出过读数。
+
+### 两类读数
+
+- **构建**：`dotnet run --project tools/AstraPagePixels` 两条通道都过（`--report` 与判定模式），后者
+  `PASS 13 pages x 3 variants, 0 offender(s)`、`judge-exit=0`（`spike/PagePixelsPlateDiag/{report-93,judge-93}.log`）。
+- **视觉**：39 条腿**没有一条**打出 `plate children`，包括 `materials HighContrast`——它的空槽读
+  `over 1 colours 0px`（1 格色、0 亮像素），就是干净底板该有的形状。槽宽这跑每腿 788，与四次整条闸口跑一致。
+
+### 那条脏读数对得上谁
+
+`gate-91` 的 337249 亮像素与本跑 `materials` 三档**自己槽内**的墨量同量级（338822 / 338821 / 338832，差 0.4%），
+而它"空槽 93 格色"**多于**同一腿"页 41 格色"。两条一起看，那次脏底板的墨与形状都对得上"**本页的槽当时还被画在
+宿主上**"——不是上一腿的页，也不是别的窗盖上来。**这是把猜测收窄成形状，仍不是机制**：为什么 `Children.Remove`
+之后、那一次 `Pump(24)` 之后，取到的帧里还有本页的槽，没量到。
+
+### Known Gap
+
+1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
+   现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
 
