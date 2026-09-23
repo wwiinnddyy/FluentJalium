@@ -160,8 +160,26 @@
    | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
    | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
    | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
-   | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
+   | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 已出事实（#91，见 7.6f） |
    | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
    | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
    | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
+
+6f. #91（2026-09-23）把上表那两行**选中态**的 TabView 格量完，读数与前面几格相反：**这一格删掉就看得见**，不必借复合突变。
+   `Styles/TabView.jalxaml:203` 同一行里的两处 `Foreground` 各出一条事实（`AstraStateCellArrivalTests` 第五、六条），
+   四种突变（每格各"删掉 / 改指成白"）逐轮一次重建、每轮只红自己那一条、revert 后 `TabView.jalxaml` 对 HEAD 干净：
+
+   | 那一格 | 载体 | 删掉 | 改指成白 | 干净树上的读数 |
+   |---|---|---|---|---|
+   | `TabViewItemHeaderForegroundSelected` | 控件自身 `Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中 `#E4000000` / 未选中那片仍 `#9E000000` |
+   | `TabViewItemIconForegroundSelected`（`TargetName="IconHost"`） | 部件 `ContentControl.Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中部件 `#E4000000` |
+
+   两处值得单记：① 回落值是**静态那格**的二级墨，不是控件在选中态的主文字墨——#51 那条"模板部件不继承前景"在这里
+   又一次成立，所以部件这格与其父格不是互为不可判读者（7.6b 里 `…Checked` 与 `…Indeterminate` 那种同实例关系在这里没出现）；
+   ② 事实必须成对读（选中那片 + 旁边那片），只断言选中项的话，"该行对所有项都写"也会满足它。
+   判据**不外推**：同文件 `:38`、`:71` 两行禁用格本批仍没量，`TabViewItemHeaderSelectedCloseButtonForeground`
+   与静态格同实例所以依旧出不了事实（见上表），而这几格是否**真的印出墨**照旧不在断言里（#50）。
+   普查是这批之前的快照，`readers=` 那两格当时报"无读者"；#91 之后按同一脚本重跑，键名无读者的数从 37 降到 **35**
+   （两条测点各把一行键名写进了断言里），指针可驱动性与状态格子总数不变（仍 176 / 91）。快照文件
+   `spike/StateCellCensus/census-2026-09-23.txt` 记的是它当时那一次，不追改。
 

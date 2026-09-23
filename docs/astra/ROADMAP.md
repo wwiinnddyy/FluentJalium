@@ -4267,7 +4267,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | build `0 警告 0 错误` → **1585 / 1585，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`（**但 2026-09-23 #88 连着两次顺序跑各红一步：一次红在页闸 9 条、一次红在套件 1 条，两次单跑都绿，本批没拿到一次全绿顺序读数**，见 #88 的串行闸口条与 #47/#90） → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新两批 `gate-88.log`、`gate-88b.log`，页闸单跑对照 `spike/ForegroundArrival/pixels-solo-1.log`） |
+| 串行闸口 | build `0 警告 0 错误` → **1587 / 1587，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`（**但 2026-09-23 连着三次顺序跑各红一步：一次红在页闸 9 条、一次红在套件 1 条（Rating）、第三次红在套件 1 条（TeachingTip），三次把那三条单拎出来都绿，到现在没拿到一次全绿顺序读数**，见 #88 的串行闸口条、#91 末行与 #47/#90） → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新三跑 `gate-88.log`、`gate-88b.log`、`gate-88c.log`，页闸单跑对照 `spike/ForegroundArrival/pixels-solo-1.log`，套件单跑对照 `spike/ForegroundArrival/solo-teachingtip.log`） |
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
 | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
@@ -4293,9 +4293,10 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 ### (b) 该干还没干的那批：不是"做不到"，别混进 (a)
 
 #8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#62 的上游复现提报、#68/#73/#75/#76 的修法本身、
-#80 的帧数守卫、#82 的读取路线定案，以及 #56 量完之后新添的两条：`TabViewItemHeaderForegroundSelected` 与
-`TabViewItemIconForegroundSelected` 两格（删行就看得见，`audits/foreground.md` 7.6e）、
-#89 那条"模板触发器里的禁用前景格改不动"的修法。
+#80 的帧数守卫、#82 的读取路线定案，以及 #56 那支量完之后**换进去**的三条：`TabView.jalxaml:38`、`:71` 两行禁用格
+（7.6c 的判据对它们是**预测**，本批仍没量）、同文件 `:203` 那两格选中前景已由 #91 出事实并转入"已量到"
+（`audits/foreground.md` 7.6f）、hover / pressed 那六行照旧等真指针通路（#13），
+以及 #89 那条"模板触发器里的禁用前景格改不动"的修法。
 
 ### 这一节自己的 Known Gap
 
@@ -4590,3 +4591,46 @@ not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carri
 - **行为**：零新测点；结论完全由 #12 的三条既有事实与 #88 的 7.6b 读数拼出，两处读数各自都可单跑复现。
 - **视觉**：零。禁用标签真以哪支刷**印出墨**仍不在断言里（#50）。
 - **硬件输入**：零。
+
+## #91（目标项 6 的 #56 余账第二手）TabView 的两格选中前景：这一族格子删掉就看得见，部件那格不继承控件那格（2026-09-23）
+
+#88 那批留下的 13 行处置表里，唯一一行标着"删行就看得见、却没做"的就是 `Styles/TabView.jalxaml:203` 的两格选中前景。
+这一批把它量完，量出来的形状和 #88 那四格**相反**：不需要复合突变、不需要改指，把那一格抽掉事实就红。理由是静态格与
+状态格转录的不是同一支刷（未选中 `TabViewItemHeaderForeground` → 二级墨 `#9E000000`，选中 `…Selected` → 主文字墨
+`#E4000000`），而 #88 那三格看不见正是因为两态同实例。
+
+### 交付形状
+
+| 位置 | 干什么 | 为什么是这个形状 |
+|---|---|---|
+| `tests/FluentJalium.Tests/AstraStateCellArrivalTests.cs` 新 2 条 | 同一行标记里的两处 `Foreground`：一处写在控件自身，一处 `TargetName="IconHost"` 写在部件 | 一行两处要各出一条事实，否则红了不知道是哪一处没落 |
+| 第一条同时断言"没被选中的那一片还是二级墨" | 只断言选中项的话，"该行对所有项都写"也满足它 | 与 #88 的第 4 条同源，但这里能断，因为两态不同值 |
+| `spike/ForegroundArrival/mutate.py` 新 4 个突变 | `tabselectedcell` / `tabselectedpoint` / `tabiconcell` / `tabiconpoint`（删格、改指成白各两种） | 复用 #88 的按字节存盘 + `git diff --quiet` 仪器，不新写一套 |
+
+### 读数（Light，每轮一次重建，revert 后 `TabView.jalxaml` 对 HEAD 干净；`spike/ForegroundArrival/mut-tabview-*.log`）
+
+| 那一格 | 载体 | 删掉 | 改指成白 | 干净树读数 |
+|---|---|---|---|---|
+| `TabViewItemHeaderForegroundSelected` | 控件自身 `Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中 `#E4000000`，未选中仍 `#9E000000` |
+| `TabViewItemIconForegroundSelected` | 部件 `ContentControl.Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中部件 `#E4000000` |
+
+四次突变各红 1 条、其余 5 条照绿，四种"谁在写"都是**我们这一格**。第二行是本批新的一条判据：部件的回落值是**静态那格**
+的二级墨，不是父控件在选中态的主文字墨——#51"模板部件不继承前景"在这里第三次成立，所以父子两格不构成 7.6b 那种
+"同实例互不可判"的关系，各配各的事实是做得出来的。普查同尺子重跑一次：状态格子 176、无指针 91 不变，键名无读者
+37 → **35**（就是这两行被写进了断言）。
+
+### Known Gaps
+
+1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
+   现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
+2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
+3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
+
+### 四类证据
+
+- **构建**：`dotnet build tests/FluentJalium.Tests -c Debug` `0 个警告 / 0 个错误`；四次突变各自重建均 0 错误，末轮恢复树再建一次。
+- **行为**：新 2 条测点，干净树单跑 `6/6`（本类四条在前批已全绿）；突变矩阵 4 轮，每轮 revert + `git diff --quiet` 收尾，
+  跑完 `git status --porcelain src` 为空。测点总数 1585 → 1587。
+- **视觉**：零新增像素断言（理由见 Known Gap 3）。
+- **硬件输入**：零。两条事实全用 `SelectedIndex` 驱动。
+- **串行闸口**：见本节末行的补记。

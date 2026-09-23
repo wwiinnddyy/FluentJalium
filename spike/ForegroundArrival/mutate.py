@@ -45,6 +45,12 @@ POINTED = '<Setter Property="Foreground" Value="{ThemeResource AccentButtonForeg
 TEXT_DISABLED = '<StaticResource x:Key="TextDisabled" ResourceKey="TextFillColorDisabledBrush" />'
 TEXT_DISABLED_MOVED = '<StaticResource x:Key="TextDisabled" ResourceKey="TextFillColorSecondaryBrush" />'
 
+TABVIEW = ROOT / "src/FluentJalium/Styles/TabView.jalxaml"
+TAB_HEADER_SELECTED_CELL = '<Setter Property="Foreground" Value="{ThemeResource TabViewItemHeaderForegroundSelected}" />'
+TAB_ICON_SELECTED_CELL = '<Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundSelected}" />'
+TAB_POINTED = '<Setter Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />'
+TAB_ICON_POINTED = '<Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />'
+
 TARGETS = {
     # A row taken away. Where the row's value equals what some other writer already supplies, this is silent -
     # measured for the three #87 rows and the two disabled cells below, which is why each has a `*point` twin.
@@ -75,6 +81,14 @@ TARGETS = {
     # Same question on the other owner: the check box's disabled cell lives in a template trigger rather than a
     # style trigger, so which writer stands behind it is measured separately rather than carried over.
     "checkboxcellmask": [(SELECTION, CHECKBOX_CELL, ""), (RETINTS, TEXT_DISABLED, TEXT_DISABLED_MOVED)],
+    # The two selected-tab cells of `Styles/TabView.jalxaml:203`, one written on the control and one on the
+    # `IconHost` part. Unlike every row above, this control's resting ink is a *different* brush
+    # (`TabViewItemHeaderForeground` = secondary, the selected row = primary), so deletion alone can be decisive -
+    # and if the part's deletion is still green, the part is inheriting and that row has no witness at all.
+    "tabselectedcell": [(TABVIEW, TAB_HEADER_SELECTED_CELL, "")],
+    "tabselectedpoint": [(TABVIEW, TAB_HEADER_SELECTED_CELL, TAB_POINTED)],
+    "tabiconcell": [(TABVIEW, TAB_ICON_SELECTED_CELL, "")],
+    "tabiconpoint": [(TABVIEW, TAB_ICON_SELECTED_CELL, TAB_ICON_POINTED)],
 }
 
 

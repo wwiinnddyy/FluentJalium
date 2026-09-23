@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-891 lines collected from 49 sections across 46 documents.
+910 lines collected from 50 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -315,7 +315,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/focus-visual.md:154` - 双圈，得逐族对着上游审 `UseSystemFocusVisuals` 与 `FocusVisualMargin`（上游确实有族显式关掉系统框，例如
 - `audits/focus-visual.md:155` - ContentDialog 的按钮），不属于本批"只换判据、不动像素"的范围。挂在视觉余账（与 #21/#23 同族）。
 
-## audits/foreground.md - 81 lines
+## audits/foreground.md - 95 lines
 
 ### 7 Known Gaps（不声称清单）
 
@@ -396,10 +396,24 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:160` - | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
 - `audits/foreground.md:161` - | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
 - `audits/foreground.md:162` - | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
-- `audits/foreground.md:163` - | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
+- `audits/foreground.md:163` - | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 已出事实（#91，见 7.6f） |
 - `audits/foreground.md:164` - | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
 - `audits/foreground.md:165` - | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
 - `audits/foreground.md:166` - | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
+- `audits/foreground.md:168` - 6f. #91（2026-09-23）把上表那两行**选中态**的 TabView 格量完，读数与前面几格相反：**这一格删掉就看得见**，不必借复合突变。
+- `audits/foreground.md:169` - `Styles/TabView.jalxaml:203` 同一行里的两处 `Foreground` 各出一条事实（`AstraStateCellArrivalTests` 第五、六条），
+- `audits/foreground.md:170` - 四种突变（每格各"删掉 / 改指成白"）逐轮一次重建、每轮只红自己那一条、revert 后 `TabView.jalxaml` 对 HEAD 干净：
+- `audits/foreground.md:172` - | 那一格 | 载体 | 删掉 | 改指成白 | 干净树上的读数 |
+- `audits/foreground.md:174` - | `TabViewItemHeaderForegroundSelected` | 控件自身 `Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中 `#E4000000` / 未选中那片仍 `#9E000000` |
+- `audits/foreground.md:175` - | `TabViewItemIconForegroundSelected`（`TargetName="IconHost"`） | 部件 `ContentControl.Foreground` | 只本条红，回落 `#9E000000` | 只本条红，读到 `#FFFFFFFF` | 选中部件 `#E4000000` |
+- `audits/foreground.md:177` - 两处值得单记：① 回落值是**静态那格**的二级墨，不是控件在选中态的主文字墨——#51 那条"模板部件不继承前景"在这里
+- `audits/foreground.md:178` - 又一次成立，所以部件这格与其父格不是互为不可判读者（7.6b 里 `…Checked` 与 `…Indeterminate` 那种同实例关系在这里没出现）；
+- `audits/foreground.md:179` - ② 事实必须成对读（选中那片 + 旁边那片），只断言选中项的话，"该行对所有项都写"也会满足它。
+- `audits/foreground.md:180` - 判据**不外推**：同文件 `:38`、`:71` 两行禁用格本批仍没量，`TabViewItemHeaderSelectedCloseButtonForeground`
+- `audits/foreground.md:181` - 与静态格同实例所以依旧出不了事实（见上表），而这几格是否**真的印出墨**照旧不在断言里（#50）。
+- `audits/foreground.md:182` - 普查是这批之前的快照，`readers=` 那两格当时报"无读者"；#91 之后按同一脚本重跑，键名无读者的数从 37 降到 **35**
+- `audits/foreground.md:183` - （两条测点各把一行键名写进了断言里），指针可驱动性与状态格子总数不变（仍 176 / 91）。快照文件
+- `audits/foreground.md:184` - `spike/StateCellCensus/census-2026-09-23.txt` 记的是它当时那一次，不追改。
 
 ## audits/icon-family.md - 13 lines
 
@@ -1015,7 +1029,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 118 lines
+## ROADMAP.md - 123 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1145,5 +1159,12 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4534` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
 - `ROADMAP.md:4544` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
 - `ROADMAP.md:4581` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
+### Known Gaps
 
-<!-- canonical-lines=891 sha256=d506297a04e9e3696d0a039d820a742653a25b6e0c9a6cf22b72de8b208a4efd -->
+- `ROADMAP.md:4623` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
+- `ROADMAP.md:4624` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
+- `ROADMAP.md:4625` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
+- `ROADMAP.md:4626` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
+- `ROADMAP.md:4633` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
+
+<!-- canonical-lines=910 sha256=4043c8762c1aac448eee73c82a29494858904aaa16fb9a7ac07709220d8e6884 -->
