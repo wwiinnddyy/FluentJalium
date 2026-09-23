@@ -1246,7 +1246,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4908` - Known Gaps 里，下一手就是量它（`spike/PagePixelsPlateDiag/`）。顺带把"槽宽在两跑之间变"这句话按盘上的文件收紧：
 ### Known Gap
 
-- `ROADMAP.md:4943` - 1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
-- `ROADMAP.md:4944` - 现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
+- `ROADMAP.md:4945` - 1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
+- `ROADMAP.md:4946` - 现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
 
-<!-- canonical-lines=990 sha256=b33afdfc62ff04ae4ae5c1039bc0c98bea4d004d043fa0a78b9bfef11e87065e -->
+<!-- canonical-lines=990 sha256=998553ac28e5124bfcf90864ca2fa08e91d0f4bb88602183daa9625b45228839 -->
