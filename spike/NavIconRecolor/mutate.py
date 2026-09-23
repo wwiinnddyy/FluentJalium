@@ -30,14 +30,16 @@ MENUS = ROOT / "src/FluentJalium/Styles/Menus.jalxaml"
 TABVIEW = ROOT / "src/FluentJalium/Styles/TabView.jalxaml"
 NAVIGATION = ROOT / "src/FluentJalium/Styles/Navigation.jalxaml"
 
-# The attached hand-off and the markup hand-off, exactly as they appear on their own line.
-ATTACHED = 'fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"'
-SELF_ATTACHED = 'controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}"'
+# The two markup hand-offs and the pane toggle's own binding, each as it appears on its line.
+CARRIER = 'fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"'
+SELF_CARRIER = 'controls:IconInk.Carrier="{Binding RelativeSource={RelativeSource Self}}"'
+ICON = 'fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"'
+SELF_ICON = 'controls:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"'
 TOGGLE = 'Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"'
 
 
 def strip_attr(line: str) -> str:
-    for attr in (ATTACHED, SELF_ATTACHED, TOGGLE):
+    for attr in (CARRIER, SELF_CARRIER, ICON, SELF_ICON, TOGGLE):
         if attr in line:
             return line.replace(attr, "")
     raise SystemExit("strip_attr: no known attribute on " + line.strip())
@@ -52,17 +54,25 @@ def widen_guard(line: str) -> str:
     return line[:-1] + " || true)"
 
 
+def first_value_only(line: str) -> str:
+    # One line, no inserted newline: the script's postcondition compares line lists.
+    return line[:-1] + " && args.OldValue is null) // MUTANT:onceonly"
+
+
 MUTANTS = {
     # The code route: Apply runs but binds nothing, so a live theme switch has no property to invalidate.
     "nobind": (ICONINK, 1, "BindingOperations.SetBinding(icon, IconElement.ForegroundProperty", drop_statement),
     # The guard goes: an icon that arrived with its own ink gets clobbered by the carrier's.
     "noguard": (ICONINK, 1, "if (ownInk is null || ReferenceEquals(ownInk", widen_guard),
-    # The framework-host route, twice over: strip the attached source out of the app bar template.
-    "noappbarink": (APPBAR, 2, ATTACHED, strip_attr),
-    # ... the three menu presenters, ...
-    "nomenusink": (MENUS, 3, ATTACHED, strip_attr),
-    # ... and the tab item's icon host.
-    "notabink": (TABVIEW, 1, SELF_ATTACHED, strip_attr),
+    # The hand-off still runs, but only for the first value it is given - an icon swapped later is on its own.
+    "onceonly": (ICONINK, 1, "if (sender.GetValue(CarrierProperty) is Control carrier", first_value_only),
+    # The framework-host route: take the carrier out of the app bar template, and the icon has no ink to copy.
+    "nocarrierink": (APPBAR, 2, CARRIER, strip_attr),
+    # ... and the icon attribute, which is what re-runs the hand-off when the host swaps the icon.
+    "noiconink": (APPBAR, 2, ICON, strip_attr),
+    # The same two lines in the menu presenters, which no pixel reading covers.
+    "nomenusink": (MENUS, 3, CARRIER, strip_attr),
+    "notabink": (TABVIEW, 1, SELF_CARRIER, strip_attr),
     # The pane toggle glyph's own markup hand-off.
     "notoggleink": (NAVIGATION, 1, TOGGLE, strip_attr),
 }

@@ -174,9 +174,15 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 
 - **我们的控件**有代码钩子：`FluentNavigationItem.OnIconChanged` 调 `IconInk.Apply(item, icon)`，图标没有本地前景时
   把宿主的 `Foreground` 绑到图标那格。本地值优先，这一条与上游"图标可覆盖宿主"一致。
-- **框架控件的模板**没有钩子：在包住图标的那个要素上挂
-  `fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`，该要素 `Loaded` 后广度优先
-  地把墨转发给身下每一枚 `IconElement`。写图标自己的属性，是这条运行时里唯一既换值又标脏的路。
+- **框架控件的模板**没有钩子，就让标记说出两样东西：`fluent:IconInk.Carrier` 是"抄谁的墨"，`fluent:IconInk.Icon`
+  是"图标在哪"（`{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}`）。两条都是普通绑定，回调只在
+  两者都到位时交付；因为绑定本来就是活的，**换上去的图标也会重新交付**。写图标自己的属性，是这条运行时里唯一
+  既换值又标脏的路。
+
+第一版不是这样：它只有一个附着属性，挂在包住图标的要素上，`Loaded` 之后走视觉树广度优先转发。串行闸口的套件步
+把它拦下了——`AstraGateTests` 那条结构闸按 AGENTS.md 的三条禁令把 `VisualTreeHelper` 整个挡在库外
+（`spike/NavIconRecolor/gate-95.log`）。改法不是放宽那条闸，而是换一条不需要找元素的路；读数的变化与两条新事实
+记在 `audits/navigation.md` §11 与 `ROADMAP.md` 的 #95 一节。
 
 这条不是框架的修复。根因在框架：主题换档时没人让 `IconElement` 失效，上游 WinUI 不需要宿主补偿是因为它整棵树
 随主题重绘。本层的接线只是让用户看见的那片墨跟上档，框架侧的账提给上游（与 #62 那条"字形不打印"同一族）。
@@ -184,6 +190,6 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 对本族第 6 节的两处更正：
 
 - 第 5 条说"没有可挂的隐式样式路子"。路子确实还没有（应用级隐式样式落不到 `SymbolIcon` 上，本批复测过），
-  但 `IconInk.Source` 是一条**能挂**的附着属性路子，宿主侧补偿因此不再受"只能靠继承"限制。高对比档的图标墨
+  但 `IconInk.Carrier` / `IconInk.Icon` 是一对**能挂**的附着属性路子，宿主侧补偿因此不再受"只能靠继承"限制。高对比档的图标墨
   仍然**未声称**——本批两条腿都是 Light↔Dark，见下。
 

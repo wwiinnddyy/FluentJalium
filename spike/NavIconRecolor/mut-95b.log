@@ -1,0 +1,160 @@
+=== baseline, no mutation: the five icon facts on the shipped wiring
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.18
+baseline-build-exit=0
+consumed-dll 72277697a438552bc6ef2aee0f01883dd007047e previous 06d49b3cbfedfd58ff09ed02bf2fd9ceddeaddb9 changed=True
+已通过! - 失败:     0，通过:   115，已跳过:     0，总计:   115，持续时间: 15 s - FluentJalium.Tests.dll (net10.0)
+
+=== LEG nobind
+2026-09-23T09:33:27Z
+applied nobind on IconInk.cs (1 line(s), snapshot IconInk.cs.snap)
+--- before
++++ after
+@@ -48 +48 @@
+-            BindingOperations.SetBinding(icon, IconElement.ForegroundProperty, new Binding("Foreground") { Source = carrier });
++            { } // MUTANT:nobind - the carrier's ink is never handed to the icon
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.79
+consumed-dll 9c6de07bd60c756d4f586c5de97bd340809afd0e previous 72277697a438552bc6ef2aee0f01883dd007047e changed=True
+  失败 FluentJalium.Tests.AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to [486 ms]
+   light: the pane icon carries <null> while its item moved to #E4000000 - the icon is not being handed the item's ink, so it keeps whatever it last drew.
+  失败 FluentJalium.Tests.AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink [855 ms]
+   light: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+  失败 FluentJalium.Tests.AstraIconFamilyTests.An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too [829 ms]
+   before the swap: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+失败!  - 失败:     3，通过:   112，已跳过:     0，总计:   115，持续时间: 10 s - FluentJalium.Tests.dll (net10.0)
+reverted nobind: IconInk.cs is byte-identical to its snapshot
+nobind REVERT-exit=0
+
+=== LEG noguard
+2026-09-23T09:33:46Z
+applied noguard on IconInk.cs (1 line(s), snapshot IconInk.cs.snap)
+--- before
++++ after
+@@ -47 +47 @@
+-        if (ownInk is null || ReferenceEquals(ownInk, DependencyProperty.UnsetValue))
++        if (ownInk is null || ReferenceEquals(ownInk, DependencyProperty.UnsetValue) || true)
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.75
+consumed-dll a4ad6c086eb3b505b02870069bd02e04581a5f0e previous 9c6de07bd60c756d4f586c5de97bd340809afd0e changed=True
+  失败 FluentJalium.Tests.AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it [478 ms]
+   Assert.Same() Failure: Values are not the same instance
+Expected: SolidColorBrush(#FF336699)
+Actual:   SolidColorBrush(#E4000000)
+失败!  - 失败:     1，通过:   114，已跳过:     0，总计:   115，持续时间: 14 s - FluentJalium.Tests.dll (net10.0)
+reverted noguard: IconInk.cs is byte-identical to its snapshot
+noguard REVERT-exit=0
+
+=== LEG onceonly
+2026-09-23T09:34:10Z
+applied onceonly on IconInk.cs (1 line(s), snapshot IconInk.cs.snap)
+--- before
++++ after
+@@ -53 +53 @@
+-        if (sender.GetValue(CarrierProperty) is Control carrier && sender.GetValue(IconProperty) is IconElement icon)
++        if (sender.GetValue(CarrierProperty) is Control carrier && sender.GetValue(IconProperty) is IconElement icon && args.OldValue is null) // MUTANT:onceonly
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.76
+consumed-dll 19c3b0264905fabcfaa7122f7896fe5ade2566f2 previous a4ad6c086eb3b505b02870069bd02e04581a5f0e changed=True
+  失败 FluentJalium.Tests.AstraIconFamilyTests.An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too [1 s]
+   swapped in: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+失败!  - 失败:     1，通过:   114，已跳过:     0，总计:   115，持续时间: 13 s - FluentJalium.Tests.dll (net10.0)
+reverted onceonly: IconInk.cs is byte-identical to its snapshot
+onceonly REVERT-exit=0
+
+=== LEG nocarrierink
+2026-09-23T09:34:32Z
+applied nocarrierink on AppBar.jalxaml (2 line(s), snapshot AppBar.jalxaml.snap)
+--- before
++++ after
+@@ -82 +82 @@
+-                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
++                        
+@@ -144 +144 @@
+-                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
++                        
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.48
+consumed-dll 5f678961c4bc2c056e2f907668c49582bbc0d8ff previous 19c3b0264905fabcfaa7122f7896fe5ade2566f2 changed=True
+  失败 FluentJalium.Tests.AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink [851 ms]
+   light: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+  失败 FluentJalium.Tests.AstraIconFamilyTests.An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too [847 ms]
+   before the swap: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+失败!  - 失败:     2，通过:   113，已跳过:     0，总计:   115，持续时间: 12 s - FluentJalium.Tests.dll (net10.0)
+reverted nocarrierink: AppBar.jalxaml is byte-identical to its snapshot
+nocarrierink REVERT-exit=0
+
+=== LEG notoggleink
+2026-09-23T09:34:54Z
+applied notoggleink on Navigation.jalxaml (1 line(s), snapshot Navigation.jalxaml.snap)
+--- before
++++ after
+@@ -196 +196 @@
+-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
++                             />
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.09
+consumed-dll 97f9bef9490c3c38d35c40a57f388cc96d2ffd2d previous 5f678961c4bc2c056e2f907668c49582bbc0d8ff changed=True
+[xUnit.net 00:00:05.24]     FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch [2 s]
+   light: the pane toggle glyph carries <null> while its button is at #E4000000 - the glyph is not handed the button's ink, so it keeps whatever it last drew.
+   at FluentJalium.Tests.AstraNavigationTests.<>c.<The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch>b__17_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 443
+   at FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 437
+失败!  - 失败:     1，通过:   114，已跳过:     0，总计:   115，持续时间: 14 s - FluentJalium.Tests.dll (net10.0)
+reverted notoggleink: Navigation.jalxaml is byte-identical to its snapshot
+notoggleink REVERT-exit=0
+
+=== tree after the run (no MUTANT lines, and only the fix modified)
+marker-grep-exit=1 (1 = none left)
+ M src/FluentJalium/Controls/IconInk.cs
+ M src/FluentJalium/Styles/AppBar.jalxaml
+ M src/FluentJalium/Styles/Menus.jalxaml
+ M src/FluentJalium/Styles/TabView.jalxaml

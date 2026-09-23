@@ -15,6 +15,9 @@ param(
     [int] $FlipMs = 6000,
     [string] $StartTheme = 'light',
     [string] $FlipTo = 'dark',
+    [string] $Page = '',
+    # Icon strip as offsets from the window's own top-left corner, in physical pixels: left,top,width,height.
+    [string] $Strip = '20,154,400,410',
     [int] $BeforeMs = 2500,
     [int] $AfterMs = 9500,
     [string] $OutDir = 'spike/NavIconRecolor'
@@ -87,7 +90,9 @@ if (-not (Test-Path $exe)) { throw "missing $exe - build the Gallery first" }
 $env:ASTRA_START_THEME = $StartTheme
 $env:ASTRA_FLIP_TO = $FlipTo
 $env:ASTRA_FLIP_MS = "$FlipMs"
-$proc = Start-Process -FilePath $exe -PassThru
+$argList = @()
+if ($Page -ne '') { $argList = @('--page', $Page) }
+$proc = Start-Process -FilePath $exe -ArgumentList $argList -PassThru
 
 function Grab([string] $tag, [string] $out, [int] $pid_, [int] $paneWidth, [int] $paneHeight) {
     # MainWindowHandle is cached on the Process object, so it has to be re-fetched until the runtime sets the caption.
@@ -109,7 +114,12 @@ function Grab([string] $tag, [string] $out, [int] $pid_, [int] $paneWidth, [int]
     $rect = New-Object NavRecolor+Rect
     [void][NavRecolor]::GetWindowRect($hwnd, [ref]$rect)
     Write-Host ("{0} pid={1} hwnd={2} rect={3},{4},{5},{6} dpi={7}" -f $tag, $pid_, $hwnd, $rect.Left, $rect.Top, $rect.Right, $rect.Bottom, [NavRecolor]::GetDpiForWindow($hwnd))
+    $parts = $Strip.Split(',')
+    $stripLeft = $rect.Left + [int]$parts[0]
+    $stripTop = $rect.Top + [int]$parts[1]
+    [NavRecolor]::Crop($png, (Join-Path $root "$OutDir/$tag-strip.png"), $stripLeft, $stripTop, [int]$parts[2], [int]$parts[3])
     [NavRecolor]::Crop($png, (Join-Path $root "$OutDir/$tag-pane.png"), $rect.Left, $rect.Top, $paneWidth, $paneHeight)
+    "$stripLeft $($stripTop - $rect.Top + $rect.Top) $($stripLeft + [int]$parts[2]) $($stripTop + [int]$parts[3])" | Out-File -Encoding ascii (Join-Path $root "$OutDir/$tag-strip-rect.txt")
     "$($rect.Left) $($rect.Top) $($rect.Right) $($rect.Bottom)" | Out-File -Encoding ascii (Join-Path $root "$OutDir/$tag-rect.txt")
 }
 

@@ -329,6 +329,35 @@ public sealed class AstraIconFamilyTests
         });
     }
 
+    [Fact]
+    public void An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too()
+    {
+        // The hand-off is two live bindings on the presenter, not a sweep taken once when the host loaded, so
+        // replacing the icon re-runs it. Asserted because the binding shape is what makes it so: drop either
+        // attribute and this is the case that goes red first.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var button = new AppBarButton { Label = "Save", Icon = new SymbolIcon { Symbol = Symbol.Save } };
+            PixelHarness.Build(button, 68, 64);
+            PixelHarness.Settle(60);
+            var first = (SymbolIcon)button.Icon;
+            AssertInk(first, button, "before the swap");
+
+            var late = new SymbolIcon { Symbol = Symbol.Save };
+            button.Icon = late;
+            PixelHarness.Settle(60);
+            AssertInk(late, button, "swapped in");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            PixelHarness.Settle(60);
+            AssertInk(late, button, "swapped in, after a live switch to dark");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            PixelHarness.Settle(6);
+        });
+    }
+
     /// <summary>
     /// The icon must carry the carrier's brush by instance. Null is the defect itself (nothing hands the ink
     /// over, so the glyph keeps whatever it last drew); a different instance is a stale or wrong source.

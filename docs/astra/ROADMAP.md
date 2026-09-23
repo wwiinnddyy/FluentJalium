@@ -4784,8 +4784,9 @@ All Astra gates passed.   GATE-EXIT=0
 
 #94 结的是侧栏**条目**那一枚图标。这一批不再靠"机制上应该一样"外推，而是把同一把尺子铺到 Gallery 全部 13 页：
 起始档钉在开窗之前，同一个活窗口翻档，前后两张抓屏逐像素找"两边都近黑 / 两边都近白"的**冻结墨**
-（`spike/NavIconRecolor/{census.sh,frozen.ps1}`）。读数两份都在盘上：`census-before.log` 是把本批接线剪掉之后重测的，
-`census-after.log` 是接上之后。
+（`spike/NavIconRecolor/{census.sh,frozen.ps1}`）。读数**三份**都在盘上：`census-before.log` 是把本批接线剪掉之后重测的，
+`census-after.log` 是接上"走视觉树"那一版之后重测的，`census-route-b.log` 是接上**出货那一版**（两条活绑定）之后重测的。
+表里"接上接线"那一列引的是最后这一份——前两列分别对应"没有接线"与"接线没出货"，只有第三份说的是这棵树 build 出来的东西。
 
 ### 读数
 
@@ -4806,10 +4807,11 @@ All Astra gates passed.   GATE-EXIT=0
 ### 交付形状：一处机制，两个入口（`Controls/IconInk.cs`）
 
 - **我们的控件**有钩子，就直接调：`FluentNavigationItem.OnIconChanged` → `IconInk.Apply(item, icon)`。
-- **框架控件的模板**没有钩子，就给它一个附着属性：`fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`
-  挂在包住图标的那个要素上，要素 `Loaded` 后广度优先把墨转发给身下每一枚 `IconElement`。
-  落点：`AppBar.jalxaml:82`/`:143`、`Menus.jalxaml:69`/`:121`/`:165`、`TabView.jalxaml:179`（宿主自己就是那条 `Control`，
-  所以用 `RelativeSource=Self`，交给它的仍是这一族本来就写好的 `TabViewItemIconForeground` 那行）。
+- **框架控件的模板**没有钩子，就让标记把两样东西说出来：`fluent:IconInk.Carrier` 说"抄谁的墨"，
+  `fluent:IconInk.Icon` 说"图标在哪"（`="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"`）。
+  两条都是普通绑定，回调只在两者都到位时交付。落点：`AppBar.jalxaml:82-83`/`:144-145`、
+  `Menus.jalxaml:69-70`/`:122-123`/`:167-168`、`TabView.jalxaml:179-180`（宿主 `IconHost` 自己就是那条 `Control`，
+  所以 `Carrier` 指 `Self`，交给它的仍是这一族本来就写好的 `TabViewItemIconForeground` 那行）。
 - **纯标记的一条**给了折叠开关：`Navigation.jalxaml:196` 的 `SymbolIcon` 直接
   `Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"`——它就在我们的模板里，
   不需要新机制。
@@ -4817,20 +4819,33 @@ All Astra gates passed.   GATE-EXIT=0
   `DependencyProperty.UnsetValue` 是 `public static readonly object`，模式匹配那个内部类型会失败，只能用
   `ReferenceEquals`——这一条是量出来的，不是猜的。
 
+**这一处第一版是走视觉树的**：附着属性只有一个（`IconInk.Source`），挂在包住图标的要素上，`Loaded` 之后广度优先
+把墨交给身下每一枚 `IconElement`。串行闸口的套件步把它拦下：
+`AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection` 报
+`Forbidden implementation pattern: src/FluentJalium/Controls/IconInk.cs: VisualTreeHelper`
+（`spike/NavIconRecolor/gate-95.log`，管道在套件步红并停在那里）。那条闸的立论写在它自己的注释里，引的是
+AGENTS.md 的三条之一："walk the visual tree to restyle live controls"。所以改法不是放宽那条闸（它点名的正是
+这段代码做的事），而是换一条不走树的路：把"图标是谁"交给绑定去说，而绑定本来就是活的。换完多了两样东西——
+`Loaded` 那个时序钩子没了，以及**换上去的图标也会重新交付**；后者出了一条新事实
+`An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too`（把回调改成"只认第一个值"即红，
+而首帧那条事实照旧绿），原来只能写进 Known Gap 的形状因此变成有事实的形状。
+
 这不是框架的修复。根因在框架：`IconElement` 不在主题换档时 `InvalidateVisual()`，上游 WinUI 整棵树随档重绘所以
 不需要宿主补偿。本层只是让用户看见的那片墨跟上档；框架侧的账与 #62 同一族提上游。
 
 ### 四类证据
 
 - **构建**：`dotnet build samples/FluentJalium.Gallery` 与 `dotnet build tests/FluentJalium.Tests` 各
-  `0 个警告 / 0 个错误`（`census-before.log` 里两次、`mut-95.log` 里五轮）。
-- **行为**：图标事实四条，基线（不突变）`通过: 4，总计: 4`，每条各被自己的突变弄红一次，
-  且每腿打印被测 `FluentJalium.dll` 的 sha1 并断言与上一腿不同（`spike/NavIconRecolor/mut-95.log`）：
-  `nobind`（`IconInk.Apply` 的交付换空块）→ 只红 `A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to`；
-  `noguard`（本地前景判据放宽）→ 只红 `A_pane_icon_that_arrives_with_its_own_ink_keeps_it`；
-  `noappbarink`（应用条那两行附着属性删掉）→ 只红 `A_template_that_hosts_an_icon_hands_it_the_carrier_ink`；
+  `0 个警告 / 0 个错误`（`census-before.log` 两次、`mut-95b.log` 六轮、`census-route-b.log` 两次）。
+- **行为**：图标事实**五条**，基线（不突变）两类别跑 `通过: 115，总计: 115`；每条各被自己的突变弄红，
+  且每腿打印被测 `FluentJalium.dll` 的 sha1 并断言与上一腿不同（`spike/NavIconRecolor/mut-95b.log`）：
+  `nobind`（`IconInk.Apply` 的交付换空块）→ 红三条依赖交付的事实（侧栏换档、宿主首帧、宿主换图标）；
+  `noguard`（本地前景判据放宽）→ 只红"图标自带墨要保留"那条；
+  `onceonly`（回调改成只认第一个值）→ **只红** `An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too`，
+  且红在 `swapped in` 那一档、`before the swap` 照旧过——这条腿说的是"绑定是活的"这件事本身有牙；
+  `nocarrierink`（应用条那两行 `Carrier` 删掉）→ 红宿主那两条，侧栏两条照旧绿（代码入口与绑定入口互不依赖）；
   `notoggleink`（折叠开关那条绑定删掉）→ 只红 `The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch`。
-  类计数：`AstraNavigationTests` 80 → **81**，`AstraIconFamilyTests` 32 → **33**（两类别跑各 `失败: 0`）。
+  类计数：`AstraNavigationTests` 80 → **81**，`AstraIconFamilyTests` 32 → **34**（两类别跑各 `失败: 0`）。
   #94 那两条的见证在机制搬进 `IconInk` 之后**重跑过**——见证要对着出货的那段代码，不是对着它搬家前的位置。
 - **视觉**：上面那张普查表 + 两帧裁块，全部来自抓屏（`shoot.ps1` 起 Gallery、`ASTRA_FLIP_MS` 定时翻档）。
   进程内 `RenderTargetBitmap` 依旧看不见这类缺陷（它重跑一遍渲染），所以这一族的像素证据只有整屏这一条路。
@@ -4840,15 +4855,41 @@ All Astra gates passed.   GATE-EXIT=0
 
 1. **菜单三处与页签一处只有机制**：普查里它们一个像素没露面，也没有各自的事实。开着的弹层翻档会不会冻，
    要等 #63 / #13 那套宿主交互通路。
-2. **框架宿主上，落子之后换进去的图标没人补交墨**：`IconInk.Source` 的转发展开在宿主 `Loaded` 那一次；
-   我们的 `FluentNavigationItem` 走 `OnIconChanged` 那条入口，框架宿主没有对应钩子。
+2. **"换上去的图标也补交墨"只在应用条那枚上出过事实**：`onceonly` 腿证的是"回调依赖活绑定"这件事本身，宿主是
+   `AppBarButton`。菜单三处与页签一处走同一对绑定，但没有各自的换图标事实。而**不从宿主 `Icon` 那一格进来的图标**
+   （模板自绘的 glyph、或宿主根本没有 `Icon` 属性）这条通路完全覆盖不到——那类形状得另找入口。
 3. **hover / pressed / 禁用下的图标墨**没读：本批四条事实全在 Light↔Dark 这一档上，接线只保证"图标跟宿主前景"。
 4. **高对比档**下图标跟不跟没量；页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
-5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。两次大数读数（一轮 `settings` 33755、
-   一轮 `surfaces` 28325+131）之后都不重演（干净树连测两轮 `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`），
+5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。三次大数读数（一轮 `settings` 33755、
+   一轮 `surfaces` 28325+131、出货那一版 `motion` light-in-both 1200）之后都不重演（前两次：干净树连测两轮
+   `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`；第三次：`motion-light.log` 里连测两轮全 `0 0`），
    而 168 与 519 每次都精确重演。`frozen.ps1` 因此加了 `-Mask` / `-Crop`，把最脏那个桶的图块留成文件，
-   下次再出现大数能看而不是猜。这两次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
+   下次再出现大数能看而不是猜。这三次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
    那一族"只在某一次跑里现身"的新成员。
-6. **仪器自己坏过一轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
-   那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行。作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
+   `motion` 那 1200 px 一开始**没有**图块可看：`-Crop` 只定位 dark-in-both 那组桶，而它是 light-in-both 的数，
+   所以仪器先补了另一半（light 也有自己的桶与裁块），再复测。**补完之后确认过这条读数路能报**：把阈值放到
+   `-Light 0` 去量同一对帧，得到 `light-in-both 2307088` 与八格桶位加一张裁块——"复测读回 0"因此不是"新代码
+   没跑"。而 light-in-both 本来就是更噪的那一组（白字配强调色底在两档下都近白，那是正确的墨不是冻结的墨），
+   这也是为什么一组大数落在它上面时更不能靠推断结案。
+6. **仪器自己坏过两轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
+   那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行——作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
+   第二轮在突变器自己：一条腿的变换串里带了一个换行，"写回后再比对行表"的后置判据因此失败，而脚本对失败的处理是
+   **跳过这条腿**——突变已经写进文件了，于是后面两条腿各多红一条事实（看起来像跨类污染，其实是上一腿的残留）。
+   现在的 `teeth95.sh` 每条腿开头先 `grep MUTANT` 做 preflight，任何 apply/build 失败都先 revert 再中止整轮，
+   并且日志留断言原文而不是只留测试名——那条残留正是被"只留名字"的过滤藏住的。被污染的那一次读数写在
+   `mut-95b.log` 里，整条腿随后**重跑并覆盖**了它，盘上留着的是干净的那一份；`mut-95.log` 是走视觉树那一版的
+   见证，那一版没出货，它的读数只算"当时那条路有牙"，不算本批的。
+   第三轮在"树上还有没有突变"这个检查自己：它 `grep -arn MUTANT src/FluentJalium`，而 `-a` 把编译产物也当文本读——
+   量这一族时把范围放大到 `tests`/`samples`，出货的 `System.Diagnostics.EventLog.dll` 里就有 `MUTANT` 这串字节，
+   一棵干净树会被读成"突变还在树上"，而把那条输出再交给一个 grep 只会得到 `Binary file (standard input) matches`：
+   既拿不到行，也诚实地说不了"没有"。现在三处 preflight 统一成 `--binary-files=without-match` 加
+   `--include='*.cs' --include='*.jalxaml'`，只查突变可能住的源码。
+
+### #95 闸口补记：第一次跑在套件步红，红因是本批自己的代码（2026-09-23）
+
+`653b940`（普查表 + 走视觉树的接线 + 三条事实）之后跑串行闸口：`spike/NavIconRecolor/gate-95.log` 在套件步红并停住，
+红的是 `AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection`，报
+`Forbidden implementation pattern: src/FluentJalium/Controls/IconInk.cs: VisualTreeHelper`。
+**这条不是 flake，也不是别人的账**——本批第一版的机制就是那条闸点名禁止的形状。处置是换路（见上面"交付形状"），
+换完多出 `onceonly` 那条腿与一条新事实；后续提交必须重跑整条管道，本节的"全绿"字样在这份读数打印出来之前不存在。
 

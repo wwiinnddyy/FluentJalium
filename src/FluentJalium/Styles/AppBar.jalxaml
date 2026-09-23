@@ -79,7 +79,8 @@
               <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
                        Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
                 <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
               </Viewbox>
               <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
                          FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
@@ -140,7 +141,8 @@
               <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
                        Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
                 <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
               </Viewbox>
               <!-- Upstream declares this margin as AppBarToggleButtonTextLabelMargin; same 2,0,2,8 value, and
                    this implementation reads the button row so only one of the two names is published. -->

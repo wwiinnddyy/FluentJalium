@@ -37,9 +37,12 @@ public static class NavRecolorFrozen {
         using (var a = new Bitmap(before))
         using (var b = new Bitmap(after)) {
             int darkBoth = 0, lightBoth = 0, total = 0;
-            // Where the frozen pixels are: a 32x32 bucket grid, so a count comes with a location and the
-            // offender can be found without knowing its coordinates in advance.
+            // Where the frozen pixels are: a 60x60 bucket grid, so a count comes with a location and the
+            // offender can be found without knowing its coordinates in advance. Both sets get their own grid -
+            // light-in-both is the noisier signal (white-on-accent ink is legitimately white in both themes),
+            // which is exactly why a big number there has to be looked at rather than explained.
             var buckets = new SortedDictionary<int, int>();
+            var lightBuckets = new SortedDictionary<int, int>();
             Bitmap outMask = null;
             Graphics g = null;
             if (mask != null && mask.Length > 0) {
@@ -63,6 +66,8 @@ public static class NavRecolorFrozen {
                         if (g != null) outMask.SetPixel(x - left, y - top, Color.White);
                     } else if (minA > light && minB > light) {
                         lightBoth++;
+                        int key = ((x - left) / 60) * 100000 + ((y - top) / 60);
+                        int had; lightBuckets.TryGetValue(key, out had); lightBuckets[key] = had + 1;
                     }
                 }
             }
@@ -73,21 +78,36 @@ public static class NavRecolorFrozen {
             for (int i = 0; i < shown; i++) {
                 int k = ranked[i].Key;
                 int bx = k / 100000, by = k % 100000;
-                Console.WriteLine("  at x={0}..{1} y={2}..{3} px={4}",
+                Console.WriteLine("  dark at x={0}..{1} y={2}..{3} px={4}",
                     bx * 60, bx * 60 + 59, by * 60, by * 60 + 59, ranked[i].Value);
+            }
+            var rankedLight = new List<KeyValuePair<int, int>>(lightBuckets);
+            rankedLight.Sort((a2, b2) => b2.Value.CompareTo(a2.Value));
+            int shownL = Math.Min(8, rankedLight.Count);
+            for (int i = 0; i < shownL; i++) {
+                int k = rankedLight[i].Key;
+                int bx = k / 100000, by = k % 100000;
+                Console.WriteLine("  light at x={0}..{1} y={2}..{3} px={4}",
+                    bx * 60, bx * 60 + 59, by * 60, by * 60 + 59, rankedLight[i].Value);
             }
             if (outMask != null) { g.Dispose(); outMask.Save(mask, System.Drawing.Imaging.ImageFormat.Png); Console.WriteLine("mask " + mask); }
             // A reading is only actionable if the worst bucket can be looked at. Grab a 240x240 patch of both
             // frames around it: a big number that turns out to be some other window over ours says so here.
-            if (crop != null && crop.Length > 0 && ranked.Count > 0) {
-                int k0 = ranked[0].Key;
-                int cx = left + (k0 / 100000) * 60 + 30, cy = top + (k0 % 100000) * 60 + 30;
-                int x0 = Math.Max(left, cx - 120), y0 = Math.Max(top, cy - 120);
-                int x1 = Math.Min(right, cx + 120), y1 = Math.Min(bottom, cy + 120);
-                var rect = new Rectangle(x0, y0, x1 - x0, y1 - y0);
-                using (var pa = a.Clone(rect, a.PixelFormat)) pa.Save(crop + ".before.png", System.Drawing.Imaging.ImageFormat.Png);
-                using (var pb = b.Clone(rect, b.PixelFormat)) pb.Save(crop + ".after.png", System.Drawing.Imaging.ImageFormat.Png);
-                Console.WriteLine("crop " + crop + " at " + rect.X + "," + rect.Y + "," + rect.Width + "x" + rect.Height);
+            if (crop != null && crop.Length > 0) {
+                // Dark-in-both and light-in-both get their own patch: a page can carry a big number in the
+                // noisier set, and "no crop" would leave that reading unlookable.
+                foreach (var pair in new[] { new { List = ranked, Tag = "dark" }, new { List = rankedLight, Tag = "light" } }) {
+                    if (pair.List.Count == 0) continue;
+                    int k0 = pair.List[0].Key;
+                    int cx = left + (k0 / 100000) * 60 + 30, cy = top + (k0 % 100000) * 60 + 30;
+                    int x0 = Math.Max(left, cx - 120), y0 = Math.Max(top, cy - 120);
+                    int x1 = Math.Min(right, cx + 120), y1 = Math.Min(bottom, cy + 120);
+                    var rect = new Rectangle(x0, y0, x1 - x0, y1 - y0);
+                    string tag = pair.Tag;
+                    using (var pa = a.Clone(rect, a.PixelFormat)) pa.Save(crop + "." + tag + "-before.png", System.Drawing.Imaging.ImageFormat.Png);
+                    using (var pb = b.Clone(rect, b.PixelFormat)) pb.Save(crop + "." + tag + "-after.png", System.Drawing.Imaging.ImageFormat.Png);
+                    Console.WriteLine("crop " + crop + " " + tag + " at " + rect.X + "," + rect.Y + "," + rect.Width + "x" + rect.Height);
+                }
             }
         }
     }

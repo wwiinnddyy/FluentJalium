@@ -66,7 +66,8 @@
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -118,7 +119,8 @@
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -162,7 +164,8 @@
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>

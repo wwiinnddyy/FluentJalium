@@ -36,7 +36,7 @@ for name in $MUTANTS; do
   python spike/NavIconRecolor/mutate.py revert "$name" >> "$LOG" 2>&1
   echo "$name revert-exit=$?" >> "$LOG"
 done
-echo "marker-grep-lines=$(grep -arc MUTANT src/FluentJalium | awk -F: '{s+=$2} END {print s}') (0 = clean)" | tee -a "$LOG"
+echo "marker-grep-lines=$(grep -rn --binary-files=without-match --include=*.cs --include=*.jalxaml MUTANT src/FluentJalium | wc -l) (0 = clean; source-scoped and binary-skipped, see teeth95.sh)" | tee -a "$LOG"
 dotnet build samples/FluentJalium.Gallery >> "$LOG" 2>&1
 echo "gallery-rebuild-exit=$?" | tee -a "$LOG"
 ls -la spike/NavIconRecolor | grep -a "probe-r"

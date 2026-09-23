@@ -24,5 +24,5 @@ for page in $pages; do
     -Mask "spike/NavIconRecolor/census-$page-mask.png" \
     -Crop "spike/NavIconRecolor/census-$page-worst" 2>&1 | tr -d '\r')
   echo "== $page $(echo "$out" | grep -a 'area')"
-  echo "$out" | grep -aE '  at |^crop' | head -5
+  echo "$out" | grep -aE 'at x=|^crop' | head -14
 done

@@ -31,8 +31,9 @@ for name in $MUTANTS; do
   echo "$name revert-exit=$?" | tee -a "$LOG"
 done
 
-grep -arn "MUTANT" src/FluentJalium >> "$LOG" 2>&1
-echo "marker-grep-lines=$(grep -arc MUTANT src/FluentJalium | awk -F: '{s+=$2} END {print s}') (0 = clean)" | tee -a "$LOG"
+MARKER='grep -rn --binary-files=without-match --include=*.cs --include=*.jalxaml MUTANT src/FluentJalium'
+$MARKER >> "$LOG" 2>&1
+echo "marker-grep-lines=$($MARKER | wc -l) (0 = clean; source-scoped and binary-skipped, see teeth95.sh)" | tee -a "$LOG"
 
 # Rebuild clean so the binaries on disk answer for the source that is actually in the tree.
 dotnet build samples/FluentJalium.Gallery >> "$LOG" 2>&1

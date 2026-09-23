@@ -1,7 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Controls;
 using Jalium.UI.Data;
-using Jalium.UI.Media;
 
 namespace FluentJalium.Controls;
 
@@ -15,17 +14,27 @@ namespace FluentJalium.Controls;
 /// changes the value and marks the visual dirty, and it leaves a readable value behind for a regression fact.
 ///
 /// Two shapes use it: a control of ours that owns its icon calls <see cref="Apply"/> when the icon arrives, and a
-/// template whose host is a framework control sets <c>fluent:IconInk.Source</c> on the element that wraps the icon,
-/// which forwards to every icon under it once that host has been loaded.
+/// template whose host is somebody else's control names the two parts from markup - <c>fluent:IconInk.Carrier</c>
+/// for the element whose ink to copy and <c>fluent:IconInk.Icon</c> for the icon property that holds the element.
+/// Both are ordinary bindings, so an icon swapped later arrives here too. Nothing walks a tree to find out what a
+/// control is showing: the structural gate in AstraGateTests keeps the visual-tree walk out of the library for the
+/// reason AGENTS.md gives - it is how the old per-window repair loops started.
 /// </summary>
 public static class IconInk
 {
-    public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached(
-        "Source", typeof(Control), typeof(IconInk), new PropertyMetadata(null, OnSourceChanged));
+    public static readonly DependencyProperty CarrierProperty = DependencyProperty.RegisterAttached(
+        "Carrier", typeof(Control), typeof(IconInk), new PropertyMetadata(null, OnHandChanged));
 
-    public static Control GetSource(DependencyObject target) => (Control)target.GetValue(SourceProperty)!;
+    public static readonly DependencyProperty IconProperty = DependencyProperty.RegisterAttached(
+        "Icon", typeof(object), typeof(IconInk), new PropertyMetadata(null, OnHandChanged));
 
-    public static void SetSource(DependencyObject target, Control value) => target.SetValue(SourceProperty, value);
+    public static Control GetCarrier(DependencyObject target) => (Control)target.GetValue(CarrierProperty)!;
+
+    public static void SetCarrier(DependencyObject target, Control value) => target.SetValue(CarrierProperty, value);
+
+    public static object? GetIcon(DependencyObject target) => target.GetValue(IconProperty);
+
+    public static void SetIcon(DependencyObject target, object? value) => target.SetValue(IconProperty, value);
 
     /// <summary>
     /// Points <paramref name="icon"/>'s ink at <paramref name="carrier"/>'s. An icon that arrived with a foreground
@@ -39,37 +48,9 @@ public static class IconInk
             BindingOperations.SetBinding(icon, IconElement.ForegroundProperty, new Binding("Foreground") { Source = carrier });
     }
 
-    private static void OnSourceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+    private static void OnHandChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
-        if (sender is not FrameworkElement host || args.NewValue is not Control carrier) return;
-
-        if (host.IsLoaded)
-        {
-            Forward(host, carrier);
-            return;
-        }
-
-        RoutedEventHandler handler = null!;
-        handler = (_, _) =>
-        {
-            host.Loaded -= handler;
-            Forward(host, carrier);
-        };
-        host.Loaded += handler;
-    }
-
-    private static void Forward(DependencyObject root, Control carrier)
-    {
-        var queue = new Queue<DependencyObject>();
-        queue.Enqueue(root);
-        while (queue.Count > 0)
-        {
-            var current = queue.Dequeue();
-            if (current is IconElement icon) Apply(carrier, icon);
-            for (var index = 0; index < VisualTreeHelper.GetChildrenCount(current); index++)
-            {
-                if (VisualTreeHelper.GetChild(current, index) is { } child) queue.Enqueue(child);
-            }
-        }
+        if (sender.GetValue(CarrierProperty) is Control carrier && sender.GetValue(IconProperty) is IconElement icon)
+            Apply(carrier, icon);
     }
 }

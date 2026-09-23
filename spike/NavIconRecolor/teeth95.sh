@@ -1,63 +1,79 @@
 #!/usr/bin/env bash
-# Four legs: each cuts one leg of the icon-ink hand-off, rebuilds the CONSUMER project, witnesses that the
-# rebuilt FluentJalium.dll is the one the host loads, and must turn exactly its own fact red.
-# A build failure aborts the leg before the test runs, otherwise the previous binary would answer for the mutant.
+# Five legs: each cuts one leg of the icon-ink hand-off, rebuilds the CONSUMER project, witnesses that the rebuilt
+# FluentJalium.dll is the one the host loads, and must turn its own fact red.
+#
+# Two things this script learned the hard way and now enforces:
+#  - a leg whose apply step failed must not run: the mutation is already in the file when the postcondition
+#    rejects it, so the next leg would measure it (that is how one leg appeared to redden another's fact);
+#  - the log must carry the assertion text, not just the test names, or a poisoned reading stays invisible.
 set -u
 cd C:/git/Jalium/FluentJalium || exit 2
 
-LOG=spike/NavIconRecolor/mut-95.log
+LOG=spike/NavIconRecolor/mut-95b.log
 : > "$LOG"
+SCOPE="FullyQualifiedName~AstraNavigationTests|FullyQualifiedName~AstraIconFamilyTests"
 
-FACTS_nobind=AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to
-FACTS_noguard=AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it
-FACTS_noappbarink=AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink
-FACTS_notoggleink=AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch
+# Look for the marker in the sources a mutant can live in, and skip binaries. An `-a` grep over a build-output
+# tree does neither: shipped copies of System.Diagnostics.EventLog.dll contain the byte string MUTANT, so
+# widening the scope to tests/ or samples/ makes a clean tree read as "a mutant is in the tree" (observed this
+# session), and piping that output into another grep answers "Binary file (standard input) matches" - a marker
+# check that can show no line and still not honestly report none.
+marker_grep() {
+  grep -rn --binary-files=without-match --include='*.cs' --include='*.jalxaml' "MUTANT" src/FluentJalium
+}
 
-echo "=== baseline, no mutation: the four facts on the shipped wiring" | tee -a "$LOG"
+preflight() {
+  if marker_grep > /dev/null 2>&1; then
+    marker_grep | tee -a "$LOG"
+    echo "PREFLIGHT FAILED: a mutant is still in the tree, aborting before measuring anything" | tee -a "$LOG"
+    exit 1
+  fi
+}
+
+echo "=== baseline, no mutation: the five icon facts on the shipped wiring" | tee -a "$LOG"
+preflight
 dotnet build tests/FluentJalium.Tests >> "$LOG" 2>&1
 echo "baseline-build-exit=$?" | tee -a "$LOG"
-# Seed the digest of the shipped binary so each leg's `changed=true` compares against a real predecessor.
 python spike/NavIconRecolor/mutate.py hash | tee -a "$LOG"
-dotnet test tests/FluentJalium.Tests --no-build \
-  --filter "FullyQualifiedName~A_live_theme_switch_moves_a_pane_icon|FullyQualifiedName~A_pane_icon_that_arrives_with_its_own_ink|FullyQualifiedName~The_pane_toggle_glyph_carries|FullyQualifiedName~A_template_that_hosts_an_icon" \
-  2>&1 | grep -aE "失败|通过|错误|Passed!|Failed!" | tail -5 | tee -a "$LOG"
-echo "baseline-test-exit=${PIPESTATUS[0]}" | tee -a "$LOG"
+dotnet test tests/FluentJalium.Tests --no-build --filter "$SCOPE" 2>&1 | grep -aE "net10.0\)|失败 Fluent|carries" | tail -4 | tee -a "$LOG"
 
-for name in nobind noguard noappbarink notoggleink; do
-  fact="FACTS_$name"
-  fact="${!fact}"
+for name in nobind noguard onceonly nocarrierink notoggleink; do
   {
     echo ""
-    echo "=== LEG $name -> $fact"
+    echo "=== LEG $name"
     date -u +%FT%TZ
   } >> "$LOG"
+  preflight
 
   python spike/NavIconRecolor/mutate.py apply "$name" >> "$LOG" 2>&1
   apply=$?
   if [ "$apply" -ne 0 ]; then
-    echo "$name APPLY-FAILED exit=$apply, leg skipped" | tee -a "$LOG"
-    continue
+    echo "$name APPLY-FAILED exit=$apply - reverting and aborting the run" | tee -a "$LOG"
+    python spike/NavIconRecolor/mutate.py revert "$name" >> "$LOG" 2>&1
+    exit 1
   fi
 
   dotnet build tests/FluentJalium.Tests >> "$LOG" 2>&1
   build=$?
   if [ "$build" -ne 0 ]; then
-    echo "$name BUILD-FAILED exit=$build - mutant never ran, leg aborted" | tee -a "$LOG"
+    echo "$name BUILD-FAILED exit=$build - mutant never ran, reverting and aborting" | tee -a "$LOG"
     python spike/NavIconRecolor/mutate.py revert "$name" >> "$LOG" 2>&1
-    continue
+    exit 1
   fi
 
   python spike/NavIconRecolor/mutate.py hash | tee -a "$LOG"
-  dotnet test tests/FluentJalium.Tests --no-build --filter "FullyQualifiedName~$fact" >> "$LOG" 2>&1
-  test=$?
-  echo "$name TEST-exit=$test (1 expected: the fact is red without its mechanism)" | tee -a "$LOG"
+  dotnet test tests/FluentJalium.Tests --no-build --filter "$SCOPE" 2>&1 |
+    grep -aE "net10.0\)|失败 Fluent|carries|Assert\.|Expected|Actual" | tail -12 | tee -a "$LOG"
 
   python spike/NavIconRecolor/mutate.py revert "$name" >> "$LOG" 2>&1
   echo "$name REVERT-exit=$?" | tee -a "$LOG"
 done
 
-echo "" | tee -a "$LOG"
-echo "=== tree after the run (must show only the fix, no MUTANT markers)" | tee -a "$LOG"
-grep -arn "MUTANT" src/FluentJalium | tee -a "$LOG"
-echo "marker-grep-exit=$? (1 = none left)" | tee -a "$LOG"
-git status --porcelain src >> "$LOG" 2>&1
+{
+  echo ""
+  echo "=== tree after the run (no MUTANT lines, and only the fix modified)"
+  marker_grep
+  echo "marker-grep-exit=$? (1 = none left)"
+  git status --porcelain src
+} >> "$LOG" 2>&1
+tail -6 "$LOG"

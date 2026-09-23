@@ -202,8 +202,9 @@ withhold 的名与理由（正向由消费点闸口盯着：`AstraResourceKeyTes
 7. **`DataPanes`/`TabItemSource` 数据驱动**：本批只有 `TabItems` 这一条元素集合。
 8. **`TabViewItem` 的 `ToolTipTitle`/`ToolTipText`/`IconSource`**：上游那三行是 `DataTemplate`+`IconSource` 面，
    本批的 `Icon` 是一个元素槽。
-9. **页签图标的换档重绘：接了线，没有读数**（#95，2026-09-23）。`Styles/TabView.jalxaml:178` 的 `IconHost` 挂了
-   `controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}"`，把这一族本来就写好的
+9. **页签图标的换档重绘：接了线，没有读数**（#95，2026-09-23）。`Styles/TabView.jalxaml:178` 的 `IconHost` 挂了两条绑定：
+   `controls:IconInk.Carrier="{Binding RelativeSource={RelativeSource Self}}"` 与
+   `controls:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"`，把这一族本来就写好的
    `TabViewItemIconForeground`（`IconHost` 自己的 `Foreground`，宿主是 `ContentControl`，它本身就是那条 `Control`）
    交给身下的图标。**但普查在把接线剪掉的状态下也没在页签那页量到冻结墨**
    （`spike/NavIconRecolor/census-before.log`，那一页的冻结集合只有外壳折叠开关那 168 px），所以这一处的依据只有
