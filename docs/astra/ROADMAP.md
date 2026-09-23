@@ -4674,7 +4674,7 @@ not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carri
 
 - **构建**：`dotnet build tests/FluentJalium.Tests -c Debug` `0 个警告 / 0 个错误`，七个突变各自重建一次，末轮恢复树再建。
 - **行为**：新 2 条 + 撤 1 条，本类 8 条单跑 `8/8`；七个突变每轮 revert 后 `git diff` 对 `TabView.jalxaml` 干净，
-  跑完 `git status --porcelain src` 为空。测点总数 1587 → **1589**。普查同尺重跑：键名无读者 35 → 见本行打印值。
+  跑完 `git status --porcelain src` 为空。测点总数 1587 → **1589**。普查同尺重跑：键名无读者 35 → **33**（状态格子 176、无指针 91 不变）。
 - **视觉**：零新增像素断言（Known Gap 3）。
 - **硬件输入**：零，全用 `IsEnabled` 驱动。
 - **串行闸口**：本批不占闸口——上一条 `gate-91.log` 之后工作树才长出这批测点，闸口读数按那跑的树记（见 #91 补记），
