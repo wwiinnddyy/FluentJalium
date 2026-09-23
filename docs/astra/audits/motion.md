@@ -84,7 +84,12 @@
 1. 上游 13 条时长键只转录了本库消费的 3 条；其余随消费它的批次一起进来，不预先占名。
 2. `ReduceMotion` 只管**下一次**过渡：已经在跑的过渡按自己的时钟走完（arm 时读值，运行中不重读）。
 3. 代码侧动画器里 NavigationView 指示器的 600/200ms 与页面淡入的 167ms 是上游没有键的数，仍按
-   `AnimationsEnabled` 整体开关，不发布伪键；`ProgressRing` 的持续自转不受减动效影响（上游也未证，见 `audits/progress-ring.md`）。
+   `AnimationsEnabled` 整体开关，不发布伪键。`ProgressRing` 的持续自转**故意**不被减动效门住，这一条已由上游代码证死
+   （#78 判掉）：`ProgressRing.cpp:327-341` 的 `UpdateStates()` 只在 `IsActive && IsIndeterminate` 下播
+   `player.PlayAsync(0, 1, true)`，`:355-360` 在非激活时 `player.Stop()`，整条路径不读任何动画策略，而
+   `AnimatedVisualPlayer.cpp` 里 `IsAnimationEnabled`/`UISettings`/`AnimationPolicy` 零命中。钉住它的是
+   `AstraProgressRingTests.ReduceMotion_does_not_stop_the_indeterminate_spin`——哪天要拿开关去门这只环，
+   得先推翻这段上游证据。
 4. 测试套件不断言"动画确实在跑"——那依赖机器的 `ClientAreaAnimation`/`UIEffects`。这条只在探针里量过，读数与前置
    条件一起记在 `s6-motion-probe-raw.txt`；套件断言的是属性读回值。
 5. 高对比与减动效的交叉未量（上游也无对应物）。

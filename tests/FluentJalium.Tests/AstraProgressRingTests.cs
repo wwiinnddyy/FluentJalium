@@ -256,6 +256,43 @@ public sealed class AstraProgressRingTests
         });
     }
 
+    /// <summary>
+    /// Upstream gates the indeterminate spin on nothing but <c>IsActive &amp;&amp; IsIndeterminate</c>:
+    /// <c>ProgressRing.cpp:327-341</c> plays <c>player.PlayAsync(0, 1, true)</c> from <c>UpdateStates()</c> and
+    /// <c>:355-360</c> stops it when the ring goes inactive, and no animation policy is read on that path -
+    /// <c>AnimatedVisualPlayer.cpp</c> carries no <c>IsAnimationEnabled</c>/<c>UISettings</c> reference either. So
+    /// the switch that stops our transitions deliberately does not stop this ring. The pair below is what keeps a
+    /// later "consistency fix" from breaking that parity quietly: the first assertion pins the switch as actually
+    /// off, the second pins the ring as still moving.
+    /// </summary>
+    [Fact]
+    public void ReduceMotion_does_not_stop_the_indeterminate_spin()
+    {
+        _fixture.Run(() =>
+        {
+            var ring = Ring(50);
+            Start(ring);
+            SettleMoved("the armed leg");
+
+            var wasReduced = FluentThemeManager.ReduceMotion;
+            try
+            {
+                FluentThemeManager.ReduceMotion = true;
+
+                Assert.False(FluentThemeManager.AnimationsEnabled,
+                    "ReduceMotion did not reach AnimationsEnabled, so this leg would measure nothing about the ring");
+
+                var before = Start(ring);
+                SettleMoved("the reduced-motion leg");
+                Assert.NotEqual(before, Start(ring));
+            }
+            finally
+            {
+                FluentThemeManager.ReduceMotion = wasReduced;
+            }
+        });
+    }
+
     [Fact]
     public void An_inactive_ring_puts_its_root_out_of_the_picture()
     {

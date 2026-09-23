@@ -49,7 +49,9 @@ ABSENT（`s1o-progress-raw.txt` §A、`s1p-ring-raw.txt` §A）。上游模板�
 动画通路（上一段已量死，`s1o-progress-raw.txt` §F）：重复 `DoubleAnimation` 在 Freezable 变换上永不走表，
 markup `Storyboard` 实例化为零子元素。而 `CompositionTarget.Rendering` 里逐帧直写 `RotateTransform.Angle`
 确实推进（第 10 帧 370、第 30 帧 1110，两张图 bbox 分别 31x25@(0,8) 与 25x17@(0,17)）。
-因此动画器 `Motion/ProgressRingAnimator.cs` 是**帧循环**，不是 storyboard。
+因此动画器 `Motion/ProgressRingAnimator.cs` 是**帧循环**，不是 storyboard。驱动它的上游条件也只有两条：
+`ProgressRing.cpp:327-341` 在 `IsActive && IsIndeterminate` 下播放、`:355-360` 在非激活时停——上游不读动画策略，
+所以本库的 `ReduceMotion` 同样不门它（#78 判掉，测点 `ReduceMotion_does_not_stop_the_indeterminate_spin`）。
 
 角度落在哪里是第二个决定：第一版把角度交给 `RenderTransform`，画面只剩 3 个色像素——
 事后查明那是 `7 * 5 / 80` 的**整数除法**（半径算成 0），不是支点问题，所以"支点该落哪"这条至今未量。

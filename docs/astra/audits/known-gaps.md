@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-800 lines collected from 47 sections across 45 documents.
+807 lines collected from 47 sections across 45 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -467,19 +467,24 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/menu-flyout.md:150` - 12. **弧的量比它自己的名义半径短，且顶行那一格不稳**（4c 的三帧）：`CornerRadius=8` 在 dpi 168 下应给 14 px 的弧，弧深度量到 9~10；`=14` 应给 24.5，量到 17。同一张卡片的宽度方向逐数吻合 1.75 倍，所以不是采集器缩放错了。另外**顶行咬入在同一个模式重采之间就有 3 px 抖动**（12 → 9，弹窗落点差 0.67 DIP），因此...
 - `audits/menu-flyout.md:151` - 13. **`ContextMenu` 的卡片没有我们那份亚克力**：那层复制 `Border` 的 `Background` 抄到的是 `{ThemeResource MenuFlyoutPresenterBackground}`，帧上读出 `#FF2C2C2C`——与 4b 里 `MenuFlyout` 弹窗的框架灰同一支。也就是说 `ContextMenu` 现在**画的是卡片色，但不是 a...
 
-## audits/motion.md - 9 lines
+## audits/motion.md - 14 lines
 
 ### 5. Known Gaps
 
 - `audits/motion.md:84` - 1. 上游 13 条时长键只转录了本库消费的 3 条；其余随消费它的批次一起进来，不预先占名。
 - `audits/motion.md:85` - 2. `ReduceMotion` 只管**下一次**过渡：已经在跑的过渡按自己的时钟走完（arm 时读值，运行中不重读）。
 - `audits/motion.md:86` - 3. 代码侧动画器里 NavigationView 指示器的 600/200ms 与页面淡入的 167ms 是上游没有键的数，仍按
-- `audits/motion.md:87` - `AnimationsEnabled` 整体开关，不发布伪键；`ProgressRing` 的持续自转不受减动效影响（上游也未证，见 `audits/progress-ring.md`）。
-- `audits/motion.md:88` - 4. 测试套件不断言"动画确实在跑"——那依赖机器的 `ClientAreaAnimation`/`UIEffects`。这条只在探针里量过，读数与前置
-- `audits/motion.md:89` - 条件一起记在 `s6-motion-probe-raw.txt`；套件断言的是属性读回值。
-- `audits/motion.md:90` - 5. 高对比与减动效的交叉未量（上游也无对应物）。
-- `audits/motion.md:91` - 6. 真指针 hover 的时长验证仍缺（与 #13 同一笔账）：现在能证明"时长来自键、键能改"，还不能证明"鼠标进去第 N 帧落在哪个色"。
-- `audits/motion.md:92` - 7. Gallery 的 Motion 系统页仍未建（#10 未完的部分）；设置页那张卡的文案已按真实覆盖面改写。
+- `audits/motion.md:87` - `AnimationsEnabled` 整体开关，不发布伪键。`ProgressRing` 的持续自转**故意**不被减动效门住，这一条已由上游代码证死
+- `audits/motion.md:88` - （#78 判掉）：`ProgressRing.cpp:327-341` 的 `UpdateStates()` 只在 `IsActive && IsIndeterminate` 下播
+- `audits/motion.md:89` - `player.PlayAsync(0, 1, true)`，`:355-360` 在非激活时 `player.Stop()`，整条路径不读任何动画策略，而
+- `audits/motion.md:90` - `AnimatedVisualPlayer.cpp` 里 `IsAnimationEnabled`/`UISettings`/`AnimationPolicy` 零命中。钉住它的是
+- `audits/motion.md:91` - `AstraProgressRingTests.ReduceMotion_does_not_stop_the_indeterminate_spin`——哪天要拿开关去门这只环，
+- `audits/motion.md:92` - 得先推翻这段上游证据。
+- `audits/motion.md:93` - 4. 测试套件不断言"动画确实在跑"——那依赖机器的 `ClientAreaAnimation`/`UIEffects`。这条只在探针里量过，读数与前置
+- `audits/motion.md:94` - 条件一起记在 `s6-motion-probe-raw.txt`；套件断言的是属性读回值。
+- `audits/motion.md:95` - 5. 高对比与减动效的交叉未量（上游也无对应物）。
+- `audits/motion.md:96` - 6. 真指针 hover 的时长验证仍缺（与 #13 同一笔账）：现在能证明"时长来自键、键能改"，还不能证明"鼠标进去第 N 帧落在哪个色"。
+- `audits/motion.md:97` - 7. Gallery 的 Motion 系统页仍未建（#10 未完的部分）；设置页那张卡的文案已按真实覆盖面改写。
 
 ## audits/navigation.md - 13 lines
 
@@ -561,19 +566,19 @@ Categorised summaries live in `ROADMAP.md`.
 
 ### 6. Known Gaps（不声称清单）
 
-- `audits/progress-ring.md:123` - 1. 不确定态的**尾部收窄**没做：上游资产在转一圈的同时把 `TrimStart` 从 0 推到 0.5，弧的尾端在追头端；
-- `audits/progress-ring.md:124` - 本层是恒定 180° 弧在转。视觉上少了那个"甩尾"，动画周期与角度速率是按资产数字来的。
-- `audits/progress-ring.md:125` - 2. 两份 Lottie 资产本身不进本仓库：`DeterminateSource`/`IndeterminateSource`（`IAnimatedVisualSource`，
-- `audits/progress-ring.md:126` - MUX_PREVIEW）没有对应物，本层外观是从资产**公布出来的数字**重建的近似，不是同一渲染源。
-- `audits/progress-ring.md:127` - 3. `ProgressRingStrokeThickness` 不发布（见 §3）；厚度是盒子的函数，写在控件里。
-- `audits/progress-ring.md:128` - 4. `ProgressRingTemplateSettings` 整体缺席，`EllipseDiameter`/`EllipseOffset`/`MaxSideLength` 三行没有绑定面。
-- `audits/progress-ring.md:129` - 5. `Inactive` 的 `AccessibilityView=Raw` 无处可写：不活动的环只靠 `Opacity=0` 退出画面，
-- `audits/progress-ring.md:130` - **仍在无障碍树里**——这是可证明的差别，不是猜测。
-- `audits/progress-ring.md:131` - 6. 旋转交给图形而非变换，这条**没有对照实验**：第一版的空画面被证明是常数写错，所以"支点落在哪"仍未量。
-- `audits/progress-ring.md:132` - 7. `-90` 起点与 `359.9` 封顶是 ModernWpf 的读法（见 §5），本层无法对着上游资产复核。
-- `audits/progress-ring.md:133` - 8. 高对比那一组（两条重指向行）在控件层没落，靠调色板别名 underneath 解决，与其他控件同一条账。
-- `audits/progress-ring.md:134` - 9. 硬件输入证据为零。上游设 `IsHitTestVisible=False`/`IsTabStop=False`，本层照抄并各钉一条断言，
-- `audits/progress-ring.md:135` - 因此这条控件没有交互臂可测——但这不等于已验证过指针路径。
+- `audits/progress-ring.md:125` - 1. 不确定态的**尾部收窄**没做：上游资产在转一圈的同时把 `TrimStart` 从 0 推到 0.5，弧的尾端在追头端；
+- `audits/progress-ring.md:126` - 本层是恒定 180° 弧在转。视觉上少了那个"甩尾"，动画周期与角度速率是按资产数字来的。
+- `audits/progress-ring.md:127` - 2. 两份 Lottie 资产本身不进本仓库：`DeterminateSource`/`IndeterminateSource`（`IAnimatedVisualSource`，
+- `audits/progress-ring.md:128` - MUX_PREVIEW）没有对应物，本层外观是从资产**公布出来的数字**重建的近似，不是同一渲染源。
+- `audits/progress-ring.md:129` - 3. `ProgressRingStrokeThickness` 不发布（见 §3）；厚度是盒子的函数，写在控件里。
+- `audits/progress-ring.md:130` - 4. `ProgressRingTemplateSettings` 整体缺席，`EllipseDiameter`/`EllipseOffset`/`MaxSideLength` 三行没有绑定面。
+- `audits/progress-ring.md:131` - 5. `Inactive` 的 `AccessibilityView=Raw` 无处可写：不活动的环只靠 `Opacity=0` 退出画面，
+- `audits/progress-ring.md:132` - **仍在无障碍树里**——这是可证明的差别，不是猜测。
+- `audits/progress-ring.md:133` - 6. 旋转交给图形而非变换，这条**没有对照实验**：第一版的空画面被证明是常数写错，所以"支点落在哪"仍未量。
+- `audits/progress-ring.md:134` - 7. `-90` 起点与 `359.9` 封顶是 ModernWpf 的读法（见 §5），本层无法对着上游资产复核。
+- `audits/progress-ring.md:135` - 8. 高对比那一组（两条重指向行）在控件层没落，靠调色板别名 underneath 解决，与其他控件同一条账。
+- `audits/progress-ring.md:136` - 9. 硬件输入证据为零。上游设 `IsHitTestVisible=False`/`IsTabStop=False`，本层照抄并各钉一条断言，
+- `audits/progress-ring.md:137` - 因此这条控件没有交互臂可测——但这不等于已验证过指针路径。
 
 ## audits/radio-buttons.md - 13 lines
 
@@ -941,7 +946,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 98 lines
+## ROADMAP.md - 100 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1042,10 +1047,12 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4256` - 不是完备性证明——这句话也印在生成文档的抬头里。
 - `ROADMAP.md:4257` - - 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
 - `ROADMAP.md:4261` - 一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
-- `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准（本批最后一次生成读到 800 行 / 47 小节 / 45 篇；往后的批次只会让它继续涨，所以**抬头那一行才是当下值**） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——...
+- `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份...
+- `ROADMAP.md:4288` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
 ### 这一节自己的 Known Gap
 
-- `ROADMAP.md:4298` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
-- `ROADMAP.md:4299` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4299` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4300` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4320` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
 
-<!-- canonical-lines=800 sha256=a7cdf68afac3536028a2607ee5287dc06721a959ecad390e8643bcefc2ad6a4d -->
+<!-- canonical-lines=807 sha256=b7322efb9ace2b6211e2f6ad52d38499fb9e6b267a1048c254475f7a6f0ad88e -->

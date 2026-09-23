@@ -4267,10 +4267,10 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | build `0 警告 0 错误` → **1575 / 1575，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)` → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；日志按批留在 `spike/SystemColorProbe/gate-83*.log` 与本批的 `gate-84.log` |
+| 串行闸口 | build `0 警告 0 错误` → **1576 / 1576，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)` → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；测点数随批变，日志按批留在 `spike/SystemColorProbe/gate-*.log`（最新一批 `gate-85.log`） |
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
-| Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准（本批最后一次生成读到 800 行 / 47 小节 / 45 篇；往后的批次只会让它继续涨，所以**抬头那一行才是当下值**） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
+| Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
 
 ### (a) 量不到的那批：逐条对得上出处，也都在这份清单里
 
@@ -4284,17 +4284,67 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 - **#73** 位置驱动指针档与 `Click` 不可达：`ROADMAP.md:3580`
 - **#75** 字族投影是本机 `Microsoft YaHei UI`，不是上游 Segoe UI Variable 一族：`ROADMAP.md:3714`（本批补标记）
 - **#76** 禁用日历的选中块不变暗：`ROADMAP.md:3784`（本批补标记）
-- **#78** 减动效关不掉 `ProgressRing` 的自转（动画器把 900°/2s 写死在代码里）：`audits/motion.md:87`
+- **#78** 已由 #85 判掉，不再算"量不到"：上游只在 `IsActive && IsIndeterminate` 下播/停，整条路径不读动画策略。
+  `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
 - **#80** ComboBox 箭头的 `Data` 是动画插值，"它变了"这条判据要帧数守卫：`ROADMAP.md:3984`（本批补标记）
 - **#82** 高对比的平台那一半：八个 `GetSysColor` 值没有一个等于框架答出来的槽：`ROADMAP.md:4066`
 
 ### (b) 该干还没干的那批：不是"做不到"，别混进 (a)
 
 #8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#56 七个 owner 的到达性、#62 的上游复现提报、
-#68/#73/#75/#76 的修法本身、#78 的帧循环开关、#80 的帧数守卫、#82 的读取路线定案。
+#68/#73/#75/#76 的修法本身、#80 的帧数守卫、#82 的读取路线定案。
 
 ### 这一节自己的 Known Gap
 
 "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+
+## #85（目标项 5 的一支）判掉 #78：减动效门不住 ProgressRing 自转，是上游语义（2026-09-23）
+
+### 上游证据（读码，不猜；引用仓只读，未做任何 checkout）
+
+- `controls/dev/ProgressRing/ProgressRing.cpp:327-341`：`UpdateStates()` 里 `IsActive() && IsIndeterminate()` 就
+  `player.PlayAsync(0, 1, true)`；
+- 同文件 `:355-360`：非激活走 `InActive` 态并 `player.Stop()`；
+- `controls/dev/AnimatedVisualPlayer/AnimatedVisualPlayer.cpp`：`IsAnimationEnabled`、`UISettings`、`AnimationPolicy`
+  三个名字**零命中**；
+- 结论：上游这圈转不转只由 `IsActive`/`IsIndeterminate` 决定，系统动画开关管不到它。于是"我们的开关漏了环"这个
+  缺陷候选改判为"照上游就这样"，剩下的问题只有一个——**这件事有没有被钉住**。
+
+### 本库的处置
+
+1. **行为不改**：`Motion/ProgressRingAnimator.cs` 仍旧只在 `IsActive`/`IsIndeterminate` 与 Loaded/Unloaded 上起停。
+2. **加一条测点钉住它**：`AstraProgressRingTests.ReduceMotion_does_not_stop_the_indeterminate_spin` 先断
+   `ReduceMotion = true` 之后 `FluentThemeManager.AnimationsEnabled` 真的为 `False`（开关没生效的话这条先红，
+   第二断言就成了空话），再断两帧之间弧的起点仍在移动。
+3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+   `audits/progress-ring.md` 动画通路那节补上"上游只读这两条"。
+
+### 牙齿：两次 mutation，第一次不算
+
+- 第一次把 `AnimationsEnabled` 加在 `Start()` 的早退条件上——测点照绿。门住"再次启动"管不到"已经在跑的循环"，
+  这条 mutation 打不到这条主张，**不算牙**，记下来免得下次又拿它当证据。
+- 第二次把同一个条件挪进 `OnRendering()` 第一行——`AstraProgressRingTests` 31 条里恰好这一条红，报的是
+  `Assert.NotEqual() Failure: Values are equal`，其余 30 条绿。`git checkout --` 还原后 31/31 绿。
+
+### status 页那一档：测到的、旁证的、不声称的
+
+- **测到的**：页闸的 `Stable` 是比较两帧的**颜色直方图**——`SamePicture` 要求颜色键与计数同时相等
+  （`tools/AstraPagePixels/Program.cs:198`、`:210-211`），它不看像素位置。一只匀速自转的环换掉的正是位置，
+  计数变化很小，所以"整窗相等、槽内不等"这对读数与"槽里有个一直在动的东西"是相容的。
+- **旁证，不是证明**：同一页同一槽在 HighContrast 读到 `True/True`，而那一档把调色板压平成四个平台色，
+  环的自转在那里几乎不产生计数变化。
+- **不声称**：要把"status 槽的飘就是这只环造成的"写成结论，得先把环设成 determinate（静止）在同一条腿复测一次，
+  看 `slot.Stable` 是否翻成 `True`。这一步没做，#78 的另一半（页闸的飘）因此**仍未结清**，不用上游证据顶它。
+
+### 闸口读数与硬件输入
+
+- **行为（串行闸口）**：`tools/Test-AstraGates.ps1 -Configuration Debug`，日志 `spike/SystemColorProbe/gate-85.log`，
+  **退出码 0**——build `0 警告 0 错误` → **1576 / 1576，0 失败 0 跳过**（多的那一条就是本批那条）→
+  `PASS 13 pages x 3 variants, 0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1312 canonical lines.` →
+  `known-gaps.md is current: 807 canonical lines.` → `All Astra gates passed.`。本批之后只剩本节自己的文字订正，
+  所以三份清单的 `-Check` 与那条交叉读文件集的测点在终态上另跑过（`gate-85b-docs.log`，四条 exit=0）。
+- **视觉**：本批没有新像素主张；页级像素那一行是回归读数。
+- **硬件输入**：仍为零——环不接受指针与键盘（上游 `IsHitTestVisible=False`/`IsTabStop=False`，已有测点钉住），
+  这条主张不需要输入通路，也没有被输入通路证明过。
 
