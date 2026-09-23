@@ -19,6 +19,7 @@
 
 上游**不给** IconElement/SymbolIcon/FontIcon/PathIcon 任何默认样式：在 `*_themeresources.xaml` 里搜
 `PathIconStyle`/`FontIconStyle` 等一个都没有。图标的前景色靠继承，尺寸靠代码里那条 TextBlock。
+（继承在本运行时只给值、不给重绘，那半边差别见第 8 节。）
 所以"资源键逐字照抄上游"在本族的落点只有一个候选——`SymbolThemeFontFamily`——见第 5 节为什么它没被发布。
 
 ## 1. 运行时导出了什么（in-proc 反射，非源码树）
@@ -159,3 +160,30 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 原始读数：`adaptation/s2-symbol-surface-raw.txt`（类型面 + 枚举三方 diff）、
 `adaptation/s2-symbol-cmap-raw.txt`（两份名单 × 两个字体逐枚命中）、`adaptation/s2-icon-family-raw.txt`（挂载、markup、墨、宿主四组）、
 仪器：`spike/SymbolCmap`（Program.cs 反射 + 三方解析，cmap-surface.py 查字形）、`spike/IconFamilyProbe`（挂载与捕获）。
+
+## 8. 换档重绘批（#94/#95，2026-09-23）：继承给的是值，不是重绘
+
+第 1 节那句"图标的前景色靠继承"只说完了一半。继承确实把**值**给到了——派生类探针在一棵活树上读
+`GetEffectiveForeground()`，Light → Dark → 回到 Light 三读都是当前档的刷（`spike/NavIconRecolor/probe-ink.log`），
+而图标自己那格一直是 `<null>`。缺的是另一半：**没人让它重画**。框架只在 `IconElement` 自己的
+`Foreground` 变化时 `InvalidateVisual()`，换档改的是那条上溯答案，不是图标那格，于是屏幕上留着上一次落笔的墨。
+用户报的"浅色切深色，侧栏图标还是黑的"就是这个；抓屏 A/B 的量法与逐色读数在 `audits/navigation.md` §10，
+本批把同一量法铺到全部宿主上（§11 与 `ROADMAP.md` #95）。
+
+修法是一处宿主侧补偿，两个入口（`Controls/IconInk.cs`）：
+
+- **我们的控件**有代码钩子：`FluentNavigationItem.OnIconChanged` 调 `IconInk.Apply(item, icon)`，图标没有本地前景时
+  把宿主的 `Foreground` 绑到图标那格。本地值优先，这一条与上游"图标可覆盖宿主"一致。
+- **框架控件的模板**没有钩子：在包住图标的那个要素上挂
+  `fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`，该要素 `Loaded` 后广度优先
+  地把墨转发给身下每一枚 `IconElement`。写图标自己的属性，是这条运行时里唯一既换值又标脏的路。
+
+这条不是框架的修复。根因在框架：主题换档时没人让 `IconElement` 失效，上游 WinUI 不需要宿主补偿是因为它整棵树
+随主题重绘。本层的接线只是让用户看见的那片墨跟上档，框架侧的账提给上游（与 #62 那条"字形不打印"同一族）。
+
+对本族第 6 节的两处更正：
+
+- 第 5 条说"没有可挂的隐式样式路子"。路子确实还没有（应用级隐式样式落不到 `SymbolIcon` 上，本批复测过），
+  但 `IconInk.Source` 是一条**能挂**的附着属性路子，宿主侧补偿因此不再受"只能靠继承"限制。高对比档的图标墨
+  仍然**未声称**——本批两条腿都是 Light↔Dark，见下。
+

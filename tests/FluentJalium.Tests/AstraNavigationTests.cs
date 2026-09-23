@@ -426,6 +426,40 @@ public sealed class AstraNavigationTests
         });
     }
 
+    [Fact]
+    public void The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch()
+    {
+        // The second frozen glyph on the same page, found by the census rather than by the report: the hamburger is
+        // template content of ours, so it is handed the button's ink in markup (Styles/Navigation.jalxaml) instead
+        // of in code. Same reason, same reading - an IconElement with no foreground resolves one at draw time and
+        // is never invalidated when the answer changes, so this asserts the value the binding leaves behind and
+        // that it moves when the theme does. The pixels are spike/NavIconRecolor/census.sh.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var view = Pane(out _);
+            var toggle = (Button)PixelHarness.Named(view, "PART_PaneToggle")!;
+            var glyph = PixelHarness.Descendant<SymbolIcon>(toggle)!;
+            AssertGlyph(glyph, toggle, "light");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            PixelHarness.Settle(60);
+            AssertGlyph(glyph, toggle, "dark");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            PixelHarness.Settle(6);
+        });
+    }
+
+    /// <summary>The glyph must carry the button's brush by instance: null (no hand-off) or a stale brush both fail.</summary>
+    private static void AssertGlyph(IconElement glyph, Control carrier, string when)
+    {
+        Assert.True(
+            ReferenceEquals(carrier.Foreground, glyph.Foreground),
+            $"{when}: the pane toggle glyph carries {Hex(glyph.Foreground)} while its button is at {Hex(carrier.Foreground)} - " +
+            "the glyph is not handed the button's ink, so it keeps whatever it last drew.");
+    }
+
     /// <summary>Mounts an open pane whose first item carries <paramref name="icon"/>; the item comes back.</summary>
     private static FluentNavigationView PaneWithIcon(out FluentNavigationItem item, IconElement icon)
     {

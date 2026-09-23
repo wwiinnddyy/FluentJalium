@@ -202,3 +202,11 @@ withhold 的名与理由（正向由消费点闸口盯着：`AstraResourceKeyTes
 7. **`DataPanes`/`TabItemSource` 数据驱动**：本批只有 `TabItems` 这一条元素集合。
 8. **`TabViewItem` 的 `ToolTipTitle`/`ToolTipText`/`IconSource`**：上游那三行是 `DataTemplate`+`IconSource` 面，
    本批的 `Icon` 是一个元素槽。
+9. **页签图标的换档重绘：接了线，没有读数**（#95，2026-09-23）。`Styles/TabView.jalxaml:178` 的 `IconHost` 挂了
+   `controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}"`，把这一族本来就写好的
+   `TabViewItemIconForeground`（`IconHost` 自己的 `Foreground`，宿主是 `ContentControl`，它本身就是那条 `Control`）
+   交给身下的图标。**但普查在把接线剪掉的状态下也没在页签那页量到冻结墨**
+   （`spike/NavIconRecolor/census-before.log`，那一页的冻结集合只有外壳折叠开关那 168 px），所以这一处的依据只有
+   "与应用条同一条码路，而那条码路有事实"，没有自己的像素读数、也没有自己的事实——按 `audits/navigation.md` §11
+   立的"不外推"处理。同理，§3 那三行状态格子里"图标前景"那一档在选中/悬停/禁用下会不会真的跟着换到字形上，
+   仍然没读："继承得到值"与"继承得到重绘"是两件事（`audits/icon-family.md` §8）。

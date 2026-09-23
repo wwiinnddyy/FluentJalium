@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-937 lines collected from 52 sections across 46 documents.
+968 lines collected from 53 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -38,7 +38,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `adaptation/07-scroll-host-substitution.md:44` - `ScrollingIndicatorStates` 需要 `Touch`/`Pen` 指示来源，Jalium 侧没有对应输入信号 → 预期进 Known Gaps。
 - `adaptation/07-scroll-host-substitution.md:95` - 记在审计的 Known Gaps 第 1 条。
 
-## audits/app-bar.md - 9 lines
+## audits/app-bar.md - 11 lines
 
 - `audits/app-bar.md:56` - | `AppBarSeparator` 的 `Rectangle`（上游也是） | 同名同形 | 框架自绘路径仍在，见 Known Gaps 4 |
 ### 5. Known Gaps
@@ -51,6 +51,8 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/app-bar.md:89` - 6. `SplitButton` 在 bar 里仍用非 app-bar 样式：`SplitButtonCommandBarStyle` 与 `SplitButtonInAppBarUnfocusedPointerOver` 本批欠着。
 - `audits/app-bar.md:90` - 7. 4 条 `Thickness` 之外的度量全是字面量（68 宽、64/48 内容带高、48 bar 高、0.5 圆角、12/16 字号与图标盒），因为 `x:Double` 资源本 reader 解析不了。`AppBarThemeMinHeight`=64 与 `AppBarThemeCompactHeight`=48 是 `x:Double` 行，只能以字面量落在 `ContentRoot...
 - `audits/app-bar.md:91` - 8. 本批把"临时模板的格子永不生效"（0.6）记成方法约束：任何状态结论都必须来自已编译字典或反射类型面，`XamlReader.Parse` 的探针模板只能读结构与像素。这条同时使 pass 4 关于 `MultiTrigger` "能解析但从未观察到生效" 的读数**不能**当作"复合状态写不出来"的证据——本批按属性面（只读 DP/无对应属性）判定，而不是按那条读数。
+- `audits/app-bar.md:92` - 9. **图标墨的换档重绘**（#95，2026-09-23）：两处 `ContentPresenter Name="Content"`（`Styles/AppBar.jalxaml:81`、`:142`）原先对图标什么都不写，`IconElement` 在落笔时上溯祖先取值、却没人让它重绘，实时翻档时应用条那一排的图标墨冻在上一档——普查量到 519 px（桶位 y 480..539 的三格，`...
+- `audits/app-bar.md:93` - `fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`，剪掉这一行 `AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink` 即红（`mut-95.log`），机制与读数见 `audits/...
 
 ## audits/autosuggestbox.md - 40 lines
 
@@ -431,19 +433,19 @@ Categorised summaries live in `ROADMAP.md`.
 
 ### 6. Known Gaps
 
-- `audits/icon-family.md:135` - 1. **字形有没有画出来，测不出来。** 同一张白底上放一个普通 `TextBlock`（纯文本、有字号、有前景）也印不出墨——
-- `audits/icon-family.md:136` - 这条路对文本是瞎的（`adaptation/00` S1-r 第 3 条，本段在 spike/IconFamilyProbe 里复测）。因此本族**不声称**
-- `audits/icon-family.md:137` - 任何 `SymbolIcon`/`FontIcon` 的字形到达像素；能声称的只有 `PathIcon` 的几何填充（400 px / 4096 px 两个数）。
-- `audits/icon-family.md:138` - 2. `Symbol` 的 4 个名字画的字与上游不同（第 2 节表），这一层无法修正：号在运行时枚举里，读它的类型只认这个枚举。
-- `audits/icon-family.md:139` - 应用要拿到上游那张图，得自己写 `FontIcon.Glyph`。
-- `audits/icon-family.md:140` - 3. 26 个上游名字在本族枚举里不存在，其中 12 个连字形号都没人承载。
-- `audits/icon-family.md:141` - 4. 上游有 `BitmapIcon`/`ImageIcon` 与整个 `IconSource` 家族，这里没有；`FluentInfoBadge` 的图标入口因此是
-- `audits/icon-family.md:142` - `IconElement` 而不是 `IconSource`。
-- `audits/icon-family.md:143` - 5. 高对比度下上游靠 `IconElement.Foreground` 的继承链改变图标颜色；这里 `Foreground` 默认读回 null 且没有可挂的
-- `audits/icon-family.md:144` - 隐式样式（运行时不给非 `Control` 应用样式的路子未验证），高对比的图标颜色**未声称**。
-- `audits/icon-family.md:145` - 6. `PathIcon` 在没有显式尺寸时铺满槽位，与上游"16x16 + Uniform"不同；本层不改（改了就是替运行时发明默认值），
-- `audits/icon-family.md:146` - 只把量到的数记在这里，并在测试里钉住铺满这一半。
-- `audits/icon-family.md:147` - 7. 指针/键盘/触摸在本族没有对应路径（`IconElement` 不是可交互控件，上游也一样），因此本段无硬件输入证据。
+- `audits/icon-family.md:136` - 1. **字形有没有画出来，测不出来。** 同一张白底上放一个普通 `TextBlock`（纯文本、有字号、有前景）也印不出墨——
+- `audits/icon-family.md:137` - 这条路对文本是瞎的（`adaptation/00` S1-r 第 3 条，本段在 spike/IconFamilyProbe 里复测）。因此本族**不声称**
+- `audits/icon-family.md:138` - 任何 `SymbolIcon`/`FontIcon` 的字形到达像素；能声称的只有 `PathIcon` 的几何填充（400 px / 4096 px 两个数）。
+- `audits/icon-family.md:139` - 2. `Symbol` 的 4 个名字画的字与上游不同（第 2 节表），这一层无法修正：号在运行时枚举里，读它的类型只认这个枚举。
+- `audits/icon-family.md:140` - 应用要拿到上游那张图，得自己写 `FontIcon.Glyph`。
+- `audits/icon-family.md:141` - 3. 26 个上游名字在本族枚举里不存在，其中 12 个连字形号都没人承载。
+- `audits/icon-family.md:142` - 4. 上游有 `BitmapIcon`/`ImageIcon` 与整个 `IconSource` 家族，这里没有；`FluentInfoBadge` 的图标入口因此是
+- `audits/icon-family.md:143` - `IconElement` 而不是 `IconSource`。
+- `audits/icon-family.md:144` - 5. 高对比度下上游靠 `IconElement.Foreground` 的继承链改变图标颜色；这里 `Foreground` 默认读回 null 且没有可挂的
+- `audits/icon-family.md:145` - 隐式样式（运行时不给非 `Control` 应用样式的路子未验证），高对比的图标颜色**未声称**。
+- `audits/icon-family.md:146` - 6. `PathIcon` 在没有显式尺寸时铺满槽位，与上游"16x16 + Uniform"不同；本层不改（改了就是替运行时发明默认值），
+- `audits/icon-family.md:147` - 只把量到的数记在这里，并在测试里钉住铺满这一半。
+- `audits/icon-family.md:148` - 7. 指针/键盘/触摸在本族没有对应路径（`IconElement` 不是可交互控件，上游也一样），因此本段无硬件输入证据。
 
 ## audits/info-badge.md - 14 lines
 
@@ -543,7 +545,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/listview.md:126` - 8. **没有分组**：本运行时导出 `GroupStyle`（mode A），但我们的列表没有写过分组面板，上游 `GroupStyle*` 那一族
 - `audits/listview.md:127` - 行与 `ListViewItem` 无涉，本批不碰。
 
-## audits/menu-flyout.md - 14 lines
+## audits/menu-flyout.md - 15 lines
 
 - `audits/menu-flyout.md:106` - 的剩余空间裁掉**。这条写进 Known Gaps 之外也写进 `adaptation/00` S0-s，因为它会让下一个人把"条目不见了"读成
 ### 5. Known Gaps
@@ -561,6 +563,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/menu-flyout.md:149` - 11. **已结（2026-09-20，`spike/FlyoutSurfaceProbe -Mode tree/sweep`）**：`MenuPopupScrollHost` 与 `MenuFlyoutPresenter` 的关系结清了——**两条都是真的，且分属两种表面**。`MenuFlyout` 的是 `PopupWindow > PopupRoot > MenuFlyoutPresent...
 - `audits/menu-flyout.md:150` - 12. **弧的量比它自己的名义半径短，且顶行那一格不稳**（4c 的三帧）：`CornerRadius=8` 在 dpi 168 下应给 14 px 的弧，弧深度量到 9~10；`=14` 应给 24.5，量到 17。同一张卡片的宽度方向逐数吻合 1.75 倍，所以不是采集器缩放错了。另外**顶行咬入在同一个模式重采之间就有 3 px 抖动**（12 → 9，弹窗落点差 0.67 DIP），因此...
 - `audits/menu-flyout.md:151` - 13. **`ContextMenu` 的卡片没有我们那份亚克力**：那层复制 `Border` 的 `Background` 抄到的是 `{ThemeResource MenuFlyoutPresenterBackground}`，帧上读出 `#FF2C2C2C`——与 4b 里 `MenuFlyout` 弹窗的框架灰同一支。也就是说 `ContextMenu` 现在**画的是卡片色，但不是 a...
+- `audits/menu-flyout.md:152` - 14. **菜单图标的换档重绘只有机制，没有读数**（#95，2026-09-23）：三处 `ContentPresenter Name="IconContent"`（`Styles/Menus.jalxaml:68`、`:120`、`:164`）挂上了与应用条同一条 `fluent:IconInk.Source`，但普查（`spike/NavIconRecolor/census-before.l...
 
 ## audits/motion.md - 14 lines
 
@@ -581,7 +584,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/motion.md:96` - 6. 真指针 hover 的时长验证仍缺（与 #13 同一笔账）：现在能证明"时长来自键、键能改"，还不能证明"鼠标进去第 N 帧落在哪个色"。
 - `audits/motion.md:97` - 7. Gallery 的 Motion 系统页仍未建（#10 未完的部分）；设置页那张卡的文案已按真实覆盖面改写。
 
-## audits/navigation.md - 13 lines
+## audits/navigation.md - 17 lines
 
 ### 6 · Known Gaps（不声称）
 
@@ -589,15 +592,19 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/navigation.md:131` - （并行任务 #13 还没通）。
 - `audits/navigation.md:132` - 2. **圆角只量到属性，没量到像素**：`Root` 边框的 `CornerRadius` 读回 8，8 DIP 圆角在角上真的把填充留出去了，
 - `audits/navigation.md:133` - 这一条没有采样（`PixelAt` 的角点采样在下一批补，宁可不写也不猜）。
-- `audits/navigation.md:134` - 3. **图标是否跟着前景状态变色**：条目前景换档时图标不重着色这条已经读到像素并修掉了（#94，见 §10）；
-- `audits/navigation.md:135` - 仍未读的是 hover / pressed 状态下图标跟不跟标签一起变（§10 的测点只覆盖 Light↔Dark）。
-- `audits/navigation.md:136` - 4. **pane 背衬是纯色不是亚克力**：上游 `NavigationViewDefaultPaneBackground`=`AcrylicInAppFillColorDefaultBrush`；
-- `audits/navigation.md:137` - 本批不接（材质摸底未做），差一层透明/模糊。
-- `audits/navigation.md:138` - 5. **高对比未测**：本层的别名向下指到 `HighContrast.map` 已重映射的 token，但导航这一族在 HC 下的读数一次都没量。
-- `audits/navigation.md:139` - 6. **没有 top mode、没有返回按钮、没有 header/分隔线/设置项**（§2 那 13+6+2+1 条键就是这些面）；
-- `audits/navigation.md:140` - 条目也没有 `IsChecked`，所以 8 条 checked 键在这个类型上没有对应状态。
-- `audits/navigation.md:141` - 7. **虚拟化/超长列表**：本控件是 `StackPanel` 摆条目，没有回收路径，条目多了会全部实例化。
-- `audits/navigation.md:142` - 8. **20 条 `x:Double` 度量值是字面量**，不是可覆盖的行；换主题不能改它们，应用侧也覆盖不了。
+- `audits/navigation.md:134` - 3. **图标是否跟着前景状态变色**：条目前景换档时图标不重着色这条已经读到像素并修掉了（#94，见 §10），
+- `audits/navigation.md:135` - pane 折叠开关那枚字形是同一处的残留，本批量到 168 px 并接上（§11）；仍未读的是 hover / pressed 状态下
+- `audits/navigation.md:136` - 图标跟不跟标签一起变（§10 与 §11 的测点都只覆盖 Light↔Dark），高对比档下跟不跟同样没量——
+- `audits/navigation.md:137` - 页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
+- `audits/navigation.md:138` - 4. **pane 背衬是纯色不是亚克力**：上游 `NavigationViewDefaultPaneBackground`=`AcrylicInAppFillColorDefaultBrush`；
+- `audits/navigation.md:139` - 本批不接（材质摸底未做），差一层透明/模糊。
+- `audits/navigation.md:140` - 5. **高对比未测**：本层的别名向下指到 `HighContrast.map` 已重映射的 token，但导航这一族在 HC 下的读数一次都没量。
+- `audits/navigation.md:141` - 6. **没有 top mode、没有返回按钮、没有 header/分隔线/设置项**（§2 那 13+6+2+1 条键就是这些面）；
+- `audits/navigation.md:142` - 条目也没有 `IsChecked`，所以 8 条 checked 键在这个类型上没有对应状态。
+- `audits/navigation.md:143` - 7. **虚拟化/超长列表**：本控件是 `StackPanel` 摆条目，没有回收路径，条目多了会全部实例化。
+- `audits/navigation.md:144` - 8. **20 条 `x:Double` 度量值是字面量**，不是可覆盖的行；换主题不能改它们，应用侧也覆盖不了。
+- `audits/navigation.md:221` - 写进 Known Gaps。
+- `audits/navigation.md:229` - 这条只写在 Known Gaps，不当已交付。
 
 ## audits/numberbox.md - 19 lines
 
@@ -826,7 +833,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/splitbutton.md:169` - 上游 SplitButton 的 HC 分支里 `…BackgroundPointerOver`→`SystemColorHighlightText` 这类**逐键**选择
 - `audits/splitbutton.md:170` - 尚未逐条断言（并行任务"高对比逐键断言"）。
 
-## audits/tab-view.md - 16 lines
+## audits/tab-view.md - 24 lines
 
 ### 7 · 未实现的整族（Known Gaps）
 
@@ -846,6 +853,14 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/tab-view.md:202` - 7. **`DataPanes`/`TabItemSource` 数据驱动**：本批只有 `TabItems` 这一条元素集合。
 - `audits/tab-view.md:203` - 8. **`TabViewItem` 的 `ToolTipTitle`/`ToolTipText`/`IconSource`**：上游那三行是 `DataTemplate`+`IconSource` 面，
 - `audits/tab-view.md:204` - 本批的 `Icon` 是一个元素槽。
+- `audits/tab-view.md:205` - 9. **页签图标的换档重绘：接了线，没有读数**（#95，2026-09-23）。`Styles/TabView.jalxaml:178` 的 `IconHost` 挂了
+- `audits/tab-view.md:206` - `controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}"`，把这一族本来就写好的
+- `audits/tab-view.md:207` - `TabViewItemIconForeground`（`IconHost` 自己的 `Foreground`，宿主是 `ContentControl`，它本身就是那条 `Control`）
+- `audits/tab-view.md:208` - 交给身下的图标。**但普查在把接线剪掉的状态下也没在页签那页量到冻结墨**
+- `audits/tab-view.md:209` - （`spike/NavIconRecolor/census-before.log`，那一页的冻结集合只有外壳折叠开关那 168 px），所以这一处的依据只有
+- `audits/tab-view.md:210` - "与应用条同一条码路，而那条码路有事实"，没有自己的像素读数、也没有自己的事实——按 `audits/navigation.md` §11
+- `audits/tab-view.md:211` - 立的"不外推"处理。同理，§3 那三行状态格子里"图标前景"那一档在选中/悬停/禁用下会不会真的跟着换到字形上，
+- `audits/tab-view.md:212` - 仍然没读："继承得到值"与"继承得到重绘"是两件事（`audits/icon-family.md` §8）。
 
 ## audits/teachingtip.md - 44 lines
 
@@ -1041,7 +1056,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 138 lines
+## ROADMAP.md - 154 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1144,54 +1159,70 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4261` - 一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
 - `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份...
 - `ROADMAP.md:4289` - `audits/motion.md:86` 的 Known Gap 3 已改写成带 `file:line` 的结论，并由一条测点钉住
+- `ROADMAP.md:4302` - 接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。
 ### 这一节自己的 Known Gap
 
-- `ROADMAP.md:4305` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
-- `ROADMAP.md:4306` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
-- `ROADMAP.md:4326` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
-- `ROADMAP.md:4411` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+- `ROADMAP.md:4306` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4307` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+- `ROADMAP.md:4327` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
+- `ROADMAP.md:4412` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
 ### Known Gap（这条做不到，不写进断言）
 
-- `ROADMAP.md:4464` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
-- `ROADMAP.md:4465` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
-- `ROADMAP.md:4466` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
-- `ROADMAP.md:4474` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+- `ROADMAP.md:4465` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+- `ROADMAP.md:4466` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+- `ROADMAP.md:4467` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+- `ROADMAP.md:4475` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
 ### Known Gap
 
-- `ROADMAP.md:4527` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
-- `ROADMAP.md:4528` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
-- `ROADMAP.md:4529` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
-- `ROADMAP.md:4530` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
-- `ROADMAP.md:4531` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
-- `ROADMAP.md:4532` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
-- `ROADMAP.md:4533` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
-- `ROADMAP.md:4534` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
-- `ROADMAP.md:4535` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
-- `ROADMAP.md:4536` - hover / pressed 行照旧归真指针通路（#13）。
-- `ROADMAP.md:4537` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
-- `ROADMAP.md:4547` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
-- `ROADMAP.md:4584` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
+- `ROADMAP.md:4528` - 1. 模板触发器里的三条禁用前景格（`CheckBoxForegroundUncheckedDisabled` 与同组两条 `…Disabled`）今天改不动像素：
+- `ROADMAP.md:4529` - 单独重写它们不生效，上游会生效。修法候选已量到证据（把该行提到 `Style.Triggers` 就压得过），登记成 #89，
+- `ROADMAP.md:4530` - 本批不动产品标记。`TabView.jalxaml:38`、`:71` 同住在模板触发器，但**没量**，不许按第 2 条外推。
+- `ROADMAP.md:4531` - 2. 普查里另有几条**值不可判**的：四行 `InfoBar*SeverityIconForeground` 全指 `TextFillColorInverseBrush`，
+- `ROADMAP.md:4532` - `CheckBoxForegroundChecked` 与 `…Indeterminate` 同指 `TextFillColorPrimaryBrush`。读数只能证明"这支刷到了"，
+- `ROADMAP.md:4533` - 不能证明"是哪一格写的"，所以这几条不出事实（同 2b 的规则）。
+- `ROADMAP.md:4534` - 3. 13 条"无指针 × 无读者"的格子逐条处置在 `audits/foreground.md` 7.6e：本批量了 1 条（另有 3 条同类事实），
+- `ROADMAP.md:4535` - 4 条按"值不可判"出不了事实，2 条 TabView 的选中行**删行就看得见**却没做（那是一批之后的第一批），
+- `ROADMAP.md:4536` - 2 条 TabView 禁用行按 7.6c 预测同判据但**没量**，2 条 InfoBar 严重度行与既有读数同实例。
+- `ROADMAP.md:4537` - hover / pressed 行照旧归真指针通路（#13）。
+- `ROADMAP.md:4538` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4548` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+- `ROADMAP.md:4585` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
 ### Known Gaps
 
-- `ROADMAP.md:4626` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
-- `ROADMAP.md:4627` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
-- `ROADMAP.md:4628` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
-- `ROADMAP.md:4629` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
-- `ROADMAP.md:4636` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
-- `ROADMAP.md:4670` - 1. `:38` 那行同键（滚动按钮样式）本批**没量到**：它的载体只在标签条溢出时实现，按上面那条不外推。
-- `ROADMAP.md:4671` - 2. `:71` 是不是**上游也这样**没量（上游同样有两处写这枚按钮的前景），所以本批只报"这行在我们的运行时到不了像素"，
-- `ROADMAP.md:4672` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
-- `ROADMAP.md:4673` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
-- `ROADMAP.md:4680` - - **视觉**：零新增像素断言（Known Gap 3）。
-- `ROADMAP.md:4709` - 不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
-- `ROADMAP.md:4747` - 1. **其余图标宿主没量**（#95）：`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178`
-- `ROADMAP.md:4748` - 的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
-- `ROADMAP.md:4749` - 按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
-- `ROADMAP.md:4750` - + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
-- `ROADMAP.md:4751` - 2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
-- `ROADMAP.md:4752` - 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
-- `ROADMAP.md:4753` - 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
-- `ROADMAP.md:4754` - 但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
-- `ROADMAP.md:4776` - `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
+- `ROADMAP.md:4627` - 1. 同文件 `:38`、`:71` 两行禁用格（`TabViewButtonForegroundDisabled`）本批**没量**：7.6c 判据（框架从 `TextDisabled`
+- `ROADMAP.md:4628` - 现查、模板格子压不过）对它是预测不是读数，按 7.6c 结尾那条"不外推"记着。
+- `ROADMAP.md:4629` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
+- `ROADMAP.md:4630` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
+- `ROADMAP.md:4637` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
+- `ROADMAP.md:4671` - 1. `:38` 那行同键（滚动按钮样式）本批**没量到**：它的载体只在标签条溢出时实现，按上面那条不外推。
+- `ROADMAP.md:4672` - 2. `:71` 是不是**上游也这样**没量（上游同样有两处写这枚按钮的前景），所以本批只报"这行在我们的运行时到不了像素"，
+- `ROADMAP.md:4673` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
+- `ROADMAP.md:4674` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4681` - - **视觉**：零新增像素断言（Known Gap 3）。
+- `ROADMAP.md:4710` - 不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
+- `ROADMAP.md:4748` - 1. **其余图标宿主没量**（#95）：`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178`
+- `ROADMAP.md:4749` - 的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
+- `ROADMAP.md:4750` - 按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
+- `ROADMAP.md:4751` - + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
+- `ROADMAP.md:4752` - **（本条由 #95 结清：普查表与接线在下一节，行号是接线前的位置。）**
+- `ROADMAP.md:4753` - 2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
+- `ROADMAP.md:4754` - 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
+- `ROADMAP.md:4755` - 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
+- `ROADMAP.md:4756` - 但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
+- `ROADMAP.md:4778` - `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
+- `ROADMAP.md:4804` - 同一条码路、而那条码路有事实"的依据，各自的像素读数与各自的事实都没有，按 #92 立的"不外推"记进 Known Gaps。
+- `ROADMAP.md:4841` - 1. **菜单三处与页签一处只有机制**：普查里它们一个像素没露面，也没有各自的事实。开着的弹层翻档会不会冻，
+- `ROADMAP.md:4842` - 要等 #63 / #13 那套宿主交互通路。
+- `ROADMAP.md:4843` - 2. **框架宿主上，落子之后换进去的图标没人补交墨**：`IconInk.Source` 的转发展开在宿主 `Loaded` 那一次；
+- `ROADMAP.md:4844` - 我们的 `FluentNavigationItem` 走 `OnIconChanged` 那条入口，框架宿主没有对应钩子。
+- `ROADMAP.md:4845` - 3. **hover / pressed / 禁用下的图标墨**没读：本批四条事实全在 Light↔Dark 这一档上，接线只保证"图标跟宿主前景"。
+- `ROADMAP.md:4846` - 4. **高对比档**下图标跟不跟没量；页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
+- `ROADMAP.md:4847` - 5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。两次大数读数（一轮 `settings` 33755、
+- `ROADMAP.md:4848` - 一轮 `surfaces` 28325+131）之后都不重演（干净树连测两轮 `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`），
+- `ROADMAP.md:4849` - 而 168 与 519 每次都精确重演。`frozen.ps1` 因此加了 `-Mask` / `-Crop`，把最脏那个桶的图块留成文件，
+- `ROADMAP.md:4850` - 下次再出现大数能看而不是猜。这两次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
+- `ROADMAP.md:4851` - 那一族"只在某一次跑里现身"的新成员。
+- `ROADMAP.md:4852` - 6. **仪器自己坏过一轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
+- `ROADMAP.md:4853` - 那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行。作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
 
-<!-- canonical-lines=937 sha256=8491efd338ca08afb76536a9cc223ff8f250e7044c6e51c4b4d76f0df194a11d -->
+<!-- canonical-lines=968 sha256=5eb28c793b36c1655a8f296e8d3555a129f6af845c34a5ae4b52cd991cd2d151 -->

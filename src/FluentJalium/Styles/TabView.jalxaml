@@ -175,7 +175,8 @@
                    here. A ContentControl, not a ContentPresenter, because the icon glyph's colour is one of the
                    ten rows this template writes and only a Control declares a Foreground. -->
               <Border Name="IconBox" MaxWidth="16" MaxHeight="16" Margin="{ThemeResource TabViewItemHeaderIconMargin}">
-                <ContentControl Name="IconHost" Content="{TemplateBinding Icon}" Foreground="{ThemeResource TabViewItemIconForeground}" IsTabStop="False" />
+                <ContentControl Name="IconHost" Content="{TemplateBinding Icon}" Foreground="{ThemeResource TabViewItemIconForeground}" IsTabStop="False"
+                        controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}" />
               </Border>
               <ContentPresenter Name="HeaderPresenter" Grid.Column="1" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
                 <!-- Upstream's header never wraps (TabView.xaml:505-541 gives it one line and clips it); the

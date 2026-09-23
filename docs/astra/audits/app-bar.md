@@ -89,6 +89,8 @@
 6. `SplitButton` 在 bar 里仍用非 app-bar 样式：`SplitButtonCommandBarStyle` 与 `SplitButtonInAppBarUnfocusedPointerOver` 本批欠着。
 7. 4 条 `Thickness` 之外的度量全是字面量（68 宽、64/48 内容带高、48 bar 高、0.5 圆角、12/16 字号与图标盒），因为 `x:Double` 资源本 reader 解析不了。`AppBarThemeMinHeight`=64 与 `AppBarThemeCompactHeight`=48 是 `x:Double` 行，只能以字面量落在 `ContentRoot.MinHeight` 上。
 8. 本批把"临时模板的格子永不生效"（0.6）记成方法约束：任何状态结论都必须来自已编译字典或反射类型面，`XamlReader.Parse` 的探针模板只能读结构与像素。这条同时使 pass 4 关于 `MultiTrigger` "能解析但从未观察到生效" 的读数**不能**当作"复合状态写不出来"的证据——本批按属性面（只读 DP/无对应属性）判定，而不是按那条读数。
+9. **图标墨的换档重绘**（#95，2026-09-23）：两处 `ContentPresenter Name="Content"`（`Styles/AppBar.jalxaml:81`、`:142`）原先对图标什么都不写，`IconElement` 在落笔时上溯祖先取值、却没人让它重绘，实时翻档时应用条那一排的图标墨冻在上一档——普查量到 519 px（桶位 y 480..539 的三格，`spike/NavIconRecolor/census-before.log`）。现在这两处挂
+   `fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`，剪掉这一行 `AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink` 即红（`mut-95.log`），机制与读数见 `audits/navigation.md` §11 与 `audits/icon-family.md` §8。仍未量的：hover / pressed / 禁用下应用条图标跟不跟标签一起变（本族那三条状态行写的是标签与表面，图标那格现在是接线后的宿主前景）；more 按钮字形与溢出图标在开放态看不见（本文件第 1 条），因此也没量。
 
 ## 6. 间距批（2026-09-19）：把条目改成上游的三层形状
 

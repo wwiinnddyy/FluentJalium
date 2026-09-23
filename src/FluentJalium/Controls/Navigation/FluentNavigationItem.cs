@@ -1,7 +1,6 @@
 using Jalium.UI;
 using Jalium.UI.Automation;
 using Jalium.UI.Controls;
-using Jalium.UI.Data;
 
 namespace FluentJalium.Controls;
 
@@ -70,14 +69,7 @@ public sealed class FluentNavigationItem : Button
         item.RemoveLogicalChild(args.OldValue);
         item.AddLogicalChild(args.NewValue);
 
-        // An IconElement with no foreground of its own resolves one by walking to an ancestor Control *while it
-        // draws*, and nothing invalidates it when that answer changes - so a live theme switch left the pane glyph
-        // painted with the previous theme's ink while its label re-tinted (docs/astra/audits/navigation.md).
-        // Forwarding this item's ink to the icon's own property is what makes it redraw; an icon that arrived with
-        // a foreground set on it keeps that, because a local value outranks the hand-off.
-        if (args.NewValue is not IconElement icon) return;
-        var ownInk = icon.ReadLocalValue(IconElement.ForegroundProperty);
-        if (ownInk is null || ReferenceEquals(ownInk, DependencyProperty.UnsetValue))
-            BindingOperations.SetBinding(icon, IconElement.ForegroundProperty, new Binding(nameof(Foreground)) { Source = item });
+        // The glyph is not invalidated when the theme changes, only when its own property does - see IconInk.
+        if (args.NewValue is IconElement icon) IconInk.Apply(item, icon);
     }
 }

@@ -4297,8 +4297,9 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 （7.6c 的判据对它是**预测**，#92 也没量到——它的载体只在溢出时实现）、同文件 `:203` 那两格选中前景已由 #91 出事实
 并转入"已量到"（`audits/foreground.md` 7.6f）、`:210` 两行部件禁用格与 `:71` 已由 #92 量到（`:71` 判成死格，
 要不要清它是另一次决定）、hover / pressed 那六行照旧等真指针通路（#13）、
-#89 那条"模板触发器里的禁用前景格改不动"的修法，以及 #94 修完侧栏之后**没量**的其余图标宿主（#95：
-`AppBar.jalxaml:79`/`:139`、`Menus.jalxaml:66`/`:117`/`:160`、`TabView.jalxaml:178` 的 `IconHost`）。
+#89 那条"模板触发器里的禁用前景格改不动"的修法。曾经列在这里的"其余图标宿主"（#95）已结：普查表、接线与
+四条图标事实见本节末 `## #95`——折叠开关那枚是 #94 的残留，应用条那一排量到 519 px，菜单三处与页签一处
+接了线但静止时没露过一个像素，那两处的界限按 Known Gap 记着，没算进"已量到"。
 
 ### 这一节自己的 Known Gap
 
@@ -4748,6 +4749,7 @@ All Astra gates passed.   GATE-EXIT=0
    的 `IconHost` 都是同一形状（图标 `Foreground` 为空、上溯祖先），机制上同样不会重绘，但本批只在侧栏量到像素，
    按 #92 那条"不外推"处理。这些宿主是框架控件，我们没有 `OnIconChanged` 那样的代码钩子，通用通路（应用级隐式样式
    + 祖先前景绑定）没量过——`ContentPresenter.Resources` 里的隐式样式落不到 `SymbolIcon` 上是本批之前量过的。
+   **（本条由 #95 结清：普查表与接线在下一节，行号是接线前的位置。）**
 2. **hover / pressed 下图标跟不跟标签一起变**没量，本批测点只覆盖 Light↔Dark（`audits/navigation.md` §6 第 3 条同步改写）。
 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
@@ -4777,3 +4779,76 @@ All Astra gates passed.   GATE-EXIT=0
 
 一句界限：**含 #94 的树至今没有一次整条管道全绿**，最近一次全绿仍是 `gate-92.log` 的 1589 条。
 本批的主张不依赖闸口——修法由抓屏 A/B 与两条各有自己突变的事实撑着；闸口这里只记"它红在哪一步、红的那条是谁"。
+
+## #95（#94 余账）其余图标宿主：普查把"同一处还剩多少"量成一张表，接线做成一处两个入口（2026-09-23）
+
+#94 结的是侧栏**条目**那一枚图标。这一批不再靠"机制上应该一样"外推，而是把同一把尺子铺到 Gallery 全部 13 页：
+起始档钉在开窗之前，同一个活窗口翻档，前后两张抓屏逐像素找"两边都近黑 / 两边都近白"的**冻结墨**
+（`spike/NavIconRecolor/{census.sh,frozen.ps1}`）。读数两份都在盘上：`census-before.log` 是把本批接线剪掉之后重测的，
+`census-after.log` 是接上之后。
+
+### 读数
+
+| 冻结墨 | 剪掉接线 | 接上接线 | 那是谁 |
+|---|---|---|---|
+| 13 页**每页都是** 168 px（桶 x 0..59：112 + 56） | 168 | **0** | pane 折叠开关那枚 `GlobalNavButton`——它是**外壳**的，所以跟着每一页跑，是 #94 的残留而不是 13 个缺陷 |
+| `command-bar` 687 px（= 168 + 519，桶 y 480..539 三格 239/160/120） | 687 | **0** | 应用条那一排的 `AppBarButton` 图标墨 |
+| 其余 11 页 | 只有那 168 | **0** | 没有第二种冻结墨 |
+
+一张图能同时看见"修好的"与"没修的"：`spike/NavIconRecolor/navicon-toggle-frozen-{light,dark}.png` 是同一块 150×150
+裁块的翻档前后两帧——深色那帧里 `Overview` 的 home 字形已经变白（#94 那条接线在起作用），它上面三横的折叠开关
+还是近黑。这条比任何计数都直接，因为它把"标签跟档、字形不跟"的形状摆在同一枚 pane 上。
+
+普查**没**量到的是另外四处宿主：`Menus.jalxaml` 三处 `IconContent` 与 `TabView.jalxaml` 的 `IconHost` 在剪掉接线的
+状态下也没露过一个冻结像素——静止时弹层是关着的，页签那页的图标不在冻结集合里。所以那四处的接线只有"与应用条
+同一条码路、而那条码路有事实"的依据，各自的像素读数与各自的事实都没有，按 #92 立的"不外推"记进 Known Gaps。
+
+### 交付形状：一处机制，两个入口（`Controls/IconInk.cs`）
+
+- **我们的控件**有钩子，就直接调：`FluentNavigationItem.OnIconChanged` → `IconInk.Apply(item, icon)`。
+- **框架控件的模板**没有钩子，就给它一个附着属性：`fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}"`
+  挂在包住图标的那个要素上，要素 `Loaded` 后广度优先把墨转发给身下每一枚 `IconElement`。
+  落点：`AppBar.jalxaml:82`/`:143`、`Menus.jalxaml:69`/`:121`/`:165`、`TabView.jalxaml:179`（宿主自己就是那条 `Control`，
+  所以用 `RelativeSource=Self`，交给它的仍是这一族本来就写好的 `TabViewItemIconForeground` 那行）。
+- **纯标记的一条**给了折叠开关：`Navigation.jalxaml:196` 的 `SymbolIcon` 直接
+  `Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"`——它就在我们的模板里，
+  不需要新机制。
+- 图标自带本地前景时不覆盖（`ReadLocalValue` + `UnsetValue` 判据），与上游"图标可盖过宿主"一致。
+  `DependencyProperty.UnsetValue` 是 `public static readonly object`，模式匹配那个内部类型会失败，只能用
+  `ReferenceEquals`——这一条是量出来的，不是猜的。
+
+这不是框架的修复。根因在框架：`IconElement` 不在主题换档时 `InvalidateVisual()`，上游 WinUI 整棵树随档重绘所以
+不需要宿主补偿。本层只是让用户看见的那片墨跟上档；框架侧的账与 #62 同一族提上游。
+
+### 四类证据
+
+- **构建**：`dotnet build samples/FluentJalium.Gallery` 与 `dotnet build tests/FluentJalium.Tests` 各
+  `0 个警告 / 0 个错误`（`census-before.log` 里两次、`mut-95.log` 里五轮）。
+- **行为**：图标事实四条，基线（不突变）`通过: 4，总计: 4`，每条各被自己的突变弄红一次，
+  且每腿打印被测 `FluentJalium.dll` 的 sha1 并断言与上一腿不同（`spike/NavIconRecolor/mut-95.log`）：
+  `nobind`（`IconInk.Apply` 的交付换空块）→ 只红 `A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to`；
+  `noguard`（本地前景判据放宽）→ 只红 `A_pane_icon_that_arrives_with_its_own_ink_keeps_it`；
+  `noappbarink`（应用条那两行附着属性删掉）→ 只红 `A_template_that_hosts_an_icon_hands_it_the_carrier_ink`；
+  `notoggleink`（折叠开关那条绑定删掉）→ 只红 `The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch`。
+  类计数：`AstraNavigationTests` 80 → **81**，`AstraIconFamilyTests` 32 → **33**（两类别跑各 `失败: 0`）。
+  #94 那两条的见证在机制搬进 `IconInk` 之后**重跑过**——见证要对着出货的那段代码，不是对着它搬家前的位置。
+- **视觉**：上面那张普查表 + 两帧裁块，全部来自抓屏（`shoot.ps1` 起 Gallery、`ASTRA_FLIP_MS` 定时翻档）。
+  进程内 `RenderTargetBitmap` 依旧看不见这类缺陷（它重跑一遍渲染），所以这一族的像素证据只有整屏这一条路。
+- **硬件输入**：零。翻档由 `FluentThemeManager.ApplyTheme` 驱动，没有指针、键盘或触摸参与。
+
+### Known Gaps
+
+1. **菜单三处与页签一处只有机制**：普查里它们一个像素没露面，也没有各自的事实。开着的弹层翻档会不会冻，
+   要等 #63 / #13 那套宿主交互通路。
+2. **框架宿主上，落子之后换进去的图标没人补交墨**：`IconInk.Source` 的转发展开在宿主 `Loaded` 那一次；
+   我们的 `FluentNavigationItem` 走 `OnIconChanged` 那条入口，框架宿主没有对应钩子。
+3. **hover / pressed / 禁用下的图标墨**没读：本批四条事实全在 Light↔Dark 这一档上，接线只保证"图标跟宿主前景"。
+4. **高对比档**下图标跟不跟没量；页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
+5. **普查器读的是整屏**，不是我们的窗口：谁盖在窗口上都算"冻结墨"。两次大数读数（一轮 `settings` 33755、
+   一轮 `surfaces` 28325+131）之后都不重演（干净树连测两轮 `surfaces`/`settings` 全 `0 0`，`surfaces-probe.log`），
+   而 168 与 519 每次都精确重演。`frozen.ps1` 因此加了 `-Mask` / `-Crop`，把最脏那个桶的图块留成文件，
+   下次再出现大数能看而不是猜。这两次读数不计进任何宿主的主张，也不当成本批修好了什么——它们是 #47/#90
+   那一族"只在某一次跑里现身"的新成员。
+6. **仪器自己坏过一轮**：第一次跑"剪掉接线"的普查时 `frozen.ps1` 的调用点少传一个参数（`MethodCountCouldNotFindBest`），
+   那一轮的 `surfaces`/`settings` 复测**没有读数**，日志里是空行。作废重跑才是结论，把空行当"量到 0"就是拿仪器故障当证据。
+

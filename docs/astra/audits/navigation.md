@@ -107,7 +107,7 @@
 ## 5 · 四类证据
 
 - **构建**：串行闸口 `tools/Test-AstraGates.ps1`（本批末尾一次），`docs/astra/adaptation/s1k-navigation-raw.txt` 收了读数。
-- **行为/结构**：`AstraNavigationTests` 80 例（4 例原有布局契约 + 74 例本批 + 2 例 #94）：
+- **行为/结构**：`AstraNavigationTests` 81 例（4 例原有布局契约 + 74 例本批 + 2 例 #94 + 1 例 #95 的折叠开关字形）：
   19+1 条键逐名"已发布"、45+5 条逐名"不得发布"、别名**同一实例**（8 条 `Assert.Same`）、
   半径读回（条目 + 模板 `Root`，且 ≠ `ControlCornerRadius`）、`NavigationViewItemButtonMargin` 落到 `item.Margin`、
   指示条几何钉在动画器常数上（`NavigationIndicatorAnimator.RestingHeight` == 模板 16 == 上游行 16）、
@@ -131,8 +131,10 @@
    （并行任务 #13 还没通）。
 2. **圆角只量到属性，没量到像素**：`Root` 边框的 `CornerRadius` 读回 8，8 DIP 圆角在角上真的把填充留出去了，
    这一条没有采样（`PixelAt` 的角点采样在下一批补，宁可不写也不猜）。
-3. **图标是否跟着前景状态变色**：条目前景换档时图标不重着色这条已经读到像素并修掉了（#94，见 §10）；
-   仍未读的是 hover / pressed 状态下图标跟不跟标签一起变（§10 的测点只覆盖 Light↔Dark）。
+3. **图标是否跟着前景状态变色**：条目前景换档时图标不重着色这条已经读到像素并修掉了（#94，见 §10），
+   pane 折叠开关那枚字形是同一处的残留，本批量到 168 px 并接上（§11）；仍未读的是 hover / pressed 状态下
+   图标跟不跟标签一起变（§10 与 §11 的测点都只覆盖 Light↔Dark），高对比档下跟不跟同样没量——
+   页闸那三档跑的是静态挂载，看不见这类只在活树上浮现的缺陷。
 4. **pane 背衬是纯色不是亚克力**：上游 `NavigationViewDefaultPaneBackground`=`AcrylicInAppFillColorDefaultBrush`；
    本批不接（材质摸底未做），差一层透明/模糊。
 5. **高对比未测**：本层的别名向下指到 `HighContrast.map` 已重映射的 token，但导航这一族在 HC 下的读数一次都没量。
@@ -180,13 +182,49 @@ parts=0`；`s0y-outstanding-names.txt:16`：`templateLock=Void:null-or-void`，1
 3. **机制**：`IconElement` 只在**自己**的 `Foreground` 变化时 `InvalidateVisual()`；换档改的是条目的属性，
    图标没有属性变化就没有重绘，屏幕上留着上一次落笔的墨。所以修法不是"补一次 `InvalidateVisual()`"，
    而是把条目的墨交给图标的 `Foreground`——这条运行时里只有"值变了"这一条路既换值又标脏，而且留下一个
-   读得到的值给回归事实（`Controls/Navigation/FluentNavigationItem.cs:OnIconChanged`）。图标自带前景时不覆盖：
+   读得到的值给回归事实（`Controls/IconInk.cs` 的 `Apply`，由 `FluentNavigationItem.OnIconChanged` 调用；
+   #95 把这处抽成两个宿主入口都走得通的公共接线，见 §11）。图标自带前景时不覆盖：
    那是本地值，上游也让它优先。
 
-突变见证（`spike/NavIconRecolor/teeth.sh`，两条事实各自只被自己的突变弄红）：交付那一行换成空块 →
-只有换档那条红，报 "the pane icon carries `<null>` while its item moved to `#E4000000`"；去掉"图标自带墨"的判据 →
-只有保留那条红。每一腿都打印测试工程输出目录里 `FluentJalium.dll` 的 sha1，证明跑的就是重建后的那份。
+突变见证（`spike/NavIconRecolor/mutate.py` + `teeth95.sh`，四条图标事实各自只被自己的突变弄红，读数在
+`mut-95.log`）：交付那一行换成空块 → 只有换档那条红，报 "the pane icon carries `<null>` while its item moved to
+`#E4000000`"；去掉"图标自带墨"的判据 → 只有保留那条红（`Expected: SolidColorBrush(#FF336699) / Actual:
+SolidColorBrush(#E4000000)`）。每一腿都打印测试工程输出目录里 `FluentJalium.dll` 的 sha1 并断言它与上一腿不同，
+证明跑的就是重建后的那份；腿与腿之间先跑一次不突变的基线（四条图标事实全绿），突变构建失败则整腿作废。
+这两条在 #95 把机制搬进 `IconInk` 之后重跑过一遍——见证要对着出货的那段代码，不是对着它搬家前的位置。
 
 一条踩过的坑要留字：第一次做这个 A/B 时只 `dotnet build src/FluentJalium` 再用 `dotnet test --no-build` 跑，
 测试进程加载的还是上一版 `FluentJalium.dll`，突变根本没进被测进程，于是把一条有牙的事实读成了哑的。
 要刷新生效的是**测试工程**的构建，且必须有"消费到的 DLL 变了"的见证。
+
+## 11 · #95：同一处缺陷在侧栏还剩一枚，别处还有六枚宿主（2026-09-23）
+
+§10 结的是**条目图标**这一枚。把同一把尺子（`spike/NavIconRecolor/census.sh`：起始档钉在开窗前，同一活窗口翻档，
+前后两张抓屏逐像素比"两边都近黑 / 两边都近白"的冻结墨）铺到 Gallery 全部 13 页，读数记在
+`spike/NavIconRecolor/census-before.log`（本批接线剪掉后重测）与 `census-after.log`（接上之后）：
+
+| 读数 | 剪掉接线 | 接上之后 | 那是谁 |
+|---|---|---|---|
+| 每一页都是 168 px，桶位 x 0..59 / y 0..59+60..119 | 168 | **0** | pane 折叠开关那枚 `GlobalNavButton` 字形——它是**外壳**的，所以 13 页都带着它，不是 13 个缺陷 |
+| `command-bar` 额外 519 px，桶位 y 480..539 三格 | 687（=168+519） | **0** | 应用条那一排的 `AppBarButton` 图标墨 |
+| 其余 11 页 | 只有那 168 | **0** | 没有第二种冻结墨 |
+
+三条要说清的界限：
+
+1. **折叠开关是 #94 的残留**，不是新缺陷形状：同一个 `IconElement`、同一处"上溯给值、不给重绘"。
+   它在 `Styles/Navigation.jalxaml` 的模板里，是枚 `SymbolIcon`，修法就落在标记上——
+   `Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"`。
+   这条绑定有事实（`The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch`，去掉那行即红）。
+2. **普查的读者是"这一页上有没有不跟档的墨"，不是"这一族有没有接线"**。菜单族三处与 `TabView` 一处接的是同一条
+   附着通路，但它们在普查里**一个像素都没露过面**（弹层静止时是关着的；页签图标那页量到的冻结集合是空的）。
+   所以那四处只有"机制同样成立 + 与已量宿主同一条码路"的依据，没有各自的像素读数——本条按 #92 立的"不外推"处理，
+   写进 Known Gaps。
+3. **普查抓的是整屏**，谁盖在窗口上都算墨。两次大数读数（一轮 `settings` 33755、一轮 `surfaces` 28325 + 131）
+   都不重演，而 168 与 519 每次都精确重演；`frozen.ps1` 因此加了 `-Mask`/`-Crop`，把最脏那个桶的图块留成文件，
+   下次再出现是大数就能看而不是猜。这两次读数不计入任何宿主的主张，也不当成本批修好了什么——它们是
+   #47/#90 那一族"只在某一次跑里现身"的又一个成员。
+
+普查器与接线本身各有一处不是像素的账：`IconInk.Source` 的转发展开在宿主 `Loaded` 之后，
+所以**子树已经落过之后才换上去的图标**在框架宿主上没人补交墨（我们的 `FluentNavigationItem` 有 `OnIconChanged`，走的是另一入口）。
+这条只写在 Known Gaps，不当已交付。
+

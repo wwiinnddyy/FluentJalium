@@ -187,7 +187,13 @@
               </Grid.RowDefinitions>
               <Button Name="PART_PaneToggle" Style="{StaticResource FluentNavigationPaneToggleButtonStyle}"
                       Margin="4,0,4,12" HorizontalAlignment="Left">
-                <SymbolIcon Symbol="GlobalNavButton" Width="16" Height="16" />
+                <!-- The glyph has to be handed the button's ink as a live value, not left to the framework's
+                     draw-time walk: an IconElement with no foreground of its own resolves one by walking to an
+                     ancestor Control while it draws, and nothing invalidates it when that answer changes, so a
+                     live theme switch left this glyph painted with the previous theme's ink (#94 measured the
+                     same route on the item icons, audits/navigation.md §10). -->
+                <SymbolIcon Symbol="GlobalNavButton" Width="16" Height="16"
+                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
               </Button>
               <!-- Auto reserves 12 DIP for the bar (measured: a 48-DIP viewport hands its content 36),
                    which squeezes the 40-DIP icon column and leaves the selection pill narrower than the

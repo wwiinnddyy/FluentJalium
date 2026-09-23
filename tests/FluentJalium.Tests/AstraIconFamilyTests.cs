@@ -302,5 +302,47 @@ public sealed class AstraIconFamilyTests
         Assert.Null(Resource(key));
     }
 
+    [Fact]
+    public void A_template_that_hosts_an_icon_hands_it_the_carrier_ink()
+    {
+        // The navigation items can hand their ink over in code because they are our type; the app bar cannot, so
+        // its template sets the attached source on the element that hosts the icon (Styles/AppBar.jalxaml).
+        // AppBarButton is the framework's own type, which makes this the shape every other host has to use -
+        // the menu family and the tab icon host ride the same line. The reading is the value the hand-off leaves
+        // on the icon and that it moves with a live theme switch; the pixels are spike/NavIconRecolor/census.sh,
+        // which counted 519 pixels of frozen ink on that bar before the line existed.
+        _fixture.Run(() =>
+        {
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            var icon = new SymbolIcon { Symbol = Symbol.Save };
+            var button = new AppBarButton { Label = "Save", Icon = icon };
+            PixelHarness.Build(button, 68, 64);
+            PixelHarness.Settle(60);
+            AssertInk(icon, button, "light");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Dark);
+            PixelHarness.Settle(60);
+            AssertInk(icon, button, "dark");
+
+            FluentThemeManager.ApplyTheme(FluentThemeVariant.Light);
+            PixelHarness.Settle(6);
+        });
+    }
+
+    /// <summary>
+    /// The icon must carry the carrier's brush by instance. Null is the defect itself (nothing hands the ink
+    /// over, so the glyph keeps whatever it last drew); a different instance is a stale or wrong source.
+    /// </summary>
+    private static void AssertInk(IconElement icon, Control carrier, string when)
+    {
+        static string Hex(Brush? brush) =>
+            brush is SolidColorBrush solid ? PixelHarness.Hex(solid.Color) : brush?.GetType().Name ?? "<null>";
+
+        Assert.True(
+            ReferenceEquals(carrier.Foreground, icon.Foreground),
+            $"{when}: the hosted icon carries {Hex(icon.Foreground)} while its {carrier.GetType().Name} is at " +
+            $"{Hex(carrier.Foreground)} - the icon is not handed the carrier's ink, so it keeps whatever it last drew.");
+    }
+
     private static object? Resource(string key) => Application.Current?.TryFindResource(key);
 }

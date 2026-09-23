@@ -31,7 +31,9 @@
      The flyout surface itself is framework-owned: an opened MenuFlyout builds its own MenuPopupScrollHost
      with two RepeatButton arrows and a ScrollViewer whose brushes we cannot reach (pass 4), so the surface
      rows below are consumed by ContextMenu, which is a control of ours to template, and by nothing else. -->
-<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
 
   <!-- ============ MenuFlyoutItem ============ -->
   <Style x:Key="DefaultMenuFlyoutItemStyle" TargetType="MenuFlyoutItem">
@@ -63,7 +65,8 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -114,7 +117,8 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>
@@ -157,7 +161,8 @@
                 Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
                 TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
           <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}" />
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
           </Border>
         </Border>
         <ControlTemplate.Triggers>

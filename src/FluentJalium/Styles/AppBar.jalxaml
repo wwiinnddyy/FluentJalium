@@ -38,7 +38,9 @@
      a template (AstraAppBarTests.LabelPosition_names_two_states_and_moves_neither); and
      the whole overflow layout (label beside a check glyph in a 48-tall list row) has no flag to watch, so a
      secondary command keeps its bar geometry here. audits/app-bar.md keeps the list with its measurement. -->
-<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
 
   <!-- ============ AppBarButton ============ -->
   <Style x:Key="DefaultAppBarButtonStyle" TargetType="AppBarButton">
@@ -76,7 +78,8 @@
                    margin 0,16,0,2, so the glyph box starts 16 below the cell top and the label follows it. -->
               <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
                        Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
-                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
               </Viewbox>
               <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
                          FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
@@ -136,7 +139,8 @@
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
               <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
                        Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
-                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}" />
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
               </Viewbox>
               <!-- Upstream declares this margin as AppBarToggleButtonTextLabelMargin; same 2,0,2,8 value, and
                    this implementation reads the button row so only one of the two names is published. -->

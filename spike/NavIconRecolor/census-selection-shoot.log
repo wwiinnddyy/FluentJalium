@@ -1,0 +1,9 @@
+wrote C:\git\Jalium\FluentJalium\spike\NavIconRecolor\before.png dpi=168
+before pid=48340 hwnd=3149422 rect=329,46,2254,1481 dpi=168
+crop C:\git\Jalium\FluentJalium\spike\NavIconRecolor\before-strip.png
+crop C:\git\Jalium\FluentJalium\spike\NavIconRecolor\before-pane.png
+wrote C:\git\Jalium\FluentJalium\spike\NavIconRecolor\after.png dpi=168
+after pid=48340 hwnd=3149422 rect=329,46,2254,1481 dpi=168
+crop C:\git\Jalium\FluentJalium\spike\NavIconRecolor\after-strip.png
+crop C:\git\Jalium\FluentJalium\spike\NavIconRecolor\after-pane.png
+closed pid=48340
