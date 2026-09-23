@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-881 lines collected from 49 sections across 46 documents.
+891 lines collected from 49 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -315,7 +315,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/focus-visual.md:154` - 双圈，得逐族对着上游审 `UseSystemFocusVisuals` 与 `FocusVisualMargin`（上游确实有族显式关掉系统框，例如
 - `audits/focus-visual.md:155` - ContentDialog 的按钮），不属于本批"只换判据、不动像素"的范围。挂在视觉余账（与 #21/#23 同族）。
 
-## audits/foreground.md - 72 lines
+## audits/foreground.md - 81 lines
 
 ### 7 Known Gaps（不声称清单）
 
@@ -374,23 +374,32 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:136` - 候选修法已有证据：把该状态的 `Foreground` 行提到 `Style.Triggers`（同表前两行证明那里压得过）。
 - `audits/foreground.md:137` - 本批没动产品标记，改动登记成 #89。同一条判据**不外推**：`TabView.jalxaml:38`、`:71` 两行也是模板触发器，
 - `audits/foreground.md:138` - 但本批只量到 CheckBox 一个 owner，那两处照旧是"只测了键能解析"。
-- `audits/foreground.md:139` - 6d. 普查的尺子本身在本批错过一次，先记下来：`spike/StateCellCensus/census.py` 第一版只认 `<Trigger>` 与
-- `audits/foreground.md:140` - `<ConditionGroup>`，而库里的多条件格子写成 `<MultiTrigger><MultiTrigger.Conditions><Condition …/>`——
-- `audits/foreground.md:141` - `<Trigger` 匹配不上 `<MultiTrigger`、`ConditionGroup` 匹配不上 `Condition`，开合两头都不匹配，
-- `audits/foreground.md:142` - 所以**带勾选条件的 39 行是整批缺席**，不是被错分。修好后同尺子是 **176 条状态格子、91 条无指针可驱动、
-- `audits/foreground.md:143` - 37 条的键名在测点里没出现过**，其中"无指针 × 无读者"13 条。这条弱信号也要一起记：`readers=` 判的是
-- `audits/foreground.md:144` - "键名字面量在测点里出现过"，本批那条勾选框事实**故意**不写键名（它钉的是调色板刷，理由在 7.6b），
-- `audits/foreground.md:145` - 于是普查把那一行仍报成"无读者"——它能提示"要不要看第二眼"，不是到达性的证据。
-- `audits/foreground.md:146` - 6e. 那 13 行逐条处置（能不能出事实，取决于该行转录的刷与"没有这格时读到的刷"是不是同一支）：
-- `audits/foreground.md:148` - | 那一行 | 位置 | 转录到 | 能否出事实 | 处置 |
-- `audits/foreground.md:150` - | `CheckBoxForegroundUncheckedDisabled` | `Selection.jalxaml:39` | 禁用刷 | 删、改指都看不见 | 本批事实 + 复合突变（7.6b） |
-- `audits/foreground.md:151` - | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
-- `audits/foreground.md:152` - | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
-- `audits/foreground.md:153` - | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
-- `audits/foreground.md:154` - | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
-- `audits/foreground.md:155` - | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
-- `audits/foreground.md:156` - | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
-- `audits/foreground.md:157` - | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
+- `audits/foreground.md:139` - 6c-bis. #89 那条候选修法（把禁用 `Foreground` 行提到 `Style.Triggers`）**已判掉，不做**，理由是把两段已量的读数放在一起：
+- `audits/foreground.md:140` - 提到样式触发器只救得到**控件自身的** `Foreground`（7.6b 前两行证得了它压得过框架那次写），而用户真正看见的那片墨是
+- `audits/foreground.md:141` - **生成的标签**，标签上带的是框架自己的局部值，#12 量过它从名字 `TextDisabled` 现查（本批 7.6b 又在控件自身上量到同一条
+- `audits/foreground.md:142` - 路）。也就是说：单独重写 `CheckBoxForegroundUncheckedDisabled` 这一族键，无论那一格住在样式层还是模板层，
+- `audits/foreground.md:143` - 都到不了标签的像素——这不是"我们少写了一处"，是**该面没有可用的标记杠杆**（局部值压在一切格子之上，而我们既不能
+- `audits/foreground.md:144` - 反射框架私有字段，也不做逐窗修表）。所以它按 Known Gap 记在这里，而不是拿一次"提到 Style.Triggers"的改动冒充结清；
+- `audits/foreground.md:145` - 真要覆盖那族键，今天唯一通的路是改 `TextDisabled` 指向的那支调色板刷本身（那会同时改掉所有控件的禁用墨）。
+- `audits/foreground.md:146` - 顺带一条风险记录：那一次"提升"还会把 hover/pressed 的格子间关系卷进来（跨层先后本段没量），在没有可见收益的前提下
+- `audits/foreground.md:147` - 引入这份不确定，不值得。
+- `audits/foreground.md:148` - 6d. 普查的尺子本身在本批错过一次，先记下来：`spike/StateCellCensus/census.py` 第一版只认 `<Trigger>` 与
+- `audits/foreground.md:149` - `<ConditionGroup>`，而库里的多条件格子写成 `<MultiTrigger><MultiTrigger.Conditions><Condition …/>`——
+- `audits/foreground.md:150` - `<Trigger` 匹配不上 `<MultiTrigger`、`ConditionGroup` 匹配不上 `Condition`，开合两头都不匹配，
+- `audits/foreground.md:151` - 所以**带勾选条件的 39 行是整批缺席**，不是被错分。修好后同尺子是 **176 条状态格子、91 条无指针可驱动、
+- `audits/foreground.md:152` - 37 条的键名在测点里没出现过**，其中"无指针 × 无读者"13 条。这条弱信号也要一起记：`readers=` 判的是
+- `audits/foreground.md:153` - "键名字面量在测点里出现过"，本批那条勾选框事实**故意**不写键名（它钉的是调色板刷，理由在 7.6b），
+- `audits/foreground.md:154` - 于是普查把那一行仍报成"无读者"——它能提示"要不要看第二眼"，不是到达性的证据。
+- `audits/foreground.md:155` - 6e. 那 13 行逐条处置（能不能出事实，取决于该行转录的刷与"没有这格时读到的刷"是不是同一支）：
+- `audits/foreground.md:157` - | 那一行 | 位置 | 转录到 | 能否出事实 | 处置 |
+- `audits/foreground.md:159` - | `CheckBoxForegroundUncheckedDisabled` | `Selection.jalxaml:39` | 禁用刷 | 删、改指都看不见 | 本批事实 + 复合突变（7.6b） |
+- `audits/foreground.md:160` - | `CheckBoxForegroundCheckedDisabled` / `…IndeterminateDisabled` | `:40` / `:41` | 禁用刷 | 同上 | 与上一行同判据，归 #89 |
+- `audits/foreground.md:161` - | `CheckBoxForegroundIndeterminate` | `:36` | 主文字刷 | 与静态格同实例 | 值不可判，不出事实 |
+- `audits/foreground.md:162` - | `TabViewButtonForegroundDisabled` ×2 | `TabView.jalxaml:38` / `:71` | 禁用刷 | 预测同 7.6c，**未量** | 留账，不外推 |
+- `audits/foreground.md:163` - | `TabViewItemHeaderForegroundSelected`、`TabViewItemIconForegroundSelected` | `:203` | 主文字刷（静态是二级刷） | 删行就看得见 | 未做，是这批之后的第一批 |
+- `audits/foreground.md:164` - | `TabViewItemHeaderSelectedCloseButtonForeground` | `:203` | 主文字刷（静态也是主文字刷） | 同实例 | 值不可判 |
+- `audits/foreground.md:165` - | `TabViewItemIconForegroundDisabled`、`TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 禁用刷 | 只删看不见 | 需改指 + 复合两种突变才说得出 |
+- `audits/foreground.md:166` - | `InfoBarSuccess/WarningSeverityIconForeground` | `Surfaces.jalxaml:199` / `:205` | 反色刷 | 四行严重度全指同一支刷 | `AstraForegroundAuditTests` 已读该实例，不重复出事实 |
 
 ## audits/icon-family.md - 13 lines
 
@@ -1006,7 +1015,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 117 lines
+## ROADMAP.md - 118 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1135,5 +1144,6 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4533` - hover / pressed 行照旧归真指针通路（#13）。
 - `ROADMAP.md:4534` - 4. 这些前景是否**真的印出墨**照旧不在断言里（#50）。
 - `ROADMAP.md:4544` - - **视觉**：零新增像素断言——理由见上面第 4 条 Known Gap 与 #50。
+- `ROADMAP.md:4581` - 不是我们漏写了一处。按纪律这记成 Known Gap（`audits/foreground.md` 7.6c-bis），不拿一次"提升格子"的改动冒充结清。
 
-<!-- canonical-lines=881 sha256=cb9c7398af69d0b62fb0217afcd34ba91d082769e1f033286f3e62bb27e31be9 -->
+<!-- canonical-lines=891 sha256=d506297a04e9e3696d0a039d820a742653a25b6e0c9a6cf22b72de8b208a4efd -->

@@ -136,6 +136,15 @@
    候选修法已有证据：把该状态的 `Foreground` 行提到 `Style.Triggers`（同表前两行证明那里压得过）。
    本批没动产品标记，改动登记成 #89。同一条判据**不外推**：`TabView.jalxaml:38`、`:71` 两行也是模板触发器，
    但本批只量到 CheckBox 一个 owner，那两处照旧是"只测了键能解析"。
+6c-bis. #89 那条候选修法（把禁用 `Foreground` 行提到 `Style.Triggers`）**已判掉，不做**，理由是把两段已量的读数放在一起：
+   提到样式触发器只救得到**控件自身的** `Foreground`（7.6b 前两行证得了它压得过框架那次写），而用户真正看见的那片墨是
+   **生成的标签**，标签上带的是框架自己的局部值，#12 量过它从名字 `TextDisabled` 现查（本批 7.6b 又在控件自身上量到同一条
+   路）。也就是说：单独重写 `CheckBoxForegroundUncheckedDisabled` 这一族键，无论那一格住在样式层还是模板层，
+   都到不了标签的像素——这不是"我们少写了一处"，是**该面没有可用的标记杠杆**（局部值压在一切格子之上，而我们既不能
+   反射框架私有字段，也不做逐窗修表）。所以它按 Known Gap 记在这里，而不是拿一次"提到 Style.Triggers"的改动冒充结清；
+   真要覆盖那族键，今天唯一通的路是改 `TextDisabled` 指向的那支调色板刷本身（那会同时改掉所有控件的禁用墨）。
+   顺带一条风险记录：那一次"提升"还会把 hover/pressed 的格子间关系卷进来（跨层先后本段没量），在没有可见收益的前提下
+   引入这份不确定，不值得。
 6d. 普查的尺子本身在本批错过一次，先记下来：`spike/StateCellCensus/census.py` 第一版只认 `<Trigger>` 与
    `<ConditionGroup>`，而库里的多条件格子写成 `<MultiTrigger><MultiTrigger.Conditions><Condition …/>`——
    `<Trigger` 匹配不上 `<MultiTrigger`、`ConditionGroup` 匹配不上 `Condition`，开合两头都不匹配，
