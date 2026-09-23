@@ -538,8 +538,32 @@ public class FluentRatingControl : Control
             HorizontalAlignment = HorizontalAlignment.Left,
             Width = ActualItemSize,
         };
-        host.Children.Add(item);
+
+        // The host crops, so it must not also be what sizes the run: measured on a mounted control at Value 3.5 with
+        // the run laid out directly in the host, a 17-wide host handed the run 17 + 8.5 of measure width, the run
+        // clamped from its natural 34 to 25.5, and the half scale then pivoted on the wrong centre - ink 12.75 wide
+        // starting 2.13 to the left of its cell, and in the fractional cell (host 8.5) a star clamped to 17 whose
+        // left arm sat outside the crop. A horizontal panel measures its children with infinite width, which is what
+        // keeps the run at its own advance while the host still cuts it.
+        var lane = new StackPanel { Orientation = Orientation.Horizontal };
+        lane.Children.Add(item);
+        host.Children.Add(lane);
         return host;
+    }
+
+    /// <summary>The run inside a cell, reaching through the lane the crop host lays out. Internal because the tests
+    /// read the same element this control animates and crops: an unwrap of their own would pass on a cell whose run
+    /// is not the one being drawn.</summary>
+    internal static FrameworkElement? CellRun(FrameworkElement cell)
+    {
+        if (cell is not Grid host || host.Children.Count == 0)
+        {
+            return cell as FrameworkElement;
+        }
+
+        return host.Children[0] is StackPanel lane && lane.Children.Count > 0
+            ? lane.Children[0] as FrameworkElement
+            : host.Children[0] as FrameworkElement;
     }
 
     private FrameworkElement CreateItemContent(FluentRatingControlDisplayState role, bool useStateBrush)
@@ -674,7 +698,7 @@ public class FluentRatingControl : Control
             if (child is Grid host)
             {
                 host.Width = width;
-                if (host.Children.Count > 0 && host.Children[0] is FrameworkElement inner)
+                if (CellRun(host) is { } inner)
                 {
                     CustomizeItem(inner, role, useStateBrush: true);
                 }
@@ -700,8 +724,7 @@ public class FluentRatingControl : Control
     /// The focal point is the raw pointer X the move handler saw, or the magic number when nothing is over the row.</summary>
     private void Magnify(object? cell, int index)
     {
-        if (cell is not Grid host || host.Children.Count == 0 ||
-            host.Children[0].RenderTransform is not ScaleTransform scale)
+        if (cell is not Grid host || CellRun(host) is not { } run || run.RenderTransform is not ScaleTransform scale)
         {
             return;
         }

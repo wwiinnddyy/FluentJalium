@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-1014 lines collected from 55 sections across 46 documents.
+1015 lines collected from 55 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -714,7 +714,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/radio-buttons.md:109` - 这个控件在 HC 下的读数一次都没量过。
 - `audits/radio-buttons.md:110` - 7. **头部只有 `Header`/`HeaderTemplate`**：上游同名字段还带 `IsHidden` 联动与 `ContentTransitions`，本层没有对应机制。
 
-## audits/rating-control.md - 11 lines
+## audits/rating-control.md - 12 lines
 
 ### 6 · 高对比（Known Gap）
 
@@ -724,13 +724,14 @@ Categorised summaries live in `ROADMAP.md`.
 ### 12 · Known Gaps 汇总与不声称清单
 
 - `audits/rating-control.md:147` - 不声称：
-- `audits/rating-control.md:148` - - 星的墨。字形墨两条捕获通路都到不了（#50），本控件的视觉列只有"实色块证明裁剪与缩放这条路能落墨"加上
-- `audits/rating-control.md:149` - 树内几何断言，没有一张有星的图。
-- `audits/rating-control.md:150` - - 真鼠标 / 真触摸 / 真键盘。本套件无合成输入（#13），钳位、分数、放大数值都走 routed 处理器调用的内部入口，
-- `audits/rating-control.md:151` - `MouseMove` 到 `PreviewAt` 的接线未被证明；悬停放大只在星心与地板上取值精确，中间一段未测。
-- `audits/rating-control.md:152` - - 焦点环外观、手柄通路、`ItemInfo` 图片路径的实际图像显示（条目已转录，无位图断言）。
-- `audits/rating-control.md:153` - - 高对比逐控件重指（第 6 节）。
-- `audits/rating-control.md:154` - - 星墨与格子的水平配准：墨在 34 的盒子里是否正好居中，无墨可量，只能按对称假定；这条若错，表现为整行左右偏一点。
+- `audits/rating-control.md:148` - - 真鼠标 / 真触摸 / 真键盘。本套件无合成输入（#13），钳位、分数、放大数值都走 routed 处理器调用的内部入口，
+- `audits/rating-control.md:149` - `MouseMove` 到 `PreviewAt` 的接线未被证明；悬停放大只在星心与地板上取值精确，中间一段未测。
+- `audits/rating-control.md:150` - - 焦点环外观、手柄通路、`ItemInfo` 图片路径的实际图像显示（条目已转录，无位图断言）。
+- `audits/rating-control.md:151` - - 高对比逐控件重指（第 6 节）。
+- `audits/rating-control.md:152` - - 选中填充色的到达只有整屏捕获里看过，没有断言：#98 量测时有一张同形状的捕获，星带内 9 549 个灰像素、
+- `audits/rating-control.md:153` - 蓝色 0 个（填充穿了继承来的文本色），其后四次跑不复现，机制未定 —— 见第 14 节末与 `spike/RatingInkProbe/README.md`。
+- `audits/rating-control.md:155` - 第 9 节留的那条"墨在盒子里是否正好居中，只能按对称假定"已经不再是假定：#98 把它量出来了，而且量出来是错的，
+- `audits/rating-control.md:156` - 见第 13 节。
 
 ## audits/right-gap.md - 28 lines
 
@@ -1273,4 +1274,4 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:5010` - 两条通路要分开记。
 - `ROADMAP.md:5016` - 在这之前 Known Gap 第 2 条那句"哪套字形"还悬着——把它量掉，才谈得上逐宿主换形状。
 
-<!-- canonical-lines=1014 sha256=ecea70dc0279528f81c2dd25ecb29d2ca2385e2f2f0eb44023dc7324a505cd9c -->
+<!-- canonical-lines=1015 sha256=f49a63667d8f501f1b12e50d8cc2b8f9d242207e871bde81fccd4fb1f4608a11 -->

@@ -222,7 +222,7 @@ public sealed class AstraRatingControlTests
             PixelHarness.Settle();
 
             Assert.Equal(5, Count(rating, "RatingForegroundStackPanel"));
-            Assert.Equal(string.Empty, ((TextBlock)((Grid)rating.ForegroundItem(0)!).Children[0]!).Text);
+            Assert.Equal(string.Empty, ((TextBlock)RunOf(rating.ForegroundItem(0))).Text);
         });
     }
 
@@ -404,13 +404,25 @@ public sealed class AstraRatingControlTests
             var rating = Rating(value: 3);
             var panel = (StackPanel)Part(rating, "RatingBackgroundStackPanel")!;
             var cell = (Grid)rating.BackgroundItem(0)!;
-            var run = (FrameworkElement)cell.Children[0]!;
+            var run = RunOf(cell);
             var scale = Assert.IsType<ScaleTransform>(run.RenderTransform);
 
             Assert.Equal(FluentRatingControl.RestItemScale, scale.ScaleX, 3);
             Assert.Equal(FluentRatingControl.RestItemScale, scale.ScaleY, 3);
             Assert.Equal(new Point(0.5, 0.5), run.RenderTransformOrigin);
             Assert.Equal(-(Advance(rating) / 2), run.Margin.Left, 1);
+
+            // The clamp this test exists for. The crop host is one cell wide, so a run laid out directly inside it is
+            // measured against cell + inset and stops there instead of at its own advance: the half scale then pivots
+            // off a centre that moved, the star paints a quarter too small, and the fractional crop cuts the wrong
+            // edge of it - which is what a user sees as "the row sits too far right and the star's right side is
+            // covered" (spike/RatingInkProbe, #98: arranged 25.5 against a natural 34, ink box 12.75 wide starting
+            // 2.13 left of its cell). The run has to keep its own advance and the host has to do the cutting.
+            Assert.Equal(2 * Advance(rating), run.ActualWidth, 1);
+            var ink = run.TransformToVisual(panel)!.TransformBounds(new Rect(0, 0, run.ActualWidth, run.ActualHeight));
+            Assert.Equal(0d, ink.X, 1);
+            Assert.Equal(rating.ActualItemSize, ink.Width, 1);
+
             Assert.True(cell.ClipToBounds == false, "the background layer is never cropped - it shows the whole outline");
             Assert.True(((Grid)rating.ForegroundItem(0)!).ClipToBounds);
 
@@ -722,13 +734,19 @@ public sealed class AstraRatingControlTests
 
     /// <summary>The magnifier transform on one star's own foreground run.</summary>
     private static ScaleTransform ScaleOf(FluentRatingControl rating, int index) =>
-        (ScaleTransform)((FrameworkElement)((Grid)rating.ForegroundItem(index)!).Children[0]!).RenderTransform!;
+        (ScaleTransform)RunOf(rating.ForegroundItem(index)).RenderTransform!;
 
     private static ScaleTransform ScaleOfBackground(FluentRatingControl rating, int index) =>
-        (ScaleTransform)((FrameworkElement)((Grid)rating.BackgroundItem(index)!).Children[0]!).RenderTransform!;
+        (ScaleTransform)RunOf(rating.BackgroundItem(index)).RenderTransform!;
 
-    /// <summary>The run inside a cell: every item the panel lays out is a crop host around the glyph or image.</summary>
-    private static FrameworkElement? Run(object? cell) => (cell as Grid)?.Children.Count > 0 ? (FrameworkElement?)((Grid)cell!).Children[0] : null;
+    /// <summary>The run inside a cell: every item the panel lays out is a crop host, and the control reaches its run
+    /// through the lane it puts between the two. The unwrap is the control's own so a test cannot pass by reading an
+    /// element the control neither crops nor animates.</summary>
+    private static FrameworkElement RunOf(object? cell) => FluentRatingControl.CellRun((FrameworkElement)cell!)!;
+
+    /// <summary>The run inside a cell, or null when the cell has none.</summary>
+    private static FrameworkElement? Run(object? cell) =>
+        cell is null ? null : FluentRatingControl.CellRun((FrameworkElement)cell);
 
     /// <summary>A panel child's own margin. <c>Children</c> hands back <c>UIElement</c>, which has no such property.</summary>
     private static Thickness MarginOf(object cell) => ((FrameworkElement)cell).Margin;
@@ -751,10 +769,10 @@ public sealed class AstraRatingControlTests
     }
 
     private static string ItemText(FluentRatingControl rating, int index) =>
-        ((TextBlock)((Grid)rating.ForegroundItem(index)!).Children[0]!).Text;
+        ((TextBlock)RunOf(rating.ForegroundItem(index))).Text;
 
     private static Brush? ItemBrush(FluentRatingControl rating, int index) =>
-        ((TextBlock)((Grid)rating.ForegroundItem(index)!).Children[0]!).Foreground;
+        ((TextBlock)RunOf(rating.ForegroundItem(index))).Foreground;
 
     private static object? Resource(string key) => Application.Current?.TryFindResource(key);
 }

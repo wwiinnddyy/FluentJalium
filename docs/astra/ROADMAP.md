@@ -5036,5 +5036,101 @@ pixels left)` 与 `printed nothing its empty slot does not already print (41 col
 那一族记——环境占用的像素断言，不是本批的账。**但这句要成立得有一次安静的全绿**，现在没有，所以 #96/#97 的
 闸口状态记为**未过**，本批的结论只建立在仪器自己打的读数上（字形墨那四条表与 `readings-96.txt` 不依赖套件）。
 
+## #98（用户报的可见缺陷）评分子格里的星被切掉右半边：裁剪的宿主同时也在定量（2026-09-23）
+
+用户形状："整行向右平移，而且星星右边一部分被遮住。" 这条不在 #52 那批留的任何一格不声称里 —— 它的九步出口
+当时把视觉列记成"字形墨测不出来，只有实色块证明裁剪与缩放这条路能落墨"（`audits/rating-control.md` 第 12 节原话），
+所以星到底画成什么样，从交付那天起就没被看过。#96 把整屏通路量通了，这条才有仪器。
+
+`spike/RatingInkProbe` 挂四档值（3.5 / 5 / 2 / 4.7）进真窗口，逐格打印宿主宽、是否裁、run 的 desired/arranged、
+字族、边距、缩放，以及 run 的盒到控件空间的水平段；同一进程再抓这张窗口的像素，两套数才能对上。
+
+### 一条因果链，两句话的形状
+
+宿主是 `Grid{Width=17, ClipToBounds=True}`（第 7 节：`UIElement.Clip` 在本运行时静默失效，裁剪只能靠宿主），
+而 `Grid` 定量时把 17 + 8.5 交给孩子 —— 那颗**画**在 34 上的 run 从没拿到过自己的自然宽，被夹到 25.5。
+0.5 缩放绕盒子中心转，盒子被夹在右边，中心就从 8.5 掉到 4.25：
+
+| | run arranged | 第 0 格墨盒 | 第 4 格墨盒 | 分数格（宿主 8.5） |
+| --- | --- | --- | --- | --- |
+| 修法前 | 25.5 | x=-2.13 w=12.75 | x=97.88 w=12.75 | 夹到 17 → 墨 8.5 |
+| 修法后 | 34 | x=0 w=17 | x=100 w=17 | 34 不动，宿主裁到 8.5 |
+
+一颗静止的星该占满自己那 17 的格子。修法前它只有 12.75 宽、还往左出格 2.13，每格右边空 6.4 DIP；
+指针模型仍按 25 的步进算星心，于是**看得见的位置**整体比**点得中的位置**偏左 4.25 DIP ——
+"向右平移"与"右边被遮"是同一个数的两句话。半星那一格是同一个夹击的另一面：宿主 8.5 → 盒子夹到 17 → 墨 8.5，
+画出来是"半星的半星"。
+
+### 修法：让裁的只管裁，定量的那条通道给无限宽
+
+`host(Grid,ClipToBounds) → lane(StackPanel 横向) → run`。横向 `StackPanel` 用无限宽量孩子，run 回到自己的 34，
+宿主照旧切。形状不是自造的：上游 `RatingControl.cpp:336-366` 把条目直接放在横向面板里、用 `UIElement.Clip` 切，
+条目拿到的定量本来就是自然宽 —— 本运行时把裁剪挪到宿主上，就必须同时把定量还回去，否则两件事咬在一起，
+咬出来的就是这个用户看得见的形状。控件与测试读同一个元素：`internal static CellRun`，测试不再自己数
+`host.Children[0]`（那样可以在"画的不是它"的树上照样绿）。
+
+### 四类证据分开记
+
+- **构建**：`dotnet build FluentJalium.slnx`（串行，随闸口跑）。
+- **行为**：`AstraRatingControlTests` 64 条，`失败: 0，通过: 64，总计: 64`。
+- **视觉**：`spike/RatingInkProbe/rating-before.png` / `rating-after.png` 同一次坐下来的 A/B，只差
+  `mutate-lane.ps1` 那一步（把 lane 换回 `host.Children.Add(item)`）。像素侧独立复核
+  （`scan-row.ps1 -BlueOnly`，星行中部 y=145 只数填充层）：前 19/20/20 px、半格 9 px；后 22/23/23 px、半格 13 px，
+  整段右移 3 px ≈ 1.8 DIP，与树上的 -2.13 对得上；按颜色数（`sample-colors.ps1`）前 `blue=5487`、后 `blue=6162`。
+- **硬件输入**：未做，仍记 #13 那条（钳位/分数/放大都走内部入口）。
+
+### 验牙
+
+`Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left` 新增三件事：run 的 `ActualWidth` 等于步进 34、
+墨盒左边界等于 0、墨盒宽等于 `ActualItemSize`。撤掉通道 → 红在 `Expected: 34 / Actual: 25.5`；还原 → 复绿。
+
+### 顺手回读 gate-96 的那条红
+
+`gate-96.log` 那次（`失败: 10，通过: 1584，总计: 1594`）红集里有
+`AstraRatingControlTests.Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left`。按 #98 的读数回看，
+它不可能是本缺陷的脚印，理由是一条读数而不是一条推读：`spike/PagePixelsPlateDiag/gate-93.log` 在 `feb45af` 上
+把同一条代码、同一条测试体打印成 `失败: 0，通过: 1594，总计: 1594`，而 `feb45af → 076c4b1` 之间 `src/`、`tests/`
+一行未动（那一批只有文档与 `spike/`）。总数还是 1594，红的还是这批"要真窗口、要排版完成"的断言 ——
+落 #47/#35/#90 那一族。这一条结的是"gate-96 的红集里有没有本缺陷的脚印"，不是"闸口过了"：那仍然要一次安静的全绿。
+
+### 没被这条结掉的
+
+- 填充色到达像素没有断言，而且量测期间有一张同形状捕获的星带是 9 549 灰像素 / **0** 蓝像素（填充穿了继承来的
+  文本色，即 `StateBrush` 走了 `?? Foreground` 那支）。其后四次跑（含 `rating-repeat1/2.png`，`blue=5620` / `5477`）
+  不复现，机制未定，写进 `audits/rating-control.md` 第 12、14 节的不声称清单。
+- 悬停放大那一段仍只在星心与地板上有取值断言；中间段与真指针一起挂在 #13。
+- 高对比逐控件重指（第 6 节）、手柄通路、`ItemInfo` 图片路径的实际位图，都没被这批动过。
+
+### 闸口读数：第三次红，红集第三次不重合（2026-09-23）
+
+`tools/Test-AstraGates.ps1` 在本批的树上跑完套件步就停了，管道自己返回 **1**（`spike/RatingInkProbe/gate-98.log`）：
+
+```
+失败!  - 失败:    13，通过:  1581，已跳过:     0，总计:  1594，持续时间: 27 m 25 s
+```
+
+13 条红，逐条第一手消息：`AstraTreeViewTests` 两条（indent 读回 0、子节点 2 而非 4——树没排版完）、
+`AstraTreeDataGridTests` 三条（含一次两档色带 `#2D2D2D…` vs `#323232…`）、`AstraToggleButtonTests` 与
+`AstraSplitButtonTests` 各一条 resting fill、`AstraTextInputTests` 一条焦点描边、`AstraTextInkTests(Dark)` 一条、
+`AstraTeachingTipTests` 一条、`AstraRatingControlTests.A_settled_row_wears_the_selected_brush…` 一条
+（`Expected: Set / Actual: PointerOverSet`，测试自己没有喂指针，读回的是真鼠标落在新窗口上的 hover）、
+`AstraProgressRingTests` 一条（`the pump delivered 0 frame(s) of the 2`，#47 那条仪器形状）、`AstraNavigationTests` 一条。
+
+判读三条，按能证到多少写多少：
+
+1. **本批的断言是绿的。** `Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left` 与其余 63 条 rating 测试
+   都通过，红的这条 rating 测试红在状态枚举而不是几何，且它测的是"没喂指针时应当是 `Set`"——真指针能把它弄成
+   `PointerOverSet`，与 lane 无关。单跑 `--filter FullyQualifiedName~AstraRatingControlTests` 打印
+   `失败: 0，通过: 64，总计: 64`，即这条红只在整套顺序跑里出现——这正是 #47/#35/#90 那一族的形状。
+   按纪律说清楚：**单跑绿不清顺序红的账**，它只说明这条不能在孤立状态下归给本批。
+2. **环境不是空口**：启动时同机在跑 `C:\git\LanDesktop\LanMountainDesktop` 的构建（快照
+   `spike/RatingInkProbe/ambient-before-gate.txt`），27 m 25 s 对 gate-93 的 7 m 48 s，慢 3.5 倍，
+   红的全部是"要真窗口、要帧、要指针位置"的那一族。
+3. **但这句话第三次说了，一次都没被读数结掉。** `feb45af` 全绿之后连续三次红，红集互不重合
+   （3 条 / 10 条 / 13 条），#96、#97、#98 三批都压在"闸口未过"上。因此下一批不再往里加账，
+   先做 #90/#47/#80 那一族的机制：把"整套顺序跑之后红"复现出来并归因，否则任何一批都收不了口。
+
+
+
 
 
