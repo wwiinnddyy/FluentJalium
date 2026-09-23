@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-791 lines collected from 46 sections across 45 documents.
+800 lines collected from 47 sections across 45 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -941,7 +941,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 89 lines
+## ROADMAP.md - 98 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -963,6 +963,10 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:3101` - ③ `TextDisabled` / `TextOnAccent` 仍无读者、`CaptionFontSize` 仍是 Known Gap，本轮不替它们改判。
 - `ROADMAP.md:3412` - gap 表里最后一个名字。目标给它写的预判是"无 `Double` 载体 → Known Gap"，第三轮那句"别名层这条杠杆只吃 Brush 形名字；
 - `ROADMAP.md:3580` - Known Gaps。
+- `ROADMAP.md:3714` - - **字族偏差没动（Known Gap #75，仍未闭合）**：这台宿主投影的是 `Microsoft YaHei UI`，上游的排印是 Segoe UI Variable 一族。本批刻意把三个
+- `ROADMAP.md:3784` - 说明不是"没重新渲染"；③**选中的那一块在禁用态一点没变暗**——上游的禁用日历会把选中填充压下去（这条按 Known Gap 记，#76 未修）。
+- `ROADMAP.md:3853` - **不声称**：① E 那一类外部焦点变化在真实闸口里既造不出也排不掉（Known Gap #47）——本批只做到"我们这条子菜单测点不再依赖它"。
+- `ROADMAP.md:3984` - **两条留着没删的等待，都是量出来该留的（Known Gap #80）**：箭头的 `Data` 是动画插值，`NotEqual(resting, …)` 是"经过渲染时间"的
 ### 非主张与 Known Gap（余账另立 #82）
 
 - `ROADMAP.md:4066` - - **平台那一半仍未落地**：八个 `GetSysColor` 值没有一个等于框架答出来的值（`#A0A0A0` 对 `#F5F5F7`、
@@ -1001,40 +1005,47 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4206` - 每一行都进清单：把这一节写完，行数从 776 涨到 808，小节从 45 涨到 46；补上这一条，又涨到 813。这不是 bug（清单要
 - `ROADMAP.md:4207` - 的就是"每一句坦白都能追到 `file:line`"，本节也是坦白），但它让"清单里写着多少行"变成一个自指主张。处置：先落内容、
 - `ROADMAP.md:4208` - 跑生成器，再把标题与表里的数改成**最后一次生成读到的那个**，然后重跑——改字符不改行数，所以第二次生成即不动点。
-- `ROADMAP.md:4209` - 自指的代价写在这里，不靠"反正下次会重算"糊过去。
-- `ROADMAP.md:4210` - 6. **第一版清单自己不好读。** 跑绿之后回头看产物，两处结构错：(a) 每个 Known Gaps 小节的标题既成了分组标签又占一行，
-- `ROADMAP.md:4211` - 46 个小节因此各多一条形如 "file:line -## 5. Known Gaps" 的行，把"行数"这个主张虚涨了 46；(b) 自带标记的行与破折号
-- `ROADMAP.md:4212` - 粘在一起（":544 -于是…"），小节内行却带一个空格（"- 1. CommandBar…"），同一份表里两种形状。改成标题一律是结构
-- `ROADMAP.md:4213` - 不是行、行统一 "file:line - 文本"。判据：先确认 46 这个数正好等于小节数，再动手——"看起来重复"要有计数支撑。
-- `ROADMAP.md:4217` - - `missing` 腿：往一篇本来不带标记的文档（`adaptation/02-render-ceiling.md`）追一行含标记的散文 →
-- `ROADMAP.md:4218` - 测点红在"Documents state a Known Gap but the inventory does not carry them"。
-- `ROADMAP.md:4219` - - `stale` 腿：把 `audits/divider.md` 唯一那条 `## 6. Known Gaps（不声称清单）` 标题改成 `Deferred items` →
-- `ROADMAP.md:4220` - 测点红在另一侧"the inventory lists documents that no longer state one"。
-- `ROADMAP.md:4221` - - 两处都 `git checkout --` 原地还原，还原后同一条测点绿（五次跑 base / m1 / missing / stale / restored 都在
-- `ROADMAP.md:4222` - `spike/SystemColorProbe/gap-teeth-*.log`）。
-- `ROADMAP.md:4223` - - `m1` 那一次绿，**不是牙齿**：我第一次往一篇本来就在清单里的文档追了一行标记，测点不动——它比的是**文件集**，
-- `ROADMAP.md:4224` - 同一篇里多一行少一行它看不见。所以这条测点真正挡的是"没登记就新增/删掉一篇"，逐字形状的过期是 `-Check` 那一半的活，
-- `ROADMAP.md:4225` - 两者不互推（这条分工本来就写在交付表里，m1 是它的实证）。
-- `ROADMAP.md:4226` - - 去重之后两条腿的结论仍然成立：`missing` 腿追的是**行**，`stale` 腿改的是**标题**——标题虽然不再成行，但它带着标记
-- `ROADMAP.md:4227` - 就仍把小节撑开，小节里的条目行照收。所以这份清单的"覆盖面"主张不靠"每个小节自己占一行"，去重只去掉重复，不去掉读者。
-- `ROADMAP.md:4231` - `powershell -NoProfile -ExecutionPolicy Bypass -File tools/Test-AstraGates.ps1 -Configuration Debug`，
-- `ROADMAP.md:4232` - 日志 `spike/SystemColorProbe/gate-83c.log`，**退出码 0**：
-- `ROADMAP.md:4234` - | 步 | 读数 |
-- `ROADMAP.md:4236` - | restore / build (Debug) | 已成功生成，0 个警告 0 个错误 |
-- `ROADMAP.md:4237` - | test suite (structure, resource keys, theme runtime) | 失败 0，通过 1575，已跳过 0，总计 1575 |
-- `ROADMAP.md:4238` - | gallery page pixels (13 pages x light, dark, high contrast) | `PASS 13 pages x 3 variants, 0 offender(s)` |
-- `ROADMAP.md:4239` - | palette drift | Light / Dark 各 83 源色 101 刷 `checked=True`；HighContrast 101 映射 + 3 条上游键因调色板无对应按住 |
-- `ROADMAP.md:4240` - | public resource key inventory | `keys.md is current: 1312 canonical lines.` |
-- `ROADMAP.md:4241` - | known gap inventory | `known-gaps.md is current: 788 canonical lines.` |
-- `ROADMAP.md:4243` - 这次跑的就是终态树。之后的改动只有本节自己的文字（订正第 1、6 条的措辞与行数主张），而它是这份清单要数的文档之一，
-- `ROADMAP.md:4244` - 所以行数会再动一次：按第 5 条的不动点程序重生成并改数字，然后单独复跑三份清单的 `-Check` 与那条测点
-- `ROADMAP.md:4245` - （`spike/SystemColorProbe/gate-83d-docs.log`）——纯文字不改代码，测试装配用的还是 gate-83c 那次构建的二进制。
-- `ROADMAP.md:4247` - 四类证据本批只动两类：**行为**（那条新测点与两套清单的 `-Check`）与**文档**。视觉侧没有新主张，页级像素那一行只是
-- `ROADMAP.md:4248` - 继续全绿；硬件输入侧本批不声称。
-- `ROADMAP.md:4252` - - **791 行不等于 791 个缺陷。** 一条缺陷在小节里可以占多行（表格行 + 续行），一行也可以只是散文引用；
-- `ROADMAP.md:4253` - 这份文档的强度是"每一句坦白都能被追到 `file:line`，且没人在不登记的情况下删掉一条"。
-- `ROADMAP.md:4254` - - **看不见没写标记的坦白。** 用别的词说的限制（"这条我们不主张"）不进这份账，所以它是**坦白总量的地板**，
-- `ROADMAP.md:4255` - 不是完备性证明——这句话也印在生成文档的抬头里。
-- `ROADMAP.md:4256` - - 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
+- `ROADMAP.md:4209` - 自指的代价写在这里，不靠"反正下次会重算"糊过去。本节这几处数字是**当次生成的读数**，之后每批补进账本的标记都会把总数往上抬；
+- `ROADMAP.md:4210` - 要此刻的数就读 `known-gaps.md` 第一行，不必回头改这里。
+- `ROADMAP.md:4211` - 6. **第一版清单自己不好读。** 跑绿之后回头看产物，两处结构错：(a) 每个 Known Gaps 小节的标题既成了分组标签又占一行，
+- `ROADMAP.md:4212` - 46 个小节因此各多一条形如 "file:line -## 5. Known Gaps" 的行，把"行数"这个主张虚涨了 46；(b) 自带标记的行与破折号
+- `ROADMAP.md:4213` - 粘在一起（":544 -于是…"），小节内行却带一个空格（"- 1. CommandBar…"），同一份表里两种形状。改成标题一律是结构
+- `ROADMAP.md:4214` - 不是行、行统一 "file:line - 文本"。判据：先确认 46 这个数正好等于小节数，再动手——"看起来重复"要有计数支撑。
+- `ROADMAP.md:4218` - - `missing` 腿：往一篇本来不带标记的文档（`adaptation/02-render-ceiling.md`）追一行含标记的散文 →
+- `ROADMAP.md:4219` - 测点红在"Documents state a Known Gap but the inventory does not carry them"。
+- `ROADMAP.md:4220` - - `stale` 腿：把 `audits/divider.md` 唯一那条 `## 6. Known Gaps（不声称清单）` 标题改成 `Deferred items` →
+- `ROADMAP.md:4221` - 测点红在另一侧"the inventory lists documents that no longer state one"。
+- `ROADMAP.md:4222` - - 两处都 `git checkout --` 原地还原，还原后同一条测点绿（五次跑 base / m1 / missing / stale / restored 都在
+- `ROADMAP.md:4223` - `spike/SystemColorProbe/gap-teeth-*.log`）。
+- `ROADMAP.md:4224` - - `m1` 那一次绿，**不是牙齿**：我第一次往一篇本来就在清单里的文档追了一行标记，测点不动——它比的是**文件集**，
+- `ROADMAP.md:4225` - 同一篇里多一行少一行它看不见。所以这条测点真正挡的是"没登记就新增/删掉一篇"，逐字形状的过期是 `-Check` 那一半的活，
+- `ROADMAP.md:4226` - 两者不互推（这条分工本来就写在交付表里，m1 是它的实证）。
+- `ROADMAP.md:4227` - - 去重之后两条腿的结论仍然成立：`missing` 腿追的是**行**，`stale` 腿改的是**标题**——标题虽然不再成行，但它带着标记
+- `ROADMAP.md:4228` - 就仍把小节撑开，小节里的条目行照收。所以这份清单的"覆盖面"主张不靠"每个小节自己占一行"，去重只去掉重复，不去掉读者。
+- `ROADMAP.md:4232` - `powershell -NoProfile -ExecutionPolicy Bypass -File tools/Test-AstraGates.ps1 -Configuration Debug`，
+- `ROADMAP.md:4233` - 日志 `spike/SystemColorProbe/gate-83c.log`，**退出码 0**：
+- `ROADMAP.md:4235` - | 步 | 读数 |
+- `ROADMAP.md:4237` - | restore / build (Debug) | 已成功生成，0 个警告 0 个错误 |
+- `ROADMAP.md:4238` - | test suite (structure, resource keys, theme runtime) | 失败 0，通过 1575，已跳过 0，总计 1575 |
+- `ROADMAP.md:4239` - | gallery page pixels (13 pages x light, dark, high contrast) | `PASS 13 pages x 3 variants, 0 offender(s)` |
+- `ROADMAP.md:4240` - | palette drift | Light / Dark 各 83 源色 101 刷 `checked=True`；HighContrast 101 映射 + 3 条上游键因调色板无对应按住 |
+- `ROADMAP.md:4241` - | public resource key inventory | `keys.md is current: 1312 canonical lines.` |
+- `ROADMAP.md:4242` - | known gap inventory | `known-gaps.md is current: 788 canonical lines.` |
+- `ROADMAP.md:4244` - 这次跑的就是终态树。之后的改动只有本节自己的文字（订正第 1、6 条的措辞与行数主张），而它是这份清单要数的文档之一，
+- `ROADMAP.md:4245` - 所以行数会再动一次：按第 5 条的不动点程序重生成并改数字，然后单独复跑三份清单的 `-Check` 与那条测点
+- `ROADMAP.md:4246` - （`spike/SystemColorProbe/gate-83d-docs.log`）——纯文字不改代码，测试装配用的还是 gate-83c 那次构建的二进制。
+- `ROADMAP.md:4248` - 四类证据本批只动两类：**行为**（那条新测点与两套清单的 `-Check`）与**文档**。视觉侧没有新主张，页级像素那一行只是
+- `ROADMAP.md:4249` - 继续全绿；硬件输入侧本批不声称。
+- `ROADMAP.md:4253` - - **791 行不等于 791 个缺陷。** 一条缺陷在小节里可以占多行（表格行 + 续行），一行也可以只是散文引用；
+- `ROADMAP.md:4254` - 这份文档的强度是"每一句坦白都能被追到 `file:line`，且没人在不登记的情况下删掉一条"。
+- `ROADMAP.md:4255` - - **看不见没写标记的坦白。** 用别的词说的限制（"这条我们不主张"）不进这份账，所以它是**坦白总量的地板**，
+- `ROADMAP.md:4256` - 不是完备性证明——这句话也印在生成文档的抬头里。
+- `ROADMAP.md:4257` - - 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
+- `ROADMAP.md:4261` - 一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
+- `ROADMAP.md:4273` - | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准（本批最后一次生成读到 800 行 / 47 小节 / 45 篇；往后的批次只会让它继续涨，所以**抬头那一行才是当下值**） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——...
+### 这一节自己的 Known Gap
 
-<!-- canonical-lines=791 sha256=f87e66d7b7c17bbcf6721042f898c87ce3a55872d194731096d7e9b4ccabe43f -->
+- `ROADMAP.md:4298` - "一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+- `ROADMAP.md:4299` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
+
+<!-- canonical-lines=800 sha256=a7cdf68afac3536028a2607ee5287dc06721a959ecad390e8643bcefc2ad6a4d -->

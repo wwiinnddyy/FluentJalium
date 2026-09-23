@@ -3711,7 +3711,7 @@ holder: Jalium.UI.Managed
 
 ### 这一批没有做
 
-- **字族偏差没动**：这台宿主投影的是 `Microsoft YaHei UI`，上游的排印是 Segoe UI Variable 一族。本批刻意把三个
+- **字族偏差没动（Known Gap #75，仍未闭合）**：这台宿主投影的是 `Microsoft YaHei UI`，上游的排印是 Segoe UI Variable 一族。本批刻意把三个
   族名原样传回。"该用哪个字族、缺字怎么兜底"是独立一笔，而且 #50/#62 还没给出文字墨迹判据，现在换字族等于
   闭眼改视觉。
 - 没有新增或删改资源键：`keys.md` 应当一字不动（这一批改的是一个调用，不是一行键）。
@@ -3781,7 +3781,7 @@ back to resting          accent=88  distinct=39
 
 固定月份 + 固定选中日，因此这四个数不依赖系统时钟。可读出的三件事：
 ①状态**能**到达一个没有部件的控件（88 → 648，且可逆）；②禁用确实重画了整张脸（页面与网格线色都动），
-说明不是"没重新渲染"；③**选中的那一块在禁用态一点没变暗**——上游的禁用日历会把选中填充压下去。
+说明不是"没重新渲染"；③**选中的那一块在禁用态一点没变暗**——上游的禁用日历会把选中填充压下去（这条按 Known Gap 记，#76 未修）。
 这条是新的用户可见偏差候选，开成 **#76**：自绘值由控件自己解析，我们既没有格子也没有部件可写，
 能做的只有名字，而这个名走的恰好是看不见的文字层。
 
@@ -3850,7 +3850,7 @@ Popup.ClosePopup`。也就是说"关掉"发生在弹层自己身上，菜单只�
 读框架抄出来的格子），改回并去掉 settle 后 1/1 绿，新那条 1/1 绿。视觉：**没有新增像素主张**，本批没动任何样式。
 硬件输入：仍为零，`RaiseMouseDown` 走的是公开路由事件门，探针也没动真指针。
 
-**不声称**：① E 那一类外部焦点变化在真实闸口里既造不出也排不掉——本批只做到"我们这条子菜单测点不再依赖它"。
+**不声称**：① E 那一类外部焦点变化在真实闸口里既造不出也排不掉（Known Gap #47）——本批只做到"我们这条子菜单测点不再依赖它"。
 同一种暴露还挂在弹层族其余测点上，而且更宽：`FlyoutBase.IsOpen` 不是一份存着的旗，它写的是
 `_popup?.IsOpen == true`（`Primitives/FlyoutBase.cs:97`），所以 `AstraMenuTests` 里那两条"ShowAt 之后它是开的"、
 `AstraAppBarTests` 的溢出条、`AstraAutoSuggestBoxTests` 的建议列表，读的同样是"这一拍里有没有人抢走焦点"——
@@ -3981,7 +3981,7 @@ raise `Opened`/`Closed`（`Controls/Popup/FluentTeachingTip.cs:327-339`、`379-3
 `AstraComboBoxTests` 两条：`toggle.IsChecked` 与 `PART_Popup.Width` 搬到 rung 0，`An_open_combo_grafts...` 补上
 rung 0 的 open 主张，并把整段搬进 `try/finally`——`finally` 里关掉下拉（#47 的"自己开自己关"，此前这条开着不关）。
 
-**两条留着没删的等待，都是量出来该留的**：箭头的 `Data` 是动画插值，`NotEqual(resting, …)` 是"经过渲染时间"的
+**两条留着没删的等待，都是量出来该留的（Known Gap #80）**：箭头的 `Data` 是动画插值，`NotEqual(resting, …)` 是"经过渲染时间"的
 主张，与第二成员的环同形，帧数守卫另立 #80；`ActualHeight` 在 rung 0 是 0，所以长条目那条与几何那半真的要一帧。
 
 **又一处"只读表面"的瞎测点**：把 S13 那条改成"开完立刻关再读"，它**绿**——`popup.Child` 在关闭之后仍带着名字、
@@ -4206,7 +4206,8 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
    每一行都进清单：把这一节写完，行数从 776 涨到 808，小节从 45 涨到 46；补上这一条，又涨到 813。这不是 bug（清单要
    的就是"每一句坦白都能追到 `file:line`"，本节也是坦白），但它让"清单里写着多少行"变成一个自指主张。处置：先落内容、
    跑生成器，再把标题与表里的数改成**最后一次生成读到的那个**，然后重跑——改字符不改行数，所以第二次生成即不动点。
-   自指的代价写在这里，不靠"反正下次会重算"糊过去。
+   自指的代价写在这里，不靠"反正下次会重算"糊过去。本节这几处数字是**当次生成的读数**，之后每批补进账本的标记都会把总数往上抬；
+   要此刻的数就读 `known-gaps.md` 第一行，不必回头改这里。
 6. **第一版清单自己不好读。** 跑绿之后回头看产物，两处结构错：(a) 每个 Known Gaps 小节的标题既成了分组标签又占一行，
    46 个小节因此各多一条形如 "file:line -## 5. Known Gaps" 的行，把"行数"这个主张虚涨了 46；(b) 自带标记的行与破折号
    粘在一起（":544 -于是…"），小节内行却带一个空格（"- 1. CommandBar…"），同一份表里两种形状。改成标题一律是结构
@@ -4255,5 +4256,45 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
   不是完备性证明——这句话也印在生成文档的抬头里。
 - 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
 
+## 1.0 终态快照（目标项 7 的"账本与 ROADMAP 终态"那一半，2026-09-23）
 
+一句总账：WinUI 3 外观的复刻面已经全部走完九步出口；剩下的账只有两种——**量不到的**（带标记记进 Known Gaps，
+生成的清单收得到）与**该干还没干的**（下面的 (b) 类）。这一节不新增主张，只把已经有出处的数摆在一处，每行都能重算。
+
+### 每一项的重算方法
+
+| 主张 | 当前读数 | 怎么重算 |
+|---|---|---|
+| 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
+| Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
+| 串行闸口 | build `0 警告 0 错误` → **1575 / 1575，0 失败 0 跳过** → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)` → 三档调色板 `checked=True` → `keys.md is current: 1312 canonical lines.` → `All Astra gates passed.`，管道退出码 0 | `tools/Test-AstraGates.ps1 -Configuration Debug`；日志按批留在 `spike/SystemColorProbe/gate-83*.log` 与本批的 `gate-84.log` |
+| 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
+| 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
+| Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准（本批最后一次生成读到 800 行 / 47 小节 / 45 篇；往后的批次只会让它继续涨，所以**抬头那一行才是当下值**） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
+
+### (a) 量不到的那批：逐条对得上出处，也都在这份清单里
+
+- **#8** 材质合成效果本环境验不了（Mica/Acrylic 要真桌面在窗口后面）：`audits/window-shell.md:128`
+- **#21** 剩余视觉差（弹层与表面的半径、烟幕层）：`audits/content-dialog.md:94`、`audits/infobar.md:125`
+- **#47** 顺序跑时的外部焦点变化既造不出也排不掉：`ROADMAP.md:3853`（本批把标记补进原句）；同族另一条
+  "子菜单在进程内根本开不了"本来就在 `audits/menu-flyout.md:141`
+- **#56** 228 条状态 Setter 只测到"键能解析"、5 处未命名部件：`audits/foreground.md:97`、`audits/foreground.md:91`
+- **#62** 字形不打印，差分表只覆盖 4 个主体 / 3 条通路：`audits/icon-family.md:135`
+- **#68** 键盘框在库里现在有两套形状（交环的 12 处是 2px+1px 双圈，其余 3px 单圈）：`audits/focus-visual.md:152`
+- **#73** 位置驱动指针档与 `Click` 不可达：`ROADMAP.md:3580`
+- **#75** 字族投影是本机 `Microsoft YaHei UI`，不是上游 Segoe UI Variable 一族：`ROADMAP.md:3714`（本批补标记）
+- **#76** 禁用日历的选中块不变暗：`ROADMAP.md:3784`（本批补标记）
+- **#78** 减动效关不掉 `ProgressRing` 的自转（动画器把 900°/2s 写死在代码里）：`audits/motion.md:87`
+- **#80** ComboBox 箭头的 `Data` 是动画插值，"它变了"这条判据要帧数守卫：`ROADMAP.md:3984`（本批补标记）
+- **#82** 高对比的平台那一半：八个 `GetSysColor` 值没有一个等于框架答出来的槽：`ROADMAP.md:4066`
+
+### (b) 该干还没干的那批：不是"做不到"，别混进 (a)
+
+#8 材质可驱动面的实测、#21 重影与间距的逐页目视复核、#56 七个 owner 的到达性、#62 的上游复现提报、
+#68/#73/#75/#76 的修法本身、#78 的帧循环开关、#80 的帧数守卫、#82 的读取路线定案。
+
+### 这一节自己的 Known Gap
+
+"一比一复刻"的**目视**那一半没有替身：三档像素闸判的是"我们的令牌上了屏、框架强调绿没上屏、上游占位符没上屏"，
+不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
 
