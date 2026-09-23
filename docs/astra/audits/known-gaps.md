@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-936 lines collected from 52 sections across 46 documents.
+937 lines collected from 52 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -1041,7 +1041,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 137 lines
+## ROADMAP.md - 138 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1192,5 +1192,6 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4752` - 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
 - `ROADMAP.md:4753` - 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
 - `ROADMAP.md:4754` - 但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
+- `ROADMAP.md:4776` - `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
 
-<!-- canonical-lines=936 sha256=01051eee09969a5886077f8ec5955e663362707fdb41904f993f254fcd99aa50 -->
+<!-- canonical-lines=937 sha256=8491efd338ca08afb76536a9cc223ff8f250e7044c6e51c4b4d76f0df194a11d -->

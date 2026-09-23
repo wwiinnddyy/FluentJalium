@@ -4267,7 +4267,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 |---|---|---|
 | 隐式样式宇宙 | 60 行 = **48 audited / 11 own-type / 1 no-upstream-control / 0 ported** | `grep -o '"parity": "[a-z-]*"' samples/FluentJalium.Gallery/Catalog.json` 数三档；`ported` 归零是 #64（TextBlock/Typography 推到 audited）的结果，目标里那句"47 / 11 / 1 / 1"是它之前的基线 |
 | Gallery 覆盖 | 13 页 / 60 条控件行 | 同一文件的 `pages` 数组；也记在 `adaptation/10-gallery-catalog.md:119` |
-| 串行闸口 | **最新一次（`gate-92.log`，提交 `3cee913` 的树）：全绿** —— 套件 `已通过! 失败: 0，通过: 1589，总计: 1589，7 m 35 s` → 页级像素 `PASS 13 pages x 3 variants, 0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1312 canonical lines.` → `known-gaps.md is current: 927 canonical lines.` → `All Astra gates passed.`，管道自己那一步的退出码 0。这一行的前四跑都不是全绿，形状留着别丢：页闸红 9 条（`gate-88.log`）/ 套件红 Rating 1 条（`gate-88b.log`）/ 套件红 TeachingTip 1 条（`gate-88c.log`）/ 页闸红 materials-HighContrast 2 条（`gate-91.log`），被点名的测点单跑都绿（`pixels-solo-1.log`、`solo-teachingtip.log` 74/74）——**一次全绿没有解释其中任何一条**：页闸槽宽在跑与跑之间 980/788 跳的机制仍未量，#47/#90 原样挂着（详见本节末`tools/Test-AstraGates.ps1 -Configuration Debug`；日志按批留在 `spike/SystemColorProbe/gate-*.log` 与 `spike/ForegroundArrival/gate-*.log`（最新 `gate-91.log`、`gate-92.log`；单跑对照 `pixels-solo-1.log`、`solo-teachingtip.log`）；三档调色板与两份清单每次改动后各自 `-Check` 当场对过 |
+| 串行闸口 | **最新一次（`spike/NavIconRecolor/gate-94b.log`，提交 `3f66093` 的树）：没有全绿** —— 套件步红 1 条（`失败: 1，通过: 1590，总计: 1591`，红的是 `AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has`，即 `gate-88c` 那个成员），管道自己打印 `GATE-EXIT=1` 并停在套件步。闸口后四步在同一片干净树上单独跑过：页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`、调色板 `-Check` 退出 0、`keys.md is current: 1312 canonical lines.`、`known-gaps.md is current: 937 canonical lines.`。**最近一次整条管道全绿仍是 `gate-92.log`（1589 条）**，形状照旧别丢：页闸红 9 条（`gate-88.log`）/ 套件红 Rating 1 条（`gate-88b.log`）/ 套件红 TeachingTip 1 条（`gate-88c.log`、`gate-94b.log`）/ 页闸红 materials-HighContrast 2 条（`gate-91.log`），被点名的测点单跑都绿（`pixels-solo-1.log`、`solo-teachingtip.log` 74/74，另加 `spike/NavIconRecolor/pair-nav-teachingtip.log` 154/154）——**一次全绿没有解释其中任何一条**：页闸槽宽在跑与跑之间 980/788 跳的机制仍未量，#47/#90 原样挂着（日志按批留在 `spike/SystemColorProbe/gate-*.log`、`spike/ForegroundArrival/gate-*.log` 与 `spike/NavIconRecolor/gate-94*.log`；三档调色板与两份清单每次改动后各自 `-Check` 当场对过）
 | 调色板 | Light / Dark 各 83 源色、101 刷；HighContrast 101 映射，3 条上游键因调色板无对应而按住 | `tools/Sync-AstraPalette.ps1 -Check` |
 | 公开资源键 + 消费点反查 | `keys.md` 1312 canonical lines；键消费点反查闸覆盖 14 份字典，逐行反查"这行有没有读者"，全绿；死键的处置是删行而不是接假消费点 | `tools/Report-AstraResourceKeys.ps1 -Check` ＋闸口里那一族 `*_are_read_by_a_*` 测点（同一次跑覆盖） |
 | Known Gaps 全集 | 行数以 `docs/astra/audits/known-gaps.md` **第一行**为准——这里刻意不留一个写死的数：本节自己就在清单要数的目录里，写下的任何数都会因"写下它"而失真（#83 纠正 5） | `tools/Report-AstraKnownGaps.ps1 -Check`。这里刻意不钉死数字：理由见 #83 纠正 5 与 6——本节就在这份清单要数的目录里 |
@@ -4752,3 +4752,28 @@ All Astra gates passed.   GATE-EXIT=0
 3. **高对比档**下图标跟不跟换没量——页闸三档跑的是静态挂载，看不见这类"活树上才浮现"的缺陷。
 4. 图标是否**真的印出墨**仍受 #50 限制：本批的墨色读数来自抓屏，不来自进程内捕获，所以这条比 #50 强，
    但它只覆盖 Gallery 侧栏那六枚 `SymbolIcon`。
+
+### #94 闸口补记：两次跑各红在一步，红的那条不是本批的（2026-09-23）
+
+`3f66093`（含 #94 的修法与两条测点）之后跑了两次串行闸口，各卡在不同一步，两条读数都要留着：
+
+1. `spike/NavIconRecolor/gate-94.log`：套件步 `已通过! - 失败: 0，通过: 1591，总计: 1591`（**含 #94 新两条**），
+   随后 `build page pixel gate` 一步红——红因不在提交里，而在**工作树里那份从没编译过的 #93 诊断**
+   （`tools/AstraPagePixels/Program.cs` 的 `host.Children.Select(...)` 对 `ImmutableArray<UIElement>` 推不出类型参数，CS0411）。
+   管道打 `GATE-EXIT=1`。处置：把那份诊断连同"它从未产出过读数"的说明存成 `spike/PagePixelsPlateDiag/`，
+   工具文件还原到 HEAD，再跑第二次。**这一跑不能当"含 #94 的树过了套件"**——它确实过了，但闸口整体没绿，
+   而且它量的树与提交不一致。
+2. `spike/NavIconRecolor/gate-94b.log`（干净树）：套件步 `失败: 1，通过: 1590，总计: 1591`，
+   红的是 `AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has`
+   （`Expected: Bottom / Actual: Top`，翻转后的卡片没挪到锚点下沿 `-185.9`）——`gate-88c` 同一个成员，#47 那一族。
+   定责做了，不是"看着不像我"：该类单跑 `74/74` 绿（`solo-teachingtip.log`），
+   与 `AstraNavigationTests`（本批翻档的那两条）**同进程连跑 `154/154` 绿**（`pair-nav-teachingtip.log`），
+   而同一片测试内容 25 分钟前的第 1 跑是 `1591/1591` 全绿。三条一起说的是：这条红只在整套顺序里现身，
+   且本批的两条不是它的触发者——**但这不等于机制量到了**，#47/#90 照旧挂着。
+3. 闸口后四步在同一片干净树上单独跑绿（`gate-94c-*.log`）：页级像素 `PASS 13 pages x 3 variants, 0 offender(s)`
+   （顺带一条：#94 把浅色下的图标墨从 `#FFFFFF` 改成 `#1A1A1A`，页闸的判据是"页面相对空槽有没有墨"，
+   没有逐色阈值，所以这一跑绿不构成"图标颜色被页闸看着"的证据），调色板 `-Check` 退出 0，
+   `keys.md` 1312 条当前，`known-gaps.md` 937 条当前（#94 新增一节 Known Gaps 后重生成）。
+
+一句界限：**含 #94 的树至今没有一次整条管道全绿**，最近一次全绿仍是 `gate-92.log` 的 1589 条。
+本批的主张不依赖闸口——修法由抓屏 A/B 与两条各有自己突变的事实撑着；闸口这里只记"它红在哪一步、红的那条是谁"。
