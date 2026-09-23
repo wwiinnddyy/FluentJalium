@@ -1,0 +1,5 @@
+grabbed pid=47796 hwnd=459240 rect=25,25,984x540 -> spike\GlyphInkProbe\grab.png
+probe closed pid=47796
+box cell-dip=24 columns=40 rows=20 box-dip=960x480 at 40,94 size 944x446 red pixels=4169
+scale from the box: 0.9833 px per DIP (box width 944 px for 960 DIP)
+BOX RATIO OFF: width says 0.9833 px/DIP, height says 0.9292 - the red box is clipped or something is on top of it

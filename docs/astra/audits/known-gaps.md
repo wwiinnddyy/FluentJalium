@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-990 lines collected from 54 sections across 46 documents.
+1014 lines collected from 55 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -428,23 +428,38 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:200` - 能红，留着就是拿相邻证据冒充到达性）；③ `:38` 那行同键、住在 `TabViewButtonStyle`，载体是滚动按钮，只在标签条
 - `audits/foreground.md:201` - 溢出时才实现，本批**没量到**，不许按前两行外推。日志 `spike/ForegroundArrival/mut-tabdis-*.log`。
 
-## audits/icon-family.md - 13 lines
+## audits/icon-family.md - 28 lines
 
 ### 6. Known Gaps
 
-- `audits/icon-family.md:136` - 1. **字形有没有画出来，测不出来。** 同一张白底上放一个普通 `TextBlock`（纯文本、有字号、有前景）也印不出墨——
-- `audits/icon-family.md:137` - 这条路对文本是瞎的（`adaptation/00` S1-r 第 3 条，本段在 spike/IconFamilyProbe 里复测）。因此本族**不声称**
-- `audits/icon-family.md:138` - 任何 `SymbolIcon`/`FontIcon` 的字形到达像素；能声称的只有 `PathIcon` 的几何填充（400 px / 4096 px 两个数）。
-- `audits/icon-family.md:139` - 2. `Symbol` 的 4 个名字画的字与上游不同（第 2 节表），这一层无法修正：号在运行时枚举里，读它的类型只认这个枚举。
-- `audits/icon-family.md:140` - 应用要拿到上游那张图，得自己写 `FontIcon.Glyph`。
-- `audits/icon-family.md:141` - 3. 26 个上游名字在本族枚举里不存在，其中 12 个连字形号都没人承载。
-- `audits/icon-family.md:142` - 4. 上游有 `BitmapIcon`/`ImageIcon` 与整个 `IconSource` 家族，这里没有；`FluentInfoBadge` 的图标入口因此是
-- `audits/icon-family.md:143` - `IconElement` 而不是 `IconSource`。
-- `audits/icon-family.md:144` - 5. 高对比度下上游靠 `IconElement.Foreground` 的继承链改变图标颜色；这里 `Foreground` 默认读回 null 且没有可挂的
-- `audits/icon-family.md:145` - 隐式样式（运行时不给非 `Control` 应用样式的路子未验证），高对比的图标颜色**未声称**。
-- `audits/icon-family.md:146` - 6. `PathIcon` 在没有显式尺寸时铺满槽位，与上游"16x16 + Uniform"不同；本层不改（改了就是替运行时发明默认值），
-- `audits/icon-family.md:147` - 只把量到的数记在这里，并在测试里钉住铺满这一半。
-- `audits/icon-family.md:148` - 7. 指针/键盘/触摸在本族没有对应路径（`IconElement` 不是可交互控件，上游也一样），因此本段无硬件输入证据。
+- `audits/icon-family.md:150` - 1. **字形墨在进程内通路上仍然测不出来，在整屏通路上测得出来——本条已按 96 重画边界，不再是"测不出来"。**
+- `audits/icon-family.md:151` - 进程内捕获会重跑渲染，对白底上的 `TextBlock` 与字形都是瞎的（`adaptation/00` S1-r 第 3 条）；监视器抓取看得见。
+- `audits/icon-family.md:152` - `spike/GlyphInkProbe` 量到的数：`SymbolIcon` 764 格里 **644 格有墨**，`FontIcon`+Segoe Fluent Icons **761**，
+- `audits/icon-family.md:153` - +Segoe MDL2 Assets **762**（`symbol` 档跑了两次并逐格比对：729 个不同码点的墨数与签名全部相同；`fluent`/`mdl2`
+- `audits/icon-family.md:154` - 各两次的汇总行相同）。同屏的文本对照格 272 px 墨、空白格 0 px，所以"整片为 0"读作仪器坏，读不作字体结论。
+- `audits/icon-family.md:155` - 第 9 节给全数与仪器账。
+- `audits/icon-family.md:156` - 2. `Symbol` 的 4 个名字画的字与上游不同（第 2 节表），这一层无法修正：号在运行时枚举里，读它的类型只认这个枚举。
+- `audits/icon-family.md:157` - 应用要拿到上游那张图，得自己写 `FontIcon.Glyph`。
+- `audits/icon-family.md:158` - 3. 26 个上游名字在本族枚举里不存在，其中 12 个连字形号都没人承载。
+- `audits/icon-family.md:159` - 4. 上游有 `BitmapIcon`/`ImageIcon` 与整个 `IconSource` 家族，这里没有；`FluentInfoBadge` 的图标入口因此是
+- `audits/icon-family.md:160` - `IconElement` 而不是 `IconSource`。
+- `audits/icon-family.md:161` - 5. 高对比度下上游靠 `IconElement.Foreground` 的继承链改变图标颜色；这里 `Foreground` 默认读回 null 且没有可挂的
+- `audits/icon-family.md:162` - 隐式样式（运行时不给非 `Control` 应用样式的路子未验证），高对比的图标颜色**未声称**。
+- `audits/icon-family.md:163` - 6. `PathIcon` 在没有显式尺寸时铺满槽位，与上游"16x16 + Uniform"不同；本层不改（改了就是替运行时发明默认值），
+- `audits/icon-family.md:164` - 只把量到的数记在这里，并在测试里钉住铺满这一半。
+- `audits/icon-family.md:165` - 7. 指针/键盘/触摸在本族没有对应路径（`IconElement` 不是可交互控件，上游也一样），因此本段无硬件输入证据。
+- `audits/icon-family.md:166` - 8. **`SymbolIcon` 有 120 枚画不出任何墨，而这 120 个码点在两个已装图标的字体里都有。** `match-cmap.py` 逐枚查
+- `audits/icon-family.md:167` - `SegoeIcons.ttf`（2033 码点）与 `segmdl2.ttf`（1833）：这 120 格**一个都不能用"字体里没有"解释**（0/120），
+- `audits/icon-family.md:168` - 而同一批码点交给 `FontIcon` 有 118 格出墨（两档都是 118）。洞在运行时的 symbol→字形那段，不在字体，
+- `audits/icon-family.md:169` - 也不在本层——本层拿不到那段（`SymbolIcon` 没有 `FontFamily`，`spike/GlyphInkProbe` 读它只读到 `<no FontFamily property>`）。
+- `audits/icon-family.md:170` - 9. **`SymbolIcon` 画的是哪套字形，没定出来。** 它与 `FontIcon`+MDL2 的签名一致率 2.3%、与 +Fluent 的 1.0%，
+- `audits/icon-family.md:171` - 而"两个不同字体走同一个要素"的对照是 19.1%（都限定在墨数相差 10% 以内的格上，排掉尺寸这一混淆）。
+- `audits/icon-family.md:172` - 这只能说"它跟两个具名字体都不一样"，不能说它是第三个哪一种——候选扫完 13 个文件：机器上没装 `segoesym.ttf`
+- `audits/icon-family.md:173` - （Segoe UI Symbol），`segoeui.*`／`segoepr*`／`segoesc*` 都在 609 个有墨格上直接矛盾，`symbol.ttf` 读不出 cmap。
+- `audits/icon-family.md:174` - 10. **cmap 有 ≠ 画得出，画得出 ≠ cmap 有。** `AlarmClock/U+E919` 与 `ScreenCapture/U+E7A0` 不在
+- `audits/icon-family.md:175` - `SegoeIcons.ttf` 的 cmap 里，`SymbolIcon` 那两格却有墨；反过来 `DataSenseBar/U+E7A5` 两档具名字体都有号，
+- `audits/icon-family.md:176` - 走 `FontIcon` 时是空的。因此第 2 节那张命中表与 s2 的 cmap 差分量不了"用户看得见几个图标"，
+- `audits/icon-family.md:177` - 两条通路要分开记（本批把像素那半补上了，cmap 那半不动）。
 
 ## audits/info-badge.md - 14 lines
 
@@ -1056,7 +1071,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 176 lines
+## ROADMAP.md - 185 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1248,5 +1263,14 @@ Categorised summaries live in `ROADMAP.md`.
 
 - `ROADMAP.md:4945` - 1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
 - `ROADMAP.md:4946` - 现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
+- `ROADMAP.md:5003` - 1. **`SymbolIcon` 有 120 枚（764 之）画不出任何墨，而字体里都有这些号。** 洞在运行时的 symbol→字形那段，
+- `ROADMAP.md:5004` - 本层没有可达的通路（`SymbolIcon` 没有 `FontFamily`，也没有可重模板的 `Template`）。提给上游，与 #62 同族。
+- `ROADMAP.md:5005` - 2. **`SymbolIcon` 到底用哪套字形，没定出来。** 13 个候选字体文件扫完：机器上没装 Segoe UI Symbol，
+- `ROADMAP.md:5006` - `segoeui.*`／`segoepr*`／`segoesc*` 在 609 个有墨格上直接矛盾，`symbol.ttf` 读不出 cmap。
+- `ROADMAP.md:5007` - 只能说它跟两个具名字体都不一样。
+- `ROADMAP.md:5008` - 3. **cmap 有 ≠ 画得出，画得出 ≠ cmap 有。** `U+E919`/`U+E7A0` 不在 `SegoeIcons.ttf` 的 cmap 里却有墨，
+- `ROADMAP.md:5009` - `U+E7A5` 两档字体都有号走 `FontIcon` 却是空的。因此 s2 那张 cmap 差分量不了"用户看得见几个图标"，
+- `ROADMAP.md:5010` - 两条通路要分开记。
+- `ROADMAP.md:5016` - 在这之前 Known Gap 第 2 条那句"哪套字形"还悬着——把它量掉，才谈得上逐宿主换形状。
 
-<!-- canonical-lines=990 sha256=998553ac28e5124bfcf90864ca2fa08e91d0f4bb88602183daa9625b45228839 -->
+<!-- canonical-lines=1014 sha256=ecea70dc0279528f81c2dd25ecb29d2ca2385e2f2f0eb44023dc7324a505cd9c -->

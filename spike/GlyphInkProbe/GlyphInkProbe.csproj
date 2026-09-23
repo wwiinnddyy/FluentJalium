@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- #96: does a Symbol glyph put ink on the screen, per symbol? The claim this replaces - "字形有没有画出来测不出
+       来" (audits/icon-family.md 6.1) - was written when the only capture paths were in-process, and an in-process
+       RenderTargetBitmap re-runs the render pass, so it cannot see draw-time glyph resolution. A monitor grab does
+       see glyph ink (#94/#95 measured 168 px and 519 px of it). This probe lays every Symbol enum value on a white
+       grid at a known box so a grab can be counted cell by cell. Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>GlyphInkProbe</RootNamespace>
+    <AssemblyName>GlyphInkProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS8618;CS8625;CS8600;CS8602;CS8604</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

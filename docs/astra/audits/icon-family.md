@@ -131,11 +131,28 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 各模板继续写字面量 `"Segoe Fluent Icons"`；`AstraIconFamilyTests` 把"这个键查不到"和"三种写法都空"
 一起钉住，等哪天运行时能承载这行，测试会红，那时再抄。
 
+**本节第 5 行管不到"字面量属性"这一形**（#96/#97 复量，2026-09-23）。上表四行的值都要先经一次资源查找
+（三种 `x:Key` 写法）或一次 `{ThemeResource}` 交接，被丢掉的是那一步；直接在要素上写 `FontFamily="名字"` 是另一条解析路。
+`spike/GlyphInkProbe` 把两形各读一次：
+
+| 写法 | 读回 | 墨 |
+| --- | --- | --- |
+| `<FontIcon Glyph="&#xE700;" FontSize="20" FontFamily="Segoe Fluent Icons" />` | `FontFamily.Source == "Segoe Fluent Icons"`，`Glyph=U+E700`，`FontSize=20` | 见下 |
+| `<TextBlock Text="MW" FontSize="20" FontFamily="Segoe MDL2 Assets" />` | `FontFamily.Source == "Segoe MDL2 Assets"` | — |
+
+而且属性读回不为空这件事在像素上算数：同一张 764 枚的格子，`FontFamily` 由代码写的 `fluent` 档与由标记写的
+`markup` 档逐格比签名，**761 格同时有墨、761 格签名完全相同（100.0%）**（`spike/GlyphInkProbe/readings-96.txt`）。
+所以"标记送不到字体"这条结论的范围要收窄成"**送不到资源键那一形**"，字面量属性是通的——这既是本族的更正，
+也是 #97 修法的前提（见第 9 节）。
+
 ## 6. Known Gaps
 
-1. **字形有没有画出来，测不出来。** 同一张白底上放一个普通 `TextBlock`（纯文本、有字号、有前景）也印不出墨——
-   这条路对文本是瞎的（`adaptation/00` S1-r 第 3 条，本段在 spike/IconFamilyProbe 里复测）。因此本族**不声称**
-   任何 `SymbolIcon`/`FontIcon` 的字形到达像素；能声称的只有 `PathIcon` 的几何填充（400 px / 4096 px 两个数）。
+1. **字形墨在进程内通路上仍然测不出来，在整屏通路上测得出来——本条已按 96 重画边界，不再是"测不出来"。**
+   进程内捕获会重跑渲染，对白底上的 `TextBlock` 与字形都是瞎的（`adaptation/00` S1-r 第 3 条）；监视器抓取看得见。
+   `spike/GlyphInkProbe` 量到的数：`SymbolIcon` 764 格里 **644 格有墨**，`FontIcon`+Segoe Fluent Icons **761**，
+   +Segoe MDL2 Assets **762**（`symbol` 档跑了两次并逐格比对：729 个不同码点的墨数与签名全部相同；`fluent`/`mdl2`
+   各两次的汇总行相同）。同屏的文本对照格 272 px 墨、空白格 0 px，所以"整片为 0"读作仪器坏，读不作字体结论。
+   第 9 节给全数与仪器账。
 2. `Symbol` 的 4 个名字画的字与上游不同（第 2 节表），这一层无法修正：号在运行时枚举里，读它的类型只认这个枚举。
    应用要拿到上游那张图，得自己写 `FontIcon.Glyph`。
 3. 26 个上游名字在本族枚举里不存在，其中 12 个连字形号都没人承载。
@@ -146,6 +163,18 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 6. `PathIcon` 在没有显式尺寸时铺满槽位，与上游"16x16 + Uniform"不同；本层不改（改了就是替运行时发明默认值），
    只把量到的数记在这里，并在测试里钉住铺满这一半。
 7. 指针/键盘/触摸在本族没有对应路径（`IconElement` 不是可交互控件，上游也一样），因此本段无硬件输入证据。
+8. **`SymbolIcon` 有 120 枚画不出任何墨，而这 120 个码点在两个已装图标的字体里都有。** `match-cmap.py` 逐枚查
+   `SegoeIcons.ttf`（2033 码点）与 `segmdl2.ttf`（1833）：这 120 格**一个都不能用"字体里没有"解释**（0/120），
+   而同一批码点交给 `FontIcon` 有 118 格出墨（两档都是 118）。洞在运行时的 symbol→字形那段，不在字体，
+   也不在本层——本层拿不到那段（`SymbolIcon` 没有 `FontFamily`，`spike/GlyphInkProbe` 读它只读到 `<no FontFamily property>`）。
+9. **`SymbolIcon` 画的是哪套字形，没定出来。** 它与 `FontIcon`+MDL2 的签名一致率 2.3%、与 +Fluent 的 1.0%，
+   而"两个不同字体走同一个要素"的对照是 19.1%（都限定在墨数相差 10% 以内的格上，排掉尺寸这一混淆）。
+   这只能说"它跟两个具名字体都不一样"，不能说它是第三个哪一种——候选扫完 13 个文件：机器上没装 `segoesym.ttf`
+   （Segoe UI Symbol），`segoeui.*`／`segoepr*`／`segoesc*` 都在 609 个有墨格上直接矛盾，`symbol.ttf` 读不出 cmap。
+10. **cmap 有 ≠ 画得出，画得出 ≠ cmap 有。** `AlarmClock/U+E919` 与 `ScreenCapture/U+E7A0` 不在
+    `SegoeIcons.ttf` 的 cmap 里，`SymbolIcon` 那两格却有墨；反过来 `DataSenseBar/U+E7A5` 两档具名字体都有号，
+    走 `FontIcon` 时是空的。因此第 2 节那张命中表与 s2 的 cmap 差分量不了"用户看得见几个图标"，
+    两条通路要分开记（本批把像素那半补上了，cmap 那半不动）。
 
 ## 7. 证据分类
 
@@ -153,13 +182,18 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
   本段末尾的"闸口读数"里，本文件不重复抄一遍数（抄了就会过期）。
 - 行为：`AstraIconFamilyTests`——类型面、成员面、枚举号、markup 名字解析、未知名静默替换、盒子随字号/不随字形、
   4 个偏差名字与 26 个缺席名字的漂移闸、`SymbolThemeFontFamily` 不可发布的复测。
-- 视觉：只有 `PathIcon` 的几何填充（`A_closed_geometry_reaches_the_pixel_and_fills_the_slot_it_is_given`）。
-  字形墨不可得，见第 6 节第 1 条。
+- 视觉：`PathIcon` 的几何填充（`A_closed_geometry_reaches_the_pixel_and_fills_the_slot_it_is_given`），加上 #96/#97
+  这一批的**整屏字形墨**：逐格墨数、8x8 签名与四档对照（`spike/GlyphInkProbe/glyph-ink-{symbol,fluent,mdl2,markup}.csv`，
+  汇总 `readings-96.txt`）。进程内通路仍然拿不到字形，两条通路分记，见第 6 节第 1 条与第 9 节。
 - 硬件输入：无（见第 6 节第 7 条）。
 
 原始读数：`adaptation/s2-symbol-surface-raw.txt`（类型面 + 枚举三方 diff）、
 `adaptation/s2-symbol-cmap-raw.txt`（两份名单 × 两个字体逐枚命中）、`adaptation/s2-icon-family-raw.txt`（挂载、markup、墨、宿主四组）、
-仪器：`spike/SymbolCmap`（Program.cs 反射 + 三方解析，cmap-surface.py 查字形）、`spike/IconFamilyProbe`（挂载与捕获）。
+`spike/GlyphInkProbe/readings-96.txt`（四档逐格对照 + 13 个字体文件的 cmap 命中）与 `probe-<variant>.log`（每次抓屏自己的几何与反射读数）。
+仪器：`spike/SymbolCmap`（Program.cs 反射 + 三方解析，cmap-surface.py 查字形）、`spike/IconFamilyProbe`（挂载与捕获）、
+`spike/GlyphInkProbe`（整屏逐格墨量：Program.cs 铺格子 + shoot-count.ps1 抓屏计数 + compare-variants.py 逐格对照 +
+match-cmap.py 对齐已装字体）。
+
 
 ## 8. 换档重绘批（#94/#95，2026-09-23）：继承给的是值，不是重绘
 
@@ -192,4 +226,76 @@ in-proc 读数取代，`check.py`/`crosscheck.py`（查装机字体 cmap 的）�
 - 第 5 条说"没有可挂的隐式样式路子"。路子确实还没有（应用级隐式样式落不到 `SymbolIcon` 上，本批复测过），
   但 `IconInk.Carrier` / `IconInk.Icon` 是一对**能挂**的附着属性路子，宿主侧补偿因此不再受"只能靠继承"限制。高对比档的图标墨
   仍然**未声称**——本批两条腿都是 Light↔Dark，见下。
+
+## 9. 字形墨与字体通路批（#96/#97，2026-09-23）：整屏读得到字形了，读出来是运行时钉死的那套
+
+用户报的形状是"这里全是 Windows 10 那代的 Fluent 图标"。这条既不能按印象结，也不能停在"看着像 MDL2"。
+两个问题分开量：**墨读不读得到**（#96，决定第 6 节第 1 条那条边界还成不成立）与**是谁在画、换得动吗**（#97）。
+
+### 9.1 仪器：四档 × 766 格，一格一个形状签名
+
+`spike/GlyphInkProbe` 把 764 个 `Symbol` 值铺进 24 DIP 的白底格子，红框圈住整张表，抓监视器后逐格数墨：
+两档阈值（`ink`＝R/G/B 全 <128，`light`＝任一通道 <215）加每格一个 8×8 **签名**，另带两格对照——
+16 px 的 `TextBlock`（必须有墨）与纯白 `Border`（必须没有）。四档只差"这个码点由谁来画"：
+
+| 档 | 要素与字体来源 | 有墨格 | 完全无墨 | 中位墨 |
+| --- | --- | --- | --- | --- |
+| `symbol` | `SymbolIcon{Symbol}`，走运行时自己那条路 | 644 / 764 | 120 | 244 px |
+| `fluent` | `FontIcon{Glyph}`，`FontFamily` 由**代码**写 `"Segoe Fluent Icons"` | 761 | 3 | 230 px |
+| `mdl2` | 同上，代码写 `"Segoe MDL2 Assets"` | 762 | 2 | 226 px |
+| `markup` | 同上，字体名由**标记字面量**给 | 761 | 3 | 230 px |
+
+四档的对照格都是 `text=272 px`、`blank=0 px`，因此表里的 0 读作"这里什么都没画"，读不作"仪器看不见字"。
+`symbol` 档跑了两次并逐格比对：729 个不同码点的 `ink`/`light`/签名全同。逐格原始数在
+`glyph-ink-<variant>.csv`，对照与 cmap 汇总在 `readings-96.txt`。
+
+### 9.2 三条读数
+
+1. **第 5 节那句"markup 送不到字体"只覆盖了资源键那一形。** 字面量 `FontFamily="Segoe Fluent Icons"` 不但读回非空，
+   还到达像素：`markup` 档与代码写的 `fluent` 档在 761 个同时有墨的格上**签名 100.0% 相同**。
+   修法因此可以留在模板里，不需要为送一个字体名再造代码钩子。
+2. **`SymbolIcon` 画的不是任何已装具名字体在枚举号上的那套字。** 与 `mdl2` 档的签名一致率 2.3%、与 `fluent` 档 1.0%，
+   而"两个不同字体走同一个要素"的对照（`fluent` vs `mdl2`）是 19.1%——三个数都限定在墨数相差 10% 以内的格上，
+   尺寸这一混淆被排掉了。它还有 120 格完全无墨，而这 120 个码点在 `SegoeIcons.ttf` 与 `segmdl2.ttf` 里**都有**
+   （`match-cmap.py`：0/120 能用缺席解释），同一批号交给 `FontIcon` 有 118 格出墨。
+   洞在运行时的 symbol→字形那段。哪套字形，本批定不出来，见第 6 节第 9 条。
+3. **Win10 那代字形的来源在运行时里，钉在两处默认值上。** 对**出货的那份** `Jalium.UI.Managed` 读私有静态
+   （那份 DLL 自己不 stamp 版本——FileVersion/ProductVersion 都是 0.0.0.0，"出货的"这件事由探针工程钉的
+   `Jalium.UI.Desktop` 26.10.9 说，不是程序集自报的）
+   （探针里读，库里读会被 `AstraGateTests` 的结构闸拦下）：
+
+   ```
+   witness SymbolIcon.SymbolFontFamily='Segoe MDL2 Assets'
+   witness FontIcon.DefaultFontFamily='Segoe MDL2 Assets'
+   witness FontIcon.FontFamily after a code write='Segoe Fluent Icons' default instance='<null>'
+   ```
+
+   `SymbolIcon` 整个类型面上没有 `FontFamily`（第 1 节那条"0 个视觉子元素、读不到字体"同一条），所以宿主改不动它；
+   `FontIcon` 有公开的 `FontFamily` 面，且第 1 条已量到代码与标记两条路都能把它送到像素。上游钉的是
+   `SymbolThemeFontFamily = "Segoe Fluent Icons"`（`audits/icon-family.md` 第 5 节），本运行时两处默认都是 MDL2——
+   用户看到的 Win10 形状就是这个默认值，不是本层挑的。
+
+### 9.3 仪器账（三次红读换回来的，写下来免得下次再交一遍）
+
+- **抓屏进程必须自己 DPI-aware。** 这台显示器 175%（DPI 168，2560×1600），未声明感知的 PowerShell 拿到的
+  `GetWindowRect` 是虚拟化坐标、`CopyFromScreen` 拿到的却是物理像素——于是每次抓到的都是窗口左上那一块，
+  红框的右/下两边被切在图像边界上。前三次运行都被读成"窗口装不下格子"，改的其实是 `GlyphInkNative.SetProcessDPIAware()`。
+- **窗口尺寸单位与内容单位不是一套。** `Window.Width/Height` 走的是设备像素那一侧，内容按 DIP 排版，
+  所以按盒子大小开窗口必然裁掉边框；现在改成由格子自己算再留余量，并让计数器用红框宽/高两个方向各自推出的
+  比例互为校验（`px-per-dip` 由窗口自己报，读回 1.75）。
+- **红框按"长边"找，不按 min/max。** 一次运行里有一颗游离红点落在抓取范围的右下角，包围盒从 1680×840 变成 1807×984，
+  红像素总数却没变（15111 对 15177）——只看包围盒会把好数据读成"被盖住"。现在取长于 50 px 的红行/红列。
+- **第一次 `markup` 档 0/764 是仪器的锅。** 那一版没给图标前景，`IconElement.GetEffectiveForeground()` 在裸窗口里
+  上溯不到 `Control`，落到 `"TextPrimary"` 资源查找——这条路上没应用主题，查不到就用静态默认刷，屏幕上就是没有墨。
+  补一行 `Foreground = Black`（只补墨、不补字体，字体仍由标记给）之后才是上面那行数。
+
+### 9.4 这批没做的事
+
+产品代码一行没动：#97 的修法形状现在有了测量的前提（标记能送字体名），但从"能送"到"换上去"要先把
+`Symbol`→`Glyph` 那层映射定下来——模板绑的是 `Icon`（`Symbol` 值），`FontIcon` 要的是字符串，
+逐宿主换形状是另一批的账，且要先回答第 6 节第 9 条那句"现在到底是谁在画"。
+本批只改了 `spike/` 与文档。串行闸口在这份树上跑了两次，两次都停在套件步，且两次的红集不重合——
+读数与判记在 `ROADMAP.md` 本节末尾（结论：环境占用下的像素断言，闸口状态记为**未过**）。本批的结论不依赖套件：
+四档的墨数与签名是仪器自己从屏上打出来的。
+
 

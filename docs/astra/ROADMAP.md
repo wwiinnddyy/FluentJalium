@@ -4945,3 +4945,96 @@ pixels left)` 与 `printed nothing its empty slot does not already print (41 col
 1. **脏底板这一族只在整条闸口之后出现过**：这一手单独跑 `--report` 与判定模式各 39 腿都干净，复现条件未明。
    现在自证常驻在闸里，下次再红会直接打出底板上剩谁；在那之前 #90 与这条都按未结记着，不用"单跑就绿"结清。
 
+## #96/#97 一手：整屏通路读得到字形墨了，读出来的是运行时钉死的 MDL2（2026-09-23）
+
+两件事并成一手。#96 是 `audits/icon-family.md` 第 6 节第 1 条那句"字形有没有画出来，测不出来"——它写于所有捕获
+通路都在进程内的时期，而 #94/#95 已经证明抓监视器看得见字形墨（168 px / 519 px 两个数就是从屏上量的）。
+#97 是用户报的形状问题："这里都是 Windows 10 那代的 Fluent 图标，不是 Win11 那套"。形状不能按印象结，
+也不能停在"看着像 MDL2"——先把墨读得到读不到定下来，再问是谁在画、换得动吗。
+
+仪器是 `spike/GlyphInkProbe`（不在 `FluentJalium.slnx` 里）：764 枚 `Symbol` 铺进 24 DIP 白底格子、红框圈表、
+抓屏逐格数墨，两档阈值加每格一个 8×8 形状签名，另带两格对照（`TextBlock` 必须有墨、空白 `Border` 必须没有）。
+四档只差"这个码点由谁画"：
+
+| 档 | 谁画这个码点 | 有墨格 | 完全无墨 | 中位墨 |
+| --- | --- | --- | --- | --- |
+| `symbol` | `SymbolIcon{Symbol}`，运行时自己的路 | 644 / 764 | 120 | 244 px |
+| `fluent` | `FontIcon{Glyph}`，`FontFamily` 由代码写 `"Segoe Fluent Icons"` | 761 | 3 | 230 px |
+| `mdl2` | 同上，代码写 `"Segoe MDL2 Assets"` | 762 | 2 | 226 px |
+| `markup` | 同上，字体名由标记字面量给 | 761 | 3 | 230 px |
+
+四档的对照格都是 `text=272 px`、`blank=0 px`，所以表里的 0 是"这里没画东西"，不是"仪器看不见字"。
+`symbol` 档跑两次并逐格比对：729 个不同码点的墨数、`light`、签名全同。汇总在
+`spike/GlyphInkProbe/readings-96.txt`，逐格在 `glyph-ink-<variant>.csv`。
+
+### 三条读数
+
+1. **第 5 节那句"markup 送不到字体"的范围要收窄到资源键那一形。** 字面量 `FontFamily="Segoe Fluent Icons"`
+   不但读回非空（`TextBlock` 那形也一样），而且到达像素：`markup` 与代码写的 `fluent` 在 761 个同时有墨的格上
+   **签名 100.0% 相同**。以后"这条运行时承载不了 FontFamily"的话不能再说圆——它承载不了的是 `x:Key` 行与
+   `{ThemeResource}` 交接。
+2. **根因在运行时的两处默认值，不在本层的挑选。** 对**出货的那份** `Jalium.UI.Managed` 读私有静态（探针里读；
+   同样反射放进 `src/FluentJalium` 会被 `AstraGateTests` 的结构闸拦下）：
+   `SymbolIcon.SymbolFontFamily='Segoe MDL2 Assets'`、`FontIcon.DefaultFontFamily='Segoe MDL2 Assets'`，
+   而 `SymbolIcon` 的类型面上根本没有 `FontFamily`（只有 `FontIcon` 有公开的一面）。上游钉的是
+   `SymbolThemeFontFamily = "Segoe Fluent Icons"`——用户看到的 Win10 形状就是这两处默认值。
+3. **但 `SymbolIcon` 画的也不是 MDL2 在枚举号上的那套字。** 它的签名与 `mdl2` 档一致率 2.3%、与 `fluent` 档 1.0%，
+   而"两个不同字体走同一个要素"的对照（`fluent` vs `mdl2`）是 19.1%；三个数都限定在墨数相差 10% 以内的格上，
+   尺寸这一混淆排掉了。它还有 120 格完全无墨，而这 120 个码点在 `SegoeIcons.ttf`（2033 码点）与 `segmdl2.ttf`
+   （1833）里都有（`match-cmap.py`：0/120 能用"字体里没有"解释），同一批号交给 `FontIcon` 有 118 格出墨。
+   洞在运行时的 symbol→字形那段，本层拿不到；是哪套字形没定出来（第 6 节第 9 条）。
+
+### 仪器账（四次红读换回来的）
+
+- **抓屏进程必须自己声明 DPI-aware。** 这台显示器 175%（DPI 168，2560×1600）。未声明感知的 PowerShell 拿到的
+  `GetWindowRect` 是虚拟化坐标，`CopyFromScreen` 拿到的却是物理像素——每次抓的都是窗口左上那块，红框右/下两边
+  被切在图像边界上。前三次运行都被读成"窗口装不下格子"，改的是 `SetProcessDPIAware()` 一行。
+- **窗口尺寸单位与内容单位不是一套**：`Window.Width/Height` 走设备像素那一侧，内容按 DIP 排版，按盒子大小开窗口
+  必然裁边框；Show 之后再改 `Width` 也不落到原生窗口（那一次打印 window=1760x960 而屏上仍是 640×480）。
+  现在 `px-per-dip` 由窗口自己报（1.75）并被计数器用来校验红框是不是完整的。
+- **红框按长边找，不按 min/max**：一次运行里一颗游离红点落在抓取范围的右下角，包围盒从 1680×840 涨到 1807×984，
+  红像素总数却没变——只看包围盒会把好数据读成"被盖住"。改成取长于 50 px 的红行/红列。
+- **第一次 `markup` 档 0/764 是仪器的锅**：那版没给图标前景，`IconElement.GetEffectiveForeground()` 在裸窗口里
+  上溯不到 `Control`，落到 `"TextPrimary"` 资源查找，而这条路上没应用主题。补 `Foreground = Black`（只补墨，
+  字体仍由标记给）之后才是上面那行数。
+
+### Known Gap
+
+1. **`SymbolIcon` 有 120 枚（764 之）画不出任何墨，而字体里都有这些号。** 洞在运行时的 symbol→字形那段，
+   本层没有可达的通路（`SymbolIcon` 没有 `FontFamily`，也没有可重模板的 `Template`）。提给上游，与 #62 同族。
+2. **`SymbolIcon` 到底用哪套字形，没定出来。** 13 个候选字体文件扫完：机器上没装 Segoe UI Symbol，
+   `segoeui.*`／`segoepr*`／`segoesc*` 在 609 个有墨格上直接矛盾，`symbol.ttf` 读不出 cmap。
+   只能说它跟两个具名字体都不一样。
+3. **cmap 有 ≠ 画得出，画得出 ≠ cmap 有。** `U+E919`/`U+E7A0` 不在 `SegoeIcons.ttf` 的 cmap 里却有墨，
+   `U+E7A5` 两档字体都有号走 `FontIcon` 却是空的。因此 s2 那张 cmap 差分量不了"用户看得见几个图标"，
+   两条通路要分开记。
+
+### 下一批要定的一件事
+
+修法形状现在有了测量的前提（标记能送字体名，且送到像素），但"换上去"不是换个属性名：模板绑的是 `Icon`
+（`Symbol` 值），`FontIcon` 要的是 `Glyph` 字符串，`Symbol`→`Glyph` 那层映射得先定下来由谁维护。
+在这之前 Known Gap 第 2 条那句"哪套字形"还悬着——把它量掉，才谈得上逐宿主换形状。
+
+### 闸口读数：两次都停在套件步，两次的红集不重合（2026-09-23）
+
+`tools/Test-AstraGates.ps1` 在本批的树上跑了两次，两次都没走完管道：
+
+- 第一次（`spike/GlyphInkProbe/gate-96-attempt1-ambient-red.log`）红三条——
+  `AstraWindowShellTests.The_title_bar_surface_reaches_the_pixels_and_follows_the_theme`、
+  `AstraTreeViewTests.Selecting_raises_the_pill_and_leaves_the_fill_subtle`、
+  `AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has`。停在红处，套件总数那一行没打印出来，
+  所以这次没有"多少条"可记。
+- 第二次（`gate-96.log`）打印了：`失败: 10，通过: 1584，已跳过: 0，总计: 1594，持续时间: 13 m 24 s`。
+  红的是 `AstraRatingControlTests.Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left`、
+  `AstraNavigationTests`（指示器宽度、选中位移）两条、`AstraMenuTests` 两条、`AstraListViewTests` 两条、
+  `AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name`、
+  `AstraAppBarTests` 两条——与第一次那三条**一条都不重合**。
+
+判读：两次的红集互不重合，而且红的全部是"要真窗口、要上屏比墨"的断言；跑的时候同一台机器上有别的仓库的测试在并行
+（`TinadecCore`、`LanMountainDesktop` 两支，第二次跑完时数到 18 个进程）。本批 `src/`、`tests/`、`tools/`、`samples/`
+一行未动（`git status` 干净），而这份代码在 `feb45af` 上由 `gate-93.log` 打印过整条全绿。因此这两次按 #47/#35/#90
+那一族记——环境占用的像素断言，不是本批的账。**但这句要成立得有一次安静的全绿**，现在没有，所以 #96/#97 的
+闸口状态记为**未过**，本批的结论只建立在仪器自己打的读数上（字形墨那四条表与 `readings-96.txt` 不依赖套件）。
+
+
+

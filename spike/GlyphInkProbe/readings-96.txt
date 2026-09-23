@@ -1,0 +1,65 @@
+cells=766 symbol cells=764
+  symbol: painted 644 / 764, fully blank 120
+  fluent: painted 761 / 764, fully blank 3
+  mdl2: painted 762 / 764, fully blank 2
+  markup: painted 761 / 764, fully blank 3
+  symbol vs fluent: 643 cells -> identical 3 (0.5%), within 2 bits 19 (3.0%) | painted under both
+  symbol vs mdl2: 644 cells -> identical 15 (2.3%), within 2 bits 39 (6.1%) | painted under both
+  symbol vs fluent: 196 cells -> identical 2 (1.0%), within 2 bits 7 (3.6%) | size-matched
+  symbol vs mdl2: 215 cells -> identical 5 (2.3%), within 2 bits 12 (5.6%) | size-matched
+  fluent vs mdl2: 383 cells -> identical 73 (19.1%), within 2 bits 119 (31.1%) | size-matched
+  markup vs fluent: 761 cells -> identical 761 (100.0%), within 2 bits 761 (100.0%) | size-matched
+  markup vs mdl2: 383 cells -> identical 73 (19.1%), within 2 bits 119 (31.1%) | size-matched
+  of the 120 cells SymbolIcon leaves blank, fluent paints 118
+  of the 120 cells SymbolIcon leaves blank, mdl2 paints 118
+  first 12 of the cells SymbolIcon leaves blank, with what each named font put there (ink/light px):
+    SignalBars1/U+E86C fluent=24/24 mdl2=0/0
+    Wifi1/U+E872 fluent=24/32 mdl2=7/9
+    Headphone1/U+ED31 fluent=180/230 mdl2=135/165
+    Headphone2/U+ED32 fluent=233/303 mdl2=188/232
+    Headphone3/U+ED33 fluent=248/323 mdl2=198/246
+    SkipBack10/U+ED3C fluent=213/280 mdl2=197/255
+    SkipForward30/U+ED3D fluent=213/278 mdl2=179/236
+  painted by symbol but blank under fluent: 1 StatusConnecting2/U+EB58
+  painted by symbol but blank under mdl2: 0 
+======== cmap sweep
+symbol cells=764 blank=120 painted=609
+candidate font files: 13
+  SegoeIcons.ttf: covers  2033 codepoints | blanks explained by absence   0/120 | blanks it HAS (unexplained) 120 | painted cells it LACKS (contradiction)   2
+  segmdl2.ttf: covers  1833 codepoints | blanks explained by absence   0/120 | blanks it HAS (unexplained) 120 | painted cells it LACKS (contradiction)   8
+  segoepr.ttf: covers   667 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeprb.ttf: covers   667 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoesc.ttf: covers   607 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoescb.ttf: covers   607 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeui.ttf: covers  3996 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeuib.ttf: covers  3993 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeuii.ttf: covers  2917 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeuil.ttf: covers  3995 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeuisl.ttf: covers  3994 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  segoeuiz.ttf: covers  2917 codepoints | blanks explained by absence 120/120 | blanks it HAS (unexplained)   0 | painted cells it LACKS (contradiction) 609
+  symbol.ttf: <no readable cmap>
+======== per-run witness lines (probe-symbol.log; the four variants print the same block)
+variant=symbol geom dpi=1.75 window=1026.29x593.14 actual=1026.29x593.14
+geom box requested=960x480 actual=960x480
+geom box origin in window=DIP 0,32
+assembly=Jalium.UI.Managed version=
+witness SymbolIcon.SymbolFontFamily='Segoe MDL2 Assets'
+witness FontIcon.DefaultFontFamily='Segoe MDL2 Assets'
+witness FontIcon.FontFamily after a code write='Segoe Fluent Icons' default instance='<null>'
+witness measure 'Segoe Fluent Icons' MW width=20.66
+witness measure 'Segoe MDL2 Assets' MW width=20.66
+witness measure 'Microsoft YaHei UI' MW width=31.91
+SymbolIcon public=Symbol,Foreground,TemplatedParent,Width,Height,MinWidth,MinHeight,MaxWidth,MaxHeight,Margin,Horizontal
+FontIcon public=Glyph,FontFamily,FontSize,Foreground,TemplatedParent,Width,Height,MinWidth,MinHeight,MaxWidth,MaxHeight,
+shipped assembly:
+
+
+FileVersion     : 0.0.0.0
+ProductVersion  : 0.0.0.0
+FileDescription :  
+
+
+
+
+note: Jalium.UI.Managed.dll stamps FileVersion/ProductVersion 0.0.0.0, so the assembly cannot name its own release -
+      the version identity of these readings is the PackageReference in spike/GlyphInkProbe/GlyphInkProbe.csproj (Jalium.UI.Desktop 26.10.9).
