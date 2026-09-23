@@ -4679,3 +4679,29 @@ not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carri
 - **硬件输入**：零，全用 `IsEnabled` 驱动。
 - **串行闸口**：本批不占闸口——上一条 `gate-91.log` 之后工作树才长出这批测点，闸口读数按那跑的树记（见 #91 补记），
   这批的全量顺序跑留给下一手（连同 `materials HighContrast` 那两条页闸读数一起看）。
+
+### #92/#93 闸口补记：第一次全绿的顺序读数（2026-09-23，`spike/ForegroundArrival/gate-92.log`）
+
+`tools/Test-AstraGates.ps1 -Configuration Debug` 在提交 `3cee913` 的树上跑完，管道自己打印的每一行都在下面，
+**本节上面那句"至今没有一次全绿的顺序读数"以及"1.0 终态快照"里串行闸口那一行都被这一跑作废**（那一行留原文是为了记下
+它是在哪一批被作废的；下次碰到这份清单的编辑顺手按这里改）：
+
+```
+已通过! - 失败: 0，通过: 1589，已跳过: 0，总计: 1589，持续时间: 7 m 35 s
+PASS 13 pages x 3 variants, 0 offender(s)
+Light/Dark : 83 source colors, 101 resolved brushes; checked=True
+HighContrast : 101 mapped keys; upstream keys held back [AccentControlElevationBorderBrush CircleElevationBorderBrush ControlElevationBorderBrush]; checked=True
+keys.md is current: 1312 canonical lines.
+known-gaps.md is current: 927 canonical lines.
+All Astra gates passed.   GATE-EXIT=0
+```
+
+三条要说清的界限，别让一次全绿多背一层证据：
+
+1. **页闸这一跑绿了，#90 仍未结**。`gate-91.log` 同一档红的是 `materials HighContrast` 两条（槽里留了 337249 个亮点、
+   41 色对 93 色），这一跑它们不在了，而**为什么不在没量出来**——槽宽在跑与跑之间 980 / 788 跳的那条机制照旧是猜的，
+   #90 按原样挂着。同一条纪律也适用于套件：`gate-88b`/`gate-88c` 各红一条（Rating、TeachingTip），这一跑 1589 全过，
+   不代表那两条的触发条件已被排除，只代表这一次没遇到。
+2. **测点数 1589 里含 #92 那 2 条**（`:210` 两行部件禁用格）；上一节写的"本批不占闸口"从此作废。
+3. 这一跑没有给任何**视觉**主张加证据：页闸判的是"我们的令牌上了屏 / 框架强调绿没上屏 / 上游占位符没上屏"，
+   不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。

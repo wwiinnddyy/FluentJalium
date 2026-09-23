@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-927 lines collected from 51 sections across 46 documents.
+928 lines collected from 51 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -1041,7 +1041,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 128 lines
+## ROADMAP.md - 129 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1183,5 +1183,6 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4670` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
 - `ROADMAP.md:4671` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
 - `ROADMAP.md:4678` - - **视觉**：零新增像素断言（Known Gap 3）。
+- `ROADMAP.md:4707` - 不判与 WinUI 截图是否一致——那台装着 WinUI Gallery 的机器还是没有，目标里"一比一"的目视那一半仍按 Known Gap 记。
 
-<!-- canonical-lines=927 sha256=987863a6164f86b9f5417177b97f26f08bed8f6381c60cc3bd61fbd29a8d54e3 -->
+<!-- canonical-lines=928 sha256=1e34067f52a0f1759b88a713caf4242323c5af20523d72ee0b4b34314bfa8db1 -->
