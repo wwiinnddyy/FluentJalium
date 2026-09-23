@@ -4182,7 +4182,7 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 | 位置 | 干什么 | 为什么是这个形状 |
 |---|---|---|
 | `tools/Report-AstraKnownGaps.ps1` | 走 `docs/astra/**/*.md`，收两类行：标题带 `Known Gap` 的小节里的**每一行**，以及任何自带该标记的散文行；每行截到 200 字符并带 `file:line`；尾部 `canonical-lines` + sha256 | 与 `keys.md` 同一套哲学：文档是生成的，**过期就是缺陷**，`-Check` 就是主张 |
-| `docs/astra/audits/known-gaps.md` | 当前树生成读数：810 行、46 篇、47 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
+| `docs/astra/audits/known-gaps.md` | 当前树生成读数：831 行、46 篇、48 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
 | `tools/Test-AstraGates.ps1` 新步 `==> known gap inventory` | `-Check` | 放在 `-SkipPalette` 之外：它读的是文档，不是调色板 |
 | `AstraGateTests.The_known_gap_inventory_covers_every_document_that_states_one` | 双向比文件集：哪篇声明了缺口而清单没它，哪篇清单里有但它已不再声明 | 测点用**自己的解析器**交叉读，不等脚本跑；`-Check` 看逐字形状，测点看覆盖面，两件事不互推 |
 
@@ -4407,3 +4407,71 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
   槽内色数（396→371）也跟着变了，本批不把它当第二个主张。
 
 
+
+## #87（目标项 6 的 #56 那一支）三处部件的前景到达读数——"把整行删掉就看得见"这条在这个运行时做不出来（2026-09-23）
+
+`audits/foreground.md` 第 7 节第 2 条挂着"5 处具名声明在实测树上取不到"，第 6 条挂着"状态格子只测了键能解析"。
+本批先复测那一串"取不到"，再给能取到的三处补上前景到达读数；顺带把这条账本应有的牙量出来——结果量出来的
+是**仪器边界**：删行看不见，改指别的键才看得见。
+
+### 交付形状
+
+| 位置 | 干什么 | 为什么是这个形状 |
+|---|---|---|
+| `tests/FluentJalium.Tests/AstraForegroundArrivalTests.cs` 新 5 条 | 提示的两行标题、下拉的 `PART_ScrollViewer` 各读"自己的行写上的那支刷"；另两条量这台机器上文本墨从哪来（默认值 vs presenter） | 一个 owner 一条测点：抽行 A/B 要求"改哪条红哪条"，两条断言并成一条就分不开是谁的牙 |
+| 提示的部件从 `PART_Popup.Child` 往下找 | 带 placement target 的 Popup 把内容长在它自己的顶层 `PopupWindow`，不是宿主的子节点 | 旧"取不到"是走法写错；下拉相反，`PART_PopupBorder`/`PART_ScrollViewer` 就 graft 在宿主覆盖层，从宿主找是对的（`AstraComboBoxTests` rung-0 那条读数） |
+| `spike/ForegroundArrival/mutate.py` + `teeth.sh` | 逐行"删掉/改指 `TextFillColorDisabledBrush`/改回"，一种突变一次重建一轮测点，日志按 `mut-<相位>-<名>.log` 存 | 精确串替换、找不够就报错退出：半 mutations 的树跑出来的绿什么也证明不了 |
+
+### 读数：两种突变，一种看得见一种看不见
+
+| 突变 | 第一版（裸身份） | 第二版（控件上先写一品红 carrier） | 最终版（五条事实） |
+|---|---|---|---|
+| 删 `TitleTextBlock` 那行 | 3/3 绿 | 4/4 绿 | 5/5 绿 |
+| 删 `SubtitleTextBlock` 那行 | 3/3 绿 | 4/4 绿 | 5/5 绿 |
+| 删 `PART_ScrollViewer` 那行 | 3/3 绿 | 4/4 绿 | 5/5 绿 |
+| 把 `TitleTextBlock` 那行改指 disabled | — | 只 `The_title_row…` 红，其余绿 | 只 `The_title_label_reads…` 红，1 红 4 绿 |
+| 把 `SubtitleTextBlock` 那行改指 disabled | — | 只 subtitle 那条红 | 只 subtitle 那条红，1 红 4 绿 |
+| 把 `PART_ScrollViewer` 那行改指 disabled | — | 只 scroller 那条红 | 只 scroller 那条红，1 红 4 绿 |
+
+改指之后部件读到 `#5C000000`（`spike/ForegroundArrival/mut-swap-*.log` 三条失败消息逐字印着"reads #5C000000,
+not the #E4000000…"），删行则三形恒绿（`mut-bare-*.log`、`mut-carrier-*.log`、`mut-del-*.log`）。
+原因不是测点松，是**回落值与行值本来就是同一个对象**——量出来的（`spike/ForegroundArrival/probe-default-ink.log`）：
+这个运行时里"什么都没写上去的 `TextBlock`"既不无墨也不继承，它带的是当前档 `TextFillColorPrimaryBrush`
+**那一个实例**（Light `#E4000000`、Dark `#FFFFFFFF`）；同一次探针里 presenter 生成的那条文本却跟着控件走（一品红）。
+这两半各成一条常驻测点：`DefaultTextInkTracksTheVariant`（两档都钉默认墨 = 那支刷）与
+`A_carrier_ink_written_on_the_tip_does_not_reach_its_titled_labels`（carrier 到得了生成内容、到不了两行标题）。
+
+### 三处更正，都是上一手的账
+
+1. **"5 处具名声明取不到"整条作废**（`audits/foreground.md` 7.2 第 2 条已改口）：五处全有读者，其中两处
+   （`PART_ChevronTextBlock`、`IconHost`）早就各有 `Assert.Same` 身份读数，本批只是发现自己在重复造它们——
+   真正缺读数的只有提示两行与下拉 scroller 三处。
+2. **本文件第一版测点没牙，而且是写完就自量出来的**：那句"身份比色更强，抽行必红"是推断，
+   抽行 A/B 一跑三形全绿。第二版加 carrier 仍然全绿，直到把突变换成"改指另一个键"才红。
+   所以断言的形状改了：主张写成"这行指着谁"，不再写"没这行会怎样"。
+3. **第 6 条的 228 不是当前数**：同一棵树三种尺子（`spike/ForegroundRoutingCensus/census-2026-09-23.txt`）
+   是 `TargetName` 写入 569、`Property="Foreground"` 的 Setter 237（其中 29 行两者皆是）、全库 `<Setter>` 1507。
+   账上那条现在带尺子重述，228 留作当时那棵树的读数。
+
+### Known Gap（这条做不到，不写进断言）
+
+"删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+
+### 四类证据
+
+- **构建**：`dotnet build tests/FluentJalium.Tests -c Debug` `0 个警告 / 0 个错误`（第一版 `Popup` 少 using、
+  一次 CS8604，都在同一批里清掉；门禁要 0 警告）。
+- **行为**：新 5 条测点，单跑 `5/5`；突变矩阵共 9 轮（3 删 × 3 形 + 3 改指），每轮都含"改回 + 重建"收尾，
+  `git diff src/FluentJalium/Styles/` 跑完为空。测点总数 1576 → 1581。
+- **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+- **硬件输入**：零。
+- **串行闸口**：`tools/Test-AstraGates.ps1 -Configuration Debug`，日志 `spike/ForegroundArrival/gate-87.log`，
+  管道自己印出 `All Astra gates passed.`（后台任务的退出码 0 只作旁证）——build `0 警告 0 错误` →
+  **1581 / 1581，0 失败 0 跳过**（7 m 43 s，比上一批多 5 条，正是本批那 5 条测点）→
+  `PASS 13 pages x 3 variants, 0 offender(s)` → 三档 `checked=True` → `keys.md is current: 1312 canonical lines.` →
+  `known-gaps.md is current: 831 canonical lines.`。
+  这一跑跑在**文档定稿之前**：它之后本段只多了这几行闸口读数（纯文档改动，产品码与测点一行未动），
+  改完立刻重跑两个清单 `-Check` 到定点（`known-gaps.md is current: 831 canonical lines.` /
+  `keys.md is current: 1312 canonical lines.`），所以"清单跟着树走"这一条仍是当场量过的，不是推断。

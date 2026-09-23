@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-810 lines collected from 47 sections across 46 documents.
+831 lines collected from 48 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -315,7 +315,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/focus-visual.md:154` - 双圈，得逐族对着上游审 `UseSystemFocusVisuals` 与 `FocusVisualMargin`（上游确实有族显式关掉系统框，例如
 - `audits/focus-visual.md:155` - ContentDialog 的按钮），不属于本批"只换判据、不动像素"的范围。挂在视觉余账（与 #21/#23 同族）。
 
-## audits/foreground.md - 17 lines
+## audits/foreground.md - 34 lines
 
 ### 7 Known Gaps（不声称清单）
 
@@ -329,13 +329,30 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:88` - carrier 一律不动（`#E4000000` 原地不动，6/6）。可判定的写法只剩"在该档下 mount、两档各一条"，
 - `audits/foreground.md:89` - 而它的牙由 A/B 证明：抽掉 `Styles/Menus.jalxaml:288` 只有 `menu-bar-item` 两档红，回落值是继承墨
 - `audits/foreground.md:90` - （`#FF1D1D1F` / `#FFF5F5F7`）不是默认黑——所以"等于令牌"才是干活的那条。
-- `audits/foreground.md:91` - 2. 5 处具名声明在实测树上取不到：`FluentTeachingTip.TitleTextBlock`/`SubtitleTextBlock`（提示未真正弹出）、
-- `audits/foreground.md:92` - `FluentTabViewItem.IconHost`、`FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`。
-- `audits/foreground.md:93` - 3. 兄弟图元判底用的是"重叠布局面板 + 尺寸同阶"的启发式，不是几何命中（本运行时没有可用的跨要素变换读数），
-- `audits/foreground.md:94` - 所以它可能漏判异形叠色。
-- `audits/foreground.md:95` - 4. 文本是否**真的印出墨**仍不在断言里（#50）；#46 的五处 1 DIP `Rectangle` 无墨仍未结。
-- `audits/foreground.md:96` - 5. 高对比档下这些前景是否走 `HighContrast` 映射，本段没测——那是逐键映射闸（已存在）之外的一层。
-- `audits/foreground.md:97` - 6. 状态格子（hover/pressed/disabled）的 228 条 Setter 只测了"键能解析"，没测"该状态下这一格确实被画上"。
+- `audits/foreground.md:91` - 2. ~~5 处具名声明在实测树上取不到：`FluentTeachingTip.TitleTextBlock`/`SubtitleTextBlock`（提示未真正弹出）、
+- `audits/foreground.md:92` - `FluentTabViewItem.IconHost`、`FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`~~
+- `audits/foreground.md:93` - —— **这一条整条作废**（2026-09-23 #87 逐处复测）：五处全都有读者，两处早就有（`AstraBreadcrumbBarTests` 的
+- `audits/foreground.md:94` - `PART_ChevronTextBlock`、`AstraTabViewTests` 的 `IconHost` 各有一条 `Assert.Same` 身份读数），
+- `audits/foreground.md:95` - `PART_ScrollViewer` 只需打开下拉就能从宿主覆盖层按名取到，而提示那两处**从 `PART_Popup.Child` 往下走就取到**
+- `audits/foreground.md:96` - ——带 placement target 的 Popup 把内容长在它自己的顶层 `PopupWindow` 里（`spike/TeachingTipProbe`），
+- `audits/foreground.md:97` - 它不是宿主的子节点，所以"从宿主窗口找"这一种走法注定空手；原来的"取不到"是走法写错，不是部件没实化。
+- `audits/foreground.md:98` - 三处新的到达读数落在 `AstraForegroundArrivalTests`。
+- `audits/foreground.md:99` - 2b. 上面那三条"等于令牌"的读数，牙只在一处：**改指另一个键**（三条逐条试过，各红自己那一条、其余四条绿，
+- `audits/foreground.md:100` - 部件读到 `#5C000000`，`spike/ForegroundArrival/mut-swap-*.log`）。**删掉整行是看不见的**：三种形状都试过
+- `audits/foreground.md:101` - （裸身份、先在控件上写一品红 carrier、最终那版五条事实），三行逐条删除后 5/5 恒绿（`mut-bare-*.log`、
+- `audits/foreground.md:102` - `mut-carrier-*.log`、`mut-del-*.log`）。原因是量出来的：这个运行时里"什么都没写上去的 `TextBlock`"既不无墨、
+- `audits/foreground.md:103` - 也不继承，它带的就是**当前档的 `TextFillColorPrimaryBrush` 同一个实例**（Light `#E4000000` / Dark `#FFFFFFFF`，
+- `audits/foreground.md:104` - `spike/ForegroundArrival/probe-default-ink.log`），而这三行转录的正是那支刷。所以"删了就看得见"这种断言
+- `audits/foreground.md:105` - 在这里做不出来，能做的只有"指着谁"；这些行是否**真的印出墨**照旧不在断言里（#50）。
+- `audits/foreground.md:106` - 3. 兄弟图元判底用的是"重叠布局面板 + 尺寸同阶"的启发式，不是几何命中（本运行时没有可用的跨要素变换读数），
+- `audits/foreground.md:107` - 所以它可能漏判异形叠色。
+- `audits/foreground.md:108` - 4. 文本是否**真的印出墨**仍不在断言里（#50）；#46 的五处 1 DIP `Rectangle` 无墨仍未结。
+- `audits/foreground.md:109` - 5. 高对比档下这些前景是否走 `HighContrast` 映射，本段没测——那是逐键映射闸（已存在）之外的一层。
+- `audits/foreground.md:110` - 6. 状态格子（hover/pressed/disabled）的 Setter 只测了"键能解析"，没测"该状态下这一格确实被画上"。
+- `audits/foreground.md:111` - 这一层的行数要说清尺子才不重复第 4 节那次事故（`spike/ForegroundRoutingCensus/census-2026-09-23.txt`，
+- `audits/foreground.md:112` - 同一棵树三种尺子）：`TargetName` 写入 569 行、`Property="Foreground"` 的 Setter 237 行（其中 29 行两者皆是）、
+- `audits/foreground.md:113` - 全库 `<Setter>` 1507 行。第 4 节第 3 条当年数的 228 是**当时那棵树**的 `Property="Foreground"` 计数，
+- `audits/foreground.md:114` - 其后各批又添了行，现在同尺子是 237。
 
 ## audits/icon-family.md - 13 lines
 
@@ -951,7 +968,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 101 lines
+## ROADMAP.md - 105 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -994,7 +1011,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4178` - 谁也没法一次看全，也没人知道新批次有没有偷偷不写。这一批把它变成一份生成的清单加两道闸。
 - `ROADMAP.md:4182` - | 位置 | 干什么 | 为什么是这个形状 |
 - `ROADMAP.md:4184` - | `tools/Report-AstraKnownGaps.ps1` | 走 `docs/astra/**/*.md`，收两类行：标题带 `Known Gap` 的小节里的**每一行**，以及任何自带该标记的散文行；每行截到 200 字符并带 `file:line`；尾部 `canonical-lines` + sha256 | 与 `keys.md` 同一套哲学：文档是生成的，**过期就是缺陷...
-- `ROADMAP.md:4185` - | `docs/astra/audits/known-gaps.md` | 当前树生成读数：810 行、46 篇、47 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
+- `ROADMAP.md:4185` - | `docs/astra/audits/known-gaps.md` | 当前树生成读数：831 行、46 篇、48 个小节（本批发行时 791 行/46 节/45 篇；行数跟着树走不跟着批次走，后面每批的坦白都往里加） | 一次跑出的全集，不是抽样 |
 - `ROADMAP.md:4186` - | `tools/Test-AstraGates.ps1` 新步 `==> known gap inventory` | `-Check` | 放在 `-SkipPalette` 之外：它读的是文档，不是调色板 |
 - `ROADMAP.md:4187` - | `AstraGateTests.The_known_gap_inventory_covers_every_document_that_states_one` | 双向比文件集：哪篇声明了缺口而清单没它，哪篇清单里有但它已不再声明 | 测点用**自己的解析器**交叉读，不等脚本跑；`-Check` 看逐字形状，测点看覆盖面，两件事不互推 |
 - `ROADMAP.md:4191` - 1. **按标记数行 → 文档不可读。** 第一版每个标记一行、每行带整条原文。`ROADMAP.md:264` 那个阶段表的单元格是一行
@@ -1060,5 +1077,11 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4300` - 不判"与 WinUI 的截图是否一致"——那要一台装着 WinUI Gallery 的机器。这条按 Known Gap 记，不用"三档全绿"顶替它。
 - `ROADMAP.md:4320` - 3. **两处旧话改写**：`audits/motion.md` Known Gap 3 里"上游也未证"换成带 `file:line` 的结论；
 - `ROADMAP.md:4405` - - **不声称**：① 这条归因没做成常驻测点——没有测点会因"环又开始让槽内飘"而红，详见 06 那节的 Known Gap；
+### Known Gap（这条做不到，不写进断言）
 
-<!-- canonical-lines=810 sha256=e6b7e222e9254d5af8f035308660f9cdf79a2e0d62c6ac499fad952e678710c8 -->
+- `ROADMAP.md:4458` - "删掉整行就该看见"这种断言在这三行上做不出来——回落到同一个对象，任何树上读数与像素读数都分不开。
+- `ROADMAP.md:4459` - 因此这三行只声称"行指着谁、那个值确实落在部件上"（改指 A/B 证），不声称"少了它部件就没墨/会变色"；
+- `ROADMAP.md:4460` - 是否**真的印出墨**照旧归 #50。已记在 `audits/foreground.md` 7.2 第 2b 条，`audits/known-gaps.md` 随树生成。
+- `ROADMAP.md:4468` - - **视觉**：本批零新增像素断言——理由就是上面那条 Known Gap 与 #50（文本字形拿不到墨）。
+
+<!-- canonical-lines=831 sha256=16979f0bc0ec9f5d1076bf80f413736dd708df4bd68a1b8007dc9ddbf5a64dbf -->

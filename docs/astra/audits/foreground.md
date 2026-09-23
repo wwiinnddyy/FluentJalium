@@ -88,10 +88,27 @@
    carrier 一律不动（`#E4000000` 原地不动，6/6）。可判定的写法只剩"在该档下 mount、两档各一条"，
    而它的牙由 A/B 证明：抽掉 `Styles/Menus.jalxaml:288` 只有 `menu-bar-item` 两档红，回落值是继承墨
    （`#FF1D1D1F` / `#FFF5F5F7`）不是默认黑——所以"等于令牌"才是干活的那条。
-2. 5 处具名声明在实测树上取不到：`FluentTeachingTip.TitleTextBlock`/`SubtitleTextBlock`（提示未真正弹出）、
-   `FluentTabViewItem.IconHost`、`FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`。
+2. ~~5 处具名声明在实测树上取不到：`FluentTeachingTip.TitleTextBlock`/`SubtitleTextBlock`（提示未真正弹出）、
+   `FluentTabViewItem.IconHost`、`FluentBreadcrumbBarItem.PART_ChevronTextBlock`、`ComboBox.PART_ScrollViewer`~~
+   —— **这一条整条作废**（2026-09-23 #87 逐处复测）：五处全都有读者，两处早就有（`AstraBreadcrumbBarTests` 的
+   `PART_ChevronTextBlock`、`AstraTabViewTests` 的 `IconHost` 各有一条 `Assert.Same` 身份读数），
+   `PART_ScrollViewer` 只需打开下拉就能从宿主覆盖层按名取到，而提示那两处**从 `PART_Popup.Child` 往下走就取到**
+   ——带 placement target 的 Popup 把内容长在它自己的顶层 `PopupWindow` 里（`spike/TeachingTipProbe`），
+   它不是宿主的子节点，所以"从宿主窗口找"这一种走法注定空手；原来的"取不到"是走法写错，不是部件没实化。
+   三处新的到达读数落在 `AstraForegroundArrivalTests`。
+2b. 上面那三条"等于令牌"的读数，牙只在一处：**改指另一个键**（三条逐条试过，各红自己那一条、其余四条绿，
+   部件读到 `#5C000000`，`spike/ForegroundArrival/mut-swap-*.log`）。**删掉整行是看不见的**：三种形状都试过
+   （裸身份、先在控件上写一品红 carrier、最终那版五条事实），三行逐条删除后 5/5 恒绿（`mut-bare-*.log`、
+   `mut-carrier-*.log`、`mut-del-*.log`）。原因是量出来的：这个运行时里"什么都没写上去的 `TextBlock`"既不无墨、
+   也不继承，它带的就是**当前档的 `TextFillColorPrimaryBrush` 同一个实例**（Light `#E4000000` / Dark `#FFFFFFFF`，
+   `spike/ForegroundArrival/probe-default-ink.log`），而这三行转录的正是那支刷。所以"删了就看得见"这种断言
+   在这里做不出来，能做的只有"指着谁"；这些行是否**真的印出墨**照旧不在断言里（#50）。
 3. 兄弟图元判底用的是"重叠布局面板 + 尺寸同阶"的启发式，不是几何命中（本运行时没有可用的跨要素变换读数），
    所以它可能漏判异形叠色。
 4. 文本是否**真的印出墨**仍不在断言里（#50）；#46 的五处 1 DIP `Rectangle` 无墨仍未结。
 5. 高对比档下这些前景是否走 `HighContrast` 映射，本段没测——那是逐键映射闸（已存在）之外的一层。
-6. 状态格子（hover/pressed/disabled）的 228 条 Setter 只测了"键能解析"，没测"该状态下这一格确实被画上"。
+6. 状态格子（hover/pressed/disabled）的 Setter 只测了"键能解析"，没测"该状态下这一格确实被画上"。
+   这一层的行数要说清尺子才不重复第 4 节那次事故（`spike/ForegroundRoutingCensus/census-2026-09-23.txt`，
+   同一棵树三种尺子）：`TargetName` 写入 569 行、`Property="Foreground"` 的 Setter 237 行（其中 29 行两者皆是）、
+   全库 `<Setter>` 1507 行。第 4 节第 3 条当年数的 228 是**当时那棵树**的 `Property="Foreground"` 计数，
+   其后各批又添了行，现在同尺子是 237。
