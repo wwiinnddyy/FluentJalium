@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using FluentJalium.Themes;
 
@@ -303,6 +304,49 @@ public class AstraGateTests
         Assert.True(checkedAttributes > 1500, $"only {checkedAttributes} attributes were checked; the gate has gone vacuous.");
         offenders.Sort(StringComparer.Ordinal);
         Assert.False(offenders.Count > 0, $"Attributes no element type can hold ({offenders.Count}):" + Environment.NewLine + string.Join(Environment.NewLine, offenders));
+    }
+
+    /// <summary>
+    /// Cross-reads the generated known-gap inventory against the ledger with its own parser, the same way the
+    /// suite cross-reads the palette. The generator's <c>-Check</c> leg in the serial gate compares whole-file
+    /// text; this one asks a question a test can answer without the generator - whether every document that
+    /// states a gap (a "Known Gap" heading or a marker in prose) appears in the index at all - so a gap added
+    /// to an audit and never regenerated goes red here even when that gate step is skipped.
+    /// </summary>
+    [Fact]
+    public void The_known_gap_inventory_covers_every_document_that_states_one()
+    {
+        const string marker = "Known Gap";
+        var docs = Path.Combine(RepositoryRoot(), "docs", "astra");
+        var index = Path.Combine(docs, "audits", "known-gaps.md");
+        Assert.True(File.Exists(index), $"{index} is missing; run tools/Report-AstraKnownGaps.ps1.");
+
+        var stating = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (var file in Directory.EnumerateFiles(docs, "*.md", SearchOption.AllDirectories))
+        {
+            if (string.Equals(file, index, StringComparison.Ordinal)) continue;
+            var relative = Path.GetRelativePath(docs, file).Replace('\\', '/');
+            if (File.ReadLines(file).Any(static line => line.Contains(marker, StringComparison.Ordinal))) stating.Add(relative);
+        }
+
+        var listed = new SortedSet<string>(StringComparer.Ordinal);
+        // The generated document is CRLF, and a multiline `$` in this runtime binds before `\n` only, so the
+        // group headers would never match without normalising the newlines first.
+        var inventory = File.ReadAllText(index).Replace("\r\n", "\n");
+        foreach (Match match in Regex.Matches(inventory, @"^## (\S+\.md) - \d+ lines$", RegexOptions.Multiline))
+        {
+            listed.Add(match.Groups[1].Value);
+        }
+
+        Assert.True(stating.Count > 20, $"only {stating.Count} documents state a Known Gap; the ledger has gone quiet.");
+        var missing = stating.Except(listed).ToArray();
+        var stale = listed.Except(stating).ToArray();
+        Assert.False(missing.Length > 0,
+            "Documents state a Known Gap but the inventory does not carry them (run tools/Report-AstraKnownGaps.ps1):"
+            + Environment.NewLine + string.Join(Environment.NewLine, missing));
+        Assert.False(stale.Length > 0,
+            "The inventory lists documents that no longer state a Known Gap (run tools/Report-AstraKnownGaps.ps1):"
+            + Environment.NewLine + string.Join(Environment.NewLine, stale));
     }
 
     private static string RepositoryRoot()

@@ -1,0 +1,17 @@
+==> palette drift (-Check)
+Light : 83 source colors, 101 resolved brushes; checked=True
+Dark : 83 source colors, 101 resolved brushes; checked=True
+HighContrast : 101 mapped keys; upstream keys held back because the palette has no entry for them [AccentControlElevationBorderBrush CircleElevationBorderBrush ControlElevationBorderBrush]; checked=True
+exit=0
+==> public resource key inventory (-Check)
+keys.md is current: 1312 canonical lines.
+exit=0
+==> known gap inventory (-Check)
+known-gaps.md is current: 791 canonical lines.
+exit=0
+==> the one xUnit fact (gate-83c binary, docs read at run time)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+
+已通过! - 失败:     0，通过:     1，已跳过:     0，总计:     1，持续时间: 34 ms - FluentJalium.Tests.dll (net10.0)
+exit=0

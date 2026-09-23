@@ -72,6 +72,12 @@ try {
         & (Join-Path $PSScriptRoot 'Report-AstraResourceKeys.ps1') -Check
         if ($LASTEXITCODE -ne 0) { Write-Error 'Public resource key inventory is stale.' }
     }
+
+    # Same shape as the key inventory: the document is generated from prose, so its staleness is the failure mode.
+    # Independent of -SkipPalette because it reads docs, not the palette.
+    Write-Host '==> known gap inventory'
+    & (Join-Path $PSScriptRoot 'Report-AstraKnownGaps.ps1') -Check
+    if ($LASTEXITCODE -ne 0) { Write-Error 'Known gap inventory is stale.' }
     Write-Host 'All Astra gates passed.'
 }
 finally {

@@ -4172,5 +4172,88 @@ Debug 构建 0 警告 0 错误 → 整套 **1574/1574 通过、0 跳过，7 分 
 三档全绿里有一条顺带量到、尚未查因的读数：`status` 那一页的槽内稳定性在 Light/Dark 是 `stable=True/False`（#78 的环），
 到 HighContrast 变成 `True/True`，同一页同一槽。这只说明那一档下这个测点不再逐帧变墨，**不**说明环停了——#78 仍挂着。
 
+## #83（目标项 7）：Known Gaps 全集落成一个能闸口的文档——45 篇里 46 个小节、791 行，全部生成（2026-09-23）
+
+纪律那句"做不到就写进 Known Gaps，不许用相邻证据替代"此前**没有可核对的总量**：非主张散在 45 篇文档里，
+谁也没法一次看全，也没人知道新批次有没有偷偷不写。这一批把它变成一份生成的清单加两道闸。
+
+### 交付形状
+
+| 位置 | 干什么 | 为什么是这个形状 |
+|---|---|---|
+| `tools/Report-AstraKnownGaps.ps1` | 走 `docs/astra/**/*.md`，收两类行：标题带 `Known Gap` 的小节里的**每一行**，以及任何自带该标记的散文行；每行截到 200 字符并带 `file:line`；尾部 `canonical-lines` + sha256 | 与 `keys.md` 同一套哲学：文档是生成的，**过期就是缺陷**，`-Check` 就是主张 |
+| `docs/astra/audits/known-gaps.md` | 791 行、45 篇、46 个 Known Gaps 小节 | 一次跑出的全集，不是抽样 |
+| `tools/Test-AstraGates.ps1` 新步 `==> known gap inventory` | `-Check` | 放在 `-SkipPalette` 之外：它读的是文档，不是调色板 |
+| `AstraGateTests.The_known_gap_inventory_covers_every_document_that_states_one` | 双向比文件集：哪篇声明了缺口而清单没它，哪篇清单里有但它已不再声明 | 测点用**自己的解析器**交叉读，不等脚本跑；`-Check` 看逐字形状，测点看覆盖面，两件事不互推 |
+
+### 六次仪器纠正，每一次都是先把错形状跑出来才看见
+
+1. **按标记数行 → 文档不可读。** 第一版每个标记一行、每行带整条原文。`ROADMAP.md:264` 那个阶段表的单元格是一行
+   15,000 字符、内含 3 个标记的段落，于是整段被抄三遍，产出 130 KB。改成"每个文档行一条 + 截断 + 同行多标记打
+   `[xN]` 角标"——角标在第 2 条改成按小节收行之后没有对象了（小节里的条目本来不带标记），随之去掉。
+2. **只索引标记行 → 退化成指针表。** 45 篇里的 `## 5. Known Gaps` 小节**条目本身不带标记**（例：`audits/divider.md`
+   全文只有标题那一次），按标记行收就只收到 96 个"指向小节的句子"，那不是全集。改成按小节收行才是"Known Gaps 全集"，
+   行内保留小节名做分组。
+3. **机械分类被自己的读数否掉。** 试过用关键词把行分六桶（硬件输入／判据看不见／运行时不承载／上游无控件／
+   环境不可观测／仍欠的活），解析到 683 行，其中 **495 行落进"其他"**——这个分布不足以出分类表，所以账本里没有
+   机械分类，分类留给读的人。别下次再凭感觉重做一遍：先跑分布，再决定要不要出表。
+4. **两条跨 runtime 的坑，都会造成假结论。** (a) 脚本里一个非 ASCII 字符（省略号 `…`）让 Windows PowerShell 5.1
+   把整段报成"缺少 `}`"——纯字符串位置也能引爆解析器，工具脚本保持 ASCII；(b) `String.Contains(string,
+   StringComparison)` 在 5.1（.NET Framework）根本不存在，只有 `IndexOf(..., Ordinal) -ge 0`。测试侧还有一条：
+   生成的文档是 CRLF，.NET 的 multiline `$` 只绑 `\n`，第一次跑出的是**假红**（`stating=45 listed=0`），
+   错在读法不在断言——先归一化换行再匹配。
+5. **记账的那一节自己也在账上。** 本节的标题带 `Known Gap`，按第 2 条的判据它就是一个 Known Gaps 小节，所以它的
+   每一行都进清单：把这一节写完，行数从 776 涨到 808，小节从 45 涨到 46；补上这一条，又涨到 813。这不是 bug（清单要
+   的就是"每一句坦白都能追到 `file:line`"，本节也是坦白），但它让"清单里写着多少行"变成一个自指主张。处置：先落内容、
+   跑生成器，再把标题与表里的数改成**最后一次生成读到的那个**，然后重跑——改字符不改行数，所以第二次生成即不动点。
+   自指的代价写在这里，不靠"反正下次会重算"糊过去。
+6. **第一版清单自己不好读。** 跑绿之后回头看产物，两处结构错：(a) 每个 Known Gaps 小节的标题既成了分组标签又占一行，
+   46 个小节因此各多一条形如 "file:line -## 5. Known Gaps" 的行，把"行数"这个主张虚涨了 46；(b) 自带标记的行与破折号
+   粘在一起（":544 -于是…"），小节内行却带一个空格（"- 1. CommandBar…"），同一份表里两种形状。改成标题一律是结构
+   不是行、行统一 "file:line - 文本"。判据：先确认 46 这个数正好等于小节数，再动手——"看起来重复"要有计数支撑。
+
+### 牙齿：两条腿各红一次，中间不夹相邻证据
+
+- `missing` 腿：往一篇本来不带标记的文档（`adaptation/02-render-ceiling.md`）追一行含标记的散文 →
+  测点红在"Documents state a Known Gap but the inventory does not carry them"。
+- `stale` 腿：把 `audits/divider.md` 唯一那条 `## 6. Known Gaps（不声称清单）` 标题改成 `Deferred items` →
+  测点红在另一侧"the inventory lists documents that no longer state one"。
+- 两处都 `git checkout --` 原地还原，还原后同一条测点绿（五次跑 base / m1 / missing / stale / restored 都在
+  `spike/SystemColorProbe/gap-teeth-*.log`）。
+- `m1` 那一次绿，**不是牙齿**：我第一次往一篇本来就在清单里的文档追了一行标记，测点不动——它比的是**文件集**，
+  同一篇里多一行少一行它看不见。所以这条测点真正挡的是"没登记就新增/删掉一篇"，逐字形状的过期是 `-Check` 那一半的活，
+  两者不互推（这条分工本来就写在交付表里，m1 是它的实证）。
+- 去重之后两条腿的结论仍然成立：`missing` 腿追的是**行**，`stale` 腿改的是**标题**——标题虽然不再成行，但它带着标记
+  就仍把小节撑开，小节里的条目行照收。所以这份清单的"覆盖面"主张不靠"每个小节自己占一行"，去重只去掉重复，不去掉读者。
+
+### 串行闸口读数
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File tools/Test-AstraGates.ps1 -Configuration Debug`，
+日志 `spike/SystemColorProbe/gate-83c.log`，**退出码 0**：
+
+| 步 | 读数 |
+|---|---|
+| restore / build (Debug) | 已成功生成，0 个警告 0 个错误 |
+| test suite (structure, resource keys, theme runtime) | 失败 0，通过 1575，已跳过 0，总计 1575 |
+| gallery page pixels (13 pages x light, dark, high contrast) | `PASS 13 pages x 3 variants, 0 offender(s)` |
+| palette drift | Light / Dark 各 83 源色 101 刷 `checked=True`；HighContrast 101 映射 + 3 条上游键因调色板无对应按住 |
+| public resource key inventory | `keys.md is current: 1312 canonical lines.` |
+| known gap inventory | `known-gaps.md is current: 788 canonical lines.` |
+
+这次跑的就是终态树。之后的改动只有本节自己的文字（订正第 1、6 条的措辞与行数主张），而它是这份清单要数的文档之一，
+所以行数会再动一次：按第 5 条的不动点程序重生成并改数字，然后单独复跑三份清单的 `-Check` 与那条测点
+（`spike/SystemColorProbe/gate-83d-docs.log`）——纯文字不改代码，测试装配用的还是 gate-83c 那次构建的二进制。
+
+四类证据本批只动两类：**行为**（那条新测点与两套清单的 `-Check`）与**文档**。视觉侧没有新主张，页级像素那一行只是
+继续全绿；硬件输入侧本批不声称。
+
+### 不声称
+
+- **791 行不等于 791 个缺陷。** 一条缺陷在小节里可以占多行（表格行 + 续行），一行也可以只是散文引用；
+  这份文档的强度是"每一句坦白都能被追到 `file:line`，且没人在不登记的情况下删掉一条"。
+- **看不见没写标记的坦白。** 用别的词说的限制（"这条我们不主张"）不进这份账，所以它是**坦白总量的地板**，
+  不是完备性证明——这句话也印在生成文档的抬头里。
+- 本批零产品代码：`src/` 一行没动，测试总数 1574 → 1575，调色板与 `keys.md` 都不受影响。
+
 
 
