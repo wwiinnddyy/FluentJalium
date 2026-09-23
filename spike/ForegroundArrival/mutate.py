@@ -51,6 +51,17 @@ TAB_ICON_SELECTED_CELL = '<Setter TargetName="IconHost" Property="Foreground" Va
 TAB_POINTED = '<Setter Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />'
 TAB_ICON_POINTED = '<Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />'
 
+# The disabled-tab rows. `:71`'s cell has to be matched with its whole trigger because the setter text is byte-identical
+# to the one in `TabViewButtonStyle` at `:38` - a needle that matches twice either fails the "exactly once" check or,
+# worse, edits the wrong style. Removing it means swapping it for a setter on a property nothing reads.
+TAB_ICON_DISABLED_CELL = '<Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource TabViewItemIconForegroundDisabled}" />'
+TAB_CLOSE_PART_CELL = '<Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource TabViewItemHeaderDisabledCloseButtonForeground}" />'
+TAB_CLOSE_STYLE_CELL = ('<Trigger Property="IsEnabled" Value="False">'
+                        '<Setter Property="Foreground" Value="{ThemeResource TabViewButtonForegroundDisabled}" /></Trigger>')
+TAB_CLOSE_STYLE_NEUTERED = '<Trigger Property="IsEnabled" Value="False"><Setter Property="Tag" Value="row-removed" /></Trigger>'
+TAB_CLOSE_STYLE_REPOINTED = ('<Trigger Property="IsEnabled" Value="False">'
+                             '<Setter Property="Foreground" Value="{ThemeResource AccentButtonForeground}" /></Trigger>')
+
 TARGETS = {
     # A row taken away. Where the row's value equals what some other writer already supplies, this is silent -
     # measured for the three #87 rows and the two disabled cells below, which is why each has a `*point` twin.
@@ -89,6 +100,16 @@ TARGETS = {
     "tabselectedpoint": [(TABVIEW, TAB_HEADER_SELECTED_CELL, TAB_POINTED)],
     "tabiconcell": [(TABVIEW, TAB_ICON_SELECTED_CELL, "")],
     "tabiconpoint": [(TABVIEW, TAB_ICON_SELECTED_CELL, TAB_ICON_POINTED)],
+    # The three disabled-tab cells. Two of the three write the *same* property on the same part with the same brush
+    # (the item template's `CloseButton` row and the close button's own style row), so each is expected to be
+    # individually undeletable and only the composite to name them - the #88 rule, predicted rather than assumed here.
+    "tabicondis": [(TABVIEW, TAB_ICON_DISABLED_CELL, "")],
+    "tabicondispoint": [(TABVIEW, TAB_ICON_DISABLED_CELL, '<Setter TargetName="IconHost" Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />')],
+    "tabclosepart": [(TABVIEW, TAB_CLOSE_PART_CELL, "")],
+    "tabclosepartpoint": [(TABVIEW, TAB_CLOSE_PART_CELL, '<Setter TargetName="CloseButton" Property="Foreground" Value="{ThemeResource AccentButtonForeground}" />')],
+    "tabclosestyle": [(TABVIEW, TAB_CLOSE_STYLE_CELL, TAB_CLOSE_STYLE_NEUTERED)],
+    "tabclosestylepoint": [(TABVIEW, TAB_CLOSE_STYLE_CELL, TAB_CLOSE_STYLE_REPOINTED)],
+    "tabcloseboth": [(TABVIEW, TAB_CLOSE_PART_CELL, ""), (TABVIEW, TAB_CLOSE_STYLE_CELL, TAB_CLOSE_STYLE_NEUTERED)],
 }
 
 

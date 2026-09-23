@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-910 lines collected from 50 sections across 46 documents.
+927 lines collected from 51 sections across 46 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -315,7 +315,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/focus-visual.md:154` - 双圈，得逐族对着上游审 `UseSystemFocusVisuals` 与 `FocusVisualMargin`（上游确实有族显式关掉系统框，例如
 - `audits/focus-visual.md:155` - ContentDialog 的按钮），不属于本批"只换判据、不动像素"的范围。挂在视觉余账（与 #21/#23 同族）。
 
-## audits/foreground.md - 95 lines
+## audits/foreground.md - 107 lines
 
 ### 7 Known Gaps（不声称清单）
 
@@ -414,6 +414,18 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:182` - 普查是这批之前的快照，`readers=` 那两格当时报"无读者"；#91 之后按同一脚本重跑，键名无读者的数从 37 降到 **35**
 - `audits/foreground.md:183` - （两条测点各把一行键名写进了断言里），指针可驱动性与状态格子总数不变（仍 176 / 91）。快照文件
 - `audits/foreground.md:184` - `spike/StateCellCensus/census-2026-09-23.txt` 记的是它当时那一次，不追改。
+- `audits/foreground.md:187` - 7g. #92（2026-09-23）把 7.6e 里那两行 `:210` 部件禁用格与 `:71` 的按钮自身样式格量完，形状是 #88 那条不对称的**纯我们内部版**：
+- `audits/foreground.md:188` - 同一支属性上两个我们的格子相遇时，**在标记里靠后的那格落格**，靠前的那格一行都到不了——这一次不涉及框架的写，
+- `audits/foreground.md:189` - 也没有局部值，所以它把 #89 当初"不想卷进来"的跨层先后**在零改动的情况下量出来了**。
+- `audits/foreground.md:191` - | 那一格 | 位置 | 载体 | 删掉 | 改指成白 | 干净树读数 |
+- `audits/foreground.md:193` - | `TabViewItemIconForegroundDisabled` | `TabView.jalxaml:210` | 部件 `IconHost` | 只本条红，回落 `#9E000000`（静态那格的二级墨） | 只本条红，读到 `#FFFFFFFF` | `#5C000000` |
+- `audits/foreground.md:194` - | `TabViewItemHeaderDisabledCloseButtonForeground` | `:210` | 部件 `CloseButton` | **两条**红，回落 `#E4000000`（静态那格的主文字墨） | 两条红，读到 `#FFFFFFFF` | `#5C000000` |
+- `audits/foreground.md:195` - | `TabViewButtonForegroundDisabled` | `:71`（`TabViewCloseButtonStyle` 自己的模板触发器） | 同一枚 `CloseButton` | **9/9 全绿** | **9/9 全绿** | 与上一行同读数 |
+- `audits/foreground.md:196` - | 上两行同删（复合突变） | `:210` + `:71` | 同一枚 `CloseButton` | 2 红，回落 `#E4000000`——与只删 `:210` 一字不差 | — | — |
+- `audits/foreground.md:198` - 三条读数要分开看：① 两行部件格都**可判**（静态≠禁用），事实按 #91 的判据出得出来；② `:71` 那行删与不删、
+- `audits/foreground.md:199` - 改指不改指都动不了任何像素，它是**死格**——所以本批**撤掉**了原本为它写的那条事实（它恒真，没有任何属它自己的突变
+- `audits/foreground.md:200` - 能红，留着就是拿相邻证据冒充到达性）；③ `:38` 那行同键、住在 `TabViewButtonStyle`，载体是滚动按钮，只在标签条
+- `audits/foreground.md:201` - 溢出时才实现，本批**没量到**，不许按前两行外推。日志 `spike/ForegroundArrival/mut-tabdis-*.log`。
 
 ## audits/icon-family.md - 13 lines
 
@@ -1029,7 +1041,7 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/window-shell.md:136` - 6. `TitleBarStyleKey`（按键解析那条路）未测，只测了 `CustomTitleBarStyle`。
 - `audits/window-shell.md:137` - 7. 标题栏与内容区在窗口内的层序/占位关系未审计（`IsShowTitleBar=false` 时内容是否顶上未测）。
 
-## ROADMAP.md - 123 lines
+## ROADMAP.md - 128 lines
 
 - `ROADMAP.md:103` - 分级决定是否允许纯模板，以及 `Known Gaps` 怎么写。
 - `ROADMAP.md:118` - 静止尺寸（栏 12、拇指 8）已经与上游一致并有断言，箭头静止可见与全部悬停/展开态进 Known Gaps。
@@ -1166,5 +1178,10 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:4626` - 2. `TabViewItemHeaderSelectedCloseButtonForeground` 与它的静态格同指主文字刷，值不可判，出不了事实（同 7.6e 表）。
 - `ROADMAP.md:4627` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）；hover / pressed 六行归真指针通路（#13）。
 - `ROADMAP.md:4634` - - **视觉**：零新增像素断言（理由见 Known Gap 3）。
+- `ROADMAP.md:4668` - 1. `:38` 那行同键（滚动按钮样式）本批**没量到**：它的载体只在标签条溢出时实现，按上面那条不外推。
+- `ROADMAP.md:4669` - 2. `:71` 是不是**上游也这样**没量（上游同样有两处写这枚按钮的前景），所以本批只报"这行在我们的运行时到不了像素"，
+- `ROADMAP.md:4670` - 不报"这是一处 1:1 失效"。要不要动它，等 #13 的真指针批或单独一次上游对表再判。
+- `ROADMAP.md:4671` - 3. 这几格是否**真的印出墨**照旧不在断言里（#50）。
+- `ROADMAP.md:4678` - - **视觉**：零新增像素断言（Known Gap 3）。
 
-<!-- canonical-lines=910 sha256=cd543df041b8bbfb38d1390f76de9595535574b0eeb7547dbdc4d3d33fec97a5 -->
+<!-- canonical-lines=927 sha256=987863a6164f86b9f5417177b97f26f08bed8f6381c60cc3bd61fbd29a8d54e3 -->
