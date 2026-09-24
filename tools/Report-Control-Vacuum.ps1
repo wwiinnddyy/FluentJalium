@@ -10,9 +10,20 @@
        control the host already has) and ModernWpf.Controls/<Name>/ (a WinUI-derived type the host
        lacks). That is the same split this repository is being restructured to.
   Writes docs/astra/adaptation/05-native-control-vacuum.md. Re-run after adding any style.
+
+  Two things keep this from eating what people write by hand. Everything below the sentinel line
+  ('<!-- hand notes: ... -->') is copied out of the existing file and back in verbatim, so a hand
+  section like the section-F re-measurement survives a re-run - before that contract existed, a
+  re-run deleted it, which is how the document stayed stale for a whole stage. And -Check recomputes
+  the generated body without writing, exiting 1 when the committed file is stale, which is what the
+  serial gate calls (the same shape as Report-AstraResourceKeys.ps1 -Check).
+
+  The generated body ends with '<!-- generated-lines=N sha256=... -->'; the hash covers the generated
+  part only, so editing a hand note never makes the document read as stale.
 #>
 [CmdletBinding()]
 param(
+    [switch]$Check,
     [string]$ModernWpfRoot,
     [string]$Census,
     [string]$Out
@@ -78,7 +89,7 @@ function Quote([string[]]$items) { ($items | ForEach-Object { "'" + $_ + "'" }) 
 $sb = [System.Text.StringBuilder]::new()
 [void]$sb.AppendLine('# 原生控件真空清单（Fluent 外观覆盖到哪一步）')
 [void]$sb.AppendLine('')
-[void]$sb.AppendLine('由 `tools/Report-Control-Vacuum.ps1` 生成，**勿手改**。范围权威是 ModernWpf 的两层：')
+[void]$sb.AppendLine('由 `tools/Report-Control-Vacuum.ps1` 生成，**哨兵以上勿手改**（改了下次重跑就没了；要写结论请写到哨兵以下）。范围权威是 ModernWpf 的两层：')
 [void]$sb.AppendLine('``ModernWpf/Styles/*.xaml``（宿主已有控件的 Fluent 样式）与 ``ModernWpf.Controls/<Name>/``（宿主没有的 WinUI 派生类型）。')
 [void]$sb.AppendLine('原生类型与绘制分级来自 ``01-census-raw-output.txt``。')
 [void]$sb.AppendLine('')
@@ -151,5 +162,55 @@ if ($substituted.Count) {
 [void]$sb.AppendLine('')
 [void]$sb.AppendLine((Quote $styledOffScope))
 
-[System.IO.File]::WriteAllText([System.IO.Path]::GetFullPath($Out), $sb.ToString(), [System.Text.UTF8Encoding]::new($false))
-Write-Output "native=$($types.Count) scope=$($scope.Count) canStyle=$($native.Count) done=$($done.Count) HARDGAPS=$($hardGaps.Count) substituted=$($substituted.Count) needsOwnType=$($needsType.Count) outOfScope=$($extra.Count)"
+# The generated body ends here. Everything below the sentinel is hand-written and is copied back in
+# verbatim, so re-running this tool can never delete a hand finding again (it did, once - see the
+# section-F re-measurement and docs/astra/audits/gap-inventory.md).
+$sentinel = '<!-- hand notes: 生成器（tools/Report-Control-Vacuum.ps1）原样保留这一行往下的一切内容 -->'
+$body = $sb.ToString().TrimEnd() -replace "`r?`n", "`r`n"
+$canonical = @($body -split "`r`n" | ForEach-Object { ($_ -replace '\s+', ' ').Trim() } | Where-Object { $_ -ne '' })
+$hash = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes(($canonical -join "`n")))) -Algorithm SHA256).Hash.ToLower()
+
+$outFull = [System.IO.Path]::GetFullPath($Out)
+$hand = ''
+$committedHash = ''
+if ([System.IO.File]::Exists($outFull)) {
+    $existing = [System.IO.File]::ReadAllText($outFull)
+    $at = $existing.IndexOf($sentinel)
+    if ($at -ge 0) { $hand = $existing.Substring($at).TrimEnd() -replace "`r?`n", "`r`n" }
+    $committedHash = [Regex]::Match($existing, '<!-- generated-lines=\d+ sha256=([0-9a-f]+) -->').Groups[1].Value
+}
+
+$content = $body + "`r`n`r`n<!-- generated-lines=$($canonical.Count) sha256=$hash -->`r`n`r`n"
+$content += $(if ($hand) { $hand + "`r`n" } else { $sentinel + "`r`n" })
+$handLines = @($(if ($hand) { $hand -split "`r`n" | Where-Object { $_ -ne '' } })).Count
+
+if ($Check) {
+    if (-not [System.IO.File]::Exists($outFull)) {
+        Write-Host 'control-vacuum.md is missing; run the tool without -Check.'
+        exit 1
+    }
+    # Compare the whole document, not just the stamp: a hand edit inside the generated section changes
+    # neither the stamp nor the freshly generated body, so a stamp-only check stays green on exactly the
+    # drift it exists to catch (measured in the batch that wrote this check).
+    $existingNorm = $existing.Replace("`r`n", "`n")
+    $contentNorm = $content.Replace("`r`n", "`n")
+    if ($existingNorm -ne $contentNorm) {
+        Write-Host 'control-vacuum.md is stale: it differs from what this run generated.'
+        $a = $existingNorm -split "`n"; $b = $contentNorm -split "`n"
+        for ($i = 0; $i -lt [Math]::Min($a.Count, $b.Count); $i++) {
+            if ($a[$i] -ne $b[$i]) {
+                Write-Host ("first difference at line {0}:" -f ($i + 1))
+                Write-Host ("  committed: {0}" -f $a[$i])
+                Write-Host ("  generated: {0}" -f $b[$i])
+                break
+            }
+        }
+        if ($a.Count -ne $b.Count) { Write-Host ("line counts: committed={0} generated={1}" -f $a.Count, $b.Count) }
+        exit 1
+    }
+    Write-Host ('control-vacuum.md is current: {0} generated lines, {1} hand lines.' -f $canonical.Count, $handLines)
+    exit 0
+}
+
+[System.IO.File]::WriteAllText($outFull, $content, [System.Text.UTF8Encoding]::new($false))
+Write-Output "native=$($types.Count) scope=$($scope.Count) canStyle=$($native.Count) done=$($done.Count) HARDGAPS=$($hardGaps.Count) substituted=$($substituted.Count) needsOwnType=$($needsType.Count) outOfScope=$($extra.Count) generated=$($canonical.Count) hand=$($handLines)"

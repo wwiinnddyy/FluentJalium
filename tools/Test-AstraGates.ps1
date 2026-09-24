@@ -78,6 +78,12 @@ try {
     Write-Host '==> known gap inventory'
     & (Join-Path $PSScriptRoot 'Report-AstraKnownGaps.ps1') -Check
     if ($LASTEXITCODE -ne 0) { Write-Error 'Known gap inventory is stale.' }
+
+    # Third generated document, same shape. It needs the pinned ../ModernWpf checkout as its scope
+    # authority, so a missing sibling fails the run loudly rather than reporting a vacuous green.
+    Write-Host '==> control vacuum inventory'
+    & (Join-Path $PSScriptRoot 'Report-Control-Vacuum.ps1') -Check
+    if ($LASTEXITCODE -ne 0) { Write-Error 'Control vacuum inventory is stale.' }
     Write-Host 'All Astra gates passed.'
 }
 finally {
