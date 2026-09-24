@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <!--
+      双目标：net10.0-windows 是宿主应用的主目标；net10.0 是给 Linux 打包（AppImage）用的。
+      库里没有任何 Windows 专属 API（样式与控件都落在 Jalium 上），所以两端都能编过 ——
+      宿主应用在 net10.0 端引用不了只发 net10.0-windows 的库（NU1201）。
+    -->
+    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
     <RootNamespace>FluentJalium</RootNamespace>
     <AssemblyName>FluentJalium</AssemblyName>
     <Description>Source-audited WinUI 3 styles and native Jalium controls. Astra implementation.</Description>

@@ -429,6 +429,11 @@ public static class FluentThemeManager
 
     private static bool IsSystemDark()
     {
+        // 这条路径只在「跟随系统主题」时走。注册表是 Windows 的事：别的平台上没有"系统深浅"可问，
+        // 返回浅色（与没有该项时的行为一致）。异常兜底留给权限类问题，平台问题在入口就挡掉，
+        // 免得 LibraryBuild 的 net10.0 目标上一堆 CA1416、Linux 上一发 PlatformNotSupportedException。
+        if (!OperatingSystem.IsWindows()) return false;
+
         try
         {
             using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
