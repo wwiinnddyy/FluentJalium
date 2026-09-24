@@ -183,7 +183,7 @@
                   </Border>
                   <TextBlock Text="ToolTip" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
                   <TextBlock Text="Shown resting in the tree, because the hover timer that would normally open it is not gated." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,8" />
-                  <ToolTip Content="Flyout surface, acrylic fill, 1px stroke, 320 DIP cap" HorizontalAlignment="Left" />
+                  <ToolTip Content="Flyout surface, solid fill (this runtime has no AcrylicBrush; the key holds upstream's own FallbackColor), 1px stroke, 320 DIP cap" HorizontalAlignment="Left" />
                 </StackPanel>
               </Border>
               <TextBlock Text="WinUI 3 styling · Jalium layout, input, and rendering" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
