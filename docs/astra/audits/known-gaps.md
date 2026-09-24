@@ -17,7 +17,7 @@ What this CANNOT see is a limitation stated without the marker anywhere - "we do
 words is invisible here, so the count is a floor on candour, not a proof of completeness.
 Categorised summaries live in `ROADMAP.md`.
 
-1015 lines collected from 55 sections across 46 documents.
+1023 lines collected from 56 sections across 47 documents.
 
 ## adaptation/00-jalium-theme-capabilities.md - 6 lines
 
@@ -427,6 +427,19 @@ Categorised summaries live in `ROADMAP.md`.
 - `audits/foreground.md:199` - 改指不改指都动不了任何像素，它是**死格**——所以本批**撤掉**了原本为它写的那条事实（它恒真，没有任何属它自己的突变
 - `audits/foreground.md:200` - 能红，留着就是拿相邻证据冒充到达性）；③ `:38` 那行同键、住在 `TabViewButtonStyle`，载体是滚动按钮，只在标签条
 - `audits/foreground.md:201` - 溢出时才实现，本批**没量到**，不许按前两行外推。日志 `spike/ForegroundArrival/mut-tabdis-*.log`。
+
+## audits/gap-inventory.md - 8 lines
+
+### 8. Known Gaps
+
+- `audits/gap-inventory.md:270` - - 本文件是**快照不是台账**：四个数记于 2026-09-25 / `e1f3366`，没有 `-Check` 守着，样式或字典一动就会漂；重算命令写在 §1，引用它们时先重跑。
+- `audits/gap-inventory.md:271` - - 键差集**只按名字比，不比值**：798 个重合名里有多少逐字同值、有多少是本层已标注的形式替换（Color→Brush、渐变改实底），本批未量。
+- `audits/gap-inventory.md:272` - - §2.1/§2.2 的名单继承 `adaptation/05` 的两处已知不可靠：绘制方式列是 `OnRender`/`OnPaint` 启发式（NumberBox 批证伪过），D 段按名字匹配 `Control` 宇宙（§F 判出 `MenuFlyout` 一条假阴性，本批照同一把尺重量又判出五条：`CommandBarFlyout`、`GridView`、`Hyperlink`、`Page...
+- `audits/gap-inventory.md:273` - - §5.1 的运行时缺席靠的是 `s0v-runtime-type-inventory-raw.txt` 那份 2026-09-20 的类型普查，本批**没有对 26.10.9 重跑普查**；若运行时升版，这张表整段要重算。
+- `audits/gap-inventory.md:274` - - §4.3 那份"从未进账"的名单是**一次字符串扫描的结果，不是完备性证明**：换个名字写法（例如上游 C++ 侧的 `FadeInThemeAnimation`）就扫不到，`audits/progress-bar.md:68` 恰好提过它一次。
+- `audits/gap-inventory.md:275` - - "1:1 复刻"的目视那一半仍然没有替身，本批也没做：三档像素闸判的是"我们的令牌上了屏、品牌绿没上屏、上游占位符没上屏"，不判与 WinUI 截图一致（`ROADMAP.md:4308` 同一条）。
+- `audits/gap-inventory.md:276` - - 本批没跑 `dotnet test` 套件、没跑串行闸口与页级像素闸；§6.4 的三条 `-Check` 与那次 Gallery 构建是本批自己的读数，而 `feb45af` 全绿与其后三次红是引来的旧读数，两者不要混着引用。
+- `audits/gap-inventory.md:277` - - Gallery 冒烟在本批**未通过判据**，且已按 A/B 判给仪器：`surfaces`（未动）与 `overview`（动过）在同一步 `WaitForInputIdle(30s)` 上一样红；这句不是“这次改动没问题”的证明，只是“它不是那条红的原因”。
 
 ## audits/icon-family.md - 28 lines
 
@@ -1274,4 +1287,4 @@ Categorised summaries live in `ROADMAP.md`.
 - `ROADMAP.md:5010` - 两条通路要分开记。
 - `ROADMAP.md:5016` - 在这之前 Known Gap 第 2 条那句"哪套字形"还悬着——把它量掉，才谈得上逐宿主换形状。
 
-<!-- canonical-lines=1015 sha256=f49a63667d8f501f1b12e50d8cc2b8f9d242207e871bde81fccd4fb1f4608a11 -->
+<!-- canonical-lines=1023 sha256=5fe06ae0531571a63dd7c464ba6cf87d8dbc5f3adb1bd5fd9c036cb23d0948a2 -->

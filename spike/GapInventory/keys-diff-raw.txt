@@ -1,0 +1,158 @@
+== inputs ==
+Astra HEAD            : e1f3366
+WinUI checkout        : 19e3bdc3c
+WinUI working tree    : 0 modified path(s) - reference must stay clean
+ledger canonical line : canonical-lines=1312
+
+== upstream rows: controls/dev/**/*_themeresources.xaml ==
+unique key names      : 2903
+typed declarations    : 3034  (a name can be declared by several files)
+
+== Astra published names (keys.md column 2, de-duplicated) ==
+unique names          : 1063
+
+== diff ==
+overlapping names     : 798
+upstream, not ours    : 2105
+ours, not an upstream theme key (palette colors, our aliases, own-type keys) : 265
+
+== the un-transcribed names, by upstream row type ==
+counts overlap: a name declared with two row types in two files is counted in both buckets
+StaticResource     upstream=1520  un-transcribed=913
+SolidColorBrush    upstream=499   un-transcribed=462
+Color              upstream=31    un-transcribed=31
+x:Double           upstream=285   un-transcribed=283
+Thickness          upstream=334   un-transcribed=230
+x:String           upstream=48    un-transcribed=47
+CornerRadius       upstream=25    un-transcribed=13
+FontWeight         upstream=13    un-transcribed=13
+Style              upstream=178   un-transcribed=120
+ControlTemplate    upstream=13    un-transcribed=13
+AcrylicBrush       upstream=44    un-transcribed=43
+x:Boolean          upstream=7     un-transcribed=7
+VerticalAlignment  upstream=5     un-transcribed=5
+HorizontalAlignment upstream=5     un-transcribed=5
+
+== the un-transcribed names, by control-family prefix ==
+    135 AppBar
+    104 Calendar
+     76 NavigationView
+     69 ListView
+     62 ToggleSwitch
+     58 Menu
+     52 GridView
+     47 DatePicker
+     46 TitleBar
+     45 ToggleButton
+     43 TimePicker
+     42 CommandBarFlyout
+     41 Slider
+     37 TabView
+     32 SelectorBar
+     32 Expander
+     29 TeachingTip
+     28 InfoBar
+     27 Text
+     23 CommandBar
+     23 CheckBox
+     22 ItemContainer
+     21 RepeatButton
+     20 ScrollView
+     20 ContentDialog
+     20 Button
+     19 BreadcrumbBar
+     18 SplitButton
+     18 RadioButton
+     16 PipsPager
+     16 ColorPicker
+     15 ListBox
+     14 Toggle
+     11 PersonPicture
+     10 ProgressBar
+     10 PagerControl
+      9 AutoSuggestBox
+      8 TreeView
+      8 ToolTip
+      8 Swipe
+      8 SplitView
+      6 InfoBadge
+      5 NumberBox
+      5 MenuBar
+      4 Hyperlink
+      4 Flyout
+      4 Accent
+      3 Thumb
+      3 Rating
+      2 RadioButtons
+      2 AnnotatedScrollBar
+      1 ProgressRing
+
+material-shaped names (acrylic|reveal|smoke|mica anywhere in the name) : 284
+
+== the 82-ish upstream named Styles we do not publish ==
+upstream named styles : 178
+un-transcribed        : 120
+AlternateCloseButtonStyle AppBarButtonOverflowStyle AppBarButtonRevealLabelsOnRightStyle AppBarButtonRevealOverflowStyle AppBarButtonRevealStyle AppBarButtonStyle AppBarToggleButtonOverflowStyle AppBarToggleButtonRevealLabelsOnRightStyle AppBarToggleButtonRevealOverflowStyle AppBarToggleButtonRevealStyle AppBarToggleButtonStyle AutoSuggestBoxTextBoxStyle BaseContentControlStyle BaseContentPresenterStyle BodyContentPresenterStyle ButtonRevealStyle CalendarViewRevealStyle ColorPickerBorderStyle ComboBoxItemPill ComboBoxItemRevealStyle ComboBoxTextBoxStyle CommandBarFlyoutAppBarButtonStyle CommandBarFlyoutAppBarButtonStyleBase CommandBarFlyoutAppBarToggleButtonStyle CommandBarFlyoutAppBarToggleButtonStyleBase CommandBarFlyoutCommandBarOverflowPresenterStyle CommandBarFlyoutEllipsisButtonStyle CommandBarRevealStyle CommandBarStyle CommandBarWithoutRevealStyle DatePickerFlyoutButtonStyle DateTimePickerFlyoutButtonStyle DateTimePickerFlyoutLoopingSelectorNavigationButtonStyle DefaultAutoSuggestBoxStyle DefaultCalendarDatePicker DefaultCalendarViewStyle DefaultCommandBarFlyoutCommandBarStyle DefaultCommandBarOverflowPresenterStyle DefaultDatePickerFlyoutPresenterStyle DefaultDatePickerStyle DefaultFlipViewItemStyle DefaultFlipViewStyle DefaultFlyoutPresenterStyle DefaultGridViewItemStyle DefaultLoopingSelectorStyle DefaultMediaTransportControlsStyle DefaultMenuFlyoutPresenterStyle DefaultPivotHeaderItemStyle DefaultPivotItemStyle DefaultPivotStyle DefaultProgressBarStyle DefaultRadioMenuFlyoutItemStyle DefaultRichEditBoxStyle DefaultScrollBarStyle DefaultSplitMenuFlyoutItemStyle DefaultSplitViewStyle DefaultToggleSwitchStyle DropDownButtonRevealStyle EllipsisButton EllipsisButtonRevealStyle ExpanderHeaderDownStyle ExpanderHeaderUpStyle FlyoutStrokeWidthSelectorStyle FlyoutStyle GridViewItemRevealBackgroundShowsAboveContentStyle GridViewItemRevealStyle HeaderNavigationButtonStyle InfoBarCloseButtonStyle InkToolbarCommonButtonStyle InkToolbarExtensionGlyphStyle InkToolbarFlyoutItemContentTextStyle InkToolbarFlyoutItemSelectionAccentStyle InkToolbarFlyoutItemStyle InkToolbarFlyoutStyle InkToolbarGlyphFillFontStyle InkToolbarGlyphFontStyle InkToolbarPenConfigurationControlTextStyle ItemContainerSelectionCheckboxStyle ListPickerFlyoutPresenterItemStyle ListViewItemExpanded ListViewItemRevealBackgroundShowsAboveContentStyle ListViewItemRevealStyle MUX_NavigationViewItemPresenterStyleWhenOnLeftPane MUX_NavigationViewItemPresenterStyleWhenOnLeftPaneWithRevealFocus MUX_NavigationViewItemPresenterStyleWhenOnTopPane MUX_NavigationViewItemPresenterStyleWhenOnTopPaneOverflow MUX_NavigationViewItemPresenterStyleWhenOnTopPaneWithRevealFocus MUX_NavigationViewSettingsItemStyleWhenOnTopPane MediaControlAppBarButtonStyle MediaSliderStyle MediaTextBlockStyle MenuFlyoutItemRevealStyle MenuFlyoutSubItemRevealStyle NavigationButtonStyle NavigationViewItemHeaderTextStyle NavigationViewOverflowButtonNoLabelStyleWhenPaneOnTop NavigationViewOverflowButtonStyleWhenPaneOnTop NavigationViewPaneSearchButtonStyle NavigationViewTitleHeaderContentControlTextStyle PagerControlNumberPanelButtonStyle PagerControlPageNavigationButtonStyle PaneToggleButtonStyle PivotTitleContentControlStyle RadioMenuFlyoutSubItemStyle RepeatButtonRevealStyle ScrollButtonStyle ScrollViewerStyle SelectorBarItemPill SemanticZoomRevealStyle SliderThumbStyle SplitButtonCommandBarStyle SplitButtonRevealStyle SwipeItemStyle TimePickerFlyoutButtonStyle TitleBarBackButtonStyle TitleBarPaneToggleButtonStyle TitleContentControlStyle ToggleButtonRevealStyle ToggleMenuFlyoutItemRevealStyle WeekDayNameStyle 
+
+Reveal-hover styles among them : 26
+NavigationView presenter styles among them : 11
+
+== Jalium.UI.Managed exported types that do not exist (exact-name match, one per line) ==
+ItemsRepeater          0
+ItemsView              0
+LayoutPanel            0
+StackLayout            0
+UniformGridLayout      0
+FlowLayout             0
+SplitView              0
+TwoPaneView            0
+GridView               1
+Card                   0
+CardAction             0
+FlyoutPresenter        0
+MenuScroller           0
+PagerControl           0
+PersonPicture          0
+SelectorBar            0
+AnnotatedScrollBar     0
+ThemeShadow            0
+AcrylicBrush           0
+AnimatedIcon           0
+RadioMenuFlyoutItem    0
+SplitMenuFlyoutItem    0
+CommandBarFlyout       1
+MenuFlyout             1
+FlyoutBase             1
+WrapPanel              1
+VisualStateManager     1
+
+== the vacuum report's section D (28 names) re-measured the way adaptation/05 section F prescribes ==
+the tool matches names against the Control census; this looks each name up in the whole exported-type inventory
+AnnotatedScrollBar     absent
+AutoSuggestBox         absent
+BreadcrumbBar          absent
+CommandBarFlyout       Jalium.UI.Controls.CommandBarFlyout
+DropDownButton         absent
+Flyout                 absent
+GridView               Jalium.UI.Controls.GridView
+Hyperlink              Jalium.UI.Documents.Hyperlink
+InfoBadge              absent
+ItemContainer          absent
+ItemsView              absent
+LayoutPanel            absent
+MenuFlyout             Jalium.UI.Controls.MenuFlyout
+NavigationBackButton   absent
+Page                   Jalium.UI.Controls.Page
+PagerControl           absent
+PersonPicture          absent
+ProgressRing           absent
+RadioButtons           absent
+RadioMenuItem          absent
+RatingControl          absent
+Repeater               absent
+SelectorBar            absent
+SplitView              absent
+TabView                absent
+TeachingTip            absent
+TwoPaneView            absent
+WrapPanel              Jalium.UI.Controls.WrapPanel
