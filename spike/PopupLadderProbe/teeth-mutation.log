@@ -1,0 +1,32 @@
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:01.69]     FluentJalium.Tests.AstraMenuTests.Showing_a_flyout_opens_it_and_hides_it_closes_it [FAIL]
+[xUnit.net 00:00:01.69]     FluentJalium.Tests.AstraMenuTests.A_context_menu_opens_on_a_point_with_its_own_surface [FAIL]
+  失败 FluentJalium.Tests.AstraMenuTests.Showing_a_flyout_opens_it_and_hides_it_closes_it [569 ms]
+  错误消息:
+   ShowAt did not open the flyout.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraMenuTests.<>c.<Showing_a_flyout_opens_it_and_hides_it_closes_it>b__24_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 471
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.Showing_a_flyout_opens_it_and_hides_it_closes_it() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 461
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失败 FluentJalium.Tests.AstraMenuTests.A_context_menu_opens_on_a_point_with_its_own_surface [2 ms]
+  错误消息:
+   Open(Point) did not open the context menu.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraMenuTests.<>c.<A_context_menu_opens_on_a_point_with_its_own_surface>b__29_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 577
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.A_context_menu_opens_on_a_point_with_its_own_surface() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 565
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     2，通过:     1，已跳过:     0，总计:     3，持续时间: 711 ms - FluentJalium.Tests.dll (net10.0)

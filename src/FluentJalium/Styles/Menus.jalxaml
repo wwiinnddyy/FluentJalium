@@ -1,0 +1,349 @@
+<!-- Astra menu styles: the flyout item family, the two bar surfaces and the context menu.
+     The row names are WinUI 3's (ThemeResources/MenuFlyout.jalxaml, ThemeResources/MenuBar.jalxaml);
+     this file is where they become pixels, because 26.10.9 reads no upstream menu resource by name -
+     thirty-three app-level sentinels installed under upstream names moved nothing on the framework's own
+     menu chrome (spike/MenuProbe pass 4), so colour parity is only reachable through a consumption point
+     of ours, exactly as in every other batch.
+     Which types can be retemplated here is measured, not assumed: Menu, ContextMenu, MenuFlyoutItem,
+     ToggleMenuFlyoutItem, MenuFlyoutSubItem and MenuFlyoutSeparator all instantiate a template that was in
+     place before the window was shown, while MenuItem stores a Template and never builds one - it paints
+     itself in OnRender through ResolveBackgroundBrush/ResolveMenuBrush/DrawCheckMark/DrawSubmenuArrow - so
+     MenuItem gets a colour-only style and its highlight/press/submenu marks stay framework-drawn.
+     The four flyout row types are the same story with a template on top, and that is what the ghost was:
+     26.10.9 draws their label, accelerator text, check mark, submenu chevron and separator rule in OnRender
+     too (spike/FlyoutGhostProbe reads the glyph and brush names straight out of those method bodies' IL),
+     so a template that presents them again paints every row twice. Their templates therefore carry only what
+     the control leaves to the skin - the surface and the icon slot, which 26.10.9 never paints - and the
+     label states ride on Style.Triggers, because the probe's tint pass measures that the control's own
+     painter does read this Foreground. What that costs: the accelerator text, the check mark, the chevron
+     and the rule keep 26.10.9's palette colours (TextSecondary / TextDisabled / MenuFlyoutPresenterBorderBrush)
+     and no row of ours can reach them, so the upstream rows for those four are not published (Known Gaps).
+     Upstream's VisualStateGroup to this runtime's cell list, per type:
+       MenuFlyoutItem        CommonStates PointerOver/Pressed/Disabled -> IsMouseOver / (no press flag) / IsEnabled=False
+       ToggleMenuFlyoutItem  CommonStates + CheckStates Checked       -> IsMouseOver / - / IsEnabled=False / IsChecked
+       MenuFlyoutSubItem     CommonStates + SubMenuOpened              -> IsMouseOver / - / IsEnabled=False / (no submenu DP)
+       MenuFlyoutSeparator   (none)
+       MenuBarItem           CommonStates PointerOver/Pressed/Selected -> IsMouseOver / - / (Title is its only DP)
+       MenuFlyoutItem        CheckPlaceholderStates + PaddingSizeStates + KeyboardAcceleratorTextVisibility
+                             -> the control's own 28-wide mark column and its fixed 43 label column already
+                                carry these three groups, so the only cell left to us is Icon={x:Null};
+                                the narrow-padding pair has no state to watch, so 11,8,11,9 is the only padding.
+     The flyout surface itself is framework-owned: an opened MenuFlyout builds its own MenuPopupScrollHost
+     with two RepeatButton arrows and a ScrollViewer whose brushes we cannot reach (pass 4), so the surface
+     rows below are consumed by ContextMenu, which is a control of ours to template, and by nothing else. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+
+  <!-- ============ MenuFlyoutItem ============ -->
+  <Style x:Key="DefaultMenuFlyoutItemStyle" TargetType="MenuFlyoutItem">
+    <Setter Property="Background" Value="{ThemeResource MenuFlyoutItemBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutItemBackgroundBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuFlyoutItemBorderThickness}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutItemThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <!-- 26.10.9 measures a flyout item to its own 34-tall floor, and 4 of those pixels go on upstream's
+         4,2,4,2 item margin before the 11,8,11,9 padding and a 17-tall label, which squeezes the label to 13.
+         38 = 4 margin + 17 padding + 17 label, which is the geometry the same rows produce upstream. -->
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="MenuFlyoutItem">
+        <!-- Upstream's LayoutRoot is a Grid; a Border carries the same six properties here and is the tinted
+             cell every other Astra template uses. Everything inside it is what the control does NOT paint:
+             the label, the accelerator text, the check mark, the chevron and the separator line are its own
+             OnRender output, so drawing them here is the second painter that produced the ghost this batch
+             removes (spike/FlyoutGhostProbe: the shipped pair measured 1194 #FFFFFF label pixels over the
+             framework's 1670 #F5F5F7 ones, the surface-only pair measures zero #FFFFFF).
+             The icon slot stays: 26.10.9 never paints Icon, and its label column starts 28 in from the
+             padding, which is exactly where a 16-wide box plus upstream's 12 gap lands. -->
+        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
+          <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+          </Border>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="Icon" Value="{x:Null}"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutItemBackgroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutItemBackgroundDisabled}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+    <!-- The label is the control's own paint, and the tint probe measures that its painter reads this
+         Foreground (a magenta value came out magenta on the capture), so the two label rows stay live as
+         style triggers rather than as a template cell on a TextBlock that no longer exists. The sweep that
+         fixed the dead cells deleted a third copy of each of these rows: they also sat inside the template
+         as Foreground cells on IconContent, a ContentPresenter, which has no Foreground member to write. -->
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundPointerOver}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="MenuFlyoutItem" BasedOn="{StaticResource DefaultMenuFlyoutItemStyle}" />
+
+  <!-- ============ ToggleMenuFlyoutItem ============ -->
+  <Style x:Key="DefaultToggleMenuFlyoutItemStyle" TargetType="ToggleMenuFlyoutItem">
+    <!-- Upstream's resting background here is a literal Transparent, not MenuFlyoutItemBackground, and its
+         hover and disabled cells write the *SubItem* rows rather than the item ones. Both are transcribed as
+         written. -->
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutItemBackgroundBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuFlyoutItemBorderThickness}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutItemThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <!-- 26.10.9 measures a flyout item to its own 34-tall floor, and 4 of those pixels go on upstream's
+         4,2,4,2 item margin before the 11,8,11,9 padding and a 17-tall label, which squeezes the label to 13.
+         38 = 4 margin + 17 padding + 17 label, which is the geometry the same rows produce upstream. -->
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ToggleMenuFlyoutItem">
+        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
+          <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+          </Border>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="Icon" Value="{x:Null}"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+          <!-- CheckStates: upstream's CheckedWithIcon state hides the icon and shows the mark in the same
+               column, and 26.10.9 paints that mark itself, so the cell is a collapse rather than a glyph. -->
+          <Trigger Property="IsChecked" Value="True"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundPointerOver}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundPointerOver}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="ToggleMenuFlyoutItem" BasedOn="{StaticResource DefaultToggleMenuFlyoutItemStyle}" />
+
+  <!-- ============ MenuFlyoutSubItem ============ -->
+  <Style x:Key="DefaultMenuFlyoutSubItemStyle" TargetType="MenuFlyoutSubItem">
+    <Setter Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutSubItemBackgroundBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuFlyoutSubItemBorderThickness}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutItemThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <!-- 26.10.9 measures a flyout item to its own 34-tall floor, and 4 of those pixels go on upstream's
+         4,2,4,2 item margin before the 11,8,11,9 padding and a 17-tall label, which squeezes the label to 13.
+         38 = 4 margin + 17 padding + 17 label, which is the geometry the same rows produce upstream. -->
+    <Setter Property="MinHeight" Value="38" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="MenuFlyoutSubItem">
+        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}" Margin="{ThemeResource MenuFlyoutItemMargin}"
+                TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}">
+          <Border Name="IconRoot" Width="16" Height="16" Margin="0,0,12,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <ContentPresenter Name="IconContent" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+          </Border>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="Icon" Value="{x:Null}"><Setter TargetName="IconRoot" Property="Visibility" Value="Collapsed" /></Trigger>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="LayoutRoot" Property="Background" Value="{ThemeResource MenuFlyoutSubItemBackgroundDisabled}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+    <!-- The chevron is the control's own paint too (SubMenuOpened has no state to watch here), so the label
+         rows ride on the property the painter reads. -->
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundPointerOver}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource MenuFlyoutSubItemForegroundDisabled}" /></Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="MenuFlyoutSubItem" BasedOn="{StaticResource DefaultMenuFlyoutSubItemStyle}" />
+
+  <!-- ============ MenuFlyoutSeparator ============ -->
+  <Style TargetType="MenuFlyoutSeparator">
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutSeparatorThemePadding}" />
+    <!-- 26.10.9 measures this type to 9 tall no matter what the template asks for (the probe reads
+         actual=218.5x9 with the margin zeroed and with the 1-tall box), while upstream's row is the 1-tall rule
+         plus its own -4,1,-4,1 padding = 3. Height is the only lever that reaches that measure, so the row
+         carries it and the flyout's separator gap becomes upstream's 3 DIP. -->
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Height" Value="3" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="MenuFlyoutSeparator">
+        <!-- A spacer, not a line: 26.10.9 draws the rule itself in OnRender from MenuFlyoutPresenterBorderBrush,
+             so painting one here is the second line of the ghost. The 1-tall box keeps upstream's measure
+             (MenuFlyoutSeparatorHeight is an x:Double row this reader cannot parse) and the -4,1,-4,1 padding
+             as its margin, which is what the control's own rule is positioned against. -->
+        <Border Background="Transparent" Margin="{TemplateBinding Padding}" Height="1" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <!-- ============ Menu (the always-visible bar) ============ -->
+  <Style x:Key="DefaultMenuStyle" TargetType="Menu">
+    <!-- ModernWpf paints WPF's Menu with MenuBarBackground/MenuBarForeground, and Jalium's Menu is that same
+         top-level bar, so it reads MenuBar's rows rather than inventing Menu* names: the WinUI dictionary has
+         no Menu rows at all. -->
+    <Setter Property="Background" Value="{ThemeResource MenuBarBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuBarItemForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuBarItemBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuBarItemBorderThickness}" />
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="FontSize" Value="14" />
+    <!-- The items panel has to come with the template. 26.10.9 lays a Menu's top-level items out
+         horizontally from its own default panel; an ItemsPresenter with no ItemsPanel of its own falls
+         back to ItemsControl's vertical one, which stacked File/Edit/View/Help into a column
+         (spike/VisualQA/out/menus.png). Upstream's nearest shape, MenuBar, is a horizontal bar too. -->
+    <Setter Property="ItemsPanel">
+      <ItemsPanelTemplate>
+        <StackPanel Orientation="Horizontal" />
+      </ItemsPanelTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="Menu">
+        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+          <ItemsPresenter />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="Menu" BasedOn="{StaticResource DefaultMenuStyle}" />
+
+  <!-- ============ ContextMenu (the popped-up menu) ============ -->
+  <Style x:Key="DefaultContextMenuStyle" TargetType="ContextMenu">
+    <!-- A context menu is WinUI's flyout surface, so it reads MenuFlyoutPresenter*'s rows instead of
+         ModernWpf's ContextMenu* names: the values are the same pair (an acrylic base plus
+         SurfaceStrokeColorFlyout) and this project publishes only upstream's names. The collapse is
+         recorded in audits/menu-flyout.md. -->
+    <Setter Property="Background" Value="{ThemeResource MenuFlyoutPresenterBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutPresenterBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuFlyoutPresenterBorderThemeThickness}" />
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutPresenterThemePadding}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForeground}" />
+    <Setter Property="MinWidth" Value="140" />
+    <!-- MenuFlyoutThemeMinHeight is 32 upstream and an x:Double row, so it rides as a literal on the surface
+         that plays the presenter role here. It must NOT go on the items: measured, an item that carries a
+         32-tall floor cannot fit upstream's 8+9 padding around a 17-tall text line and the label is squeezed. -->
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="FontSize" Value="14" />
+    <!-- This setter is not for our own template - it is for the Border the framework builds OUTSIDE it.
+         Measured (spike/FlyoutSurfaceProbe, modes radius + sweep): ContextMenu.Open grafts
+         PopupRoot > Border > MenuPopupScrollHost into the window's overlay, and that Border takes this
+         control's Background / BorderBrush / CornerRadius as local values - which is why the two presenter rows
+         reach pixels here and nowhere else. The copy reads what the control was TOLD to take, not any effective
+         value: with no setter here the surface stayed at the framework's own 14,14,14,14 LOCAL, while an explicit
+         0 does reach it - so a control that asks for nothing gets a corner it never asked for. Writing 3 on the
+         control moved the surface to 3 live, and clearing it re-copied this row. Upstream's flyout surface is
+         OverlayCornerRadius: MenuFlyout_themeresources.xaml:285 with the key at 8 (CornerRadius_themeresources.xaml:6),
+         and MenuFlyout's own surface already wears 8 from the framework, which we cannot and need not reach.
+         Raw log: docs/astra/adaptation/s1a-menu-surface-raw.txt; contract: adaptation/00 S1-a. -->
+    <Setter Property="CornerRadius" Value="{ThemeResource OverlayCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="ContextMenu">
+        <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                Padding="{TemplateBinding Padding}">
+          <ItemsPresenter />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="ContextMenu" BasedOn="{StaticResource DefaultContextMenuStyle}" />
+
+  <!-- ============ MenuBar ============ -->
+  <Style x:Key="DefaultMenuBarStyle" TargetType="MenuBar">
+    <Setter Property="Background" Value="{ThemeResource MenuBarBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuBarItemForeground}" />
+    <!-- MenuBarHeight is 40 upstream and an x:Double row. -->
+    <Setter Property="MinHeight" Value="40" />
+    <Setter Property="FontSize" Value="14" />
+  </Style>
+  <Style TargetType="MenuBar" BasedOn="{StaticResource DefaultMenuBarStyle}" />
+
+  <!-- ============ MenuBarItem ============ -->
+  <Style x:Key="DefaultMenuBarItemStyle" TargetType="MenuBarItem">
+    <Setter Property="Foreground" Value="{ThemeResource MenuBarItemForeground}" />
+    <Setter Property="Background" Value="{ThemeResource MenuBarItemBackground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource MenuBarItemBorderThickness}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuBarItemBorderBrush}" />
+    <Setter Property="Margin" Value="{ThemeResource MenuBarItemMargin}" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="MenuBarItem">
+        <!-- ContentRoot / Background / ContentButton are upstream's three names. The Border is the only tinted
+             layer and the Button carries the title, so a hover of the item still shows the button's own
+             visual states nowhere - upstream neutralises them with four transparent ButtonBackground rows in
+             Grid.Resources, which is what the four literals below are. ContentRoot stays unpainted: a fill on
+             the Grid sits square under the Border that rounds it, invisible while the resting row is transparent
+             and showing as corners the moment an app sets a Background of its own. -->
+        <Grid Name="ContentRoot">
+          <Border Name="Background" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                  BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}" />
+          <Button Name="ContentButton" Content="{x:Null}" Foreground="{TemplateBinding Foreground}"
+                  Background="Transparent" BorderBrush="Transparent" BorderThickness="0" Padding="{ThemeResource MenuBarItemButtonPadding}"
+                  VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        </Grid>
+        <ControlTemplate.Triggers>
+          <!-- Upstream's only reachable state here: MenuBarItem has Title as its one dependency property, so
+               there is no press and no selection to write, and the four pressed/selected rows stay unpublished. -->
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="Background" Property="Background" Value="{ThemeResource MenuBarItemBackgroundPointerOver}" />
+            <Setter TargetName="Background" Property="BorderBrush" Value="{ThemeResource MenuBarItemBorderBrushPointerOver}" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="MenuBarItem" BasedOn="{StaticResource DefaultMenuBarItemStyle}" />
+
+  <!-- ============ MenuItem (colour only) ============ -->
+  <Style x:Key="DefaultMenuItemStyle" TargetType="MenuItem">
+    <!-- 26.10.9's MenuItem never builds a Template, so this style can only hand it brushes and sizes and let
+         its own OnRender paint them. The rows are the flyout item's, because a menu item is the same role and
+         this project publishes one name per role. The highlight, press and submenu marks stay framework
+         colours: the control writes a local Background for them, which outranks every setter here. -->
+    <Setter Property="Background" Value="{ThemeResource MenuFlyoutItemBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource MenuFlyoutItemBackgroundBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutItemThemePadding}" />
+    <Setter Property="FontSize" Value="14" />
+    <Style.Triggers>
+      <Trigger Property="IsEnabled" Value="False">
+        <Setter Property="Foreground" Value="{ThemeResource MenuFlyoutItemForegroundDisabled}" />
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="MenuItem" BasedOn="{StaticResource DefaultMenuItemStyle}" />
+</ResourceDictionary>

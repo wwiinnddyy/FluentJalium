@@ -1,0 +1,82 @@
+=== the OS fact no in-process colour read can stand in for ===
+   SPI_GETHIGHCONTRAST (A, uiParam=cbSize) ok=False err=87 dwFlags=0x0 highContrastOn=False
+   SPI_GETHIGHCONTRAST (A, uiParam=0) ok=True err=0 dwFlags=0x0 highContrastOn=False
+   SPI_GETHIGHCONTRAST (W, uiParam=cbSize) ok=False err=87 dwFlags=0x0 highContrastOn=False
+   GetSystemMetrics(SM_HIGCONTRASTMODE=21) -> 30
+   (if every one of these says off, this machine cannot show what a high-contrast user sees; the slot
+    values below are the classic-theme values, and any claim about HC pixels needs a machine with the theme on)
+
+=== what Win32 answers for the eight slots our table names ===
+   WindowColor          COLORREF   1 -> #000000
+   WindowTextColor      COLORREF   8 -> #000000
+   HighlightColor       COLORREF  13 -> #0078D4
+   HighlightTextColor   COLORREF  14 -> #FFFFFF
+   ControlColor         COLORREF  15 -> #F0F0F0
+   ControlTextColor     COLORREF  16 -> #A0A0A0
+   GrayTextColor        COLORREF  17 -> #6D6D6D
+   HotTrackColor        COLORREF  26 -> #0066CC
+
+=== what the framework resolves, per theme state, and what shadows it ===
+   --- no theme applied   ---
+      WindowColor          win32=#000000 framework=#FF1C1C1E ours=n/a brushResource=#FF1C1C1E colorResource=#FF1C1C1E
+      WindowTextColor      win32=#000000 framework=#FFF5F5F7 ours=n/a brushResource=#FFF5F5F7 colorResource=#FFF5F5F7
+      HighlightColor       win32=#0078D4 framework=#FF1E793F ours=n/a brushResource=#FF1E793F colorResource=#FF1E793F
+      HighlightTextColor   win32=#FFFFFF framework=#FFFFFFFF ours=n/a brushResource=#FFFFFFFF colorResource=#FFFFFFFF
+      ControlColor         win32=#F0F0F0 framework=#FF2C2C2E ours=n/a brushResource=#FF2C2C2E colorResource=#FF2C2C2E
+      ControlTextColor     win32=#A0A0A0 framework=#FFF5F5F7 ours=n/a brushResource=#FFF5F5F7 colorResource=#FFF5F5F7
+      GrayTextColor        win32=#6D6D6D framework=#FF636366 ours=n/a brushResource=#FF636366 colorResource=#FF636366
+      HotTrackColor        win32=#0066CC framework=#FF0A84FF ours=n/a brushResource=#FF0A84FF colorResource=#FF0A84FF
+      TextFillColorPrimaryBrush via TryFindResource in this state: #FFF5F5F7
+   --- Light             ---
+      WindowColor          win32=#000000 framework=#FF1C1C1E ours=ours brushResource=#FF1C1C1E colorResource=#FF1C1C1E
+      WindowTextColor      win32=#000000 framework=#FFF5F5F7 ours=ours brushResource=#FFF5F5F7 colorResource=#FFF5F5F7
+      HighlightColor       win32=#0078D4 framework=#FF1E793F ours=ours brushResource=#FF1E793F colorResource=#FF1E793F
+      HighlightTextColor   win32=#FFFFFF framework=#FFFFFFFF ours=ours brushResource=#FFFFFFFF colorResource=#FFFFFFFF
+      ControlColor         win32=#F0F0F0 framework=#FF2C2C2E ours=ours brushResource=#FF2C2C2E colorResource=#FF2C2C2E
+      ControlTextColor     win32=#A0A0A0 framework=#FFF5F5F7 ours=ours brushResource=#FFF5F5F7 colorResource=#FFF5F5F7
+      GrayTextColor        win32=#6D6D6D framework=#FF636366 ours=ours brushResource=#FF636366 colorResource=#FF636366
+      HotTrackColor        win32=#0066CC framework=#FF0A84FF ours=ours brushResource=#FF0A84FF colorResource=#FF0A84FF
+      TextFillColorPrimaryBrush via TryFindResource in this state: #FFFFFFFF
+   --- HighContrast      ---
+      WindowColor          win32=#000000 framework=#FF1C1C1E ours=ours brushResource=#FF1C1C1E colorResource=#FFF5F5F7
+      WindowTextColor      win32=#000000 framework=#FFF5F5F7 ours=ours brushResource=#FFF5F5F7 colorResource=#FF1D1D1F
+      HighlightColor       win32=#0078D4 framework=#FF1E793F ours=ours brushResource=#FF1E793F colorResource=#FF1E793F
+      HighlightTextColor   win32=#FFFFFF framework=#FFFFFFFF ours=ours brushResource=#FFFFFFFF colorResource=#FFFFFFFF
+      ControlColor         win32=#F0F0F0 framework=#FF2C2C2E ours=ours brushResource=#FF2C2C2E colorResource=#FFFFFFFF
+      ControlTextColor     win32=#A0A0A0 framework=#FFF5F5F7 ours=ours brushResource=#FFF5F5F7 colorResource=#FF1D1D1F
+      GrayTextColor        win32=#6D6D6D framework=#FF636366 ours=ours brushResource=#FF636366 colorResource=#FFAEAEB2
+      HotTrackColor        win32=#0066CC framework=#FF0A84FF ours=ours brushResource=#FF0A84FF colorResource=#FF007AFF
+      TextFillColorPrimaryBrush via TryFindResource in this state: #FFF5F5F7
+
+=== does a write to our own cell move the framework's system-colour read? ===
+      WindowColor          override=#FF11ABCD -> framework=#FF11ABCD brushResource=#FF11ABCD moved=True
+      WindowTextColor      override=#FF18ABCD -> framework=#FF18ABCD brushResource=#FF18ABCD moved=True
+      HighlightColor       override=#FF1DABCD -> framework=#FF1DABCD brushResource=#FF1DABCD moved=True
+      HighlightTextColor   override=#FF1EABCD -> framework=#FF1EABCD brushResource=#FF1EABCD moved=True
+      ControlColor         override=#FF1FABCD -> framework=#FF1FABCD brushResource=#FF1FABCD moved=True
+      ControlTextColor     override=#FF20ABCD -> framework=#FF20ABCD brushResource=#FF20ABCD moved=True
+      GrayTextColor        override=#FF21ABCD -> framework=#FF21ABCD brushResource=#FF21ABCD moved=True
+      HotTrackColor        override=#FF2AABCD -> framework=#FF2AABCD brushResource=#FF2AABCD moved=True
+   --- back to Light     ---
+      WindowColor          win32=#000000 framework=#FF11ABCD ours=ours brushResource=#FF11ABCD colorResource=#FFF5F5F7
+      WindowTextColor      win32=#000000 framework=#FF18ABCD ours=ours brushResource=#FF18ABCD colorResource=#FF1D1D1F
+      HighlightColor       win32=#0078D4 framework=#FF1DABCD ours=ours brushResource=#FF1DABCD colorResource=#FF1E793F
+      HighlightTextColor   win32=#FFFFFF framework=#FF1EABCD ours=ours brushResource=#FF1EABCD colorResource=#FFFFFFFF
+      ControlColor         win32=#F0F0F0 framework=#FF1FABCD ours=ours brushResource=#FF1FABCD colorResource=#FFFFFFFF
+      ControlTextColor     win32=#A0A0A0 framework=#FF20ABCD ours=ours brushResource=#FF20ABCD colorResource=#FF1D1D1F
+      GrayTextColor        win32=#6D6D6D framework=#FF21ABCD ours=ours brushResource=#FF21ABCD colorResource=#FFAEAEB2
+      HotTrackColor        win32=#0066CC framework=#FF2AABCD ours=ours brushResource=#FF2AABCD colorResource=#FF007AFF
+      TextFillColorPrimaryBrush via TryFindResource in this state: #E4000000
+
+=== are the framework's eight slots distinct, or do some collapse onto one value? ===
+   #FF11ABCD <- WindowColor
+   #FF18ABCD <- WindowTextColor
+   #FF1DABCD <- HighlightColor
+   #FF1EABCD <- HighlightTextColor
+   #FF1FABCD <- ControlColor
+   #FF20ABCD <- ControlTextColor
+   #FF21ABCD <- GrayTextColor
+   #FF2AABCD <- HotTrackColor
+
+=== and the same collapse question asked of Win32 ===
+   #000000 <- WindowColor, WindowTextColor

@@ -1,0 +1,288 @@
+Stage 6 segment 1 raw readings. spike/ProgressProbe (modes census|mount|retemplate|anim|later|alias|axis),
+run against runtime 26.10.9 with the Astra theme applied, window shown and pumped through
+CompositionTarget.Rendering, closed on exit. Every line below is program output, copied verbatim.
+
+  census     the exported type surface and the resource rows upstream's markup names
+  mount      the host's own bar: element tree and inked columns, swept over Value and over IsIndeterminate
+  retemplate three declarative routes for the indicator's width (fixed, TemplateBinding Value, part-named)
+  anim       the first animation pass - which turned out to animate two properties whose types are not double
+  later      Anim2 + Nest: the corrected animation routes, and what the host writes onto the parts
+  alias      whether a row that names a Color can land on a Brush property, and whether a CornerRadius row can
+  axis       one template carrying both axes: Auto/NaN sentinels and a {TemplateBinding} inside a trigger setter
+
+Mode labels are the section headers inside each block.
+
+
+==============================================================================
+=== progress-probe-all.txt (census + mount + retemplate + anim) ===
+==============================================================================
+theme dictionaries=55
+
+=== A. do the types this family's markup leans on exist here ===
+  ProgressBar                    ProgressBar < RangeBase < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ProgressRing                   ABSENT
+  Divider                        ABSENT
+  InfoBadge                      ABSENT
+  InfoBadgeValueKind             ABSENT
+  RatingControl                  ABSENT
+  SymbolIcon                     SymbolIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  FontIcon                       FontIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  BitmapIcon                     ABSENT
+  PathIcon                       PathIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  IconSource                     ABSENT
+  Symbol                         Symbol < Enum < ValueType
+  SymbolEnum                     ABSENT
+  ProgressBarTemplateSettings    ABSENT
+  ProgressRingTemplateSettings   ABSENT
+  RangeBase                      RangeBase < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Control                        Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ArcSegment                     ArcSegment < PathSegment < Animatable < Freezable < DependencyObject < DispatcherObject
+  EllipseGeometry                EllipseGeometry < Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  Path                           Path < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Ellipse                        Ellipse < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  RotateTransform                RotateTransform < Transform < GeneralTransform < Animatable < Freezable < DependencyObject < DispatcherObject
+  TranslateTransform             TranslateTransform < Transform < GeneralTransform < Animatable < Freezable < DependencyObject < DispatcherObject
+  Storyboard                     Storyboard < ParallelTimeline < TimelineGroup < Timeline < Animatable < Freezable < DependencyObject < DispatcherObject
+  DoubleAnimation                DoubleAnimation < DoubleAnimationBase < AnimationTimeline < Timeline < Animatable < Freezable < DependencyObject < DispatcherObject
+  DoubleAnimationUsingKeyFrames  DoubleAnimationUsingKeyFrames < DoubleAnimationBase < AnimationTimeline < Timeline < Animatable < Freezable < DependencyObject < DispatcherObject
+  ReplicableTimeline             ABSENT
+  Duration                       Duration < ValueType
+  RepeatBehavior                 RepeatBehavior < ValueType
+  KeySpline                      KeySpline < Freezable < DependencyObject < DispatcherObject
+  PointCollection                PointCollection < Freezable < DependencyObject < DispatcherObject
+  Symbol members (764): GlobalNavButton, Wifi, Bluetooth, Connect, InternetSharing, VPN, Brightness, MapPin, QuietHours, Airplane, Tablet, QuickNote ...
+
+  ProgressBar surface (ProgressBar < RangeBase < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject):
+    Minimum                    prop Double (RangeBase)
+    Maximum                    prop Double (RangeBase)
+    Value                      prop Double (RangeBase)
+    IsIndeterminate            prop Boolean (ProgressBar)
+    Orientation                prop Orientation (ProgressBar)
+    ShowProgress               ABSENT
+    TemplateSettings           ABSENT
+    Foreground                 prop Brush (Control)
+    Background                 prop Brush (Control)
+    BorderBrush                prop Brush (Control)
+    BorderThickness            prop Thickness (Control)
+    CornerRadius               prop CornerRadius (Control)
+    Height                     prop Double (FrameworkElement)
+    IsEnabled                  prop Boolean (UIElement)
+    FontFamily                 prop FontFamily (Control)
+    FontSize                   prop Double (Control)
+
+  ProgressRing surface (type absent):
+
+  RatingControl surface (type absent):
+
+  InfoBadge surface (type absent):
+
+  resource rows upstream declares for this family, as this runtime resolves them:
+    ProgressBarBackground                          null
+    ProgressBarForeground                          null
+    ProgressBarBorderThemeThickness                null
+    ProgressBarHeight                              null
+    ProgressBarAnimationDuration                   null
+    ProgressBarDeterminateIndicatorTransition      null
+    ProgressBarIndeterminateElement1Stops          null
+    ProgressBarIndeterminateElement2Stops          null
+    ProgressBarIndeterminateDuration               null
+    ProgressBarProgressBarRotation                 null
+    ProgressBarRingBackground                      null
+    ProgressBarRingForeground                      null
+    ProgressBarRingEllipsisVisibility              null
+    ProgressRingBackground                         null
+    ProgressRingForeground                         SolidColorBrush = SolidColorBrush(#FF1E793F)
+    ProgressRingEllipsisVisibility                 null
+    ProgressRingRingSize                           null
+    DividerStrokeThickness                         null
+    DividerStroke                                  null
+    CardBackgroundFillColorDefault                 Color = #0DFFFFFF
+    SystemAccentColor                              Color = #FF1E793F
+    AccentFillColorDefaultBrush                    SolidColorBrush = SolidColorBrush(#FF60CDFF)
+    TextBlockForeground                            null
+
+=== B. the host's own ProgressBar: tree, then ink ===
+  value=0 size=300x40 style=null template=set
+    Grid  300x40 
+      Rectangle PART_Track 300x40 
+      Border PART_Indicator 0x40 SolidColorBrush(#FF60CDFF)
+  value 0: no ink
+  value=25 size=300x40 style=null template=set
+    Grid  300x40 
+      Rectangle PART_Track 300x40 
+      Border PART_Indicator 75x40 SolidColorBrush(#FF60CDFF)
+  value 25: ink=2704 bbox=75x40@(0,0) rows=[0:47,1:53,2:57,3:59,4:61,5:63,6:65,7:67,8:69,9:71,10:71,11:73,12:73,13:73,14:75,15:75,16:75,17:75,18:75,19:75,20:75,21:75,22:75,23:75,24:75,25:75,26:73,27:73,28:73,29:71,30:71,31:69,32:67,33:65,34:63,35:61,36:59,37:57,38:53,39:47]
+  value=50 size=300x40 style=null template=set
+    Grid  300x40 
+      Rectangle PART_Track 300x40 
+      Border PART_Indicator 150x40 SolidColorBrush(#FF60CDFF)
+  value 50: ink=5704 bbox=150x40@(0,0) rows=[0:122,1:128,2:132,3:134,4:136,5:138,6:140,7:142,8:144,9:146,10:146,11:148,12:148,13:148,14:150,15:150,16:150,17:150,18:150,19:150,20:150,21:150,22:150,23:150,24:150,25:150,26:148,27:148,28:148,29:146,30:146,31:144,32:142,33:140,34:138,35:136,36:134,37:132,38:128,39:122]
+  value=75 size=300x40 style=null template=set
+    Grid  300x40 
+      Rectangle PART_Track 300x40 
+      Border PART_Indicator 225x40 SolidColorBrush(#FF60CDFF)
+  value 75: ink=8704 bbox=225x40@(0,0) rows=[0:197,1:203,2:207,3:209,4:211,5:213,6:215,7:217,8:219,9:221,10:221,11:223,12:223,13:223,14:225,15:225,16:225,17:225,18:225,19:225,20:225,21:225,22:225,23:225,24:225,25:225,26:223,27:223,28:223,29:221,30:221,31:219,32:217,33:215,34:213,35:211,36:209,37:207,38:203,39:197]
+  value=100 size=300x40 style=null template=set
+    Grid  300x40 
+      Rectangle PART_Track 300x40 
+      Border PART_Indicator 300x40 SolidColorBrush(#FF60CDFF)
+  value 100: ink=11704 bbox=300x40@(0,0) rows=[0:272,1:278,2:282,3:284,4:286,5:288,6:290,7:292,8:294,9:296,10:296,11:298,12:298,13:298,14:300,15:300,16:300,17:300,18:300,19:300,20:300,21:300,22:300,23:300,24:300,25:300,26:298,27:298,28:298,29:296,30:296,31:294,32:292,33:290,34:288,35:286,36:284,37:282,38:278,39:272]
+
+  indeterminate:
+  indeterminate after 2 extra frames: ink=3304 bbox=90x40@(0,0) rows=[0:62,1:68,2:72,3:74,4:76,5:78,6:80,7:82,8:84,9:86,10:86,11:88,12:88,13:88,14:90,15:90,16:90,17:90,18:90,19:90,20:90,21:90,22:90,23:90,24:90,25:90,26:88,27:88,28:88,29:86,30:86,31:84,32:82,33:80,34:78,35:76,36:74,37:72,38:68,39:62]
+  indeterminate +2: ink=3304 bbox=90x40@(0,0) rows=[0:62,1:68,2:72,3:74,4:76,5:78,6:80,7:82,8:84,9:86,10:86,11:88,12:88,13:88,14:90,15:90,16:90,17:90,18:90,19:90,20:90,21:90,22:90,23:90,24:90,25:90,26:88,27:88,28:88,29:86,30:86,31:84,32:82,33:80,34:78,35:76,36:74,37:72,38:68,39:62]
+  indeterminate after 40 extra frames: ink=3304 bbox=90x40@(0,0) rows=[0:62,1:68,2:72,3:74,4:76,5:78,6:80,7:82,8:84,9:86,10:86,11:88,12:88,13:88,14:90,15:90,16:90,17:90,18:90,19:90,20:90,21:90,22:90,23:90,24:90,25:90,26:88,27:88,28:88,29:86,30:86,31:84,32:82,33:80,34:78,35:76,36:74,37:72,38:68,39:62]
+  indeterminate +40: ink=3304 bbox=90x40@(0,0) rows=[0:62,1:68,2:72,3:74,4:76,5:78,6:80,7:82,8:84,9:86,10:86,11:88,12:88,13:88,14:90,15:90,16:90,17:90,18:90,19:90,20:90,21:90,22:90,23:90,24:90,25:90,26:88,27:88,28:88,29:86,30:86,31:84,32:82,33:80,34:78,35:76,36:74,37:72,38:68,39:62]
+
+  brushes the host reads (identity, not pixels):
+    Foreground         SolidColorBrush(#FF60CDFF)
+    Background         SolidColorBrush(#28FFFFFF)
+    BorderBrush        SolidColorBrush(#FF48484A)
+    BorderThickness    0,0,0,0
+    CornerRadius       999,999,999,999
+    accent identity      same instance as AccentFillColorDefaultBrush
+
+=== C. three declarative routes for the indicator's width ===
+  markup parsed: FixedTemplate, BindingTemplate, PartNamedTemplate
+  FixedTemplate        value=25 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border Indicator 120x4 SolidColorBrush(#FF0000FF)
+      FixedTemplate @ 25: ink=3604 bbox=300x40@(0,0) rows=[0:47,1:53,2:57,3:59,4:61,5:63,6:65,7:67,8:69,9:71,10:71,11:73,12:73,13:73,14:75,15:75,16:75,17:75,18:300,19:300,20:300,21:300,22:75,23:75,24:75,25:75,26:73,27:73,28:73,29:71,30:71,31:69,32:67,33:65,34:63,35:61,36:59,37:57,38:53,39:47]
+  FixedTemplate        value=75 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border Indicator 120x4 SolidColorBrush(#FF0000FF)
+      FixedTemplate @ 75: ink=9004 bbox=300x40@(0,0) rows=[0:197,1:203,2:207,3:209,4:211,5:213,6:215,7:217,8:219,9:221,10:221,11:223,12:223,13:223,14:225,15:225,16:225,17:225,18:300,19:300,20:300,21:300,22:225,23:225,24:225,25:225,26:223,27:223,28:223,29:221,30:221,31:219,32:217,33:215,34:213,35:211,36:209,37:207,38:203,39:197]
+  BindingTemplate      value=25 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border Indicator 25x4 SolidColorBrush(#FF00FF00)
+      BindingTemplate @ 25: ink=3604 bbox=300x40@(0,0) rows=[0:47,1:53,2:57,3:59,4:61,5:63,6:65,7:67,8:69,9:71,10:71,11:73,12:73,13:73,14:75,15:75,16:75,17:75,18:300,19:300,20:300,21:300,22:75,23:75,24:75,25:75,26:73,27:73,28:73,29:71,30:71,31:69,32:67,33:65,34:63,35:61,36:59,37:57,38:53,39:47]
+  BindingTemplate      value=75 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border Indicator 75x4 SolidColorBrush(#FF00FF00)
+      BindingTemplate @ 75: ink=9004 bbox=300x40@(0,0) rows=[0:197,1:203,2:207,3:209,4:211,5:213,6:215,7:217,8:219,9:221,10:221,11:223,12:223,13:223,14:225,15:225,16:225,17:225,18:300,19:300,20:300,21:300,22:225,23:225,24:225,25:225,26:223,27:223,28:223,29:221,30:221,31:219,32:217,33:215,34:213,35:211,36:209,37:207,38:203,39:197]
+  PartNamedTemplate    value=25 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border PART_Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border PART_Indicator 75x40 SolidColorBrush(#FFFF0000)
+      Border PART_GlowRect 30x4 SolidColorBrush(#FFFFFF00)
+      Border PART_Decorator 30x4 SolidColorBrush(#FFFF00FF)
+      PartNamedTemplate @ 25: ink=3900 bbox=300x40@(0,0) rows=[0:75,1:75,2:75,3:75,4:75,5:75,6:75,7:75,8:75,9:75,10:75,11:75,12:75,13:75,14:75,15:75,16:75,17:75,18:300,19:300,20:300,21:300,22:75,23:75,24:75,25:75,26:75,27:75,28:75,29:75,30:75,31:75,32:75,33:75,34:75,35:75,36:75,37:75,38:75,39:75]
+  PartNamedTemplate    value=75 template=set size=300x40
+    Grid RootGrid 300x40 
+      Border PART_Track 300x4 SolidColorBrush(#FFE0E0E0)
+      Border PART_Indicator 225x40 SolidColorBrush(#FFFF0000)
+      Border PART_GlowRect 30x4 SolidColorBrush(#FFFFFF00)
+      Border PART_Decorator 30x4 SolidColorBrush(#FFFF00FF)
+      PartNamedTemplate @ 75: ink=9300 bbox=300x40@(0,0) rows=[0:225,1:225,2:225,3:225,4:225,5:225,6:225,7:225,8:225,9:225,10:225,11:225,12:225,13:225,14:225,15:225,16:225,17:225,18:300,19:300,20:300,21:300,22:225,23:225,24:225,25:225,26:225,27:225,28:225,29:225,30:225,31:225,32:225,33:225,34:225,35:225,36:225,37:225,38:225,39:225]
+
+=== D. animation: repeating DoubleAnimation on a transform, and a markup Storyboard ===
+  before: X=0
+  BeginAnimation(RenderTransformProperty, DoubleAnimation Forever) accepted
+  X over six 6-frame pumps: 0, 0, 0, 0, 0, 0 (moving means the clock runs on this runtime)
+  BeginAnimation(MarginProperty, ...) accepted
+  margin after 12 frames: 0,0,0,0
+    margin-animated card: ink=400 bbox=20x20@(140,10) rows=[10:20,11:20,12:20,13:20,14:20,15:20,16:20,17:20,18:20,19:20,20:20,21:20,22:20,23:20,24:20,25:20,26:20,27:20,28:20,29:20]
+
+  a Storyboard declared in markup, hydrated and started:
+  parsed as Storyboard; children=
+
+  RotateTransform.Angle animatable? Angle present
+
+
+==============================================================================
+=== progress-probe-later.txt (Anim2 + Nest) ===
+==============================================================================
+theme dictionaries=55
+
+=== F. animation routes, read back as property values ===
+  TranslateTransform.XProperty Forever: 0 -> 0 -> 0
+  FrameworkElement.WidthProperty Forever: 20 -> 46.2 -> 91.9
+  RotateTransform.AngleProperty Forever: 0 -> 0 -> 0
+  Canvas.LeftProperty Forever: 0 -> 42.3 -> 87.3
+  UIElement.OpacityProperty Forever: 1 -> 46.36 -> 91.72
+
+  Trigger.EnterActions     prop TriggerActionCollection (TriggerBase)
+  Trigger.ExitActions      prop TriggerActionCollection (TriggerBase)
+  Style.Triggers         prop TriggerCollection (Style)
+  Timeline.RepeatBehavior   prop RepeatBehavior (Timeline)
+  StoryBoard.Begin            type absent
+  keyframe control Width 20 -> 145.2
+
+  a Storyboard in markup, with TargetName rather than an attached-property path:
+  parsed Storyboard children=
+  board.Begin(host) then Angle 0 -> 0
+
+=== E. what the host writes onto the parts, and which metric rows this reader parses ===
+  host drives ShowError        ABSENT
+  host drives ShowPaused       ABSENT
+  host drives Orientation      prop Orientation (ProgressBar)
+  host drives TemplateSettings ABSENT
+  host drives Minimum          prop Double (RangeBase)
+  host drives Maximum          prop Double (RangeBase)
+  row ProbeCornerRadius  -> CornerRadius = 1.5,1.5,1.5,1.5
+  row ProbeThickness     -> Thickness = 0,0,0,0
+  ExplicitHeight value=25
+    track     300x4 Height=4 VerticalAlignment=Center CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 75x40 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      ExplicitHeight @ 25: ink=3900 bbox=300x40@(0,0) rows=[0:75,1:75,2:75,3:75,4:75,5:75,6:75,7:75,8:75,9:75,10:75,11:75,12:75,13:75,14:75,15:75,16:75,17:75,18:300,19:300,20:300,21:300,22:75,23:75,24:75,25:75,26:75,27:75,28:75,29:75,30:75,31:75,32:75,33:75,34:75,35:75,36:75,37:75,38:75,39:75]
+  ExplicitHeight value=100
+    track     300x4 Height=4 VerticalAlignment=Center CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 300x40 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      ExplicitHeight @ 100: ink=12000 bbox=300x40@(0,0) rows=[0:300,1:300,2:300,3:300,4:300,5:300,6:300,7:300,8:300,9:300,10:300,11:300,12:300,13:300,14:300,15:300,16:300,17:300,18:300,19:300,20:300,21:300,22:300,23:300,24:300,25:300,26:300,27:300,28:300,29:300,30:300,31:300,32:300,33:300,34:300,35:300,36:300,37:300,38:300,39:300]
+  NestedBand     value=25
+    track     300x4 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 75x4 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      NestedBand @ 25: ink=1200 bbox=300x4@(0,18) rows=[18:300,19:300,20:300,21:300]
+  NestedBand     value=100
+    track     300x4 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 300x4 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      NestedBand @ 100: ink=1200 bbox=300x4@(0,18) rows=[18:300,19:300,20:300,21:300]
+  RadiusRead     value=25
+    track     300x4 Height=4 VerticalAlignment=Center CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 75x40 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      RadiusRead @ 25: ink=3900 bbox=300x40@(0,0) rows=[0:75,1:75,2:75,3:75,4:75,5:75,6:75,7:75,8:75,9:75,10:75,11:75,12:75,13:75,14:75,15:75,16:75,17:75,18:300,19:300,20:300,21:300,22:75,23:75,24:75,25:75,26:75,27:75,28:75,29:75,30:75,31:75,32:75,33:75,34:75,35:75,36:75,37:75,38:75,39:75]
+  RadiusRead     value=100
+    track     300x4 Height=4 VerticalAlignment=Center CornerRadius=0,0,0,0 SolidColorBrush(#FFE0E0E0)
+    indicator 300x40 Height=NaN VerticalAlignment=Stretch CornerRadius=0,0,0,0 SolidColorBrush(#FF60CDFF)
+      RadiusRead @ 100: ink=12000 bbox=300x40@(0,0) rows=[0:300,1:300,2:300,3:300,4:300,5:300,6:300,7:300,8:300,9:300,10:300,11:300,12:300,13:300,14:300,15:300,16:300,17:300,18:300,19:300,20:300,21:300,22:300,23:300,24:300,25:300,26:300,27:300,28:300,29:300,30:300,31:300,32:300,33:300,34:300,35:300,36:300,37:300,38:300,39:300]
+
+  vertical orientation, host's own template:
+    size=60x40 orientation=Vertical
+    Grid  60x40 
+      Rectangle PART_Track 60x40 
+      Border PART_Indicator 60x20 SolidColorBrush(#FF60CDFF)
+      vertical @ 50: ink=1132 bbox=60x20@(0,100) rows=[100:48,101:52,102:54,103:56,104:58,105:58,106:60,107:60,108:60,109:60,110:60,111:60,112:60,113:60,114:58,115:58,116:56,117:54,118:52,119:48]
+
+
+==============================================================================
+=== progress-probe-alias.txt (alias) ===
+==============================================================================
+theme dictionaries=55
+
+=== G. upstream's alias targets, as this reader hands them over ===
+  row ProbeColorAlias    -> Color
+    into the app dictionary: added
+  row ProbeBrushAlias    -> SolidColorBrush
+    into the app dictionary: added
+  row ProbeRadiusAlias   -> CornerRadius
+    into the app dictionary: added
+  Color target on Background       -> Background=null CornerRadius=0,0,0,0
+  Brush target on Background       -> Background=SolidColorBrush(#8BFFFFFF) CornerRadius=0,0,0,0
+  CornerRadius row on CornerRadius -> Background=null CornerRadius=4,4,4,4
+
+
+==============================================================================
+=== progress-probe-axis.txt (axis) ===
+==============================================================================
+theme dictionaries=55
+
+=== H. an Orientation trigger that re-sizes the band: does Auto or NaN parse? ===
+  Horizontal  band=300x3 Height=3 Width=NaN indicator=150x3
+      Horizontal @ 50: ink=900 bbox=300x4@(0,18) rows=[18:150,19:300,20:300,21:150]
+  Vertical    band=3x40 Height=NaN Width=3 indicator=3x20
+      Vertical @ 50: ink=120 bbox=4x40@(148,0) rows=[0:2,1:2,2:2,3:2,4:2,5:2,6:2,7:2,8:2,9:2,10:2,11:2,12:2,13:2,14:2,15:2,16:2,17:2,18:2,19:2,20:4,21:4,22:4,23:4,24:4,25:4,26:4,27:4,28:4,29:4,30:4,31:4,32:4,33:4,34:4,35:4,36:4,37:4,38:4,39:4]
+    after MinHeight=7: band=7x40

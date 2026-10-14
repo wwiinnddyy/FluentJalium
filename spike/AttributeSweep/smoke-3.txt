@@ -1,0 +1,17 @@
+==> overview
+    'FluentJalium Gallery' - closed cleanly in 12.8 s
+==> buttons
+    'FluentJalium Gallery' - closed cleanly in 13.8 s
+==> inputs
+    'FluentJalium Gallery' - closed cleanly in 8.5 s
+==> selection
+    'FluentJalium Gallery' - closed cleanly in 8.8 s
+==> navigation
+    'FluentJalium Gallery' - closed cleanly in 11.3 s
+==> surfaces
+    'FluentJalium Gallery' - closed cleanly in 9.2 s
+==> menus
+    'FluentJalium Gallery' - closed cleanly in 8 s
+==> settings
+    'FluentJalium Gallery' - closed cleanly in 7.2 s
+8 page(s) mounted and closed; no Gallery process left.

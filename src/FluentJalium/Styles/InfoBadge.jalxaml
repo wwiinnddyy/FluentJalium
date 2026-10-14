@@ -1,0 +1,146 @@
+<!-- WinUI 3 InfoBadge_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     b09b56572ac8a2159bf9ba2dda7f063ec5460c6a - the sixteen Style rows (:47-146) - and InfoBadge.xaml, blob
+     1f6ab40e7cc23c5bb7311a85006ec780e6a27d4f, which is three lines that only base the implicit control style on
+     DefaultInfoBadgeStyle. All sixteen are transcribed in upstream's order, plus that implicit style, with these
+     differences and no others:
+       - the control is FluentJalium's own type, because 26.10.9 has neither InfoBadge nor Badge
+         (spike/ControlCensus);
+       - upstream's <c>Grid x:Name="RootGrid" CornerRadius="..."> becomes a Border wrapped around a Grid: this
+         runtime's Grid has no CornerRadius to write the computed radius onto, and the Border is what carries
+         background, padding and radius;
+       - the four DisplayKindStates VisualStates become three template triggers on FluentInfoBadge.DisplayKind,
+         because 26.10.9 has no VisualStateManager route a trigger cannot replace; the Dot state stays empty and so
+         stays unwritten - it is the template's resting look;
+       - TemplateSettings disappears with the object that carries it: the computed half-height radius is written onto
+         FluentInfoBadge's own CornerRadius, which the template binds, in place of the
+         TemplateSettings.InfoBadgeCornerRadius upstream binds; the icon reaches the presenter the same way, in
+         place of TemplateSettings.IconElement. The input property is an IconElement rather than upstream's
+         IconSource because no IconSource type ships here at all;
+       - the icon styles keep upstream's element choice, including SymbolIcon for the Success/Caution/Critical trio,
+         which is what its IconSource rows name (Symbol=Accept / Important / Cancel).
+     Full mapping and the two measured unknowns: docs/astra/audits/info-badge.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <!-- ============ DefaultInfoBadgeStyle (upstream :47-89) ============ -->
+  <Style x:Key="DefaultInfoBadgeStyle" TargetType="controls:FluentInfoBadge">
+    <!-- 4 / 4 / 16 and the 11 below are upstream's x:Double rows, which this reader cannot carry
+         (adaptation/00 S1-r); all four are the same number in Light, Default and HighContrast, so a literal loses
+         nothing across themes. spike/DoubleRowProbe measured the alternative: a
+         sys:Double row parses, keeps its type, and reads back as the type's default - a row that silently lies. -->
+    <Setter Property="MinHeight" Value="4" />
+    <Setter Property="MinWidth" Value="4" />
+    <Setter Property="MaxHeight" Value="16" />
+    <Setter Property="Background" Value="{ThemeResource InfoBadgeBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource InfoBadgeForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource InfoBadgePadding}" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FluentInfoBadge">
+          <Border Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <Grid>
+              <!-- Upstream's TextBlock names no Foreground and relies on the control's value inheriting down the
+                   tree. This runtime does not: read off a mounted badge the part reports the framework default
+                   #E4000000 rather than the badge's own white InfoBadgeForeground (spike reading in
+                   docs/astra/audits/info-badge.md), so the binding is the adaptation and the inherited route is a
+                   dead end here. -->
+              <TextBlock Name="ValueTextBlock" Foreground="{TemplateBinding Foreground}" FontSize="11"
+                         Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <!-- Upstream names the Viewbox IconPresenter and puts a ContentPresenter inside it whose Content is
+                   TemplateSettings.IconElement. The names keep that split: the trigger targets the Viewbox, and
+                   FluentInfoBadge fills the presenter the icon element itself. -->
+              <Viewbox Name="IconPresenter" Visibility="Collapsed"
+                       HorizontalAlignment="Center" VerticalAlignment="Stretch">
+                <ContentPresenter Name="IconContent" />
+              </Viewbox>
+            </Grid>
+          </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="DisplayKind" Value="Value">
+                <Setter TargetName="ValueTextBlock" Property="Visibility" Value="Visible" />
+                <Setter TargetName="ValueTextBlock" Property="Margin" Value="{ThemeResource ValueInfoBadgeTextMargin}" />
+              </Trigger>
+              <Trigger Property="DisplayKind" Value="Icon">
+                <Setter TargetName="IconPresenter" Property="Visibility" Value="Visible" />
+                <Setter TargetName="IconPresenter" Property="Margin" Value="{ThemeResource IconInfoBadgeIconMargin}" />
+              </Trigger>
+              <Trigger Property="DisplayKind" Value="FontIcon">
+                <Setter TargetName="IconPresenter" Property="Visibility" Value="Visible" />
+                <Setter TargetName="IconPresenter" Property="Margin" Value="{ThemeResource IconInfoBadgeFontIconMargin}" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- ============ the five severities x three display kinds (upstream :91-146) ============ -->
+  <!-- Attention (:91-102). Only the Background and the icon differ between severities; the Value row upstream emits
+       is an empty BasedOn, and it is transcribed as one because it is what makes the key exist. -->
+  <Style x:Key="AttentionDotInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemFillColorAttentionBrush}" />
+  </Style>
+  <Style x:Key="AttentionValueInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource AttentionDotInfoBadgeStyle}" />
+  <Style x:Key="AttentionIconInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource AttentionDotInfoBadgeStyle}">
+    <Setter Property="Padding" Value="0,4,0,2" />
+    <Setter Property="Icon">
+      <Setter.Value>
+        <controls:FontIcon Glyph="&#xEA38;" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <!-- Informational (:103-114) -->
+  <Style x:Key="InformationalDotInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemFillColorSolidNeutralBrush}" />
+  </Style>
+  <Style x:Key="InformationalValueInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource InformationalDotInfoBadgeStyle}" />
+  <Style x:Key="InformationalIconInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource InformationalDotInfoBadgeStyle}">
+    <Setter Property="Padding" Value="0,4,0,2" />
+    <Setter Property="Icon">
+      <Setter.Value>
+        <controls:FontIcon Glyph="&#xF13F;" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <!-- Success (:115-125) -->
+  <Style x:Key="SuccessDotInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemFillColorSuccessBrush}" />
+  </Style>
+  <Style x:Key="SuccessValueInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource SuccessDotInfoBadgeStyle}" />
+  <Style x:Key="SuccessIconInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource SuccessDotInfoBadgeStyle}">
+    <Setter Property="Icon">
+      <Setter.Value>
+        <controls:SymbolIcon Symbol="Accept" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <!-- Caution (:126-136) -->
+  <Style x:Key="CautionDotInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemFillColorCautionBrush}" />
+  </Style>
+  <Style x:Key="CautionValueInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource CautionDotInfoBadgeStyle}" />
+  <Style x:Key="CautionIconInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource CautionDotInfoBadgeStyle}">
+    <Setter Property="Icon">
+      <Setter.Value>
+        <controls:SymbolIcon Symbol="Important" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <!-- Critical (:137-146) -->
+  <Style x:Key="CriticalDotInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}">
+    <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+  </Style>
+  <Style x:Key="CriticalValueInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource CriticalDotInfoBadgeStyle}" />
+  <Style x:Key="CriticalIconInfoBadgeStyle" TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource CriticalDotInfoBadgeStyle}">
+    <Setter Property="Icon">
+      <Setter.Value>
+        <controls:SymbolIcon Symbol="Cancel" />
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- InfoBadge.xaml:3-5, the implicit style. Own types reach their look through the named key the constructor
+       applies, so this row is for the case where one is placed in markup and the implicit route does resolve. -->
+  <Style TargetType="controls:FluentInfoBadge" BasedOn="{StaticResource DefaultInfoBadgeStyle}" />
+</ResourceDictionary>

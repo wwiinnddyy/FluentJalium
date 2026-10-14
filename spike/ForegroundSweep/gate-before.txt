@@ -1,0 +1,100 @@
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(243,24): warning CS8600: 将 null 文本或可能的 null 值转换为不可为 null 类型。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(244,30): warning CS8602: 解引用可能出现空引用。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(198,32): warning CS8605: 取消装箱可能为 null 的值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(223,58): warning CS8602: 解引用可能出现空引用。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(390,74): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(431,80): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(448,83): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(454,79): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(459,82): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(511,35): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(538,83): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(551,85): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(593,33): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(594,35): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(595,31): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(968,24): warning CS8604: “DependencyObject? AstraMenuTests.HostOf(DependencyObject root)”中的形参“root”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(991,36): warning CS8604: “List<string> AstraMenuTests.TextsIn(DependencyObject root)”中的形参“root”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(651,13): warning xUnit2029: Do not use Assert.Empty to check if a value does not exist in a collection. Use Assert.DoesNotContain instead. (https://xunit.net/xunit.analyzers/rules/xUnit2029) [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:00.41]     FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have [FAIL]
+  失败 FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have [142 ms]
+  错误消息:
+   Cells writing a property their target does not have (68):
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: ContentPresenter 'RadioLabel' has no Foreground
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/Inputs.jalxaml: Grid 'RadioRoot' has no BorderBrush
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListBoxes.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListViews.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListViews.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListViews.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListViews.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/ListViews.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Menus.jalxaml: ContentPresenter 'IconContent' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'CheckLabel' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'ContentPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'PART_SelectionPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'PART_SelectionPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'PART_SelectionPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'PART_SelectionPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: ContentPresenter 'PART_SelectionPresenter' has no Foreground
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/Selection.jalxaml: Grid 'CheckRoot' has no BorderBrush
+src/FluentJalium/Styles/TextInput.jalxaml: ContentPresenter 'HeaderContentPresenter' has no Foreground
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraGateTests.cs:line 213
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 155 ms - FluentJalium.Tests.dll (net10.0)

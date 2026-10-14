@@ -1,0 +1,72 @@
+AppBar.jalxaml: cells=7 inert-on-ContentPresenter=0 target-has-foreground=7 name-not-in-this-file=0
+  ok L91 LabelText -> TextBlock
+  ok L96 LabelText -> TextBlock
+  ok L101 LabelText -> TextBlock
+  ok L153 LabelText -> TextBlock
+  ok L158 LabelText -> TextBlock
+  ok L165 LabelText -> TextBlock
+  ok L170 LabelText -> TextBlock
+Inputs.jalxaml: cells=7 inert-on-ContentPresenter=7 target-has-foreground=0 name-not-in-this-file=0
+  INERT L373 RadioLabel -> ContentPresenter
+  INERT L374 RadioLabel -> ContentPresenter
+  INERT L375 RadioLabel -> ContentPresenter
+  INERT L376 RadioLabel -> ContentPresenter
+  INERT L377 RadioLabel -> ContentPresenter
+  INERT L378 RadioLabel -> ContentPresenter
+  INERT L379 RadioLabel -> ContentPresenter
+ListBoxes.jalxaml: cells=6 inert-on-ContentPresenter=6 target-has-foreground=0 name-not-in-this-file=0
+  INERT L80 ContentPresenter -> ContentPresenter
+  INERT L81 ContentPresenter -> ContentPresenter
+  INERT L82 ContentPresenter -> ContentPresenter
+  INERT L83 ContentPresenter -> ContentPresenter
+  INERT L84 ContentPresenter -> ContentPresenter
+  INERT L85 ContentPresenter -> ContentPresenter
+ListViews.jalxaml: cells=5 inert-on-ContentPresenter=5 target-has-foreground=0 name-not-in-this-file=0
+  INERT L113 ContentPresenter -> ContentPresenter
+  INERT L114 ContentPresenter -> ContentPresenter
+  INERT L115 ContentPresenter -> ContentPresenter
+  INERT L116 ContentPresenter -> ContentPresenter
+  INERT L117 ContentPresenter -> ContentPresenter
+Menus.jalxaml: cells=6 inert-on-ContentPresenter=6 target-has-foreground=0 name-not-in-this-file=0
+  INERT L73 IconContent -> ContentPresenter
+  INERT L77 IconContent -> ContentPresenter
+  INERT L127 IconContent -> ContentPresenter
+  INERT L130 IconContent -> ContentPresenter
+  INERT L171 IconContent -> ContentPresenter
+  INERT L175 IconContent -> ContentPresenter
+Selection.jalxaml: cells=29 inert-on-ContentPresenter=25 target-has-foreground=4 name-not-in-this-file=0
+  INERT L31 CheckLabel -> ContentPresenter
+  INERT L32 CheckLabel -> ContentPresenter
+  INERT L33 CheckLabel -> ContentPresenter
+  INERT L34 CheckLabel -> ContentPresenter
+  INERT L35 CheckLabel -> ContentPresenter
+  INERT L36 CheckLabel -> ContentPresenter
+  INERT L37 CheckLabel -> ContentPresenter
+  INERT L38 CheckLabel -> ContentPresenter
+  INERT L39 CheckLabel -> ContentPresenter
+  INERT L40 CheckLabel -> ContentPresenter
+  INERT L41 CheckLabel -> ContentPresenter
+  INERT L97 PART_SelectionPresenter -> ContentPresenter
+  INERT L99 PART_SelectionPresenter -> ContentPresenter
+  INERT L102 PART_SelectionPresenter -> ContentPresenter
+  INERT L105 PART_SelectionPresenter -> ContentPresenter
+  INERT L108 PART_SelectionPresenter -> ContentPresenter
+  INERT L156 ContentPresenter -> ContentPresenter
+  INERT L157 ContentPresenter -> ContentPresenter
+  INERT L158 ContentPresenter -> ContentPresenter
+  INERT L159 ContentPresenter -> ContentPresenter
+  INERT L160 ContentPresenter -> ContentPresenter
+  INERT L161 ContentPresenter -> ContentPresenter
+  INERT L162 ContentPresenter -> ContentPresenter
+  INERT L163 ContentPresenter -> ContentPresenter
+  INERT L164 ContentPresenter -> ContentPresenter
+  ok L104 PART_ToggleButton -> ToggleButton
+  ok L107 PART_ToggleButton -> ToggleButton
+  ok L109 PART_ToggleButton -> ToggleButton
+  ok L110 PART_ToggleButton -> ToggleButton
+Surfaces.jalxaml: cells=3 inert-on-ContentPresenter=0 target-has-foreground=3 name-not-in-this-file=0
+  ok L189 IconGlyph -> TextBlock
+  ok L195 IconGlyph -> TextBlock
+  ok L201 IconGlyph -> TextBlock
+TextInput.jalxaml: cells=1 inert-on-ContentPresenter=1 target-has-foreground=0 name-not-in-this-file=0
+  INERT L253 HeaderContentPresenter -> ContentPresenter

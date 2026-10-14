@@ -1,0 +1,15 @@
+--- mounted-light theme=Light
+  item=Overview item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  item=Tokens item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  item=Dark item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  TextPrimary=#E4000000 TextFillColorPrimaryBrush=#E4000000 NavigationViewItemForeground=#E4000000
+--- flipped-dark theme=Dark
+  item=Overview item.Foreground=#FFFFFFFF icon.Foreground=<null> resolved=#FFFFFFFF
+  item=Tokens item.Foreground=#FFFFFFFF icon.Foreground=<null> resolved=#FFFFFFFF
+  item=Dark item.Foreground=#FFFFFFFF icon.Foreground=<null> resolved=#FFFFFFFF
+  TextPrimary=#FFFFFFFF TextFillColorPrimaryBrush=#FFFFFFFF NavigationViewItemForeground=#FFFFFFFF
+--- flipped-back-light theme=Light
+  item=Overview item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  item=Tokens item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  item=Dark item.Foreground=#E4000000 icon.Foreground=<null> resolved=#E4000000
+  TextPrimary=#E4000000 TextFillColorPrimaryBrush=#E4000000 NavigationViewItemForeground=#E4000000

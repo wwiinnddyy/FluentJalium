@@ -1,38 +1,54 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
+    <!--
+      双目标：net10.0-windows 是宿主应用的主目标；net10.0 是给 Linux 打包（AppImage）用的。
+      库里没有任何 Windows 专属 API（样式与控件都落在 Jalium 上），所以两端都能编过 ——
+      宿主应用在 net10.0 端引用不了只发 net10.0-windows 的库（NU1201）。
+    -->
+    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
     <RootNamespace>FluentJalium</RootNamespace>
     <AssemblyName>FluentJalium</AssemblyName>
-    <Description>Fluent Design System themes and controls for Jalium.UI.</Description>
+    <Description>Source-audited WinUI 3 styles and native Jalium controls. Astra implementation.</Description>
     <IsPackable>true</IsPackable>
     <PackageId>FluentJalium</PackageId>
-    <IsTrimmable>true</IsTrimmable>
-    <IsAotCompatible>true</IsAotCompatible>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
     <EnableJalxamlCodeGeneration>false</EnableJalxamlCodeGeneration>
     <EnableJalxamlRazorTransform>false</EnableJalxamlRazorTransform>
-    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
-    <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">false</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath Condition="'$(CompilerGeneratedFilesOutputPath)' == ''">$(IntermediateOutputPath)Generated</CompilerGeneratedFilesOutputPath>
+    <!-- Runtime resource parsing is intentional; trimming/AOT is not certified. -->
+    <IsTrimmable>false</IsTrimmable>
+    <IsAotCompatible>false</IsAotCompatible>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Jalium.UI.Core" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Media" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Input" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Interop" Version="$(JaliumPackageVersion)" />
+    <Compile Include="Controls/**/*.cs" />
+    <Compile Include="Motion/**/*.cs" />
+    <Compile Include="Themes/**/*.cs" />
+    <!-- The logical name is the folder-relative path: no separate naming scheme to keep in sync. -->
+    <EmbeddedResource Include="ThemeResources/**/*.jalxaml">
+      <LogicalName>ThemeResources/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Styles/*.jalxaml">
+      <LogicalName>Styles/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Themes/Manifest.txt">
+      <LogicalName>Themes/Manifest.txt</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ThemeResources/HighContrast.map">
+      <LogicalName>ThemeResources/HighContrast.map</LogicalName>
+    </EmbeddedResource>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The gate tests assert Astra's internal resource tables directly rather than widening the
+         public surface to expose them. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FluentJalium.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />
     <PackageReference Include="Jalium.UI.Xaml" Version="$(JaliumPackageVersion)" />
-    <PackageReference Include="Jalium.UI.Xaml.SourceGenerator" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
-    <PackageReference Include="Jalium.UI.Build" Version="$(JaliumPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
-
-  <ItemGroup>
-    <JalxamlPage Include="Themes\**\*.jalxaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Fonts\*.ttf" />
-  </ItemGroup>
-
 </Project>

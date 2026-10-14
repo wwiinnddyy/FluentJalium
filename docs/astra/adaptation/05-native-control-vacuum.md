@@ -1,0 +1,117 @@
+# 原生控件真空清单（Fluent 外观覆盖到哪一步）
+
+由 `tools/Report-Control-Vacuum.ps1` 生成，**哨兵以上勿手改**（改了下次重跑就没了；要写结论请写到哨兵以下）。范围权威是 ModernWpf 的两层：
+``ModernWpf/Styles/*.xaml``（宿主已有控件的 Fluent 样式）与 ``ModernWpf.Controls/<Name>/``（宿主没有的 WinUI 派生类型）。
+原生类型与绘制分级来自 ``01-census-raw-output.txt``。
+
+| 量 | 数 |
+|---|---|
+| Jalium public 具体 `Control` 类型 | 163 |
+| ModernWpf 承诺覆盖的控件名（并集） | 84 |
+| 其中 Jalium 有同名原生类型（可走样式层） | 56 |
+| 其中我们已声明隐式样式 | 30 |
+| **其中真空，且无自有类型顶替** | **23** |
+| 其中真空但已有自有类型顶替 | 3 |
+| ModernWpf 得自己写类型、Jalium 也无同名原生类型 | 28 |
+| Jalium 独有、不在这份范围内（只标注，不还原） | 92 |
+| 我们已样式、但 ModernWpf 无同名文件（按别名/内联实现） | 15 |
+
+## A. 真空：范围内、Jalium 有原生类型、我们还没有样式（23）
+
+绘制方式列只说明**能不能**靠模板解决；排批顺序仍以"底座先于叶子"为准（见 ROADMAP D 节）。
+
+这一列是启发式：类型重写了 OnRender 或 OnPaint 就记作"自绘"。NumberBox 批实测它会把话说死——
+`NumberBox` 重写绘制，却仍带一个可替换的代码构建 `ControlTemplate`（样式 setter 换得动，
+见 `adaptation/00` S0-h 与 `audits/numberbox.md`）。**排到某个控件时先量一遍再决定要不要自有类型，
+不要把这一列当结论。**
+
+| 控件 | 绘制方式 | ModernWpf 放在哪一层 |
+|---|---|---|
+| Calendar | 自绘，模板只能改外围 | Styles |
+| ColorPicker | 自绘，模板只能改外围 | Controls |
+| ContentControl | 纯模板，可完全覆盖 | Styles |
+| DatePicker | 自绘，模板只能改外围 | Styles |
+| Frame | 纯模板，可完全覆盖 | Styles |
+| GridSplitter | 纯模板，可完全覆盖 | Styles |
+| GroupBox | 纯模板，可完全覆盖 | Styles |
+| GroupItem | 纯模板，可完全覆盖 | Styles |
+| HeaderedContentControl | 纯模板，可完全覆盖 | Styles |
+| ItemsControl | 自绘，模板只能改外围 | Styles |
+| Label | 自绘，模板只能改外围 | Styles |
+| NavigationWindow | 纯模板，可完全覆盖 | Styles |
+| ResizeGrip | 自绘，模板只能改外围 | Styles |
+| RichTextBox | 自绘，模板只能改外围 | Styles |
+| ScrollBar | 自绘，模板只能改外围 | Styles |
+| StatusBar | 自绘，模板只能改外围 | Styles |
+| TabControl | 自绘，模板只能改外围 | Styles |
+| Thumb | 自绘，模板只能改外围 | Styles |
+| TimePicker | 自绘，模板只能改外围 | Controls |
+| TitleBar | 纯模板，可完全覆盖 | Controls |
+| ToolBar | 纯模板，可完全覆盖 | Styles |
+| UserControl | 纯模板，可完全覆盖 | Styles |
+| Window | 自绘，模板只能改外围 | Styles |
+
+## B. 已上隐式样式（30）
+
+'Button' 'CheckBox' 'ComboBox' 'CommandBar' 'ContentDialog' 'ContextMenu' 'DataGrid' 'Expander' 'HyperlinkButton' 'ListBox' 'ListBoxItem' 'ListView' 'ListViewItem' 'Menu' 'MenuBar' 'MenuItem' 'NumberBox' 'PasswordBox' 'ProgressBar' 'RadioButton' 'RepeatButton' 'ScrollViewer' 'Separator' 'Slider' 'SplitButton' 'TextBox' 'ToggleButton' 'ToolTip' 'TreeView' 'TreeViewItem'
+
+## C. 真空但已有自有类型顶替（3）
+
+- InfoBar  ←  'FluentInfoBar'
+- NavigationView  ←  'FluentNavigationView'
+- ToggleSwitch  ←  'FluentToggleSwitch'
+
+## D. Jalium 无同名原生类型（28）
+
+补样式解决不了：要么自有类型，要么明确放弃。名单里含 ModernWpf 的工程目录名（非控件），保留不筛。
+
+'AnnotatedScrollBar' 'AutoSuggestBox' 'BreadcrumbBar' 'CommandBarFlyout' 'DropDownButton' 'Flyout' 'GridView' 'Hyperlink' 'InfoBadge' 'ItemContainer' 'ItemsView' 'LayoutPanel' 'MenuFlyout' 'NavigationBackButton' 'Page' 'PagerControl' 'PersonPicture' 'ProgressRing' 'RadioButtons' 'RadioMenuItem' 'RatingControl' 'Repeater' 'SelectorBar' 'SplitView' 'TabView' 'TeachingTip' 'TwoPaneView' 'WrapPanel'
+
+## E. Jalium 独有、这份范围不覆盖（92）
+
+不做 Fluent 还原，但**它们会露出框架素外观**：Gallery 里出现任何一个都必须显式标"未样式化"，
+这也是把 Gallery 当成唯一回归面的原因。
+
+'CalendarDayButton' 'CalendarButton' 'RangeSlider' 'DiffViewer' 'HeaderedItemsControl' 'PropertyGrid' 'MarkdownListPresenter' 'MarkdownHeadingPresenter' 'MarkdownQuotePresenter' 'Split' 'NavigationViewItemHeader' 'TabItem' 'PieChart' 'TreeSelectorItem' 'ChartTooltip' 'Terminal' 'RibbonSplitMenuItem' 'MarkdownTableCellPresenter' 'RibbonQuickAccessToolBar' 'Sparkline' 'RibbonApplicationMenuItem' 'RibbonTab' 'SankeyDiagram' 'SwipeControl' 'MarkdownTablePresenter' 'HexEditor' 'StickyNoteControl' 'RibbonGalleryItem' 'DatePickerTextBox' 'FlowDocumentPageViewer' 'TransitioningContentControl' 'RibbonMenuButton' 'NavigationViewItem' 'BarChart' 'RibbonToggleButton' 'RazorItemsHost' 'DockLayout' 'NavigationViewItemSeparator' 'RibbonMenuItem' 'TreeDataGridRow' 'GaugeChart' 'MarkdownDiagramPresenter' 'MarkdownCodePresenter' 'RibbonContextualTabGroup' 'JsonTreeViewer' 'RibbonGallery' 'RibbonSeparator' 'TreeMap' 'MarkdownImagePresenter' 'MarkdownFootnotePresenter' 'ChartLegend' 'DevToolsWindow' 'CalendarItem' 'DataGridCellsPresenter' 'FlowDocumentReader' 'EditControl' 'DockTabPanel' 'DocumentViewer' 'QRCode' 'RibbonComboBox' 'TitleBarButton' 'GridViewColumnHeader' 'MarkdownListItemPresenter' 'RibbonButton' 'Markdown' 'DockItem' 'TreeSelector' 'RibbonApplicationMenu' 'RibbonCheckBox' 'RibbonTextBox' 'ScatterPlot' 'LineChart' 'StatusBarItem' 'MarkdownParagraphPresenter' 'GanttChart' 'NetworkGraph' 'RibbonApplicationSplitMenuItem' 'FlowchartDiagram' 'CameraView' 'RibbonGalleryCategory' 'ToastNotificationItem' 'Control' 'CandlestickChart' 'RibbonSplitButton' 'MapView' 'FlowDocumentScrollViewer' 'Heatmap' 'MarkdownRulePresenter' 'MermaidDiagram' 'DataGridColumnHeadersPresenter' 'RibbonGroup' 'Ribbon'
+
+## 这份清单证明不了什么
+
+- 只统计**声明**。"声明是否落到像素"这条限定现在只对 **Button 撤了**（``06-pixel-attribution.md``：
+  隐式样式 -> 模板 -> 令牌 -> 像素已有断言），其余真空控件仍未证。``00-pixel-harness-raw-output.txt``
+  里"像素不动"那组读数出自未推帧的捕获，不再作为证据。
+- 绘制方式列来自 census 的 ``OnRender``/``OnPaint`` 判定，不区分读 DP 还是读死的 ``ThemeColors``；
+  后者见 ``02-render-ceiling.md``。
+- 范围以 ModernWpf 为**文件/目录名**为锚，所以按别名或内联在父控件文件里的条目样式会漏计
+  （``TabItem``/``ComboBoxItem``/``MenuFlyoutItem`` 这类条目容器就是假阴性来源）。下面这份
+  "已样式但名单没有"的差集是人工核对入口，不要当成"范围外"：
+
+'AppBarButton' 'AppBarSeparator' 'AppBarToggleButton' 'AutoCompleteBox' 'ComboBoxItem' 'DataGridCell' 'DataGridColumnHeader' 'DataGridRow' 'DataGridRowHeader' 'MenuBarItem' 'MenuFlyoutItem' 'MenuFlyoutSeparator' 'MenuFlyoutSubItem' 'ToggleMenuFlyoutItem' 'TreeDataGrid'
+
+<!-- generated-lines=69 sha256=968796f7266cea1c355ab3ee02b682f6aeb7421b82670b1c33e9635a3a1c94c5 -->
+
+<!-- hand notes: 生成器（tools/Report-Control-Vacuum.ps1）原样保留这一行往下的一切内容 -->
+
+## F. 2026-09-19 对着 26.10.9 复测：本文件 §D 的名单已经不可信
+
+`Report-Control-Vacuum.ps1` 的名单是**按名字匹配**的快照，而且和 S0-v/S0-p 记录过的老毛病一样把"造不出实例"
+和"类型不存在"混成一格。`spike/ControlCensus` 的 `OutstandingNames` pass 改成按 `Type.Name` 全程序集找、
+找到之后打印基链、公开构造器、`Style`/`Template` 读回，跑出来的结果（原始日志 `s0y-outstanding-names.txt`）：
+
+- **这一条原先手写在 §D 段里**：`MenuFlyout`、`MenuFlyoutPresenter`、`FlyoutBase` 三条是假阴性，以本节的复测为准（搬到这里，是为了让生成器重跑时不再把它删掉）。
+
+- **§D 里至少三条是假阴性**：`MenuFlyout`（`MenuFlyout : FlyoutBase`，菜单批就是用它 `ShowAt` 开的弹层）、
+  `MenuFlyoutPresenter`（`: Control`，唯一公开构造器 `MenuFlyoutPresenter(MenuFlyout)` → 无参构造不存在，
+  `Activator.CreateInstance` 抛 `MissingMethodException`）、`FlyoutBase`（在 `Jalium.UI.Controls.Primitives`，
+  §D 只查了 `Jalium.UI.Controls` 的名字）。**结论改法**：以后"缺什么类型"只按 `Type.Name` 全程序集量，
+  并把"存在但构造器不友好"单独记一档。
+- **确认为真缺（这些才允许起自有类型）**：`TeachingTip`、`Card`、`CardAction`、`CardGroup`、`CardElement`、
+  `Divider`、`InfoBadge`、`RatingControl`、`ProgressRing`、`TabView`、`BreadcrumbBar`、`RadioButtons`、
+  `PipsPager`、`Flyout`、`FlyoutPresenter`、`MenuScroller`、`MenuScrollViewer`、`RadioMenuFlyoutItem`、
+  `SplitMenuFlyoutItem`。阶段 4 剩下的 `TeachingTip`/`Card` 与阶段 5、6 里挂着"(自有)"的名单，现在有了
+  实测依据而不是名单推断。
+- **`UseTemplateContentManagement` 是 `void`**（S0-m 那把锁）：所以它**只能被调用、不能被读回**，
+  `Expander`/`NavigationView` 挂载读回都是 `style=False factoryTemplate=False`。这再次坐实 `adaptation/01`
+  的更正——"零默认样式 ≠ 零默认外观"，而"这把锁开了没有"在属性面上永远没有读数，只能看像素。
+
+这份复测**证明不了**：类型存在之后模板/行为是否够用（要逐个控件探针）、`MenuFlyoutPresenter` 到底是不是
+`MenuFlyout` 那层表面（见 `audits/menu-flyout.md` §5.11）。

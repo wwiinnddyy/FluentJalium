@@ -1,0 +1,89 @@
+阶段 6 第五段 RatingControl 的原始读数。运行时权威 NuGet Jalium.UI 26.10.9（AGENTS.md 钉住）。
+探针：spike/RatingProbe（一次一进程，自己上屏窗口 + Pump 帧后读，输出写在 exe 旁 rating-probe.txt）。
+下面每一行都是程序打出来的原文，只有小节标题和注释是本文加的；结论见 docs/astra/audits/rating-control.md。
+
+[A] 有没有原生东西可样式化
+types: Button assembly = Jalium.UI.Managed 0.0.0.0, 2958 public types
+types: Jalium.UI.Controls.RatingControl -> ABSENT
+types: Jalium.UI.Controls.Rating -> ABSENT
+types: Jalium.UI.Controls.RatingItemInfo -> ABSENT
+types: Jalium.UI.Controls.RatingItemFontInfo -> ABSENT
+types: Jalium.UI.Controls.RatingItemImageInfo -> ABSENT
+types: Jalium.UI.Controls.SymbolIcon -> Jalium.UI.Controls.SymbolIcon
+types: Jalium.UI.Controls.FontIcon -> Jalium.UI.Controls.FontIcon
+types: Jalium.UI.Controls.BitmapIcon -> ABSENT
+types: Jalium.UI.Controls.PathIcon -> Jalium.UI.Controls.PathIcon
+types: Jalium.UI.Controls.Image -> Jalium.UI.Controls.Image
+types: any public *Rating* type across 45 loaded assemblies: 7 [FluentJalium.Controls.FluentRatingControl, FluentJalium.Controls.FluentRatingControlDisplayState, FluentJalium.Controls.FluentRatingItemFontInfo, FluentJalium.Controls.FluentRatingItemImageInfo, FluentJalium.Controls.FluentRatingItemInfo, Jalium.UI.Controls.DataGridAutoGeneratingColumnEventArgs, System.OperatingSystem]
+
+读法：控件族五个名字全部 ABSENT，全进程只有我们自己那三个类型命中 *Rating* —— 自有类型是被测出来的，不是选的。
+同一段还顺手量到 BitmapIcon 也不在（阶段 6 尾批的账），而 SymbolIcon/FontIcon/PathIcon/Image 在。
+
+[B] 成员面（typeof 直读，不是反射猜）
+members: StackPanel.Spacing -> StackPanel.Spacing:Double
+members: StackPanel.Orientation -> StackPanel.Orientation:Orientation
+members: UIElement.Clip -> UIElement.Clip:Geometry
+members: UIElement.ClipToBounds -> UIElement.ClipToBounds:Boolean
+members: RectangleGeometry.Rect -> RectangleGeometry.Rect:Rect
+members: Geometry.Bounds -> Geometry.Bounds:Rect
+members: FrameworkElement.RenderTransform -> UIElement.RenderTransform:Transform
+members: Control.IsHitTestVisible -> UIElement.IsHitTestVisible:Boolean
+members: Control.Focusable -> UIElement.Focusable:Boolean
+members: Control.FontFamily -> Control.FontFamily:FontFamily
+members: Control.FontSize -> Control.FontSize:Double
+members: Control.Foreground -> Control.Foreground:Brush
+members: Control.Template -> Control.Template:ControlTemplate
+members: Border.Background -> Border.Background:Brush
+members: Border.Child -> Decorator.Child:UIElement
+members: TextBlock.Text -> TextBlock.Text:String
+members: TextBlock.Foreground -> TextBlock.Foreground:Brush
+members: typeof(UIElement).GetProperty("Clip").PropertyType = Geometry
+
+[C] 间距与步进：Spacing 的正负不对称
+spacing: code unset: read-back=0 desired=48x16 pitch=16
+spacing: code 8: read-back=8 desired=64x16 pitch=24
+spacing: code 24: read-back=24 desired=96x16 pitch=40
+spacing: code -10: read-back=-10 desired=48x16 pitch=16
+spacing: markup Orientation=Horizontal Spacing="8": type=StackPanel orientation=Horizontal read-back=8 desired=64x16 pitch=24
+spacing: pitch with Spacing=8 + Margin=-8,-8,0,0: pitch=16 cell0.X=-8 desired=40
+spacing: pitch with Spacing=8 + cells 34 wide, later cells Margin.Left=-18: pitch=24 cell4.X=96 desired=130 (5*34+4*8=202, compensated=130)
+spacing: Segoe Fluent Icons 32 set glyph: measured=34x34 arranged=306.286x201.143
+spacing: Segoe Fluent Icons 32 unset glyph: measured=34x34 arranged=306.286x201.143
+
+读法：三格 16 宽。间距 0/8/24 时 pitch 16/24/40 —— 正数照加。间距 -10 时属性读回 -10，
+但 desired 仍是 48（=3×16）且 pitch 仍是 16：负号被留下、被排布当成 0。这是第三类静默失效
+（前两类是 {x:Bind} 与 Clip），而且是最阴的一种：属性读回证明你写了。
+同一份 -10 改成"后续格 Margin.Left=-18"时 pitch 实测 24、第五格落在 X=96、行宽从 202 收到 130 —— 负边距真的动布局。
+32 号 Segoe 星形实测步进 34（arranged 那一对是宿主格子撑出来的，不是字形的盒子，别读它）。
+
+[D] 裁剪：Clip 死、ClipToBounds 活且按比例
+clip: control, no clip: accent=3600/0 painted=3600
+clip: code RectangleGeometry(0,0,30,60): accent=3600 clip=RectangleGeometry rect=0,0,30,60
+clip: markup <RectangleGeometry Rect="0,0,30,60"/>: accent=3600 clip=RectangleGeometry rect=Empty
+clip: markup Rect="0 0 30 60" (spaces): accent=3600 rect=Empty
+clip: glyph layer under the same clip: accent=3600 rest=0 (S1-r clause 3 predicts the rest count is 0 either way)
+clip: ClipToBounds clip=false 30 of 60: accentInAncestor=3600 hostActual=30
+clip: ClipToBounds clip=true 30 of 60: accentInAncestor=1800 hostActual=30
+clip: ClipToBounds clip=true 45 of 60: accentInAncestor=2700 hostActual=45
+clip: markup ClipToBounds=True host 20 over two 16 cells: accentInAncestor=320 clipToBounds=True actual=20x16 (32x16 of ink = 512, cut at 20 => 320 if the clip reaches)
+
+读法：代码写的 RectangleGeometry 属性留着、墨一点不裁（3600/3600）；markup 写同一段几何，逗号式与空格式都读回 rect=Empty。
+ClipToBounds 反过来：宿主 30/60 时墨 1800，45/60 时 2700，20 宽的宿主盖住两格 512 墨时读到 320 —— 精确按比例。
+裁剪题必须捕获更宽的祖先：RenderTargetBitmap 是按目标尺寸出的，裁没裁都填满那张图。
+
+[E] 缩放：0.5 真的落墨，但"捕获目标自己"看不见
+transform: control, no transform: accent=3600 painted=3600
+transform: origin read-back=0.5,0.5 type=ScaleTransform: accent=3600 painted=3600 (900 if the 0.5 reaches the ink, 3600 if not)
+transform: 60x60 at 0.5 seen through a 200x200 ancestor: x=15..44 y=15..44 accent=900
+transform: same box with no transform, same ancestor: x=0..59 y=0..59 accent=3600
+
+读法：前两行差点把结论写错。第三行才说清楚：0.5 关于 0.5,0.5 真的缩小了墨 —— 从 200×200 祖先里看，
+60 的块只占 x=15..44、900 像素，没有变换的对照是 x=0..59、3600 像素。
+所以"捕获目标自己"对目标自身的 RenderTransform 是瞎的（与 [D] 最后一行同一条仪器账），
+uniform 的读数先怀疑仪器，这次也是仪器。上游的 0.5 因此可以照搬成 RenderTransform。
+
+[F] 测试跑次（同一进程内量到的行几何）
+1) 用上游那行 Spacing = 8-(34-16) = -10、格宽 34 时：pitch 实测 34（应为 24），属性读回 -10。
+2) 改成"格宽 = 墨盒 17 + 面板间距 8、条目缩放 0.5、左移 8.5"后：cell 17、pitch 25、第五格 X=100、
+   行右边界 100+17=117 = MaxRating*size+(MaxRating-1)*spacing，与指针模型同一个数；AstraRatingControlTests 64/64 绿。
+3) A/B 验牙：把补偿撤掉（回到 [C] 的上游行）→ pitch 42、格边距读回 0，两条断言按预测变红；还原后复绿。

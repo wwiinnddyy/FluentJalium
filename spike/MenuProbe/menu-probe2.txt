@@ -1,0 +1,311 @@
+=== Z0. candidate keys that resolve at all: 8 of 71 ===
+  unresolvable: MenuBarItemBackground, MenuBarItemBackgroundPointerOver, MenuBarItemBackgroundSelected, MenuBarItemBorderBrush, MenuBarItemBorderThickness, MenuBarItemBorderThicknessPointerOver, MenuBarItemBorderBrushPointerOver, MenuBarItemBorderBrushSelected, MenuBarItemBorderBrushDisabled, MenuBarItemForeground, MenuBarItemForegroundPointerOver, MenuBarItemForegroundSelected, MenuBarItemForegroundDisabled, MenuBarItemBackgroundSelectedPointerOver, MenuFlyoutPresenterBackground, MenuFlyoutPresenterBorderBrush, MenuFlyoutPresenterBorderThemeThickness, MenuFlyoutPresenterItemBackground, MenuFlyoutPresenterItemBackgroundDisabled, MenuFlyoutPresenterItemBackgroundPointerOver, MenuFlyoutPresenterItemBackgroundPressed, MenuFlyoutPresenterItemBackgroundSelected, MenuFlyoutPresenterItemBackgroundSelectedPointerOver, MenuFlyoutPresenterItemBorderThickness, MenuFlyoutPresenterPointerUpThemeAnimation, MenuFlyoutPresenterItemBorderBrush, MenuFlyoutPresenterItemBorderBrushPointerOver, MenuFlyoutItemBackground, MenuFlyoutItemBackgroundPointerOver, MenuFlyoutItemBackgroundPressed, MenuFlyoutItemBackgroundDisabled, MenuFlyoutItemForeground, MenuFlyoutItemForegroundPointerOver, MenuFlyoutItemForegroundPressed, MenuFlyoutItemForegroundDisabled, MenuFlyoutItemForegroundSelected, MenuFlyoutItemBorderBrush, MenuFlyoutSubItemChevron, MenuBackground, MenuBorderBrush, MenuBorderThickness, MenuBorderBrushSecondary, MenuItemBackground, MenuItemBackgroundPointerOver, MenuItemBackgroundPressed, MenuItemBackgroundDisabled, MenuItemBackgroundSelected, MenuItemForeground, MenuItemPointerOverForeground, MenuItemDisabledForeground, MenuItemPressedForeground, MenuItemSelectedForeground, MenuItemSelectedSubmenuBackground, MenuItemBorderBrushPointerOver, MenuItemSeparatorBorderBrush, MenuItemGlyphBrush, MenuItemGlyphPointerOverBrush, MenuItemSelectedGlyphBrush, TextOnColorPrimaryBrush, FlyoutPresenterBackground, FlyoutBorderThemeBrush, FlyoutBorderThemeThickness, SystemScrollBarColorScrollBarThumbActiveBrush
+
+=== T. dependency property surface ===
+  --- Menu: 1 own / 101 total ---
+    own: IsMainMenu:Boolean
+    inherited: ActualHeight, ActualWidth, AllowDrop, AlternationCount, AlternationIndex, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, DisplayMemberPath, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, GroupStyleSelector, HasItems, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsGrouping, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsTextSearchCaseSensitive, IsTextSearchEnabled, IsVisible, ItemBindingGroup, ItemContainerStyle, ItemContainerStyleSelector, ItemContainerTemplateSelector, ItemStringFormat, ItemTemplate, ItemTemplateSelector, ItemsPanel, ItemsSource, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, UsesItemContainerTemplate, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- MenuBase: 3 own / 100 total ---
+    own: ItemContainerStyle:Style, ItemContainerTemplateSelector:ItemContainerTemplateSelector, UsesItemContainerTemplate:Boolean
+    inherited: ActualHeight, ActualWidth, AllowDrop, AlternationCount, AlternationIndex, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, DisplayMemberPath, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, GroupStyleSelector, HasItems, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsGrouping, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsTextSearchCaseSensitive, IsTextSearchEnabled, IsVisible, ItemBindingGroup, ItemContainerStyleSelector, ItemStringFormat, ItemTemplate, ItemTemplateSelector, ItemsPanel, ItemsSource, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- MenuItem: 16 own / 119 total ---
+    own: Command:ICommand, CommandParameter:Object, CommandTarget:IInputElement, Icon:Object, InputGestureText:String, IsCheckable:Boolean, IsChecked:Boolean, IsHighlighted:Boolean, IsPressed:Boolean, IsSelected:Boolean, IsSubmenuOpen:Boolean, IsSuspendingPopupAnimation:Boolean, ItemContainerTemplateSelector:ItemContainerTemplateSelector, Role:MenuItemRole, StaysOpenOnClick:Boolean, UsesItemContainerTemplate:Boolean
+    inherited: ActualHeight, ActualWidth, AllowDrop, AlternationCount, AlternationIndex, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, DisplayMemberPath, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, GroupStyleSelector, HasHeader, HasItems, Header, HeaderStringFormat, HeaderTemplate, HeaderTemplateSelector, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsGrouping, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsTextSearchCaseSensitive, IsTextSearchEnabled, IsVisible, ItemBindingGroup, ItemContainerStyle, ItemContainerStyleSelector, ItemStringFormat, ItemTemplate, ItemTemplateSelector, ItemsPanel, ItemsSource, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- MenuBar: 0 own / 82 total ---
+    own: -
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- ContextMenu: 9 own / 109 total ---
+    own: CustomPopupPlacementCallback:CustomPopupPlacementCallback, HasDropShadow:Boolean, HorizontalOffset:Double, IsOpen:Boolean, Placement:PlacementMode, PlacementRectangle:Rect, PlacementTarget:UIElement, StaysOpen:Boolean, VerticalOffset:Double
+    inherited: ActualHeight, ActualWidth, AllowDrop, AlternationCount, AlternationIndex, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, DisplayMemberPath, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, GroupStyleSelector, HasItems, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsGrouping, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsTextSearchCaseSensitive, IsTextSearchEnabled, IsVisible, ItemBindingGroup, ItemContainerStyle, ItemContainerStyleSelector, ItemContainerTemplateSelector, ItemStringFormat, ItemTemplate, ItemTemplateSelector, ItemsPanel, ItemsSource, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, UsesItemContainerTemplate, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- MenuFlyoutItem: 5 own / 87 total ---
+    own: Command:ICommand, CommandParameter:Object, Icon:Object, KeyboardAcceleratorTextOverride:String, Text:String
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- ToggleMenuFlyoutItem: 1 own / 88 total ---
+    own: IsChecked:Boolean
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, Command, CommandParameter, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, Icon, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, KeyboardAcceleratorTextOverride, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, Text, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- Separator: 3 own / 85 total ---
+    own: Orientation:Orientation, StrokeBrush:Brush, StrokeThickness:Double
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- CommandBar: 5 own / 87 total ---
+    own: ClosedDisplayMode:CommandBarClosedDisplayMode, DefaultLabelPosition:CommandBarDefaultLabelPosition, IsOpen:Boolean, IsSticky:Boolean, OverflowButtonVisibility:CommandBarOverflowButtonVisibility
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- AppBarButton: 5 own / 102 total ---
+    own: DynamicOverflowOrder:Int32, Icon:IconElement, IsCompact:Boolean, Label:String, LabelPosition:CommandBarLabelPosition
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, ClickMode, Clip, ClipToBounds, ClipToBoundsEdges, Command, CommandParameter, CommandTarget, Content, ContentStringFormat, ContentTemplate, ContentTemplateSelector, ContentTransition, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, HasContent, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsCancel, IsDefault, IsDefaulted, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsPressed, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionMode, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  --- FlyoutBase: 1 own / 1 total ---
+    own: Placement:FlyoutPlacementMode
+    inherited: 
+  --- ItemsControl: 16 own / 98 total ---
+    own: AlternationCount:Int32, AlternationIndex:Int32, DisplayMemberPath:String, GroupStyleSelector:GroupStyleSelector, HasItems:Boolean, IsGrouping:Boolean, IsTextSearchCaseSensitive:Boolean, IsTextSearchEnabled:Boolean, ItemBindingGroup:BindingGroup, ItemContainerStyle:Style, ItemContainerStyleSelector:StyleSelector, ItemStringFormat:String, ItemTemplate:DataTemplate, ItemTemplateSelector:DataTemplateSelector, ItemsPanel:ItemsPanelTemplate, ItemsSource:IEnumerable
+    inherited: ActualHeight, ActualWidth, AllowDrop, AreAnyTouchesCaptured, AreAnyTouchesCapturedWithin, AreAnyTouchesDirectlyOver, AreAnyTouchesOver, BackdropEffect, Background, BindingGroup, BitmapEffect, BitmapEffectInput, BorderBrush, BorderThickness, CacheMode, Clip, ClipToBounds, ClipToBoundsEdges, ContextMenu, CornerRadius, Cursor, DataContext, Effect, FlowDirection, FocusVisualStyle, Focusable, FontFamily, FontSize, FontStretch, FontStyle, FontWeight, ForceCursor, Foreground, Height, HorizontalAlignment, HorizontalContentAlignment, InputScope, IsEnabled, IsFocused, IsHitTestVisible, IsKeyboardFocusWithin, IsKeyboardFocused, IsManipulationEnabled, IsMouseCaptureWithin, IsMouseCaptured, IsMouseDirectlyOver, IsMouseOver, IsStylusCaptureWithin, IsStylusCaptured, IsStylusDirectlyOver, IsStylusOver, IsTabStop, IsVisible, Language, LayoutTransform, Margin, MaxHeight, MaxWidth, MinHeight, MinWidth, Name, Opacity, OpacityMask, OverridesDefaultStyle, Padding, RenderTransform, RenderTransformOrigin, SnapsToDevicePixels, Style, TabIndex, Tag, Template, ToolTip, TransitionDuration, TransitionProperty, TransitionTimingFunction, Uid, UseLayoutRounding, VerticalAlignment, VerticalContentAlignment, Visibility, Width
+  MenuBarItem type: Jalium.UI.Controls.MenuBarItem  chain: MenuBarItem < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+    MenuFlyoutItem.Text = flyout item
+    ToggleMenuFlyoutItem.Text = toggle item
+    AppBarButton.Label = Cut
+    MenuFlyoutItem.Text = in flyout
+  MenuFlyout.Items: 1 item(s)
+  attached Flyout DP found: none of -
+  FrameworkElement.ContextMenu settable: no
+
+=== U. mounted trees + which palette instance each node settled on ===
+  --- Menu ---
+    Menu bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x32
+      StackPanel 420x32
+        MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelHeader IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+        MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelItem IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+  --- MenuBar ---
+    MenuBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 420x36
+      StackPanel 420x36
+        MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+        MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+  --- MenuFlyoutItem ---
+    MenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Text=flyout item Icon=null [ownDP: Command,CommandParameter,Icon,KeyboardAcceleratorTextOverride,Text] 300x34
+  --- ToggleMenuFlyoutItem ---
+    ToggleMenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 IsChecked=False Text=toggle item Icon=null [ownDP: IsChecked] 300x34
+  --- Separator ---
+    Separator bg=#FF48484A(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 300x1
+      Border 'SeparatorBorder' bg=#FF48484A(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 300x1
+  --- CommandBar ---
+    CommandBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x48.7
+      StackPanel ∞x48.7
+        AppBarButton bg=#001C1C1E(not-a-candidate-key) fg=#FF680081(not-a-candidate-key) border=- bt=0,0,0,0 80x48.7
+          Grid 80x48.7
+            Border 'Root' bg=#001C1C1E(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 80x48.7
+              StackPanel 20x40.7
+                ContentPresenter 'IconPresenter' content="" 20x20
+                TextBlock 'LabelText' text="Cut" fg=#FF680081(not-a-candidate-key) size=10 18.58x14.7
+      Button bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+        Grid 0x0 [hidden]
+          Border 'Surface' bg=#00FFFFFF(not-a-candidate-key) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+            ContentPresenter content="⋯" 0x0 [hidden]
+              TextBlock text="⋯" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 0x0 [hidden]
+          Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 0x0 [hidden]
+            Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 0x0 [hidden]
+      Popup 0x0
+  --- Button ---
+    Button bg=#0FFFFFFF(ControlFillColorDefaultBrush) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+      Grid 160x32.78
+        Border 'Surface' bg=#0FFFFFFF(not-a-candidate-key) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+          ContentPresenter content="flyout host" 74.09x19.78
+            TextBlock text="flyout host" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 74.09x19.78
+        Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 158x30.78
+          Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 154x26.78
+
+=== V. opening a ContextMenu without OS input ===
+  before: IsOpen=False
+  Open(Point) threw? no
+  after Open: IsOpen=True
+  window (depth 5) while open:
+    Window bg=#FF1C1C1E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 986.29x913.14
+      StackPanel 938.29x833.14
+        Menu bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelHeader IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+            MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelItem IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+        MenuBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 420x36
+          StackPanel 420x36
+            MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+            MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+        MenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Text=flyout item Icon=null [ownDP: Command,CommandParameter,Icon,KeyboardAcceleratorTextOverride,Text] 300x34
+        ToggleMenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 IsChecked=False Text=toggle item Icon=null [ownDP: IsChecked] 300x34
+        Separator bg=#FF48484A(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 300x1
+          Border 'SeparatorBorder' bg=#FF48484A(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 300x1
+        CommandBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x48.7
+          StackPanel ∞x48.7
+            AppBarButton bg=#001C1C1E(not-a-candidate-key) fg=#FF680081(not-a-candidate-key) border=- bt=0,0,0,0 80x48.7
+              Grid 80x48.7
+          Button bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+            Grid 0x0 [hidden]
+              Border 'Surface' bg=#00FFFFFF(not-a-candidate-key) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 0x0 [hidden]
+          Popup 0x0
+        Button bg=#0FFFFFFF(ControlFillColorDefaultBrush) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+          Grid 160x32.78
+            Border 'Surface' bg=#0FFFFFFF(ControlFillColorDefaultBrush) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+              ContentPresenter content="flyout host" 74.09x19.78
+            Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 158x30.78
+              Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 154x26.78
+      TitleBar bg=#FF202020(SolidBackgroundFillColorBaseBrush) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 986.29x32
+        Border 'PART_RootBorder' bg=#FF202020(SolidBackgroundFillColorBaseBrush) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 986.29x32
+          DockPanel 986.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+            ContentPresenter 'PART_RightWindowCommandsHost' content="" 0x0 [hidden]
+            DockPanel 830.29x32
+              Grid 'PART_WindowIconHost' 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 2" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' content="" 0x0 [hidden]
+      AdornerLayer 986.29x913.14
+      OverlayLayer 986.29x913.14
+        DebugHudOverlay bg=#EB101016(not-a-candidate-key) border=#5064A0DC(not-a-candidate-key) bt=1,1,1,1 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" fg=#FF50FF50(not-a-candidate-key) size=20 0x0 [hidden]
+              TextBlock text="FPS" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+              TextBlock text="worst 0.0ms" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" fg=#F5F0F0F0(not-a-candidate-key) size=10 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              Border bg=#C8FFA028(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              Border bg=#C864DC64(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+        PopupRoot 62x76
+          Border bg=#FF2C2C2E(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=1,1,1,1 62x76
+            MenuPopupScrollHost bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 50x64
+              RepeatButton bg=- fg=#FFDCDCDC(not-a-candidate-key) border=- bt=0,0,0,0 0x0 [hidden]
+              ScrollViewer bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#00FFFFFF(not-a-candidate-key) bt=0,0,0,0 50x64
+              RepeatButton bg=- fg=#FFDCDCDC(not-a-candidate-key) border=- bt=0,0,0,0 0x0 [hidden]
+  the ContextMenu is NOT reachable from the window visual tree while open
+  IsOpen=false: no
+
+=== W. MenuFlyout on a button ===
+  FlyoutBase public members: Hide, IsOpen, Opened, Opening, Placement, ShowAt, add_Opened, add_Opening, get_IsOpen, get_Placement, remove_Opened, remove_Opening, set_Placement
+  ShowAt(host) threw? no
+  after ShowAt: IsOpen=True
+  window (depth 6) while the flyout is open:
+    Window bg=#FF1C1C1E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 986.29x913.14
+      StackPanel 938.29x833.14
+        Menu bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x32
+          StackPanel 420x32
+            MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelHeader IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+            MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelItem IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+        MenuBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 420x36
+          StackPanel 420x36
+            MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+            MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+        MenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Text=flyout item Icon=null [ownDP: Command,CommandParameter,Icon,KeyboardAcceleratorTextOverride,Text] 300x34
+        ToggleMenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 IsChecked=False Text=toggle item Icon=null [ownDP: IsChecked] 300x34
+        Separator bg=#FF48484A(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 300x1
+          Border 'SeparatorBorder' bg=#FF48484A(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 300x1
+        CommandBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x48.7
+          StackPanel ∞x48.7
+            AppBarButton bg=#001C1C1E(not-a-candidate-key) fg=#FF680081(not-a-candidate-key) border=- bt=0,0,0,0 80x48.7
+              Grid 80x48.7
+                Border 'Root' bg=#001C1C1E(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 80x48.7
+          Button bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+            Grid 0x0 [hidden]
+              Border 'Surface' bg=#00FFFFFF(not-a-candidate-key) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+                ContentPresenter content="⋯" 0x0 [hidden]
+              Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 0x0 [hidden]
+                Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 0x0 [hidden]
+          Popup 0x0
+        Button bg=#0FFFFFFF(ControlFillColorDefaultBrush) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+          Grid 160x32.78
+            Border 'Surface' bg=#0FFFFFFF(ControlFillColorDefaultBrush) border=#12FFFFFF(not-a-candidate-key) bt=1,1,1,1 160x32.78
+              ContentPresenter content="flyout host" 74.09x19.78
+                TextBlock text="flyout host" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 74.09x19.78
+            Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 158x30.78
+              Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 154x26.78
+      TitleBar bg=#FF202020(SolidBackgroundFillColorBaseBrush) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 986.29x32
+        Border 'PART_RootBorder' bg=#FF202020(SolidBackgroundFillColorBaseBrush) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 986.29x32
+          DockPanel 986.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+                Grid 16x16
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+                Grid 16x16
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=- bt=0,0,0,0 46x32
+              Border 'PART_RootBorder' bg=#00FFFFFF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 46x32
+                Grid 16x16
+            ContentPresenter 'PART_RightWindowCommandsHost' content="" 0x0 [hidden]
+            DockPanel 830.29x32
+              Grid 'PART_WindowIconHost' 20x20
+                Image 20x20
+              TextBlock 'PART_TitleText' text="Menu probe 2" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 97.44x19.78
+              ContentPresenter 'PART_LeftWindowCommandsHost' content="" 0x0 [hidden]
+      AdornerLayer 986.29x913.14
+      OverlayLayer 986.29x913.14
+        DebugHudOverlay bg=#EB101016(not-a-candidate-key) border=#5064A0DC(not-a-candidate-key) bt=1,1,1,1 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              TextBlock text="0" fg=#FF50FF50(not-a-candidate-key) size=20 0x0 [hidden]
+              TextBlock text="FPS" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+              TextBlock text="Full [D3D12 · Impeller]" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+              TextBlock text="worst 0.0ms" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" fg=#F5F0F0F0(not-a-candidate-key) size=10 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+              Border bg=#C850B4FF(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              Border bg=#C8FFA028(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              Border bg=#C864DC64(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#DCAAB4BE(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+            TextBlock text="" fg=#C88C919B(not-a-candidate-key) size=10 0x0 [hidden]
+  flyout content reachable from the window: vis=Visible 300x34
+      MenuFlyoutItem bg=- fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Text=flyout item Icon=null [ownDP: Command,CommandParameter,Icon,KeyboardAcceleratorTextOverride,Text] 300x34
+  Hide(): no
+
+=== X. clicking a menu item and a menu bar item ===
+  --- click Menu ---
+    target: MenuItem
+    after: Menu height=32
+      Menu bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x32
+        StackPanel 420x32
+          MenuItem bg=#FF3A3A3C(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelHeader IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=True [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+          MenuItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 Role=TopLevelItem IsChecked=False Header=null InputGestureText=null Icon=null StaysOpenOnClick=False IsSubmenuOpen=False [ownDP: Command,CommandParameter,CommandTarget,Icon,InputGestureText,IsCheckable,IsChecked,IsHighlighted,IsPressed,IsSelected,IsSubmenuOpen,IsSuspendingPopupAnimation,ItemContainerTemplateSelector,Role,StaysOpenOnClick,UsesItemContainerTemplate] 50x32
+  --- click MenuBar ---
+    target: MenuBarItem
+    after: MenuBar height=36
+      MenuBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0 420x36
+        StackPanel 420x36
+          MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+          MenuBarItem bg=#00FFFFFF(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=- bt=0,0,0,0  [ownDP: Title] 24x36
+  --- click CommandBar ---
+    target: AppBarButton
+    after: CommandBar height=48.7
+      CommandBar bg=#FF2C2C2E(not-a-candidate-key) fg=#FFF5F5F7(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 420x48.7
+        StackPanel ∞x48.7
+          AppBarButton bg=#001C1C1E(not-a-candidate-key) fg=#FF680081(not-a-candidate-key) border=- bt=0,0,0,0 80x48.7
+            Grid 80x48.7
+              Border 'Root' bg=#FF48484A(not-a-candidate-key) border=#FF48484A(not-a-candidate-key) bt=0,0,0,0 80x48.7
+                StackPanel 20x40.7
+                  ContentPresenter 'IconPresenter' content="" 20x20
+                  TextBlock 'LabelText' text="Cut" fg=#FF680081(not-a-candidate-key) size=10 18.58x14.7
+        Button bg=#00FFFFFF(not-a-candidate-key) fg=#FFFFFFFF(TextFillColorPrimaryBrush) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+          Grid 0x0 [hidden]
+            Border 'Surface' bg=#00FFFFFF(not-a-candidate-key) border=#12FFFFFF(not-a-candidate-key) bt=0,0,0,0 0x0 [hidden]
+              ContentPresenter content="⋯" 0x0 [hidden]
+                TextBlock text="⋯" fg=#FFFFFFFF(TextFillColorPrimaryBrush) size=14 0x0 [hidden]
+            Border 'FocusOutline' bg=- border=#FFFFFFFF(not-a-candidate-key) bt=2,2,2,2 0x0 [hidden]
+              Border bg=- border=#B3000000(not-a-candidate-key) bt=1,1,1,1 0x0 [hidden]
+        Popup 0x0
+
+=== Y. automation peers (the pointer-free drive, if any) ===
+  Menu: peer=MenuAutomationPeer patterns=none
+  MenuItem: peer=MenuItemAutomationPeer patterns=ExpandCollapse(MenuItemAutomationPeer)
+  MenuBar: peer=MenuBarAutomationPeer patterns=none
+  MenuFlyoutItem: peer=MenuFlyoutItemAutomationPeer patterns=Invoke(MenuFlyoutItemAutomationPeer)
+  ToggleMenuFlyoutItem: peer=MenuFlyoutItemAutomationPeer patterns=Invoke(MenuFlyoutItemAutomationPeer)
+  Button: peer=ButtonAutomationPeer patterns=Invoke(ButtonAutomationPeer)
+
+=== Z. does an app-level sentinel reach these nodes? ===
+  override MenuBackground: KeyNotFoundException: Resource key 'MenuBackground' not found.
+    changed: 
+    restore: KeyNotFoundException: Resource key 'MenuBackground' not found.
+  override MenuBarItemBackground: KeyNotFoundException: Resource key 'MenuBarItemBackground' not found.
+    changed: 
+    restore: KeyNotFoundException: Resource key 'MenuBarItemBackground' not found.
+  override MenuItemBackground: KeyNotFoundException: Resource key 'MenuItemBackground' not found.
+    changed: 
+    restore: KeyNotFoundException: Resource key 'MenuItemBackground' not found.
+  override FlyoutPresenterBackground: KeyNotFoundException: Resource key 'FlyoutPresenterBackground' not found.
+    changed: 
+    restore: KeyNotFoundException: Resource key 'FlyoutPresenterBackground' not found.
+  override MenuFlyoutPresenterBackground: KeyNotFoundException: Resource key 'MenuFlyoutPresenterBackground' not found.
+    changed: 
+    restore: KeyNotFoundException: Resource key 'MenuFlyoutPresenterBackground' not found.
+  override SolidBackgroundFillColorBaseBrush: no
+    changed: 
+    restore: no
+  override AcrylicInAppFillColorDefaultBrush: no
+    changed: 
+    restore: no

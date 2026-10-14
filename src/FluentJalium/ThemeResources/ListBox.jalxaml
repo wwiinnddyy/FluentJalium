@@ -1,0 +1,52 @@
+<!-- WinUI 3 ListBox_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob df9ca8dfe48b7cd4487b24b4f7954c7a74e683f8. Its ThemeDictionaries are Default (4-31), High Contrast
+     (32-59) and Light (60-87); all three carry the SAME 26 row names - 11 current-generation rows plus 15
+     legacy *ThemeBrush rows - and one more row, ListBoxItemPadding, sits outside them at line 89. This file
+     publishes the twelve with a consumer (the eleven plus the padding row); what was left out and why is at
+     the bottom, and the row-by-row branch comparison is docs/astra/audits/listbox.md §1. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The control. Upstream draws the surface with ListBoxBackground and gives it a 0-thick border in the two
+       normal scopes (2 in High Contrast), so the four ListBoxBorder rows below paint nothing in Light and Dark -
+       the same inertness the ComboBox audit records for its nine item-border rows, kept because a parity claim
+       about a name has to survive the state map. -->
+  <Thickness x:Key="ListBoxBorderThemeThickness">0</Thickness>
+  <StaticResource x:Key="ListBoxForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- Deviation (value): upstream's target is SystemControlBackgroundChromeMediumLowBrush, which generic.xaml:243
+       defines as SystemChromeMediumLowColor - #F2F2F2 in Light, #2B2B2B in Dark. No token in our generated palette
+       carries those two hexes (Light.jalxaml and Dark.jalxaml are output of tools/Sync-AstraPalette.ps1, so a row
+       cannot be added there), and the nearest list-surface token is one step off: #F3F3F3 / #202020. -->
+  <StaticResource x:Key="ListBoxBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
+  <StaticResource x:Key="ListBoxBorder" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- Items. Foreground rows are upstream's own aliasing; the two pointer rows alias the same subtle tokens
+       upstream names. -->
+  <StaticResource x:Key="ListBoxItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ListBoxItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ListBoxItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ListBoxItemBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <!-- The three selected rows are where this dictionary departs from a literal transcription, and the departure
+       is one layer deep rather than a name change. Upstream aliases all three at SystemControlHighlight*-family
+       tokens; generic.xaml:300-302 resolves those to SystemAccentColor at Opacity 0.9 / 0.6 / 0.8, and the
+       runtime's own stock item paints exactly that shape - spike/ListProbe mode I read #99680081, the OS accent
+       at 60%, on PART_BackgroundBorder of a selected stock item. Our palette exposes the accent at 1 / 0.9 / 0.8
+       only, and no row can be added to the generated palette files, so the colour lives here and the alpha rides
+       on the template part: Styles/ListBoxes.jalxaml writes the highlight's Opacity to 0.6 / 0.8 / 0.9 in the
+       same three states, which multiplies out to upstream's pixel over a single opaque layer. All three rows
+       alias the same brush instance on purpose - a row that does not follow an application accent change would
+       be a worse copy than a row with the wrong alpha. -->
+  <StaticResource x:Key="ListBoxItemBackgroundSelected" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ListBoxItemBackgroundSelectedPointerOver" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="ListBoxItemBackgroundSelectedPressed" ResourceKey="AccentFillColorDefaultBrush" />
+  <!-- Item geometry. Upstream keeps this outside the ThemeDictionaries (line 89) with the same value in every
+       scope, so it is one row. The runtime's own resting item padding measured 10,6,10,6 (mode I), which is
+       the number this row replaces. -->
+  <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness>
+  <!-- Fifteen upstream rows are deliberately not here, and none of them is a count-only omission: the 15
+       *ThemeBrush rows (ListBoxBackgroundThemeBrush, ListBoxBorderThemeBrush, ListBoxDisabledForegroundThemeBrush,
+       ListBoxFocusBackgroundThemeBrush, ListBoxForegroundThemeBrush, ListBoxItemDisabledForegroundThemeBrush,
+       ListBoxItemPointerOver{Background,Foreground}ThemeBrush, ListBoxItemPressed{Background,Foreground}ThemeBrush,
+       ListBoxItemSelected{Background,DisabledBackground,DisabledForeground,Foreground}ThemeBrush,
+       ListBoxItemSelectedPointerOverBackgroundThemeBrush) are dead in upstream itself: grep over the reference
+       commit finds them in the three declaration blocks of this file and in its perf2026 twin and nowhere else,
+       so publishing them would put Windows 8.1-era hexes (#CCFFFFFF, #FF5F37BE, #66FFFFFF) into a public surface
+       no template reads. AstraListBoxTests.A_dead_upstream_row_is_not_published names each one. -->
+</ResourceDictionary>

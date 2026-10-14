@@ -1,0 +1,27 @@
+Common.jalxaml: removed 3
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+Inputs.jalxaml: removed 4
+   <Grid> BorderBrush="{TemplateBinding BorderBrush}"
+   <Grid> BorderThickness="{TemplateBinding BorderThickness}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> TextWrapping="Wrap"
+Menus.jalxaml: removed 4
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <Grid> CornerRadius="{TemplateBinding CornerRadius}"
+Navigation.jalxaml: removed 4
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+Selection.jalxaml: removed 4
+   <Grid> BorderBrush="{TemplateBinding BorderBrush}"
+   <Grid> BorderThickness="{TemplateBinding BorderThickness}"
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+   <ContentPresenter> TextWrapping="Wrap"
+Surfaces.jalxaml: removed 1
+   <ContentPresenter> Foreground="{TemplateBinding Foreground}"
+total removals: 20

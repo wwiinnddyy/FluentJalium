@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway SplitButton / DropDownButton probe. Not referenced by FluentJalium.slnx.
+       Measures which button-family types 26.10.9 actually ships (the objective assumes DropDownButton
+       needs an own type and SplitButton does not), what SplitButton's real surface and code-built
+       template are, and what a mounted instance builds under our theme. Also censuses the stage-4
+       surfaces (Menu / MenuFlyout / Expander / InfoBar / CommandBar) in the same pass. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SplitButtonProbe</RootNamespace>
+    <AssemblyName>SplitButtonProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

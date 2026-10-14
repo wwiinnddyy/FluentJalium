@@ -1,0 +1,83 @@
+# spike/MotionProbe, run 2026-09-21 against the pinned Jalium.UI 26.10.9 runtime.
+# Built with `dotnet build spike/MotionProbe/MotionProbe.csproj` (0 warnings, 0 errors) and run with
+# `dotnet run --project spike/MotionProbe/MotionProbe.csproj --no-build`; exit 0, one shown 320x240 window closed by
+# the process exiting. The probe is a real Application + ThemeLoader + FluentThemeManager.Apply startup, and every
+# reading below is a value back off a mounted element or a rendered 40x40 field - not a property name.
+# Source read for the questions: Jalium.UI 26.10.9 (UIElement.cs 5893-5990, 6040-6141 - TransitionDuration is a
+# Duration DP on UIElement, default 180ms, read at arm time, and a value with no TimeSpan or at or below zero starts
+# nothing; Application.cs:55 additionally gates every automatic transition on SystemParameters.ClientAreaAnimation
+# && UIEffects). The sibling source tree was used to find the questions, and every answer came from the runtime.
+
+[[0] instrument]
+[SystemParameters] ClientAreaAnimation=True, UIEffects=True
+[Astra] FluentThemeManager.AnimationsEnabled=True, ReduceMotion=False
+[application] MainWindow named=none, merged dictionaries=68
+[[1] property surface]
+[TransitionDuration unset] 180ms
+[DP] name=TransitionDuration, declared type=Duration, registered on=UIElement
+[Duration states] default=Automatic, Automatic=Automatic, zero=0ms, 83ms=83ms
+[Duration converter] Jalium.UI.DurationConverter, Jalium.UI.Managed, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+[DurationConverter "0:0:0.083"] 83ms
+[DurationConverter "00:00:00.083"] 83ms
+[DurationConverter "00:00:00.250"] 250ms
+[DurationConverter "0"] 0ms
+[DurationConverter "Auto"] threw FormatException
+[DurationConverter ""] threw FormatException
+[[2] row x consumer]
+[p:Duration via Core] row does not parse: Cannot resolve type 'Duration' in namespace 'clr-namespace:Jalium.UI;assembly=Jalium.UI.Core'.
+[m:Duration via Managed] row does not parse: Cannot resolve type 'Duration' in namespace 'clr-namespace:Jalium.UI;assembly=Jalium.UI.Managed'.
+[Duration unqualified] row parses as Duration "00:00:00.0830000"
+[Duration unqualified -> attribute {ThemeResource}] row stored Duration "00:00:00.0830000"; Border.TransitionDuration=83ms
+[Duration unqualified -> attribute {StaticResource}] row stored Duration "00:00:00.0830000"; Border.TransitionDuration=83ms
+[Duration unqualified -> implicit style setter] row stored Duration "00:00:00.0830000"; Border.TransitionDuration=83ms
+[Duration unqualified -> inside a ControlTemplate] row stored Duration "00:00:00.0830000"; Border in template.TransitionDuration=83ms
+[x:String 0:0:0.083] row parses as String "0:0:0.083"
+[x:String 0:0:0.083 -> attribute {ThemeResource}] row stored String "0:0:0.083"; Border.TransitionDuration=180ms
+[x:String 0:0:0.083 -> attribute {StaticResource}] row stored String "0:0:0.083"; Border.TransitionDuration=180ms
+[x:String 0:0:0.083 -> implicit style setter] row stored String "0:0:0.083"; Border.TransitionDuration=180ms
+[x:String 0:0:0.083 -> inside a ControlTemplate] row stored String "0:0:0.083"; Border in template.TransitionDuration=180ms
+[x:String 00:00:00.083 upstream form] row parses as String "00:00:00.083"
+[x:String 00:00:00.083 upstream form -> attribute {ThemeResource}] row stored String "00:00:00.083"; Border.TransitionDuration=180ms
+[x:String 00:00:00.083 upstream form -> attribute {StaticResource}] row stored String "00:00:00.083"; Border.TransitionDuration=180ms
+[x:String 00:00:00.083 upstream form -> implicit style setter] row stored String "00:00:00.083"; Border.TransitionDuration=180ms
+[x:String 00:00:00.083 upstream form -> inside a ControlTemplate] row stored String "00:00:00.083"; Border in template.TransitionDuration=180ms
+[sys:TimeSpan 00:00:00.083] row parses as TimeSpan "00:00:00"
+[sys:TimeSpan 00:00:00.083 -> attribute {ThemeResource}] row stored TimeSpan "00:00:00"; Border.TransitionDuration=180ms
+[sys:TimeSpan 00:00:00.083 -> attribute {StaticResource}] row stored TimeSpan "00:00:00"; Border.TransitionDuration=180ms
+[sys:TimeSpan 00:00:00.083 -> implicit style setter] row stored TimeSpan "00:00:00"; Border.TransitionDuration=180ms
+[sys:TimeSpan 00:00:00.083 -> inside a ControlTemplate] row stored TimeSpan "00:00:00"; Border in template.TransitionDuration=180ms
+[x:Double 0.083 known-dead control] row does not parse: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+[literal 0:0:0.083 (control)] row stored <no row>; Border.TransitionDuration=83ms
+[[3] live flip]
+[83ms -> 0] mounted row=83ms: before=83ms, after write=0ms, after theme re-apply=0ms
+[0 -> 250ms] mounted row=0ms: before=0ms, after write=250ms, after theme re-apply=250ms
+[[3b] live flip inside a ControlTemplate]
+[template row 83ms -> 0] mounted: 83ms
+[template row 83ms -> 0] after write: 0ms
+[[4] animation]
+[literal 0:0:0.400] duration=400ms, DP color=#DB0093 (start #FF0000 asked #0000FF), ink: start-like=0, end-like=0, between=1600 of 1600
+[row 400ms via {ThemeResource}] duration=400ms, DP color=#DC0091 (start #FF0000 asked #0000FF), ink: start-like=0, end-like=0, between=1600 of 1600
+[same row flipped to 0] duration=0ms, DP color=#0000FF (start #FF0000 asked #0000FF), ink: start-like=0, end-like=1600, between=0 of 1600
+
+# What each section decides:
+# [0]  The instrument is live. Both OS settings are on, so a "no animation" reading anywhere below is a claim about
+#      the row and not about the machine - and on a machine where either is off, the framework starts no automatic
+#      transition at all, which is why the suite never asserts that an animation runs (see [4]).
+# [1]  TransitionDuration is a Duration DP registered on UIElement, so it is on every element and not only on
+#      Controls; the framework default is 180ms. The three states are distinguishable from the value alone
+#      (Automatic vs 0ms), which is what makes a dropped row detectable. DurationConverter takes both time forms and
+#      "0", and throws on "Auto" - so an "Auto" row would be a parse failure, not a clear.
+# [2]  The row type is the whole story: only <Duration> written unqualified under the framework's own xmlns produces
+#      a Duration object, and it then lands through all four consumer shapes - including inside a ControlTemplate.
+#      Upstream's <x:String> shape stores the text and hands the consumer 180ms in all four shapes: silently, with no
+#      parse error. <sys:TimeSpan> is worse: the row itself loses the fraction ("00:00:00.083" stores as "00:00:00"),
+#      so a TimeSpan row is both a truncated number and an unlanded one. The two clr-namespace spellings of Duration
+#      cannot be resolved at all, from either assembly name, and x:Double cannot be resolved in the x: namespace - the
+#      same shape the styles files already document for the metric rows.
+# [3]/[3b] A write to the live row re-resolves within four pumped frames, on a bare element and on a Border inside a
+#      realised ControlTemplate, with no theme re-apply needed. This is the mechanism ReduceMotion uses.
+# [4]  The lever moves something. 400ms from red to blue reads an in-between #DB0093 off the property and 1600 of
+#      1600 ink pixels in-between; the same row written as 400ms through {ThemeResource} reads #DC0091 and 1600
+#      in-between; the same row flipped to zero reads the asked-for #0000FF with 1600 end-like pixels and no ink
+#      between - i.e. nothing animated. Positive and negative controls in one run, so neither reading is explained by
+#      the judge.

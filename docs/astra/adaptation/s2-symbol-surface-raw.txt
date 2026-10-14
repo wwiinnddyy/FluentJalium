@@ -1,0 +1,321 @@
+instrument: spike/SymbolCmap, in-proc on .NET 10.0.11
+why not PowerShell: 5.1 is .NET Framework, LoadFrom of a net10.0 assembly throws on GetTypes, and the empty catch in the earlier script read that as an absent type
+
+=== [A] assembly identity and per-file load report ===
+SymbolIcon runtime type: Jalium.UI.Controls.SymbolIcon | version 0.0.0.0
+SymbolIcon declaring assembly: Jalium.UI.Managed
+SymbolIcon assembly file version: <none>
+load Jalium.UI.Controls.dll: ok -> Jalium.UI.Controls 0.0.0.0, 0 exported types
+load Jalium.UI.Core.dll: ok -> Jalium.UI.Core 0.0.0.0, 0 exported types
+load Jalium.UI.Desktop.dll: ok -> Jalium.UI.Desktop 0.0.0.0, 2 exported types
+load Jalium.UI.Gpu.dll: ok -> Jalium.UI.Gpu 0.0.0.0, 166 exported types
+load Jalium.UI.Input.dll: ok -> Jalium.UI.Input 0.0.0.0, 0 exported types
+load Jalium.UI.Interop.dll: ok -> Jalium.UI.Interop 0.0.0.0, 0 exported types
+load Jalium.UI.Managed.dll: ok -> Jalium.UI.Managed 0.0.0.0, 3014 exported types
+load Jalium.UI.Media.dll: ok -> Jalium.UI.Media 0.0.0.0, 0 exported types
+load Jalium.UI.Xaml.dll: ok -> Jalium.UI.Xaml 0.0.0.0, 138 exported types
+load jalium.native.browser.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.browser.dll' is invalid.
+load jalium.native.core.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.core.dll' is invalid.
+load jalium.native.d3d12.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.d3d12.dll' is invalid.
+load jalium.native.media.core.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.media.core.dll' is invalid.
+load jalium.native.media.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.media.dll' is invalid.
+load jalium.native.platform.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.platform.dll' is invalid.
+load jalium.native.software.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.software.dll' is invalid.
+load jalium.native.vulkan.dll: THREW BadImageFormatException: Bad IL format. The format of the file 'C:\git\Jalium\FluentJalium\spike\SymbolCmap\bin\Debug\net10.0-windows\jalium.native.vulkan.dll' is invalid.
+
+=== [B] exported types whose name contains Symbol or Icon ===
+Jalium.UI.Controls.ArrowIcons [Jalium.UI.Managed] static <- Object
+Jalium.UI.Controls.BalloonTipIcon [Jalium.UI.Managed] enum <- Enum <- ValueType <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.DocumentSymbol [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.DocumentSymbolClientCapabilities [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.DocumentSymbolParams [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.SymbolInformation [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.SymbolKind [Jalium.UI.Managed] enum <- Enum <- ValueType <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.SymbolKindCapabilities [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.SymbolResolveSupport [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.SymbolTag [Jalium.UI.Managed] enum <- Enum <- ValueType <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.WorkspaceSymbol [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.WorkspaceSymbolClientCapabilities [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Editor.LanguageServer.Protocol.WorkspaceSymbolParams [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.FontIcon [Jalium.UI.Managed] class <- IconElement <- FrameworkElement <- UIElement <- Visual <- DependencyObject <- DispatcherObject <- Object
+Jalium.UI.Controls.IconElement [Jalium.UI.Managed] class <- FrameworkElement <- UIElement <- Visual <- DependencyObject <- DispatcherObject <- Object
+Jalium.UI.Controls.NotifyIcon [Jalium.UI.Managed] class <- FrameworkElement <- UIElement <- Visual <- DependencyObject <- DispatcherObject <- Object
+Jalium.UI.Controls.PathIcon [Jalium.UI.Managed] class <- IconElement <- FrameworkElement <- UIElement <- Visual <- DependencyObject <- DispatcherObject <- Object
+Jalium.UI.Controls.PickIconDialog [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.QR.QRSymbol [Jalium.UI.Managed] class <- Object
+Jalium.UI.Controls.Symbol [Jalium.UI.Managed] enum <- Enum <- ValueType <- Object
+Jalium.UI.Controls.SymbolIcon [Jalium.UI.Managed] class <- IconElement <- FrameworkElement <- UIElement <- Visual <- DependencyObject <- DispatcherObject <- Object
+Jalium.UI.Markup.IconElementConverter [Jalium.UI.Xaml] class <- TypeConverter <- Object
+Jalium.UI.Media.Imaging.IconBitmapDecoder [Jalium.UI.Managed] class <- BitmapDecoder <- DispatcherObject <- Object
+probe IconElement: Jalium.UI.Controls.IconElement
+probe SymbolIcon: Jalium.UI.Controls.SymbolIcon
+probe FontIcon: Jalium.UI.Controls.FontIcon
+probe PathIcon: Jalium.UI.Controls.PathIcon
+probe BitmapIcon: not exported under this name by any loaded Jalium assembly
+probe ImageIcon: not exported under this name by any loaded Jalium assembly
+probe IconSource: not exported under this name by any loaded Jalium assembly
+probe Symbol: Jalium.UI.Controls.Symbol
+
+=== [C] the icon family's own declared surface ===
+IconElement declares 1 public instance properties: Foreground:Brush
+IconElement public constructors: 0
+SymbolIcon declares 1 public instance properties: Symbol:Symbol
+  Symbol : Jalium.UI.Controls.Symbol
+SymbolIcon public constructors: 2
+FontIcon declares 3 public instance properties: FontFamily:FontFamily, FontSize:Double, Glyph:String
+  FontFamily : Jalium.UI.Media.FontFamily
+FontIcon public constructors: 1
+PathIcon declares 1 public instance properties: Data:Geometry
+PathIcon public constructors: 1
+property: SymbolIcon.Symbol : Jalium.UI.Controls.Symbol (declared by Jalium.UI.Managed) | IsEnum=True | underlying=Int32
+shipped members: 764
+shipped codepoints carried by two or more names: 35
+
+=== [D] upstream Symbol, read from the IDL and from the generated model ===
+idl: 197 members, 197 distinct codepoints
+model: 197 members, 197 distinct codepoints
+idl vs model disagreement: 0 (the two upstream readings agree)
+
+=== [E] upstream vs shipped ===
+names on both sides with the same codepoint: 3
+upstream-only: 26
+  Bullets = 0xE133  (codepoint not in the shipped enum at all)
+  Character = 0xE164  (codepoint not in the shipped enum at all)
+  ClosedCaption = 0xE190  (codepoint not in the shipped enum at all)
+  FourBars = 0xE1E9  (codepoint not in the shipped enum at all)
+  GlobalNavigationButton = 0xE700  (codepoint carried by GlobalNavButton)
+  GoToToday = 0xE184  (codepoint not in the shipped enum at all)
+  MailFilled = 0xE135  (codepoint not in the shipped enum at all)
+  Manage = 0xE178  (codepoint not in the shipped enum at all)
+  OneBar = 0xE1E6  (codepoint not in the shipped enum at all)
+  OutlineStar = 0xE1CE  (codepoint not in the shipped enum at all)
+  Page2 = 0xE160  (codepoint not in the shipped enum at all)
+  Pictures = 0xE158  (codepoint not in the shipped enum at all)
+  Placeholder = 0xE18A  (codepoint not in the shipped enum at all)
+  Priority = 0xE182  (codepoint not in the shipped enum at all)
+  ReShare = 0xE1CA  (codepoint not in the shipped enum at all)
+  SetLockScreen = 0xE18C  (codepoint not in the shipped enum at all)
+  SetTile = 0xE18D  (codepoint not in the shipped enum at all)
+  SolidStar = 0xE1CF  (codepoint not in the shipped enum at all)
+  StopSlideShow = 0xE191  (codepoint not in the shipped enum at all)
+  Target = 0xE1D2  (codepoint not in the shipped enum at all)
+  ThreeBars = 0xE1E8  (codepoint not in the shipped enum at all)
+  TwoBars = 0xE1E7  (codepoint not in the shipped enum at all)
+  UnPin = 0xE196  (codepoint not in the shipped enum at all)
+  UnSyncFolder = 0xE1DD  (codepoint not in the shipped enum at all)
+  WebCam = 0xE156  (codepoint not in the shipped enum at all)
+  ZeroBars = 0xE1E5  (codepoint not in the shipped enum at all)
+upstream codepoints with no shipped carrier at all: 25
+value mismatch under a shared name: 168
+  Accept: upstream 0xE10B vs shipped 0xE8FB (upstream's number is carried here by absent)
+  Account: upstream 0xE168 vs shipped 0xE77B (upstream's number is carried here by absent)
+  Add: upstream 0xE109 vs shipped 0xE710 (upstream's number is carried here by absent)
+  AddFriend: upstream 0xE1E2 vs shipped 0xE8FA (upstream's number is carried here by absent)
+  Admin: upstream 0xE1A7 vs shipped 0xE7EF (upstream's number is carried here by absent)
+  AlignCenter: upstream 0xE1A1 vs shipped 0xE8E3 (upstream's number is carried here by absent)
+  AlignLeft: upstream 0xE1A2 vs shipped 0xE8E4 (upstream's number is carried here by absent)
+  AlignRight: upstream 0xE1A0 vs shipped 0xE8E2 (upstream's number is carried here by absent)
+  AllApps: upstream 0xE179 vs shipped 0xE71D (upstream's number is carried here by absent)
+  Attach: upstream 0xE16C vs shipped 0xE723 (upstream's number is carried here by absent)
+  AttachCamera: upstream 0xE12D vs shipped 0xE8A2 (upstream's number is carried here by absent)
+  Audio: upstream 0xE189 vs shipped 0xE8D6 (upstream's number is carried here by absent)
+  Back: upstream 0xE112 vs shipped 0xE72B (upstream's number is carried here by absent)
+  BackToWindow: upstream 0xE1D8 vs shipped 0xE73F (upstream's number is carried here by absent)
+  BlockContact: upstream 0xE1E0 vs shipped 0xE8F8 (upstream's number is carried here by absent)
+  Bold: upstream 0xE19B vs shipped 0xE8DD (upstream's number is carried here by absent)
+  Bookmarks: upstream 0xE12F vs shipped 0xE8A4 (upstream's number is carried here by absent)
+  BrowsePhotos: upstream 0xE155 vs shipped 0xE7C5 (upstream's number is carried here by absent)
+  Calculator: upstream 0xE1D0 vs shipped 0xE8EF (upstream's number is carried here by absent)
+  Calendar: upstream 0xE163 vs shipped 0xE787 (upstream's number is carried here by absent)
+  CalendarDay: upstream 0xE161 vs shipped 0xE8BF (upstream's number is carried here by absent)
+  CalendarReply: upstream 0xE1DB vs shipped 0xE8F5 (upstream's number is carried here by absent)
+  CalendarWeek: upstream 0xE162 vs shipped 0xE8C0 (upstream's number is carried here by absent)
+  Camera: upstream 0xE114 vs shipped 0xE722 (upstream's number is carried here by absent)
+  Cancel: upstream 0xE10A vs shipped 0xE711 (upstream's number is carried here by absent)
+  Caption: upstream 0xE15A vs shipped 0xE8BA (upstream's number is carried here by absent)
+  CellPhone: upstream 0xE1C9 vs shipped 0xE8EA (upstream's number is carried here by absent)
+  Clear: upstream 0xE106 vs shipped 0xE894 (upstream's number is carried here by absent)
+  ClearSelection: upstream 0xE1C5 vs shipped 0xE8E6 (upstream's number is carried here by absent)
+  Clock: upstream 0xE121 vs shipped 0xE823 (upstream's number is carried here by absent)
+  ClosePane: upstream 0xE127 vs shipped 0xE89F (upstream's number is carried here by absent)
+  Comment: upstream 0xE134 vs shipped 0xE90A (upstream's number is carried here by absent)
+  Contact: upstream 0xE13D vs shipped 0xE77B (upstream's number is carried here by absent)
+  Contact2: upstream 0xE187 vs shipped 0xE8D4 (upstream's number is carried here by absent)
+  ContactInfo: upstream 0xE136 vs shipped 0xE779 (upstream's number is carried here by absent)
+  ContactPresence: upstream 0xE181 vs shipped 0xE8CF (upstream's number is carried here by absent)
+  Copy: upstream 0xE16F vs shipped 0xE8C8 (upstream's number is carried here by absent)
+  Crop: upstream 0xE123 vs shipped 0xE7A8 (upstream's number is carried here by absent)
+  Cut: upstream 0xE16B vs shipped 0xE8C6 (upstream's number is carried here by absent)
+  Delete: upstream 0xE107 vs shipped 0xE74D (upstream's number is carried here by absent)
+  Directions: upstream 0xE1D1 vs shipped 0xE8F0 (upstream's number is carried here by absent)
+  DisableUpdates: upstream 0xE194 vs shipped 0xE8D8 (upstream's number is carried here by absent)
+  DisconnectDrive: upstream 0xE17A vs shipped 0xE8CD (upstream's number is carried here by absent)
+  Dislike: upstream 0xE19E vs shipped 0xE8E0 (upstream's number is carried here by absent)
+  DockBottom: upstream 0xE147 vs shipped 0xE90E (upstream's number is carried here by absent)
+  DockLeft: upstream 0xE145 vs shipped 0xE90C (upstream's number is carried here by absent)
+  DockRight: upstream 0xE146 vs shipped 0xE90D (upstream's number is carried here by absent)
+  Document: upstream 0xE130 vs shipped 0xE8A5 (upstream's number is carried here by absent)
+  Download: upstream 0xE118 vs shipped 0xE896 (upstream's number is carried here by absent)
+  Edit: upstream 0xE104 vs shipped 0xE70F (upstream's number is carried here by absent)
+  Emoji: upstream 0xE11D vs shipped 0xE899 (upstream's number is carried here by absent)
+  Emoji2: upstream 0xE170 vs shipped 0xE76E (upstream's number is carried here by absent)
+  Favorite: upstream 0xE113 vs shipped 0xE734 (upstream's number is carried here by absent)
+  Filter: upstream 0xE16E vs shipped 0xE71C (upstream's number is carried here by absent)
+  Find: upstream 0xE11A vs shipped 0xE721 (upstream's number is carried here by absent)
+  Flag: upstream 0xE129 vs shipped 0xE7C1 (upstream's number is carried here by absent)
+  Folder: upstream 0xE188 vs shipped 0xE8B7 (upstream's number is carried here by absent)
+  Font: upstream 0xE185 vs shipped 0xE8D2 (upstream's number is carried here by absent)
+  FontColor: upstream 0xE186 vs shipped 0xE8D3 (upstream's number is carried here by absent)
+  FontDecrease: upstream 0xE1C6 vs shipped 0xE8E7 (upstream's number is carried here by absent)
+  FontIncrease: upstream 0xE1C7 vs shipped 0xE8E8 (upstream's number is carried here by absent)
+  FontSize: upstream 0xE1C8 vs shipped 0xE8E9 (upstream's number is carried here by absent)
+  Forward: upstream 0xE111 vs shipped 0xE72A (upstream's number is carried here by absent)
+  FullScreen: upstream 0xE1D9 vs shipped 0xE740 (upstream's number is carried here by absent)
+  Globe: upstream 0xE12B vs shipped 0xE774 (upstream's number is carried here by absent)
+  Go: upstream 0xE143 vs shipped 0xE8AD (upstream's number is carried here by absent)
+  GoToStart: upstream 0xE1E4 vs shipped 0xE8FC (upstream's number is carried here by absent)
+  HangUp: upstream 0xE137 vs shipped 0xE778 (upstream's number is carried here by absent)
+  Help: upstream 0xE11B vs shipped 0xE897 (upstream's number is carried here by absent)
+  HideBcc: upstream 0xE16A vs shipped 0xE8C5 (upstream's number is carried here by absent)
+  Highlight: upstream 0xE193 vs shipped 0xE7E6 (upstream's number is carried here by absent)
+  Home: upstream 0xE10F vs shipped 0xE80F (upstream's number is carried here by absent)
+  Import: upstream 0xE150 vs shipped 0xE8B5 (upstream's number is carried here by absent)
+  ImportAll: upstream 0xE151 vs shipped 0xE8B6 (upstream's number is carried here by absent)
+  Important: upstream 0xE171 vs shipped 0xE8C9 (upstream's number is carried here by absent)
+  Italic: upstream 0xE199 vs shipped 0xE8DB (upstream's number is carried here by absent)
+  Keyboard: upstream 0xE144 vs shipped 0xE765 (upstream's number is carried here by absent)
+  LeaveChat: upstream 0xE11F vs shipped 0xE89B (upstream's number is carried here by absent)
+  Library: upstream 0xE1D3 vs shipped 0xE8F1 (upstream's number is carried here by absent)
+  Like: upstream 0xE19F vs shipped 0xE8E1 (upstream's number is carried here by absent)
+  LikeDislike: upstream 0xE19D vs shipped 0xE8DF (upstream's number is carried here by absent)
+  Link: upstream 0xE167 vs shipped 0xE71B (upstream's number is carried here by absent)
+  List: upstream 0xE14C vs shipped 0xEA37 (upstream's number is carried here by absent)
+  Mail: upstream 0xE119 vs shipped 0xE715 (upstream's number is carried here by absent)
+  MailForward: upstream 0xE120 vs shipped 0xE89C (upstream's number is carried here by absent)
+  MailReply: upstream 0xE172 vs shipped 0xE8CA (upstream's number is carried here by absent)
+  MailReplyAll: upstream 0xE165 vs shipped 0xE8C2 (upstream's number is carried here by absent)
+  Map: upstream 0xE1C4 vs shipped 0xE826 (upstream's number is carried here by absent)
+  MapDrive: upstream 0xE17B vs shipped 0xE8CE (upstream's number is carried here by absent)
+  MapPin: upstream 0xE139 vs shipped 0xE707 (upstream's number is carried here by absent)
+  Memo: upstream 0xE1D5 vs shipped 0xE77C (upstream's number is carried here by absent)
+  Message: upstream 0xE15F vs shipped 0xE8BD (upstream's number is carried here by absent)
+  Microphone: upstream 0xE1D6 vs shipped 0xE720 (upstream's number is carried here by absent)
+  More: upstream 0xE10C vs shipped 0xE712 (upstream's number is carried here by absent)
+  MoveToFolder: upstream 0xE19C vs shipped 0xE8DE (upstream's number is carried here by absent)
+  MusicInfo: upstream 0xE142 vs shipped 0xE90B (upstream's number is carried here by absent)
+  Mute: upstream 0xE198 vs shipped 0xE74F (upstream's number is carried here by absent)
+  NewFolder: upstream 0xE1DA vs shipped 0xE8F4 (upstream's number is carried here by absent)
+  NewWindow: upstream 0xE17C vs shipped 0xE78B (upstream's number is carried here by absent)
+  Next: upstream 0xE101 vs shipped 0xE893 (upstream's number is carried here by absent)
+  OpenFile: upstream 0xE1A5 vs shipped 0xE8E5 (upstream's number is carried here by absent)
+  OpenLocal: upstream 0xE197 vs shipped 0xE8DA (upstream's number is carried here by absent)
+  OpenPane: upstream 0xE126 vs shipped 0xE8A0 (upstream's number is carried here by absent)
+  OpenWith: upstream 0xE17D vs shipped 0xE7AC (upstream's number is carried here by absent)
+  Orientation: upstream 0xE14F vs shipped 0xE8B4 (upstream's number is carried here by absent)
+  OtherUser: upstream 0xE1A6 vs shipped 0xE7EE (upstream's number is carried here by absent)
+  Page: upstream 0xE132 vs shipped 0xE7C3 (upstream's number is carried here by absent)
+  Paste: upstream 0xE16D vs shipped 0xE77F (upstream's number is carried here by absent)
+  Pause: upstream 0xE103 vs shipped 0xE769 (upstream's number is carried here by absent)
+  People: upstream 0xE125 vs shipped 0xE716 (upstream's number is carried here by absent)
+  Permissions: upstream 0xE192 vs shipped 0xE8D7 (upstream's number is carried here by absent)
+  Phone: upstream 0xE13A vs shipped 0xE717 (upstream's number is carried here by absent)
+  PhoneBook: upstream 0xE1D4 vs shipped 0xE780 (upstream's number is carried here by absent)
+  Pin: upstream 0xE141 vs shipped 0xE718 (upstream's number is carried here by absent)
+  Play: upstream 0xE102 vs shipped 0xE768 (upstream's number is carried here by absent)
+  PostUpdate: upstream 0xE1D7 vs shipped 0xE8F3 (upstream's number is carried here by absent)
+  Preview: upstream 0xE295 vs shipped 0xE8FF (upstream's number is carried here by absent)
+  PreviewLink: upstream 0xE12A vs shipped 0xE8A1 (upstream's number is carried here by absent)
+  Previous: upstream 0xE100 vs shipped 0xE892 (upstream's number is carried here by absent)
+  ProtectedDocument: upstream 0xE131 vs shipped 0xE8A6 (upstream's number is carried here by absent)
+  Read: upstream 0xE166 vs shipped 0xE8C3 (upstream's number is carried here by absent)
+  Redo: upstream 0xE10D vs shipped 0xE7A6 (upstream's number is carried here by absent)
+  Refresh: upstream 0xE149 vs shipped 0xE72C (upstream's number is carried here by absent)
+  Remote: upstream 0xE148 vs shipped 0xE8AF (upstream's number is carried here by absent)
+  Remove: upstream 0xE108 vs shipped 0xE738 (upstream's number is carried here by absent)
+  Rename: upstream 0xE13E vs shipped 0xE8AC (upstream's number is carried here by absent)
+  Repair: upstream 0xE15E vs shipped 0xE90F (upstream's number is carried here by absent)
+  RepeatAll: upstream 0xE1CD vs shipped 0xE8EE (upstream's number is carried here by absent)
+  RepeatOne: upstream 0xE1CC vs shipped 0xE8ED (upstream's number is carried here by absent)
+  ReportHacked: upstream 0xE1DE vs shipped 0xE730 (upstream's number is carried here by absent)
+  Rotate: upstream 0xE14A vs shipped 0xE7AD (upstream's number is carried here by absent)
+  RotateCamera: upstream 0xE124 vs shipped 0xE89E (upstream's number is carried here by absent)
+  Save: upstream 0xE105 vs shipped 0xE74E (upstream's number is carried here by absent)
+  SaveLocal: upstream 0xE159 vs shipped 0xE78C (upstream's number is carried here by absent)
+  Scan: upstream 0xE294 vs shipped 0xE8FE (upstream's number is carried here by absent)
+  SelectAll: upstream 0xE14E vs shipped 0xE8B3 (upstream's number is carried here by absent)
+  Send: upstream 0xE122 vs shipped 0xE724 (upstream's number is carried here by absent)
+  Setting: upstream 0xE115 vs shipped 0xE713 (upstream's number is carried here by absent)
+  Shop: upstream 0xE14D vs shipped 0xE719 (upstream's number is carried here by absent)
+  ShowBcc: upstream 0xE169 vs shipped 0xE8C4 (upstream's number is carried here by absent)
+  ShowResults: upstream 0xE15C vs shipped 0xE8BC (upstream's number is carried here by absent)
+  Shuffle: upstream 0xE14B vs shipped 0xE8B1 (upstream's number is carried here by absent)
+  SlideShow: upstream 0xE173 vs shipped 0xE786 (upstream's number is carried here by absent)
+  Sort: upstream 0xE174 vs shipped 0xE8CB (upstream's number is carried here by absent)
+  Stop: upstream 0xE15B vs shipped 0xE71A (upstream's number is carried here by absent)
+  Street: upstream 0xE1C3 vs shipped 0xE913 (upstream's number is carried here by absent)
+  Switch: upstream 0xE13C vs shipped 0xE8AB (upstream's number is carried here by absent)
+  SwitchApps: upstream 0xE1E1 vs shipped 0xE8F9 (upstream's number is carried here by absent)
+  Sync: upstream 0xE117 vs shipped 0xE895 (upstream's number is carried here by absent)
+  SyncFolder: upstream 0xE1DF vs shipped 0xE8F7 (upstream's number is carried here by absent)
+  Tag: upstream 0xE1CB vs shipped 0xE8EC (upstream's number is carried here by absent)
+  TouchPointer: upstream 0xE1E3 vs shipped 0xE7C9 (upstream's number is carried here by absent)
+  Trim: upstream 0xE12C vs shipped 0xE78A (upstream's number is carried here by absent)
+  TwoPage: upstream 0xE11E vs shipped 0xE89A (upstream's number is carried here by absent)
+  UnFavorite: upstream 0xE195 vs shipped 0xE8D9 (upstream's number is carried here by absent)
+  Underline: upstream 0xE19A vs shipped 0xE8DC (upstream's number is carried here by absent)
+  Undo: upstream 0xE10E vs shipped 0xE7A7 (upstream's number is carried here by absent)
+  Up: upstream 0xE110 vs shipped 0xE74A (upstream's number is carried here by absent)
+  Upload: upstream 0xE11C vs shipped 0xE898 (upstream's number is carried here by absent)
+  Video: upstream 0xE116 vs shipped 0xE714 (upstream's number is carried here by absent)
+  VideoChat: upstream 0xE13B vs shipped 0xE8AA (upstream's number is carried here by absent)
+  View: upstream 0xE18B vs shipped 0xE890 (upstream's number is carried here by absent)
+  ViewAll: upstream 0xE138 vs shipped 0xE8A9 (upstream's number is carried here by absent)
+  Volume: upstream 0xE15D vs shipped 0xE767 (upstream's number is carried here by absent)
+  World: upstream 0xE128 vs shipped 0xE909 (upstream's number is carried here by absent)
+  Zoom: upstream 0xE1A3 vs shipped 0xE71E (upstream's number is carried here by absent)
+  ZoomIn: upstream 0xE12E vs shipped 0xE8A3 (upstream's number is carried here by absent)
+  ZoomOut: upstream 0xE1A4 vs shipped 0xE71F (upstream's number is carried here by absent)
+shared names whose upstream number exists in the shipped enum under some other name: 0 of 168
+shipped-only: 593
+  first 25: Accident, Accounts, ActionCenter, ActionCenterAsterisk, ActionCenterNotification, AddRemoteDevice, AddTo, Airplane, AirplaneSolid, AlarmClock, Annotation, ApplicationGuard, Apps, AreaChart, ArrowDown8, ArrowLeft8, ArrowRight8, ArrowUp8, AspectRatio, Asterisk, BackMirrored, BackgroundToggle, Badge, Bank, BarcodeScanner
+
+=== [F] the converted codepoint upstream paints, against the number our enum holds ===
+icon.cpp: 197 cases | design note: 197 table rows
+icon.cpp vs design-note disagreement: 0 (the two upstream renderings of the map agree)
+enum members with no case, or a case whose source number differs: 0 (every enum member is converted exactly once)
+names where our number paints the same glyph upstream paints: 167
+names where our number paints a different glyph: 4
+  Account: upstream paints 0xE910 (enum 0xE168), ours holds 0xE77B
+  Map: upstream paints 0xE707 (enum 0xE1C4), ours holds 0xE826
+  MapPin: upstream paints 0xE7B7 (enum 0xE139), ours holds 0xE707
+  Page: upstream paints 0xE729 (enum 0xE132), ours holds 0xE7C3
+upstream names with no member of the same name here: 26
+  Bullets: upstream paints 0xE8FD, carried here by BulletedList/Designer
+  Character: upstream paints 0xE8C1, carried here by Characters
+  ClosedCaption: upstream paints 0xE7F0, carried here by CC
+  FourBars: upstream paints 0xE908, carried here by absent
+  GlobalNavigationButton: upstream paints 0xE700, carried here by GlobalNavButton
+  GoToToday: upstream paints 0xE8D1, carried here by GotoToday
+  MailFilled: upstream paints 0xE8A8, carried here by MailFill
+  Manage: upstream paints 0xE912, carried here by absent
+  OneBar: upstream paints 0xE905, carried here by absent
+  OutlineStar: upstream paints 0xE734, carried here by Favorite/FavoriteStar
+  Page2: upstream paints 0xE7C3, carried here by Page
+  Pictures: upstream paints 0xE8B9, carried here by Picture
+  Placeholder: upstream paints 0xE18A, carried here by absent
+  Priority: upstream paints 0xE8D0, carried here by absent
+  ReShare: upstream paints 0xE8EB, carried here by absent
+  SetLockScreen: upstream paints 0xE7B5, carried here by SetlockScreen
+  SetTile: upstream paints 0xE97B, carried here by absent
+  SolidStar: upstream paints 0xE735, carried here by FavoriteStarFill
+  StopSlideShow: upstream paints 0xE620, carried here by absent
+  Target: upstream paints 0xF5F0, carried here by absent
+  ThreeBars: upstream paints 0xE907, carried here by absent
+  TwoBars: upstream paints 0xE906, carried here by absent
+  UnPin: upstream paints 0xE77A, carried here by Unpin
+  UnSyncFolder: upstream paints 0xE8F6, carried here by UnsyncFolder
+  WebCam: upstream paints 0xE8B8, carried here by Webcam
+  ZeroBars: upstream paints 0xE904, carried here by absent
+
+=== [G] sidecars ===
+shipped-symbol.tsv + upstream-symbol.tsv written to spike/SymbolCmap/out

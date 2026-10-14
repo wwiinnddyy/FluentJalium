@@ -1,0 +1,33 @@
+<!-- WinUI 3 InfoBadge_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     b09b56572ac8a2159bf9ba2dda7f063ec5460c6a. Twelve distinct keys declared at thirty-six sites: the two brush
+     aliases (:5-6, :19-20, :33-34) and the ten metric rows (:7-16, :21-30, :35-44), each written once per Light /
+     Default / HighContrast dictionary. Six of the twelve are published here; the other six are x:Double rows this
+     reader cannot carry, and the reason is measured rather than inherited - see docs/astra/audits/info-badge.md
+     and adaptation/00 S1-r. The sixteen Style rows of the same file live in Styles/InfoBadge.jalxaml, which is
+     where this layer puts styles. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The two aliases are identical in upstream's Light and Default dictionaries - the badge is accent-filled with
+       white content in both - and are re-pointed in HighContrast (SystemControlHighlightAltChromeWhiteBrush,
+       SystemControlHighlightAccentBrush). HighContrast re-pointing stays underneath the aliases in
+       ThemeResources/HighContrast.map, as it does for ProgressBar, ProgressRing and PipsPager, so it is not
+       reproduced here. -->
+  <StaticResource x:Key="InfoBadgeForeground" ResourceKey="TextOnAccentFillColorPrimaryBrush" />
+  <StaticResource x:Key="InfoBadgeBackground" ResourceKey="AccentFillColorDefaultBrush" />
+  <!-- The four Thickness rows read the same in all three dictionaries, so one publication each is faithful. They are
+       the only metric rows this reader can carry: spike/DoubleRowProbe measured that a Thickness row not only parses
+       and keeps its number but switches per theme (a Light 8 / Dark 9 pair read back as 8 then 9), which is what
+       lets the three margins below live in the template's triggers instead of being literals. -->
+  <Thickness x:Key="InfoBadgePadding">0,0,0,0</Thickness>
+  <Thickness x:Key="IconInfoBadgeFontIconMargin">4,0,4,2</Thickness>
+  <Thickness x:Key="ValueInfoBadgeTextMargin">4,0,4,2</Thickness>
+  <Thickness x:Key="IconInfoBadgeIconMargin">4,4,4,4</Thickness>
+  <!-- The six x:Double rows. InfoBadgeMinHeight(4), InfoBadgeMinWidth(4), InfoBadgeMaxHeight(16) and
+       InfoBadgeValueFontSize(11) are read by upstream's default style (:48-50, :82) and are the same number in all
+       three dictionaries, so they become literals in Styles/InfoBadge.jalxaml where a test can read them off the
+       control - no theme's value is lost, because no theme differs.
+       InfoBadgeIconHeight (8 in Default, 9 in Light and HighContrast, :11/:25/:39) and InfoBadgeIconWidth (12) are
+       held out on the same count ProgressRingStrokeThickness was: they are dead rows. A repo-wide search at the
+       pinned commit finds no consumer outside the declarations themselves, and upstream's own template does not size
+       the icon - the Viewbox scales whatever the icon measures at. Their Light/Dark difference therefore has no
+       pixel to move, so nothing here picks a side between 8 and 9. -->
+</ResourceDictionary>

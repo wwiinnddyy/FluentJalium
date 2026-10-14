@@ -1,0 +1,54 @@
+<!-- WinUI 3 PipsPager_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     0d93a289b39a22b7e859a2ecea964575826e52f7. Fifty-one rows: 27 brush aliases inside the theme dictionaries
+     (Light 5-31 and Default 34-60 are identical name-for-name and target-for-target; HighContrast 63-89 re-points
+     all 27 at SystemColor* brushes), 12 metric rows outside them (:92-109), and 6 Style rows (:110-290) which
+     live in Styles/PipsPager.jalxaml because that is where this layer puts styles. Row-by-row inventory, the
+     HighContrast targets we do not reproduce and why: docs/astra/audits/pips-pager.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The pip (upstream calls it the selection indicator). Every Background and BorderBrush target is
+       ControlFillColorTransparentBrush: the pip has no fill and no stroke at any state in Light or Dark, so the
+       only thing these fifteen rows can move is the dot's Foreground. That is why the dot, not a surface, is what
+       the pixel assertions read. -->
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBackground" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBackgroundPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBackgroundPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBackgroundSelected" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBorderBrushSelected" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorForeground" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorForegroundSelected" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="PipsPagerSelectionIndicatorForegroundDisabled" ResourceKey="ControlStrongFillColorDisabledBrush" />
+  <!-- The previous/next pair. Same story: four background rows and four border rows that all resolve to
+       transparent, so the button is its glyph and nothing else. -->
+  <StaticResource x:Key="PipsPagerNavigationButtonBackground" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBackgroundPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBackgroundPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBorderBrush" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBorderBrushPointerOver" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBorderBrushPressed" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonBorderBrushDisabled" ResourceKey="ControlFillColorTransparentBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonForeground" ResourceKey="ControlStrongFillColorDefaultBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="PipsPagerNavigationButtonForegroundDisabled" ResourceKey="ControlStrongFillColorDisabledBrush" />
+  <!-- The two Thickness rows are publishable and are read by the styles below. The other ten metric rows outside
+       the theme dictionaries are x:Double (PipsPagerButtonWidth 20, PipsPagerButtonHeight 12, the four
+       orientation footprints 12/24 and 24/12, PipsPagerNavigationButtonHeight/Width 24,
+       PipsPagerNavigationButtonFontSize 8, PipsPagerNavigationButtonScalePressed 0.875) or x:String
+       (PipsPagerSelectedGlyph/NormalGlyph E+3B, PipsPagerPreviousPageButtonGlyph EDDB,
+       PipsPagerNextPageButtonGlyph EDDC, and the two glyph font sizes 6 and 4, which upstream also types as
+       x:String). This reader cannot parse an x:Double or x:String row at all, so those sixteen names stay
+       unpublished: the footprints become properties on Controls/Navigation/FluentPipsPager.cs and the dot
+       diameters become literals in Styles/PipsPager.jalxaml. PipsPagerButtonWidth/Height are held out of the
+       published set by a gate in AstraPipsPagerTests because upstream itself never reads them either - no
+       template or code file in the reference tree names them. -->
+  <Thickness x:Key="PipsPagerButtonBorderThickness">1</Thickness>
+  <Thickness x:Key="PipsPagerNavigationButtonBorderThickness">1</Thickness>
+</ResourceDictionary>

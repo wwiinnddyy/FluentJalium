@@ -1,0 +1,53 @@
+<!-- WinUI 3 ProgressRing.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     df15b1794bbd0cda30279b5ab0674cafa544a0cd - one style, twelve setters, one template, three visual states and
+     no trigger at all. The setter list is transcribed as written; the template is not, because what upstream
+     puts inside it is an AnimatedVisualPlayer and 26.10.9 has no such type (spike/ProgressProbe mode census:
+     ProgressRing and LottiePlayer both absent). Full mapping, including which visual state became which cell:
+     docs/astra/audits/progress-ring.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="DefaultProgressRingStyle" TargetType="controls:FluentProgressRing">
+    <!-- Upstream :4-14, in its order. StrokeThickness is deliberately absent: upstream never sets it either
+         (the asset carries its own), and here the value has to be a function of the box, so the control writes
+         it onto the part. -->
+    <Setter Property="Foreground" Value="{ThemeResource ProgressRingForegroundThemeBrush}" />
+    <Setter Property="Background" Value="{ThemeResource ProgressRingBackgroundThemeBrush}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="HorizontalAlignment" Value="Center" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="MinHeight" Value="16" />
+    <Setter Property="MinWidth" Value="16" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Maximum" Value="100" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="controls:FluentProgressRing">
+          <!-- LayoutRoot keeps upstream's name (:18, the only part its state setters reach). The arc is ours and
+               is named for what it is; FluentProgressRing writes its Data and StrokeThickness only - the spin
+               rides inside the arc's start angle rather than on a RenderTransform, because the frame loop is the
+               only animation route that ticks here (adaptation/00 S1-p 4). A dashed stroke prints nothing and
+               neither a storyboard nor a markup geometry figure does either: spike/RingProbe modes ink, E2, E3
+               and E5 each measured one of those four dead ends, and Motion/ProgressRingAnimator.cs is what
+               replaces the fourth. -->
+          <Grid Name="LayoutRoot" Background="{TemplateBinding Background}">
+            <Path Name="ProgressRingArc" Stroke="{TemplateBinding Foreground}" Stretch="None"
+                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <!-- The Inactive state (upstream :21-26) sets exactly two things: LayoutRoot opacity 0 and the
+                 player's AccessibilityView=Raw. The first is this cell; the second has no member to write to -
+                 26.10.9 declares no AccessibilityView, already recorded against BreadcrumbBar. DeterminateActive
+                 and Active (:27-28) are empty states whose whole content is which source the C++ hands the
+                 player, so they become control code, not markup. -->
+            <Trigger Property="IsActive" Value="False">
+              <Setter TargetName="LayoutRoot" Property="Opacity" Value="0" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  <Style TargetType="controls:FluentProgressRing" BasedOn="{StaticResource DefaultProgressRingStyle}" />
+</ResourceDictionary>

@@ -1,0 +1,402 @@
+target types - upstream spec: 72  ours: 29
+
+### AppBarButton   upstream 8 / ours 2
+  UP   CommandBarFlyout_themeresources.xaml: MinWidth=40/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=*/16/Auto  Width=*/Auto/NaN  Padding=0,6,0,7  Margin=0,6,0,2/12,0,12,0/24,0,12,0/key:{StaticResource CommandBarFlyoutAppBarButtonInnerBorderMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  UP   CommandBarFlyout_themeresources.xaml: 
+  UP   AppBarButton_themeresources.xaml: Width=NaN
+  UP   AppBarButton_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=Auto/key:{ThemeResource AppBarButtonContentHeight  Width=*/68/Auto  Padding=key:{ThemeResource AppBarButtonOverflowTextLabelPadding  Margin=12,0,12,0/24,0,12,0/key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarButtonInnerBorderMargin/key:{ThemeResource AppBarButtonSecondarySubItemChevronMargin/key:{ThemeResource AppBarButtonSubItemChevronMargin/key:{ThemeResource AppBarButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   RevealBrush_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=Auto/key:{ThemeResource AppBarButtonContentHeight  Width=*/68/Auto  Padding=key:{ThemeResource AppBarButtonOverflowTextLabelPadding  Margin=-1,0/1,0/12,0,12,0/24,0,12,0/key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AppBarButtonRevealBorderThemeThickness
+  UP   RevealBrush_themeresources.xaml: Width=Auto
+  UP   RevealBrush_themeresources.xaml: Width=Auto
+  UP   SwipeControl_themeresources.xaml: MinHeight=40  MinWidth=16/68/key:{TemplateBinding MinWidth  Height=*/Auto  Width=Auto  Margin=0,0,0,2/4,4,4,2  BorderThickness=key:{TemplateBinding BorderThickness
+  OURS AppBar.jalxaml: MinHeight=64  Height=16  Width=68  Margin=key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarButtonInnerBorderMargin/key:{ThemeResource AppBarButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/key:{TemplateBinding BorderThickness
+  OURS AppBar.jalxaml: MinHeight=64  Height=16  Width=68  Margin=key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarButtonInnerBorderMargin/key:{ThemeResource AppBarButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/key:{TemplateBinding BorderThickness
+
+### AppBarSeparator   upstream 1 / ours 1
+  UP   AppBarSeparator_themeresources.xaml: Width=key:{StaticResource AppBarSeparatorWidth  Padding=key:{ThemeResource AppBarSeparatorMargin  Margin=key:{TemplateBinding Padding
+  OURS AppBar.jalxaml: MinHeight=48  Padding=4,0,0,0  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=0,0,0,1
+
+### AppBarToggleButton   upstream 8 / ours 1
+  UP   CommandBarFlyout_themeresources.xaml: MinWidth=40/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=*/16/Auto  Width=*/Auto/NaN  Padding=0,6,0,7  Margin=0,6,0,2/15,4,14,4/24,0,12,0/39,0,12,0/key:{StaticResource CommandBarFlyoutAppBarButtonInnerBorderMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   CommandBarFlyout_themeresources.xaml: 
+  UP   AppBarToggleButton_themeresources.xaml: Width=NaN
+  UP   AppBarToggleButton_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=14/Auto/key:{ThemeResource AppBarButtonContentHeight  Width=*/14/68/Auto  Padding=key:{ThemeResource AppBarToggleButtonOverflowTextLabelPadding  Margin=24,0,12,0/38,0,12,0/key:{StaticResource AppBarButtonInnerBorderMargin/key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarToggleButtonOverflowCheckMargin/key:{ThemeResource AppBarToggleButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AppBarToggleButtonBorderThemeThickness
+  UP   MediaTransportControls_themeresources.xaml: Height=key:{ThemeResource MediaTransportControlsAppBarButtonHeight  Width=key:{ThemeResource MediaTransportControlsAppBarButtonWidth
+  UP   RevealBrush_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth/key:{TemplateBinding MinWidth  Height=14/Auto/key:{ThemeResource AppBarButtonContentHeight  Width=*/14/68/Auto  Padding=key:{ThemeResource AppBarToggleButtonOverflowTextLabelPadding  Margin=-1,0/1,0/24,0,12,0/38,0,12,0/key:{ThemeResource AppBarButtonContentViewboxCollapsedMargin/key:{ThemeResource AppBarToggleButtonOverflowCheckMargin/key:{ThemeResource AppBarToggleButtonTextLabelMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AppBarToggleButtonRevealBorderThemeThickness
+  UP   RevealBrush_themeresources.xaml: Width=Auto
+  UP   RevealBrush_themeresources.xaml: Width=Auto
+  OURS AppBar.jalxaml: Width=1  Padding=key:{ThemeResource AppBarSeparatorMargin  Margin=key:{TemplateBinding Padding
+
+### AutoCompleteBox   upstream 0 / ours 1
+  OURS AutoSuggestBox.jalxaml: MinHeight=32  MinWidth=64  Height=1  Padding=key:{ThemeResource AutoSuggestListMargin/key:{ThemeResource TextControlThemePadding  Margin=1,0,1,1/key:{TemplateBinding Padding/key:{ThemeResource AutoSuggestListPadding  CornerRadius=0,0,3,3/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AutoSuggestListBorderThemeThickness/key:{ThemeResource TextControlBorderThemeThickness
+
+### AutoSuggestBox   upstream 1 / ours 0
+  UP   AutoSuggestBox_themeresources.xaml: Height=*  Width=*/key:{TemplateBinding Width  Padding=key:{ThemeResource AutoSuggestListMargin  Margin=0/key:{ThemeResource AutoSuggestListPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AutoSuggestListBorderThemeThickness/key:{ThemeResource TextControlBorderThemeThickness
+
+### Border   upstream 0 / ours 1
+  OURS Common.jalxaml: Padding=16  CornerRadius=key:{StaticResource ControlCornerRadius  BorderThickness=1
+
+### Button   upstream 26 / ours 5
+  UP   AutoSuggestBox_themeresources.xaml: Padding=key:{TemplateBinding Padding  Margin=key:{ThemeResource AutoSuggestBoxInnerButtonMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   CommandBarFlyout_themeresources.xaml: MinHeight=40  Width=44  Padding=0/key:{TemplateBinding Padding  Margin=key:{StaticResource CommandBarFlyoutAppBarEllipsisButtonInnerBorderMargin  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   Button_themeresources.xaml: Padding=key:{StaticResource ButtonPadding/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonBorderThemeThickness
+  UP   Button_themeresources.xaml: Padding=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   Button_themeresources.xaml: Padding=key:{StaticResource ButtonPadding/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonBorderThemeThickness
+  UP   CalendarView_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource CalendarViewHeaderNavigationButtonPadding  Margin=key:{ThemeResource CalendarViewHeaderNavigationButtonMargin  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   CalendarView_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource CalendarViewNavigationButtonPadding  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   CalendarView_themeresources.xaml: Padding=key:{TemplateBinding Padding  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   InfoBar_themeresources.xaml: Height=key:{StaticResource InfoBarCloseButtonSize  Width=key:{StaticResource InfoBarCloseButtonSize  Margin=5
+  UP   RevealBrush_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonRevealBorderThemeThickness
+  UP   RevealBrush_themeresources.xaml: Width=key:{ThemeResource AppBarExpandButtonThemeWidth  Padding=0,0,9,0/key:{TemplateBinding Padding  Margin=-2,-1,-1,-1/1,0,0,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource AppBarEllipsisButtonRevealBorderThemeThickness
+  UP   NavigationView_themeresources.xaml: MinHeight=key:{StaticResource PaneToggleButtonHeight  MinWidth=key:{StaticResource PaneToggleButtonWidth  Height=16/key:{TemplateBinding MinHeight/key:{ThemeResource PaneToggleButtonHeight  Width=*/16/Auto/key:{TemplateBinding MinWidth  Padding=4,0,0,0/key:{ThemeResource NavigationViewItemButtonMargin  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource NavigationViewToggleBorderThickness
+  UP   NavigationView_themeresources.xaml: MinHeight=36  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource NavigationViewToggleBorderThickness
+  UP   NavigationView_themeresources.xaml: Height=key:{StaticResource TopNavigationViewOverflowButtonHeight/key:{TemplateBinding Height  Width=key:{StaticResource TopNavigationViewOverflowButtonWidth/key:{TemplateBinding Width  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   NavigationView_themeresources.xaml: Height=key:{StaticResource TopNavigationViewOverflowButtonHeight/key:{TemplateBinding Height  Width=key:{StaticResource TopNavigationViewOverflowButtonWidth/key:{TemplateBinding Width  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   PagerControl_themeresources.xaml: Height=40  Width=40  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius
+  UP   PagerControl_themeresources.xaml: MinHeight=20  MinWidth=key:{StaticResource PagerControlNumberPanelButtonWidth  Padding=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   PipsPager_themeresources.xaml: Height=key:{StaticResource PipsPagerNavigationButtonHeight  Width=key:{StaticResource PipsPagerNavigationButtonWidth  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{StaticResource PipsPagerNavigationButtonBorderThickness/key:{TemplateBinding BorderThickness
+  UP   PipsPager_themeresources.xaml: 
+  UP   PipsPager_themeresources.xaml: 
+  UP   PipsPager_themeresources.xaml: Height=key:{StaticResource PipsPagerHorizontalOrientationButtonHeight  Width=key:{StaticResource PipsPagerHorizontalOrientationButtonWidth  CornerRadius=key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{StaticResource PipsPagerButtonBorderThickness/key:{TemplateBinding BorderThickness
+  UP   PipsPager_themeresources.xaml: 
+  UP   PipsPager_themeresources.xaml: 
+  UP   TeachingTip_themeresources.xaml: Height=key:{ThemeResource TeachingTipAlternateCloseButtonSize  Width=key:{ThemeResource TeachingTipAlternateCloseButtonSize  Padding=4/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TeachingTipAlternateCloseButtonBorderThickness
+  UP   TitleBar_themeresources.xaml: Height=16  Width=16/key:{ThemeResource TitleBarBackButtonWidth  Margin=2  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius
+  UP   TitleBar_themeresources.xaml: Height=16  Width=16/key:{ThemeResource TitleBarPaneToggleButtonWidth  Margin=2  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius
+  OURS Common.jalxaml: 
+  OURS Common.jalxaml: Padding=key:{ThemeResource SplitButtonPadding  CornerRadius=4,0,0,4  BorderThickness=1,1,0,1
+  OURS Common.jalxaml: MinHeight=32  MinWidth=0  Height=12  Width=12  Padding=0,0,12,0/key:{TemplateBinding Padding  Margin=1  CornerRadius=0,4,4,0/2/4/key:{TemplateBinding CornerRadius  BorderThickness=0,1,1,1/1/2/key:{TemplateBinding BorderThickness
+  OURS Common.jalxaml: Padding=0  BorderThickness=0
+  OURS Navigation.jalxaml: MinHeight=36  MinWidth=40  Height=36  Width=40  Padding=0  Margin=1  CornerRadius=2/4/key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=0/1/2
+
+### ButtonBase   upstream 2 / ours 3
+  UP   DateTimePickerFlyout_themeresources.xaml: Padding=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource DateTimeFlyoutButtonBorderThickness
+  UP   DateTimePickerFlyout_themeresources.xaml: Padding=key:{TemplateBinding Padding
+  OURS Common.jalxaml: MinHeight=32  MinWidth=0  Padding=key:{StaticResource ButtonPadding/key:{TemplateBinding Padding  Margin=1  CornerRadius=2/4/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/2/key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonBorderThemeThickness
+  OURS Common.jalxaml: 
+  OURS Common.jalxaml: 
+
+### CalendarDatePicker   upstream 1 / ours 0
+  UP   CalendarDatePicker_themeresources.xaml: Padding=0  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness/key:{ThemeResource CalendarDatePickerBorderThemeThickness
+
+### CalendarView   upstream 2 / ours 0
+  UP   CalendarView_themeresources.xaml: Padding=key:{ThemeResource CalendarViewWeekDayPadding  Margin=key:{ThemeResource CalendarViewWeekDayMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/key:{TemplateBinding BorderThickness
+  UP   CalendarView_themeresources.xaml: CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/key:{TemplateBinding BorderThickness
+
+### CalendarViewDayItem   upstream 1 / ours 0
+  UP   CalendarView_themeresources.xaml: MinHeight=40  MinWidth=40  Padding=0,0,0,4  Margin=1
+
+### CheckBox   upstream 2 / ours 2
+  UP   CheckBox_themeresources.xaml: MinHeight=key:{StaticResource CheckBoxHeight  MinWidth=key:{StaticResource CheckBoxMinWidth  Height=key:{StaticResource CheckBoxSize  Width=*/Auto/key:{StaticResource CheckBoxSize  Padding=key:{StaticResource CheckBoxPadding  Margin=0,1,0,-1/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   ItemContainer_themeresources.xaml: MinWidth=key:{ThemeResource ItemContainerCheckboxMinWidth  Height=key:{ThemeResource CheckBoxSize  Width=key:{ThemeResource CheckBoxSize  Margin=0,1,0,-1/key:{ThemeResource ItemContainerCheckboxMargin  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource CheckBoxBorderThickness
+  OURS Selection.jalxaml: MinHeight=32  MinWidth=120  Height=12/2/20  Width=*/14/20/8  Padding=key:{ThemeResource CheckBoxPadding  Margin=-2,1/key:{TemplateBinding Padding  CornerRadius=1/4  BorderThickness=2/key:{TemplateBinding BorderThickness/key:{ThemeResource CheckBoxBorderThickness
+  OURS Selection.jalxaml: 
+
+### ComboBox   upstream 1 / ours 2
+  UP   ComboBox_themeresources.xaml: MinHeight=key:{ThemeResource ComboBoxMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.DropDownContentMinWidth/key:{ThemeResource ComboBoxThemeMinWidth  Height=*/12/Auto  Width=*/12/30/38  Padding=key:{ThemeResource ComboBoxDropdownBorderPadding/key:{ThemeResource ComboBoxEditableTextPadding/key:{ThemeResource ComboBoxPadding  Margin=-4/0,-0.5,0,-1/0,0,0,0/0,0,14,0/1,0,0,0/4,4,4,4/key:{TemplateBinding Padding/key:{ThemeResource ComboBoxDropdownContentMargin/key:{ThemeResource ComboBoxTopHeaderMargin  CornerRadius=key:{StaticResource ComboBoxDropDownButtonBackgroundCornerRadius/key:{StaticResource ComboBoxHiglightBorderCornerRadius/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{StaticResource ComboBoxBackgroundBorderThicknessFocused/key:{TemplateBinding BorderThickness/key:{ThemeResource ComboBoxBorderThemeThickness/key:{ThemeResource ComboBoxDropdownBorderThickness
+  OURS Selection.jalxaml: MinHeight=0/32  MinWidth=0/64  Height=12  Width=*/12/30/38  Padding=0/key:{ThemeResource ComboBoxDropdownBorderPadding/key:{ThemeResource ComboBoxEditableTextPadding/key:{ThemeResource ComboBoxPadding  Margin=-4/0,-0.5,0,-1/0,0,14,0/4/key:{TemplateBinding Padding/key:{ThemeResource ComboBoxDropdownContentMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ComboBoxDropDownButtonBackgroundCornerRadius/key:{ThemeResource ComboBoxHiglightBorderCornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness/key:{ThemeResource ComboBoxBackgroundBorderThicknessFocused/key:{ThemeResource ComboBoxBorderThemeThickness/key:{ThemeResource ComboBoxDropdownBorderThickness
+  OURS Selection.jalxaml: MinHeight=32  Height=16  Width=3  Padding=key:{TemplateBinding Padding/key:{ThemeResource ComboBoxItemThemePadding  Margin=1,0,0,0/5,2,5,2/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ComboBoxItemCornerRadius/key:{ThemeResource ComboBoxItemPillCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### ComboBoxItem   upstream 2 / ours 0
+  UP   ComboBox_themeresources.xaml: Padding=key:{ThemeResource ComboBoxItemThemePadding  Margin=5,2,5,2/key:{TemplateBinding Padding  CornerRadius=key:{StaticResource ComboBoxItemCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   RevealBrush_themeresources.xaml: Padding=key:{ThemeResource ComboBoxItemRevealThemePadding  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ComboBoxItemRevealBorderThemeThickness
+
+### CommandBar   upstream 4 / ours 0
+  UP   CommandBar_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeCompactHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CommandBarTemplateSettings.OverflowContentMinWidth/key:{ThemeResource AppBarMoreButtonColumnMinWidth  Height=Auto/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CommandBarTemplateSettings.ContentHeight/key:{TemplateBinding Height/key:{ThemeResource AppBarExpandButtonCircleDiameter  Width=*/Auto  Padding=4,0,0,0/key:{ThemeResource CommandBarMoreButtonMargin  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{ThemeResource CommandBarBorderThicknessOpen
+  UP   CommandBar_themeresources.xaml: Width=key:{ThemeResource AppBarExpandButtonThemeWidth  Padding=0  Margin=key:{StaticResource AppBarEllipsisButtonInnerBorderMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  UP   MediaTransportControls_themeresources.xaml: 
+  UP   RevealBrush_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeCompactHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CommandBarTemplateSettings.OverflowContentMinWidth  Height=Auto/key:{TemplateBinding Height/key:{ThemeResource AppBarExpandButtonCircleDiameter  Width=*/Auto/NaN  Padding=key:{ThemeResource CommandBarMoreButtonMargin  Margin=key:{TemplateBinding Padding
+
+### CommandBarOverflowPresenter   upstream 2 / ours 0
+  UP   CommandBarFlyout_themeresources.xaml: MinWidth=136  Padding=key:{TemplateBinding Padding  Margin=3/key:{TemplateBinding BorderThickness  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  UP   CommandBar_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource CommandBarOverflowPresenterBorderPadding  Margin=key:{ThemeResource CommandBarOverflowPresenterMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{ThemeResource CommandBarOverflowPresenterBorderThickness
+
+### ContentControl   upstream 3 / ours 0
+  UP   Pivot_themeresources.xaml: 
+  UP   Pivot_themeresources.xaml: Margin=key:{StaticResource PivotPortraitThemePadding
+  UP   NavigationView_themeresources.xaml: Margin=key:{ThemeResource NavigationViewHeaderMargin
+
+### ContentDialog   upstream 1 / ours 0
+  UP   ContentDialog_themeresources.xaml: MinHeight=key:{ThemeResource ContentDialogMinHeight  MinWidth=key:{ThemeResource ContentDialogMinWidth  Height=*/Auto  Width=*/0/key:{ThemeResource ContentDialogButtonSpacing  Padding=key:{ThemeResource ContentDialogPadding  Margin=key:{TemplateBinding Padding/key:{ThemeResource ContentDialogTitleMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ContentDialogBorderWidth/key:{ThemeResource ContentDialogSeparatorThickness
+
+### ContentPresenter   upstream 1 / ours 0
+  UP   ListBox_themeresources.xaml: 
+
+### ContextMenu   upstream 0 / ours 1
+  OURS Menus.jalxaml: MinHeight=40
+
+### DatePicker   upstream 1 / ours 0
+  UP   DatePicker_themeresources.xaml: Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource DatePickerBorderThemeThickness
+
+### DatePickerFlyoutPresenter   upstream 1 / ours 0
+  UP   DatePicker_themeresources.xaml: MinWidth=296  Height=*/Auto/key:{ThemeResource DatePickerFlyoutPresenterAcceptDismissHostGridHeight/key:{ThemeResource DatePickerFlyoutPresenterHighlightHeight/key:{ThemeResource DatePickerSpacerThemeWidth  Width=*/132*/296/78*/Auto/key:{ThemeResource DatePickerSpacerThemeWidth  Padding=4/key:{ThemeResource DateTimeFlyoutBorderPadding  Margin=4,2,4,2/key:{StaticResource DatePickerFlyoutPresenterAcceptMargin/key:{StaticResource DatePickerFlyoutPresenterDismissMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource DateTimeFlyoutBorderThickness
+
+### Expander   upstream 0 / ours 2
+  OURS Surfaces.jalxaml: MinHeight=48  Height=12/32/Auto  Width=*/12/32/Auto  Padding=key:{TemplateBinding Padding/key:{ThemeResource ExpanderContentPadding/key:{ThemeResource ExpanderHeaderPadding  Margin=1/key:{ThemeResource ExpanderChevronMargin  CornerRadius=0,0,4,4/2/4/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=1/2/key:{ThemeResource ExpanderChevronBorderThickness/key:{ThemeResource ExpanderContentDownBorderThickness/key:{ThemeResource ExpanderHeaderBorderThickness
+  OURS Surfaces.jalxaml: MinHeight=48  Height=16/38/Auto  Width=*/16/38/Auto  Padding=key:{ThemeResource InfoBarContentRootPadding/key:{ThemeResource InfoBarPanelVerticalOrientationPadding  Margin=5/key:{ThemeResource InfoBarActionVerticalOrientationMargin/key:{ThemeResource InfoBarIconMargin/key:{ThemeResource InfoBarMessageVerticalOrientationMargin/key:{ThemeResource InfoBarPanelMargin/key:{ThemeResource InfoBarTitleVerticalOrientationMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource InfoBarBorderThickness
+
+### FlipView   upstream 1 / ours 0
+  UP   FlipView_themeresources.xaml: Height=16/38  Width=16/38  Padding=key:{TemplateBinding Padding  Margin=1  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness/key:{ThemeResource FlipViewButtonBorderThemeThickness
+
+### FlipViewItem   upstream 1 / ours 0
+  UP   FlipViewItem_themeresources.xaml: Padding=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### FlyoutPresenter   upstream 3 / ours 0
+  UP   FlyoutPresenter_themeresources.xaml: MinHeight=key:{ThemeResource FlyoutThemeMinHeight  MinWidth=key:{ThemeResource FlyoutThemeMinWidth  Padding=key:{StaticResource FlyoutContentPadding  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource FlyoutBorderThemeThickness
+  UP   InkToolbar_themeresources.xaml: MinHeight=0  MinWidth=0  Padding=0,0,0,0  Margin=2,4,2,4  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=1
+  UP   MediaTransportControls_themeresources.xaml: Padding=0  CornerRadius=key:{ThemeResource OverlayCornerRadius
+
+### GridViewItem   upstream 4 / ours 0
+  UP   GridViewItem_themeresources.xaml: MinHeight=key:{ThemeResource GridViewItemMinHeight  MinWidth=key:{ThemeResource GridViewItemMinWidth  Margin=0,0,4,4  CornerRadius=key:{ThemeResource GridViewItemCornerRadius
+  UP   InkToolbar_themeresources.xaml: MinHeight=52  MinWidth=52  Height=52  Width=52  Padding=0  Margin=0/6,6,6,6
+  UP   RevealBrush_themeresources.xaml: MinHeight=key:{ThemeResource GridViewItemMinHeight  MinWidth=key:{ThemeResource GridViewItemMinWidth  Margin=0,0,4,4
+  UP   RevealBrush_themeresources.xaml: 
+
+### HyperlinkButton   upstream 1 / ours 1
+  UP   HyperlinkButton_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource HyperlinkButtonBorderThemeThickness
+  OURS Common.jalxaml: BorderThickness=key:{ThemeResource HyperlinkButtonBorderThemeThickness
+
+### InkToolbar   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Margin=2,2,2,2  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarBallpointPenButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarCustomPenButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarCustomToggleButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarCustomToolButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarEraserButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarFlyoutItem   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: MinWidth=136  Height=40  Margin=2,2,2,2  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0
+
+### InkToolbarHighlighterButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarPenConfigurationControl   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: MinWidth=320
+
+### InkToolbarPencilButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarRulerButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### InkToolbarStencilButton   upstream 1 / ours 0
+  UP   InkToolbar_themeresources.xaml: Height=key:{StaticResource InkToolbarButtonHeight  Width=key:{StaticResource InkToolbarButtonWidth  Margin=1,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### ListBox   upstream 1 / ours 0
+  UP   ListBox_themeresources.xaml: Padding=key:{TemplateBinding Padding  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ListBoxBorderThemeThickness
+
+### ListBoxItem   upstream 1 / ours 0
+  UP   ListBox_themeresources.xaml: Padding=key:{StaticResource ListBoxItemPadding  BorderThickness=key:{TemplateBinding BorderThickness
+
+### ListViewItem   upstream 5 / ours 0
+  UP   ListViewItem_themeresources.xaml: MinHeight=key:{ThemeResource ListViewItemMinHeight  MinWidth=key:{ThemeResource ListViewItemMinWidth  Padding=16,0,12,0  CornerRadius=key:{ThemeResource ListViewItemCornerRadius
+  UP   ListViewItem_themeresources.xaml: MinHeight=key:{ThemeResource ListViewItemMinHeight  MinWidth=20/key:{ThemeResource ListViewItemMinWidth  Height=20  Width=20  Padding=12,0,12,0  Margin=0,0,0,0/12,0,0,0/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=0/2/key:{TemplateBinding BorderThickness
+  UP   ListViewItem_themeresources.xaml: Height=14.5/17/25.5/34  Width=17/18.5/25.5/34  Margin=0,1,1,0/key:{TemplateBinding Padding/key:{ThemeResource ListPickerFlyoutPresenterItemMargin/key:{ThemeResource ListPickerFlyoutPresenterMultiselectCheckBoxMargin  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource GridViewItemMultiselectBorderThickness
+  UP   RevealBrush_themeresources.xaml: MinHeight=key:{ThemeResource ListViewItemMinHeight  MinWidth=key:{ThemeResource ListViewItemMinWidth  Padding=12,0,12,0
+  UP   RevealBrush_themeresources.xaml: 
+
+### LoopingSelector   upstream 1 / ours 0
+  UP   DateTimePickerFlyout_themeresources.xaml: Height=key:{ThemeResource LoopingSelectorUpDownButtonHeight  Padding=0  Margin=key:{StaticResource LoopingSelectorUpDownButtonMargin  CornerRadius=key:{ThemeResource ControlCornerRadius
+
+### LoopingSelectorItem   upstream 1 / ours 0
+  UP   DateTimePickerFlyout_themeresources.xaml: Padding=key:{TemplateBinding Padding  Margin=2,0,2,0/key:{StaticResource LoopingSelectorItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius
+
+### MediaTransportControls   upstream 1 / ours 0
+  UP   MediaTransportControls_themeresources.xaml: MinWidth=key:{ThemeResource MediaTransportControlsMinWidth  Height=key:{ThemeResource MediaTransportControlsAppBarButtonHeight  Width=key:{ThemeResource MediaTransportControlsAppBarButtonWidth  Margin=key:{ThemeResource MediaTransportControlsMargin  CornerRadius=key:{ThemeResource OverlayCornerRadius
+
+### Menu   upstream 0 / ours 2
+  OURS Menus.jalxaml: MinHeight=40  Padding=key:{TemplateBinding Padding  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuBarItemBorderThickness
+  OURS Menus.jalxaml: MinHeight=32  MinWidth=140  Padding=key:{TemplateBinding Padding/key:{ThemeResource MenuFlyoutPresenterThemePadding  CornerRadius=key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutPresenterBorderThemeThickness
+
+### MenuBar   upstream 0 / ours 1
+  OURS Menus.jalxaml: Padding=key:{ThemeResource MenuBarItemButtonPadding  Margin=key:{ThemeResource MenuBarItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness/key:{ThemeResource MenuBarItemBorderThickness
+
+### MenuBarItem   upstream 0 / ours 1
+  OURS Menus.jalxaml: Padding=key:{ThemeResource MenuFlyoutItemThemePadding
+
+### MenuFlyoutItem   upstream 2 / ours 2
+  UP   MenuFlyout_themeresources.xaml: MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth  Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=24,4,0,0/key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutItemBorderThickness
+  UP   MenuFlyout_themeresources.xaml: MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth  Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=24,0,0,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutItemRevealBorderThickness
+  OURS Menus.jalxaml: MinHeight=38  Height=16  Width=16  Padding=key:{TemplateBinding Padding/key:{ThemeResource MenuFlyoutItemThemePadding  Margin=0,0,12,0/key:{ThemeResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutItemBorderThickness
+  OURS Menus.jalxaml: MinHeight=38  Height=16  Width=16  Padding=key:{TemplateBinding Padding/key:{ThemeResource MenuFlyoutItemThemePadding  Margin=0,0,12,0/key:{ThemeResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutItemBorderThickness
+
+### MenuFlyoutPresenter   upstream 1 / ours 0
+  UP   MenuFlyout_themeresources.xaml: MinHeight=key:{StaticResource MenuFlyoutThemeMinHeight  MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.FlyoutContentMinWidth/key:{ThemeResource FlyoutThemeMinWidth  Padding=key:{StaticResource MenuFlyoutPresenterThemePadding  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutPresenterBorderThemeThickness
+
+### MenuFlyoutSeparator   upstream 1 / ours 0
+  UP   MenuFlyout_themeresources.xaml: Height=key:{StaticResource MenuFlyoutSeparatorHeight  Padding=key:{StaticResource MenuFlyoutSeparatorThemePadding  Margin=key:{TemplateBinding Padding
+
+### MenuFlyoutSubItem   upstream 3 / ours 1
+  UP   MenuFlyout_themeresources.xaml: Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=key:{StaticResource MenuFlyoutItemChevronMargin/key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutSubItemBorderThickness
+  UP   MenuFlyout_themeresources.xaml: Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=key:{StaticResource MenuFlyoutItemChevronMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutSubItemRevealBorderThickness
+  UP   RadioMenuFlyoutItem_themeresources.xaml: Height=16  Width=*/16/Auto  Padding=key:{TemplateBinding Padding  Margin=0,0,15,0/key:{StaticResource MenuFlyoutItemChevronMargin/key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  OURS Menus.jalxaml: Height=1  Padding=key:{ThemeResource MenuFlyoutSeparatorThemePadding  Margin=key:{TemplateBinding Padding
+
+### NumberBox   upstream 0 / ours 1
+  OURS TextInput.jalxaml: MinHeight=32  MinWidth=120  Height=*/1/6/8/9/Auto  Width=*/10/12/Auto  Padding=6/key:{ThemeResource TextControlThemePadding  Margin=0,0,0,4/0,4,4,4/1,0,1,1/4/key:{TemplateBinding Padding/key:{ThemeResource NumberBoxIconMargin/key:{ThemeResource TextBoxTopHeaderMargin  CornerRadius=0,0,3,3/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource NumberBoxPopupBorderThickness/key:{ThemeResource NumberBoxSpinButtonBorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+
+### PasswordBox   upstream 1 / ours 1
+  UP   PasswordBox_themeresources.xaml: Padding=key:{ThemeResource TextControlThemePadding  Margin=key:{ThemeResource TextBoxInnerButtonMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+  OURS TextInput.jalxaml: MinWidth=32  Padding=0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource NumberBoxSpinButtonBorderThickness
+
+### Pivot   upstream 1 / ours 0
+  UP   Pivot_themeresources.xaml: Padding=0  Margin=0/key:{TemplateBinding Padding
+
+### PivotHeaderItem   upstream 1 / ours 0
+  UP   Pivot_themeresources.xaml: Height=3/48  Padding=key:{TemplateBinding Padding/key:{ThemeResource PivotHeaderItemMargin  Margin=0,0,0,2  CornerRadius=key:{ThemeResource PivotHeaderItemSelectedPipeCornerRadius
+
+### PivotItem   upstream 1 / ours 0
+  UP   Pivot_themeresources.xaml: Padding=0  Margin=key:{TemplateBinding Padding/key:{ThemeResource PivotItemMargin
+
+### ProgressBar   upstream 1 / ours 0
+  UP   Deprecated_themeresources.xaml: Height=16/2  Width=*/16/Auto  Margin=16,0,0,0/16,0,16,4/8,0,16,0
+
+### RadioButton   upstream 1 / ours 0
+  UP   RadioButton_themeresources.xaml: MinWidth=120  Height=20/32/4/key:{ThemeResource RadioButtonCheckGlyphSize  Width=*/20/4/key:{ThemeResource RadioButtonCheckGlyphSize  Padding=8,6,0,0  Margin=key:{TemplateBinding Padding  CornerRadius=6/key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### Rectangle   upstream 3 / ours 0
+  UP   ComboBox_themeresources.xaml: Height=key:{StaticResource ComboBoxItemPillHeight  Width=key:{StaticResource ComboBoxItemPillWidth
+  UP   InkToolbar_themeresources.xaml: Height=16  Width=3
+  UP   SelectorBar_themeresources.xaml: Height=key:{ThemeResource SelectorBarItemPillHeight  Width=key:{ThemeResource SelectorBarItemPillWidth
+
+### RepeatButton   upstream 3 / ours 2
+  UP   AnnotatedScrollBar_themeresources.xaml: MinHeight=16  MinWidth=16  Padding=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ScrollButtonStyleBorderThickness
+  UP   RepeatButton_themeresources.xaml: Padding=key:{StaticResource ButtonPadding/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonBorderThemeThickness
+  UP   RevealBrush_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource RepeatButtonRevealBorderThemeThickness
+  OURS Common.jalxaml: 
+  OURS TextInput.jalxaml: MinWidth=0  Height=36  Width=36  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource NumberBoxPopupSpinButtonBorderThickness
+
+### RichEditBox   upstream 1 / ours 0
+  UP   RichEditBox_themeresources.xaml: MinHeight=key:{ThemeResource TextControlThemeMinHeight  MinWidth=key:{ThemeResource TextControlThemeMinWidth  Height=*/Auto  Padding=key:{TemplateBinding Padding/key:{ThemeResource TextControlThemePadding  Margin=key:{TemplateBinding BorderThickness/key:{ThemeResource RichEditBoxTopHeaderMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+
+### ScrollBar   upstream 1 / ours 0
+  UP   ScrollBar_themeresources.xaml: MinHeight=24/32/key:{StaticResource ScrollBarSize/key:{StaticResource ScrollBarVerticalThumbMinHeight  MinWidth=24/32/key:{StaticResource ScrollBarHorizontalThumbMinWidth/key:{StaticResource ScrollBarSize  Height=*/0/2/Auto/key:{StaticResource ScrollBarSize/key:{ThemeResource ScrollBarHorizontalThumbMinHeight  Width=*/0/2/Auto/key:{StaticResource ScrollBarSize/key:{ThemeResource ScrollBarVerticalThumbMinWidth  Padding=key:{ThemeResource ScrollBarHorizontalDecreaseMargin/key:{ThemeResource ScrollBarHorizontalIncreaseMargin/key:{ThemeResource ScrollBarVerticalDecreaseMargin/key:{ThemeResource ScrollBarVerticalIncreaseMargin  Margin=0/0,2,0,2/2,0,2,0  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ScrollBarCornerRadius  BorderThickness=0
+
+### ScrollViewer   upstream 3 / ours 1
+  UP   CalendarView_themeresources.xaml: 
+  UP   CalendarView_themeresources.xaml: 
+  UP   ScrollViewer_themeresources.xaml: Height=*/Auto  Width=*/Auto  Padding=0/key:{ThemeResource ScrollViewerScrollBarMargin  Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  OURS Common.jalxaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ToolTipBorderPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ToolTipBorderThemeThickness
+
+### SemanticZoom   upstream 1 / ours 0
+  UP   RevealBrush_themeresources.xaml: Height=12  Width=12  Padding=0/key:{TemplateBinding Padding  Margin=0,0,19,19/key:{TemplateBinding Padding  BorderThickness=0/key:{TemplateBinding BorderThickness
+
+### Shape   upstream 1 / ours 0
+  UP   ColorPicker_themeresources.xaml: 
+
+### Slider   upstream 2 / ours 1
+  UP   MediaTransportControls_themeresources.xaml: MinWidth=80  Height=*/0/16/4/96/Auto/key:{ThemeResource MediaTransportControlsSliderHeight  Width=*/0/24/320/Auto/key:{ThemeResource MediaTransportControlsSliderWidth  Padding=3,11  Margin=0/0,0/0,2,0,0/0,3/12/12,0,8,0/7,0,7,2/7,2,7,1/8,0,16,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{ThemeResource MediaTransportControlsBorderThickness
+  UP   Slider_themeresources.xaml: Height=key:{ThemeResource SliderInnerThumbHeight  Width=key:{ThemeResource SliderInnerThumbWidth  Margin=-2/key:{TemplateBinding Padding  CornerRadius=key:{ThemeResource SliderThumbCornerRadius/key:{ThemeResource SliderTrackCornerRadius  BorderThickness=1/key:{TemplateBinding BorderThickness/key:{ThemeResource SliderBorderThemeThickness
+  OURS Inputs.jalxaml: MinWidth=120  Height=12/20/32  Width=*/12/20  Padding=8,6,0,0  Margin=-2,1/key:{TemplateBinding Padding  CornerRadius=10/4  BorderThickness=2/key:{TemplateBinding BorderThickness/key:{ThemeResource RadioButtonBorderThemeThickness
+
+### SplitButton   upstream 0 / ours 1
+  OURS Common.jalxaml: MinWidth=35  Width=*/1/35  Padding=key:{ThemeResource SplitButtonPadding  Margin=1  CornerRadius=2/4/key:{ThemeResource ControlCornerRadius  BorderThickness=1/2/key:{ThemeResource SplitButtonBorderThemeThickness
+
+### SplitMenuFlyoutItem   upstream 1 / ours 0
+  UP   MenuFlyout_themeresources.xaml: Margin=key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+
+### SplitView   upstream 1 / ours 0
+  UP   SplitView_themeresources.xaml: Width=*/1/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.OpenPaneGridLength, FallbackValue=0/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.OpenPaneLength  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource SplitViewPaneRootCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource SplitViewLeftBorderThemeThickness
+
+### TextBlock   upstream 19 / ours 6
+  UP   InkToolbar_themeresources.xaml: 
+  UP   InkToolbar_themeresources.xaml: 
+  UP   InkToolbar_themeresources.xaml: Margin=0,0,0,0
+  UP   InkToolbar_themeresources.xaml: 
+  UP   InkToolbar_themeresources.xaml: 
+  UP   MediaTransportControls_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources.xaml: 
+  UP   TextBlock_themeresources_v2.5.xaml: 
+  UP   TextBlock_themeresources_v2.5.xaml: 
+  UP   TextBlock_themeresources_v2.5.xaml: 
+  UP   NavigationView_themeresources.xaml: 
+  OURS Typography.jalxaml: 
+  OURS Typography.jalxaml: 
+  OURS Typography.jalxaml: 
+  OURS Typography.jalxaml: 
+  OURS Typography.jalxaml: 
+  OURS Typography.jalxaml: 
+
+### TextBox   upstream 3 / ours 2
+  UP   AutoSuggestBox_themeresources.xaml: MinHeight=key:{ThemeResource TextControlThemeMinHeight  MinWidth=key:{ThemeResource TextControlThemeMinWidth  Padding=key:{ThemeResource TextControlThemePadding  Margin=key:{StaticResource AutoSuggestBoxDeleteButtonMargin  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+  UP   ComboBox_themeresources.xaml: Padding=key:{TemplateBinding Padding  Margin=key:{TemplateBinding BorderThickness  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+  UP   TextBox_themeresources.xaml: MinHeight=key:{ThemeResource TextControlThemeMinHeight  MinWidth=key:{ThemeResource TextControlThemeMinWidth  Padding=key:{ThemeResource TextControlThemePadding  Margin=key:{ThemeResource TextBoxInnerButtonMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+  OURS TextInput.jalxaml: MinHeight=32  MinWidth=64  Height=1  Padding=key:{ThemeResource TextControlThemePadding  Margin=1,0,1,1/key:{TemplateBinding Padding  CornerRadius=0,0,3,3/key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource TextControlBorderThemeThickness
+  OURS TextInput.jalxaml: MinHeight=32  MinWidth=64  Padding=key:{ThemeResource TextControlThemePadding  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource TextControlBorderThemeThickness
+
+### TimePicker   upstream 1 / ours 0
+  UP   TimePicker_themeresources.xaml: Margin=key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource DatePickerBorderThemeThickness
+
+### TimePickerFlyoutPresenter   upstream 1 / ours 0
+  UP   TimePicker_themeresources.xaml: MinWidth=242  Height=*/Auto/key:{ThemeResource TimePickerFlyoutPresenterAcceptDismissHostGridHeight/key:{ThemeResource TimePickerFlyoutPresenterHighlightHeight/key:{ThemeResource TimePickerSpacerThemeWidth  Width=*/242/Auto/key:{ThemeResource TimePickerSpacerThemeWidth  Padding=4/key:{ThemeResource DateTimeFlyoutBorderPadding  Margin=3,0/4,2,4,2/key:{StaticResource DatePickerFlyoutPresenterDismissMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource DateTimeFlyoutBorderThickness
+
+### ToggleButton   upstream 5 / ours 1
+  UP   InkToolbar_themeresources.xaml: MinHeight=key:{StaticResource InkToolbarButtonHeight  MinWidth=key:{StaticResource InkToolbarButtonWidth  Padding=2,2,2,2  Margin=2,2,2,2  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource InkToolbarButtonBorderThemeThickness
+  UP   ToggleButton_themeresources.xaml: Padding=key:{StaticResource ButtonPadding/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ToggleButtonBorderThemeThickness
+  UP   Expander_themeresources.xaml: MinHeight=key:{TemplateBinding MinHeight  MinWidth=key:{TemplateBinding MinWidth  Height=key:{StaticResource ExpanderChevronGlyphSize/key:{ThemeResource ExpanderChevronButtonSize  Width=*/Auto/key:{StaticResource ExpanderChevronGlyphSize/key:{TemplateBinding Width/key:{ThemeResource ExpanderChevronButtonSize  Padding=key:{StaticResource ExpanderHeaderPadding/key:{TemplateBinding Padding  Margin=key:{ThemeResource ExpanderChevronMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ExpanderChevronBorderThickness
+  UP   Expander_themeresources.xaml: MinHeight=key:{TemplateBinding MinHeight  MinWidth=key:{TemplateBinding MinWidth  Height=key:{StaticResource ExpanderChevronGlyphSize/key:{ThemeResource ExpanderChevronButtonSize  Width=*/Auto/key:{StaticResource ExpanderChevronGlyphSize/key:{TemplateBinding Width/key:{ThemeResource ExpanderChevronButtonSize  Padding=key:{StaticResource ExpanderHeaderPadding/key:{TemplateBinding Padding  Margin=key:{ThemeResource ExpanderChevronMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ExpanderChevronBorderThickness
+  UP   RevealBrush_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ToggleButtonRevealBorderThemeThickness
+  OURS Common.jalxaml: BorderThickness=key:{ThemeResource ToggleButtonBorderThemeThickness
+
+### ToggleMenuFlyoutItem   upstream 2 / ours 1
+  UP   MenuFlyout_themeresources.xaml: MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth  Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=0,0,16,0/24,0,0,0/key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{ThemeResource MenuFlyoutItemBorderThickness
+  UP   MenuFlyout_themeresources.xaml: MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth  Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=0,0,12,0/24,0,0,0  CornerRadius=key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ToggleMenuFlyoutItemRevealBorderThickness
+  OURS Menus.jalxaml: MinHeight=38  Height=16  Width=16  Padding=key:{TemplateBinding Padding/key:{ThemeResource MenuFlyoutItemThemePadding  Margin=0,0,12,0/key:{ThemeResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource MenuFlyoutSubItemBorderThickness
+
+### ToggleSwitch   upstream 1 / ours 0
+  UP   ToggleSwitch_themeresources.xaml: MinWidth=key:{StaticResource ToggleSwitchThemeMinWidth  Height=*/12/20/Auto/key:{ThemeResource ToggleSwitchPostContentMargin/key:{ThemeResource ToggleSwitchPreContentMargin  Width=12/20/40/Auto  Margin=-1,0,0,0/0,0,1,0/0,5/key:{ThemeResource ToggleSwitchTopHeaderMargin  CornerRadius=7/key:{StaticResource ControlCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=key:{TemplateBinding BorderThickness
+
+### ToolTip   upstream 1 / ours 0
+  UP   ToolTip_themeresources.xaml: Padding=key:{StaticResource ToolTipBorderPadding/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ToolTipBorderThemeThickness
+
+### controls   upstream 16 / ours 3
+  UP   InfoBadge_themeresources.xaml: MinHeight=key:{ThemeResource InfoBadgeMinHeight  MinWidth=key:{ThemeResource InfoBadgeMinWidth  Padding=key:{TemplateBinding Padding/key:{ThemeResource InfoBadgePadding  CornerRadius=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.InfoBadgeCornerRadius
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: Padding=0,4,0,2
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: Padding=0,4,0,2
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: 
+  UP   InfoBadge_themeresources.xaml: 
+  UP   RevealBrush_themeresources.xaml: Width=*/Auto  Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  Margin=6,0,0,0  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonRevealBorderThemeThickness
+  UP   RevealBrush_themeresources.xaml: Padding=key:{TemplateBinding Padding/key:{ThemeResource ButtonPadding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonRevealBorderThemeThickness/key:{ThemeResource SplitButtonBorderThemeThickness
+  UP   NavigationView_themeresources.xaml: Height=*/16/Auto/key:{StaticResource TopNavigationViewSettingsButtonHeight  Width=*/Auto/key:{StaticResource TopNavigationViewSettingsButtonHeight  Margin=0/key:{ThemeResource NavigationViewItemButtonMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   RadioMenuFlyoutItem_themeresources.xaml: MinWidth=key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.KeyboardAcceleratorTextMinWidth  Height=16  Width=*/16/Auto  Padding=key:{StaticResource MenuFlyoutItemThemePadding/key:{TemplateBinding Padding  Margin=0,0,16,0/24,0,0,0/key:{StaticResource MenuFlyoutItemMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius
+  UP   SplitButton_themeresources.xaml: MinHeight=key:{ThemeResource AppBarThemeCompactHeight  Padding=12,8,4,8/key:{TemplateBinding Padding/key:{ThemeResource AppBarButtonInnerBorderMargin  CornerRadius=key:{ThemeResource ControlCornerRadius  BorderThickness=0/key:{TemplateBinding BorderThickness
+  OURS Common.jalxaml: Height=12  Width=*/12/Auto  Padding=key:{TemplateBinding Padding  Margin=1/8,0,0,0  CornerRadius=2/4/key:{TemplateBinding CornerRadius  BorderThickness=1/2/key:{TemplateBinding BorderThickness/key:{ThemeResource ButtonBorderThemeThickness
+  OURS Inputs.jalxaml: MinHeight=0  MinWidth=0  Height=12/20/32  Width=12/20/40/48  Padding=0  Margin=1/key:{TemplateBinding ThumbOffset  CornerRadius=10/4/7  BorderThickness=1/2
+  OURS Inputs.jalxaml: MinHeight=32  MinWidth=32  Height=12/14/18/4/Auto  Width=12/14/18/4/Auto  Padding=key:{TemplateBinding Padding  Margin=-2/0,2/0,9/0,9,4,9/2,0/4,9,0,9/9,0/9,0,9,4/9,4,9,0  CornerRadius=4/key:{ThemeResource SliderThumbCornerRadius/key:{ThemeResource SliderTrackCornerRadius  BorderThickness=1/2/key:{ThemeResource SliderBorderThemeThickness
+
+### local   upstream 0 / ours 2
+  OURS Navigation.jalxaml: MinHeight=36  MinWidth=0  Height=16  Width=*/16/40  Padding=0  Margin=0,0,12,0/1/4,2  CornerRadius=2/4/key:{StaticResource NavigationViewItemCornerRadius/key:{TemplateBinding CornerRadius  BorderThickness=0/1/2
+  OURS Navigation.jalxaml: Height=*/16/Auto  Width=*/16/240/3/Auto  Padding=24  Margin=0,12,0,0/0,8/0,8,8,8/4,0,4,12/key:{TemplateBinding Padding  CornerRadius=2/8  BorderThickness=1
+
+### primitives   upstream 7 / ours 0
+  UP   CommandBarFlyout_themeresources.xaml: MinWidth=3/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FlyoutTemplateSettings.CurrentWidth  Height=40/Auto/key:{TemplateBinding Height  Width=*/Auto/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=FlyoutTemplateSettings.ExpandedWidth  Margin=3,3,0,3/key:{TemplateBinding Padding  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{TemplateBinding BorderThickness/key:{ThemeResource CommandBarFlyoutBorderThemeThickness
+  UP   Deprecated_themeresources.xaml: MinHeight=key:{ThemeResource NavigationViewItemOnLeftMinHeight  Height=24  Width=*/2/key:{ThemeResource NavigationViewCompactPaneLength  Margin=4,0,0,0/key:{TemplateBinding Padding/key:{ThemeResource NavigationViewItemOnLeftIconBoxMargin  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   Deprecated_themeresources_any.xaml: Height=16/2  Width=*/16/Auto  Margin=16,0,0,0/16,0,16,4/8,0,16,0
+  UP   Deprecated_themeresources_any.xaml: MinHeight=key:{ThemeResource NavigationViewItemOnLeftMinHeight  Height=24  Width=*/2/key:{ThemeResource NavigationViewCompactPaneLength  Margin=4,0,0,0/key:{TemplateBinding Padding/key:{ThemeResource NavigationViewItemOnLeftIconBoxMargin  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   NavigationView_themeresources.xaml: MinHeight=key:{ThemeResource NavigationViewItemOnLeftMinHeight  Height=12/key:{ThemeResource NavigationViewItemOnLeftIconBoxHeight/key:{ThemeResource NavigationViewSelectionIndicatorHeight  Width=*/12/40/Auto/key:{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.SmallerIconWidth/key:{ThemeResource NavigationViewSelectionIndicatorWidth  Padding=key:{TemplateBinding Padding  Margin=0,0,14,0/key:{ThemeResource NavigationViewItemButtonMargin/key:{ThemeResource NavigationViewItemContentPresenterMargin/key:{ThemeResource NavigationViewItemExpandChevronMargin/key:{ThemeResource NavigationViewItemOnLeftIconBoxMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource OverlayCornerRadius  BorderThickness=key:{StaticResource NavigationViewItemBorderThickness
+  UP   NavigationView_themeresources.xaml: Height=12/16/3  Width=*/12/16/40/Auto  Margin=-16,0,2,13/12,0,0,0/16,0,16,4/key:{StaticResource NavigationViewItemButtonMargin/key:{ThemeResource TopNavigationViewItemContentPresenterMargin/key:{ThemeResource TopNavigationViewItemExpandChevronMargin  CornerRadius=key:{TemplateBinding CornerRadius/key:{ThemeResource ControlCornerRadius
+  UP   NavigationView_themeresources.xaml: Height=12/16/24/36  Width=*/12/16/2/40/Auto  Padding=key:{ThemeResource TopNavigationViewItemOnOverflowExpandChevronPadding  Margin=0,0,14,0/16,0,0,0/4,0,0,0/key:{ThemeResource TopNavigationViewItemOnOverflowContentPresenterMargin/key:{ThemeResource TopNavigationViewItemOnOverflowExpandChevronMargin

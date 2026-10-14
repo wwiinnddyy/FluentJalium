@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway audit of one base capability, for task #22. The spacing batch found that a checked
+       AppBarToggleButton paints its accent into every read-back this repo owns - property, offscreen
+       RenderTargetBitmap, in-bar offscreen, shown-window "Chrome" (which turns out to be RenderTargetBitmap
+       of the Window visual too, not a screen grab) - while the external PrintWindow capture of the same
+       page reads 0 pixels of that colour, and 7786 when the only change is deleting
+       TransitionProperty from that nested Border. Before this batch's conclusion is allowed to shape the
+       other 19 transition sites in src/FluentJalium, the symptom needs its own discriminating matrix:
+       which variable actually decides whether a transition's end value reaches the composited frame -
+       nesting, the presence of a transition, its duration, when the value is written, whether the element
+       sits in a template, whether the brush came from {ThemeResource}, or brush-versus-size transitions.
+       Not referenced by FluentJalium.slnx: it holds a shown window and an external script grabs it. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TransitionProbe</RootNamespace>
+    <AssemblyName>TransitionProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

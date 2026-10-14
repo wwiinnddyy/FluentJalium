@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway CommandBar / AppBar census. Not referenced by FluentJalium.slnx.
+       The stage-4 objective lists CommandBar as one more native control that only needs a skin, but the
+       menu batch just proved that "the type exists" and "a template can be swapped into it" are two
+       different facts (MenuItem stores a Template and never builds one), and the Expander/InfoBar batch
+       proved that an unopened template-content switch can make a whole skin silently dead. Nothing here
+       is typed against a guessed class: every candidate is found by simple name and asked in reflection. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AppBarProbe</RootNamespace>
+    <AssemblyName>AppBarProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,73 @@
+<!-- WinUI 3 TreeView_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 8e7a107255310706dda5e4e5ca6edf99b6b14eb9. Its ThemeDictionaries are Default (4-44), Light (45-85) and
+     High Contrast (86-126); all three carry the SAME 39 rows - 32 brush aliases, 4 Thickness, 3 x:Double - and
+     every one of them is named TreeViewItem*, because upstream publishes no host rows for this control at all.
+     This file ships the 31 with a consumer; what was left out and why is at the bottom, and the row-by-row
+     branch comparison is docs/astra/audits/treeview.md §1. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. There is nothing to alias here: DefaultTreeViewStyle (controls/dev/TreeView/TreeView.xaml:9-30)
+       sets IsTabStop, three drag/drop switches, ItemContainerTransitions and a Template whose whole body is
+       <TreeViewList Background="{TemplateBinding Background}">. It reads no Foreground row, no Background row and
+       no Border row, so the control's surface is transparent and its text colour is inherited - which is exactly
+       what Styles/TreeViews.jalxaml copies, rather than reaching for the ListBox rows the ListView host had to
+       borrow (audits/listview.md §1). Inventing a TreeViewBackground row would be inventing a name. -->
+  <!-- Items. Upstream's eight background rows: the resting row is the transparent subtle fill, hover and press are
+       the two subtle steps, and the three selected rows are subtle too - a tree selects with a pill, not with an
+       accent block, which is why this family reads like ListViewItem and not like ListBoxItem. -->
+  <StaticResource x:Key="TreeViewItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundSelected" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundSelectedPointerOver" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundSelectedPressed" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TreeViewItemBackgroundSelectedDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <!-- Foreground rows are upstream's own; the four Pressed-family rows step down to TextFillColorSecondary, which
+       the list family does not do. -->
+  <StaticResource x:Key="TreeViewItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundSelected" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundSelectedPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundSelectedPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TreeViewItemForegroundSelectedDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Border rows. Every one of the eight aliases the transparent subtle fill and TreeViewItemBorderThemeThickness
+       below is 0 in Default and Light (2 only in High Contrast), so no border paints in the two normal scopes.
+       They are still published with a consumer because a parity claim about a name has to survive the state map -
+       the same reason the ComboBox audit keeps its inert item-border rows. -->
+  <StaticResource x:Key="TreeViewItemBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushSelected" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushSelectedPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushSelectedPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TreeViewItemBorderBrushSelectedDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <!-- The selection pill. Upstream calls these Foreground rows and writes them onto a Rectangle's Fill
+       (TreeViewItem.xaml:23,27,45,130), so the names are kept and the Fill is what consumes them here. The
+       pill's geometry is readable in this file - Width 3, Height 16, RadiusX/Y 2 at TreeViewItem.xaml:130 - which
+       is more than the ListViewItem audit could say: ListViewItemPresenter is C++ and hides the same numbers
+       (adaptation/00 S1-d 9). The disabled target is TextFillColorDisabledBrush upstream, not the accent
+       disabled token, and is kept as written. -->
+  <StaticResource x:Key="TreeViewItemSelectionIndicatorForeground" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="TreeViewItemSelectionIndicatorForegroundPointerOver" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="TreeViewItemSelectionIndicatorForegroundPressed" ResourceKey="AccentFillColorDefaultBrush" />
+  <StaticResource x:Key="TreeViewItemSelectionIndicatorForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Geometry. Three of upstream's four Thickness rows have a consumer here; the values are upstream's own in
+       every scope, so each is one row. -->
+  <Thickness x:Key="TreeViewItemBorderThemeThickness">0</Thickness>
+  <Thickness x:Key="TreeViewItemPresenterMargin">4,2</Thickness>
+  <Thickness x:Key="TreeViewItemPresenterPadding">0,3,0,5</Thickness>
+  <!-- Eight upstream rows are deliberately not published, and none of the eight is a count-only omission.
+       Five belong to a surface this runtime has no way to reach: the four multi-select brush rows
+       (TreeViewItemMultiSelectBorderBrushSelected, TreeViewItemCheckBoxBackgroundSelected,
+       TreeViewItemCheckBoxBorderSelected, TreeViewItemCheckGlyphSelected) and
+       TreeViewItemMultiSelectSelectedItemBorderMargin - TreeView exposes no SelectionMode, no MultiSelect and no
+       check glyph (spike/TreeViewProbe mode A absent list), so a CheckBox in the row would be our invention.
+       Three are x:Double rows, which this reader cannot parse as a resource (established for Expander, AppBar,
+       AutoSuggestBox and Metrics): TreeViewItemMinHeight 28, TreeViewItemMultiSelectCheckBoxMinHeight 28 and
+       TreeViewItemContentHeight 20. The first of them still shapes the row - it rides as a literal on the style
+       that needs it, in Styles/TreeViews.jalxaml, exactly where the other two would ride if they had a consumer.
+       AstraTreeViewTests.A_withheld_upstream_row_is_not_published names all eight. -->
+</ResourceDictionary>

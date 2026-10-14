@@ -1,0 +1,40 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:01.40
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:02:15.59]     FluentJalium.Tests.AstraMenuTests.Each_item_style_carries_one_cell_per_reachable_state(key: "DefaultToggleMenuFlyoutItemStyle", expected: ["Icon=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False"]) [FAIL]
+  失败 FluentJalium.Tests.AstraMenuTests.Each_item_style_carries_one_cell_per_reachable_state(key: "DefaultToggleMenuFlyoutItemStyle", expected: ["Icon=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False"]) [6 ms]
+  错误消息:
+   Assert.Equal() Failure: Collections differ
+                                                                                               ↓ (pos 3)
+Expected: string[]                         ["Icon=null", "IsChecked=True", "IsMouseOver=True", "IsEnabled=False"]
+Actual:   ListSelectIterator<Cell, string> ["Icon=null", "IsChecked=True", "IsMouseOver=True"]
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraMenuTests.<>c__DisplayClass21_0.<Each_item_style_carries_one_cell_per_reachable_state>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 379
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.Each_item_style_carries_one_cell_per_reachable_state(String key, String[] expected) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 376
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:   927，已跳过:     0，总计:   928，持续时间: 4 m 25 s - FluentJalium.Tests.dll (net10.0)
+Invoke-Step : test suite (structure, resource keys, theme runtime) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:47 �ַ�: 5
++     Invoke-Step 'test suite (structure, resource keys, theme runtime) ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

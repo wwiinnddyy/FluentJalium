@@ -1,0 +1,14 @@
+Gallery 的 navigation 页在 SelectedIndex 范围闸修好之前的启动崩溃。
+命令：samples/FluentJalium.Gallery/bin/Debug/net10.0-windows/FluentJalium.Gallery.exe --page navigation
+（同一栈由 tools/Test-AstraGallerySmoke.ps1 -Page navigation 报成"进程已退出，因此无法获得所请求的信息"）
+时间：2026-09-20，构建 = 本批 977/977 全绿的那一棵树。
+
+EXIT=127
+Unhandled exception. System.ArgumentOutOfRangeException: SelectedIndex must name a tab or be -1. (Parameter 'value')
+   at FluentJalium.Controls.FluentTabView.set_SelectedIndex(Int32 value)
+   at FluentJalium.Gallery.MainWindow.InitializeComponent() in C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\obj\Debug\net10.0-windows\Jalium.UI.Xaml.SourceGenerator\Jalium.UI.Xaml.SourceGenerator.JalxamlSourceGenerator\FluentJalium_Gallery_MainWindow.g.cs:line 2486
+   at FluentJalium.Gallery.MainWindow..ctor() in C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\MainWindow.jalxaml.cs:line 37
+   at FluentJalium.Gallery.Program.Main(String[] args) in C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\Program.cs:line 20
+
+读法：g.cs:2486 是源生成器写 SelectedIndex 的那一行，TabItems 的三段子元素在它之后才 append，
+所以"上界必须落在集合内"这条闸在 markup 顺序下必炸。修后这条页挂载 6.8 秒并优雅关闭（smoke-pass.txt）。

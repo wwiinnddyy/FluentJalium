@@ -1,0 +1,89 @@
+theme dictionaries=42
+our ListView styles are live: ListViewItemStyle=True
+our ListBox styles are live: ListBoxStyle=True
+TreeViewItem type: Jalium.UI.Controls.TreeViewItem base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+
+=== B. a mounted stock tree: nesting, collapse, parts, containers ===
+
+    TreeView 300x220
+      Border 'LayoutRoot' 300x220
+        ScrollViewer 'ScrollViewer' 300x220
+          ItemsPresenter 'ItemsPresenter' 300x220
+            VirtualizingStackPanel 300x220
+              TreeViewItem 300x32
+                Grid 300x32
+                  Border 'ContentBorder' 292x28
+                    Grid 292x20
+                      Rectangle 'SelectionIndicator' 3x16
+                      Grid 20x20
+                        ToggleButton 'ChevronHitTarget' 20x20
+                          Grid 20x20
+                            Border 'Surface' 20x20
+                              ContentPresenter 0x0
+                            Border 'FocusOutline' 18x18
+                              Border 14x14
+                        Grid 12x12
+                          Path 'CollapsedGlyph' 12x12
+                          Path 'ExpandedGlyph' 0x0
+                      ContentPresenter 'ContentPresenter' 45.44x20
+                        TextBlock "Parent" 45.44x20
+                  ItemsPresenter 'ChildHost' 0x0
+              TreeViewItem 300x32
+                Grid 300x32
+                  Border 'ContentBorder' 292x28
+                    Grid 292x20
+                      Rectangle 'SelectionIndicator' 3x16
+                      Grid 20x20
+                        ToggleButton 'ChevronHitTarget' 20x20
+                          Grid 20x20
+                            Border 'Surface' 20x20
+                              ContentPresenter 0x0
+                            Border 'FocusOutline' 18x18
+                              Border 14x14
+                        Grid 12x12
+                          Path 'CollapsedGlyph' 12x12
+                          Path 'ExpandedGlyph' 12x12
+                      ContentPresenter 'ContentPresenter' 80.29x20
+                        TextBlock "Sibling root" 80.29x20
+                  ItemsPresenter 'ChildHost' 0x0
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 0x40
+                Border 'ThumbBorder' 0x40
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 40x0
+                Border 'ThumbBorder' 40x0
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+  named parts in tree: Border:LayoutRoot, ScrollViewer:ScrollViewer, ItemsPresenter:ItemsPresenter, Border:ContentBorder, Rectangle:SelectionIndicator, ToggleButton:ChevronHitTarget, Border:Surface, Border:FocusOutline, Path:CollapsedGlyph, Path:ExpandedGlyph, ContentPresenter:ContentPresenter, ItemsPresenter:ChildHost, Border:PART_ButtonRoot, Path:PART_Arrow, Border:ThumbBorder
+  containers in the visual tree (collapsed roots): 2
+  first container: TreeViewItem 300x32 style=Jalium.UI.Style padding=0,0,0,0 min-height=28 background=#00FFFFFF header=Parent
+  header text host: presenter Content=null textBlock=none
+    set IsExpanded=True -> True
+  expand parent (IsExpanded=true): containers=5 childTwoExpanded=True
+  expand grandchild level: containers=7 rows=4
+  collapse parent again: containers=7
+  after collapse: containers=7
+  select the first row through its own property: container.IsSelected=True tree.SelectedItem=Parent
+  selected row brushes: [op=1 vis=Visible] Border.ContentBorder=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.ContentBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=0 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Hidden] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Hidden] [op=1 vis=Hidden] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.ContentBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=0 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.ContentBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=0 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Hidden] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Hidden] [op=1 vis=Hidden] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Collapsed] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.ContentBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=0 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Hidden] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Hidden] [op=1 vis=Hidden] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Collapsed] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.ContentBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Rectangle.SelectionIndicator=#FF60CDFF; [op=0 vis=Visible] [op=1 vis=Visible] ToggleButton.ChevronHitTarget=#00FFFFFF; [op=1 vis=Hidden] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Hidden] [op=1 vis=Hidden] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] 
+  accent in effect: #FF60CDFF
+  item panels in the stock tree: VirtualizingStackPanel(300x220), StackPanel(284x160), StackPanel(268x0), StackPanel(268x64), StackPanel(268x0), StackPanel(284x0)

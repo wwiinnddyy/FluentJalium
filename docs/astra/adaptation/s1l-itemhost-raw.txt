@@ -1,0 +1,125 @@
+s1l 条目宿主与阶段 5 收尾选型——原始读数
+=========================================
+运行时权威：NuGet Jalium.UI 26.10.9。探针：spike/ItemHostProbe（Program.cs 顶部记着 mode 表）。
+这台机器 175% 缩放；下面的尺寸都是 DIP。所有读数来自同一次 `all` 运行（431 行）加一次
+`capture` 运行，窗口都是真实 Application.Run + 已上屏 Window + CompositionTarget.Rendering 推帧。
+原始日志：spike/ItemHostProbe/bin/Debug/net10.0-windows/itemhost-probe-all.txt（本机，不入库）；
+本文件是转录 + 每条读数对应的行。
+
+[A] 阶段 5 收尾批要用的名字在 26.10.9 里存不存在
+------------------------------------------------
+  BreadcrumbBar   ABSENT
+  PipsPager       ABSENT
+  RadioButtons    ABSENT
+  ItemsRepeater   ABSENT
+  CardAction      ABSENT
+  ItemsControl    ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  ItemsPresenter  ItemsPresenter : FrameworkElement : ...（不是 Control，没有 Template）
+  ItemsPanelTemplate ItemsPanelTemplate : FrameworkTemplate : DispatcherObject
+  WrapPanel / UniformGrid / StackPanel / VirtualizingStackPanel 都在；
+  VirtualizingStackPanel : VirtualizingPanel : Panel
+
+GridView 那条不是"有同名控件"：
+  Jalium.UI.Controls.GridView : ViewBase : DependencyObject : DispatcherObject
+  含 "GridView" 的导出类型共 14 个，全是 WPF 那套视图家族：
+  GridViewColumn / GridViewColumnCollection / GridViewColumnHeader(: ButtonBase : ContentControl : Control) /
+  GridViewColumnHeaderRole / GridViewHeaderRowPresenter / GridViewRowPresenter / GridViewRowPresenterBase + 5 个 peer。
+  GridViewRow=ABSENT、GridViewItem=ABSENT。ListView 自己声明的 DP 里有一个 View。
+  → 结论：运行时的 GridView 是 ListView.View 的装饰器（WPF 语义），不是 WinUI 的换行条目宿主。
+
+ItemsControl 的派生者（框架自己的条目宿主清单，35 个）里和这批有关的：
+  Selector / ListBox(: Selector) / ListView(: ListBox, declaredDp 只有 View) / ComboBox / Menu / MenuBase /
+  ContextMenu / TabControl / TreeView / DataGrid / HeaderedItemsControl / StatusBar / ToolBar /
+  DockTabPanel / Ribbon* / RazorItemsHost / MultiSelector / TreeSelector
+  → 没有 GridView、没有任何"换行条目宿主"。
+
+[B] 容器生成能不能被我们覆写（决定自造控件的基类型）
+----------------------------------------------------
+反射读 MethodAttributes（IsFamily/IsPrivate/IsAssembly）+ 参数表：
+  GetContainerForItemOverride        protected/virtual () -> DependencyObject
+  IsItemItsOwnContainerOverride      protected/virtual (Object item) -> Boolean
+  ClearContainerForItemOverride      protected/virtual (DependencyObject element, Object item) -> Void
+  PrepareContainerForItemOverride    protected/virtual (DependencyObject element, Object item) -> Void
+  GetContainerForItem                protected/virtual (Object item) -> FrameworkElement
+  OnItemsChanged                     protected/virtual (NotifyCollectionChangedEventArgs e) -> Void
+另外属性面：ItemContainerGenerator/ItemContainerStyle/ItemContainerStyleSelector/ItemTemplate/
+ItemTemplateSelector/Items/ItemsSource/ItemsPanel/HasItems/AlternationCount 全是 public final；
+ItemsHost、ItemsHostInternal、HasTemplate 是 nonpublic；UsesFallbackItemsHost 是 virtual nonpublic。
+  → protected 就是给我们 override 的；签名与 WPF 一致。
+
+[C] 五种挂载，同一个窗口、同一个泵
+----------------------------------
+1) ListBox（正对照，不设任何东西）
+   挂载前 Template=null Style=null Items=3；挂载后 Template=SET，10 帧返回，420x140
+   树：ListBox > Border #LayoutRoot > ScrollViewer #ScrollViewer > ItemsPresenter #ItemsPresenter >
+       VirtualizingStackPanel > ListBoxItem×3（每个 420x40.78）> Grid > Rectangle #PressedBackground +
+       ContentPresenter #ContentPresenter > TextBlock
+   面板：VirtualizingStackPanel(children=3)；容器：ListBoxItem=3 ContentPresenter=3 TextBlock=3
+
+2) ItemsControl + 我们的 ControlTemplate（本地值）
+   模板是 markup 解析出来的 `Border #ProbeHostRoot(bg #FFFF00FF, r=4) > ItemsPresenter #ProbeItems`
+   10 帧返回，420x140；树：
+       ItemsControl > Border #ProbeHostRoot > ItemsPresenter #ProbeItems > StackPanel >
+       ContentPresenter×3 > TextBlock×3（每项 420x19.78）
+   → 我们的部件在树里，条目管线照常跑，边框背景与圆角都按我们的模板走。
+
+3) 同一个模板，改走 Style 的 Template setter（Astra 字典真正用的路）
+   挂载后 Style=SET Template=SET，树与 (2) 逐行一致。
+
+4) 派生类 ProbeItemsControl : ItemsControl，什么都不设
+   Template=null Style=null，仍然生成 StackPanel > ContentPresenter×3
+   → 隐式样式按精确类型查（派生类拿不到 ItemsControl 的行），但条目管线不受影响。
+
+5) 裸 ItemsControl（adaptation/09 当年记的"挂住"形状），预算 700ms
+   after 4 frames 返回；树与 (4) 同形；size=420x140
+   → 没有挂住。这一条推翻原节的机制断言，见 [F]。
+
+[D] 条目面板能不能换（决定 RadioButtons / GridView 版式）
+--------------------------------------------------------
+ListBox + ItemsPanel 赋 ItemsPanelTemplate，8 帧：
+  WrapPanel            panels=WrapPanel|Grid×8   每项 68.36x40.78（宿主 420x160，按内容宽换行）
+  UniformGrid Columns=4 panels=UniformGrid|Grid×8 每项正好 105x80（420/4、160/2）
+  StackPanel Horizontal panels=StackPanel|Grid×8  每项 68.36x160
+  三种赋值的读回都是 ItemsPanel=Jalium.UI.Controls.ItemsPanelTemplate，条目都 realize 满 8 个。
+  → 换行/网格版式不需要自造面板，ItemsPanel 一条赋值就够；容器仍是 ListBoxItem，样式仍走 ItemContainerStyle。
+
+[E] 捕获成本在哪一侧
+--------------------
+RenderTargetBitmap(200x120,Bgr32).Render 计时：
+  ListBox（不透明 Border/Rectangle）        0.03s
+  裸 ItemsControl（只有 ContentPresenter>TextBlock 的纯文本树） 0.00s
+  → 当年那句"纯文本捕获要几十秒"（PixelHarness 注释里也有）不适用于这条路径；两种捕获都是毫秒级。
+
+[F] 撤回 adaptation/09 的机制断言
+--------------------------------
+原文：裸 ItemsControl 上屏捕获 → UI 线程 60 秒不回应；机制＝"Template 为 null，框架走进不产出帧的路径"；
+纪律＝"自造条目宿主不要继承 ItemsControl"。
+本轮三处读数把它拆开：
+  - [C]5 同形状 4 帧返回；
+  - [C]4/[C]5 证明无模板也有回退条目宿主（`UsesFallbackItemsHost`/`ItemsHostInternal` 在属性面里读得到），
+    条目照样生成；
+  - [E] 证明捕获不是成本。
+还活着的解释写在 tests/FluentJalium.Tests/Pixel/PixelHarness.cs:259-268：静态场景不发
+CompositionTarget.Rendering，而当年的看门狗把 frame.Continue=false 排到了线程池的 dispatcher 上
+（那个 dispatcher 没人泵），于是等帧变死等——评论里连同类例子都有（焦点切 Slider 也 60 秒超时）。
+本轮没有故意把看门狗写坏去复现 60 秒，所以强度是：机制断言被推翻，残余现象归因到一个已修、已文档化的
+harness 缺陷。原节的纪律随之撤销；哪些控件真的改用 ItemsControl 派生，由各自审计决定。
+
+[G] 另两条读数（同一轮补测）
+--------------------------
+F 段（mode `radio`）：一个 `ProbeRadioHost : ItemsControl`，覆写
+  IsItemItsOwnContainerOverride(item => item is RadioButton) / GetContainerForItemOverride() => new RadioButton()
+  / PrepareContainerForItemOverride 里塞 Content——三个覆写都编译得过（protected 属实）。挂载 10 帧后：
+  树 `ProbeRadioHost > Border #ProbeHostRoot > ItemsPresenter #ProbeItems > WrapPanel > RadioButton×4`，
+  每个 120x32，内部 `#RadioRoot > #RadioColumn > #RadioBorder... #RadioRing(20x20, bg #19000000, r=10) > #RadioDot(12x12)`
+  `#RadioLabel > TextBlock`——**部件名与颜色都是阶段 3 我们的 RadioButton 模板**，而 `radio.Style` 读回 null。
+  即：框架给原生类型解析隐式样式时不写 Style 属性，判据要落在建出来的树上。
+  互斥：GroupName 全为 ""，把 [1] 置 true 读回 F|T|F|F，再把 [2] 置 true 读回 F|F|T|F ⇒ 同组自动互斥。
+
+[H] 闸口读数
+------------
+串行 `tools/Test-AstraGates.ps1`：exit 0；Debug 真重编 0 警告 / 0 错误；
+整套 1137/1137 通过（6 m 47 s）；调色板漂移三行 checked=True；`All Astra gates passed.`
+新控件的 16 条断言在 `tests/FluentJalium.Tests/AstraRadioButtonsTests.cs`，
+其中 `MaxColumns_reaches_the_layout_and_fills_the_first_column_before_the_second`
+最初以"条目全在 X=100 的一列"失败，是它抓出了面板取不到宿主 `MaxColumns` 的静默退化。

@@ -1,0 +1,45 @@
+diff --git a/tools/AstraPagePixels/Program.cs b/tools/AstraPagePixels/Program.cs
+index b8e8c81..e194b10 100644
+--- a/tools/AstraPagePixels/Program.cs
++++ b/tools/AstraPagePixels/Program.cs
+@@ -114,10 +114,15 @@ internal static class Program
+ 
+                 if (pageElement is not null) host.Children.Remove(pageElement);
+                 Pump(24);
++                // #90: the plate that stands in for "nothing on this page" is only trustworthy if the removal actually
++                // took. Children.Count is what the removal below touches, so a plate that still holds a child is the
++                // instrument's problem, not the page's - print it rather than infer it from the pixel count.
++                var plateChildren = host.Children.Count;
++                var plateTypes = string.Join(',', host.Children.Select(static child => child.GetType().Name));
+                 var emptySlot = CaptureStable(host);
+                 if (pageElement is not null) host.Children.Add(pageElement);
+ 
+-                Report(id, variant, whole, slot, emptySlot, still, frozen);
++                Report(id, variant, whole, slot, emptySlot, still, frozen, plateChildren, plateTypes);
+ 
+                 if (!report) Judge(id, variant, whole, slot, emptySlot, failures);
+             }
+@@ -132,16 +137,21 @@ internal static class Program
+     }
+ 
+     private static void Report(string id, FluentThemeVariant variant, Sample whole, Sample slot, Sample emptySlot,
+-        bool still, (int Found, int Stopped) frozen)
++        bool still, (int Found, int Stopped) frozen, int plateChildren, string plateTypes)
+     {
+         // Found and stopped are both printed: a leg that stops nothing has either no spinning ring in it, or one
+         // the walk never reached, and those two readings must not collapse into the same number.
+         var frozenNote = still ? $" rings {frozen.Found} found/{frozen.Stopped} stopped" : string.Empty;
++        // The plate's own picture is printed only when it is not empty - which colours survived the removal is what
++        // tells #90 whether a dirty plate is the previous leg's page, this leg's page, or something the walk missed.
++        var plateNote = Painted(emptySlot.Histogram) > 0
++            ? $" | plate children {plateChildren} [{plateTypes}] top {Top(emptySlot.Histogram)}"
++            : string.Empty;
+         Console.WriteLine($"{id} {variant}: stable={whole.Stable}/{slot.Stable} painted={Painted(whole.Histogram)} " +
+             $"{string.Join(' ', BaseFills.Select(fill => $"{FillName(fill.Variant)}={Count(whole.Histogram, fill.Base)}"))} " +
+             $"placeholder={Count(whole.Histogram, UpstreamPlaceholder)} green={Count(whole.Histogram, BrandFocusGreen)} | slot {slot.Histogram.Count} colours " +
+             $"{Painted(slot.Histogram)}px over {emptySlot.Histogram.Count} colours {Painted(emptySlot.Histogram)}px " +
+-            $"(slot {slot.Width}x{slot.Height}){frozenNote} | top {Top(whole.Histogram)}");
++            $"(slot {slot.Width}x{slot.Height}){frozenNote}{plateNote} | top {Top(whole.Histogram)}");
+     }
+ 
+     private static string FillName(FluentThemeVariant variant) => variant switch

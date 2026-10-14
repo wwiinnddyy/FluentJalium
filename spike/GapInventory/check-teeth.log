@@ -1,0 +1,23 @@
+== 1. regenerate clean, then snapshot
+native=163 scope=84 canStyle=56 done=30 HARDGAPS=23 substituted=3 needsOwnType=28 outOfScope=92 generated=69 hand=21
+   exit=0
+== 2. -Check on the fresh file must be 0
+control-vacuum.md is current: 69 generated lines, 21 hand lines.
+   exit=0
+== 3. hand edit inside the generated body must go red
+control-vacuum.md is stale: it differs from what this run generated.
+first difference at line 12:
+  committed: | 其中我们已声明隐式样式 | 29 |
+  generated: | 其中我们已声明隐式样式 | 30 |
+   exit=1
+== 4. restore from the byte snapshot must go green again
+control-vacuum.md is current: 69 generated lines, 21 hand lines.
+   exit=0
+== 5. a line below the sentinel is hand notes: a re-run must keep it, and -Check must stay green
+native=163 scope=84 canStyle=56 done=30 HARDGAPS=23 substituted=3 needsOwnType=28 outOfScope=92 generated=69 hand=22
+   exit=0
+control-vacuum.md is current: 69 generated lines, 22 hand lines.
+   exit=0
+== 6. source-side drift (a type disappears from the census denominator) must go red
+   generated body differs from the committed report: 42 line(s)
+== 7. final state must be the snapshot

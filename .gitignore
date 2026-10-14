@@ -55,3 +55,7 @@ nunit-*.xml
 /.idea
 /.tmp
 /.codex-temp
+/.arts/
+/spike/NavIconRecolor
+/spike
+/spike

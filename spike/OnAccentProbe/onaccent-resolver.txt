@@ -1,0 +1,14 @@
+=== resolvers the IL census named, called resting and with a probe under TextOnAccent ===
+Jalium.UI.Controls.Calendar.ResolveSelectedTextBrush
+   resting    = SolidColorBrush ##FFFFFFFF instance=0x3304168
+   withProbe  = SolidColorBrush ##FF112233 instance=0x173524D followed=True
+   afterRemove= SolidColorBrush ##FFFFFFFF instance=0x3304168 backToResting=True
+Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveSelectedForegroundBrush
+   resting    = SolidColorBrush ##FFFFFFFF instance=0x3304168
+   withProbe  = SolidColorBrush ##FF112233 instance=0x173524D followed=True
+   afterRemove= SolidColorBrush ##FFFFFFFF instance=0x3304168 backToResting=True
+Jalium.UI.Controls.SwipeControl.ResolveSwipeItemForeground: takes 1 argument(s), not invoked here
+Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSelectionIndicatorBrush
+   resting    = SolidColorBrush ##FFFFFFFF instance=0x3304168
+   withProbe  = SolidColorBrush ##FF112233 instance=0x173524D followed=True
+   afterRemove= SolidColorBrush ##FFFFFFFF instance=0x3304168 backToResting=True

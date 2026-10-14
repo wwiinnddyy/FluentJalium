@@ -1,0 +1,60 @@
+    set TabStripBorderThickness: TabControl declares no such property
+    set TabStripPlacement=Bottom: ok
+    set TabStripPlacement: no writable property
+    set TabStripPlacement: no writable property
+    set TabStripPlacement: no writable property
+=== A. one lever per TabControl, each rendered alone ===
+  0 baseline: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+  1 TabStripBackground=magenta: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=8 magenta=10150 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex34860  #FF00FFx10150  #871488x2450  #3A3A3Cx2040  #323234x420  #A324A4x290
+  2 TabStripBorderBrush=lime + TabStripHeight=20: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45140  #202022x2380  #3A3A3Cx2040  #0E8E0Fx580  #1A541Cx140  #1E793Fx120
+  3 item Background=#112233: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=7 magenta=0 lime=0 cyan=0 ink=2160 red=0
+      top: #1C1C1Ex42910  #161F2Ax2450  #112233x2160  #3A3A3Cx2040  #323234x650  #1E793Fx120
+  4 selected item SelectedBackground=magenta: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=2040 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #FF00FFx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+  5 item HoverBackground=cyan: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+  6 item IndicatorBrush=lime IndicatorHeight=6: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=360 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx1800  #323234x710  #00FF00x360  #2A2A2Cx70
+  7 item Foreground=#112233 (label): 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+  8 TabStripPlacement=Bottom: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+  9 host BorderBrush=lime BorderThickness=6: 420x120 items=60x36,60x36,70x36
+    render 420x120 distinct=6 magenta=0 lime=0 cyan=0 ink=0 red=0
+      top: #1C1C1Ex45010  #202022x2450  #3A3A3Cx2040  #323234x710  #1E793Fx120  #2A2A2Cx70
+
+=== B. does an implicit style from application resources reach the native item? ===
+  add to app resources: ok
+  items: padding=30,8,30,8 minH=50 bg=#FFFF0000  padding=30,8,30,8 minH=50 bg=#FFFF0000  padding=30,8,30,8 minH=50 bg=#FF242426
+    render 420x120 distinct=14 magenta=0 lime=0 cyan=0 ink=0 red=4200
+      top: #1C1C1Ex36456  #202022x4848  #FF0000x4200  #3A3A3Cx4080  #323234x294  #2A2A2Cx202
+
+=== C. can a key reach the control at all? ===
+  focus: ok
+  ctor(RoutedEvent routedEvent, Key key, ModifierKeys modifiers, Boolean isDown, Boolean isRepeat, Int32 timestamp) public=False
+  ctor(KeyboardDevice keyboard, PresentationSource inputSource, Int32 timestamp, Key key) public=True
+  Right via ctor(RoutedEvent,Key,ModifierKeys,Boolean,Boolean,Int32): TargetInvocationException
+  Right via ctor(KeyboardDevice,PresentationSource,Int32,Key): TargetInvocationException
+  Left via ctor(RoutedEvent,Key,ModifierKeys,Boolean,Boolean,Int32): TargetInvocationException
+  Left via ctor(KeyboardDevice,PresentationSource,Int32,Key): TargetInvocationException
+
+=== D. tree of the baseline (depth 5) ===
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null 420x120
+      StackPanel 420x36
+        TabItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null 60x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 tmpl=null 60x36
+        TabItem bg=#FF242426 fg=#FF636366 tmpl=null 70x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" fg=#FFFFFFFF 65.82x19.78

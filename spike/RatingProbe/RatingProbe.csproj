@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for the RatingControl slice: whether the shipped 26.10.9 runtime has anything to be
+       styled instead (Rating* types), whether the two layout members upstream's item pitch depends on exist and
+       survive markup (StackPanel.Spacing), and which of the two half-star routes actually removes ink
+       (UIElement.Clip with a RectangleGeometry vs. a ClipToBounds host sized to the fraction). Answers come from
+       reflection, read-backs off mounted elements, and rendered captures - never from a type or attribute name.
+       Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RatingProbe</RootNamespace>
+    <AssemblyName>RatingProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS8618;CS8625;CS8600;CS8602;CS8604</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

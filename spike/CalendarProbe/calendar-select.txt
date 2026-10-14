@@ -1,0 +1,5 @@
+=== the calendar's own accent mark, resting / selected / disabled (token #0078D4) ===
+resting                  children=0 accent=88 distinct=39 top: #F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #0078D4=88 #616161=28 #1382D6=24 #B7D5EB=24
+SelectedDate=2026-09-15  children=0 accent=648 distinct=47 top: #F3F3F3=79700 #FFFFFF=7976 #ECECEC=1104 #0078D4=648 #000000=136 #616161=28 #0279D4=24 #1382D6=24
+and disabled             children=0 accent=648 distinct=46 top: #F2F2F7=79700 #FFFFFF=7976 #ECECF0=1088 #0078D4=648 #000000=100 #E5E5EA=44 #E6E6EB=32 #616161=28
+back to resting          children=0 accent=88 distinct=39 top: #F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #0078D4=88 #616161=28 #1382D6=24 #B7D5EB=24

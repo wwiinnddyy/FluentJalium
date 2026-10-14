@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for the user-reported RatingControl defect (stars shifted right, the right arm of a star cut
+       off). It asks what the in-process probes of #52 could not: where the ink of one star cell actually lands.
+       Two readings per cell - the layout box the control computed, and the box after its own render transform - plus a
+       window held open for a monitor grab, because glyph ink reaches a screen shot and not a RenderTargetBitmap
+       (spike/GlyphInkProbe, #96). Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RatingInkProbe</RootNamespace>
+    <AssemblyName>RatingInkProbe</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

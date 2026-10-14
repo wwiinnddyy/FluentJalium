@@ -1,0 +1,333 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:26.31
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:05:35.14]     FluentJalium.Tests.AstraForegroundRoutingTests.A_disabled_combo_box_row_sends_its_label_row_into_the_label [FAIL]
+  失败 FluentJalium.Tests.AstraForegroundRoutingTests.A_disabled_combo_box_row_sends_its_label_row_into_the_label [3 s]
+  错误消息:
+   System.InvalidOperationException : the open dropdown never reached the overlay layer
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraForegroundRoutingTests.<>c.<A_disabled_combo_box_row_sends_its_label_row_into_the_label>b__8_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundRoutingTests.cs:line 144
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraForegroundRoutingTests.A_disabled_combo_box_row_sends_its_label_row_into_the_label() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundRoutingTests.cs:line 138
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:01.80]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: "S", close: "C", columns: "2:4") [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: "S", close: "C", columns: "2:4") [874 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+[xUnit.net 00:06:02.62]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: "S", close: null, columns: "4") [FAIL]
+[xUnit.net 00:06:03.45]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: "S", close: "C", columns: "0:2:4") [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: "S", close: null, columns: "4") [819 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: "S", close: "C", columns: "0:2:4") [824 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:04.27]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: null, close: "C", columns: "4") [FAIL]
+[xUnit.net 00:06:05.09]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: null, close: null, columns: "4") [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: null, close: "C", columns: "4") [817 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: null, close: null, columns: "4") [823 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:05.94]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: "S", close: null, columns: "0:2") [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: "S", close: null, columns: "0:2") [843 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:06.84]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: null, close: null, columns: "") [FAIL]
+[xUnit.net 00:06:07.68]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: null, close: "C", columns: "2:4") [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: null, secondary: null, close: null, columns: "") [901 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(primary: "P", secondary: null, close: "C", columns: "2:4") [835 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<>c__DisplayClass15_0.<The_command_row_holds_one_arrangement_per_text_combination>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 278
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(String primary, String secondary, String close, String columns) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 276
+   at InvokeStub_AstraContentDialogTests.The_command_row_holds_one_arrangement_per_text_combination(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:08.52]     FluentJalium.Tests.AstraContentDialogTests.The_control_owns_the_card_box_and_the_surface_keeps_upstreams_cap [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_control_owns_the_card_box_and_the_surface_keeps_upstreams_cap [838 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_control_owns_the_card_box_and_the_surface_keeps_upstreams_cap>b__11_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 175
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_control_owns_the_card_box_and_the_surface_keeps_upstreams_cap() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 173
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:12.67]     FluentJalium.Tests.AstraContentDialogTests.The_surface_wears_the_rows_a_dialog_surface_needs [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_surface_wears_the_rows_a_dialog_surface_needs [833 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_surface_wears_the_rows_a_dialog_surface_needs>b__10_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 141
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_surface_wears_the_rows_a_dialog_surface_needs() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 139
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:13.53]     FluentJalium.Tests.AstraContentDialogTests.Our_template_displaces_the_frameworks_and_keeps_its_part_names [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.Our_template_displaces_the_frameworks_and_keeps_its_part_names [864 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<Our_template_displaces_the_frameworks_and_keeps_its_part_names>b__9_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 112
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.Our_template_displaces_the_frameworks_and_keeps_its_part_names() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 110
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:14.37]     FluentJalium.Tests.AstraContentDialogTests.The_default_button_takes_the_accent_style_and_gives_it_back [FAIL]
+[xUnit.net 00:06:15.31]     FluentJalium.Tests.AstraContentDialogTests.A_button_of_our_template_reports_through_the_controls_own_events_and_ends_the_operation [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_default_button_takes_the_accent_style_and_gives_it_back [832 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_default_button_takes_the_accent_style_and_gives_it_back>b__16_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 309
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_default_button_takes_the_accent_style_and_gives_it_back() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 307
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraContentDialogTests.A_button_of_our_template_reports_through_the_controls_own_events_and_ends_the_operation [941 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.<>c.<A_button_of_our_template_reports_through_the_controls_own_events_and_ends_the_operation>b__19_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 399
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.A_button_of_our_template_reports_through_the_controls_own_events_and_ends_the_operation() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 382
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:21.61]     FluentJalium.Tests.AstraContentDialogTests.FullSizeDesired_stretches_the_card_and_the_enabled_flags_reach_the_buttons [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.FullSizeDesired_stretches_the_card_and_the_enabled_flags_reach_the_buttons [881 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<FullSizeDesired_stretches_the_card_and_the_enabled_flags_reach_the_buttons>b__17_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 333
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.FullSizeDesired_stretches_the_card_and_the_enabled_flags_reach_the_buttons() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 331
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:22.50]     FluentJalium.Tests.AstraContentDialogTests.The_surface_row_reaches_the_card_pixels_and_nothing_invented_with_it [FAIL]
+[xUnit.net 00:06:23.38]     FluentJalium.Tests.AstraContentDialogTests.A_disabled_button_of_our_template_raises_no_click [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_surface_row_reaches_the_card_pixels_and_nothing_invented_with_it [887 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_surface_row_reaches_the_card_pixels_and_nothing_invented_with_it>b__22_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 471
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_surface_row_reaches_the_card_pixels_and_nothing_invented_with_it() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 464
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraContentDialogTests.A_disabled_button_of_our_template_raises_no_click [878 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<A_disabled_button_of_our_template_raises_no_click>b__21_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 444
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.A_disabled_button_of_our_template_raises_no_click() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 442
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:24.29]     FluentJalium.Tests.AstraContentDialogTests.The_command_row_splits_the_width_the_way_upstream_does_when_all_three_show [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_command_row_splits_the_width_the_way_upstream_does_when_all_three_show [886 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_command_row_splits_the_width_the_way_upstream_does_when_all_three_show>b__14_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 239
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_command_row_splits_the_width_the_way_upstream_does_when_all_three_show() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 237
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:25.24]     FluentJalium.Tests.AstraContentDialogTests.A_shown_dialog_looks_different_in_light_and_in_dark [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.A_shown_dialog_looks_different_in_light_and_in_dark [949 ms]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<A_shown_dialog_looks_different_in_light_and_in_dark>b__23_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 502
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.A_shown_dialog_looks_different_in_light_and_in_dark() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 499
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:06:30.26]     FluentJalium.Tests.AstraContentDialogTests.The_two_inner_surfaces_leave_the_cards_round_corners_alone [FAIL]
+  失败 FluentJalium.Tests.AstraContentDialogTests.The_two_inner_surfaces_leave_the_cards_round_corners_alone [1 s]
+  错误消息:
+   System.InvalidOperationException : ContentDialog could not resolve a host window.
+  堆栈跟踪:
+     at Jalium.UI.Controls.ContentDialog.ShowAsync(ContentDialogPlacement placement)
+   at Jalium.UI.Controls.ContentDialog.ShowAsync()
+   at FluentJalium.Tests.AstraContentDialogTests.Shown(String primary, String secondary, String close, Nullable`1 maxWidth) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 602
+   at FluentJalium.Tests.AstraContentDialogTests.<The_two_inner_surfaces_leave_the_cards_round_corners_alone>b__24_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 542
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraContentDialogTests.The_two_inner_surfaces_leave_the_cards_round_corners_alone() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs:line 540
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+失败!  - 失败:    20，通过:   931，已跳过:     0，总计:   951，持续时间: 7 m - FluentJalium.Tests.dll (net10.0)
+Invoke-Step : test suite (structure, resource keys, theme runtime) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:47 �ַ�: 5
++     Invoke-Step 'test suite (structure, resource keys, theme runtime) ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

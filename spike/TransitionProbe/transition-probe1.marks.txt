@@ -1,0 +1,7 @@
+17059	ready
+24318	capture1
+24451	capture2
+24514	capture3
+24531	final
+39329	close
+39728	exit

@@ -1,0 +1,229 @@
+DividerProbe raw transcript - 2026-09-21, Jalium.UI 26.10.9, RenderingEngine.Impeller, 96 DPI render targets.
+Built by spike/DividerProbe (Program.cs); run as `dotnet run --project spike/DividerProbe -c Release -- <mode>`.
+Every line below is copied out of the tool's own log file, unedited; the two blocks are the two runs that were made.
+
+What the run was for: WinUI has no Divider control at the pinned commit, so the segment had to find its host and its
+authority by measurement. The readings that changed a decision are marked at the bottom of this header.
+
+1. Three cells that asked for the token through {ThemeResource} inside a standalone XamlReader.Parse element printed
+   nothing (TokenLineLight in mode ink, the mode alpha block, Border1Token in mode shape). Two of those three are
+   confounded - they are 1 DIP Rectangles, which print nothing whatever the brush is - but Border1Token is a Border,
+   so the markup scope is a real cause. mode shape's last block re-measured it by resolving the brush in code from
+   Application.Current and handing it over: 600 ink, the line rows reading #F8F8F8 in Light. Only that second reading
+   is evidence about paint, and it is also what shows a {ThemeResource} row is not resolvable from a parsed-but-
+   unmerged snippet (the S1-p negative-reading trap, met a second time).
+2. "no ink" for a 1 DIP Rectangle survived three alignments and a stroked variant, and a 4 DIP Rectangle
+   printed - so the claim in the docs is about the 1 DIP band, not about the shape type.
+3. The vertical block prints one line per row on purpose: the row profile is what shows a 1 DIP column landing on
+   two columns of pixels.
+
+===== mode all (surface, ink, alpha, mount) ===== spike/DividerProbe/bin/Release/net10.0-windows/divider-probe-all.txt (53 lines) =====
+theme dictionaries=59
+
+=== A. separator and icon candidates: chain, own DPs, and who owns OnRender ===
+  Separator              Separator < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=Separator.DECLARES OnRender | background=True template=True | ownDPs=[Orientation=Orientation, StrokeBrush=Brush, StrokeThickness=Double]
+  MenuFlyoutSeparator    MenuFlyoutSeparator < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=MenuFlyoutSeparator.DECLARES OnRender | background=True template=True | ownDPs=[]
+  AppBarSeparator        AppBarSeparator < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=AppBarSeparator.DECLARES OnRender | background=True template=True | ownDPs=[DynamicOverflowOrder=Int32, IsCompact=Boolean]
+  GridViewItemSeparator  ABSENT
+  Divider                ABSENT
+  Line                   Line < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=Line.DECLARES OnRender | background=False template=False | ownDPs=[X1=Double, X2=Double, Y1=Double, Y2=Double]
+  Rectangle              Rectangle < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=Rectangle.DECLARES OnRender | background=False template=False | ownDPs=[RadiusX=Double, RadiusY=Double]
+  Border                 Border < Decorator < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=Border.DECLARES OnRender | background=True template=False | ownDPs=[Background=Brush, BorderBrush=Brush, BorderThickness=Thickness, CornerRadius=CornerRadius, LiquidGlass=Boolean, LiquidGlassBlurRadius=Double, LiquidGlassChromaticAberration=Double, LiquidGlassFusionRadius=Double, LiquidGlassInteractive=Boolean, LiquidGlassRefractionAmount=Double, Padding=Thickness, Shape=BorderShape, SuperEllipseN=Double]
+  GridSplitter           GridSplitter < Thumb < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=GridSplitter.no own OnRender | background=True template=True | ownDPs=[DragIncrement=Double, KeyboardIncrement=Double, PreviewStyle=Style, ResizeBehavior=GridResizeBehavior, ResizeDirection=GridResizeDirection, ShowsPreview=Boolean]
+  ToolBar                ToolBar < HeaderedItemsControl < ItemsControl < Control < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=ToolBar.no own OnRender | background=True template=True | ownDPs=[Band=Int32, BandIndex=Int32, HasOverflowItems=Boolean, IsOverflowItem=?, IsOverflowOpen=Boolean, Orientation=Orientation, OverflowMode=?]
+  SymbolIcon             SymbolIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=SymbolIcon.DECLARES OnRender | background=False template=False | ownDPs=[Symbol=Symbol]
+  FontIcon               FontIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=FontIcon.DECLARES OnRender | background=False template=False | ownDPs=[FontFamily=FontFamily, FontSize=Double, Glyph=String]
+  PathIcon               PathIcon < IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=PathIcon.DECLARES OnRender | background=False template=False | ownDPs=[Data=Geometry]
+  BitmapIcon             ABSENT
+  IconElement            IconElement < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject | onRender=IconElement.no own OnRender | background=False template=False | ownDPs=[Foreground=Brush]
+  Symbol                 Symbol < Enum < ValueType | onRender=Symbol.no own OnRender | background=False template=False | ownDPs=[]
+  --- a bare Separator's own read-backs, through its own typed properties ---
+  fresh: Style=null Template=null Height=NaN MinHeight=0 Margin=0,0,0,0 IsHitTestVisible=False
+
+=== B. 1 DIP line candidates: parsed, mounted, then counted for ink ===
+  RectFixed            cell=320x24 inner=Rectangle innerSize=300x1 innerHeight=1
+    RectFixed: ink=0 rows=[]
+  BorderFixed          cell=320x24 inner=Border innerSize=300x1 innerHeight=1
+    BorderFixed: ink=600 rows=[11:300,12:300]
+  RectStretch          cell=320x24 inner=Rectangle innerSize=320x1 innerHeight=1
+    RectStretch: ink=0 rows=[]
+  RectHalf             cell=320x24 inner=Rectangle innerSize=320x1 innerHeight=0.5
+    RectHalf: ink=0 rows=[]
+  BareSeparator        cell=320x24 inner=Separator innerSize=320x12 innerHeight=NaN
+    BareSeparator: ink=640 rows=[11:320,12:320]
+  TemplatedSeparator   cell=320x24 inner=Separator innerSize=320x12 innerHeight=NaN
+    part DividerLine realized=Border size=320x1
+    TemplatedSeparator: ink=640 rows=[11:320,12:320]
+  VerticalBorder       cell=24x120 inner=Border innerSize=1x100 innerHeight=100
+    VerticalBorder: ink=200 rows=[10:2,11:2,12:2,13:2,14:2,15:2,16:2,17:2,18:2,19:2,20:2,21:2,22:2,23:2,24:2,25:2,26:2,27:2,28:2,29:2,30:2,31:2,32:2,33:2,34:2,35:2,36:2,37:2,38:2,39:2,40:2,41:2,42:2,43:2,44:2,45:2,46:2,47:2,48:2,49:2,50:2,51:2,52:2,53:2,54:2,55:2,56:2,57:2,58:2,59:2,60:2,61:2,62:2,63:2,64:2,65:2,66:2,67:2,68:2,69:2,70:2,71:2,72:2,73:2,74:2,75:2,76:2,77:2,78:2,79:2,80:2,81:2,82:2,83:2,84:2,85:2,86:2,87:2,88:2,89:2,90:2,91:2,92:2,93:2,94:2,95:2,96:2,97:2,98:2,99:2,100:2,101:2,102:2,103:2,104:2,105:2,106:2,107:2,108:2,109:2]
+  TokenLineLight       cell=320x24 inner=Rectangle innerSize=320x1 innerHeight=1
+    TokenLineLight: ink=0 rows=[]
+
+=== C. DividerStrokeColorDefaultBrush as painted, both themes, on a white card ===
+  Light: token row reads #0F000000 (Color row: #0F000000)
+  Dark: token row reads #15FFFFFF (Color row: #15FFFFFF)
+
+=== D. a Separator styled from markup: does the part realize, and who owns the box ===
+  style parsed=True
+  separator: box=300x9 Height=9 Background=SolidColorBrush
+  part DividerLine realized=Border size=300x1
+  part DividerRoot realized=null size=x
+    StyledSeparator: ink=604 rows=[19:302,20:302]
+  after Height=20: box=20 line=1
+    StyledSeparator(taller): ink=604 rows=[19:302,20:302]
+
+===== mode shape (the control experiment) ===== spike/DividerProbe/bin/Release/net10.0-windows/divider-probe-shape.txt (154 lines) =====
+theme dictionaries=59
+
+=== E. control experiment: which thin element actually paints ===
+  Rect1          inner=Rectangle size=300x1
+    Rect1: ink=0 rows=[]
+  Rect2          inner=Rectangle size=300x2
+    Rect2: ink=600 rows=[11:300,12:300]
+  Rect3          inner=Rectangle size=300x3
+    Rect3: ink=600 rows=[11:300,12:300]
+  Rect1Top       inner=Rectangle size=300x1
+    Rect1Top: ink=0 rows=[]
+  Rect1Bottom    inner=Rectangle size=300x1
+    Rect1Bottom: ink=0 rows=[]
+  Rect4          inner=Rectangle size=300x4
+    Rect4: ink=1200 rows=[10:300,11:300,12:300,13:300]
+  Rect1Stroke    inner=Rectangle size=300x1
+    Rect1Stroke: ink=0 rows=[]
+  Line1          inner=Line size=320x24
+    Line1: ink=604 rows=[11:302,12:302]
+  Border1        inner=Border size=300x1
+    Border1: ink=600 rows=[11:300,12:300]
+  Border1Token   inner=Border size=300x1
+    Border1Token: ink=0 rows=[]
+  --- the native control's own drawing, driven by its own properties (no template) ---
+  bare Separator (stroke=SolidColorBrush x1): box=300x12
+    bare/stroke1: ink=600 rows=[11:300,12:300]
+    bare/stroke1: row 11 darkest=#A3A3A4
+    bare/stroke1: row 12 darkest=#A3A3A4
+  bare Separator (stroke=SolidColorBrush x4): box=300x12
+    bare/stroke4: ink=1200 rows=[10:300,11:300,12:300,13:300]
+    bare/stroke4: row 10 darkest=#48484A
+    bare/stroke4: row 11 darkest=#48484A
+    bare/stroke4: row 12 darkest=#48484A
+    bare/stroke4: row 13 darkest=#48484A
+  bare Separator (stroke=SolidColorBrush x3): box=300x12
+    bare/stroke3: ink=1200 rows=[10:300,11:300,12:300,13:300]
+    bare/stroke3: row 10 darkest=#FF8080
+    bare/stroke3: row 11 darkest=#FF0000
+    bare/stroke3: row 12 darkest=#FF0000
+    bare/stroke3: row 13 darkest=#FF8080
+  --- the vertical axis ---
+  vertical Separator: box=12x100
+    vertical: ink=200 rows=[10:2,11:2,12:2,13:2,14:2,15:2,16:2,17:2,18:2,19:2,20:2,21:2,22:2,23:2,24:2,25:2,26:2,27:2,28:2,29:2,30:2,31:2,32:2,33:2,34:2,35:2,36:2,37:2,38:2,39:2,40:2,41:2,42:2,43:2,44:2,45:2,46:2,47:2,48:2,49:2,50:2,51:2,52:2,53:2,54:2,55:2,56:2,57:2,58:2,59:2,60:2,61:2,62:2,63:2,64:2,65:2,66:2,67:2,68:2,69:2,70:2,71:2,72:2,73:2,74:2,75:2,76:2,77:2,78:2,79:2,80:2,81:2,82:2,83:2,84:2,85:2,86:2,87:2,88:2,89:2,90:2,91:2,92:2,93:2,94:2,95:2,96:2,97:2,98:2,99:2,100:2,101:2,102:2,103:2,104:2,105:2,106:2,107:2,108:2,109:2]
+    vertical: row 10 darkest=#A3A3A4
+    vertical: row 11 darkest=#A3A3A4
+    vertical: row 12 darkest=#A3A3A4
+    vertical: row 13 darkest=#A3A3A4
+    vertical: row 14 darkest=#A3A3A4
+    vertical: row 15 darkest=#A3A3A4
+    vertical: row 16 darkest=#A3A3A4
+    vertical: row 17 darkest=#A3A3A4
+    vertical: row 18 darkest=#A3A3A4
+    vertical: row 19 darkest=#A3A3A4
+    vertical: row 20 darkest=#A3A3A4
+    vertical: row 21 darkest=#A3A3A4
+    vertical: row 22 darkest=#A3A3A4
+    vertical: row 23 darkest=#A3A3A4
+    vertical: row 24 darkest=#A3A3A4
+    vertical: row 25 darkest=#A3A3A4
+    vertical: row 26 darkest=#A3A3A4
+    vertical: row 27 darkest=#A3A3A4
+    vertical: row 28 darkest=#A3A3A4
+    vertical: row 29 darkest=#A3A3A4
+    vertical: row 30 darkest=#A3A3A4
+    vertical: row 31 darkest=#A3A3A4
+    vertical: row 32 darkest=#A3A3A4
+    vertical: row 33 darkest=#A3A3A4
+    vertical: row 34 darkest=#A3A3A4
+    vertical: row 35 darkest=#A3A3A4
+    vertical: row 36 darkest=#A3A3A4
+    vertical: row 37 darkest=#A3A3A4
+    vertical: row 38 darkest=#A3A3A4
+    vertical: row 39 darkest=#A3A3A4
+    vertical: row 40 darkest=#A3A3A4
+    vertical: row 41 darkest=#A3A3A4
+    vertical: row 42 darkest=#A3A3A4
+    vertical: row 43 darkest=#A3A3A4
+    vertical: row 44 darkest=#A3A3A4
+    vertical: row 45 darkest=#A3A3A4
+    vertical: row 46 darkest=#A3A3A4
+    vertical: row 47 darkest=#A3A3A4
+    vertical: row 48 darkest=#A3A3A4
+    vertical: row 49 darkest=#A3A3A4
+    vertical: row 50 darkest=#A3A3A4
+    vertical: row 51 darkest=#A3A3A4
+    vertical: row 52 darkest=#A3A3A4
+    vertical: row 53 darkest=#A3A3A4
+    vertical: row 54 darkest=#A3A3A4
+    vertical: row 55 darkest=#A3A3A4
+    vertical: row 56 darkest=#A3A3A4
+    vertical: row 57 darkest=#A3A3A4
+    vertical: row 58 darkest=#A3A3A4
+    vertical: row 59 darkest=#A3A3A4
+    vertical: row 60 darkest=#A3A3A4
+    vertical: row 61 darkest=#A3A3A4
+    vertical: row 62 darkest=#A3A3A4
+    vertical: row 63 darkest=#A3A3A4
+    vertical: row 64 darkest=#A3A3A4
+    vertical: row 65 darkest=#A3A3A4
+    vertical: row 66 darkest=#A3A3A4
+    vertical: row 67 darkest=#A3A3A4
+    vertical: row 68 darkest=#A3A3A4
+    vertical: row 69 darkest=#A3A3A4
+    vertical: row 70 darkest=#A3A3A4
+    vertical: row 71 darkest=#A3A3A4
+    vertical: row 72 darkest=#A3A3A4
+    vertical: row 73 darkest=#A3A3A4
+    vertical: row 74 darkest=#A3A3A4
+    vertical: row 75 darkest=#A3A3A4
+    vertical: row 76 darkest=#A3A3A4
+    vertical: row 77 darkest=#A3A3A4
+    vertical: row 78 darkest=#A3A3A4
+    vertical: row 79 darkest=#A3A3A4
+    vertical: row 80 darkest=#A3A3A4
+    vertical: row 81 darkest=#A3A3A4
+    vertical: row 82 darkest=#A3A3A4
+    vertical: row 83 darkest=#A3A3A4
+    vertical: row 84 darkest=#A3A3A4
+    vertical: row 85 darkest=#A3A3A4
+    vertical: row 86 darkest=#A3A3A4
+    vertical: row 87 darkest=#A3A3A4
+    vertical: row 88 darkest=#A3A3A4
+    vertical: row 89 darkest=#A3A3A4
+    vertical: row 90 darkest=#A3A3A4
+    vertical: row 91 darkest=#A3A3A4
+    vertical: row 92 darkest=#A3A3A4
+    vertical: row 93 darkest=#A3A3A4
+    vertical: row 94 darkest=#A3A3A4
+    vertical: row 95 darkest=#A3A3A4
+    vertical: row 96 darkest=#A3A3A4
+    vertical: row 97 darkest=#A3A3A4
+    vertical: row 98 darkest=#A3A3A4
+    vertical: row 99 darkest=#A3A3A4
+    vertical: row 100 darkest=#A3A3A4
+    vertical: row 101 darkest=#A3A3A4
+    vertical: row 102 darkest=#A3A3A4
+    vertical: row 103 darkest=#A3A3A4
+    vertical: row 104 darkest=#A3A3A4
+    vertical: row 105 darkest=#A3A3A4
+    vertical: row 106 darkest=#A3A3A4
+    vertical: row 107 darkest=#A3A3A4
+    vertical: row 108 darkest=#A3A3A4
+    vertical: row 109 darkest=#A3A3A4
+  --- the token brush handed over in code, both themes (Border and the native stroke) ---
+  Light: resolved brush=#0F000000
+    Light/Border: ink=600 rows=[11:300,12:300]
+    Light/Border: row 11 darkest=#F8F8F8
+    Light/Border: row 12 darkest=#F8F8F8
+    Light/SeparatorStroke: ink=600 rows=[11:300,12:300]
+    Light/SeparatorStroke: row 11 darkest=#F8F8F8
+    Light/SeparatorStroke: row 12 darkest=#F8F8F8
+  Dark: resolved brush=#15FFFFFF
+    Dark/Border: ink=0 rows=[]
+    Dark/SeparatorStroke: ink=0 rows=[]

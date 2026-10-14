@@ -1,0 +1,87 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.16
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+
+已通过! - 失败:     0，通过:  1585，已跳过:     0，总计:  1585，持续时间: 7 m 34 s - FluentJalium.Tests.dll (net10.0)
+==> build page pixel gate (Debug)
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+  AstraPagePixels -> C:\git\Jalium\FluentJalium\tools\AstraPagePixels\bin\Debug\net10.0-windows\AstraPagePixels.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:04.57
+==> gallery page pixels (13 pages x light, dark, high contrast)
+overview Light: stable=True/True painted=848166 light-base=198611 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 87 colours 607506px over 1 colours 0px (slot 788x1028) | top #FDFDFD:396210 #F9F9F9:224155 #F3F3F3:198611 #EAEAEA:8757 #FEFEFE:3474 #0078D4:3447
+tokens Light: stable=True/True painted=848166 light-base=197487 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 268 colours 1531859px over 1 colours 0px (slot 788x2112) | top #FDFDFD:314980 #F9F9F9:207659 #F3F3F3:197487 #0078D4:23193 #EEEEEE:10142 #FEFEFE:9266
+materials Light: stable=True/True painted=848166 light-base=256758 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 48 colours 338822px over 1 colours 0px (slot 788x618) | top #F9F9F9:289042 #F3F3F3:256758 #FDFDFD:244462 #EBEBEB:31232 #EAEAEA:8755 #F1F1F1:2821
+motion Light: stable=True/True painted=848166 light-base=197024 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 67 colours 182017px over 1 colours 0px (slot 788x569) | top #F9F9F9:381739 #FDFDFD:243113 #F3F3F3:197024 #EAEAEA:8754 #0078D4:6294 #EFEFEF:1848
+buttons Light: stable=True/True painted=848166 light-base=197033 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 130 colours 510585px over 1 colours 0px (slot 788x1046) | top #FDFDFD:319955 #F9F9F9:296670 #F3F3F3:197033 #EAEAEA:8843 #F1F1F1:3576 #FEFEFE:2513
+inputs Light: stable=True/True painted=848166 light-base=197460 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 284 colours 1268083px over 1 colours 0px (slot 788x2011) | top #FDFDFD:361288 #F3F3F3:197460 #F9F9F9:197442 #FEFEFE:52867 #FCFCFC:12246 #EAEAEA:8754
+selection Light: stable=True/True painted=848166 light-base=197025 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 253 colours 1409709px over 1 colours 0px (slot 788x2918) | top #FDFDFD:380953 #F9F9F9:246215 #F3F3F3:197025 #EAEAEA:8754 #F1F1F1:3395 #F7F7F7:2855
+navigation Light: stable=True/True painted=848166 light-base=197032 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 156 colours 1013316px over 1 colours 0px (slot 788x1733) | top #FDFDFD:347281 #F9F9F9:272231 #F3F3F3:197032 #EAEAEA:8754 #FEFEFE:7126 #F1F1F1:4412
+surfaces Light: stable=True/True painted=848166 light-base=197851 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 178 colours 965255px over 1 colours 0px (slot 788x1625) | top #FDFDFD:289664 #F9F9F9:285910 #F3F3F3:197851 #FEFEFE:42033 #EAEAEA:8755 #F7F7F7:4600
+status Light: stable=True/False painted=848166 light-base=197029 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 400 colours 1189788px over 1 colours 0px (slot 788x1972) | top #FDFDFD:372495 #F9F9F9:253320 #F3F3F3:197029 #EAEAEA:8754 #F1F1F1:4183 #F7F7F7:3416
+menus Light: stable=True/True painted=848166 light-base=197022 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 80 colours 335672px over 1 colours 0px (slot 788x672) | top #FDFDFD:340254 #F9F9F9:287982 #F3F3F3:197022 #EAEAEA:8757 #F1F1F1:4175 #F7F7F7:2345
+command-bar Light: stable=True/True painted=848166 light-base=197846 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 53 colours 243485px over 1 colours 0px (slot 788x490) | top #FDFDFD:365017 #F9F9F9:255680 #F3F3F3:197846 #EAEAEA:8754 #FEFEFE:4433 #F1F1F1:3950
+settings Light: stable=True/True painted=848166 light-base=197031 dark-base=0 hc-base=0 placeholder=0 green=0 | slot 118 colours 288331px over 1 colours 0px (slot 788x658) | top #FDFDFD:333464 #F9F9F9:278528 #F3F3F3:197031 #FEFEFE:11833 #EAEAEA:8765 #F1F1F1:4134
+overview Dark: stable=True/True painted=848166 light-base=0 dark-base=198598 hc-base=0 placeholder=0 green=0 | slot 127 colours 607504px over 1 colours 0px (slot 788x1044) | top #333333:396176 #282828:221801 #202020:198598 #2D2D2D:8013 #272727:3668 #3F3F3F:3475
+tokens Dark: stable=True/True painted=848166 light-base=0 dark-base=198598 hc-base=0 placeholder=0 green=0 | slot 313 colours 1527225px over 1 colours 0px (slot 788x2112) | top #333333:314868 #202020:198598 #282828:194251 #60CDFF:23193 #414141:9698 #3F3F3F:9622
+materials Dark: stable=True/True painted=848166 light-base=0 dark-base=257809 hc-base=0 placeholder=0 green=0 | slot 49 colours 338821px over 1 colours 0px (slot 788x618) | top #282828:288193 #202020:257809 #333333:244463 #1C1C1C:31003 #2D2D2D:8008 #272727:2725
+motion Dark: stable=True/True painted=848166 light-base=0 dark-base=198598 hc-base=0 placeholder=0 green=0 | slot 62 colours 182017px over 1 colours 0px (slot 788x569) | top #282828:381764 #333333:243107 #202020:198598 #2D2D2D:8008 #60CDFF:6296 #323232:2169
+buttons Dark: stable=True/True painted=848166 light-base=0 dark-base=198598 hc-base=0 placeholder=0 green=0 | slot 92 colours 510583px over 62 colours 182017px (slot 788x1046) | top #333333:319816 #282828:296665 #202020:198598 #2D2D2D:8009 #272727:3570 #313131:3129
+inputs Dark: stable=True/True painted=848166 light-base=0 dark-base=257809 hc-base=0 placeholder=0 green=0 | slot 92 colours 510583px over 92 colours 510583px (slot 788x1046) | top #282828:288203 #202020:257809 #333333:244463 #1C1C1C:31003 #292929:8009 #272727:2725
+selection Dark: stable=True/True painted=848082 light-base=0 dark-base=190064 hc-base=0 placeholder=0 green=0 | slot 223 colours 1431822px over 1 colours 0px (slot 788x2918) | top #333333:380959 #282828:246231 #202020:190064 #2D2D2D:16065 #313131:3126 #272727:2857
+navigation Dark: stable=True/True painted=848166 light-base=0 dark-base=190064 hc-base=0 placeholder=0 green=0 | slot 168 colours 1196515px over 1 colours 0px (slot 980x1667) | top #333333:347281 #282828:272246 #202020:190064 #2D2D2D:16067 #3F3F3F:7128 #272727:4382
+surfaces Dark: stable=True/True painted=848166 light-base=0 dark-base=57386 hc-base=0 placeholder=0 green=0 | slot 179 colours 1122054px over 1 colours 0px (slot 980x1546) | top #333333:362969 #282828:313964 #202020:57386 #3D3D3D:40956 #393939:33418 #3F3F3F:9723
+status Dark: stable=True/False painted=848166 light-base=0 dark-base=57386 hc-base=0 placeholder=0 green=0 | slot 312 colours 1417972px over 1 colours 0px (slot 980x1911) | top #333333:464112 #282828:306124 #202020:57386 #272727:4385 #313131:3898 #2D2D2D:2707
+menus Dark: stable=True/True painted=848166 light-base=0 dark-base=57386 hc-base=0 placeholder=0 green=0 | slot 44 colours 388062px over 1 colours 0px (slot 980x641) | top #333333:421999 #282828:349238 #202020:57386 #313131:3761 #272727:3378 #2D2D2D:2711
+command-bar Dark: stable=True/True painted=848166 light-base=0 dark-base=57386 hc-base=0 placeholder=0 green=0 | slot 56 colours 289084px over 1 colours 0px (slot 980x490) | top #333333:440863 #282828:324744 #202020:57386 #3F3F3F:4435 #272727:4366 #313131:3319
+settings Dark: stable=True/True painted=848166 light-base=0 dark-base=57384 hc-base=0 placeholder=0 green=0 | slot 98 colours 341785px over 1 colours 0px (slot 980x642) | top #333333:403864 #282828:350256 #202020:57384 #3F3F3F:11839 #272727:7283 #2E2E2E:3357
+overview HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=818713 placeholder=0 green=0 | slot 132 colours 757514px over 1 colours 0px (slot 980x1044) | top #1C1C1E:818713 #2C2C2E:6708 #5A5A5C:4326 #B7B7B9:4300 #98989A:3093 #79797B:3049
+tokens HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=697097 placeholder=0 green=0 | slot 109 colours 1391591px over 1 colours 0px (slot 980x1570) | top #1C1C1E:697097 #2C2C2E:73206 #F5F5F7:43562 #636366:4859 #3B3B3D:4578 #5A5A5C:4226
+materials HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=783141 placeholder=0 green=0 | slot 49 colours 406691px over 1 colours 0px (slot 980x603) | top #1C1C1E:783141 #F5F5F7:41022 #B7B7B9:4206 #5A5A5C:4164 #98989A:3833 #79797B:3790
+motion HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=831499 placeholder=0 green=0 | slot 60 colours 227351px over 1 colours 0px (slot 980x569) | top #1C1C1E:831499 #F5F5F7:2736 #2C2C2E:2694 #3B3B3D:2338 #D6D6D8:2337 #B7B7B9:2114
+buttons HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=819287 placeholder=0 green=0 | slot 183 colours 623252px over 1 colours 0px (slot 980x1030) | top #1C1C1E:819287 #2C2C2E:7642 #B7B7B9:3093 #5A5A5C:3093 #79797B:3074 #98989A:2994
+inputs HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=758284 placeholder=0 green=0 | slot 214 colours 1567823px over 1 colours 0px (slot 980x1996) | top #1C1C1E:758284 #2C2C2E:67794 #5A5A5C:3130 #98989A:2928 #79797B:2499 #B7B7B9:2262
+selection HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=827783 placeholder=0 green=0 | slot 205 colours 1758454px over 1 colours 0px (slot 980x2873) | top #1C1C1E:827783 #2C2C2E:3495 #98989A:2912 #79797B:2906 #F5F5F7:2835 #5A5A5C:2218
+navigation HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=816033 placeholder=0 green=0 | slot 185 colours 1200458px over 1 colours 0px (slot 980x1667) | top #1C1C1E:816033 #2C2C2E:10054 #79797B:3881 #98989A:3880 #5A5A5C:3565 #B7B7B9:3097
+surfaces HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=810361 placeholder=0 green=0 | slot 168 colours 1127941px over 1 colours 0px (slot 980x1546) | top #1C1C1E:810361 #2C2C2E:12409 #98989A:7130 #79797B:6826 #3B3B3D:2518 #D6D6D8:2493
+status HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=827353 placeholder=0 green=0 | slot 177 colours 1424830px over 1 colours 0px (slot 980x1911) | top #1C1C1E:827353 #98989A:4973 #79797B:3881 #2C2C2E:3613 #F5F5F7:1766 #D6D6D8:1506
+menus HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=826432 placeholder=0 green=0 | slot 102 colours 389050px over 1 colours 0px (slot 980x641) | top #1C1C1E:826432 #2C2C2E:3985 #79797B:3877 #98989A:3867 #5A5A5C:2148 #B7B7B9:2139
+command-bar HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=820441 placeholder=0 green=0 | slot 96 colours 289093px over 1 colours 0px (slot 980x490) | top #1C1C1E:820441 #2C2C2E:7128 #79797B:3136 #252527:3098 #98989A:2992 #B7B7B9:2167
+settings HighContrast: stable=True/True painted=848166 light-base=0 dark-base=0 hc-base=809307 placeholder=0 green=0 | slot 146 colours 347651px over 1 colours 0px (slot 980x642) | top #1C1C1E:809307 #2C2C2E:14961 #B7B7B9:5034 #5A5A5C:5034 #F5F5F7:2845 #3B3B3D:2540
+buttons Dark: the slot was not actually emptied (182017 lit pixels left)
+inputs Dark: the slot was not actually emptied (510583 lit pixels left)
+inputs Dark: the page printed nothing its empty slot does not already print (92 colours against 92)
+surfaces Dark: the variant's own base fill covers 57386 pixels, under 150000
+status Dark: the variant's own base fill covers 57386 pixels, under 150000
+menus Dark: the variant's own base fill covers 57386 pixels, under 150000
+command-bar Dark: the variant's own base fill covers 57386 pixels, under 150000
+settings Dark: the variant's own base fill covers 57384 pixels, under 150000
+tokens HighContrast: the variant's own base fill covers 697097 pixels, under 700000
+FAIL 13 pages x 3 variants, 9 offender(s)
+Invoke-Step : gallery page pixels (13 pages x light, dark, high contrast) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:60 �ַ�: 5
++     Invoke-Step 'gallery page pixels (13 pages x light, dark, high co ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

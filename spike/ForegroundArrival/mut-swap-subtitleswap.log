@@ -1,0 +1,18 @@
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:04.80]     FluentJalium.Tests.AstraForegroundArrivalTests.The_subtitle_label_reads_the_brush_its_row_names [FAIL]
+  失败 FluentJalium.Tests.AstraForegroundArrivalTests.The_subtitle_label_reads_the_brush_its_row_names [3 s]
+  错误消息:
+   SubtitleTextBlock reads #5C000000, not the #E4000000 it carries when TeachingTipSubtitleForegroundBrush reaches it.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraForegroundArrivalTests.AssertRowWritten(String part, String rowKey, Brush brush) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundArrivalTests.cs:line 205
+   at FluentJalium.Tests.AstraForegroundArrivalTests.AssertRowOnLabel(String part, String rowKey) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundArrivalTests.cs:line 200
+   at FluentJalium.Tests.AstraForegroundArrivalTests.<The_subtitle_label_reads_the_brush_its_row_names>b__7_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundArrivalTests.cs:line 113
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraForegroundArrivalTests.The_subtitle_label_reads_the_brush_its_row_names() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraForegroundArrivalTests.cs:line 110
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     4，已跳过:     0，总计:     5，持续时间: 11 s - FluentJalium.Tests.dll (net10.0)

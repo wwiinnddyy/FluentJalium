@@ -1,0 +1,16 @@
+=== 1. public typography surface on the shipped runtime ===
+holder: Jalium.UI.Managed (loaded assembly identity, not the sibling source tree)
+  method ApplyTypography(String display, String body, String mono) -> Void
+  method ApplyTypography(String display, String body, String mono, Double bodyFontSize) -> Void
+  method get_CurrentBodyFontFamily() -> String
+  method get_CurrentBodyFontSize() -> Double
+  method get_CurrentDisplayFontFamily() -> String
+  method get_CurrentMonospaceFontFamily() -> String
+  property String CurrentBodyFontFamily = Microsoft YaHei UI
+  property Double CurrentBodyFontSize = 12
+  property String CurrentDisplayFontFamily = Microsoft YaHei UI
+  property String CurrentMonospaceFontFamily = Cascadia Code
+
+=== 2. the four-arg overload's parameter shape, which is what the probe calls ===
+  present: (String display, String body, String mono, Double bodyFontSize)
+  three-arg overload: present

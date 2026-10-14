@@ -1,0 +1,123 @@
+<!-- WinUI 3 TabView_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT): ThemeDictionaries
+     Default (82-159), Light (4-81) and High Contrast (160-237), plus 31 metric rows outside them (239-269).
+     Light and Default are byte-identical (diff of the two 68-row blocks: no output), so one alias block here
+     carries both, the same way the other control dictionaries do; the High Contrast block is a different set of
+     names and lives in the high-contrast scope, so the rows below are the Light/Default pair verbatim and
+     audits/tab-view.md §1 records every High Contrast difference this host cannot express.
+     What is NOT published here, and why (a name with no consumer is an idle name, and the key-consumption gate
+     in tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs enforces that):
+       twelve TabViewScrollButton* rows plus TabViewItemScrollButtonPadding,
+       TabViewItemLeftScrollButtonContainerPadding and TabViewItemRightScrollButtonContainerPadding - upstream
+         hangs them on the scroll RepeatButtons of the TabViewListView overflow, which this batch does not ship
+         (the strip never scrolls: see audits/tab-view.md §7).
+       TabViewItemHeaderDragBackground, TabViewShadowDepth and the reorder/drag rows - no drag path yet.
+       TabViewButtonForegroundActiveTab and TabViewButtonBackgroundActiveTab - upstream hands them to the +
+         button while a tab is active, a state this batch does not raise.
+       TabViewSelectedItemHeaderPadding - it overlaps the PaddingWith/PaddingWithoutCloseButton pair, which is
+         what the item template actually reads.
+       Sixteen x:Double metrics this reader cannot parse; audits/tab-view.md §1 names each one and the literal
+         that stands in for it.
+       The SingleBottomBorderLine and NoBottomBorderLine host states, and the item's TabWidthModes,
+       ForegroundNotSet/ForegroundSet and the eleven reorder/drag groups - audits/tab-view.md §7.
+     Every other row below is written by Styles/TabView.jalxaml, and the key-consumption gate in
+     tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs is what keeps it that way. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. TabContainerGrid takes TabViewBackground (TabView.xaml:31), which is the transparent subtle fill,
+       so a tab strip rests on whatever surface the page puts it on; TabViewBorderBrush is the 1 DIP line under
+       the strip and, unlike the rest of the rows, aliases a COLOR rather than a brush (CardStrokeColorDefault) -
+       an upstream quirk that still works there because the row is read by a Background, which takes a brush
+       name at lookup. Ours is the brush form, which is what the same row resolves to in practice. -->
+  <StaticResource x:Key="TabViewBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+  <StaticResource x:Key="TabViewItemBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <!-- Items: the eight header fills. The resting tab is the transparent layer-on-mica fill, hover and press take
+       the two steps above it, and the selected tab is NOT one of them: upstream paints the selected tab with a
+       Path (SelectedBackgroundPath, Fill=TabViewItemHeaderBackgroundSelected) and pushes the Border itself back
+       to the transparent resting fill (TabView.xaml:341-342). The disabled row is the transparent one again, so
+       a disabled tab differs from a resting one only in its text. -->
+  <StaticResource x:Key="TabViewItemHeaderBackground" ResourceKey="LayerOnMicaBaseAltFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderBackgroundPointerOver" ResourceKey="LayerOnMicaBaseAltFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderBackgroundPressed" ResourceKey="LayerOnMicaBaseAltFillColorDefaultBrush" />
+  <StaticResource x:Key="TabViewItemHeaderBackgroundDisabled" ResourceKey="LayerOnMicaBaseAltFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderBackgroundSelected" ResourceKey="SolidBackgroundFillColorTertiaryBrush" />
+  <!-- Header text. Resting is SECONDARY, not primary - an unselected tab is quieter than its content - and the
+       selected tab goes primary plus SemiBold (TabView.xaml:351). Pressed steps down to tertiary. -->
+  <StaticResource x:Key="TabViewItemHeaderForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderForegroundPressed" ResourceKey="TextFillColorTertiaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderForegroundSelected" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- Icon text follows the header row for row, with the same secondary resting step. -->
+  <StaticResource x:Key="TabViewItemIconForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemIconForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemIconForegroundPressed" ResourceKey="TextFillColorTertiaryBrush" />
+  <StaticResource x:Key="TabViewItemIconForegroundSelected" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemIconForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- The separator between two unselected tabs: 1 DIP of the divider stroke, 8 DIP short of the tab's top and
+       bottom. Hover, press and selection fade it out (TabView.xaml:322), which is a state and not a brush. -->
+  <StaticResource x:Key="TabViewItemSeparator" ResourceKey="DividerStrokeColorDefaultBrush" />
+  <!-- The add button and its container. All four button fills are the subtle family and the border is the
+       transparent one, so what shows is the glyph alone until the pointer arrives. -->
+  <StaticResource x:Key="TabViewButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="TabViewButtonBackgroundDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="TabViewButtonBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewButtonBorderBrushPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewButtonBorderBrushPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewButtonBorderBrushDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <!-- The per-tab close button. The first three rows are the button's own states and the next group is what the
+       ITEM's state does to it: upstream keeps the close button transparent until the pointer is on the tab, so
+       PointerOver/Pressed/Selected/Disabled header rows all name the transparent subtle fill, and only the
+       disabled foreground steps down. -->
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBorderBrushPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBorderBrushPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBorderBrushSelected" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderCloseButtonBorderBrushDisabled" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderPointerOverCloseButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderPressedCloseButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderSelectedCloseButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderDisabledCloseButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TabViewItemHeaderPointerOverCloseButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderPressedCloseButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderSelectedCloseButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TabViewItemHeaderDisabledCloseButtonForeground" ResourceKey="TextFillColorDisabledBrush" />
+  <!-- The selected tab's border is a 4-DIP vertical fade, transparent at the bottom of the tab and the card
+     stroke at the top (StartPoint 0,0 EndPoint 0,4 with ScaleTransform ScaleY=-1). Two rows in this family are
+     Thickness, which this reader parses; the 16 x:Double rows are not (adaptation/00 S0-c), so their values ride
+     as literals on the elements that use them and each one is named at its use site in Styles/TabView.jalxaml. -->
+  <LinearGradientBrush x:Key="TabViewSelectedItemBorderBrush" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,4">
+    <LinearGradientBrush.RelativeTransform>
+      <ScaleTransform ScaleY="-1" CenterY="0.5" />
+    </LinearGradientBrush.RelativeTransform>
+    <LinearGradientBrush.GradientStops>
+      <GradientStop Offset="1.0" Color="Transparent" />
+      <GradientStop Offset="1.0" Color="{ThemeResource CardStrokeColorDefault}" />
+    </LinearGradientBrush.GradientStops>
+  </LinearGradientBrush>
+  <Thickness x:Key="TabViewButtonBorderThickness">0</Thickness>
+  <Thickness x:Key="TabViewItemHeaderCloseButtonBorderThickness">0</Thickness>
+  <!-- Metrics with a Thickness type, so they are publishable. Values are upstream's, line for line. -->
+  <Thickness x:Key="TabViewHeaderPadding">0,8,0,0</Thickness>
+  <Thickness x:Key="TabViewItemAddButtonContainerPadding">3,0,0,3</Thickness>
+  <Thickness x:Key="TabViewItemHeaderPadding">8,3,4,3</Thickness>
+  <Thickness x:Key="TabViewItemHeaderPaddingWithCloseButton">8,3,4,3</Thickness>
+  <Thickness x:Key="TabViewItemHeaderPaddingWithoutCloseButton">8,3,8,3</Thickness>
+  <Thickness x:Key="TabViewItemHeaderIconMargin">0,0,10,0</Thickness>
+  <Thickness x:Key="TabViewItemHeaderCloseMargin">4,0,0,0</Thickness>
+  <Thickness x:Key="TabViewItemSeparatorMargin">0,8,0,8</Thickness>
+  <Thickness x:Key="TabViewItemBorderThickness">1</Thickness>
+  <Thickness x:Key="TabViewSelectedItemBorderThickness">1,1,1,0</Thickness>
+  <Thickness x:Key="TabViewSelectedItemHeaderMargin">-1,0,-1,1</Thickness>
+</ResourceDictionary>

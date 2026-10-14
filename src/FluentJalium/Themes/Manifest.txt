@@ -1,0 +1,101 @@
+# Astra control dictionaries, in dependency order. One entry per line; # starts a comment.
+# Loaded after the Light/Dark palette. FluentThemeManager validates both directions:
+# an entry with no embedded resource, and an embedded dictionary with no entry, both throw.
+ThemeResources/Metrics.jalxaml
+# The three animation durations our templates read. FluentThemeManager keeps a reference to this dictionary
+# because ReduceMotion rewrites these rows to zero; a row the manager cannot find is a startup failure, not a
+# silent default - see spike/MotionProbe and docs/astra/audits/motion.md.
+ThemeResources/Motion.jalxaml
+ThemeResources/Typography.jalxaml
+ThemeResources/FlyoutPresenter.jalxaml
+ThemeResources/ToolTip.jalxaml
+ThemeResources/TitleBar.jalxaml
+ThemeResources/Button.jalxaml
+ThemeResources/ToggleButton.jalxaml
+ThemeResources/RepeatButton.jalxaml
+ThemeResources/HyperlinkButton.jalxaml
+ThemeResources/SplitButton.jalxaml
+ThemeResources/DropDownButton.jalxaml
+ThemeResources/Expander.jalxaml
+ThemeResources/InfoBar.jalxaml
+ThemeResources/MenuFlyout.jalxaml
+ThemeResources/MenuBar.jalxaml
+ThemeResources/AppBar.jalxaml
+ThemeResources/CheckBox.jalxaml
+ThemeResources/RadioButton.jalxaml
+ThemeResources/RadioButtons.jalxaml
+ThemeResources/TextBox.jalxaml
+ThemeResources/NumberBox.jalxaml
+ThemeResources/Slider.jalxaml
+ThemeResources/ComboBox.jalxaml
+ThemeResources/AutoSuggestBox.jalxaml
+ThemeResources/ListBox.jalxaml
+ThemeResources/ListView.jalxaml
+ThemeResources/TreeView.jalxaml
+ThemeResources/TabView.jalxaml
+ThemeResources/ContentDialog.jalxaml
+ThemeResources/TeachingTip.jalxaml
+ThemeResources/DataGrid.jalxaml
+ThemeResources/NavigationView.jalxaml
+ThemeResources/PipsPager.jalxaml
+ThemeResources/BreadcrumbBar.jalxaml
+ThemeResources/ProgressBar.jalxaml
+ThemeResources/ProgressRing.jalxaml
+# The badge: two brush aliases and the four Thickness rows of upstream's twelve keys. The six x:Double rows are not
+# here - one spelling is rejected outright and the other carries zero instead of the number (spike/DoubleRowProbe).
+ThemeResources/InfoBadge.jalxaml
+# The rating: the eight brush aliases, the default font info row and the four item templates of upstream's sixteen
+# keys. Its three metric rows are x:Double too, so they became literals and constants the same way (spike/RatingProbe
+# measured the clip route the control then has to use instead of upstream's RectangleGeometry).
+ThemeResources/RatingControl.jalxaml
+# Last of the token block on purpose: it aliases rows the dictionaries above publish, and it is the only file here
+# whose readers are the framework's own templates rather than ours (see its header comment).
+ThemeResources/FrameworkRetints.jalxaml
+# The four keyboard focus rings, as FocusVisualStyle values rather than template parts. Declared first among the
+# style dictionaries because every family below reads them through {ThemeResource}.
+Styles/FocusVisuals.jalxaml
+Styles/Common.jalxaml
+Styles/Inputs.jalxaml
+Styles/TextInput.jalxaml
+Styles/AutoSuggestBox.jalxaml
+Styles/Selection.jalxaml
+Styles/ListBoxes.jalxaml
+Styles/ListViews.jalxaml
+# The radio-button list: its panel and spacing come from code, its two foreground rows and its header margin do not.
+Styles/RadioButtons.jalxaml
+Styles/TreeViews.jalxaml
+Styles/Navigation.jalxaml
+# The pip pager: the control generates its own pip buttons, so this file also carries the six styles upstream
+# publishes next to its token rows (the footprints those styles read are x:Double rows this reader cannot parse).
+Styles/PipsPager.jalxaml
+Styles/Surfaces.jalxaml
+Styles/Menus.jalxaml
+Styles/AppBar.jalxaml
+Styles/ContentDialog.jalxaml
+Styles/TeachingTip.jalxaml
+Styles/TabView.jalxaml
+Styles/DataGrid.jalxaml
+# Reads the DataGrid family's token rows rather than declaring its own: the two grids share the cell, the column
+# header and the surface, and this runtime has no tree-only versions of them.
+Styles/TreeDataGrid.jalxaml
+# The breadcrumb bar: its crumb row is a panel of its own, so this file carries the item style, the nested button
+# style the item and the ellipsis share, and the bar style that hosts both.
+Styles/BreadcrumbBar.jalxaml
+# The progress bar: the host's own control keeps the geometry (it sizes PART_Indicator against Value), so this file
+# only carries the band that geometry has to land in - one style, no own type.
+Styles/ProgressBar.jalxaml
+# The progress ring: an own type, because 26.10.9 has neither the control nor the animated-visual player upstream
+# feeds it. This file carries the twelve setters and the two-part template; the arc's geometry and its spin come
+# from FluentProgressRing and Motion/ProgressRingAnimator.cs.
+Styles/ProgressRing.jalxaml
+# The divider: no upstream control exists at the pinned commit, so this file publishes no rows of its own and
+# styles the runtime's native Separator with the palette's divider token - two setters, no template.
+Styles/Divider.jalxaml
+# The badge's look: sixteen styles upstream writes next to its tokens plus the implicit row from InfoBadge.xaml. One
+# template, and three triggers standing in for upstream's four DisplayKindStates visual states - the fourth (Dot) is
+# the template's resting look.
+Styles/InfoBadge.jalxaml
+# The rating's look: one style, the implicit row, and six triggers for upstream's six CommonStates - each writing
+# the same foreground presenter upstream writes, and each reached through a state property this control publishes
+# because this runtime has no visual-state manager.
+Styles/RatingControl.jalxaml

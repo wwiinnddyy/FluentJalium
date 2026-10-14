@@ -1,0 +1,29 @@
+# Astra implementation
+
+This branch is a breaking replacement of the pre-Astra FW facade, not a WPF or WinUI runtime application.
+The old implementation remains available on branch `new` at `d03b377`.
+
+- Product code lives in `src/FluentJalium`, laid out after ModernWpf's two layers: `ThemeResources/`
+  (generated palette and per-theme tokens), `Styles/` (styles and control templates), `Themes/` (the
+  theme facade and the load manifest), `Controls/` and `Motion/` (types for demonstrated behavior gaps).
+  "Astra" stays the name of this rewrite, not a directory. No retired FW types or compatibility
+  parser belongs in the new runtime.
+- `src/FluentJalium.Localization` is a host library, not part of the product's theme surface: the runtime
+  text catalog, the logical-tree sweep that applies it, and the settings file. It carries no style and
+  no control, and neither host may reimplement a second mechanism beside it. `docs/astra/launcher.md`
+  records the contract; a string added to a page and not registered fails
+  `tests/FluentJalium.Tests/Localization/LocalizationCoverageTests.cs`.
+- `samples/FluentJalium.Launcher` is the transition host and opens the Gallery in-process, so the
+  Gallery must not depend on it, and a Gallery change that makes its window un-constructible from
+  another entry point breaks the handoff. See `docs/astra/launcher.md`.
+- Use native Jalium controls with `.jalxaml` templates. Add a custom control only for a demonstrated behavior gap.
+- Runtime authority is NuGet Jalium.UI **26.10.9**; a sibling source tree is reference only and may be newer.
+- WinUI reference: `../microsoft-ui-xaml`, commit `19e3bdc3ccf3361393d623d3a5d2667cb8f33229`.
+- Adaptation-method reference: `../ModernWpf`, commit `23555a6c00623b2f80e67f20d7f1df49a1d28ad8`, `v1.0.0-rc.1`.
+- Reference repositories are read-only. Never reset, restore, checkout or patch them during a FluentJalium change.
+- Templates, input/commands, animation, resources and platform substitution are separate responsibilities.
+- Keep mouse, touch and keyboard paths functional. Never replace touch capture with mouse-only DragMove.
+- Document resource and public API changes, upstream file evidence, and adaptations under `docs/astra`.
+- Build serially. Integration checks must close their windows and must not write into the user's profile.
+- Record build, behavior, visual and hardware-input evidence separately. A template or wrapper is not proof of complete WinUI parity.
+- No unconditional retemplating, reflection into private framework fields, or per-window resource repair loops.

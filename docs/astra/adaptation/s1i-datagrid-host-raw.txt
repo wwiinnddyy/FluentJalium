@@ -1,0 +1,653 @@
+theme dictionaries=44
+
+=== A. grid types ===
+assemblies=Jalium.UI.Managed, Jalium.UI.Xaml, Jalium.UI.Desktop, Jalium.UI.Controls
+Jalium.UI.Managed: 64
+  Jalium.UI.Automation.Peers.DataGridAutomationPeer  abstract=False public=True  chain=DataGridAutomationPeer : ItemsControlAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridCellAutomationPeer  abstract=False public=True  chain=DataGridCellAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridColumnHeaderAutomationPeer  abstract=False public=True  chain=DataGridColumnHeaderAutomationPeer : ButtonBaseAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridColumnHeaderItemAutomationPeer  abstract=False public=True  chain=DataGridColumnHeaderItemAutomationPeer : ItemAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridColumnHeadersPresenterAutomationPeer  abstract=False public=True  chain=DataGridColumnHeadersPresenterAutomationPeer : ItemsControlAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridDetailsPresenterAutomationPeer  abstract=False public=True  chain=DataGridDetailsPresenterAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridItemAutomationPeer  abstract=False public=True  chain=DataGridItemAutomationPeer : ItemAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridRowAutomationPeer  abstract=False public=True  chain=DataGridRowAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.DataGridRowHeaderAutomationPeer  abstract=False public=True  chain=DataGridRowHeaderAutomationPeer : ButtonBaseAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Automation.Peers.GridSplitterAutomationPeer  abstract=False public=True  chain=GridSplitterAutomationPeer : ThumbAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject : Object
+  Jalium.UI.Controls.DataGrid  abstract=False public=True  chain=DataGrid : MultiSelector : Selector : ItemsControl : Control : FrameworkElement : UIElement
+  Jalium.UI.Controls.DataGridAutoGeneratingColumnEventArgs  abstract=False public=True  chain=DataGridAutoGeneratingColumnEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridBeginningEditEventArgs  abstract=False public=True  chain=DataGridBeginningEditEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridBoundColumn  abstract=True public=True  chain=DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridCell  abstract=False public=True  chain=DataGridCell : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  Jalium.UI.Controls.DataGridCellClipboardEventArgs  abstract=False public=True  chain=DataGridCellClipboardEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridCellEditEndingEventArgs  abstract=False public=True  chain=DataGridCellEditEndingEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridCellInfo  abstract=False public=True  chain=DataGridCellInfo : ValueType : Object
+  Jalium.UI.Controls.DataGridCellsPanel  abstract=False public=True  chain=DataGridCellsPanel : VirtualizingPanel : Panel : FrameworkElement : UIElement : Visual : DependencyObject
+  Jalium.UI.Controls.DataGridCheckBoxColumn  abstract=False public=True  chain=DataGridCheckBoxColumn : DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridClipboardCellContent  abstract=False public=True  chain=DataGridClipboardCellContent : ValueType : Object
+  Jalium.UI.Controls.DataGridClipboardCopyMode  abstract=False public=True  chain=DataGridClipboardCopyMode : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridClipboardCopyingEventArgs  abstract=False public=True  chain=DataGridClipboardCopyingEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridColumn  abstract=True public=True  chain=DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridColumnEventArgs  abstract=False public=True  chain=DataGridColumnEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridColumnPropertyChange  abstract=False public=False  chain=DataGridColumnPropertyChange : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridColumnReorderingEventArgs  abstract=False public=True  chain=DataGridColumnReorderingEventArgs : DataGridColumnEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridComboBoxColumn  abstract=False public=True  chain=DataGridComboBoxColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridEditAction  abstract=False public=True  chain=DataGridEditAction : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridEditingUnit  abstract=False public=True  chain=DataGridEditingUnit : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridGridLinesVisibility  abstract=False public=True  chain=DataGridGridLinesVisibility : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridHeadersVisibility  abstract=False public=True  chain=DataGridHeadersVisibility : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridHyperlinkColumn  abstract=False public=True  chain=DataGridHyperlinkColumn : DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridLength  abstract=False public=True  chain=DataGridLength : ValueType : Object
+  Jalium.UI.Controls.DataGridLengthConverter  abstract=False public=True  chain=DataGridLengthConverter : TypeConverter : Object
+  Jalium.UI.Controls.DataGridLengthUnitType  abstract=False public=True  chain=DataGridLengthUnitType : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridPreparingCellForEditEventArgs  abstract=False public=True  chain=DataGridPreparingCellForEditEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridRow  abstract=False public=True  chain=DataGridRow : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  Jalium.UI.Controls.DataGridRowClipboardEventArgs  abstract=False public=True  chain=DataGridRowClipboardEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridRowDetailsEventArgs  abstract=False public=True  chain=DataGridRowDetailsEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridRowDetailsVisibilityMode  abstract=False public=True  chain=DataGridRowDetailsVisibilityMode : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridRowEditEndingEventArgs  abstract=False public=True  chain=DataGridRowEditEndingEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridRowEventArgs  abstract=False public=True  chain=DataGridRowEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridSelectionMode  abstract=False public=True  chain=DataGridSelectionMode : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridSelectionUnit  abstract=False public=True  chain=DataGridSelectionUnit : Enum : ValueType : Object
+  Jalium.UI.Controls.DataGridSortingEventArgs  abstract=False public=True  chain=DataGridSortingEventArgs : DataGridColumnEventArgs : EventArgs : Object
+  Jalium.UI.Controls.DataGridSortingEventHandler  abstract=False public=True  chain=DataGridSortingEventHandler : MulticastDelegate : Delegate : Object
+  Jalium.UI.Controls.DataGridTemplateColumn  abstract=False public=True  chain=DataGridTemplateColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.DataGridTextColumn  abstract=False public=True  chain=DataGridTextColumn : DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+  Jalium.UI.Controls.GridSplitter  abstract=False public=True  chain=GridSplitter : Thumb : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  Jalium.UI.Controls.IProvideDataGridColumn  abstract=True public=False  chain=IProvideDataGridColumn
+  Jalium.UI.Controls.Primitives.DataGridCellsPresenter  abstract=False public=True  chain=DataGridCellsPresenter : ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  Jalium.UI.Controls.Primitives.DataGridColumnHeader  abstract=False public=True  chain=DataGridColumnHeader : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual
+  Jalium.UI.Controls.Primitives.DataGridColumnHeadersPresenter  abstract=False public=True  chain=DataGridColumnHeadersPresenter : ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  Jalium.UI.Controls.Primitives.DataGridDetailsPresenter  abstract=False public=True  chain=DataGridDetailsPresenter : ContentPresenter : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  Jalium.UI.Controls.Primitives.DataGridRowHeader  abstract=False public=True  chain=DataGridRowHeader : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual
+  Jalium.UI.Controls.Primitives.DataGridRowsPresenter  abstract=False public=True  chain=DataGridRowsPresenter : VirtualizingStackPanel : VirtualizingPanel : Panel : FrameworkElement : UIElement : Visual
+  Jalium.UI.Controls.TreeDataGrid  abstract=False public=True  chain=TreeDataGrid : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  Jalium.UI.Controls.TreeDataGridNode  abstract=False public=False  chain=TreeDataGridNode : Object
+  Jalium.UI.Controls.TreeDataGridNodeEventArgs  abstract=False public=True  chain=TreeDataGridNodeEventArgs : RoutedEventArgs : EventArgs : Object
+  Jalium.UI.Controls.TreeDataGridNodeExpandingEventArgs  abstract=False public=True  chain=TreeDataGridNodeExpandingEventArgs : TreeDataGridNodeEventArgs : RoutedEventArgs : EventArgs : Object
+  Jalium.UI.Controls.TreeDataGridRow  abstract=False public=True  chain=TreeDataGridRow : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml  abstract=True public=False  chain=_Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml : Object
+  Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml  abstract=True public=False  chain=_Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml : Object
+lookup DataGrid: Jalium.UI.Controls.DataGrid
+lookup DataGridColumn: Jalium.UI.Controls.DataGridColumn
+lookup DataGridTextColumn: Jalium.UI.Controls.DataGridTextColumn
+lookup DataGridCell: Jalium.UI.Controls.DataGridCell
+lookup DataRow: NOT EXPORTED
+lookup ColumnHeader: NOT EXPORTED
+lookup GridSplitter: Jalium.UI.Controls.GridSplitter
+lookup TreeDataGrid: Jalium.UI.Controls.TreeDataGrid
+lookup TreeNode: NOT EXPORTED
+
+=== B. mount shape: does a DataGrid have a replaceable template? ===
+  unmounted new DataGrid(): Template=null Style=null localTemplate=False localStyle=False
+  control ListBox unmounted: Template=null Style=null
+  control TabControl unmounted: Template=null Style=null
+  set AutoGenerateColumns=true -> AutoGenerateColumns=True
+  set ItemsSource=3 rows -> ItemsSource=System.Collections.Generic.List`1[System.Object]
+  columns route -> DataGridTextColumn added=2 count=4 
+  set Width/Height=560x180 -> Width=560, Height=180
+  mounted after 10 frames: rendered= size=560x180
+  mounted: Template=SET Style=null localTemplate=False
+  mounted style: null
+  mounted template: type=ControlTemplate VisualTreeXaml chars=0 triggers=1
+  template xaml follows:
+  visual tree:
+    DataGrid size=560x180
+    Border 'PART_OuterBorder' bg=#FF2C2C2E r=12,12,12,12 bt=1,1,1,1 size=560x180
+    Grid size=558x178
+    Grid 'PART_ColumnHeadersBorder' size=558x34
+    ScrollViewer 'PART_ColumnHeadersScrollViewer' size=538x34
+    StackPanel 'PART_ColumnHeadersHost' size=538x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=42.18x19.78
+    TextBlock size=42.18x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=39.5x19.78
+    TextBlock size=39.5x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=40.88x19.78
+    TextBlock size=40.88x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=31.68x19.78
+    TextBlock size=31.68x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=12x0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Rectangle size=558x1
+    Grid 'PART_RowHeaderCorner' size=20x34
+    Rectangle size=1x34
+    Rectangle size=20x1
+    ScrollViewer 'PART_DataScrollViewer' size=558x144
+    StackPanel 'PART_RowsHost' size=546x132
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    DataGridRow size=546x30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=546x30
+    StackPanel 'PART_CellsPanel' size=546x29
+    StackPanel size=546x30.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=47.45x19.78
+    TextBlock size=43.45x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=22.42x19.78
+    TextBlock size=18.42x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridRowHeader size=20x30
+    DataGridDetailsPresenter size=0x0
+    DataGridRow size=546x30
+    Border 'PART_RowBorder' bg=#0FFFFFFF r=0,0,0,0 bt=0,0,0,1 size=546x30
+    StackPanel 'PART_CellsPanel' size=546x29
+    StackPanel size=546x30.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=47.45x19.78
+    TextBlock size=43.45x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=22.42x19.78
+    TextBlock size=18.42x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridRowHeader size=20x30
+    DataGridDetailsPresenter size=0x0
+    DataGridRow size=546x30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=546x30
+    StackPanel 'PART_CellsPanel' size=546x29
+    StackPanel size=546x30.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=47.45x19.78
+    TextBlock size=43.45x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=22.42x19.78
+    TextBlock size=18.42x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridRowHeader size=20x30
+    DataGridDetailsPresenter size=0x0
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=12x0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Canvas 'PART_DragOverlay' size=0x0
+  named parts: PART_OuterBorder(Border), PART_ColumnHeadersBorder(Grid), PART_ColumnHeadersScrollViewer(ScrollViewer), PART_ColumnHeadersHost(StackPanel), PART_HeaderBorder(Border), PART_SortIndicator(TextBlock), PART_ResizeGrip(Rectangle), PART_ButtonRoot(Border), PART_Arrow(Path), ThumbBorder(Border), PART_RowHeaderCorner(Grid), PART_DataScrollViewer(ScrollViewer), PART_RowsHost(StackPanel), PART_RowBorder(Border), PART_CellsPanel(StackPanel), PART_CellBorder(Border), PART_DragOverlay(Canvas)
+  counts: DataGridRow=6 DataGridCell=12 *Presenter*=19 ScrollViewer=2
+
+=== C. re-templatability: three routes, same frame pump ===
+  probe template parsed: ok triggers=0
+  --- route1 implicit app style ---
+    after 8 frames: Template=SET localTemplate=False rendered= size=480x140
+    our marker ProbeTemplateRoot present=True type=Border
+    our ItemsPresenter ProbeItems present=True
+    named parts: ProbeTemplateRoot(Border), PART_HeaderHost(TextBlock), ProbeItems(ItemsPresenter), PART_RowBorder(Border), PART_CellsPanel(StackPanel)
+    counts: DataGridRow=4 DataGridCell=0 ScrollViewer=0 TextBlock=1
+    tree:
+      DataGrid size=480x140
+      Border 'ProbeTemplateRoot' bg=#FFFF00FF r=4,4,4,4 bt=0,0,0,0 size=480x140
+      StackPanel size=480x140
+      TextBlock 'PART_HeaderHost' size=480x19.78
+      ItemsPresenter 'ProbeItems' size=480x60
+      StackPanel size=480x60
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+    style assignment -> Style=Jalium.UI.Style
+  --- route2 explicit style + template setter ---
+    after 8 frames: Template=SET localTemplate=False rendered= size=480x140
+    our marker ProbeTemplateRoot present=True type=Border
+    our ItemsPresenter ProbeItems present=True
+    named parts: ProbeTemplateRoot(Border), PART_HeaderHost(TextBlock), ProbeItems(ItemsPresenter), PART_RowBorder(Border), PART_CellsPanel(StackPanel)
+    counts: DataGridRow=4 DataGridCell=0 ScrollViewer=0 TextBlock=1
+    tree:
+      DataGrid size=480x140
+      Border 'ProbeTemplateRoot' bg=#FFFF00FF r=4,4,4,4 bt=0,0,0,0 size=480x140
+      StackPanel size=480x140
+      TextBlock 'PART_HeaderHost' size=480x19.78
+      ItemsPresenter 'ProbeItems' size=480x60
+      StackPanel size=480x60
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+    template assignment -> Template=Jalium.UI.Controls.ControlTemplate
+  --- route3 template local value ---
+    after 8 frames: Template=SET localTemplate=True rendered= size=480x140
+    our marker ProbeTemplateRoot present=True type=Border
+    our ItemsPresenter ProbeItems present=True
+    named parts: ProbeTemplateRoot(Border), PART_HeaderHost(TextBlock), ProbeItems(ItemsPresenter), PART_RowBorder(Border), PART_CellsPanel(StackPanel)
+    counts: DataGridRow=4 DataGridCell=0 ScrollViewer=0 TextBlock=1
+    tree:
+      DataGrid size=480x140
+      Border 'ProbeTemplateRoot' bg=#FFFF00FF r=4,4,4,4 bt=0,0,0,0 size=480x140
+      StackPanel size=480x140
+      TextBlock 'PART_HeaderHost' size=480x19.78
+      ItemsPresenter 'ProbeItems' size=480x60
+      StackPanel size=480x60
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+      DataGridRow size=480x30
+      Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=480x30
+      StackPanel 'PART_CellsPanel' size=480x29
+      StackPanel size=480x30
+      DataGridRowHeader size=20x30
+      DataGridDetailsPresenter size=0x0
+  --- control ListBox + same template ---
+    after 8 frames: Template=SET localTemplate=True rendered= size=838.29x19.78
+    our marker ProbeTemplateRoot present=True type=Border
+    our ItemsPresenter ProbeItems present=True
+    named parts: ProbeTemplateRoot(Border), PART_HeaderHost(TextBlock), ProbeItems(ItemsPresenter), PressedBackground(Rectangle), ContentPresenter(ContentPresenter)
+    counts: DataGridRow=0 DataGridCell=0 ScrollViewer=0 TextBlock=2
+    tree:
+      ListBox size=838.29x19.78
+      Border 'ProbeTemplateRoot' bg=#FFFF00FF r=4,4,4,4 bt=0,0,0,0 size=838.29x19.78
+      StackPanel size=838.29x19.78
+      TextBlock 'PART_HeaderHost' size=838.29x19.78
+      ItemsPresenter 'ProbeItems' size=838.29x0
+      VirtualizingStackPanel size=838.29x0
+      ListBoxItem size=838.29x40.78
+      Grid size=838.29x40.78
+      Rectangle 'PressedBackground' size=838.29x40.78
+      ContentPresenter 'ContentPresenter' size=9.74x19.78
+      TextBlock size=9.74x19.78
+
+=== D. {ThemeResource} names consumed by the framework's own grid templates ===
+  DataGrid: unmounted Template=null (chain DataGrid : MultiSelector : Selector : ItemsControl : Control : FrameworkElement : UIElement)
+  TreeDataGrid: unmounted Template=null (chain TreeDataGrid : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject)
+  DataGridCell: unmounted Template=null (chain DataGridCell : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject)
+  DataGridColumnHeader: unmounted Template=null (chain DataGridColumnHeader : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual)
+  ColumnHeader: NOT EXPORTED
+  DataGridRow: unmounted Template=null (chain DataGridRow : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject)
+  RowHeader: NOT EXPORTED
+  DataGridSplitter: NOT EXPORTED
+  GridSplitter: unmounted Template=null (chain GridSplitter : Thumb : Control : FrameworkElement : UIElement : Visual : DependencyObject)
+
+=== E. TreeDataGrid ===
+  chain=TreeDataGrid : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  unmounted: Template=null Style=null
+  mounted after 10: Template=SET Style=null
+  mounted template: 0 chars, triggers=1
+  tree:
+    TreeDataGrid size=480x160
+    Border 'PART_OuterBorder' bg=#FF2C2C2E r=12,12,12,12 bt=1,1,1,1 size=480x160
+    Grid size=478x158
+    Grid 'PART_ColumnHeadersBorder' size=478x1
+    ScrollViewer 'PART_ColumnHeadersScrollViewer' size=478x1
+    StackPanel 'PART_ColumnHeadersHost' size=478x1
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=12x0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Rectangle size=478x1
+    ScrollViewer 'PART_DataScrollViewer' size=478x157
+    StackPanel 'PART_RowsHost' size=466x145
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    TreeDataGridRow size=466x30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=466x30
+    StackPanel 'PART_CellsPanel' size=466x29
+    TreeDataGridRow size=466x30
+    Border 'PART_RowBorder' bg=#0FFFFFFF r=0,0,0,0 bt=0,0,0,1 size=466x30
+    StackPanel 'PART_CellsPanel' size=466x29
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=12x0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Canvas 'PART_DragOverlay' size=0x0
+  named parts: PART_OuterBorder(Border), PART_ColumnHeadersBorder(Grid), PART_ColumnHeadersScrollViewer(ScrollViewer), PART_ColumnHeadersHost(StackPanel), PART_ButtonRoot(Border), PART_Arrow(Path), ThumbBorder(Border), PART_DataScrollViewer(ScrollViewer), PART_RowsHost(StackPanel), PART_RowBorder(Border), PART_CellsPanel(StackPanel), PART_DragOverlay(Canvas)
+  counts: TreeDataGridRow=2 Cell=0 Expander=0 ToggleButton=0 ScrollViewer=2
+
+=== F. header / gridline / resize surface ===
+  DataGridColumnHeader: DataGridColumnHeader : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual
+    DPs=6: CanUserSort, DisplayIndex, IsFrozen, SeparatorBrush, SeparatorVisibility, SortDirection
+    props=7: CanUserSort, Column, DisplayIndex, IsFrozen, SeparatorBrush, SeparatorVisibility, SortDirection
+  ColumnHeader: NOT EXPORTED
+  DataGridCell: DataGridCell : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+    DPs=4: Column, IsEditing, IsReadOnly, IsSelected
+    props=4: Column, IsEditing, IsReadOnly, IsSelected
+  DataGridRow: DataGridRow : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+    DPs=14: AlternationIndex, DetailsTemplate, DetailsTemplateSelector, DetailsVisibility, Header, HeaderStyle, HeaderTemplate, HeaderTemplateSelector, IsEditing, IsNewItem, IsSelected, Item, ItemsPanel, ValidationErrorTemplate
+    props=14: AlternationIndex, DetailsTemplate, DetailsTemplateSelector, DetailsVisibility, Header, HeaderStyle, HeaderTemplate, HeaderTemplateSelector, IsEditing, IsNewItem, IsSelected, Item, ItemsPanel, ValidationErrorTemplate
+  DataGridSplitter: NOT EXPORTED
+  GridSplitter: GridSplitter : Thumb : Control : FrameworkElement : UIElement : Visual : DependencyObject
+    DPs=6: DragIncrement, KeyboardIncrement, PreviewStyle, ResizeBehavior, ResizeDirection, ShowsPreview
+    props=6: DragIncrement, KeyboardIncrement, PreviewStyle, ResizeBehavior, ResizeDirection, ShowsPreview
+  DataGridColumn: DataGridColumn : DependencyObject : DispatcherObject : Object
+    DPs=21: ActualWidth, CanUserReorder, CanUserResize, CanUserSort, CellStyle, DisplayIndex, DragIndicatorStyle, Header, HeaderStringFormat, HeaderStyle, HeaderTemplate, HeaderTemplateSelector, IsAutoGenerated, IsFrozen, IsReadOnly, MaxWidth, MinWidth, SortDirection, SortMemberPath, Visibility, Width
+    props=22: ActualWidth, CanUserReorder, CanUserResize, CanUserSort, CellStyle, ClipboardContentBinding, DisplayIndex, DragIndicatorStyle, Header, HeaderStringFormat, HeaderStyle, HeaderTemplate, HeaderTemplateSelector, IsAutoGenerated, IsFrozen, IsReadOnly, MaxWidth, MinWidth, SortDirection, SortMemberPath, Visibility, Width
+  DataGridTextColumn: DataGridTextColumn : DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+    DPs=5: FontFamily, FontSize, FontStyle, FontWeight, Foreground
+    props=5: FontFamily, FontSize, FontStyle, FontWeight, Foreground
+  DataGridBoundColumn: DataGridBoundColumn : DataGridColumn : DependencyObject : DispatcherObject : Object
+    DPs=2: EditingElementStyle, ElementStyle
+    props=4: Binding, ClipboardContentBinding, EditingElementStyle, ElementStyle
+  explicit-column grid tree:
+    DataGrid size=480x140
+    Border 'PART_OuterBorder' bg=#FF2C2C2E r=12,12,12,12 bt=1,1,1,1 size=480x140
+    Grid size=478x138
+    Grid 'PART_ColumnHeadersBorder' size=478x34
+    ScrollViewer 'PART_ColumnHeadersScrollViewer' size=458x34
+    StackPanel 'PART_ColumnHeadersHost' size=458x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=42.18x19.78
+    TextBlock size=42.18x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=39.5x19.78
+    TextBlock size=39.5x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=40.88x19.78
+    TextBlock size=40.88x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    DataGridColumnHeader size=120x34
+    Grid size=120x34
+    Border 'PART_HeaderBorder' bg=#0DFFFFFF r=0,0,0,0 bt=0,0,1,0 size=120x34
+    Grid size=103x20
+    ContentPresenter size=31.68x19.78
+    TextBlock size=31.68x19.78
+    TextBlock 'PART_SortIndicator' size=0x0
+    Rectangle 'PART_ResizeGrip' size=8x34
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=12x0
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=12x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Rectangle size=478x1
+    Grid 'PART_RowHeaderCorner' size=20x34
+    Rectangle size=1x34
+    Rectangle size=20x1
+    ScrollViewer 'PART_DataScrollViewer' size=478x104
+    StackPanel 'PART_RowsHost' size=466x92
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    DataGridRow size=500x30
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=500x30
+    StackPanel 'PART_CellsPanel' size=500x29
+    StackPanel size=500x30.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=47.45x19.78
+    TextBlock size=43.45x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=22.42x19.78
+    TextBlock size=18.42x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridRowHeader size=20x30
+    DataGridDetailsPresenter size=0x0
+    DataGridRow size=500x30
+    Border 'PART_RowBorder' bg=#0FFFFFFF r=0,0,0,0 bt=0,0,0,1 size=500x30
+    StackPanel 'PART_CellsPanel' size=500x29
+    StackPanel size=500x30.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=47.45x19.78
+    TextBlock size=43.45x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=22.42x19.78
+    TextBlock size=18.42x19.78
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridCell size=120x30.78
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x29.78
+    ContentPresenter size=4x0
+    TextBlock size=0x0
+    DataGridRowHeader size=20x30
+    DataGridDetailsPresenter size=0x0
+    Border bg=null r=0,0,0,0 bt=0,0,0,0 size=0x0
+    ScrollBar size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    Track size=0x0
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    Thumb size=0x12
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=0x12
+    RepeatButton size=0x0
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x0
+    RepeatButton size=0x0
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=0x0
+    Path 'PART_Arrow' size=0x0
+    ScrollBar size=466x12
+    RepeatButton size=12x12
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=12x12
+    Path 'PART_Arrow' size=8x8
+    Track size=442x12
+    RepeatButton size=0x12
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=0x12
+    Thumb size=411.94x7.55
+    Border 'ThumbBorder' bg=#8BFFFFFF r=999,999,999,999 bt=0,0,0,0 size=411.94x7.55
+    RepeatButton size=30.06x12
+    Border bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,0 size=30.06x12
+    RepeatButton size=12x12
+    Border 'PART_ButtonRoot' bg=#00FFFFFF r=5,5,5,5 bt=0,0,0,0 size=12x12
+    Path 'PART_Arrow' size=8x8
+    Canvas 'PART_DragOverlay' size=0x0
+    Border name=PART_OuterBorder bg=#FF2C2C2E bw=1,1,1,1 bc=#FF48484A r=12,12,12,12 size=480x140
+    Border name=PART_HeaderBorder bg=#0DFFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=120x34
+    Border name=PART_HeaderBorder bg=#0DFFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=120x34
+    Border name=PART_HeaderBorder bg=#0DFFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=120x34
+    Border name=PART_HeaderBorder bg=#0DFFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=120x34
+    Border name=PART_ButtonRoot bg=#00FFFFFF bw=0,0,0,0 bc=#00FFFFFF r=5,5,5,5 size=0x0
+    Border name= bg=#00FFFFFF bw=0,0,0,0 bc=#FF48484A r=0,0,0,0 size=0x0
+    Border name=ThumbBorder bg=#8BFFFFFF bw=0,0,0,0 bc=#00FFFFFF r=999,999,999,999 size=0x12
+    Border name= bg=#00FFFFFF bw=0,0,0,0 bc=#FF48484A r=0,0,0,0 size=0x0
+    Border name=PART_ButtonRoot bg=#00FFFFFF bw=0,0,0,0 bc=#00FFFFFF r=5,5,5,5 size=0x0
+    Border name=PART_ButtonRoot bg=#00FFFFFF bw=0,0,0,0 bc=#00FFFFFF r=5,5,5,5 size=0x0
+    Border name= bg=#00FFFFFF bw=0,0,0,0 bc=#FF48484A r=0,0,0,0 size=0x0
+    Border name=ThumbBorder bg=#8BFFFFFF bw=0,0,0,0 bc=#00FFFFFF r=999,999,999,999 size=12x0
+    Border name= bg=#00FFFFFF bw=0,0,0,0 bc=#FF48484A r=0,0,0,0 size=0x0
+    Border name=PART_ButtonRoot bg=#00FFFFFF bw=0,0,0,0 bc=#00FFFFFF r=5,5,5,5 size=0x0
+    Border name= bg=null bw=0,0,0,0 bc=#FF48484A r=0,0,0,0 size=0x0
+    Border name=PART_RowBorder bg=#00FFFFFF bw=0,0,0,1 bc=#FF48484A r=0,0,0,0 size=500x30
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78
+    Border name=PART_RowBorder bg=#0FFFFFFF bw=0,0,0,1 bc=#FF48484A r=0,0,0,0 size=500x30
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78
+    Border name=PART_CellBorder bg=#00FFFFFF bw=0,0,1,0 bc=#FF48484A r=0,0,0,0 size=119x29.78

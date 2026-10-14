@@ -1,0 +1,7 @@
+
+12936 "C:\Program Files\dotnet\dotnet.exe" build LanMountainDesktop.slnx -c Debug -m:1
+24172 dotnet exec --runtimeconfig C:\git\LanDesktop\LanMountainDesktop\.nuget\packages\avalonia.buildservices\11.3.2\to
+ols\netstandard2.0\runtimeconfig.json C:\git\LanDesktop\LanMountainDesktop\.nuget\packages\avalonia.buildservices\11.3.
+2\tools\netstandard2.0\Avalonia.BuildServices.Collector.dll
+
+

@@ -1,0 +1,125 @@
+=== A. the opt-in member, and what can reach it ===
+  TabControl: TabControl < Selector < ItemsControl OnTemplateContentClearing[private] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  TabItem: TabItem < HeaderedContentControl < ContentControl UseTemplateContentManagement[protected] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ListBox: ListBox < Selector < ItemsControl OnTemplateContentClearing[private] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ListBoxItem: ListBoxItem < ContentControl UseTemplateContentManagement[protected] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ContentControl: ContentControl UseTemplateContentManagement[protected] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  ItemsControl: ItemsControl OnTemplateContentClearing[private] < Control ExpandTemplateContent[private],ClearTemplateContent[private],OnTemplateContentClearing[private] < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+
+=== B. what the tab pair does with its template, by member name ===
+  TabControl.EnsureSelectedContentPresenter() private
+  TabControl.OnRender(DrawingContext) protected
+  TabControl.OnSelectedTabContentChanged(TabItem,Object) private
+  TabControl.OnSelectedTabContentPresentationChanged(TabItem) private
+  TabControl.RemoveSelectedContentPresenter() private
+  TabControl.SetSelectedContentValues(Object,DataTemplate,DataTemplateSelector,String,TabItem) private
+  TabControl.UpdateSelectedContent() private
+  TabControl.get_ContentStringFormat() public
+  TabControl.get_ContentTemplate() public
+  TabControl.get_ContentTemplateSelector() public
+  TabControl.get_SelectedContent() public
+  TabControl.get_SelectedContentStringFormat() public
+  TabControl.get_SelectedContentTemplate() public
+  TabControl.get_SelectedContentTemplateSelector() public
+  TabControl.set_ContentStringFormat(String) public
+  TabControl.set_ContentTemplate(DataTemplate) public
+  TabControl.set_ContentTemplateSelector(DataTemplateSelector) public
+  TabItem.OnContentChanged(Object,Object) protected
+  TabItem.OnContentStringFormatChanged(String,String) protected
+  TabItem.OnContentTemplateChanged(DataTemplate,DataTemplate) protected
+  TabItem.OnContentTemplateSelectorChanged(DataTemplateSelector,DataTemplateSelector) protected
+  TabItem.OnRender(DrawingContext) protected
+
+=== C. positive control: does a style-setter template build for ListBox? ===
+  merged: ok
+  parts: ProbeListRoot=True  ProbeListItems=True
+  control read: items=2
+  ListBox via style: 420x130 distinct=1 tint#0000FF=54600
+    top: #0000FFx54600
+    ListBox bg=#2C2C2E sel= 420x130
+      Border 'ProbeListRoot' 420x130
+        ItemsPresenter 'ProbeListItems' 420x130
+          VirtualizingStackPanel 420x130
+            ListBoxItem bg=#FFFFFF sel=False 420x40.78
+              Grid 420x40.78
+            ListBoxItem bg=#FFFFFF sel=False 420x40.78
+              Grid 420x40.78
+
+=== D. TabControl alone, through the same route ===
+  merged: ok
+  parts: ProbeHostRoot=False  ProbeStrip=False  ProbeBody=False
+  control read: SelectedIndex=0 items=2
+  TabControl host style only: 420x130 distinct=2 tint#FF00FF=0
+    top: #1C1C1Ex53760  #323234x840
+    TabControl bg=#1C1C1E sel= 420x130
+      StackPanel 0x0
+        TabItem bg=#FFFFFF sel=True 0x36
+        TabItem bg=#FFFFFF sel=False 0x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" 0x0
+
+=== E. TabItem alone ===
+  merged: ok
+  parts: ProbeItemRoot=False  ProbeItemHeader=False
+  control read: SelectedIndex=0 items=2
+  TabItem style only: 420x130 distinct=4 tint#00FF00=0
+    top: #1C1C1Ex51660  #3A3A3Cx2040  #323234x780  #1E793Fx120
+    TabControl bg=#1C1C1E sel= 420x130
+      StackPanel 420x36
+        TabItem bg=#FFFFFF sel=True 60x36
+        TabItem bg=#FFFFFF sel=False 60x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" 65.82x19.78
+
+=== F. both at once, then a selection flip ===
+  parts: ProbeHostRoot=False  ProbeStrip=False  ProbeBody=False  ProbeItemRoot=False
+  F both: 420x130 distinct=2 tint#FF00FF=0  tint#00FF00=0
+    top: #1C1C1Ex53760  #323234x840
+    TabControl bg=#1C1C1E sel= 420x130
+      StackPanel 0x0
+        TabItem bg=#FFFFFF sel=True 0x36
+        TabItem bg=#FFFFFF sel=False 0x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" 0x0
+    visible body texts: body two  SelectedContent=TextBlock
+  SelectedIndex 0 -> 1: ok
+  F after flip: 420x130 distinct=2 tint#FF00FF=0  tint#00FF00=0
+    top: #1C1C1Ex53760  #323234x840
+    TabControl bg=#1C1C1E sel= 420x130
+      StackPanel 0x0
+        TabItem bg=#FFFFFF sel=False 0x36
+        TabItem bg=#FFFFFF sel=True 0x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body two" 0x0
+
+=== G. local value again, in this same build, for the record ===
+  parsed template: ControlTemplate
+  parts: ProbeHostRoot=False  ProbeStrip=False  ProbeBody=False
+  G local value: 420x130 distinct=4 tint#FF00FF=0
+    top: #1C1C1Ex51660  #3A3A3Cx2040  #323234x780  #1E793Fx120
+    TabControl bg=#1C1C1E sel= 420x130
+      StackPanel 420x36
+        TabItem bg=#FFFFFF sel=True 60x36
+        TabItem bg=#FFFFFF sel=False 60x36
+      ContentPresenter 47.59x14.7
+        TextBlock text="body one" 47.59x14.7
+
+=== H. a TabItem subclass that opts in: does the template build, and does a trigger land? ===
+  parts: ProbeSubRoot=False  ProbeSubHeader=False
+  H rest: 482x36 distinct=1 tint#00FF00=0  tint#0000FF=0
+    top: #000000x17352
+    ProbeItemSub bg=#FFFFFF sel=False 482.29x36
+  H IsSelected=true: 482x36 distinct=2 tint#00FF00=0  tint#0000FF=0
+    top: #3A3A3Cx16388  #1E793Fx964
+    ProbeItemSub bg=#FFFFFF sel=True 482.29x36
+
+=== I. the same through a ContentControl subclass, the route the own type will take ===
+  parts: ProbeViewRoot=True  ProbeStripHost=True  ProbeBodyHost=True
+  I view subclass: 482x20 distinct=1 tint#FF00FF=9640
+    top: #FF00FFx9640
+    ProbeViewSub bg=- sel= 482.29x19.78
+      Border 'ProbeViewRoot' 482.29x19.78
+        StackPanel 482.29x19.78
+          StackPanel 'ProbeStripHost' 482.29x0
+          ContentPresenter 'ProbeBodyHost' 65.82x19.78
+            TextBlock text="body one" 65.82x19.78

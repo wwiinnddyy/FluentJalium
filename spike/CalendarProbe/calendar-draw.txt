@@ -1,0 +1,28 @@
+=== 1. what each subject is: tree, geometry, its own implicit style, its defaults ===
+Calendar             children=0 actual=300x300 desired=300x300 visible=True style=setters=9[Background,Foreground,BorderBrush,BorderThickness,Padding,CornerRadius,TransitionProperty,TransitionDuration,TransitionTimingFunction] triggers=2 template-cell=False
+                     DisplayDate=2026-09-23 SelectedDate=0001-01-01 SelectedDates.Count=0
+DatePicker           children=0 actual=300x300 desired=300x300 visible=True style=setters=10[Background,Foreground,BorderBrush,BorderThickness,Padding,CornerRadius,MinHeight,TransitionProperty,TransitionDuration,TransitionTimingFunction] triggers=3 template-cell=False
+                     SelectedDate=null
+TimePicker           children=0 actual=300x300 desired=300x300 visible=True style=setters=10[Background,Foreground,BorderBrush,BorderThickness,Padding,CornerRadius,MinHeight,TransitionProperty,TransitionDuration,TransitionTimingFunction] triggers=3 template-cell=False
+                     SelectedTime=null ClockIdentifier=12HourClock
+Button (calibration) children=4 actual=300x300 desired=300x300 visible=True style=setters=0[] triggers=0 template-cell=False
+Grid (baseline)      children=0 actual=300x300 desired=300x300 visible=True style=no implicit style by type
+
+=== 2. does it paint? histogram of each crop against the empty-Grid baseline ===
+baseline (Grid 300x300) : #000000=90000
+Calendar             #F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #0078D4=88 (two consecutive captures agreed=True, distinct=39)
+DatePicker           #F3F3F3=88560 #D8D8D8=1128 #828282=124 #000000=84 #D4D4D4=16 (two consecutive captures agreed=True, distinct=15)
+TimePicker           #F3F3F3=88604 #D8D8D8=1128 #000000=84 #D4D4D4=16 #858585=16 (two consecutive captures agreed=True, distinct=30)
+Button (calibration) #FFFFFF=88784 #D9D9D9=1168 #000000=12 #D7D7D7=12 #C1C1C1=8 (two consecutive captures agreed=True, distinct=7)
+
+=== 3. do the names an OnRender path would read reach these pixels? ===
+  probe under TextOnAccent resolves at app scope to: SolidColorBrush #112233
+    Calendar             probe-colour pixels=0 total=#F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #0078D4=88
+    DatePicker           probe-colour pixels=0 total=#F3F3F3=88560 #D8D8D8=1128 #828282=124 #000000=84 #D4D4D4=16
+    TimePicker           probe-colour pixels=0 total=#F3F3F3=88604 #D8D8D8=1128 #000000=84 #D4D4D4=16 #858585=16
+    Button (calibration) probe-colour pixels=0 total=#FFFFFF=88784 #D9D9D9=1168 #000000=12 #D7D7D7=12 #C1C1C1=8
+  probe under AccentBrush resolves at app scope to: SolidColorBrush #112233
+    Calendar             probe-colour pixels=88 total=#F3F3F3=80348 #FFFFFF=7976 #ECECEC=1104 #000000=136 #112233=88
+    DatePicker           probe-colour pixels=0 total=#F3F3F3=88560 #D8D8D8=1128 #828282=124 #000000=84 #D4D4D4=16
+    TimePicker           probe-colour pixels=0 total=#F3F3F3=88604 #D8D8D8=1128 #000000=84 #D4D4D4=16 #858585=16
+    Button (calibration) probe-colour pixels=0 total=#FFFFFF=88784 #D9D9D9=1168 #000000=12 #D7D7D7=12 #C1C1C1=8

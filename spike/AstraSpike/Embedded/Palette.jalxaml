@@ -1,0 +1,27 @@
+<!-- S0-b/S0-c probe: can non-brush token types live inside real ThemeDictionaries?
+     Each type is isolated so one failure does not hide the others' results. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <ResourceDictionary.ThemeDictionaries>
+    <ResourceDictionary x:Key="Light">
+      <SolidColorBrush x:Key="SpikeBrush" Color="#FFFF0000" />
+      <Color x:Key="SpikeColor">#FFFF0000</Color>
+      <CornerRadius x:Key="SpikeRadius">4</CornerRadius>
+      <Thickness x:Key="SpikeMargin">8,4,8,4</Thickness>
+      <Duration x:Key="SpikeDuration">0:0:0.167</Duration>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="Dark">
+      <SolidColorBrush x:Key="SpikeBrush" Color="#FF00FF00" />
+      <Color x:Key="SpikeColor">#FF00FF00</Color>
+      <CornerRadius x:Key="SpikeRadius">8</CornerRadius>
+      <Thickness x:Key="SpikeMargin">16,8,16,8</Thickness>
+      <Duration x:Key="SpikeDuration">0:0:0.333</Duration>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="HighContrast">
+      <SolidColorBrush x:Key="SpikeBrush" Color="#FF0000FF" />
+      <Color x:Key="SpikeColor">#FF0000FF</Color>
+      <CornerRadius x:Key="SpikeRadius">0</CornerRadius>
+      <Thickness x:Key="SpikeMargin">0</Thickness>
+      <Duration x:Key="SpikeDuration">0:0:0</Duration>
+    </ResourceDictionary>
+  </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

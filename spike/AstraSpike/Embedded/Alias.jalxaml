@@ -1,0 +1,4 @@
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- S0-c: is the WinUI alias form (StaticResource as an element with ResourceKey) parseable? -->
+  <StaticResource x:Key="SpikeAliasBrush" ResourceKey="SpikeBrush" />
+</ResourceDictionary>

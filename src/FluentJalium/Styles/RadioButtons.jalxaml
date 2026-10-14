@@ -1,0 +1,37 @@
+<!-- WinUI 3 RadioButtons.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob 40a2827458d18bd57fd164c3f00fc88b19501fb8:
+     the default template is 20 lines wide (RadioButtons.xaml:9-28) - a StackPanel holding the header presenter (:21)
+     and the item host (:22) - plus one VisualStateGroup, CommonStates, whose only non-empty state is Disabled (:14-18).
+     The type is own because 26.10.9 exports no RadioButtons at all; the item host is the runtime's own ItemsControl
+     pipeline rather than upstream's ItemsRepeater, which is what spike/ItemHostProbe sections B and F measured.
+     Row-by-row mapping and every deviation: docs/astra/audits/radio-buttons.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+  <Style x:Key="DefaultRadioButtonsStyle" TargetType="controls:FluentRadioButtons">
+    <!-- Upstream paints nothing on the panel itself, so there is no Background or BorderBrush row to read: the
+         five rows this control has are in ThemeResources/RadioButtons.jalxaml. The Foreground row is written on
+         the control rather than on the header presenter, because a ContentPresenter on this runtime declares no
+         Foreground - a cell written there is the dead-write class adaptation/00 S1-f gates - and the header's
+         text reaches the brush through the inheritance chain instead. The items are unaffected: each generated
+         RadioButton brings its own Foreground cells from Styles/Inputs.jalxaml. -->
+    <Setter Property="Foreground" Value="{ThemeResource RadioButtonsHeaderForeground}" />
+    <Setter Property="Template"><ControlTemplate TargetType="controls:FluentRadioButtons">
+      <StackPanel>
+        <ContentPresenter Name="HeaderContentPresenter"
+                          Content="{TemplateBinding Header}"
+                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                          Margin="{ThemeResource RadioButtonsTopHeaderMargin}" />
+        <!-- Upstream's second child is an ItemsRepeater with a ColumnMajorUniformToLargestGridLayout bound to
+             MaxColumns and the two spacing rows (RadioButtons.xaml:22-24). This host has no repeater: the panel is
+             FluentRadioButtonsPanel, chosen by FluentRadioButtons.UpdatePanel, which reads MaxColumns and carries
+             the two spacings as its own defaults because x:Double rows cannot be published here. -->
+        <ItemsPresenter Name="ItemsPresenter" />
+      </StackPanel>
+        <ControlTemplate.Triggers>
+          <!-- CommonStates/Disabled (RadioButtons.xaml:14-18) writes exactly one thing: the header's foreground. -->
+          <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource RadioButtonsHeaderForegroundDisabled}" /></Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+
+  <Style TargetType="controls:FluentRadioButtons" BasedOn="{StaticResource DefaultRadioButtonsStyle}" />
+</ResourceDictionary>

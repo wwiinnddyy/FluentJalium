@@ -1,0 +1,148 @@
+applied noappbarink on AppBar.jalxaml (2 line(s), snapshot AppBar.jalxaml.snap)
+--- before
++++ after
+@@ -82 +82 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+@@ -143 +143 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+noappbarink apply-exit=0
+applied nomenusink on Menus.jalxaml (3 line(s), snapshot Menus.jalxaml.snap)
+--- before
++++ after
+@@ -69 +69 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+@@ -121 +121 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+@@ -165 +165 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+nomenusink apply-exit=0
+applied notabink on TabView.jalxaml (1 line(s), snapshot TabView.jalxaml.snap)
+--- before
++++ after
+@@ -179 +179 @@
+-                        controls:IconInk.Source="{Binding RelativeSource={RelativeSource Self}}" />
++                         />
+notabink apply-exit=0
+applied notoggleink on Navigation.jalxaml (1 line(s), snapshot Navigation.jalxaml.snap)
+--- before
++++ after
+@@ -196 +196 @@
+-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
++                             />
+notoggleink apply-exit=0
+src/FluentJalium/Styles/AppBar.jalxaml:0
+src/FluentJalium/Styles/AutoSuggestBox.jalxaml:0
+src/FluentJalium/Styles/BreadcrumbBar.jalxaml:0
+src/FluentJalium/Styles/Common.jalxaml:0
+src/FluentJalium/Styles/ContentDialog.jalxaml:0
+src/FluentJalium/Styles/DataGrid.jalxaml:0
+src/FluentJalium/Styles/Divider.jalxaml:0
+src/FluentJalium/Styles/FocusVisuals.jalxaml:0
+src/FluentJalium/Styles/InfoBadge.jalxaml:0
+src/FluentJalium/Styles/Inputs.jalxaml:0
+src/FluentJalium/Styles/ListBoxes.jalxaml:0
+src/FluentJalium/Styles/ListViews.jalxaml:0
+src/FluentJalium/Styles/Menus.jalxaml:0
+src/FluentJalium/Styles/Navigation.jalxaml:0
+src/FluentJalium/Styles/PipsPager.jalxaml:0
+src/FluentJalium/Styles/ProgressBar.jalxaml:0
+src/FluentJalium/Styles/ProgressRing.jalxaml:0
+src/FluentJalium/Styles/RadioButtons.jalxaml:0
+src/FluentJalium/Styles/RatingControl.jalxaml:0
+src/FluentJalium/Styles/Selection.jalxaml:0
+src/FluentJalium/Styles/Surfaces.jalxaml:0
+src/FluentJalium/Styles/TabView.jalxaml:0
+src/FluentJalium/Styles/TeachingTip.jalxaml:0
+src/FluentJalium/Styles/TextInput.jalxaml:0
+src/FluentJalium/Styles/TreeDataGrid.jalxaml:0
+src/FluentJalium/Styles/TreeViews.jalxaml:0
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:06.64
+gallery-build-exit=0
+== overview area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== tokens area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== materials area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== motion area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== buttons area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== inputs area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== selection area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== navigation area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== surfaces area 1877x1240 dark-in-both 28325 light-in-both 131
+  at x=1800..1859 y=1140..1199 px=3420
+  at x=1740..1799 y=1140..1199 px=2825
+  at x=1800..1859 y=1200..1259 px=2343
+  at x=1680..1739 y=1140..1199 px=2248
+== status area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== menus area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+== command-bar area 1877x1240 dark-in-both 687 light-in-both 0
+  at x=660..719 y=480..539 px=239
+  at x=540..599 y=480..539 px=160
+  at x=780..839 y=480..539 px=120
+  at x=0..59 y=0..59 px=112
+== settings area 1877x1240 dark-in-both 168 light-in-both 0
+  at x=0..59 y=0..59 px=112
+  at x=0..59 y=60..119 px=56
+reverted noappbarink: AppBar.jalxaml is byte-identical to its snapshot
+noappbarink revert-exit=0
+reverted nomenusink: Menus.jalxaml is byte-identical to its snapshot
+nomenusink revert-exit=0
+reverted notabink: TabView.jalxaml is byte-identical to its snapshot
+notabink revert-exit=0
+reverted notoggleink: Navigation.jalxaml is byte-identical to its snapshot
+notoggleink revert-exit=0
+marker-grep-lines=0 (0 = clean)
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.06
+gallery-rebuild-exit=0
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:02.46
+tests-rebuild-exit=0

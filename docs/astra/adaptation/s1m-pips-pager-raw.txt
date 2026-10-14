@@ -1,0 +1,118 @@
+S1-m raw readings - the PipsPager slice (2026-09-20)
+Run by spike/PipsPagerProbe (modes api | pip, log written next to its bin) and by the iterations of
+tests/FluentJalium.Tests/AstraPipsPagerTests.cs. Upstream is microsoft-ui-xaml
+@19e3bdc3ccf3361393d623d3a5d2667cb8f33229, PipsPager_themeresources.xaml blob 0d93a289b39a22b7e859a2ecea964575826e52f7
+and PipsPager.xaml blob 42c1ab313201354cb4d77897acfc36b8b867cc25. Interpretation lives in
+docs/astra/audits/pips-pager.md; this file is only what was read off the machine.
+
+[A] 26.10.9 surface, from the probe's api mode (theme dictionaries = 51)
+  present: FontIcon < IconElement < FrameworkElement; SymbolIcon; PathIcon; FocusManager; ToolTipService;
+           AutomationProperties; ScrollViewer; Button/RepeatButton/ToggleButton < ButtonBase < ContentControl;
+           VisualStateManager; VisualState; Style; Orientation {Horizontal, Vertical}; Key {Left,Right,Up,Down,Enter,Space}
+  absent : BitmapIcon, IconSource, ItemsRepeater, StackLayout, PipsPager, RadioButtons, BreadcrumbBar
+  Button  : CornerRadius, BorderThickness, BorderBrush, Background, Foreground, FontSize, FontFamily, Content,
+            IsTabStop, Command, CommandParameter, Click, Template, Padding, MinHeight - all present.
+            FocusVisualMargin - absent.  UseSystemFocusVisuals - absent.
+  ScrollViewer: VerticalScrollBarVisibility, HorizontalScrollBarVisibility, CanContentScroll, HorizontalOffset,
+            Content present.  VerticalScrollMode / HorizontalScrollMode / IsScrollChainingEnabled /
+            IsHorizontalScrollChainingEnabled / IsVerticalScrollChainingEnabled - all absent.
+  UIElement: IsEnabled, IsVisible, Focus() (public), IsKeyboardFocused, KeyDown (KeyEventHandler),
+            PreviewKeyDown, GotFocus/LostFocus (RoutedEventHandler), DesiredSize.
+            GettingFocus / LosingFocus - absent.
+  Control : GetTemplateChild (protected), OnApplyTemplate (public), TryFindResource (public), DefaultStyleKey
+            (non-public getter).
+  FrameworkElement: MaxWidth, MaxHeight, MinHeight, Opacity, Visibility, RenderTransform (Transform),
+            RenderTransformOrigin (Point), FlowDirection, Name, Tag, Parent, Resources - all present.
+  StackPanel: Orientation, Spacing.  Panel: Children (UIElementCollection).
+  AutomationProperties public static fields: NameProperty, HeadingLevelProperty, PositionInSetProperty,
+            SizeOfSetProperty, IsRowHeaderProperty, IsColumnHeaderProperty, IsDialogProperty, AutomationIdProperty,
+            HelpTextProperty, ItemStatusProperty, ItemTypeProperty, LabeledByProperty, IsRequiredForFormProperty,
+            AcceleratorKeyProperty, AccessKeyProperty, LiveSettingProperty, IsOffscreenBehaviorProperty.
+            (No AccessibilityView - upstream's AccessibilityView="Raw" on the glyph has nothing to land on.)
+  ToolTipService public static fields: ToolTipProperty, HorizontalOffsetProperty, VerticalOffsetProperty,
+            HasDropShadowProperty, PlacementTargetProperty, PlacementRectangleProperty, PlacementProperty,
+            ShowOnDisabledProperty, IsEnabledProperty, IsOpenProperty, ShowDurationProperty, InitialShowDelayProperty,
+            BetweenShowDelayProperty, ShowsToolTipOnKeyboardFocusProperty + Opening/Closing events.
+
+[B] symbol codepoints, from the installed fonts (spike/SymbolCmap/check.py, fontTools 4.63.0, upem 2048)
+  Segoe Fluent Icons (C:\Windows\Fonts\SegoeIcons.ttf, 2033 mapped):
+    U+EA3B uniEA3B  advance 1.000em  bbox 0.938 x 0.938em  x .031..0.969  y .031..0.969  contours 1
+    U+EDDB uniEDDB  advance 1.000em  bbox 1.000 x 0.745em  y .125..0.870  contours 1
+    U+EDDC uniEDDC  advance 1.000em  bbox 1.000 x 0.750em  y .125..0.875  contours 1
+  Segoe MDL2 Assets (segmdl2.ttf, 1833 mapped): EA3B 0.969em square; EDDB/EDDC 1.000 x 0.500em.
+  One contour and a square box is a solid disc, not a ring and not a hollow tofu rectangle. So the two pip states
+  are the same glyph and only the run size separates them: 0.938 x 6 = 5.6 DIP, 0.938 x 4 = 3.8 DIP.
+
+[C] the same codepoints rendered by this runtime (probe mode pip, 40x40 black cells, white ink, threshold 120)
+  drawn square  8x8      ink=64  bbox=8x8   fillOfBbox=1     centreBright=765
+  drawn circle  8x8 r=4  ink=60  bbox=8x8   fillOfBbox=0.938 centreBright=765
+  pip EA3B @24           cell=40x40 laid out 26x26   -> capture: no ink above threshold
+  pip EA3B @6            cell=40x40 laid out 8x8     -> capture: no ink above threshold
+  pip EA3B @4            cell=40x40 laid out 6x6     -> capture: no ink above threshold
+  prev EDDB @8 / next EDDC @8  laid out 10x10        -> capture: no ink above threshold
+  absent EFFE @12        laid out 9.746x14           -> capture: no ink above threshold
+  Every drawn reference painted and every glyph cell did not. The layout box is the right size in each case, so the
+  run is resolved and measured; it is the glyph's ink that never arrives. This is the same defect the Button audit
+  already records as "text colour never reaches the capture path", now measured on a control whose entire paint is
+  a glyph.
+
+[D] the runtime's own button chrome against a 12x24 pip (probe mode chrome)
+  default Button                        size=33.1x32.78 style=null minHeight=32 padding=11,5,11,6 template=SET parts=Surface, FocusOutline
+  Button forced 12x24                   size=12x32      style=null minHeight=32 padding=11,5,11,6 template=SET parts=Surface, FocusOutline
+  Button MinHeight=0 forced 12x24       size=12x24      style=null minHeight=0  padding=11,5,11,6 template=SET parts=Surface, FocusOutline
+  A generated Button picks up the implicit Fluent button style without its Style property being written (the same
+  read as s1l section F), and its 32 DIP floor is what a pip has to take off explicitly.
+
+[E] markup and template readings, from the test iterations that found them
+  1. <ControlTemplate.Triggers> written inside the template's root element is a parse error, not a silent drop:
+     XamlParseException: Cannot find attached property setter for: ControlTemplate.Triggers. It has to be a direct
+     child of <ControlTemplate>. Three templates in Styles/PipsPager.jalxaml hit this before the first green run.
+  2. A <Setter TargetName="..."> inside a Style's setters does not reach the template part. The selected pip kept
+     the 3.8 dot its base style gave it. The same write from a ControlTemplate.Triggers arm works, which is how the
+     focus outline of a button is drawn today. Selected/normal therefore switch two drawn dots by Visibility through
+     a trigger on the pip's Tag, and the styles carry only the brushes.
+  3. Two <Ellipse> siblings directly inside one <Border> in a template leave the Border with no named child at all:
+     Named(pip, "NormalDot") returned null while RootGrid resolved. Wrapped in a <Grid>, both parts are found.
+     (No parse error, no warning - the parts simply were not there.)
+  4. Clamping the scroll viewport from the realized containers' DesiredSize starves itself: UpdateViewport ran
+     before anything was measured, and the _pipHost.SizeChanged that would re-run it never arrived again, because
+     the host's arranged width is what the clamp limits. Reading: MaxWidth stayed 12 with two pips in the row and
+     the second pip painted no ink. The footprint the control itself writes onto each container is now the input.
+  5. The DP changed callback fires for a write of the value that is already set, with OldValue carrying the rejected
+     value. That is what made the first version of the clamp raise SelectedIndexChanged twice for a second
+     out-of-range write.
+  6. An unbounded row (NumberOfPages=-1) has to be regenerated on every selection change, and the grow-only rule
+     cannot ask the live list how big it was: PipCount saw an emptied list and shrank eight pips back to five.
+  7. In Light the pip token is #5E000000, so its packed RGB is the same key as the host window's black backdrop:
+     PixelKey(brush) counted 105966 pixels in a 9600 pixel subject, and adding a pip changed nothing at all. On a
+     white surface the dot lands on #B5B5B5 and the same delta measures 19 pixels for one selected pip, then grows
+     again for the second. Counts are read as histogram deltas between captures of one hosted element; hosting a
+     second element in the same window leaves the first one in front of the capture.
+  8. ((IInvokeProvider)new ButtonAutomationPeer(disabledButton)).Invoke() throws
+     InvalidOperationException: Cannot invoke a disabled button - so the edge-of-range disable rule is assertable
+     through the pattern rather than only through IsEnabled.
+
+[F] test and gate readings
+  AstraPipsPagerTests: 29 members, 0 failed (13 facts + 16 theory rows), 3 s.
+  src/FluentJalium and the Gallery both build with 0 warnings, 0 errors.
+
+  Gate run 1 (serial tools/Test-AstraGates.ps1, exit 1): restore all current; Debug build 0 warnings /
+  0 errors; suite 1166 passed / 1 failed / 0 skipped in 9 m 55 s. The failure was
+  AstraDataGridTests.The_grid_surface_paints_its_background_row - "capture never settled:
+  #FF00FFx51426 #F600F6x12381 #D2D2D7x1218 #E300E3x1128 #D600D6x380 #F000F0x248" - a pixel test that was
+  green in the previous segment, not a PipsPager test. The palette step never ran because the suite failed.
+  Attribution, in one pass each way: that class alone is 56/56 green; AstraPipsPagerTests + AstraDataGridTests +
+  AstraTeachingTipTests (the two other magenta-sentinel classes, the neighbours that could leave content in the
+  shared host window) together are 159/159 green. So nothing about this slice reproduces it.
+
+  Gate run 2, same tree, no other process running (exit 0): restore all current; Debug build
+  0 warnings / 0 errors; suite 1167 passed / 0 failed / 0 skipped in 5 m 35 s - 30 more members than the
+  previous segment's 1137 (29 new tests + 1 for the new dictionary row in the resource-key gate);
+  palette drift Light 83 source colors / 101 brushes, Dark the same, HighContrast 101 mapped keys with the
+  3 upstream names held back for want of a palette entry, all three lines checked=True; "All Astra gates
+  passed." The first run's failure is therefore recorded as the sequence flake that task #35 already tracks,
+  not as a pass claim: two readings of the same tree, one red one green, and no isolated reproduction.
+
+  Gallery smoke (tools/Test-AstraGallerySmoke.ps1 -Page navigation): window handle and title asserted,
+  closed cleanly in 12.8 s, no Gallery process left. The page is mounted, not the new card eyeballed -
+  it sits below the fold, and a screenshot is not evidence (adaptation/06).

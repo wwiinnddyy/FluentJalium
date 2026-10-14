@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway census for the class of silent failure the dead-cell sweep (adaptation/00 S1-f) left open:
+       the gate proved every `<Setter TargetName Property>` names a property its part actually has, but the
+       same markup language accepts an *attribute* on an element whose type has no such member, parses it,
+       and paints nothing - which is exactly how a margin or a radius can look transcribed and still be
+       wrong on screen. This probe reflects the shipped markup against the runtime's public surface and
+       prints what has no receiver. It never opens a window. Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AttributeSweep</RootNamespace>
+    <AssemblyName>AttributeSweep</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

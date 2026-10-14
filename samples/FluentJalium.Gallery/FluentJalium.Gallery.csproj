@@ -4,12 +4,28 @@
     <TargetFramework>net10.0-windows</TargetFramework>
     <RootNamespace>FluentJalium.Gallery</RootNamespace>
     <AssemblyName>FluentJalium.Gallery</AssemblyName>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+    <Compile Include="*.cs" />
+    <JalxamlPage Include="*.jalxaml" />
+    <!-- The parity strip and the catalog gate read the same file; it has to travel with the app. -->
+    <None Include="Catalog.json" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="../../src/FluentJalium/FluentJalium.csproj" />
+    <!-- The text catalog, the tree sweeper and the settings store. The launcher references this project to show
+         the Gallery in-process, so the dependency has to point this way and not the other way round. -->
+    <ProjectReference Include="../../src/FluentJalium.Localization/FluentJalium.Localization.csproj" />
     <PackageReference Include="Jalium.UI.Desktop" Version="$(JaliumPackageVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- GalleryText is internal because a sample has no business publishing a catalog; the coverage gate in
+         tests/FluentJalium.Tests needs to register it and walk it, so it reads the same source of truth the
+         window does rather than a copy. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FluentJalium.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>

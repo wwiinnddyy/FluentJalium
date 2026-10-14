@@ -1,0 +1,85 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:10.40
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:01.51]     FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have [FAIL]
+  失败 FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have [338 ms]
+  错误消息:
+   Cells writing a property their target does not have (10):
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no Background
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no Background
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no Background
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no Background
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no Background
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no BorderBrush
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no BorderBrush
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no BorderBrush
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no BorderBrush
+src/FluentJalium/Styles/TabView.jalxaml: ContentPresenter 'ContentPresenter' has no BorderBrush
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraGateTests.State_cells_name_properties_the_template_parts_actually_have() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraGateTests.cs:line 213
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:01.58]     FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.The_catalog_covers_every_type_astra_restyles_implicitly [FAIL]
+[xUnit.net 00:00:01.62]     FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.Every_parity_claim_cites_evidence_that_exists [FAIL]
+  失败 FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.The_catalog_covers_every_type_astra_restyles_implicitly [27 ms]
+  错误消息:
+   Catalog and shipped styles disagree: 46 restyled, 46 catalogued.
+Restyled but not catalogued: FluentJalium.Controls.FluentTabView, FluentJalium.Controls.FluentTabViewItem
+Catalogued but not restyled: FluentTabView, FluentTabViewItem
+  堆栈跟踪:
+     at FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.The_catalog_covers_every_type_astra_restyles_implicitly() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Gallery\AstraGalleryCatalogTests.cs:line 59
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  失败 FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.Every_parity_claim_cites_evidence_that_exists [31 ms]
+  错误消息:
+   Unsustainable catalog claims:
+FluentTabView: docs/astra/audits/tab-view.md does not exist
+FluentTabViewItem: docs/astra/audits/tab-view.md does not exist
+  堆栈跟踪:
+     at FluentJalium.Tests.Gallery.AstraGalleryCatalogTests.Every_parity_claim_cites_evidence_that_exists() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Gallery\AstraGalleryCatalogTests.cs:line 129
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:01.67]     FluentJalium.Tests.AstraGateTests.Template_attributes_name_members_the_element_type_actually_has [FAIL]
+  失败 FluentJalium.Tests.AstraGateTests.Template_attributes_name_members_the_element_type_actually_has [109 ms]
+  错误消息:
+   Attributes no element type can hold (14):
+src\FluentJalium\Styles\TabView.jalxaml: <Button AutomationProperties.Name> names a prefix type AutomationProperties the runtime does not export
+src\FluentJalium\Styles\TabView.jalxaml: <Button AutomationProperties.Name> names a prefix type AutomationProperties the runtime does not export
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter Background> - ContentPresenter has no Background
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter Background> - ContentPresenter has no Background
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter BorderBrush> - ContentPresenter has no BorderBrush
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter BorderBrush> - ContentPresenter has no BorderBrush
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter BorderThickness> - ContentPresenter has no BorderThickness
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter BorderThickness> - ContentPresenter has no BorderThickness
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter CornerRadius> - ContentPresenter has no CornerRadius
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter CornerRadius> - ContentPresenter has no CornerRadius
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter HorizontalContentAlignment> - ContentPresenter has no HorizontalContentAlignment
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter HorizontalContentAlignment> - ContentPresenter has no HorizontalContentAlignment
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter VerticalContentAlignment> - ContentPresenter has no VerticalContentAlignment
+src\FluentJalium\Styles\TabView.jalxaml: <ContentPresenter VerticalContentAlignment> - ContentPresenter has no VerticalContentAlignment
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraGateTests.Template_attributes_name_members_the_element_type_actually_has() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraGateTests.cs:line 305
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     4，通过:   946，已跳过:     0，总计:   950，持续时间: 4 m 57 s - FluentJalium.Tests.dll (net10.0)
+Invoke-Step : test suite (structure, resource keys, theme runtime) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:47 �ַ�: 5
++     Invoke-Step 'test suite (structure, resource keys, theme runtime) ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

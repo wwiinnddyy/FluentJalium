@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- S0-a subject: does {ThemeResource} re-resolve when CurrentThemeKey flips? -->
+  <Style x:Key="ThemeBrushButtonStyle" TargetType="Button">
+    <Setter Property="Background" Value="{ThemeResource SpikeBrush}" />
+  </Style>
+  <!-- S0-b subjects: non-brush tokens consumed through {ThemeResource}. -->
+  <Style x:Key="TokenBorderStyle" TargetType="Border">
+    <Setter Property="CornerRadius" Value="{ThemeResource SpikeRadius}" />
+    <Setter Property="Padding" Value="{ThemeResource SpikeMargin}" />
+  </Style>
+  <Style x:Key="TokenDoubleButtonStyle" TargetType="Button">
+    <Setter Property="Width" Value="{ThemeResource SpikeDouble}" />
+  </Style>
+  <Style x:Key="TokenDurationButtonStyle" TargetType="Button">
+    <Setter Property="TransitionDuration" Value="{ThemeResource SpikeDuration}" />
+  </Style>
+</ResourceDictionary>

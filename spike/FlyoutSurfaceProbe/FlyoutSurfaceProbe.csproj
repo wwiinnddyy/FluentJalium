@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for one open question in the menu audit (docs/astra/audits/menu-flyout.md §5.11):
+       Jalium.UI.Controls.MenuFlyoutPresenter really exists, so "no such type" is off the table, but nothing
+       has yet proved whether the framework puts an instance of it under an opened MenuFlyout / ContextMenu /
+       MenuBarItem dropdown - or whether that surface is the anonymous Border + MenuPopupScrollHost that pass 6
+       of MenuProbe saw. This probe answers that by walking the tree a real popup actually lands in, by reading
+       the radius/colour of every node there, and by mounting the presenter type itself to see whether it is
+       styleable at all. Reflects by simple name; nothing is typed against a guessed class.
+       Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FlyoutSurfaceProbe</RootNamespace>
+    <AssemblyName>FlyoutSurfaceProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

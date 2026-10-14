@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway surface probe for the stage-6 icon family. Not referenced by FluentJalium.slnx.
+
+       Two earlier instruments said "there is no Symbol type". Both were broken the same way: PowerShell 5.1 runs
+       on .NET Framework, and LoadFrom of a net10.0-windows assembly leaves GetTypes() throwing, which an empty
+       catch turns into an absence. This one asks the pinned runtime in its own process, over the assembly the
+       test project resolves, so the only way a name can come back missing is if it really is missing. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SymbolCmap</RootNamespace>
+    <AssemblyName>SymbolCmap</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+  </ItemGroup>
+</Project>

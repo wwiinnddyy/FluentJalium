@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway stage-0 probe. Not referenced by FluentJalium.slnx; delete after
+       docs/astra/adaptation/00-jalium-theme-capabilities.md records its results. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AstraSpike</RootNamespace>
+    <AssemblyName>AstraSpike</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Flat on purpose: a recursive glob would sweep obj/**/*.cs in as source. -->
+    <Compile Include="*.cs" />
+    <EmbeddedResource Include="Embedded/*.jalxaml">
+      <LogicalName>Embedded/%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <JalxamlPage Include="Compiled/Theme.jalxaml" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+  </ItemGroup>
+</Project>

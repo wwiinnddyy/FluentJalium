@@ -1,0 +1,674 @@
+﻿{
+  "note": "One file, two consumers: the Gallery renders its parity strip from it, and tests/FluentJalium.Tests/Gallery/AstraGalleryCatalogTests.cs fails when it stops matching the styles Astra actually ships. Scope is the implicit-style universe - every TargetType a product dictionary restyles without an x:Key - because that is the set an app inherits silently.",
+  "parityLegend": {
+    "audited": "Upstream dictionary transcribed key for key with its blob recorded, states mapped, and at least one pixel assertion - or, where a pixel assertion is provably unreachable rather than merely unmade, the measurement that proves it (as #50 does for text glyph ink) plus live-element dependency-property readings taken on the styled control in its place. Whatever is missing is named in gaps.",
+    "ported": "Style came from the pre-Astra adapter and consumes Astra tokens, but the upstream key list was never transcribed verbatim and no pixel assertion covers it.",
+    "own-type": "Jalium has no native type for this control, so an Astra-owned type carries the behavior; adaptation/05 records the demonstrated gap.",
+    "no-upstream-control": "The pinned WinUI commit carries no such control at all (the search is recorded in the cited audit), so the look is built on the token row that commit does ship plus the divider-role templates around it. Nothing on this row is claimed as a key-for-key transcription."
+  },
+  "pages": [
+    { "id": "overview", "title": "Overview", "host": "OverviewPage" },
+    { "id": "tokens", "title": "Tokens", "host": "TokensPage" },
+    { "id": "materials", "title": "Materials", "host": "MaterialsPage" },
+    { "id": "motion", "title": "Motion", "host": "MotionPage" },
+    { "id": "buttons", "title": "Buttons", "host": "ButtonsPage" },
+    { "id": "inputs", "title": "Inputs", "host": "InputsPage" },
+    { "id": "selection", "title": "Selection", "host": "SelectionPage" },
+    { "id": "navigation", "title": "Navigation", "host": "NavigationPage" },
+    { "id": "surfaces", "title": "Surfaces", "host": "SurfacesPage" },
+    { "id": "status", "title": "Status", "host": "StatusPage" },
+    { "id": "menus", "title": "Menus", "host": "MenusPage" },
+    { "id": "command-bar", "title": "Command bar", "host": "CommandBarPage" },
+    { "id": "settings", "title": "Settings", "host": "SettingsPage" }
+  ],
+  "controls": [
+    {
+      "markup": "Button",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "press, keyboard and touch activation are not gated", "text colour never reaches the capture path", "the Compound variant is not built" ]
+    },
+    {
+      "markup": "ToggleButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs", "tests/FluentJalium.Tests/AstraToggleButtonTests.cs" ],
+      "gaps": [ "press, keyboard and touch activation are not gated - the cycle is driven through the framework's own IToggleProvider, not a pointer", "mixed has no pixels of its own: upstream maps the indeterminate rows to the same brushes as rest, so only a probe style can show the cell firing", "a local Background outranks the state cells here, the opposite of upstream's VisualState storyboards", "PointerUp and PointerDown theme animations are missing; our surface fades between fills" ]
+    },
+    {
+      "markup": "RepeatButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "hold-to-repeat interval and delay are framework behavior, unmeasured" ]
+    },
+    {
+      "markup": "HyperlinkButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/button.md", "docs/astra/audits/togglebutton.md", "tests/FluentJalium.Tests/AstraButtonTests.cs" ],
+      "gaps": [ "navigation of NavigateUri is untested", "the link text colour cannot be asserted in pixels" ]
+    },
+    {
+      "markup": "SplitButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/splitbutton.md", "tests/FluentJalium.Tests/AstraSplitButtonTests.cs" ],
+      "gaps": [ "FlyoutOpen, TouchPressed and the nine Checked states have no driver: the control exposes no open flag and FlyoutBase.IsOpen is not a dependency property", "the two background grids upstream paints are gone; each half paints itself", "the flyout and click wiring depends on the halves being named PrimaryButton and SecondaryButton, which is tested both ways rather than trusted", "no AnimatedIcon, so the chevron is the combo box's Path glyph", "no real pointer or touch reaches either half" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentDropDownButton",
+      "source": "Styles/Common.jalxaml",
+      "page": "buttons",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/splitbutton.md", "tests/FluentJalium.Tests/AstraSplitButtonTests.cs", "spike/SplitButtonProbe/Program.cs" ],
+      "gaps": [ "WinUI's DropDownButton derives from ButtonBase and adds IsExpanded, Flyout, Command and Click; this one derives from Jalium's Button, so the type name is upstream's and the base is the host's", "no Expanded and Collapsed routed events", "IsExpanded drives no visual, exactly as upstream's four states do not either", "the chevron is a Path, not the AnimatedIcon upstream animates" ]
+    },
+    {
+      "markup": "ScrollViewer",
+      "source": "Styles/Common.jalxaml",
+      "page": "overview",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/scrollviewer.md", "tests/FluentJalium.Tests/AstraScrollHostTests.cs" ],
+      "gaps": [ "drag, inertia and touch panning have no evidence", "ScrollBar restyling is limited to the two generated-brush hooks" ]
+    },
+    {
+      "markup": "ToolTip",
+      "source": "Styles/Common.jalxaml",
+      "page": "overview",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/tooltip.md", "tests/FluentJalium.Tests/AstraThemeRuntimeTests.cs" ],
+      "gaps": [ "show delay, auto-hide and placement are framework behavior, unmeasured" ]
+    },
+    {
+      "markup": "TextBlock",
+      "source": "ThemeResources/Typography.jalxaml",
+      "page": "overview",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/textblock-typography.md", "docs/astra/adaptation/13-typography-property-transcription.md", "tests/FluentJalium.Tests/AstraTypographyTests.cs" ],
+      "gaps": [ "the seven upstream *TextBlockFontSize rows stay unpublished - this reader carries a markup number as zero, so the ramp rides as literals", "font fallback is the operating system's, not measured", "text colour and glyph ink never reach the capture path (#50), so every claim in this row is dependency-property level", "the implicit TextBlock row is ours, not upstream's: it still pins primary ink and wraps what WinUI would leave unwrapped" ]
+    },
+    {
+      "markup": "TextBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
+      "gaps": [ "4 of the 25 upstream rows have no property to read here: the placeholder family, because TextBox and PasswordBox have no PlaceholderText", "the eight delete-button rows now exist as rows but are read by the NumberBox spin buttons, not by these two controls", "the elevation border pair is a documented value substitution, not upstream's gradient", "the disabled text colour is the framework's own local grey, not our token", "typing, selection, caret and IME paths unmeasured", "the focused cell is read back from a real Focus() but never captured to pixels" ]
+    },
+    {
+      "markup": "PasswordBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "tests/FluentJalium.Tests/AstraTextInputTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "docs/astra/audits/textbox-passwordbox.md" ],
+      "gaps": [ "the type is drawn by the framework, so only native properties are styled and the focused accent border goes all the way round", "its resting Background reads back as the framework's own #D9FFFFFF, so no surface claim is made for any of its three states", "no reveal button, so upstream's reveal glyph and its state are absent", "no pixel assertion" ]
+    },
+    {
+      "markup": "NumberBox",
+      "source": "Styles/TextInput.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/numberbox.md", "tests/FluentJalium.Tests/AstraNumberBoxTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "5 of the 13 upstream NumberBox* keys have no row here: 4 are x:Double metrics this reader cannot parse and ride as literals, 1 has no second element to land on", "upstream's template-local RepeatButton* alias block is read through its targets instead, because those names belong to the RepeatButton control at application scope", "the spinner popup opens on focus, not on tapping the indicator: tapping needs code", "the header carrier is a ContentControl because this runtime's ContentPresenter has no Foreground member to write: the disabled row lands on the carrier, while the glyph it generates keeps the colour inherited when it was built, so the row stops one hop short of the pixels", "the spinner popup's radius, border and fill only have a painter now that its surface is a Border - on a Grid those three rows had no member to land on, so the popup came out square (adaptation/00 S1-g); the open popup is read at the property level and never captured", "no real pointer or touch drives hover or press on the spin buttons" ]
+    },
+    {
+      "markup": "AutoCompleteBox",
+      "source": "Styles/AutoSuggestBox.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/autosuggestbox.md", "tests/FluentJalium.Tests/AstraAutoSuggestBoxTests.cs", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream's AutoSuggestBox has no type here: the surface is the native AutoCompleteBox, so the 5 transcribed rows only earn their place where that type has a property or a part to land on", "14 of the 19 rows upstream declares for this control have no row here: this host has no query button, no delete button, no header and no light-dismiss overlay; 6 of the 14 are x:Double metrics this reader cannot parse anyway and 6 have no consumer upstream either", "choosing a suggestion no longer writes its text into the box: that behaviour lives in the framework template this one replaces", "the suggestion rows take their fill from the framework's own local value, so only their text colour is ours", "the list surface is a solid flyout substitution for upstream's AcrylicBrush", "no real pointer or touch opens or closes the popup", "the suggestion rows carry a framework-local MinHeight of 28 while the style row is 32, so a suggestion is visibly shorter than a combo item", "the -1,0,-1,0 list margin is stamped by the framework onto the realized scroll viewer, so the row never reaches the pixels and the list sits 1 DIP off each edge", "a framework-painted ring and paren mark the left edge of the opened list and no element in our subtree explains them - the hardest evidence that a true 1:1 AutoSuggestBox needs its own type" ]
+    },
+    {
+      "markup": "Slider",
+      "source": "Styles/Inputs.jalxaml",
+      "page": "inputs",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/slider.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSliderTests.cs" ],
+      "gaps": [ "20 of the 23 upstream alias rows have a consumer; the two header rows and the inline tick-bar row are left out because this runtime has no Slider header and no Inline member in either tick enum", "the thumb ring stroke takes a solid token because upstream's gradient cannot ride the in-place retint model", "no real pointer or touch drives hover or press: those cells are named and read back, never clicked", "the thumb squeeze is markup only - no animation frame was captured", "High Contrast per-control rows are not ported, so the palette-level remap only approximates them",
+      "the framework reserves a literal 16 for the thumb travel (measured: 204 of a 220 control with both a 16 and an 18 body), so with upstream's 18 the ring reaches 2 DIP past the control at maximum; the track inset is half a thumb because this framework moves the thumb by its left edge" ]
+    },
+    {
+      "markup": "CheckBox",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "gaps": [ "pointer-over and pressed cells have no real-pointer evidence", "the mark is geometry, not upstream's AnimatedIcon frame set", "the selection page is not measured on screen", "label rows are written on the control, not the presenter: this runtime's ContentPresenter has no Foreground member, so the template cells aimed at it were inert (adaptation/00 S1-f); on a disabled box the label is the framework's own local grey, not CheckBoxForegroundUncheckedDisabled" ],
+      "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ]
+    },
+    {
+      "markup": "RadioButton",
+      "source": "Styles/Inputs.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/checkbox-radiobutton.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraSelectionTests.cs" ],
+      "gaps": [ "the press squeeze on the dot is not ported", "nine elevation-brush rows are solid-token substitutions", "arrow-key group navigation unmeasured", "the selection page is not measured on screen", "label rows are written on the control, not the presenter (adaptation/00 S1-f), and a disabled dot's label keeps the framework's own local grey rather than RadioButtonForegroundDisabled" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentBreadcrumbBarItem",
+      "source": "Styles/BreadcrumbBar.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/breadcrumb-bar.md",
+        "docs/astra/adaptation/s1n-breadcrumb-upstream-raw.txt",
+        "tests/FluentJalium.Tests/AstraBreadcrumbBarTests.cs"
+      ],
+      "gaps": [
+        "the item needs ContentControl's UseTemplateContentManagement opt-in: with Template set and the style found, the realized crumb still painted a bare TextBlock and no template part existed at all",
+        "the four Current* states and their rows are not implemented: upstream reaches them only through the last crumb's own button, which its LastItem state collapses",
+        "the last crumb's current colour is written on the item rather than on its presenter, because a ContentPresenter declares no Foreground on this runtime (adaptation/00 S1-f)",
+        "no pointer, touch or keyboard measurement of the hover, press or focus arms (task #13)",
+        "IsTabStop=True and the two IsTemplateFocusTarget cells have no equivalent here, so the crumb's keyboard stop is the nested button's own"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentBreadcrumbBar",
+      "source": "Styles/BreadcrumbBar.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/breadcrumb-bar.md",
+        "docs/astra/adaptation/s1n-breadcrumb-upstream-raw.txt",
+        "tests/FluentJalium.Tests/AstraBreadcrumbBarTests.cs",
+        "spike/BreadcrumbProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no BreadcrumbBar, no BreadcrumbBarItem and no ItemsRepeater, StackLayout or Flyout to build one out of",
+        "19 of upstream's 29 token rows are unpublished: six because this reader cannot parse or resolve them, thirteen because nothing in this port could read them without overwriting a live cell",
+        "the hide mechanism is Visibility=Hidden rather than upstream's zero arrange rect: measured here that a zero rect leaves a sized child painted and hit-testable, and that Collapsed removes the container from the panel's Children",
+        "the ellipsis is a part of the bar's template rather than a synthetic zeroth crumb, so its entries are MenuFlyoutItems showing item.ToString() instead of the app's ItemTemplate",
+        "the drop-down entry's close-then-raise ordering is unmeasured, and no pointer, touch or keyboard path is measured at all (task #13)",
+        "no Navigation landmark and no AccessibilityView: neither property exists on this runtime, so the ellipsis stays in the automation tree it would be pulled out of",
+        "RTL chevrons and the four Current* visual states are not implemented; upstream's own arrow-key escape hatch has no object here",
+        "high-contrast: the flyout border thickness stays 1 where upstream moves it to 2, and three foreground rows resolve through the palette rather than to the system colours upstream names"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentPipsPager",
+      "source": "Styles/PipsPager.jalxaml",
+      "page": "navigation",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/pips-pager.md",
+        "docs/astra/adaptation/s1m-pips-pager-raw.txt",
+        "tests/FluentJalium.Tests/AstraPipsPagerTests.cs",
+        "spike/PipsPagerProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no PipsPager and no ItemsRepeater to build one out of",
+        "a pip is drawn rather than typed: the upstream glyph lays out at the right box but its ink reaches no capture in this runtime, so nothing about a glyph pip could be asserted",
+        "WrapMode is not shipped: upstream keeps it behind MUX_PUBLIC_V7",
+        "TemplateSettings.PipsPagerItems has no public twin here - there is no data-bound repeater to feed - so the pip list stays internal and PipFromIndex is this port's door",
+        "no automation peer: upstream's exposes a Selection pattern whose control type is Menu, and the pips here carry only their Name/PositionInSet/SizeOfSet",
+        "arrow keys and the VisibleOnPointerOver reveal have no driver: the harness delivers no real pointer or key",
+        "the pip's hover and pressed enlargement, and the nav button's 0.875 press scale, are markup no capture reaches",
+        "high contrast resolves through the palette aliases, which lands on different system colors than upstream's 27 re-pointed rows",
+        "no scroll-into-view: a selected pip beyond the clamped window is not brought back, because the runtime exposes no verified offset API"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentRadioButtons",
+      "source": "Styles/RadioButtons.jalxaml",
+      "page": "selection",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/radio-buttons.md", "docs/astra/adaptation/s1l-itemhost-raw.txt", "tests/FluentJalium.Tests/AstraRadioButtonsTests.cs", "spike/ItemHostProbe/Program.cs" ],
+      "gaps": [ "no real pointer, keyboard or touch reaches a generated row: the choice is driven by writing IsChecked, which is the state a click leaves behind rather than the click", "the header's colour is written on the control and inherited, because a ContentPresenter here declares no Foreground (adaptation/00 S1-f)", "upstream fills each column to the largest item in that column and virtualises; this panel makes every cell the size of the largest item overall and realizes every row", "RadioButtonsColumnSpacing and RadioButtonsRowSpacing are the panel's own defaults rather than published rows, because an x:Double row cannot be read here", "no HeaderTemplateSelector, no ItemContainerStyle override surface and no ContainerContentChanging event upstream has", "arrow-key navigation across the generated rows is the framework's RadioButton group behavior and is unmeasured" ]
+    },
+    {
+      "markup": "ComboBox",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/combobox.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs", "tests/FluentJalium.Tests/AstraComboBoxTests.cs" ],
+      "gaps": [ "no real pointer or touch evidence for the hover, press and open states", "no header, so five upstream header rows are not transcribed", "the split open/close animations and the pill scale-in are not ported", "a disabled combo's text colour is the framework's own local value, not ComboBoxForegroundDisabled" ]
+    },
+    {
+      "markup": "ComboBoxItem",
+      "source": "Styles/Selection.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/combobox.md", "tests/FluentJalium.Tests/AstraComboBoxTests.cs", "tests/FluentJalium.Tests/AstraItemHostTests.cs" ],
+      "gaps": [ "the nine item border-brush rows are inert upstream too, because the item style sets no BorderThickness", "no SelectedUnfocused state is reachable, so those three rows are not transcribed", "no InputMode states, so the touch and controller paddings are not transcribed",
+      "the 5,2,5,2 row inset rides as a literal because upstream's is a literal on the template root, and the 32 MinHeight is ours - upstream sets none and gets the same height from its padding" ]
+    },
+    {
+      "markup": "ListBox",
+      "source": "Styles/ListBoxes.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listbox.md", "tests/FluentJalium.Tests/AstraListBoxTests.cs", "spike/ListProbe/Program.cs" ],
+      "gaps": [ "upstream's eleven ScrollViewer.* attached setters have no working equivalent: an attached-name setter parses and never reaches the part (mode J read viewer.Auto/False in all four combinations), so the switches are literals on our part and an application cannot retarget them", "the surface token stands in for SystemControlBackgroundChromeMediumLow, whose two hexes no palette row carries (#F2F2F2 / #2B2B2B against our #F3F3F3 / #202020)", "no grouping, so GroupStyle rows are untouched", "no real pointer or touch evidence for hover, press and drag-select", "the row's text colour is written on the container, not the presenter, because this runtime's ContentPresenter has no Foreground member to receive the cell (adaptation/00 S1-f); a disabled row's label then keeps the framework's local grey rather than ListBoxItemForegroundDisabled" ]
+    },
+    {
+      "markup": "ListBoxItem",
+      "source": "Styles/ListBoxes.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listbox.md", "tests/FluentJalium.Tests/AstraListBoxTests.cs", "spike/ListProbe/Program.cs" ],
+      "gaps": [ "the row style ships under the implicit type key, so a container's own Style property stays null - every assertion here reads the effect, not the assignment", "upstream's SelectedUnfocused state has no signal on this type (no IsSelectionActive, no IsHighlighted), so it merges onto the Selected row as upstream's own values do", "the 0.6 / 0.8 / 0.9 accent alphas ride on the highlight part's Opacity rather than in the rows, because the palette layer that would carry them is generated", "the fifteen legacy *ThemeBrush rows are not published - they are dead in upstream itself", "no focus visual is claimed: the stock template shows none inside its own tree, and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
+    },
+    {
+      "markup": "ListView",
+      "source": "Styles/ListViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listview.md", "tests/FluentJalium.Tests/AstraListViewTests.cs", "spike/ListViewProbe/Program.cs" ],
+      "gaps": [ "the reference commit publishes no ListView-level theme rows at all (no ListViewBackground, no ListViewStyle key, no controls/dev/ListView directory - the host chrome is in the closed dxaml generic.xaml), so the host reads the ListBox rows and one override of ListBoxBackground moves both list surfaces", "ListView.View - the WPF column view this runtime exposes as its only own dependency property - has no header surface in our template, so a list carrying a View loses its column headers; the stock PART_ColumnHeadersBorder measured 0x0 with the View null", "the grid surface the objective names is not here: Jalium's GridView is the WPF column View (ViewBase, not a Control) and no GridViewItem type is exported, so the card layout is an ItemsPanel swap on this host and the WrapPanel fact is as far as the claim goes", "no real pointer or touch evidence for hover, press and drag-select", "the row's five text cells write the container, not the presenter, because this runtime's ContentPresenter has no Foreground member to receive them (adaptation/00 S1-f) - a reading of the property, not of pixels" ]
+    },
+    {
+      "markup": "ListViewItem",
+      "source": "Styles/ListViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/listview.md", "tests/FluentJalium.Tests/AstraListViewTests.cs", "spike/ListViewProbe/Program.cs" ],
+      "gaps": [ "the indicator pill's 16 DIP height is ours: upstream keeps the geometry in the C++ ListViewItemPresenter, which is not in the reference tree, while its 4 DIP width and 1.5 radius are read from rows", "a disabled host does not re-run the row's disabled cell - IsEnabled reaches the generated container (asserted) yet the row keeps Opacity 1, so the 0.3 dim only appears when the row itself is disabled", "upstream's SelectedUnfocused, Selecting, MultiSelect and reorder states have no signal on this container, so 21 of its rows (focus, check, drag, placeholder, multi-arrange) are withheld rather than published unread", "the row style ships under the implicit type key, so a container's own Style stays null and every assertion here reads an effect rather than an assignment", "no focus visual is claimed: the stock template shows none inside its own tree and this runtime has no UseSystemFocusVisuals slot for a template to opt into" ]
+    },
+    {
+      "markup": "TreeView",
+      "source": "Styles/TreeViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/treeview.md", "tests/FluentJalium.Tests/AstraTreeViewTests.cs", "spike/TreeViewProbe/Program.cs" ],
+      "gaps": [ "WinUI's tree is a flattened list: its whole template is one TreeViewList (TreeView.xaml:26) and none of TreeViewList, TreeViewNode, TreeViewItemPresenter or TreeViewItemTemplateSettings is exported here, so this is the runtime's nested TreeView wearing WinUI's row, not WinUI's TreeView", "the host paints no surface on purpose - upstream's DefaultTreeViewStyle reads no colour row at all - so overriding a background token moves a ListBox and not a tree (asserted both ways)", "upstream's IsTabStop=False is not copied: its host has a focusable inner list and this one does not, so the value would take the tree out of the tab order", "no SelectionMode, no multi-select, no drag, no ItemInvoked and no ExpandAll on this control, so 8 of upstream's 39 rows are withheld rather than published unread" ]
+    },
+    {
+      "markup": "TreeViewItem",
+      "source": "Styles/TreeViews.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/treeview.md", "tests/FluentJalium.Tests/AstraTreeViewTests.cs", "spike/TreeViewProbe/Program.cs" ],
+      "gaps": [ "the 16 DIP indent is produced by the nesting (each level's child host insets 16), because no dependency property carries depth here - the consequence is a child row whose fill is 16 DIP narrower than its parent's, where WinUI's row spans the list", "a part named Expander hooks nothing on this runtime, so expansion runs through a two-way TemplatedParent binding on IsExpanded; the keyboard route is not claimed, and any route that writes the property drives the same visuals", "state text colour is written on the container, not on the presenter: ContentPresenter has no Foreground member here, so every template cell aimed at it is inert (adaptation/00 S1-e 7; the same route now covers the eight families that shipped before it - S1-f)", "hover and press are still trigger readings rather than a pointer: no real pointer or touch injection backs the PointerOver and Pressed cells", "collapse keeps child containers realised, as the runtime itself does; the visible effect is the child host's visibility, not the container count" ]
+    },
+    {
+      "markup": "DataGrid",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs", "spike/DataGridProbe/Program.cs", "docs/astra/adaptation/s1i-datagrid-host-raw.txt" ],
+      "gaps": [ "this family has NO WinUI 3 upstream - microsoft-ui-xaml ships no DataGrid at all, so the authority being copied is the dotnet/wpf official Fluent theme as ModernWpf transcribes it (audits/datagrid.md §1); a 'WinUI parity' reading of this row is really a WPF Fluent reading", "the row is the framework's own template on purpose: installing a DataGridRow style strands the cell's generated text and the table renders no values (audits/datagrid.md §5) - which is also why the selected row fills through the retinted AccentBrush name in ThemeResources/FrameworkRetints.jalxaml instead of a part of ours", "the host paints no focus border: the runtime's own ControlBorderFocused measures brand emerald #FF1E793F and the WPF Fluent theme this family copies carries no host focus border at all", "RowHeight 32 and ColumnHeaderHeight 32 are literals, because upstream keeps those two rows as x:Double this reader cannot publish; the four selected-row opacity rows are withheld with the same reason and the selected fill therefore sits at the accent brush's own opacity 1", "column drag, drop, reorder, resize and cell editing have no input evidence of any kind, and the row-header gutter carries none of upstream's four gripper Thumbs (audits/datagrid.md §4)", "TreeDataGrid now carries its own host style (Styles/TreeDataGrid.jalxaml) and shares this file's cell, column header and row-header styles - the runtime has no tree-only versions of those" ]
+    },
+    {
+      "markup": "TreeDataGrid",
+      "source": "Styles/TreeDataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/treedatagrid.md", "tests/FluentJalium.Tests/AstraTreeDataGridTests.cs", "spike/DataGridProbe/Program.cs", "docs/astra/adaptation/s1j-treedatagrid-feed-raw.txt", "docs/astra/adaptation/s1j-treedatagrid-columns-raw.txt" ],
+      "gaps": [ "no WinUI 3 upstream either: microsoft-ui-xaml ships no TreeDataGrid (the toolkit's is not WinUI), so this row is a dotnet/wpf Fluent reading over this runtime's own part contract, same as the DataGrid family", "the feed is now measured (a flat IEnumerable plus ChildrenPropertyPath, with ExpandAll / CollapseAll / IsExpanded(int) / FlattenedCount public) and the runtime's TreeDataGridNode stays private - the earlier gap that kept this control out of the library is closed, and audits/treedatagrid.md §1 records the reading", "the row gets no style of ours: TreeDataGridRow is the container the control builds cells into (the layer the DataGrid batch measured as un-retemplatable) and only IsSelected is public on it, so the row fill, line and selection stay the framework's", "every row carries a LOCAL Background the control writes (measured #00FFFFFF even / #0FFFFFFF odd), so a style setter on the row's fill could never win here even if the template were replaceable", "a tree column left at Auto lays out at width 0 and its text never reaches a pixel, and a bare number on a column's Width silently fails to convert to DataGridLength - MinWidth is therefore the only markup lever on this control, and the Gallery page is written against that", "expand and collapse are driven through public calls, not through a pointer: the chevron's hit-target, hover, keyboard Alt+Right/Left and touch all have zero evidence", "upstream's seventeen-cell row/column state matrix, the row-header grippers and column drag/drop/resize are not transcribed, and the framework's own tree dictionary (nine ThemeResource names, including the ControlBorderFocused brand-emerald focus line) is replaced rather than re-tinted", "high contrast is untested: this control's framework dictionary carries Light and Dark only" ]
+    },
+    {
+      "markup": "DataGridCell",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs", "docs/astra/adaptation/s1i-datagrid-cells-raw.txt" ],
+      "gaps": [ "no selection overlay of its own: the layer that would hold one is the row, and the row cannot be re-templated, so the text-on-accent colour is the only half of upstream's selected cell this batch delivers", "upstream's focus visual rows (DataGridCellFocusVisual*) are withheld rather than published unread - the runtime draws the cell focus surface itself", "a disabled host does not move the cell's foreground: the framework writes #FFAEAEB2 locally and a local value outranks the style cell (asserted as a loss, not dropped)" ]
+    },
+    {
+      "markup": "DataGridColumnHeader",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs" ],
+      "gaps": [ "the sort glyph's Text and Visibility are local values the control writes (Primitives/DataGridColumnHeader.cs:269-286), so the template owns only its size and family and no state cell can retarget it", "no three-state or multi-column sort surface, and the resize grip's hit-testing is written by the control as a local value, so drag-to-size is unproven here" ]
+    },
+    {
+      "markup": "DataGridRowHeader",
+      "source": "Styles/DataGrid.jalxaml",
+      "page": "selection",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/datagrid.md", "tests/FluentJalium.Tests/AstraDataGridTests.cs" ],
+      "gaps": [ "upstream's row header is a ButtonBase with four resize gripper Thumbs and a seventeen-cell state matrix; this runtime's row-header code resolves no part name at all, so the shipped template is the resting surface and row select, resize and edit are owed" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentToggleSwitch",
+      "source": "Styles/Inputs.jalxaml",
+      "page": "inputs",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/adaptation/05-native-control-vacuum.md", "tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs" ],
+      "gaps": [ "upstream ToggleSwitch keys not transcribed", "the drag-to-toggle path has no evidence" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentNavigationView",
+      "source": "Styles/Navigation.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/navigation.md", "docs/astra/adaptation/s1k-navigation-raw.txt", "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
+      "gaps": [ "only the flat pane exists; no top mode, no breadcrumbs, no settings item, no back button - which is why 13 TopNavigationViewItem* and 6 NavigationViewButton* upstream rows stay unpublished", "the type is ours while the runtime ships a style-less native NavigationView (adaptation/01 census: style=False parts=0); audits/navigation.md §9 carries that judgement with its readings", "the pane sits on a solid brush: upstream's NavigationViewDefaultPaneBackground is acrylic and materials are not characterised yet", "the 20 upstream x:Double metric rows cannot be resource rows on this reader, so 36/40/16/48/3/2 ride as literals", "back-button and item invocation not gated", "the pane bar is Hidden, not overlaid: Auto costs 12 DIP of layout width, which is what broke compact" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentNavigationItem",
+      "source": "Styles/Navigation.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/navigation.md", "docs/astra/adaptation/s1k-navigation-raw.txt", "docs/astra/adaptation/05-native-control-vacuum.md", "docs/astra/adaptation/12-sidebar-on-screen-measurement.md", "tests/FluentJalium.Tests/AstraNavigationTests.cs" ],
+      "gaps": [ "no expandable children, icon sources beyond SymbolIcon, and no checked state - so upstream's 8 NavigationViewItem*Checked* rows have nothing to bind to", "hover/press reach the pixel gate only as trigger structure: no real pointer input has been captured", "the corner clip itself is not sampled: the 8 DIP OverlayCornerRadius is read back on the item and its Root border, not measured at the corner", "selection indicator motion unmeasured", "the item's ink reaching the glyph is read for a live theme switch and was broken there - the glyph kept the previous theme's pixels until the item hands it its ink (#94, audits/navigation.md §10); hover and pressed glyph ink is still unread" ]
+    },
+    {
+      "markup": "ContentDialog",
+      "source": "Styles/ContentDialog.jalxaml",
+      "page": "surfaces",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/content-dialog.md", "tests/FluentJalium.Tests/AstraContentDialogTests.cs", "spike/RightGapProbe/Program.cs" ],
+      "gaps": [
+        "26.10.9 ships ContentDialog natively, so the plan's own-type column is void (adaptation/00 S0-v); the dialog is opened by ShowAsync on this card rather than placed on it, because the control hosts a shown dialog in the window's own overlay layer and refuses one already in a tree",
+        "upstream's six VisualStateManager groups become ten cells, because markup VisualStateManager throws on this runtime; the open and close transitions and their scale and fade animations are not carried at all",
+        "ContentDialogMinWidth, MaxWidth, MinHeight, MaxHeight and the ButtonSpacing GridLength ride as literals in the template because this reader cannot parse those rows, and the control maps the app's own size box onto the card on top of that",
+        "a two-button row is two thirds with the spare third at an end, not upstream's two halves, and one button is a third rather than a right-hand half: a template cell cannot write a named ColumnDefinition's Width (measured in both value shapes) and UniformGrid does not reflow when a child collapses",
+        "the title's 20 SemiBold rides on a default TitleTemplate, because a FontSize on the title host is dropped on the text element the framework generates; the cost is that a non-string Title needs the app's own template",
+        "whether the framework's overlay host paints a smoke layer of its own behind the template's cannot be read - it exposes no Background property - so a doubled dim is neither claimed nor excluded",
+        "the title strip and the command row each carry a literal half of the card's 8 DIP arc, because a border on this runtime rounds what it fills and never clips a child - so an app that changes ContentDialog.CornerRadius moves the surface and not the two bands inside it",
+        "no hardware-input evidence: the three buttons' hover, press, keyboard and touch pixels are the button batch's, and this card's captures read a card built inside the shown host"
+      ]
+    },
+    {
+      "markup": "Expander",
+      "source": "Styles/Surfaces.jalxaml",
+      "page": "surfaces",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/expander.md", "tests/FluentJalium.Tests/AstraExpanderInfoBarTests.cs", "spike/ExpanderInfoBarProbe/Program.cs" ],
+      "gaps": [ "the Pressed header state has no driver: the control exposes no press flag, so upstream's five Pressed rows stay unpublished", "ExpandDirection is ignored by the control, which always rotates the chevron by +90 and shows the body below, so ExpanderContentUpBorderThickness is not transcribed", "the chevron is a Path rather than the AnimatedIcon upstream animates, and the resting mark points right", "content alignment rides the presenter's own HorizontalAlignment and VerticalAlignment, because a ContentPresenter has no *ContentAlignment member on this runtime (adaptation/00 S1-g)", "hover pixels and the real pointer and touch paths are not gated" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentInfoBar",
+      "source": "Styles/Surfaces.jalxaml",
+      "page": "surfaces",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/infobar.md", "tests/FluentJalium.Tests/AstraExpanderInfoBarTests.cs", "spike/ExpanderInfoBarProbe/Program.cs" ],
+      "gaps": [ "the native InfoBar cannot be templated on 26.10.9: it never opts into template content management, so it paints its own hardcoded severity fill, icon and 32 DIP close rectangle - this type exists only to call that protected opt-in", "there is no icon slot, so upstream's UserIconVisible state is unreachable and IsIconVisible only shows or hides the severity mark", "InfoBarHyperlinkButtonForeground and InfoBarHyperlinkButtonMargin are not transcribed: the action slot takes a Button, and a template-internal implicit HyperlinkButton style is unproven here", "the bar always stacks title over message; upstream's horizontal InfoBarPanel rows are not transcribed", "the severity mark needs Segoe Fluent Icons to be installed", "IsOpen=false is collapsed by the style, because the control only drops its own measure, and no real pointer or touch is gated", "both padding rows needed a Border to land on - InfoBarContentRootPadding now insets from RootBorder and the panel's vertical-orientation padding from PanelSurface, because a Grid and a StackPanel have no Padding member (adaptation/00 S1-g); the bar's own Background is still painted by that inner Grid, so an app-set fill is not clipped by the root's radius" ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentTeachingTip",
+      "source": "Styles/TeachingTip.jalxaml",
+      "page": "surfaces",
+      "parity": "own-type",
+      "evidence": [ "docs/astra/audits/teachingtip.md", "tests/FluentJalium.Tests/AstraTeachingTipTests.cs", "spike/TeachingTipProbe/Program.cs" ],
+      "gaps": [ "26.10.9 exports no TeachingTip at all, so this is an own type over ContentControl rather than a retemplate", "placement is six sides, not upstream's eighteen: the runtime's Popup.Placement has no per-edge or per-corner value, so LeftEdgeTopEdge and its neighbours are unreachable", "no light dismiss: the runtime's Popup has StaysOpen but its close path is unmeasured, and a tip that closes itself behind IsOpen's back is worse than one that stays", "no hero content, no icon slot and no header close button - 29 of upstream's 50 row names stay unpublished for want of a consumer", "no top highlight: a full-width 1 DIP hairline would paint square corners outside the card's 8 DIP arc, because this Border never clips a child", "no entrance animation and no theme shadow, so the card appears in one frame and floats with only its stroke", "of upstream's 50 row names, 21 are transcribed and consumed; the other 29 are each named by a test that fails if one is published without a reader, and the 8 x:Double rows stay literals because an x:Double row aborts the whole dictionary through this loader", "the card is 320 DIP wide at rest with no ScaleX transform, so a narrow window squeezes nothing the way upstream's does", "the card's radius and stroke only have a painter now that the surface is a Border - on the layout Grid those three rows had no member to land on, so the tip came out square and edgeless (adaptation/00 S1-g); the four corners are read off the element and never captured", "no real pointer or touch is gated: the buttons were invoked through their automation peers and placement was read back from TranslatePoint" ]
+    },
+    {
+      "markup": "Menu",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "the item highlight, check mark and submenu arrow inside a Menu are the framework's own drawing, because a MenuItem never builds a Template", "no pointer reaches the bar, so which colour a real hover paints inside a self-drawn MenuItem is unmeasured" ]
+    },
+    {
+      "markup": "MenuItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "colour only: the control stores a Template and never instantiates one, so it has no parts of ours and no state cell of ours", "IsHighlighted, IsPressed, IsSelected and IsSubmenuOpen are read-only dependency properties, and the self-painter's highlight fill is a framework colour" ]
+    },
+    {
+      "markup": "MenuBar",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "no Template: the bar hosts its own items, so only its surface and label colours are ours", "MenuBarHeight (40) is an x:Double row and rides as a literal" ]
+    },
+    {
+      "markup": "MenuBarItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "upstream's pressed and selected states are not published here, because Title is this control's only dependency property", "whether a click on the item's own ContentButton opens the bar's flyout is unmeasured: the code drives reach the handler and report no open state without a pointer", "the resting fill is painted once, by the rounded Border: the root Grid used to bind the same brush square behind it, which is invisible at rest and on hover because that row is transparent, and only shows as corners when an app sets a Background of its own (adaptation/00 S1-g) - read off the elements, never off a frame" ]
+    },
+    {
+      "markup": "ContextMenu",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "retracted and replaced (2026-09-20): the chrome around an opened menu is not untouched framework paint - the framework builds a Border outside our template and copies Background, BorderBrush, BorderThickness and CornerRadius onto it from the control as local values, which is the only way the MenuFlyoutPresenter rows reach this surface's pixels; the style therefore has to write the radius on the control, and until this batch did, the card carried the framework's own 14 instead of upstream's OverlayCornerRadius 8", "the copied card paints the aliased acrylic row as a flat solid colour - no backdrop is wired behind it (materials batch)", "MinWidth 140 is ours; the host sizes the popup to its content (measured: 74.27 DIP for two short labels)" ]
+    },
+    {
+      "markup": "MenuFlyoutItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "pressed has no state to watch and is not published", "the control measures its own row and draws in OnRender as well as hosting a template, so a real hover may show a framework fill; the 38 literal is what makes upstream's 11,8,11,9 padding fit at all", "the narrow-padding and check-placeholder state groups have no consumer here", "the label and the accelerator text are the control's own paint: the skin presents only the icon, so the three MenuFlyoutItemKeyboardAcceleratorTextForeground* rows are withdrawn and that text keeps the runtime's grey", "the same IconInk.Carrier / IconInk.Icon pair is wired on this template's IconContent, but the census never saw a menu icon at all: a closed flyout has no pixels to compare. So this host rests on the app-bar fact and the shared code route, not on a reading or a fact of its own (#95)." ]
+    },
+    {
+      "markup": "ToggleMenuFlyoutItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "upstream answers the Toggle automation pattern; 26.10.9 answers Invoke, which is asserted rather than fixed", "the mark is the control's own OnRender glyph, so the skin only takes the icon out of that column when checked (upstream's CheckedWithIcon) and its three accelerator rows are withdrawn", "pressed is not published" ]
+    },
+    {
+      "markup": "MenuFlyoutSubItem",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "SubMenuOpened and pressed are not published: IsSubMenuOpen is a read-only CLR getter and the submenu opens on mouse enter, which nothing but a pointer can raise", "the submenu popup is built by the control in code, so no template part carries it - which also means no menu part name is a functional contract", "the chevron is the control's own paint, so its three rows and MenuFlyoutItemChevronMargin are withdrawn and the mark keeps the runtime's grey" ]
+    },
+    {
+      "markup": "MenuFlyoutSeparator",
+      "source": "Styles/Menus.jalxaml",
+      "page": "menus",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/menu-flyout.md", "tests/FluentJalium.Tests/AstraMenuTests.cs" ],
+      "gaps": [ "MenuFlyoutSeparatorHeight (1) is an x:Double row and rides as a literal", "the rule is the control's own paint, so our template is a transparent spacer and MenuFlyoutSeparatorBackground is withdrawn" ]
+    },
+    {
+      "markup": "AppBarButton",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "26.10.9 already ships an implicit style for this type and paints it from nine rows of its own, including a hard-coded accent purple for AppBarButtonForeground: ours replaces both, but only for a control built after the theme is installed",
+        "upstream's six Secondary/Overflow row families are not published, because the runtime exposes no overflow flag on a bar button, so a secondary command keeps its bar geometry",
+        "accelerator text, the highlight overlay and the eleven chevron rows have no dependency property behind them here",
+        "the side-by-side label layout is not reachable: CommandBarLabelPosition is Default/Collapsed on both sides and neither member moves anything on its own, while upstream picks it from the bar's DefaultLabelPosition - on a control that never builds a template",
+        "the hover leg has never been driven by a real pointer: IsMouseOver has no public setter here, so what is measured is a routed MouseDown/MouseUp leaving the flag set and the hover row reaching the surface (The_hover_row_reaches_the_surface_once_a_routed_press_leaves_the_pointer_over), not an enter-and-leave cycle",
+      "the highlight carries no brush fade: a nested Border with TransitionProperty keeps its state brush in the property, the offscreen rasteriser and the shown-window read, yet paints nothing in the composited window - 0 pixels of the accent against 7786 once the attribute is removed (adaptation/00 S0-r)",
+        "the icon under the content presenter is handed the button's ink by a pair of ordinary bindings, fluent:IconInk.Carrier (whose ink) and fluent:IconInk.Icon (which icon): a live theme switch used to leave the glyph painted with the previous theme's ink, which the frozen-ink census measured as 519 pixels on this page and as 0 once the pair was in. Deleting the Carrier lines turns AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink red, and letting the hand-off fire only on its first value turns AstraIconFamilyTests.An_icon_swapped_onto_the_host_after_it_was_built_is_handed_the_ink_too red - the second witness is only possible because the bindings stay live (#95). Hover, pressed and disabled glyph ink are still unread - these facts only cover Light<->Dark."
+      ]
+    },
+    {
+      "markup": "AppBarToggleButton",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "checked is the accent fill and nothing else, which is upstream's answer inside the bar too: the check-glyph and highlight-overlay rows belong to the overflow layout, and no flag here selects it",
+        "AppBarToggleButtonBorderBrushChecked is a deviation - upstream's AccentControlElevationBorderBrush is an absolute gradient this pipeline cannot publish",
+        "the checked pair is reached by setting IsChecked and through the automation peer's Toggle pattern, not by a pointer click: this family has no keyboard or touch behaviour test of its own, and inherits whatever ToggleButton does",
+        "hover has the same limit as the button: no public IsMouseOver setter, so the leg is measured through a routed press pair and never through a pointer that moves",
+      "same fade trade as the button: the nested highlight is transition-free so the checked accent actually lands in the composited frame"
+      ]
+    },
+    {
+      "markup": "AppBarSeparator",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "the framework gives this type no template and draws its own line in code from its own row, but does build ours, so two paths can paint the same pixel: our row is the one the capture reads, and a host build that draws without the template would show the framework's grey",
+        "no state cells: a separator has no hover, press or checked state here, and upstream gives it none either",
+        "the half-DIP corner radius on the line is a literal - upstream publishes it as an x:Double row this reader cannot parse",
+      "the rule has no height of its own, as upstream: the 2,8,2,8 is the rectangle's margin and the bar's row is what sizes it"
+      ]
+    },
+    {
+      "markup": "CommandBar",
+      "source": "Styles/AppBar.jalxaml",
+      "page": "command-bar",
+      "parity": "audited",
+      "evidence": [ "docs/astra/audits/app-bar.md", "tests/FluentJalium.Tests/AstraAppBarTests.cs" ],
+      "gaps": [
+        "surface and geometry only: the control stores a Template and never builds one, so its code-built StackPanel, its 40x32 ellipsis button and its overflow Popup stay host-drawn and follow just the three rows its code reads",
+        "the open state never displays: setting IsOpen moves that property only - the bar's own Popup stays closed in-process - so CommandBarBackgroundOpen, the ellipsis icon rows, the light-dismiss overlay and the overflow-presenter borders are withheld, and AstraAppBarTests.The_open_bar_shows_its_overflow_outside_the_surface_this_capture_can_reach pins why no row of that state can be promised to an app",
+        "a SplitButton placed in the bar keeps its non-app-bar style: upstream's SplitButtonInAppBarUnfocusedPointerOver and a CommandBar-scoped SplitButton style are still owed by this family",
+        "the bar's 48-tall closed height is a literal on the style; upstream's AppBarThemeMinHeight / AppBarThemeCompactHeight pair are x:Double rows this reader cannot parse, and no compact height is set at all"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentTabView",
+      "source": "Styles/TabView.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/tab-view.md",
+        "tests/FluentJalium.Tests/AstraTabViewTests.cs",
+        "spike/TabViewStyle/tab-style1.txt",
+        "spike/TabViewTint/tint-2.txt"
+      ],
+      "gaps": [
+        "Own type, not the runtime's TabControl: a TabControl handed a template - through a style setter or a local value - builds no tree at all, its realized tree is unchanged, and its strip's measure collapses to 0 wide (spike/TabViewStyle sections D-G, adaptation/00 S1-h). A ContentControl subclass on the same route does build (section I), which is what this type and its item are.",
+        "No drag, no drop and no reorder: upstream's CanDragTabs, CanReorderTabs and AllowDropTabs with their eleven drag and reorder VisualStates, the TabItemDragStarting/TabItemDropDetected/TabItemsReorderEnded events and the TabDragVisualContainer part are absent here.",
+        "No overflow scroll buttons: the strip scrolls, but the two RepeatButtons upstream hangs on TabScrollViewerStyle (TabView.xaml:133-172) and their twelve TabViewScrollButton* rows are withheld rather than published unread.",
+        "No TabWidthMode: upstream's Equal/SizeToContent/Compact group and its per-tab width arithmetic are not implemented, so a strip wider than the window scrolls instead of shrinking its tabs.",
+        "The selected tab's fill is a Border rather than upstream's code-built Path: the two 4 DIP corner hooks are drawn as separate arc Paths and the fill stays square where upstream's geometry curves out (TabViewItem.cpp:98-122).",
+        "The host's SingleBottomBorderLine and NoBottomBorderLine states are not switched: both line pieces are always drawn, which is upstream's default state, and the code that decides between them is not reproduced.",
+        "No TabStripHeaderTemplate/TabStripFooterTemplate and no TabItemTemplate or selector: the two strip slots take an element, not a data template.",
+        "The Ctrl+Tab, Ctrl+Shift+Tab and Delete accelerators are handled inside the control with no KeyboardAcceleratorTextVisible surface, so no key breadcrumb is drawn anywhere."
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentTabViewItem",
+      "source": "Styles/TabView.jalxaml",
+      "page": "navigation",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/tab-view.md",
+        "tests/FluentJalium.Tests/AstraTabViewTests.cs",
+        "spike/TabViewStyle/tab-style1.txt",
+        "spike/TabViewTint/tint-2.txt"
+      ],
+      "gaps": [
+        "The item's template holds no presenter for Content - the view's body presenter owns it - so the strip shows Header and the page shows Content, one parent each.",
+        "Upstream builds the selected tab's outline in code from TabViewItemTemplateSettings.TabGeometry; TopCornerRadius here is the item's own read-only row over the same value the TopCornerRadiusFilterConverter produces.",
+        "No ToolTipTitle/ToolTipText rows and no TabViewTemplateSettings surface; a long header trims to an ellipsis at the 240 DIP maximum.",
+        "No automation peer of its own: the tab is a HeaderedContentControl, so an inspector sees a text control rather than a SelectionItem, and this runtime cannot synthesize a KeyEventArgs to prove the keyboard path end to end (spike/TabViewProbe section C).",
+        "the IconHost carries the same IconInk.Carrier / IconInk.Icon pair (its carrier is the host itself), so the icon follows the TabViewItemIconForeground row this template already writes; the census measured no frozen ink on this host either, which makes the wiring a mechanism resting on the app-bar fact rather than a reading of its own (#95)."
+      ]
+    },
+    {
+      "markup": "ProgressBar",
+      "source": "Styles/ProgressBar.jalxaml",
+      "page": "status",
+      "parity": "audited",
+      "evidence": [
+        "docs/astra/audits/progress-bar.md",
+        "tests/FluentJalium.Tests/AstraProgressBarTests.cs",
+        "docs/astra/adaptation/s1o-progress-raw.txt"
+      ],
+      "gaps": [
+        "the indeterminate bar is a still picture: spike/ProgressProbe mode F measured that a repeating animation on TranslateTransform.XProperty and on RotateTransform.AngleProperty never advances on 26.10.9 while Width and Canvas.Left do, and a Storyboard read out of markup hydrates with zero children - so upstream's two-bar slide has no declarative route and no animator is wired for it",
+        "ShowError and ShowPaused do not exist on the host's ProgressBar, so upstream's Error and Paused states - and the two foreground rows they read - are not published at all",
+        "there is no ProgressBarTemplateSettings here, so TemplateSettings.ClipRect and IndicatorLengthDelta (ProgressBar.cpp:195, :246) are dropped rather than faked: no clip layer, no reposition rebound on the Updating-to-Determinate transition",
+        "the 3 DIP band and the 1 DIP rail are literals in the template: ProgressBarMinHeight and ProgressBarTrackHeight are x:Double rows this markup reader rejects outright, not silently drops",
+        "upstream declares no Orientation at all, so the vertical band this layer honours is a host extra, asserted as geometry and not as parity",
+        "no pointer or touch evidence: the bar takes no input, so nothing on this page is claimed as an interaction path"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentProgressRing",
+      "source": "Styles/ProgressRing.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/progress-ring.md",
+        "docs/astra/adaptation/s1p-ring-raw.txt",
+        "tests/FluentJalium.Tests/AstraProgressRingTests.cs",
+        "spike/RingProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports neither ProgressRing nor the AnimatedVisualPlayer its template hosts - and no Lottie reader either, so the two shipped assets are not carried and the look is rebuilt from the numbers inside them",
+        "the indeterminate arc keeps its half circle while it turns: upstream's asset also animates TrimStart from 0 to 0.5 across the loop (ProgressRingIndeterminate.cpp:305, :318), which is the taper at the trailing end, and nothing here reproduces it",
+        "the rotation is written into the figure rather than onto a RenderTransform, because the transform route was never measured clean: the first cut's empty-looking picture turned out to be an integer-division constant, so the pivot question stays open",
+        "DeterminateSource and IndeterminateSource (IAnimatedVisualSource, MUX_PREVIEW) have no counterpart, and ProgressRingTemplateSettings is absent, so ApplyTemplateSettings' EllipseDiameter/EllipseOffset/MaxSideLength arithmetic is carried as constants in the control instead of as a bindable surface",
+        "ProgressRingStrokeThickness is not published: this reader rejects an x:Double row outright and upstream's own template never reads it",
+        "the Inactive state's AccessibilityView=Raw has no member here, so an inactive ring leaves the accessibility tree by opacity only",
+        "the 359.9 degree cap and the -90 start follow ModernWpf's reading rather than the asset, which no tool in this repository can inspect",
+        "high contrast resolves through the palette aliases instead of upstream's two re-pointed rows",
+        "no pointer or touch evidence: upstream sets IsHitTestVisible=False and IsTabStop=False, both asserted, so the ring has no interaction arm to prove"
+      ]
+    },
+    {
+      "markup": "Separator",
+      "source": "Styles/Divider.jalxaml",
+      "page": "status",
+      "parity": "no-upstream-control",
+      "evidence": [
+        "docs/astra/audits/divider.md",
+        "docs/astra/adaptation/s1q-divider-raw.txt",
+        "tests/FluentJalium.Tests/AstraDividerTests.cs",
+        "spike/DividerProbe/Program.cs"
+      ],
+      "gaps": [
+        "the reference commit has no Divider control - zero files by name and no Divider type in any .idl or .h - so this row cannot claim a transcription, a state map or a key list against upstream",
+        "the 1 DIP thickness is the only number every divider-role template in the commit agrees on; the 12 DIP box the line sits in is the runtime's own measurement of Separator and is asserted as measured, not as parity",
+        "no margin is set: upstream's role-specific margins (2,8,2,8 on the app-bar pair, 0,3,0,4 in the sidebar, 0,8,0,8 between tabs) belong to their hosts and none of them is a general divider's",
+        "the line is the control's own OnRender output, not a template: a templated route was measured and works, but the element upstream reaches for - a 1 DIP Rectangle - prints nothing on this runtime, and the five such rectangles already shipped in the table and app-bar styles are an open defect",
+        "no key is published here: the file consumes the palette's DividerStrokeColorDefaultBrush, whose high-contrast re-point is that layer's job",
+        "the framework's own default line colour before this style existed is a grey (#A3A3A4) this layer reproduces nowhere, so the before/after reading is a probe record rather than a parity claim",
+        "no pointer or touch evidence: the runtime already keeps the separator out of the hit-test path, so there is no interaction arm to prove"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentInfoBadge",
+      "source": "Styles/InfoBadge.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/info-badge.md",
+        "docs/astra/adaptation/s1r-double-row-raw.txt",
+        "tests/FluentJalium.Tests/AstraInfoBadgeTests.cs",
+        "spike/DoubleRowProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports neither InfoBadge nor Badge; the sixteen style keys, the two aliases, the four Thickness rows and every number in the look are upstream's",
+        "the icon input is an IconElement, not upstream's IconSource: IconSource, FontIconSource, SymbolIconSource, PathIconSource, BitmapIconSource and ImageIconSource are all absent, so there is no object that property could hold",
+        "a style's Setter.Value holds one element instance, so the five icon styles each carry a single FontIcon/SymbolIcon shared by every badge of that style - tree-level independence is measured, visual independence is not",
+        "six x:Double rows are not published: this reader rejects an x:Double element outright and carries a clr-namespace numeric row as the type's default, so the four the template reads are literals and the two nobody upstream reads are not written at all",
+        "InfoBadgeIconHeight differs per theme upstream (8 in the dark dictionary, 9 in the light two) and no numeric row can carry a theme-dependent number here - immaterial, because nothing in upstream consumes the row",
+        "the number's ink cannot be asserted: neither capture path reaches a glyph run (adaptation/00 S1-r clause 3), so the value state is proven by Text, Visibility, the foreground brush identity and the measured box rather than by pixels",
+        "the template's TextBlock needs an explicit Foreground binding: parts do not inherit the control's foreground here, and upstream's row relies on inheritance",
+        "no Severity enum and no AutomationPeer upstream either - the five severities are style keys only - and high contrast re-points underneath the aliases in the palette layer rather than in this file",
+        "no pointer or touch evidence: upstream declares no events and its style sets IsTabStop=False, so there is no interaction arm to prove"
+      ]
+    },
+    {
+      "markup": "FluentJalium.Controls.FluentRatingControl",
+      "source": "Styles/RatingControl.jalxaml",
+      "page": "status",
+      "parity": "own-type",
+      "evidence": [
+        "docs/astra/audits/rating-control.md",
+        "docs/astra/adaptation/s1s-rating-raw.txt",
+        "tests/FluentJalium.Tests/AstraRatingControlTests.cs",
+        "spike/RatingProbe/Program.cs"
+      ],
+      "gaps": [
+        "own type, because the runtime exports no RatingControl, Rating, RatingItemInfo, RatingItemFontInfo or RatingItemImageInfo - all five absent across the 2958 public types of the assembly that really holds the controls",
+        "three x:Double rows stay unpublished: this reader rejects the element and carries a clr-namespace numeric row as zero, so 32 and 8 became literals and constants a test reads off the control",
+        "RatingControlCaptionTopMargin (-12.5) is not written at all: upstream applies it against TextLineBounds=Tight on its caption, and this runtime's caption has no such knob to compensate for",
+        "the star's own ink reaches no capture, so this control's visual column is the crop route proven on solid blocks plus the geometry read back in the tree - not a picture of stars",
+        "upstream's Spacing = ItemSpacing - (advance - actual) is a negative number here and a negative StackPanel.Spacing arranges as zero while keeping its value, so the cell box became the ink box instead of copying a line the runtime drops",
+        "UIElement.Clip paints nothing here, so a half star is a ClipToBounds host around the run rather than upstream's RectangleGeometry",
+        "no synthesised pointer, touch or key reaches a control in this suite, so the coercion, the crop fractions and the magnifier are proven through the internal entries the routed handlers call; the wiring from a real MouseMove is not",
+        "the magnifier is evaluated per state change in code: upstream runs one expression animation per item on a composition visual, which this runtime does not give an item, so the lift is exact at the centre and on the floor and unmeasured between them",
+        "no AccessibilityView=Raw on the item runs and no RatingControlAutomationPeer: the runtime has no such property and no peer base was copied, so a screen reader gets the control and not the star count"
+      ]
+    }
+  ]
+}

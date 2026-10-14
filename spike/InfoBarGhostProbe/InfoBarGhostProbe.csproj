@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway InfoBar double-paint probe. The shipped surfaces page draws the info bar's title,
+       message, icon and close mark twice with a small offset (spike/VisualQA/out/surfaces.png), which
+       means two painters are alive on one control: our JALXAML template and something the base class
+       still draws itself. This probe answers, in one run, (a) which virtuals and cached parts InfoBar
+       actually declares, and (b) whether the base still contributes pixels when the template's root
+       Border is an opaque sentinel colour that no part of our style could let through. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>InfoBarGhostProbe</RootNamespace>
+    <AssemblyName>InfoBarGhostProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

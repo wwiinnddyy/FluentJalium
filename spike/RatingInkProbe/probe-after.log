@@ -1,0 +1,167 @@
+row 0: Value=3.5 MaxRating=5 ActualItemSize=17 ItemInset=8.5 ItemSpacing= ActualRatingWidth=117 | control FontFamily='Segoe Fluent Icons' _itemAdvance=34
+  background panel: children=2 spacing=0 width=149
+    cell 0: host w=117 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host 0x0 <no child>
+  foreground panel: children=5 spacing=8 width=117
+    cell 0: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=5 spacing=8 width=91.5
+    cell 0: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=8.5 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=0 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=91.5 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=8.5
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=0
+    cell 0: host 34x34 <no child>
+FluentRatingControl 646.3x34 children=1
+.Grid 646.3x34 children=1
+..StackPanel 149x34 children=2
+...Grid 117x34 children=2
+....StackPanel 117x34 children=5
+.....Grid 17x34 children=1
+......StackPanel 17x34 children=1
+.....Grid 17x34 children=1
+......StackPanel 17x34 children=1
+.....Grid 17x34 children=1
+......StackPanel 17x34 children=1
+.....Grid 17x34 children=1
+......StackPanel 17x34 children=1
+.....Grid 17x34 children=1
+......StackPanel 17x34 children=1
+....ContentControl 91.5x34 children=1
+.....StackPanel 91.5x34 children=5
+......Grid 17x34 children=1
+......Grid 17x34 children=1
+......Grid 17x34 children=1
+......Grid 8.5x34 children=1
+......Grid 0x34 children=1
+...TextBlock 0x0 children=0
+row 1: Value=5 MaxRating=5 ActualItemSize=17 ItemInset=8.5 ItemSpacing= ActualRatingWidth=117 | control FontFamily='Segoe Fluent Icons' _itemAdvance=34
+  background panel: children=2 spacing=0 width=149
+    cell 0: host w=117 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host 0x0 <no child>
+  foreground panel: children=5 spacing=8 width=117
+    cell 0: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=5 spacing=8 width=117
+    cell 0: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+row 2: Value=2 MaxRating=5 ActualItemSize=17 ItemInset=8.5 ItemSpacing= ActualRatingWidth=117 | control FontFamily='Segoe Fluent Icons' _itemAdvance=34
+  background panel: children=2 spacing=0 width=149
+    cell 0: host w=117 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host 0x0 <no child>
+  foreground panel: children=5 spacing=8 width=117
+    cell 0: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=5 spacing=8 width=66
+    cell 0: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=0 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=0 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=58 w=17 in control space
+    cell 4: host w=0 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=66 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=0
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=0
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=0
+    cell 0: host 34x34 <no child>
+row 3: Value=4.7 MaxRating=5 ActualItemSize=17 ItemInset=8.5 ItemSpacing= ActualRatingWidth=117 | control FontFamily='Segoe Fluent Icons' _itemAdvance=34
+  background panel: children=2 spacing=0 width=149
+    cell 0: host w=117 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host 0x0 <no child>
+  foreground panel: children=5 spacing=8 width=117
+    cell 0: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=17 clip=False | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=5 spacing=8 width=111.9
+    cell 0: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=0 w=17 in control space
+    cell 1: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=25 w=17 in control space
+    cell 2: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=50 w=17 in control space
+    cell 3: host w=17 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=75 w=17 in control space
+    cell 4: host w=11.9 clip=True | run TextBlock desired=25.5 arranged=34 family='Segoe Fluent Icons' margin=-8.5,0,0,0 scale=0.5 | ink box x=100 w=17 in control space
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=17
+    cell 0: host 34x34 <no child>
+  foreground panel: children=1 spacing=0 width=11.9
+    cell 0: host 34x34 <no child>

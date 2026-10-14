@@ -1,0 +1,216 @@
+﻿<#
+.SYNOPSIS
+  Reports which controls still have no Fluent appearance ("the vacuum"), scoped by ModernWpf.
+.DESCRIPTION
+  Three read-only sources:
+    1. spike/ControlCensus output (docs/astra/adaptation/01-census-raw-output.txt) - the native
+       Jalium public concrete Control types, with the census' own OnRender/OnPaint classification;
+    2. the implicit styles we declare (any <Style> without x:Key, under src/**/*.jalxaml);
+    3. the scope authority: ../ModernWpf's two layers - ModernWpf/Styles/*.xaml (Fluent style for a
+       control the host already has) and ModernWpf.Controls/<Name>/ (a WinUI-derived type the host
+       lacks). That is the same split this repository is being restructured to.
+  Writes docs/astra/adaptation/05-native-control-vacuum.md. Re-run after adding any style.
+
+  Two things keep this from eating what people write by hand. Everything below the sentinel line
+  ('<!-- hand notes: ... -->') is copied out of the existing file and back in verbatim, so a hand
+  section like the section-F re-measurement survives a re-run - before that contract existed, a
+  re-run deleted it, which is how the document stayed stale for a whole stage. And -Check recomputes
+  the generated body without writing, exiting 1 when the committed file is stale, which is what the
+  serial gate calls (the same shape as Report-AstraResourceKeys.ps1 -Check).
+
+  The generated body ends with '<!-- generated-lines=N sha256=... -->'; the hash covers the generated
+  part only, so editing a hand note never makes the document read as stale.
+#>
+[CmdletBinding()]
+param(
+    [switch]$Check,
+    [string]$ModernWpfRoot,
+    [string]$Census,
+    [string]$Out
+)
+$ErrorActionPreference = 'Stop'
+Add-Type -AssemblyName System.Xml.Linq
+
+# $PSScriptRoot is still empty while a param default expression runs, so the defaults resolve here.
+if (-not $ModernWpfRoot) { $ModernWpfRoot = Join-Path $PSScriptRoot '../../ModernWpf' }
+if (-not $Census) { $Census = Join-Path $PSScriptRoot '../docs/astra/adaptation/01-census-raw-output.txt' }
+if (-not $Out) { $Out = Join-Path $PSScriptRoot '../docs/astra/adaptation/05-native-control-vacuum.md' }
+if (-not [System.IO.File]::Exists($Census)) { throw "Missing census output: $Census (build and run spike/ControlCensus first)" }
+if (-not [System.IO.Directory]::Exists($ModernWpfRoot)) { throw "Missing ModernWpf reference checkout: $ModernWpfRoot" }
+
+# 1. native types + how they draw.
+$types = @{}
+foreach ($line in [System.IO.File]::ReadAllLines($Census)) {
+    $m = [regex]::Match($line, '^\[TYPE\] (?<name>\S+)\s+style=\S+ render=(?<render>\S+) paint=(?<paint>\S+)')
+    if ($m.Success) { $types[$m.Groups['name'].Value] = (@($m.Groups['render'].Value, $m.Groups['paint'].Value) -contains 'True') }
+}
+
+# 2. our implicit styles: a <Style> with no x:Key is implicit for its TargetType.
+$ns = [System.Xml.Linq.XNamespace]'http://schemas.jalium.ui/2024'
+$xamlNs = [System.Xml.Linq.XNamespace]'http://schemas.microsoft.com/winfx/2006/xaml'
+$implicit = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($file in Get-ChildItem -Path (Split-Path -Parent $PSScriptRoot) -Filter *.jalxaml -Recurse) {
+    foreach ($style in [System.Xml.Linq.XDocument]::Load($file.FullName).Root.Descendants($ns + 'Style')) {
+        if ($style.Attribute($xamlNs + 'Key')) { continue }
+        $target = $style.Attribute('TargetType').Value
+        if (-not $target) { continue }
+        $short = ([regex]::Replace($target, '^\{x:Type\s+(?<t>[A-Za-z0-9_.]+)\}$', '${t}')) -split '\.' | Select-Object -Last 1
+        [void]$implicit.Add(($short -split ':')[-1])
+    }
+}
+
+# 3. scope: what ModernWpf committed to covering, in the two layers it used.
+$nonControl = @('Common', 'Properties', 'Themes', 'CornerRadius', 'TextStyles', 'Resources', 'Strings', 'Primitives')
+$styled = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($file in Get-ChildItem -Path (Join-Path $ModernWpfRoot 'ModernWpf/Styles') -Filter *.xaml) {
+    if ($nonControl -notcontains $file.BaseName) { [void]$styled.Add($file.BaseName) }
+}
+$own = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($dir in Get-ChildItem -Path (Join-Path $ModernWpfRoot 'ModernWpf.Controls') -Directory) {
+    if ($nonControl -notcontains $dir.Name) { [void]$own.Add($dir.Name) }
+}
+$scope = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($name in @($styled) + @($own)) { [void]$scope.Add($name) }
+
+$native = @($scope | Where-Object { $types.ContainsKey($_) })
+$gaps = @($native | Where-Object { -not $implicit.Contains($_) })
+$done = @($native | Where-Object { $implicit.Contains($_) })
+$needsType = @($scope | Where-Object { -not $types.ContainsKey($_) })
+$extra = @($types.Keys | Where-Object { -not $scope.Contains($_) -and -not $implicit.Contains($_) })
+$styledOffScope = @($implicit | Where-Object { $types.ContainsKey($_) -and -not $scope.Contains($_) })
+# A gap is only real if nothing of ours stands in for it. Our own types are named Fluent<Control>,
+# so a suffixed name means the native control was replaced rather than styled.
+function Test-Substitute([string]$name) { @($implicit | Where-Object { $_ -ne $name -and $_ -like "*$name" }).Count -gt 0 }
+$hardGaps = @($gaps | Where-Object { -not (Test-Substitute $_) })
+$substituted = @($gaps | Where-Object { Test-Substitute $_ })
+
+function Quote([string[]]$items) { ($items | ForEach-Object { "'" + $_ + "'" }) -join ' ' }
+
+$sb = [System.Text.StringBuilder]::new()
+[void]$sb.AppendLine('# 原生控件真空清单（Fluent 外观覆盖到哪一步）')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('由 `tools/Report-Control-Vacuum.ps1` 生成，**哨兵以上勿手改**（改了下次重跑就没了；要写结论请写到哨兵以下）。范围权威是 ModernWpf 的两层：')
+[void]$sb.AppendLine('``ModernWpf/Styles/*.xaml``（宿主已有控件的 Fluent 样式）与 ``ModernWpf.Controls/<Name>/``（宿主没有的 WinUI 派生类型）。')
+[void]$sb.AppendLine('原生类型与绘制分级来自 ``01-census-raw-output.txt``。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('| 量 | 数 |')
+[void]$sb.AppendLine('|---|---|')
+[void]$sb.AppendLine("| Jalium public 具体 ``Control`` 类型 | $($types.Count) |")
+[void]$sb.AppendLine("| ModernWpf 承诺覆盖的控件名（并集） | $($scope.Count) |")
+[void]$sb.AppendLine("| 其中 Jalium 有同名原生类型（可走样式层） | $($native.Count) |")
+[void]$sb.AppendLine("| 其中我们已声明隐式样式 | $($done.Count) |")
+[void]$sb.AppendLine("| **其中真空，且无自有类型顶替** | **$($hardGaps.Count)** |")
+[void]$sb.AppendLine("| 其中真空但已有自有类型顶替 | $($substituted.Count) |")
+[void]$sb.AppendLine("| ModernWpf 得自己写类型、Jalium 也无同名原生类型 | $($needsType.Count) |")
+[void]$sb.AppendLine("| Jalium 独有、不在这份范围内（只标注，不还原） | $($extra.Count) |")
+[void]$sb.AppendLine("| 我们已样式、但 ModernWpf 无同名文件（按别名/内联实现） | $($styledOffScope.Count) |")
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine("## A. 真空：范围内、Jalium 有原生类型、我们还没有样式（$($hardGaps.Count)）")
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('绘制方式列只说明**能不能**靠模板解决；排批顺序仍以"底座先于叶子"为准（见 ROADMAP D 节）。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('这一列是启发式：类型重写了 OnRender 或 OnPaint 就记作"自绘"。NumberBox 批实测它会把话说死——')
+[void]$sb.AppendLine('`NumberBox` 重写绘制，却仍带一个可替换的代码构建 `ControlTemplate`（样式 setter 换得动，')
+[void]$sb.AppendLine('见 `adaptation/00` S0-h 与 `audits/numberbox.md`）。**排到某个控件时先量一遍再决定要不要自有类型，')
+[void]$sb.AppendLine('不要把这一列当结论。**')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('| 控件 | 绘制方式 | ModernWpf 放在哪一层 |')
+[void]$sb.AppendLine('|---|---|---|')
+foreach ($name in $hardGaps) {
+    $drawn = if ($types[$name]) { '自绘，模板只能改外围' } else { '纯模板，可完全覆盖' }
+    $layer = @()
+    if ($styled.Contains($name)) { $layer += 'Styles' }
+    if ($own.Contains($name)) { $layer += 'Controls' }
+    [void]$sb.AppendLine("| $name | $drawn | $($layer -join ' + ') |")
+}
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine("## B. 已上隐式样式（$($done.Count)）")
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine((Quote $done))
+if ($substituted.Count) {
+    [void]$sb.AppendLine('')
+    [void]$sb.AppendLine("## C. 真空但已有自有类型顶替（$($substituted.Count)）")
+    [void]$sb.AppendLine('')
+    foreach ($name in $substituted) {
+        [void]$sb.AppendLine("- $name  ←  " + (Quote @($implicit | Where-Object { $_ -ne $name -and $_ -like "*$name" })))
+    }
+}
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine("## D. Jalium 无同名原生类型（$($needsType.Count)）")
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('补样式解决不了：要么自有类型，要么明确放弃。名单里含 ModernWpf 的工程目录名（非控件），保留不筛。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine((Quote $needsType))
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine("## E. Jalium 独有、这份范围不覆盖（$($extra.Count)）")
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('不做 Fluent 还原，但**它们会露出框架素外观**：Gallery 里出现任何一个都必须显式标"未样式化"，')
+[void]$sb.AppendLine('这也是把 Gallery 当成唯一回归面的原因。')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine((Quote $extra))
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('## 这份清单证明不了什么')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine('- 只统计**声明**。"声明是否落到像素"这条限定现在只对 **Button 撤了**（``06-pixel-attribution.md``：')
+[void]$sb.AppendLine('  隐式样式 -> 模板 -> 令牌 -> 像素已有断言），其余真空控件仍未证。``00-pixel-harness-raw-output.txt``')
+[void]$sb.AppendLine('  里"像素不动"那组读数出自未推帧的捕获，不再作为证据。')
+[void]$sb.AppendLine('- 绘制方式列来自 census 的 ``OnRender``/``OnPaint`` 判定，不区分读 DP 还是读死的 ``ThemeColors``；')
+[void]$sb.AppendLine('  后者见 ``02-render-ceiling.md``。')
+[void]$sb.AppendLine('- 范围以 ModernWpf 为**文件/目录名**为锚，所以按别名或内联在父控件文件里的条目样式会漏计')
+[void]$sb.AppendLine('  （``TabItem``/``ComboBoxItem``/``MenuFlyoutItem`` 这类条目容器就是假阴性来源）。下面这份')
+[void]$sb.AppendLine('  "已样式但名单没有"的差集是人工核对入口，不要当成"范围外"：')
+[void]$sb.AppendLine('')
+[void]$sb.AppendLine((Quote $styledOffScope))
+
+# The generated body ends here. Everything below the sentinel is hand-written and is copied back in
+# verbatim, so re-running this tool can never delete a hand finding again (it did, once - see the
+# section-F re-measurement and docs/astra/audits/gap-inventory.md).
+$sentinel = '<!-- hand notes: 生成器（tools/Report-Control-Vacuum.ps1）原样保留这一行往下的一切内容 -->'
+$body = $sb.ToString().TrimEnd() -replace "`r?`n", "`r`n"
+$canonical = @($body -split "`r`n" | ForEach-Object { ($_ -replace '\s+', ' ').Trim() } | Where-Object { $_ -ne '' })
+$hash = (Get-FileHash -InputStream ([IO.MemoryStream]::new([Text.Encoding]::UTF8.GetBytes(($canonical -join "`n")))) -Algorithm SHA256).Hash.ToLower()
+
+$outFull = [System.IO.Path]::GetFullPath($Out)
+$hand = ''
+$committedHash = ''
+if ([System.IO.File]::Exists($outFull)) {
+    $existing = [System.IO.File]::ReadAllText($outFull)
+    $at = $existing.IndexOf($sentinel)
+    if ($at -ge 0) { $hand = $existing.Substring($at).TrimEnd() -replace "`r?`n", "`r`n" }
+    $committedHash = [Regex]::Match($existing, '<!-- generated-lines=\d+ sha256=([0-9a-f]+) -->').Groups[1].Value
+}
+
+$content = $body + "`r`n`r`n<!-- generated-lines=$($canonical.Count) sha256=$hash -->`r`n`r`n"
+$content += $(if ($hand) { $hand + "`r`n" } else { $sentinel + "`r`n" })
+$handLines = @($(if ($hand) { $hand -split "`r`n" | Where-Object { $_ -ne '' } })).Count
+
+if ($Check) {
+    if (-not [System.IO.File]::Exists($outFull)) {
+        Write-Host 'control-vacuum.md is missing; run the tool without -Check.'
+        exit 1
+    }
+    # Compare the whole document, not just the stamp: a hand edit inside the generated section changes
+    # neither the stamp nor the freshly generated body, so a stamp-only check stays green on exactly the
+    # drift it exists to catch (measured in the batch that wrote this check).
+    $existingNorm = $existing.Replace("`r`n", "`n")
+    $contentNorm = $content.Replace("`r`n", "`n")
+    if ($existingNorm -ne $contentNorm) {
+        Write-Host 'control-vacuum.md is stale: it differs from what this run generated.'
+        $a = $existingNorm -split "`n"; $b = $contentNorm -split "`n"
+        for ($i = 0; $i -lt [Math]::Min($a.Count, $b.Count); $i++) {
+            if ($a[$i] -ne $b[$i]) {
+                Write-Host ("first difference at line {0}:" -f ($i + 1))
+                Write-Host ("  committed: {0}" -f $a[$i])
+                Write-Host ("  generated: {0}" -f $b[$i])
+                break
+            }
+        }
+        if ($a.Count -ne $b.Count) { Write-Host ("line counts: committed={0} generated={1}" -f $a.Count, $b.Count) }
+        exit 1
+    }
+    Write-Host ('control-vacuum.md is current: {0} generated lines, {1} hand lines.' -f $canonical.Count, $handLines)
+    exit 0
+}
+
+[System.IO.File]::WriteAllText($outFull, $content, [System.Text.UTF8Encoding]::new($false))
+Write-Output "native=$($types.Count) scope=$($scope.Count) canStyle=$($native.Count) done=$($done.Count) HARDGAPS=$($hardGaps.Count) substituted=$($substituted.Count) needsOwnType=$($needsType.Count) outOfScope=$($extra.Count) generated=$($canonical.Count) hand=$($handLines)"

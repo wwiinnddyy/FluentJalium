@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for the fifth slice of the list batch (stage 5): what the runtime actually offers for
+       DataGrid / TreeDataGrid, and - the blocking question - whether the framework's own DataGrid template is a
+       replaceable ControlTemplate at all. S0-s records that no DataGrid style lives in ThemeManager.RegisterBuiltins
+       while TreeDataGrid does, and reads that as "DataGrid has no template to hand back"; nothing in this repo has
+       ever MOUNTED a DataGrid, so the claim was never measured (the window-shell row of S0-s was written, shipped
+       into a key-deletion rationale, and reversed one session later for exactly that reason). The TabView batch
+       (S1-h) then made the same question decisive a second time: a control whose parts the framework builds in code
+       takes no template, so "re-template or own type" is answered by mounting, never by the type graph.
+       Answers before any product code exists. Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>DataGridProbe</RootNamespace>
+    <AssemblyName>DataGridProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

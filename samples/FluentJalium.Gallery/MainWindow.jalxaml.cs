@@ -1,20 +1,1072 @@
 using FluentJalium.Controls;
-using FluentJalium.Controls.Themes;
-using FluentJalium.Gallery.Shell;
+using FluentJalium.Localization;
+using FluentJalium.Themes;
 using Jalium.UI;
+using Jalium.UI.Automation;
+using Jalium.UI.Controls;
+using Jalium.UI.Controls.Primitives;
+using Jalium.UI.Media;
 
 namespace FluentJalium.Gallery;
 
-public sealed partial class MainWindow : Window
+public partial class MainWindow : Window
 {
+    private readonly Dictionary<FluentNavigationItem, FrameworkElement> _pages;
+    private readonly Dictionary<FluentNavigationItem, string> _pageIds = [];
+    private readonly GalleryCatalog _catalog = GalleryCatalog.Load();
+    private readonly TextSweeper _sweeper = new();
+
+    // Content the tree walk cannot reach: a MenuFlyout's and a ContextMenu's items live on objects rather than in
+    // the visual tree, and the command bar's buttons are generated. Held here so a language change can rewrite
+    // them without rebuilding the collections and duplicating every row.
+    private readonly List<Action> _dynamicTextWriters = [];
+    private List<string> _unresolvedTokens = [];
+    private bool _compactCommandBar;
+
+    private FluentThemeVariant _theme = FluentThemeVariant.System;
+    private bool _syncControls = true;
+    private bool _loaded;
+    private int _buttonCount;
+    private int _repeatCount;
+    private int _splitCount;
+    private string? _startPageId;
+
+    private FluentNavigationView Navigation => (FluentNavigationView)NavigationRoot!;
+    private Grid ContentHost => (Grid)PageHost!;
+    private TextBox NameInput => (TextBox)DisplayNameBox!;
+    private PasswordBox PasswordInput => (PasswordBox)SamplePasswordBox!;
+    private ComboBox ProfileChoice => (ComboBox)ProfileComboBox!;
+    private ComboBox ThemeChoice => (ComboBox)ThemeComboBox!;
+    private ComboBox AccentChoice => (ComboBox)AccentComboBox!;
+    private Slider Volume => (Slider)VolumeSlider!;
+    private FluentToggleSwitch Notifications => (FluentToggleSwitch)NotificationsSwitch!;
+    private FluentToggleSwitch MotionPreference => (FluentToggleSwitch)ReduceMotionSwitch!;
+
     public MainWindow()
     {
         InitializeComponent();
-        ShellHost.Content = new GalleryShell(this);
+        _pages = new Dictionary<FluentNavigationItem, FrameworkElement>
+        {
+            [(FluentNavigationItem)OverviewItem!] = (FrameworkElement)OverviewPage!,
+            [(FluentNavigationItem)TokensItem!] = (FrameworkElement)TokensPage!,
+            [(FluentNavigationItem)MaterialsItem!] = (FrameworkElement)MaterialsPage!,
+            [(FluentNavigationItem)MotionItem!] = (FrameworkElement)MotionPage!,
+            [(FluentNavigationItem)ButtonsItem!] = (FrameworkElement)ButtonsPage!,
+            [(FluentNavigationItem)InputsItem!] = (FrameworkElement)InputsPage!,
+            [(FluentNavigationItem)SelectionItem!] = (FrameworkElement)SelectionPage!,
+            [(FluentNavigationItem)NavigationItem!] = (FrameworkElement)NavigationPage!,
+            [(FluentNavigationItem)SurfacesItem!] = (FrameworkElement)SurfacesPage!,
+            [(FluentNavigationItem)StatusItem!] = (FrameworkElement)StatusPage!,
+            [(FluentNavigationItem)MenusItem!] = (FrameworkElement)MenusPage!,
+            [(FluentNavigationItem)CommandBarItem!] = (FrameworkElement)CommandBarPage!,
+            [(FluentNavigationItem)SettingsItem!] = (FrameworkElement)SettingsPage!,
+        };
+        _pageIds[(FluentNavigationItem)OverviewItem!] = "overview";
+        _pageIds[(FluentNavigationItem)TokensItem!] = "tokens";
+        _pageIds[(FluentNavigationItem)MaterialsItem!] = "materials";
+        _pageIds[(FluentNavigationItem)MotionItem!] = "motion";
+        _pageIds[(FluentNavigationItem)ButtonsItem!] = "buttons";
+        _pageIds[(FluentNavigationItem)InputsItem!] = "inputs";
+        _pageIds[(FluentNavigationItem)SelectionItem!] = "selection";
+        _pageIds[(FluentNavigationItem)NavigationItem!] = "navigation";
+        _pageIds[(FluentNavigationItem)SurfacesItem!] = "surfaces";
+        _pageIds[(FluentNavigationItem)StatusItem!] = "status";
+        _pageIds[(FluentNavigationItem)MenusItem!] = "menus";
+        _pageIds[(FluentNavigationItem)CommandBarItem!] = "command-bar";
+        _pageIds[(FluentNavigationItem)SettingsItem!] = "settings";
 
-        // The window has no native handle until it is shown, so the chrome (DWM caption/border and
-        // immersive dark mode) must be synchronised once Loaded fires. Runtime theme switches are
-        // handled centrally by FluentThemeManager.
-        Loaded += (_, _) => FluentWindowChrome.Apply(this);
+        // Only the active page is in the visual tree and tab order. Reusing the same
+        // page instances preserves native input state when moving between examples.
+        ContentHost.Children.Clear();
+        Navigation.SelectionChanged += OnNavigationChanged;
+        WireButtons();
+        WireInputs();
+        WireSelection();
+        WireSurfaces();
+        WireStatus();
+        WireMenus();
+        WireCommandBar();
+        WireAppearance();
+        WireTokens();
+        WireMotion();
+        SetAccessibleNames();
+
+        // The catalog is process-wide and idempotent, and it is registered here rather than in Program.cs because
+        // the launcher shows this window in-process without ever calling that entry point.
+        GalleryText.Register();
+
+        ProfileChoice.SelectedItem = ProfileChoice.Items[0];
+        ThemeChoice.SelectedItem = ThemeChoice.Items[2];
+        AccentChoice.SelectedItem = AccentChoice.Items[0];
+        MotionPreference.IsChecked = FluentThemeManager.ReduceMotion;
+        Navigation.SelectedItem = (FluentNavigationItem)OverviewItem!;
+        _syncControls = false;
+
+        // Every page was built by InitializeComponent but only one is attached, so the sweep is told about the
+        // detached ones explicitly - a walk from the window would reach the Overview page and nothing else.
+        UiText.LanguageChanged += ApplyLanguage;
+        ApplyLanguage();
+
+        FluentThemeManager.Changed += ApplyAppearance;
+        ApplyAppearance();
+        Loaded += (_, _) =>
+        {
+            _loaded = true;
+            if (_startPageId is { } pageId) NavigateToPage(pageId);
+        };
+        SystemSettingsChanged += (_, _) => FluentThemeManager.ApplyTheme(_theme);
+        ((FrameworkElement)Content!).SizeChanged += (_, args) =>
+            ContentHost.Margin = new Thickness(args.NewSize.Width < 720 ? 16 : 24);
+        Closed += (_, _) =>
+        {
+            _loaded = false;
+            FluentThemeManager.Changed -= ApplyAppearance;
+            UiText.LanguageChanged -= ApplyLanguage;
+            Navigation.SelectionChanged -= OnNavigationChanged;
+        };
+    }
+
+    /// <summary>
+    /// Writes the current catalog language over the whole window, all thirteen pages, and the content that lives on
+    /// objects rather than in the tree. Safe to call at any time; the sweep writes from the text the markup authored
+    /// rather than from what is currently on screen, so switching twice returns to English.
+    /// </summary>
+    private void ApplyLanguage()
+    {
+        _sweeper.Apply(this);
+        _sweeper.Apply(_pages.Values);
+        foreach (var write in _dynamicTextWriters)
+        {
+            write();
+        }
+
+        ApplyRuntimeReadouts();
+    }
+
+    private void ApplyRuntimeReadouts()
+    {
+        WriteThemeStatus();
+        WriteMotionReadout();
+        WriteTokenReadout();
+        WriteParityStatus();
+    }
+
+    /// <summary>
+    /// Builds the palette grid on the Tokens page from <see cref="TokenCatalog" />, one card per brush token, filled
+    /// with what that name resolves to at this moment so a theme switch repaints the whole set, and names every token
+    /// that resolves to nothing in the readout. The page has no other state to wire: the diagnostics exist precisely so
+    /// a missing row is visible on screen instead of as a swatch someone has to recognise as blank.
+    /// </summary>
+    private void WireTokens()
+    {
+        var host = (WrapPanel)TokenSwatchHost!;
+        var outline = Application.Current?.TryFindResource("ControlStrokeColorDefaultBrush") as Brush;
+        _unresolvedTokens = [];
+
+        foreach (var key in TokenCatalog.BrushTokens)
+        {
+            if (Application.Current?.TryFindResource(key) is not Brush brush)
+            {
+                _unresolvedTokens.Add(key);
+                continue;
+            }
+
+            var card = new StackPanel { Width = 116, Margin = new Thickness(0, 0, 8, 12) };
+            card.Children.Add(new Border
+            {
+                Height = 44,
+                Background = brush,
+                BorderBrush = outline,
+                BorderThickness = new Thickness(1),
+            });
+            card.Children.Add(new TextBlock { Text = key, FontSize = 10, Margin = new Thickness(0, 4, 0, 0) });
+            host.Children.Add(card);
+        }
+
+        WriteTokenReadout();
+    }
+
+    private void WriteTokenReadout()
+    {
+        if (TokenSwatchHost is not Panel host || TokenReadout is not TextBlock readout)
+        {
+            return;
+        }
+
+        // The sentence counts what is on screen and names what is not, so a token that stops resolving shows up as
+        // a hole in the grid and in this line at the same time.
+        readout.Text = _unresolvedTokens.Count == 0
+            ? UiText.T("{0} palette tokens resolved, {1} painted, none missing.",
+                TokenCatalog.BrushTokens.Length, host.Children.Count)
+            : UiText.T("{0} of {1} tokens painted; unresolved: {2}",
+                host.Children.Count, TokenCatalog.BrushTokens.Length, string.Join(", ", _unresolvedTokens));
+    }
+
+    /// <summary>
+    /// Runs the three published duration rows side by side. Each bar carries
+    /// <c>TransitionProperty="Width"</c> and a <c>TransitionDuration</c> taken from its own resource row, so the
+    /// click below writes a new Width and the framework animates it over that row's time - the one property shape this
+    /// runtime ticks, which is why nothing here moves a transform. The readout reports what the rows resolve to right
+    /// now rather than what this file says they should be, so the page also shows reduce-motion rewriting the live row.
+    /// </summary>
+    private void WireMotion()
+    {
+        var bars = new[] { (Border)MotionFasterBar!, (Border)MotionFastBar!, (Border)MotionPaneBar! };
+        var wide = false;
+        ((Button)MotionBeatButton!).Click += (_, _) =>
+        {
+            wide = !wide;
+            foreach (var bar in bars)
+            {
+                bar.Width = wide ? 460 : 120;
+            }
+
+            WriteMotionReadout();
+        };
+
+        WriteMotionReadout();
+    }
+
+    private void WriteMotionReadout()
+    {
+        var rows = new[]
+        {
+            "ControlFasterAnimationDuration",
+            "ControlFastAnimationDuration",
+            "SplitViewPaneAnimationOpenDuration",
+        };
+        var parts = new List<string>();
+        foreach (var key in rows)
+        {
+            parts.Add(Application.Current?.TryFindResource(key) is { } value
+                ? $"{key} = {value}"
+                : $"{key} unresolved");
+        }
+
+        parts.Add(FluentThemeManager.ReduceMotion ? "reduce motion on" : "reduce motion off");
+        ((TextBlock)MotionReadout!).Text = string.Join("   ·   ", parts);
+    }
+
+    private void WireButtons()
+    {
+        ((Button)ExploreInputsButton!).Click += (_, _) => Select((FluentNavigationItem)InputsItem!);
+        ((Button)ExploreButtonsButton!).Click += (_, _) => Select((FluentNavigationItem)ButtonsItem!);
+        ((Button)ExploreNavigationButton!).Click += (_, _) => Select((FluentNavigationItem)NavigationItem!);
+        ((Button)JumpOverviewButton!).Click += (_, _) => Select((FluentNavigationItem)OverviewItem!);
+        ((Button)JumpSettingsButton!).Click += (_, _) => Select((FluentNavigationItem)SettingsItem!);
+        ((Button)TogglePaneButton!).Click += (_, _) =>
+        {
+            Navigation.IsPaneOpen = !Navigation.IsPaneOpen;
+            Report(Navigation.IsPaneOpen ? "Navigation pane expanded." : "Navigation pane compact.");
+        };
+
+        foreach (var button in new[] { (Button)StandardActionButton!, (Button)AccentActionButton!, (Button)SubtleActionButton! })
+            button.Click += (_, _) => Report($"{button.Content} button activated. Total actions: {++_buttonCount}.");
+
+        ((Button)ClearOutputButton!).Click += (_, _) => Report("Output cleared. Choose a control to try it.");
+
+        ((RepeatButton)RepeatActionButton!).Click += (_, _) =>
+            ((TextBlock)RepeatReadout!).Text = $"Repeat button fired {++_repeatCount} times.";
+        foreach (var toggle in new[] { (ToggleButton)QuietToggleButton!, (ToggleButton)CheckedToggleButton!, (ToggleButton)MixedToggleButton! })
+            WireToggle(toggle, toggle.Content?.ToString() ?? "Toggle");
+
+        // Set in code, not markup: IsChecked='{x:Null}' parses without error and yields false, so a
+        // three-state sample written the WinUI way would sit in off while looking tri-state on screen.
+        ((ToggleButton)MixedToggleButton!).IsChecked = null;
+
+        var split = (SplitButton)SplitActionButton!;
+        split.Click += (_, _) => ((TextBlock)SplitReadout!).Text = $"Split primary action ran {++_splitCount} time(s).";
+        split.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = "Split flyout opened - the left half did not run.";
+        split.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = "Split flyout closed.";
+
+        var dropDown = (FluentDropDownButton)DropDownMoreButton!;
+        dropDown.Flyout!.Opened += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down opened; IsExpanded={dropDown.IsExpanded}.";
+        dropDown.Flyout.Closed += (_, _) => ((TextBlock)SplitReadout!).Text = $"Drop-down closed; IsExpanded={dropDown.IsExpanded}.";
+    }
+
+    private void WireCommandBar()
+    {
+        var bar = (CommandBar)SampleCommandBar!;
+        var save = new AppBarButton { Label = "Save", Icon = new SymbolIcon { Symbol = Symbol.Save } };
+        var bold = new AppBarToggleButton { Label = "Bold", Icon = new SymbolIcon { Symbol = Symbol.Bold } };
+        var share = new AppBarButton { Label = "Share", Icon = new SymbolIcon { Symbol = Symbol.Share } };
+        var disabled = new AppBarButton { Label = "Delete", Icon = new SymbolIcon { Symbol = Symbol.Delete }, IsEnabled = false };
+        var without = new AppBarButton { Label = "No icon" };
+        var properties = new AppBarButton { Label = "Properties" };
+        var history = new AppBarButton { Label = "Version history" };
+        bar.PrimaryCommands.Add(save);
+        bar.PrimaryCommands.Add(bold);
+        bar.PrimaryCommands.Add(share);
+        bar.PrimaryCommands.Add(new AppBarSeparator());
+        bar.PrimaryCommands.Add(disabled);
+        bar.PrimaryCommands.Add(without);
+        bar.SecondaryCommands.Add(properties);
+        bar.SecondaryCommands.Add(history);
+
+        // The generated rows are on the bar, not in a tree the sweeper walks, so their labels are rewritten here.
+        _dynamicTextWriters.Add(() =>
+        {
+            save.Label = UiText.T("Save");
+            bold.Label = UiText.T("Bold");
+            share.Label = UiText.T("Share");
+            disabled.Label = UiText.T("Delete");
+            without.Label = UiText.T("No icon");
+            properties.Label = UiText.T("Properties");
+            history.Label = UiText.T("Version history");
+            ((Button)CommandBarCompactButton!).Content = _compactCommandBar
+                ? UiText.T("Show the labels")
+                : UiText.T("Compact the buttons");
+        });
+
+        save.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Save invoked - the fill under the label is AppBarButtonBackground, and the press that lights it is the IsPressed cell.";
+        share.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Share invoked through the same routed handler a click reaches.";
+        bold.IsChecked = true;
+        bold.Checked += (_, _) => ((TextBlock)CommandBarReadout!).Text = $"Bold checked: the accent fill is AppBarToggleButtonBackgroundChecked, which is the whole mark - upstream shows no glyph in a bar.";
+        bold.Unchecked += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Bold unchecked: the resting row is transparent, so the button reads as the bar again.";
+        disabled.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "A disabled bar button answered a click.";
+
+        ((Button)CommandBarOpenButton!).Click += (_, _) =>
+        {
+            bar.IsOpen = !bar.IsOpen;
+            ((TextBlock)CommandBarReadout!).Text = $"IsOpen={bar.IsOpen} - the overflow list is a popup the bar builds for itself, and its colour is the one row this batch had to withhold.";
+        };
+
+        var compact = false;
+        ((Button)CommandBarCompactButton!).Click += (_, _) =>
+        {
+            compact = !compact;
+            _compactCommandBar = compact;
+            foreach (var element in bar.PrimaryCommands.OfType<AppBarButton>())
+            {
+                element.IsCompact = compact;
+            }
+
+            ((Button)CommandBarCompactButton!).Content = compact
+                ? UiText.T("Show the labels")
+                : UiText.T("Compact the buttons");
+            ((TextBlock)CommandBarReadout!).Text = compact
+                ? UiText.T("IsCompact dropped every label - the one application-view state this runtime exposes as a property a cell can watch.")
+                : UiText.T("Labels back: the side-by-side layout upstream has is picked by the bar's DefaultLabelPosition, and the bar never builds a template of ours, so no label position but this one is reachable.");
+        };
+
+        ((Button)CommandBarClearButton!).Click += (_, _) =>
+        {
+            bold.IsChecked = false;
+            ((TextBlock)CommandBarReadout!).Text = "Check cleared: the accent fill left with it.";
+        };
+    }
+
+    private void WireStatus()
+    {
+        var bar = (ProgressBar)SampleProgressBar!;
+        var ring = (FluentProgressRing)SampleProgressRing!;
+        var bigRing = (FluentProgressRing)BigRing!;
+        ((Slider)ProgressValueSlider!).ValueChanged += (_, args) =>
+        {
+            if (bar.IsIndeterminate)
+            {
+                return;
+            }
+
+            bar.Value = args.NewValue;
+            ring.Value = args.NewValue;
+            bigRing.Value = args.NewValue;
+            ReportProgress(bar);
+            ReportRing(ring);
+        };
+
+        var indeterminate = (CheckBox)IndeterminateCheck!;
+        void Changed(object sender, RoutedEventArgs args)
+        {
+            bar.IsIndeterminate = indeterminate.IsChecked == true;
+            ReportProgress(bar);
+            Report(bar.IsIndeterminate ? "Progress: indeterminate." : "Progress: determinate.");
+        }
+
+        indeterminate.Checked += Changed;
+        indeterminate.Unchecked += Changed;
+        ReportProgress(bar);
+        ReportRing(ring);
+    }
+
+    private void ReportProgress(ProgressBar bar) =>
+        ((TextBlock)ProgressReadout!).Text = bar.IsIndeterminate
+            ? "Indeterminate: a third of the row, and it stays put."
+            : $"{bar.Value:0} of {bar.Maximum:0}.";
+
+    private void ReportRing(FluentProgressRing ring) =>
+        ((TextBlock)RingReadout!).Text = ring.IsIndeterminate
+            ? "Ring: indeterminate, a half circle carried round by a frame loop."
+            : $"Ring: {ring.Value:0} of {ring.Maximum:0}, an arc of {ring.CurrentSweepAngle:0} degrees.";
+
+    private void WireMenus()
+    {
+        foreach (var title in new[] { "View", "Help" })
+        {
+            ((MenuBar)SampleMenuBar!).Items.Add(new MenuBarItem { Title = title });
+        }
+
+        var menu = (Menu)SampleMenu!;
+        menu.AddHandler(MenuItem.ClickEvent, new RoutedEventHandler((sender, arguments) =>
+            ((TextBlock)MenuBarReadout!).Text =
+            $"{((MenuItem)arguments.OriginalSource!).Header} clicked - the label and the disabled colour are ours; the highlight and the check mark are the control's own drawing."));
+
+        var flyout = new MenuFlyout();
+        flyout.Items.Add(new MenuFlyoutItem
+        {
+            Text = "Rename",
+            Icon = new TextBlock { Text = "\uE713", FontFamily = new FontFamily("Segoe Fluent Icons"), FontSize = 14 },
+            KeyboardAcceleratorTextOverride = "F2",
+        });
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Archive", KeyboardAcceleratorTextOverride = "Ctrl+Shift+A" });
+        flyout.Items.Add(new ToggleMenuFlyoutItem { Text = "Show read receipts", IsChecked = true });
+        flyout.Items.Add(new MenuFlyoutSeparator());
+        var share = new MenuFlyoutSubItem { Text = "Share with" };
+        share.Items.Add(new MenuFlyoutItem { Text = "Team channel" });
+        share.Items.Add(new MenuFlyoutItem { Text = "Direct link" });
+        flyout.Items.Add(share);
+        flyout.Items.Add(new MenuFlyoutItem { Text = "Delete", IsEnabled = false });
+        flyout.Closed += (_, _) => ((TextBlock)MenuReadout!).Text = "Flyout closed.";
+
+        ((Button)ShowFlyoutButton!).Click += (_, _) => flyout.ShowAt((Button)ShowFlyoutButton!);
+
+        var contextMenu = new ContextMenu();
+        contextMenu.Items.Add(new MenuItem { Header = "Copy path", Icon = new TextBlock { Text = "\uE8C8", FontFamily = new FontFamily("Segoe Fluent Icons"), FontSize = 14 } });
+        contextMenu.Items.Add(new MenuItem { Header = "Open containing folder" });
+        contextMenu.Items.Add(new Separator());
+        contextMenu.Items.Add(new MenuItem { Header = "Properties", IsEnabled = false });
+        ((Button)ShowContextMenuButton!).Click += (_, _) => contextMenu.Open(new Point(360, 320));
+    }
+
+    private void WireSurfaces()
+    {
+        var expander = (Expander)SampleExpander!;
+        expander.Expanded += (_, _) => ((TextBlock)ExpanderReadout!).Text =
+            "Expanded. The control wrote the content part's visibility and rotated its chevron; this page drives neither.";
+        expander.Collapsed += (_, _) => ((TextBlock)ExpanderReadout!).Text = "Collapsed.";
+
+        var bar = (FluentInfoBar)SampleInfoBar!;
+        bar.CloseButtonClick += (_, _) =>
+        {
+            ((TextBlock)InfoBarReadout!).Text =
+                "CloseButtonClick came from the base class, which also set IsOpen=false; the style collapses the bar.";
+            Report("Info bar closed.");
+        };
+
+        foreach (var (button, severity) in new[]
+                 {
+                     ((Button)SeverityInformationalButton!, InfoBarSeverity.Informational),
+                     ((Button)SeveritySuccessButton!, InfoBarSeverity.Success),
+                     ((Button)SeverityWarningButton!, InfoBarSeverity.Warning),
+                     ((Button)SeverityErrorButton!, InfoBarSeverity.Error),
+                 })
+        {
+            button.Click += (_, _) =>
+            {
+                bar.Severity = severity;
+                bar.IsOpen = true;
+                ((TextBlock)InfoBarReadout!).Text = $"Severity {severity}: the fill is upstream's severity row.";
+            };
+        }
+
+        ((Button)ShowInfoBarButton!).Click += (_, _) =>
+        {
+            bar.IsOpen = true;
+            ((TextBlock)InfoBarReadout!).Text = "IsOpen=true again.";
+        };
+        ((ToggleButton)InfoBarClosableToggle!).Click += (_, _) =>
+            bar.IsClosable = ((ToggleButton)InfoBarClosableToggle!).IsChecked == true;
+        ((ToggleButton)InfoBarIconToggle!).Click += (_, _) =>
+            bar.IsIconVisible = ((ToggleButton)InfoBarIconToggle!).IsChecked == true;
+
+        var tabs = (FluentTabView)SampleTabView!;
+        var tabsReadout = (TextBlock)TabViewReadout!;
+        tabs.AddTabButtonClick += (_, _) =>
+        {
+            var number = tabs.TabItems.Count + 1;
+            tabs.TabItems.Add(new FluentTabViewItem
+            {
+                Header = $"Tab {number}",
+                Content = new TextBlock { Text = $"Added by the + button as {number}.", Margin = new Thickness(12) },
+            });
+            tabs.SelectedIndex = tabs.TabItems.Count - 1;
+        };
+        tabs.TabCloseRequested += (_, args) =>
+        {
+            var index = tabs.TabItems.IndexOf(args.Item);
+            var header = args.Item.Header as string ?? "tab";
+            tabs.TabItems.Remove(args.Item);
+            if (tabs.SelectedIndex < 0 || index <= tabs.SelectedIndex)
+            {
+                tabs.SelectedIndex = Math.Max(0, Math.Min(index, tabs.TabItems.Count - 1));
+            }
+
+            tabsReadout.Text = $"{header} closed; {tabs.TabItems.Count} left.";
+        };
+        tabs.SelectionChanged += (_, args) => tabsReadout.Text =
+            args.NewSelectedItem is { } tab ? $"{tab.Header} selected." : "Nothing selected.";
+        ((ToggleButton)TabViewAddToggle!).Click += (_, _) =>
+            tabs.IsAddButtonVisible = ((ToggleButton)TabViewAddToggle!).IsChecked == true;
+        ((Button)TabViewSelectFirstButton!).Click += (_, _) => tabs.SelectedIndex = 0;
+
+        var pager = (FluentPipsPager)SlidesPager!;
+        var pagerReadout = (TextBlock)PagerReadout!;
+        void ReportPager()
+        {
+            var pips = 0;
+            while (pager.PipFromIndex(pips) is not null)
+            {
+                pips++;
+            }
+
+            pagerReadout.Text = $"Page {pager.SelectedPageIndex + 1} of {pager.NumberOfPages}; " +
+                $"{pips} pips generated, {pager.MaxVisiblePips} of them in the window.";
+        }
+
+        pager.SelectedIndexChanged += (_, _) => ReportPager();
+        ((ToggleButton)PagerVertical!).Click += (_, _) =>
+            pager.Orientation = ((ToggleButton)PagerVertical!).IsChecked == true
+                ? Jalium.UI.Controls.Orientation.Vertical
+                : Jalium.UI.Controls.Orientation.Horizontal;
+        ((ToggleButton)PagerHiddenArrows!).Click += (_, _) =>
+        {
+            var visibility = ((ToggleButton)PagerHiddenArrows!).IsChecked == true
+                ? FluentPipsPagerButtonVisibility.Collapsed
+                : FluentPipsPagerButtonVisibility.Visible;
+            pager.PreviousButtonVisibility = visibility;
+            pager.NextButtonVisibility = visibility;
+        };
+        ((Button)PagerNextButton!).Click += (_, _) => pager.SelectedPageIndex++;
+        ReportPager();
+
+        var trail = (FluentBreadcrumbBar)TrailBar!;
+        var trailReadout = (TextBlock)BreadcrumbReadout!;
+        foreach (var level in new[] { "This PC", "Documents", "Projects", "FluentJalium" })
+        {
+            trail.Items.Add(level);
+        }
+
+        void ReportTrail(string action)
+        {
+            var shown = 0;
+            for (var index = 0; index < trail.Items.Count; index++)
+            {
+                if (trail.ContainerFromIndex(index)?.Visibility == Jalium.UI.Visibility.Visible)
+                {
+                    shown++;
+                }
+            }
+
+            trailReadout.Text = $"{action} {trail.Items.Count} levels, {shown} of them in the row" +
+                (trail.IsEllipsisRendered ? ", the rest behind the ellipsis." : ".");
+        }
+
+        trail.ItemClicked += (_, args) => ReportTrail($"Crumb {args.Index} ({args.Item}) clicked;");
+        ((Button)BreadcrumbPushButton!).Click += (_, _) =>
+        {
+            trail.Items.Add($"Level {trail.Items.Count + 1}");
+            ReportTrail("Pushed;");
+        };
+        ((Button)BreadcrumbPopButton!).Click += (_, _) =>
+        {
+            if (trail.Items.Count > 1)
+            {
+                trail.Items.RemoveAt(trail.Items.Count - 1);
+            }
+
+            ReportTrail("Popped;");
+        };
+        ((Slider)BreadcrumbWidthSlider!).ValueChanged += (_, args) => trail.Width = args.NewValue;
+        ReportTrail("Loaded:");
+
+        foreach (var (button, shapes) in new[]
+                 {
+                     ((Button)DialogThreeButton!, 3),
+                     ((Button)DialogTwoButton!, 2),
+                     ((Button)DialogOneButton!, 1),
+                 })
+        {
+            button.Click += (_, _) => _ = ShowDialogAsync(shapes);
+        }
+
+        WireTeachingTip();
+    }
+
+    /// <summary>
+    /// The tip is on the page rather than built on the click, because that is the shape the control exists for:
+    /// it points at an element that is already in the tree. The one thing it cannot do here is name that element
+    /// in markup - {x:Bind} is dropped silently on this runtime - so the target is assigned from code.
+    /// </summary>
+    private void WireTeachingTip()
+    {
+        var tip = (FluentTeachingTip)SampleTeachingTip!;
+        var anchor = (Button)TipShowButton!;
+        var readout = (TextBlock)TipReadout!;
+        var target = anchor;
+        var reason = "Nothing has happened yet.";
+        tip.Target = target;
+
+        anchor.Click += (_, _) =>
+        {
+            tip.Target = target;
+            reason = $"Opened at the {tip.PreferredPlacement} side.";
+            tip.IsOpen = !tip.IsOpen;
+        };
+
+        ((Button)TipSideButton!).Click += (_, _) =>
+        {
+            tip.PreferredPlacement = tip.PreferredPlacement switch
+            {
+                FluentTeachingTipPlacementMode.Top => FluentTeachingTipPlacementMode.Right,
+                FluentTeachingTipPlacementMode.Right => FluentTeachingTipPlacementMode.Bottom,
+                FluentTeachingTipPlacementMode.Bottom => FluentTeachingTipPlacementMode.Left,
+                _ => FluentTeachingTipPlacementMode.Top,
+            };
+            reason = $"Preferred side is {tip.PreferredPlacement}.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason + $" The control put it on {tip.EffectivePlacement}.";
+            }
+        };
+
+        ((Button)TipNoTargetButton!).Click += (_, _) =>
+        {
+            target = target is null ? anchor : null!;
+            tip.Target = target;
+            reason = target is null
+                ? "No target: the tail is gone and Auto falls to Bottom."
+                : "Targeted again.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        ((ToggleButton)TipTailToggle!).Click += (_, _) =>
+        {
+            tip.TailVisibility = ((ToggleButton)TipTailToggle!).IsChecked == true
+                ? FluentTeachingTipTailVisibility.Auto
+                : FluentTeachingTipTailVisibility.Collapsed;
+            reason = $"TailVisibility is {tip.TailVisibility}.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        ((ToggleButton)TipButtonsToggle!).Click += (_, _) =>
+        {
+            var both = ((ToggleButton)TipButtonsToggle!).IsChecked == true;
+            tip.ActionButtonContent = both ? "Got it" : null;
+            tip.CloseButtonContent = both ? "Dismiss" : null;
+            reason = both ? "Both buttons are back." : "No button content: the row collapses.";
+            if (tip.IsOpen)
+            {
+                readout.Text = reason;
+            }
+        };
+
+        tip.Opened += (_, _) => readout.Text = reason + $" Card on {tip.EffectivePlacement}, " +
+            $"{(tip.Target is null ? "no target" : "target " + tip.Target.GetType().Name)}.";
+        tip.Closed += (_, _) => readout.Text = UiText.T("Closed.") + " " + reason;
+        tip.ActionButtonClick += (_, _) =>
+        {
+            // Upstream's action button announces itself and leaves the card open; closing here is this page's choice.
+            reason = "ActionButtonClick fired and the page closed the tip.";
+            tip.IsOpen = false;
+        };
+        tip.CloseButtonClick += (_, _) => reason = "CloseButtonClick fired; the control set IsOpen=false.";
+    }
+
+    /// <summary>
+    /// Builds the dialog on the click instead of placing one on the page: the control hosts a shown dialog in the
+    /// window's overlay layer and throws if the instance is already in a tree, which is also why the gate opens
+    /// one through ShowAsync rather than mounting it (docs/astra/audits/content-dialog.md).
+    /// </summary>
+    private async Task ShowDialogAsync(int shapes)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = "Publish this draft?",
+            Content = "Once it is public, readers and search engines can see the version as of now.",
+            PrimaryButtonText = shapes >= 2 ? "Publish" : null!,
+            SecondaryButtonText = shapes == 3 ? "Save draft" : null!,
+            CloseButtonText = "Cancel",
+            FullSizeDesired = ((ToggleButton)DialogFullSizeToggle!).IsChecked == true,
+        };
+        if (((ToggleButton)DialogDefaultToggle!).IsChecked == true)
+        {
+            dialog.DefaultButton = ContentDialogButton.Primary;
+        }
+
+        var result = await dialog.ShowAsync();
+        ((TextBlock)DialogReadout!).Text = $"ShowAsync completed with {result}; the click that ended it came from the template's own part.";
+        Report($"Dialog closed: {result}.");
+    }
+
+    private void WireInputs()
+    {
+        NameInput.TextChanged += (_, _) => Report($"Display name changed: {NameInput.Text.Length} characters.");
+        PasswordInput.PasswordChanged += (_, _) => Report($"Password changed: {PasswordInput.Password.Length} characters.");
+        ProfileChoice.SelectionChanged += (_, _) => Report($"Profile: {Describe(ProfileChoice.SelectedItem)}.");
+        Volume.ValueChanged += (_, _) =>
+        {
+            ((TextBlock)VolumeValue!).Text = $"{Volume.Value:0}%";
+            Report($"Volume: {Volume.Value:0}%.");
+        };
+        WireToggle(Notifications, "Notifications");
+        // AutoCompleteBox has no Items collection, only ItemsSource, so the candidate list is code-side.
+        var fruits = new[] { "Apple", "Apricot", "Banana", "Blueberry", "Cherry", "Grapefruit", "Lemon", "Mango", "Orange", "Peach" };
+        FruitBox.ItemsSource = fruits;
+        DisabledFruitBox.ItemsSource = fruits;
+        FruitBox.TextChanged += (_, _) => Report($"Fruit filter: {FruitBox.Text.Length} characters.");
+        FruitBox.SelectionChanged += (_, _) => Report($"Fruit suggestion: {Describe(FruitBox.SelectedItem)}.");
+
+        ((Button)ApplyInputsButton!).Click += (_, _) =>
+        {
+            var name = NameInput.Text.Trim();
+            if (string.IsNullOrWhiteSpace(name)) name = "Unnamed";
+            if (name.Length > 48) name = name[..48] + "…";
+            Report($"Applied locally: {name} · {Describe(ProfileChoice.SelectedItem)} · Volume {Volume.Value:0}% · Notifications {(Notifications.IsChecked == true ? "on" : "off")}.");
+        };
+        ((Button)ResetInputsButton!).Click += (_, _) =>
+        {
+            _syncControls = true;
+            try
+            {
+                NameInput.Text = "Astra";
+                PasswordInput.Password = string.Empty;
+                ProfileChoice.SelectedItem = ProfileChoice.Items[0];
+                Volume.Value = 45;
+                Notifications.IsChecked = true;
+            }
+            finally { _syncControls = false; }
+            Report("Input values reset.");
+        };
+    }
+
+    private void WireSelection()
+    {
+        WireToggle((CheckBox)PreviewCheckBox!, "Preview");
+        WireToggle((CheckBox)DetailsCheckBox!, "Details");
+        WireToggle((CheckBox)MixedCheckBox!, "Three-state option");
+        // IsChecked="{x:Null}" in markup arrives as false on this runtime, so the third state is set
+        // here or the sample would quietly show an unchecked box. See AstraSelectionTests.
+        ((CheckBox)MixedCheckBox!).IsChecked = null;
+        ((RadioButton)ComfortableRadio!).Checked += (_, _) => Report("Density choice: Comfortable.");
+        ((RadioButton)CompactRadio!).Checked += (_, _) => Report("Density choice: Compact.");
+
+        // The list's rows are generated by the control from plain strings, so nothing here picks a container
+        // style: the radios the layout places are the same implicit RadioButton style the two rows above use.
+        var choices = (FluentRadioButtons)TransportChoices!;
+        choices.ItemsSource = new[] { "Train", "Ferry", "Tram", "Cycle", "On foot", "Bus" };
+        var twoColumns = (CheckBox)TransportTwoColumns!;
+        choices.MaxColumns = twoColumns.IsChecked == true ? 2 : 1;
+        choices.SelectionChanged += (_, _) =>
+            Report(choices.SelectedItem is { } picked ? $"Radio list choice: {Describe(picked)}." : "Radio list choice: none.");
+        twoColumns.Checked += (_, _) => choices.MaxColumns = 2;
+        twoColumns.Unchecked += (_, _) => choices.MaxColumns = 1;
+        ((ListBox)SampleListBox!).SelectionChanged += (_, _) =>
+            Report($"List selection: {Describe(((ListBox)SampleListBox!).SelectedItem)}.");
+
+        // The overflow list only reports the last row the control named, because SelectedItems was measured not to
+        // follow a SelectedIndex write on this runtime (AstraListBoxTests drives multi-selection through the rows
+        // themselves), and a readout that listed nothing would claim the framework does something it does not.
+        var overflow = (ListBox)SampleOverflowList!;
+        overflow.SelectionChanged += (_, _) => Report($"Overflow list last change: {Describe(overflow.SelectedItem)}.");
+
+        var view = (ListView)SampleListView!;
+        view.SelectionChanged += (_, _) => Report($"List view selection: {Describe(view.SelectedItem)}.");
+
+        var tree = (TreeView)SampleTreeView!;
+        tree.SelectedItemChanged += (_, _) => Report($"Tree selection: {Describe(tree.SelectedItem)}.");
+
+        // A grid cannot be fed from markup the way the other three lists can: its columns read a Binding path, so
+        // the rows have to be objects with public properties.
+        var grid = (DataGrid)SampleDataGrid!;
+        grid.ItemsSource = new[]
+        {
+            new GridWorkItem("Phase 5 gate list", "Lince", "Shipped"),
+            new GridWorkItem("Pixel attribution", "Lince", "Shipped"),
+            new GridWorkItem("NavigationView styles", "Lince", "Open"),
+            new GridWorkItem("Hardware input evidence", "Lince", "Open"),
+            new GridWorkItem("Public key inventory", "Lince", "Open"),
+        };
+        grid.SelectionChanged += (_, _) =>
+            Report(grid.SelectedItem is GridWorkItem item
+                ? $"Grid row: {item.Name} · {item.Status}."
+                : $"Grid row: {Describe(grid.SelectedItem)}.");
+
+        // The hierarchical grid is fed the same way: a flat list plus the ChildrenPropertyPath the markup names.
+        // The control's own node type is private and a consumer never has to name it - the reading that let this
+        // control into the library (docs/astra/audits/treedatagrid.md §1). ExpandAll is a public call, so the tree
+        // opens here without a pointer, and what that proves is the activation path only.
+        var treeGrid = (TreeDataGrid)SampleTreeDataGrid!;
+        treeGrid.ItemsSource = new[]
+        {
+            new TreeWorkItem("Phase 5 gate list", "Lince",
+                [new TreeWorkItem("Astra gates", "Lince", []), new TreeWorkItem("Palette drift", "Lince", [])]),
+            new TreeWorkItem("NavigationView styles", "Lince", [new TreeWorkItem("Selection indicator", "Lince", [])]),
+            new TreeWorkItem("Hardware input evidence", "Lince", []),
+        };
+        treeGrid.ExpandAll();
+        treeGrid.SelectionChanged += (_, _) =>
+            Report(treeGrid.SelectedItem is TreeWorkItem node
+                ? $"Tree grid row: {node.Name}."
+                : $"Tree grid row: {Describe(treeGrid.SelectedItem)}.");
+    }
+
+    private sealed record GridWorkItem(string Name, string Owner, string Status);
+
+    private sealed record TreeWorkItem(string Name, string Owner, IReadOnlyList<TreeWorkItem> Children);
+
+    private void WireAppearance()
+    {
+        ThemeChoice.SelectionChanged += (_, _) =>
+        {
+            if (_syncControls) return;
+            var index = SelectedIndex(ThemeChoice);
+            if (index < 0) return;
+            _theme = (FluentThemeVariant)index;
+            FluentThemeManager.ApplyTheme(_theme);
+            Report($"Theme: {Describe(ThemeChoice.SelectedItem)}.");
+        };
+        AccentChoice.SelectionChanged += (_, _) =>
+        {
+            if (_syncControls) return;
+            var index = SelectedIndex(AccentChoice);
+            if (index < 0) return;
+            FluentThemeManager.ApplyAccent(index switch
+            {
+                1 => Color.FromRgb(0, 120, 212),
+                2 => Color.FromRgb(126, 70, 204),
+                3 => Color.FromRgb(16, 124, 65),
+                _ => (Color?)null,
+            });
+            Report($"Accent: {Describe(AccentChoice.SelectedItem)}.");
+        };
+        MotionPreference.Checked += OnMotionPreferenceChanged;
+        MotionPreference.Unchecked += OnMotionPreferenceChanged;
+
+        ((Button)ReplayEntranceButton!).Click += (_, _) =>
+        {
+            if (Navigation.SelectedItem is { } selected && _pages.TryGetValue(selected, out var page))
+                FluentThemeManager.Enter(page);
+            Report(FluentThemeManager.AnimationsEnabled ? "Page entrance replayed." : "Page shown immediately because motion is reduced.");
+        };
+        ((Button)RestoreDefaultsButton!).Click += (_, _) =>
+        {
+            _syncControls = true;
+            try
+            {
+                _theme = FluentThemeVariant.System;
+                ThemeChoice.SelectedItem = ThemeChoice.Items[2];
+                AccentChoice.SelectedItem = AccentChoice.Items[0];
+                FluentThemeManager.ApplyTheme(_theme);
+                FluentThemeManager.ApplyAccent(null);
+                FluentThemeManager.ReduceMotion = false;
+                MotionPreference.IsChecked = false;
+            }
+            finally { _syncControls = false; }
+            Report("Appearance restored to system theme and default accent.");
+        };
+    }
+
+    private void OnMotionPreferenceChanged(object sender, RoutedEventArgs args)
+    {
+        if (_syncControls) return;
+        FluentThemeManager.ReduceMotion = MotionPreference.IsChecked == true;
+        Report(FluentThemeManager.ReduceMotion
+            ? "Reduced motion enabled for Astra's own animations. Template transitions still use their designed durations."
+            : "App animations enabled; Windows preferences still apply.");
+    }
+
+    private void WireToggle(ToggleButton control, string label)
+    {
+        control.Checked += Changed;
+        control.Unchecked += Changed;
+        control.Indeterminate += Changed;
+        void Changed(object sender, RoutedEventArgs args) =>
+            Report($"{label}: {(control.IsChecked == true ? "on" : control.IsChecked == false ? "off" : "mixed")}.");
+    }
+
+    private void SetAccessibleNames()
+    {
+        AutomationProperties.SetName(Navigation, "Gallery navigation");
+        AutomationProperties.SetName(NameInput, "Display name");
+        AutomationProperties.SetName(PasswordInput, "Password sample");
+        AutomationProperties.SetName(ProfileChoice, "Profile");
+        AutomationProperties.SetName(Notifications, "Notifications");
+        AutomationProperties.SetName(Volume, "Volume");
+        AutomationProperties.SetName((ListBox)SampleListBox!, "Workflow stage");
+        AutomationProperties.SetName(ThemeChoice, "Gallery theme");
+        AutomationProperties.SetName(AccentChoice, "Accent color");
+        AutomationProperties.SetName(MotionPreference, "Reduce motion");
+    }
+
+    private void Select(FluentNavigationItem item) => Navigation.SelectedItem = item;
+
+    /// <summary>Page id to mount on start-up instead of Overview. Must be set before Show().</summary>
+    public void SetStartPage(string pageId) => _startPageId = pageId;
+
+    /// <summary>
+    /// Theme to start on instead of following the system. Must be set before Show().
+    /// </summary>
+    /// <remarks>
+    /// A host that shows this window in-process - the launcher does, after handing over a renderer - has no
+    /// command line to pass a preference through, and the field is private because the window owns it. This is the
+    /// same shape as <see cref="SetStartPage"/>: staged, not applied, because the constructor ends by applying
+    /// <see cref="FluentThemeVariant.System"/> and the two calls would otherwise fight. The combo box is moved
+    /// under the same guard the appearance wiring uses, so staging the value does not read as the user choosing it.
+    /// </remarks>
+    public void SetTheme(FluentThemeVariant theme)
+    {
+        _theme = theme;
+        _syncControls = true;
+        try
+        {
+            // Combo order is the enum order: Light, Dark, System.
+            var index = theme switch
+            {
+                FluentThemeVariant.Light => 0,
+                FluentThemeVariant.Dark => 1,
+                _ => 2,
+            };
+            if (index < ThemeChoice.Items.Count)
+            {
+                ThemeChoice.SelectedItem = ThemeChoice.Items[index];
+            }
+        }
+        finally
+        {
+            _syncControls = false;
+        }
+    }
+
+    public void NavigateToPage(string pageId)
+    {
+        foreach (var pair in _pageIds)
+        {
+            if (string.Equals(pair.Value, pageId, StringComparison.OrdinalIgnoreCase))
+            {
+                Select(pair.Key);
+                return;
+            }
+        }
+
+        Report($"\"{pageId}\" is not a gallery page id. Options: {string.Join(", ", _pageIds.Values)}.");
+    }
+
+    private void OnNavigationChanged(object? sender, FluentNavigationSelectionChangedEventArgs args)
+    {
+        if (args.SelectedItem == null || !_pages.TryGetValue(args.SelectedItem, out var page)) return;
+        ProfileChoice.IsDropDownOpen = false;
+        ThemeChoice.IsDropDownOpen = false;
+        AccentChoice.IsDropDownOpen = false;
+        ContentHost.Children.Clear();
+        ContentHost.Children.Add(page);
+        ((ScrollViewer)PageScrollViewer!).ScrollToVerticalOffset(0);
+        if (_loaded) FluentThemeManager.Enter(page);
+        ShowParity(args.SelectedItem);
+        Report($"Navigated to {args.SelectedItem.Content}.");
+    }
+
+    /// <summary>
+    /// The per-control parity line the nine-step exit asks for, read straight out of Catalog.json. A
+    /// page with no type of its own says so instead of going quiet, and a missing catalog file says
+    /// that too - an empty strip would otherwise look like "nothing restyled here".
+    /// </summary>
+    /// <remarks>
+    /// Status and open gaps land in one TextBlock on purpose. Two stacked wrapping TextBlocks overlap
+    /// here: the first is measured at a wider constraint than it is eventually arranged at, so it asks
+    /// for one line and paints two, and the second is placed on top of the overflow. A single element
+    /// inside the footer's fixed-height scroll host cannot do that.
+    /// </remarks>
+    private void ShowParity(FluentNavigationItem? item)
+    {
+        var status = (TextBlock)ParityStatus!;
+        if (item is null)
+        {
+            status.Text = string.Empty;
+            return;
+        }
+
+        if (_catalog.Controls.Length == 0)
+        {
+            status.Text = UiText.T("Catalog.json did not reach the output folder, so no parity claim on this page is checked.");
+            return;
+        }
+
+        if (!_pageIds.TryGetValue(item, out var pageId))
+        {
+            status.Text = UiText.T("{0} is not in the catalog.", item.Content);
+            return;
+        }
+
+        var onPage = _catalog.OnPage(pageId);
+        var title = LocalizedCatalogTitle(pageId);
+        var claim = onPage.Length == 0
+            ? UiText.T("{0} · composes the {1} restyled types listed on their own pages", title, _catalog.Controls.Length)
+            : UiText.T("{0} · {1} · {2} of {3} restyled types",
+                title,
+                string.Join(", ", onPage.Select(control => $"{control.Name} {control.Parity}")),
+                onPage.Length,
+                _catalog.Controls.Length);
+        var open = _catalog.GapsLine(pageId);
+        status.Text = open.Length == 0
+            ? claim
+            : UiText.Format("{0}\n{1}", [claim, UiText.T("Not claimed: {0}", open)]);
+    }
+
+    /// <summary>
+    /// The catalog's page title, translated. <c>Catalog.json</c> is the English source of record and is read by the
+    /// parity tests as such, so the Chinese titles live in <see cref="GalleryText"/> rather than in a second copy of
+    /// the data file, and a page the map does not cover falls back to the catalog's own title.
+    /// </summary>
+    private string LocalizedCatalogTitle(string pageId)
+    {
+        var english = _catalog.Page(pageId)?.Title ?? pageId;
+        return UiText.HasChinese(english) ? UiText.T(english) : english;
+    }
+
+    private void ApplyAppearance()
+    {
+        Background = FluentThemeManager.GetBrush("SolidBackgroundFillColorBaseBrush");
+        Foreground = FluentThemeManager.GetBrush("TextFillColorPrimaryBrush");
+        if (TitleBar is { } titleBar)
+        {
+            titleBar.Background = Background;
+            titleBar.Foreground = Foreground;
+        }
+
+        WriteThemeStatus();
+    }
+
+    /// <summary>Rewrites the theme/motion line. Separate from <see cref="ApplyAppearance"/> because a language
+    /// change moves it without touching the palette.</summary>
+    private void WriteThemeStatus() =>
+        ((TextBlock)ThemeStatus!).Text = UiText.T("{0} · {1}", _theme,
+            FluentThemeManager.AnimationsEnabled ? UiText.T("Motion on") : UiText.T("Reduced motion"));
+
+    private void WriteParityStatus() => ShowParity(Navigation.SelectedItem);
+
+    private void Report(string message)
+    {
+        if (!_syncControls) ((TextBlock)LiveOutput!).Text = message;
+    }
+
+    private static string Describe(object? item) => item is ContentControl control
+        ? control.Content?.ToString() ?? UiText.T("None")
+        : item?.ToString() ?? UiText.T("None");
+
+    private static int SelectedIndex(ComboBox combo)
+    {
+        for (var index = 0; index < combo.Items.Count; index++)
+        {
+            var item = combo.Items[index];
+            if (ReferenceEquals(item, combo.SelectedItem) ||
+                item is ContentControl control && Equals(control.Content, combo.SelectedItem)) return index;
+        }
+        return -1;
     }
 }

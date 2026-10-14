@@ -1,0 +1,176 @@
+<!-- Application-level retints of names the framework's own control dictionaries read. Nothing here is an Astra
+     resource key: every row exists because 26.10.9 paints something with a name of its own, that paint is wrong for
+     a Fluent surface, and the markup that reads it cannot be replaced. A control template that owns the surface can
+     be re-templated and reads Astra rows; a template that cannot be touched can only be reached through its name.
+     That is the same mechanism the window-chrome and flyout-presenter aliases use (audits/window-shell.md,
+     flyout-presenter.md), and the reason this dictionary is deliberately out of the key-consumption gate in
+     tests/FluentJalium.Tests/Resources/AstraResourceKeyTests.cs: the reader lives in the framework, so there is no
+     setter of ours that could cite it, and a gate that demanded one would only be satisfiable by a lie.
+     What each row must keep doing, per row, is pinned by an Assert.Same fact in the control batch that found it. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Found by the DataGrid batch. The runtime's DataGridRow template fills a selected row with this name, and its
+       value on 26.10.9 is a brand-emerald LinearGradientBrush (#1D733C..#2B804A as measured,
+       s1i-datagrid-tokens-raw.txt §J) - the exact colour this library is not allowed to show. The row cannot be
+       re-templated to hold a different fill: installing a DataGridRow style strands the cell's content visual, so
+       the cell renders no text at all (the reading is recorded in Styles/DataGrid.jalxaml). Aliasing rather than
+       redefining is what makes this follow the application accent - both names resolve to the same brush instance,
+       which is the instance FluentThemeManager.ApplyAccent and OverrideBrush move.
+       Scope, measured over the framework's own dictionaries: 58 reads in twelve files (RangeControls 26, Dialogs 8,
+       PropertyGrid 6, Calendar 5, ToggleControls 4, Containers 2, Navigation 2, TreeView 2, DataGrid 1,
+       TreeDataGrid 1, DockLayout 1, MenusToolbars 1). Every one of them paints emerald today, so all of them change
+       together. Controls this library restyles outright are unaffected - their own templates never ask for this
+       name - which is what AstraDataGridTests.The_selected_row_fills_through_the_frameworks_own_name pins for the
+       grid, and what the palette drift gate covers for the rest. -->
+  <StaticResource x:Key="AccentBrush" ResourceKey="AccentFillColorDefaultBrush" />
+
+  <!-- Found by the A2 alias-layer batch. The runtime paints a focused control's outer border with this name, and on
+       26.10.9 the value it falls back to is brand green (ThemeColors.ControlBorderFocused is an expression-bodied
+       property returning Color.FromRgb(32,114,69); #FF1E793F measured off the grid host's PART_OuterBorder under the
+       IsKeyboardFocused cell, s1i-datagrid-tokens-raw.txt §J) - the colour this library is not allowed to show.
+       The lever was measured on the authority rather than inherited from the reference tree: the six text families
+       (TextBox, PasswordBox, NumberBox, AutoCompleteBox, DatePicker, TimePicker) resolve the name per call with the
+       static only as the ?? fallback, which is what
+       tests/FluentJalium.Tests/AstraFrameworkNameResolutionTests.cs pins with an installed probe brush.
+       Solid, not upstream's gradient, deliberately: WinUI's twin for the same construct is
+       TextControlElevationBorderFocusedBrush, a LinearGradientBrush (TextBox_themeresources.xaml:57/101/164 at
+       19e3bdc, stops SystemAccentColorLight2 / Dark1 over ControlStrokeColorDefault), and a gradient parked behind an
+       alias row freezes on the Light stops because FluentThemeManager.RefreshPalette re-tints SolidColorBrush
+       instances in place. ThemeResources/TextBox.jalxaml:21-33 already recorded that reasoning and made the same
+       substitution for our own row (TextControlBorderBrushFocused -> AccentFillColorDefaultBrush); this line extends
+       that one decision to the name the framework reads, so the elevation ring is a documented deviation in exactly
+       one place rather than two. Controls this library restyles are unaffected - their templates ask for Astra rows. -->
+  <StaticResource x:Key="ControlBorderFocused" ResourceKey="AccentFillColorDefaultBrush" />
+
+  <!-- Second segment of the same layer, chosen from the gap table in docs/astra/ROADMAP.md (#12) rather than from a
+       name list: these two framework names carry the runtime's own iOS-flavoured grey set, which reads as a seam
+       against the surfaces this library paints. Measured on 26.10.9 - SurfaceBackground #FFFFFFFF (Light) /
+       #FF2C2C2E (Dark) against our SolidBackgroundFillColorBaseBrush #FFF3F3F3 / #FF202020; ControlBorder #FFD2D2D7 /
+       #FF48484A against our ControlStrokeColorDefaultBrush #0F000000 / #12FFFFFF. The framework reads both names in
+       code as well as in its own dictionaries (6 and 7 name lookups plus 18 and 8 markup reads), and every one of
+       those sites is a surface this library cannot re-template - popups and application-level fills - so the name is
+       the only lever. What these rows must NOT do is freeze: a StaticResource alias forwards the instance the palette
+       holds, and the theme flip re-tints SolidColorBrush instances in place (Themes/FluentThemeManager.cs
+       RefreshPalette), which is why the gradient behind an alias is a documented deviation above. That property is
+       asserted, not assumed, by AstraFrameworkNameResolutionTests.A_retint_row_follows_the_theme_flip_to_the_variant_it_declares. -->
+  <StaticResource x:Key="SurfaceBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
+  <StaticResource x:Key="ControlBorder" ResourceKey="ControlStrokeColorDefaultBrush" />
+
+  <!-- Third segment of the same layer, and the first row here whose reader is proven at the PIXEL rather than at the
+       dictionary or the reflection log. Instrument: install a probe brush under the name in Application.Resources,
+       capture, count colours. Measured on 26.10.9 - a MenuFlyoutSubItem paints its own row text from TextSecondary
+       (38 pixels of the framework grey become 38 pixels of the probe, and come back exactly when the probe is
+       removed), and a native Label, which this library never restyles at all, resolves its Foreground from that same
+       name. Probes under TextPrimary and TextDisabled move neither surface, which is why this is the one of the three
+       that earns a row now and not the other two. Alias rather than redefine, for the standing reason: the palette
+       twin TextFillColorSecondaryBrush carries the WinUI literal (#9E000000 Light / #C5FFFFFF Dark, translucent)
+       where the framework's own value is an opaque macOS-flavoured grey (#FF6E6E73 / #FFD1D1D6), so forwarding the
+       palette instance moves the surface toward 1:1 and keeps it following ApplyAccent and RefreshPalette. The rows
+       this reaches are exactly the ones no template of ours can: the row's text is the control's own OnRender output
+       (docs/astra/audits/menus.md, the ghost batch), and a Label has no style of ours at all. Pinned by
+       AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name and
+       A_native_label_resolves_its_ink_from_the_same_name. What the row cost is the same evidence read the other way:
+       the menu batch had a fact asserting our palette override reaches NEITHER the row's text nor its rule. The text
+       half inverted - an override of this palette row now inks the control's own paint - so that fact is renamed and
+       re-pinned onto the composited token value (AstraMenuTests.The_alias_layer_reaches_the_rows_own_text_while_
+       our_rows_still_reach_the_rule), and its theme-flip sibling now captures each variant on an opaque plate because
+       the token, unlike the grey it replaced, is translucent. -->
+  <StaticResource x:Key="TextSecondary" ResourceKey="TextFillColorSecondaryBrush" />
+
+  <!-- Fifth segment, and the weakest-evidenced row in this file: keep reading before reusing its shape.
+       The reader is a self-drawn one - MenuItem never instantiates the template it stores, so its ink is decided by
+       Jalium.UI.Controls' own per-call lookup (docs/astra/audits/menus.md), and the only lever over that ink is the
+       name. Measured on 26.10.9 with a probe brush installed under TextPrimary: MenuItem.ResolvePrimaryTextBrush
+       returns the probe (AstraFrameworkNameResolutionTests.A_self_drawn_menu_item_reads_the_primary_text_name), so the
+       lookup is live rather than cached, which is the precondition this layer has used for every row.
+       What is NOT measured is a pixel. The TextSecondary row above was proven by counting colours in a capture;
+       this one is proven by reading a resolver's return value, and every attempt to photograph a built MenuItem
+       came back uniform #000000 - the same wall #50 documents for glyph ink. So this row buys name-resolution-level
+       purity for a surface whose pixels this test bed cannot see yet, and it is written down as such rather than
+       described as a visual fix. Alias, not redefine, for the standing reason: the two names resolve to one instance,
+       which is the instance FluentThemeManager.ApplyAccent, OverrideBrush and RefreshPalette move.
+       Solidity: TextFillColorPrimaryBrush is a SolidColorBrush in both variants (#E4000000 / #FFFFFFFF), so the
+       freeze-on-a-gradient case documented above does not apply here. -->
+  <StaticResource x:Key="TextPrimary" ResourceKey="TextFillColorPrimaryBrush" />
+
+  <!-- Sixth segment. The question this row answers is narrower than "does anything read the name" and was the reason
+       it sat unshipped one round longer: the framework's disabled ink reads #FFAEAEB2, which is EXACTLY the value the
+       name TextDisabled projects to, so the colour alone cannot tell a by-name lookup from a direct ThemeColors read
+       - and only the first of those two is something this layer can redirect. Measured on 26.10.9 by installing a
+       probe under the name and toggling IsEnabled, on the four surfaces whose labels this library re-templates but
+       never owns the text element of: CheckBox, RadioButton, ListBoxItem and ComboBoxItem. Each generated label
+       reads resting #E4000000 (ours) while enabled, and with the probe installed its disabled stamp becomes
+       #FF112233 - the probe INSTANCE, not just the colour - then returns to #FFAEAEB2 when the probe is removed.
+       So the stamp is a local value on that element (which is why no cell of ours could ever reach it, the reading
+       #51/#55 recorded) but the VALUE it stamps is looked up by name at stamp time, and the name is this row's
+       property. Alias, not redefine: TextFillColorDisabledBrush carries the WinUI literal (#5C000000 / #5DFFFFFF,
+       translucent) where the framework's projection is an opaque macOS-flavoured grey (#FFAEAEB2 / #FF636366), so
+       forwarding the palette instance moves four real surfaces toward 1:1 and keeps them following ApplyAccent and
+       RefreshPalette. Two legs of the same measurement came back empty and are recorded as empty rather than as
+       support: a disabled TextBox offers no generated TextBlock to read at all (its ink lives in the framework's
+       text host), and a disabled DataGridColumnHeader already paints our own #5C000000 - our style row wins there, so
+       the framework never stamps it. No pixel witness exists either: a disabled MenuFlyoutItem's crop is page colour
+       edge to edge (0 pixels of the grey, 0 of the probe), the #50 wall again, so this row's grade is
+       stamp-value-level, like TextPrimary's is, not like TextSecondary's. The blast radius is by design and was
+       enumerated by running the suite rather than by grepping literals: every fact that pinned "the framework owns
+       the disabled label colour" flips to ours, which is that row landing, not a regression. -->
+  <StaticResource x:Key="TextDisabled" ResourceKey="TextFillColorDisabledBrush" />
+
+  <!-- Measured and deliberately NOT shipped: the name TextOnAccent. Recorded here so the next reader does not run the
+       census twice. On 26.10.9 the lever is real and unusually clean - Calendar.ResolveSelectedTextBrush,
+       CalendarDayButton.ResolveSelectedForegroundBrush and DataGridRowHeader.ResolveSelectionIndicatorBrush each return
+       a probe brush installed under the name (so the read is per call, like every other row here). Its read shape is
+       also cleaner than the text rows above: ThemeColors carries no TextOnAccent member (it does carry TextPrimary,
+       TextSecondary, TextDisabled, ControlBorder and ControlBorderFocused), so there is no direct static read an alias
+       would miss here - the ambiguity that cost the TextDisabled row a round cannot arise for this name.
+       What it lacks is ink a reader can see. Five of the six compiled framework reads (the DataGrid, TreeDataGrid,
+       Dialogs, TitleBar and ToggleControls builders) sit in families this library re-templates, so our markup never
+       asks that name; the sixth is Calendar, and the calendar family carries no Control.Template cell and builds no
+       elements at all. That is NOT the same as "paints nothing" - the reason written here in the TextOnAccent round
+       was wrong about that, and ROADMAP #70 records the correction: the family draws itself in OnRender and prints a
+       full face (80k+ surface pixels, 39 distinct colours over a 300x300 calendar), and its fills DO follow names of
+       ours - the same probe that moved 0 pixels under TextOnAccent moved the calendar's 88 accent pixels under
+       AccentBrush, a row this file already ships. What keeps this name un-issued is what its readers return: the
+       selected-day TEXT brush, and glyph ink is #50's wall, so no capture in this repository can show the row moving
+       anything. Pinned by AstraFrameworkNameResolutionTests
+       .The_calendar_family_has_no_template_cell_and_builds_no_elements_to_write_onto (shape) and by
+       AstraCalendarFamilyTests (the face, the state arrival, and the AccentBrush pixel proof on this very surface). -->
+
+  <!-- Measured and deliberately NOT shipped: the name CaptionFontSize, the last entry in the #12 gap table. Recorded
+       here because the reason written for it in the third round was wrong, and a wrong reason is worse than no reason.
+       That round closed it as "no Double carrier" on the strength of AstraTypographyTests
+       .A_numeric_row_written_in_markup_loses_its_number_while_one_written_in_code_does_not - but that fact measures a row
+       carrying a LITERAL, and no row in this file has ever carried a literal: every one of them is a StaticResource
+       redirect, which needs no number. Re-measured in spike/OnAccentProbe (carrier mode) and re-pinned by
+       AstraFrameworkNameResolutionTests.A_redirect_row_carries_a_number_to_a_live_font_size_and_freezes_it_there: a
+       redirect row does carry a number, all the way to a mounted TextBlock.FontSize (10 to 9, back to 10 when the row is
+       removed). So the carrier is not the obstacle. Three other readings are:
+       (1) The census is not empty either - 26.10.9 loads the string in 13 places: one publisher
+       (ThemeManager.BuildTypographyDictionary, which projects body/caption/small from whatever body size it is given -
+       12/10/8 out of the box, 14/12/10 with the call FluentThemeManager.Apply now makes, ROADMAP #72), two inside
+       SystemFonts,
+       and ten inside seven compiled framework dictionary builders (Containers, DataGrid, DockLayout, MenusToolbars,
+       Primitives, TabControl, TitleBar). Two of those are confirmed reads on the shipped markup rather than inference:
+       the DataGrid batch dumped the framework's own template and read PART_SortIndicator's FontSize=
+       {ThemeResource CaptionFontSize}=10 (audits/datagrid.md), and the TitleBar builder's literal run is
+       FontSize , CaptionFontSize , FontFamily , BodyFontFamily - a title-bar caption this library does not re-template
+       (the shell is reached through brush names only, audits/window-shell.md). So unlike TextOnAccent this name does
+       paint where our markup cannot reach. What is NOT measured: which of the ten sites is a read and which a local
+       write - an ldstr resolves to a builder, not to a style key or a property.
+       (2) What it lacks instead is a destination. A row here forwards a framework name to an Astra token; this library
+       publishes no numeric token at all - the seven upstream size keys resolve to nothing
+       (AstraTypographyTests.An_upstream_size_row_is_not_published), and pointing CaptionFontSize at another framework
+       number would be an invention, not a transcription.
+       (3) A numeric row would also be dead in a way the seven above are not: the redirect holds a copy taken while the
+       row was parsed, so moving the source leaves the alias behind, while a brush row stays live because ApplyAccent and
+       OverrideBrush retint the instance the row forwarded. A CaptionFontSize row would therefore freeze the framework's
+       caption size against its own typography driver, and would still not cover the whole read set: SystemFonts.
+       CaptionFontSize reports a number (12) that an application-level entry does not
+       move. ThemeColors carries no member for the name, so nothing here is outside the layer's reach by shape 3.
+       Pinned by AstraFrameworkNameResolutionTests.The_caption_size_name_is_a_projected_double_with_no_astra_number_to_alias_it_to.
+       The 12/10/8 projection against WinUI's own type scale was a real deviation on the framework-drawn
+       surfaces this list names, and it is ROADMAP #72 - a size question that needs a source number and a pixel, not an
+       alias row borrowed to hide it. #72 settled it that way: the source number is upstream's 14
+       (generic.xaml:13280), the driver is the framework's public ApplyTypography call, and the projected caption has
+       since become 12 - upstream's caption number, generic.xaml:13283 - which is why no row of this file needs the name
+       any more. -->
+</ResourceDictionary>

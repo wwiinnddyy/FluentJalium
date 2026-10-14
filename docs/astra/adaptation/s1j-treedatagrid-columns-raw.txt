@@ -1,0 +1,78 @@
+theme dictionaries=47
+
+=== I. column width: markup vs code, DataGrid vs TreeDataGrid ===
+  DataGrid markup Width=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=Auto actualWidth=120 minWidth=20 maxWidth=∞
+    col1 width=Auto actualWidth=120 minWidth=20 maxWidth=∞
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@66.16x19.78, "Mara"@36.5x19.78, "TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }"@19x31, "Test base"@64.91x19.78
+    item-content path: DataGrid > Border'PART_OuterBorder' > Grid > ScrollViewer'PART_DataScrollViewer' > StackPanel'PART_RowsHost' > DataGridRow > Border'PART_RowBorder' > StackPanel'PART_CellsPanel' > StackPanel > DataGridRowHeader Content=TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }
+    item-content path: DataGrid > Border'PART_OuterBorder' > Grid > ScrollViewer'PART_DataScrollViewer' > StackPanel'PART_RowsHost' > DataGridRow > Border'PART_RowBorder' > StackPanel'PART_CellsPanel' > StackPanel > DataGridRowHeader > Border'PART_RowHeaderBorder' > Grid > ContentPresenter'ContentPresenter' Content=TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }
+    item-content path: DataGrid > Border'PART_OuterBorder' > Grid > ScrollViewer'PART_DataScrollViewer' > StackPanel'PART_RowsHost' > DataGridRow > Border'PART_RowBorder' > StackPanel'PART_CellsPanel' > StackPanel > DataGridRowHeader Content=TreeNode { Name = Test base, Owner = Nils, Children = <>z__ReadOnlySingleElementList`1[DataGridProbe.Program+TreeNode] }
+  TreeDataGrid markup Width=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=Auto actualWidth=0 minWidth=20 maxWidth=∞
+    col1 width=Auto actualWidth=0 minWidth=20 maxWidth=∞
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    realized text: 6: "Name"@0x19.78, "Owner"@0x19.78, "Ship train"@0x17.24, "Mara"@0x19.78, "Test base"@0x17.24, "Nils"@0x19.78
+  DataGrid markup MinWidth=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=Auto actualWidth=200 minWidth=200 maxWidth=∞
+    col1 width=Auto actualWidth=200 minWidth=200 maxWidth=∞
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@66.16x19.78, "Mara"@36.5x19.78, "TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }"@19x31, "Test base"@64.91x19.78
+  TreeDataGrid markup MinWidth=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=Auto actualWidth=200 minWidth=200 maxWidth=∞
+    col1 width=Auto actualWidth=200 minWidth=200 maxWidth=∞
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@57x17.24, "Mara"@36.5x19.78, "Test base"@55.92x17.24, "Nils"@27.31x19.78
+  DataGrid code Width=200: code col0 widthType=DataGridLength -> read back 200
+  DataGrid code Width=200: code col1 widthType=DataGridLength -> read back 200
+  DataGrid code Width=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    col1 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@66.16x19.78, "Mara"@36.5x19.78, "TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }"@19x31, "Test base"@64.91x19.78
+  TreeDataGrid code Width=200: code col0 widthType=DataGridLength -> read back 200
+  TreeDataGrid code Width=200: code col1 widthType=DataGridLength -> read back 200
+  TreeDataGrid code Width=200: grid size=460x160 desired=460,160 cells=4
+    col0 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    col1 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    cell size=200x32 desired=200,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@57x17.24, "Mara"@36.5x19.78, "Test base"@55.92x17.24, "Nils"@27.31x19.78
+  DataGrid code Width=200 AFTER mount: code col0 widthType=DataGridLength -> read back 200
+  DataGrid code Width=200 AFTER mount: code col1 widthType=DataGridLength -> read back 200
+  DataGrid code Width=200 AFTER mount: grid size=460x160 desired=460,160 cells=4
+    col0 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    col1 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    cell size=120x32 desired=120,32 localWidth=True
+    realized text: 6: "Name"@43.86x19.78, "Owner"@48.53x19.78, "Ship train"@66.16x19.78, "Mara"@36.5x19.78, "TreeNode { Name = Ship train, Owner = Mara, Children = <>z__ReadOnlyArray`1[DataGridProbe.Program+TreeNode] }"@19x31, "Test base"@64.91x19.78
+  TreeDataGrid code Width=200 AFTER mount: code col0 widthType=DataGridLength -> read back 200
+  TreeDataGrid code Width=200 AFTER mount: code col1 widthType=DataGridLength -> read back 200
+  TreeDataGrid code Width=200 AFTER mount: grid size=460x160 desired=460,160 cells=4
+    col0 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    col1 width=200 actualWidth=200 minWidth=20 maxWidth=∞
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    cell size=0x32 desired=0,32 localWidth=True
+    realized text: 6: "Name"@0x19.78, "Owner"@0x19.78, "Ship train"@0x17.24, "Mara"@0x19.78, "Test base"@0x17.24, "Nils"@0x19.78

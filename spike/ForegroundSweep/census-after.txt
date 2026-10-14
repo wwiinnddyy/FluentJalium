@@ -1,0 +1,19 @@
+AppBar.jalxaml: cells=7 inert-on-ContentPresenter=0 target-has-foreground=7 name-not-in-this-file=0
+  ok L91 LabelText -> TextBlock
+  ok L96 LabelText -> TextBlock
+  ok L101 LabelText -> TextBlock
+  ok L153 LabelText -> TextBlock
+  ok L158 LabelText -> TextBlock
+  ok L165 LabelText -> TextBlock
+  ok L170 LabelText -> TextBlock
+Selection.jalxaml: cells=4 inert-on-ContentPresenter=0 target-has-foreground=4 name-not-in-this-file=0
+  ok L104 PART_ToggleButton -> ToggleButton
+  ok L107 PART_ToggleButton -> ToggleButton
+  ok L109 PART_ToggleButton -> ToggleButton
+  ok L110 PART_ToggleButton -> ToggleButton
+Surfaces.jalxaml: cells=3 inert-on-ContentPresenter=0 target-has-foreground=3 name-not-in-this-file=0
+  ok L189 IconGlyph -> TextBlock
+  ok L195 IconGlyph -> TextBlock
+  ok L201 IconGlyph -> TextBlock
+TextInput.jalxaml: cells=1 inert-on-ContentPresenter=0 target-has-foreground=1 name-not-in-this-file=0
+  ok L265 HeaderContentPresenter -> ContentControl

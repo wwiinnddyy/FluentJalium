@@ -1,0 +1,45 @@
+  passing back the families as found: display='Microsoft YaHei UI' body='Microsoft YaHei UI' mono='Cascadia Code' so only the number moves (before the manifest is installed)
+  invoked ThemeManager.ApplyTypography(..., 14) with no exception
+=== leg order: apply the body size BEFORE FluentThemeManager.Apply ===
+FluentThemeManager.IsInitialized=True native ThemeMode=Light
+
+=== 1. resting: what the app projects, and what mounted text resolves to ===
+  mounted 'resting': keys in the probe dictionary=1
+  resting app.BodyFontSize                double 14
+  resting app.CaptionFontSize             double 12
+  resting app.SmallFontSize               double 10
+  resting app.ControlContentThemeFontSize null
+  resting app.BodyFontFamily              FontFamily 'Microsoft YaHei UI'
+  resting app.MonoFontFamily              FontFamily 'Cascadia Code'
+  resting app.DisplayFontFamily           FontFamily 'Microsoft YaHei UI'
+  resting TextBlock() default FontSize   14
+  resting mounted (no style) FontSize    14
+  resting mounted via BodyFontSize       14
+  resting Button content presenter       14 (TextBlock in the template, Button.FontSize=14)
+  resting SystemFonts.CaptionFontSize    12
+  resting SystemFonts.MessageFontSize    12
+
+=== 2. one call to the framework's own typography entry point, families passed back unchanged ===
+  (already applied before the manifest; nothing called in this step)
+  mounted 'after apply': keys in the probe dictionary=1
+  after   app.BodyFontSize                double 14
+  after   app.CaptionFontSize             double 12
+  after   app.SmallFontSize               double 10
+  after   app.ControlContentThemeFontSize null
+  after   app.BodyFontFamily              FontFamily 'Microsoft YaHei UI'
+  after   app.MonoFontFamily              FontFamily 'Cascadia Code'
+  after   app.DisplayFontFamily           FontFamily 'Microsoft YaHei UI'
+  after   TextBlock() default FontSize   14
+  after   mounted (no style) FontSize    14
+  after   mounted via BodyFontSize       14
+  after   Button content presenter       14 (TextBlock in the template, Button.FontSize=14)
+  after   SystemFonts.CaptionFontSize    12
+  after   SystemFonts.MessageFontSize    12
+  the resting block, still on screen and never re-mounted: FontSize=14 (a live instance that follows would read the same as a fresh mount)
+
+=== 3. did our own rows survive the framework refresh the call triggers? ===
+  TextPrimary          SolidColorBrush SolidColorBrush(#E4000000)
+  TextSecondary        SolidColorBrush SolidColorBrush(#9E000000)
+  SurfaceBackground    SolidColorBrush SolidColorBrush(#FFF3F3F3)
+  ControlBackground    SolidColorBrush SolidColorBrush(#FFFFFFFF)
+  BodyTextBlockStyle   Style Jalium.UI.Style

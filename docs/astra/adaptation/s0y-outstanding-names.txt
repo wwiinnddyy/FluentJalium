@@ -1,0 +1,27 @@
+[OUTSTANDING] TeachingTip: no type with this name
+[OUTSTANDING] Card: no type with this name
+[OUTSTANDING] CardAction: no type with this name
+[OUTSTANDING] CardGroup: no type with this name
+[OUTSTANDING] Divider: no type with this name
+[OUTSTANDING] Expander: Jalium.UI.Controls.Expander : HeaderedContentControl : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | style=False factoryTemplate=False templateLock=Void:null-or-void declaredProperties=3
+[OUTSTANDING] InfoBadge: no type with this name
+[OUTSTANDING] RatingControl: no type with this name
+[OUTSTANDING] ProgressRing: no type with this name
+[OUTSTANDING] TabView: no type with this name
+[OUTSTANDING] BreadcrumbBar: no type with this name
+[OUTSTANDING] RadioButtons: no type with this name
+[OUTSTANDING] PipsPager: no type with this name
+[OUTSTANDING] MenuFlyout: Jalium.UI.Controls.MenuFlyout : FlyoutBase : DependencyObject : DispatcherObject : Object | not a Control
+[OUTSTANDING] MenuFlyoutPresenter: Jalium.UI.Controls.MenuFlyoutPresenter : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | ctor threw MissingMethodException: public(MenuFlyout)
+[OUTSTANDING] NavigationView: Jalium.UI.Controls.NavigationView : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | style=False factoryTemplate=False templateLock=Void:null-or-void declaredProperties=16
+[OUTSTANDING] Flyout: no type with this name
+[OUTSTANDING] FlyoutBase: Jalium.UI.Controls.Primitives.FlyoutBase : DependencyObject : DispatcherObject : Object | not a Control
+[OUTSTANDING] FlyoutPresenter: no type with this name
+[OUTSTANDING] MenuScroller: no type with this name
+[OUTSTANDING] MenuScrollViewer: no type with this name
+[OUTSTANDING] RadioMenuFlyoutItem: no type with this name
+[OUTSTANDING] SplitMenuFlyoutItem: no type with this name
+[OUTSTANDING] ToggleMenuFlyoutItem: Jalium.UI.Controls.ToggleMenuFlyoutItem : MenuFlyoutItem : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | style=False factoryTemplate=False templateLock=no such method declaredProperties=1
+[OUTSTANDING] MenuFlyoutSubItem: Jalium.UI.Controls.MenuFlyoutSubItem : MenuFlyoutItem : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | style=False factoryTemplate=False templateLock=no such method declaredProperties=1
+[OUTSTANDING] InfoBar: Jalium.UI.Controls.InfoBar : ContentControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object | style=False factoryTemplate=False templateLock=Void:null-or-void declaredProperties=7
+[OUTSTANDING] CardElement: no type with this name

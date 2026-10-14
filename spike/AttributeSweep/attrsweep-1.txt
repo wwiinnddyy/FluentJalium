@@ -1,0 +1,56 @@
+elements checked: 2530, attributes checked: 5263
+unknown element names (not exported by the runtime): 493
+  ? StaticResource x493
+
+direct attributes with no member on the element type: 35
+  ContentPresenter has no Foreground (value: {TemplateBinding Foreground})  x15
+      src\FluentJalium\Styles\Common.jalxaml:33 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Common.jalxaml:281 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Common.jalxaml:341 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Inputs.jalxaml:366 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Menus.jalxaml:66 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Menus.jalxaml:117 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Menus.jalxaml:160 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Navigation.jalxaml:24 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Navigation.jalxaml:78 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Navigation.jalxaml:87 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Navigation.jalxaml:188 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Selection.jalxaml:27 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Surfaces.jalxaml:52 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\Surfaces.jalxaml:83 <ContentPresenter Foreground>
+      src\FluentJalium\Styles\TeachingTip.jalxaml:68 <ContentPresenter Foreground>
+  Grid has no BorderBrush (value: {TemplateBinding BorderBrush})  x3
+      src\FluentJalium\Styles\Inputs.jalxaml:353 <Grid BorderBrush>
+      src\FluentJalium\Styles\Selection.jalxaml:17 <Grid BorderBrush>
+      src\FluentJalium\Styles\TeachingTip.jalxaml:56 <Grid BorderBrush>
+  Grid has no BorderThickness (value: {TemplateBinding BorderThickness})  x3
+      src\FluentJalium\Styles\Inputs.jalxaml:353 <Grid BorderThickness>
+      src\FluentJalium\Styles\Selection.jalxaml:17 <Grid BorderThickness>
+      src\FluentJalium\Styles\TeachingTip.jalxaml:56 <Grid BorderThickness>
+  Grid has no CornerRadius (value: {TemplateBinding CornerRadius})  x3
+      src\FluentJalium\Styles\Menus.jalxaml:300 <Grid CornerRadius>
+      src\FluentJalium\Styles\Surfaces.jalxaml:135 <Grid CornerRadius>
+      src\FluentJalium\Styles\TeachingTip.jalxaml:56 <Grid CornerRadius>
+  ContentPresenter has no TextWrapping (value: Wrap)  x2
+      src\FluentJalium\Styles\Inputs.jalxaml:368 <ContentPresenter TextWrapping>
+      src\FluentJalium\Styles\Selection.jalxaml:27 <ContentPresenter TextWrapping>
+  ContentPresenter has no HorizontalContentAlignment (value: {TemplateBinding HorizontalContentAlignment})  x1
+      src\FluentJalium\Styles\Surfaces.jalxaml:81 <ContentPresenter HorizontalContentAlignment>
+  ContentPresenter has no VerticalContentAlignment (value: {TemplateBinding VerticalContentAlignment})  x1
+      src\FluentJalium\Styles\Surfaces.jalxaml:82 <ContentPresenter VerticalContentAlignment>
+  Grid has no Padding (value: {ThemeResource InfoBarContentRootPadding})  x1
+      src\FluentJalium\Styles\Surfaces.jalxaml:136 <Grid Padding>
+  StackPanel has no Padding (value: {ThemeResource InfoBarPanelVerticalOrientationPadding})  x1
+      src\FluentJalium\Styles\Surfaces.jalxaml:158 <StackPanel Padding>
+  ContentPresenter has no Background (value: {TemplateBinding Background})  x1
+      src\FluentJalium\Styles\TeachingTip.jalxaml:68 <ContentPresenter Background>
+  Grid has no Padding (value: 6)  x1
+      src\FluentJalium\Styles\TextInput.jalxaml:231 <Grid Padding>
+  Grid has no CornerRadius (value: {ThemeResource OverlayCornerRadius})  x1
+      src\FluentJalium\Styles\TextInput.jalxaml:231 <Grid CornerRadius>
+  Grid has no BorderBrush (value: {ThemeResource NumberBoxPopupBorderBrush})  x1
+      src\FluentJalium\Styles\TextInput.jalxaml:232 <Grid BorderBrush>
+  Grid has no BorderThickness (value: {ThemeResource NumberBoxPopupBorderThickness})  x1
+      src\FluentJalium\Styles\TextInput.jalxaml:233 <Grid BorderThickness>
+
+attached attributes with no member on the prefix type: 0

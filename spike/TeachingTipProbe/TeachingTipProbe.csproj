@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway probe for the three questions docs/astra/audits/teachingtip.md §5 says must be measured
+       before a TeachingTip is designed: (A) does the runtime have the primitives the upstream template needs
+       (Polygon + Points, Popup with a templated child, Shape fill/stroke), (B) which resource ROW TYPES our
+       markup loader actually turns into entries - upstream keeps two GridLength rows and eight x:Double rows,
+       and S0-b only ever proved x:Double is unreachable, and (C) can a ContentControl-derived own type host a
+       Popup inside its template and get that popup to realize with a size, which is the route ModernWpf took
+       (ModernWpf.Controls/TeachingTip/TeachingTip.xaml:412) because WinUI builds the popup in code instead.
+       Not referenced by FluentJalium.slnx. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TeachingTipProbe</RootNamespace>
+    <AssemblyName>TeachingTipProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

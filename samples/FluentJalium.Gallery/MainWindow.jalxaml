@@ -1,20 +1,885 @@
 <Window xmlns="http://schemas.jalium.ui/2024"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:fw="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+        xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
         x:Class="FluentJalium.Gallery.MainWindow"
-        Title="FluentJalium Gallery"
-        Width="1360"
-        Height="860"
-        MinWidth="640"
-        MinHeight="500"
-        Background="Transparent">
-    <Grid>
-        <fw:FWBackdrop x:Name="Backdrop"
-                       Type="Mica"
-                       TintOpacity="0.86"
-                       LuminosityOpacity="0.92" />
-        <ContentControl x:Name="ShellHost"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch" />
-    </Grid>
+        Title="FluentJalium Gallery" Width="1100" Height="820" MinWidth="560" MinHeight="480"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize" ShowInTaskbar="True"
+        AllowsTransparency="False" SystemBackdrop="None" UseLayoutRounding="True"
+        Background="{StaticResource SolidBackgroundFillColorBaseBrush}"
+        Foreground="{StaticResource TextFillColorPrimaryBrush}">
+  <!-- The pane owns the whole client height. A window-level band above the NavigationView stacked a second
+       header on top of the title bar and pushed the first item to 126 DIP from the client top, where WinUI's
+       pane reaches it at ~52; the header belongs to the content column, over the page. -->
+  <fluent:FluentNavigationView x:Name="NavigationRoot" Padding="0"
+                              Style="{StaticResource FluentNavigationViewStyle}">
+      <fluent:FluentNavigationView.MenuItems>
+        <fluent:FluentNavigationItem x:Name="OverviewItem" Content="Overview" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Home" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="TokensItem" Content="Tokens" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Color" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MaterialsItem" Content="Materials" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Globe" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MotionItem" Content="Motion" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="CalculatorAnimation" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="ButtonsItem" Content="Buttons" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="TouchPointer" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="InputsItem" Content="Inputs" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Edit" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="SelectionItem" Content="Selection" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="List" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="NavigationItem" Content="Navigation" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="GlobalNavButton" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="SurfacesItem" Content="Surfaces" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Calendar" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="StatusItem" Content="Status" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Info" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="CommandBarItem" Content="Command bar" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="List" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+        <fluent:FluentNavigationItem x:Name="MenusItem" Content="Menus" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="More" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+      </fluent:FluentNavigationView.MenuItems>
+      <fluent:FluentNavigationView.FooterMenuItems>
+        <fluent:FluentNavigationItem x:Name="SettingsItem" Content="Settings" Style="{StaticResource FluentNavigationItemStyle}">
+          <fluent:FluentNavigationItem.Icon><SymbolIcon Symbol="Settings" /></fluent:FluentNavigationItem.Icon>
+        </fluent:FluentNavigationItem>
+      </fluent:FluentNavigationView.FooterMenuItems>
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Margin="24,16,24,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="FluentJalium  /  Gallery" Style="{StaticResource BodyTextBlockStyle}" VerticalAlignment="Center" />
+          <TextBlock x:Name="ThemeStatus" Grid.Column="1" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="16,0,0,0" />
+        </Grid>
+        <!-- Hidden, not Auto: 26.10.9's Auto reserves 12 DIP of layout width on the right only, which made
+             every sample card sit 25 DIP from the content area's left edge and 36.6 from its right
+             (spike/VisualQA/out/pages/page-selection.png). The wheel and the keys still scroll. -->
+        <ScrollViewer Grid.Row="1" x:Name="PageScrollViewer" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+          <!-- The constructor retains these pages and attaches only the current one. -->
+          <Grid x:Name="PageHost" Margin="24,8,24,24" MaxWidth="1000" HorizontalAlignment="Stretch">
+            <StackPanel x:Name="MotionPage">
+              <TextBlock Text="Motion" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Three durations are published as resource rows, and this page runs them side by side on the one property shape this runtime actually animates: a Double dependency property on the element itself." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <Button x:Name="MotionBeatButton" Content="Beat" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" />
+                  <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="250" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ControlFasterAnimationDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+                    <Border x:Name="MotionFasterBar" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource ControlFasterAnimationDuration}" />
+                    <TextBlock Grid.Row="1" Text="ControlFastAnimationDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <Border x:Name="MotionFastBar" Grid.Row="1" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource ControlFastAnimationDuration}" Margin="0,8,0,0" />
+                    <TextBlock Grid.Row="2" Text="SplitViewPaneAnimationOpenDuration" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" Margin="0,8,0,0" />
+                    <Border x:Name="MotionPaneBar" Grid.Row="2" Grid.Column="1" Height="14" Width="120" HorizontalAlignment="Left" Background="{StaticResource AccentFillColorDefaultBrush}" TransitionProperty="Width" TransitionDuration="{StaticResource SplitViewPaneAnimationOpenDuration}" Margin="0,8,0,0" />
+                  </Grid>
+                  <TextBlock x:Name="MotionReadout" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="The bars move their Width rather than a transform because a transform never ticks on this runtime, and the row stays a Duration so a theme flip re-resolves it; the reduce-motion switch is on the Settings page and is deliberately not duplicated here, since it rewrites the live row for the whole application and two switches over one global would only be able to disagree." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            </StackPanel>
+            <StackPanel x:Name="MaterialsPage">
+              <TextBlock Text="Materials" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="What this runtime can actually compose, shown as nested fills rather than as a list of names: an alpha layer is only a layer because of what sits behind it, so the ramp below paints the base, then the layer over it, then the card over that, and the stroke on the card is the same alpha token doing its work against two different backgrounds." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Background="{StaticResource SolidBackgroundFillColorBaseBrush}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <Border Background="{StaticResource LayerFillColorDefaultBrush}" Padding="16">
+                    <StackPanel>
+                      <TextBlock Text="SolidBackgroundFillColorBaseBrush  →  LayerFillColorDefaultBrush (#80FFFFFF)" Style="{StaticResource CaptionTextBlockStyle}" />
+                      <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" Padding="16" Margin="0,12,0,0">
+                        <StackPanel>
+                          <TextBlock Text="CardBackgroundFillColorDefaultBrush (#B3FFFFFF) with CardStrokeColorDefaultBrush (#0F000000) on its edge" Style="{StaticResource CaptionTextBlockStyle}" />
+                          <TextBlock Text="The stroke reads darker over the base than over the card, which is the point: an alpha stroke has no single colour, and that is why the ramp has to be nested to be read at all." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+                  </Border>
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Where a floating surface cannot composite" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Border Background="{StaticResource CardStrokeColorDefaultSolidBrush}" Height="44" Margin="0,0,0,8" />
+                  <TextBlock Text="Element-level material is not available on 26.10.9: the runtime ships no AcrylicBrush, MicaBrush or RevealBrush type at all (the shipped-type inventory in docs/astra/adaptation/s0v-runtime-type-inventory-raw.txt), so a floating surface here is a solid fill plus an alpha stroke, and CardStrokeColorDefaultSolidBrush is the #EBEBEB twin used where a border cannot composite over what it floats on. Window-level backdrop is a different story and is real - WindowBackdropType = None / Auto / Mica / Acrylic / MicaAlt, measured in docs/astra/adaptation/01-jalium-control-census.md:146 - which is why the switch for it sits on the Settings page, over the one surface that can actually take it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <StackPanel x:Name="TokensPage">
+              <TextBlock Text="Tokens" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Every fill this gallery paints comes from one palette of 101 brush tokens, and this page is the whole set at once: the swatches are built from the canonical key inventory, so a token that no longer resolves shows up as a hole in the grid and is named in the readout below." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="16">
+                  <WrapPanel x:Name="TokenSwatchHost" />
+                  <TextBlock x:Name="TokenReadout" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Switch the theme on the Settings page and come back: the fills move because each name resolves to one instance the facade re-tints in place, which is also why the aliases the framework's own dictionaries read follow the same switch." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            </StackPanel>
+            <StackPanel x:Name="OverviewPage">
+              <TextBlock Text="FluentJalium" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Explore familiar Windows controls, built on Jalium." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,24,0,0">
+                <StackPanel Margin="20">
+                  <TextBlock Text="Astra" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="{StaticResource AccentTextFillColorPrimaryBrush}" />
+                  <TextBlock Text="A shared design language" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,12,0,0" />
+                  <TextBlock Text="Try the controls, navigate with a keyboard, and switch themes while your input stays in place." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <Button x:Name="ExploreInputsButton" Content="Explore inputs" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Left" Margin="0,20,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Start exploring" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="460">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Buttons and selection" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Pointer, pressed, disabled, selected, and focus states." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="ExploreButtonsButton" Content="Open buttons" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="460">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Navigation that follows you" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Resize the window and watch the shared selection indicator." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="ExploreNavigationButton" Content="Open navigation" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Base surfaces" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <TextBlock Text="ScrollViewer" Style="{StaticResource BodyTextBlockStyle}" />
+                  <TextBlock Text="Every page here scrolls through this host. The bar only appears while it is needed, and the thumb width is the upstream one." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,8" />
+                  <Border Background="{StaticResource LayerFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4">
+                    <ScrollViewer Height="120" Padding="12">
+                      <TextBlock TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}"
+                                 Text="Astra does not retemplate the scroll host: the framework owns its parts, and the theme reaches it through the two generated brush hooks and the implicit style. Measured on 26.10.9: the resting bar paints, the thumb follows the theme, an opaque host background covers its own bar, and overlay mode takes the repeat arrows away. What is not measured is dragging, inertia and touch panning, so scroll this box yourself and treat the picture as the claim rather than the physics." />
+                    </ScrollViewer>
+                  </Border>
+                  <TextBlock Text="ToolTip" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBlock Text="Shown resting in the tree, because the hover timer that would normally open it is not gated." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,8" />
+                  <ToolTip Content="Flyout surface, solid fill (this runtime has no AcrylicBrush; the key holds upstream's own FallbackColor), 1px stroke, 320 DIP cap" HorizontalAlignment="Left" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="WinUI 3 styling · Jalium layout, input, and rendering" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,16,0,0" />
+            </StackPanel>
+
+            <StackPanel x:Name="ButtonsPage">
+              <TextBlock Text="Buttons" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Choose the emphasis that matches an action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Emphasis" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="StandardActionButton" Content="Standard" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="AccentActionButton" Content="Accent" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SubtleActionButton" Content="Subtle" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="Click a button to see its action in the live output below." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Disabled" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <WrapPanel Margin="16">
+                  <Button Content="Standard" Style="{StaticResource DefaultButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                  <Button Content="Accent" Style="{StaticResource AccentButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                  <Button Content="Subtle" Style="{StaticResource SubtleButtonStyle}" IsEnabled="False" Margin="0,0,8,8" />
+                </WrapPanel>
+              </Border>
+              <TextBlock Text="The rest of the family" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <ToggleButton x:Name="QuietToggleButton" Content="Toggle" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="CheckedToggleButton" Content="Checked" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="MixedToggleButton" Content="Three state" IsThreeState="True" Margin="0,0,8,8" />
+                    <RepeatButton x:Name="RepeatActionButton" Content="Repeat" Margin="0,0,8,8" />
+                    <HyperlinkButton Content="Hyperlink" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="These four take their fills from their own upstream alias files - ToggleButton, RepeatButton and HyperlinkButton each carry a transcribed key list, and the hyperlink inherits the layout style rather than the subtle button's fill. The third-state toggle cycles off, on, mixed; mixed paints the same brushes off does, because that is what upstream's own alias rows say, so the live readout is the only place the third state shows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="RepeatReadout" Text="Hold the repeat button to see it fire." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Split and drop-down" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <SplitButton x:Name="SplitActionButton" Content="Split" Margin="0,0,8,8">
+                      <SplitButton.Flyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem Text="First" />
+                          <MenuFlyoutItem Text="Second" />
+                        </MenuFlyout>
+                      </SplitButton.Flyout>
+                    </SplitButton>
+                    <fluent:FluentDropDownButton x:Name="DropDownMoreButton" Content="More" Margin="0,0,8,8">
+                      <fluent:FluentDropDownButton.Flyout>
+                        <MenuFlyout>
+                          <MenuFlyoutItem Text="One" />
+                          <MenuFlyoutItem Text="Two" />
+                        </MenuFlyout>
+                      </fluent:FluentDropDownButton.Flyout>
+                    </fluent:FluentDropDownButton>
+                    <SplitButton Content="Disabled split" IsEnabled="False" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The split button is native, restyled from upstream's SplitButton* rows; the drop-down is an Astra-owned type, because 26.10.9 ships no DropDownButton to retemplate. On a split button only the left half is the action: the divider and the right chevron belong to the flyout, and a split button with no flyout has its right half disabled by the framework. Neither control's open state reaches the paint here - upstream asks its own internal flags for that and this runtime keeps them private." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="SplitReadout" Text="Left half acts, right half opens." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Keyboard" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,8" />
+              <TextBlock Text="Use Tab to move between buttons and Space or Enter to activate the focused action." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel x:Name="InputsPage">
+              <TextBlock Text="Inputs" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Edit text, choose a value, and adjust native controls." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Text and passwords" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Display name" Style="{StaticResource BodyTextBlockStyle}" />
+                  <TextBox x:Name="DisplayNameBox" Text="Astra" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Password" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <PasswordBox x:Name="SamplePasswordBox" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Only the number of password characters is shown in the output." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock Text="Disabled text field" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBox Text="This field is disabled" IsEnabled="False" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Wrapping notes" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <TextBox Text="Upstream ships a multi-line text box on this page; TextWrapping and the line counts are the parts our template has to keep painting from the same tokens at a taller surface."
+                           TextWrapping="Wrap" MinLines="3" MaxLines="6" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Number boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <NumberBox x:Name="PlainNumberBox" Header="Quantity" PlaceholderText="Any number" Value="3"
+                             MaxWidth="440" HorizontalAlignment="Stretch" />
+                  <NumberBox Minimum="0" Maximum="10" SmallChange="1" LargeChange="5" Value="4"
+                             SpinButtonPlacementMode="Inline" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <NumberBox SpinButtonPlacementMode="Compact" Value="7" Header="Compact spinners"
+                             MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <NumberBox IsEnabled="False" Value="12" MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,16,0,0" />
+                  <TextBlock Text="These four wear the implicit NumberBox style: the surface, border and spinner fills come from the transcribed TextControl* and NumberBox* rows, and the spinner popup in the compact box opens when the control takes keyboard focus."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                  <TextBlock Text="Not claimed here: the spinner border is the framework's own local value, the header text keeps a local colour the tokens cannot reach, and nothing on this page was measured on screen."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Suggested text" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Fruit" Style="{StaticResource BodyTextBlockStyle}" />
+                  <AutoCompleteBox x:Name="FruitBox" PlaceholderText="Start typing a fruit"
+                                   MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Disabled" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <AutoCompleteBox x:Name="DisabledFruitBox" Text="Blueberry" IsEnabled="False"
+                                   MaxWidth="440" HorizontalAlignment="Stretch" Margin="0,8,0,0" />
+                  <TextBlock Text="Upstream ships this as AutoSuggestBox; the native type here is AutoCompleteBox, and it wears the same TextControl* rows as the text box above plus the AutoSuggestBox* rows for the suggestion list. Type into the first box to open the list."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                  <TextBlock Text="Not claimed here: choosing a suggestion does not write its text back into the box once the framework template is replaced, the suggestion rows keep the framework's own fill, and there is no query button, header or description to place."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Choices and values" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Profile" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Open the list and choose a profile." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="ProfileComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Balanced" />
+                    <ComboBoxItem Content="Focused" />
+                    <ComboBoxItem Content="Relaxed" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="360">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Notifications" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Click, drag, or press Space to toggle." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <fluent:FluentToggleSwitch x:Name="NotificationsSwitch" Style="{StaticResource FluentToggleSwitchStyle}" IsChecked="True" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Volume" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock x:Name="VolumeValue" Text="45%" Style="{StaticResource CaptionTextBlockStyle}" />
+                  </fluent:FluentSettingsRow>
+                  <Slider x:Name="VolumeSlider" Minimum="0" Maximum="100" Value="45" SmallChange="1" LargeChange="10" Margin="0,12,0,0" />
+                  <TextBlock Text="Tick marks and a disabled slider" Style="{StaticResource BodyTextBlockStyle}" Margin="0,16,0,0" />
+                  <Slider Minimum="0" Maximum="100" Value="30" TickPlacement="BottomRight" TickFrequency="10" Margin="0,8,0,0" />
+                  <Slider IsEnabled="False" Minimum="0" Maximum="100" Value="60" Margin="0,12,0,0" />
+                  <TextBlock Text="The first slider above carries no Style attribute, so it is the implicit Slider style doing the work: the thumb body is upstream 18x18 with its ring 2 wider on every side, and the track is inset by half a thumb because this framework moves the thumb by its left edge, which leaves the ring 2 DIP past the control at maximum."
+                             Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+              <WrapPanel Margin="0,16,0,0">
+                <Button x:Name="ApplyInputsButton" Content="Apply values" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                <Button x:Name="ResetInputsButton" Content="Reset" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+              </WrapPanel>
+            </StackPanel>
+
+            <StackPanel x:Name="SelectionPage">
+              <TextBlock Text="Selection" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Independent options, a single choice, and a list." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Check boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <CheckBox x:Name="PreviewCheckBox" Content="Show a preview" IsChecked="True" Margin="0,0,0,8" />
+                  <CheckBox x:Name="DetailsCheckBox" Content="Include details" Margin="0,0,0,8" />
+                  <CheckBox x:Name="MixedCheckBox" Content="Three-state option" IsThreeState="True" Margin="0,0,0,8" />
+                  <CheckBox Content="Unavailable option" IsEnabled="False" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Radio buttons" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <RadioButton x:Name="ComfortableRadio" Content="Comfortable" GroupName="GalleryDensity" IsChecked="True" Style="{StaticResource DefaultRadioButtonStyle}" Margin="0,0,0,8" />
+                  <RadioButton x:Name="CompactRadio" Content="Compact" GroupName="GalleryDensity" Style="{StaticResource DefaultRadioButtonStyle}" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Radio button list" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="A header, generated radios, and a column count the layout reads back off the control: nothing here sets a style on the rows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                  <fluent:FluentRadioButtons x:Name="TransportChoices" Header="Transport" Margin="0,0,0,12" />
+                  <CheckBox x:Name="TransportTwoColumns" Content="Two columns" IsChecked="True" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Combo boxes" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Nothing here names a style: each combo is wearing the implicit one, and each surface colour comes from upstream's ComboBox* rows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,0,0,12" />
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Transport" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="TransportComboBox" Width="180" VerticalAlignment="Center">
+                      <ComboBoxItem Content="Train" />
+                      <ComboBoxItem Content="Ferry" />
+                      <ComboBoxItem Content="Car" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Seat" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="SeatComboBox" Width="180" VerticalAlignment="Center" PlaceholderText="Pick a seat" />
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Note" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox x:Name="NoteComboBox" Width="180" VerticalAlignment="Center" IsEditable="True" Text="Window side">
+                      <ComboBoxItem Content="Window side" />
+                      <ComboBoxItem Content="Aisle side" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <fluent:FluentSettingsRow StackAtWidth="0">
+                    <TextBlock Text="Ticket office" Style="{StaticResource BodyTextBlockStyle}" />
+                    <ComboBox Width="180" VerticalAlignment="Center" IsEnabled="False" SelectedIndex="0">
+                      <ComboBoxItem Content="Closed today" />
+                    </ComboBox>
+                  </fluent:FluentSettingsRow>
+                  <TextBlock Text="Hover, press and the dropdown animation are not claimed: the pressed states here are driven by mouse capture in a test, never by a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="List selection" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <ListBox x:Name="SampleListBox" Height="156">
+                <ListBoxItem Content="Design" />
+                <ListBoxItem Content="Develop" />
+                <ListBoxItem Content="Review" />
+                <ListBoxItem Content="Ship" />
+              </ListBox>
+              <TextBlock Text="Rows overflow" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- Multiple selection and a list long enough to show the bar: the row gaps on both lists are equal
+                   (measured 1 versus 13 before the overlay switch, adaptation/00 S1-c), and the selection fill is
+                   the palette accent at upstream's 0.6, not the framework's own purple. -->
+              <ListBox x:Name="SampleOverflowList" Height="156" SelectionMode="Multiple">
+                <ListBoxItem Content="Backlog" />
+                <ListBoxItem Content="In progress" />
+                <ListBoxItem Content="In review" />
+                <ListBoxItem Content="Blocked" />
+                <ListBoxItem Content="Ready to ship" />
+                <ListBoxItem Content="Shipped" />
+                <ListBoxItem Content="Rolled back" />
+                <ListBoxItem Content="Archived" />
+              </ListBox>
+              <TextBlock Text="Hover, press and the drag-select gesture are not claimed: the row states here are driven by selection in a test, never by a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="List view" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- The same row surface again, with WinUI's selection shape instead of the list's: a subtle fill plus
+                   a 4 DIP accent pill, and upstream's 40 DIP row with 16,0,12,0 padding rather than the runtime's
+                   30 DIP row at 10,5,10,5 (spike/ListViewProbe mode B). -->
+              <ListView x:Name="SampleListView" Height="176">
+                <ListViewItem Content="Quarterly review" />
+                <ListViewItem Content="Design sync" IsSelected="True" />
+                <ListViewItem Content="Ship train" />
+                <ListViewItem Content="Retro" IsEnabled="False" />
+              </ListView>
+              <TextBlock Text="The pill is 4 DIP wide and 1.5 rounded by upstream's own rows; its 16 DIP length is ours, because upstream keeps that number in a C++ presenter this reference does not carry. Disabling the list would not dim these rows - only a row-level IsEnabled reaches the cell." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="Tree view" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- WinUI's tree is one flattened list; this runtime's TreeViewItem is the nested shape, so the row
+                   carries upstream's measure (a 28 DIP header line built from 20 + 3 + 5, against the runtime's own
+                   40) and the indent comes from the nesting at the 16 DIP step the runtime's own spacer measures.
+                   The pill is the only one in the list family whose whole geometry is readable upstream: 3 wide,
+                   16 tall, radius 2 (TreeViewItem.xaml:130). -->
+              <TreeView x:Name="SampleTreeView" Height="196">
+                <TreeViewItem Header="Ship train" IsExpanded="True">
+                  <TreeViewItem Header="Astra styles" />
+                  <TreeViewItem Header="Gallery pages" IsExpanded="True">
+                    <TreeViewItem Header="Selection" />
+                    <TreeViewItem Header="Navigation" />
+                  </TreeViewItem>
+                  <TreeViewItem Header="Test base" IsSelected="True" />
+                </TreeViewItem>
+                <TreeViewItem Header="Archive" IsEnabled="False" />
+              </TreeView>
+              <TextBlock Text="The chevron runs on a two-way binding to IsExpanded, because a part named Expander hooks nothing on this runtime. The subtree's fill is 16 DIP narrower than its parent's - the cost of an indent built by nesting rather than by a depth value, which this runtime does not expose." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="Data grid" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- Row 32 and header 32 are upstream's pair; the runtime's own theme rests them at 30/34, so a mounted
+                   grid had to be measured before those two lines were written. The row keeps the framework's template
+                   deliberately: installing a DataGridRow style of ours strands the cell's generated text and the
+                   table renders no values at all (docs/astra/audits/datagrid.md §5), which also means the selected
+                   row fills through the retinted AccentBrush name rather than through a part of ours - the accent
+                   here is the application accent, never the framework's brand-emerald gradient.
+                   Two readings from spike/DataGridProbe (datagrid-probe-cols.txt) shaped the markup below, and both
+                   are silent failures rather than errors: a bare number on a column's Width does not convert to that
+                   property's DataGridLength type and stays Auto, while MinWidth is a plain number and lands; and this
+                   runtime hands the row's own data item to DataGridRowHeader.Content, so a visible row header paints
+                   the model's ToString in the gutter. Hence MinWidth everywhere and HeadersVisibility="Column". -->
+              <DataGrid x:Name="SampleDataGrid" Height="180" AutoGenerateColumns="False" HeadersVisibility="Column">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" MinWidth="200" />
+                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" MinWidth="140" />
+                  <DataGridTextColumn Header="Status" Binding="{Binding Status}" MinWidth="120" />
+                </DataGrid.Columns>
+              </DataGrid>
+              <TextBlock Text="Column sort writes a glyph into PART_SortIndicator itself, so the template only owns its size; the row line is the framework's, the cell line is ours. Editing a cell still needs the runtime's own commit path - see the parity strip." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+              <TextBlock Text="Tree data grid" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <!-- The hierarchical grid is the same host family: it reuses our cell, column header and row-header
+                   styles because this runtime has no tree-only versions of them, and only the host template is new.
+                   Its feed is a plain list plus a children path - the node type stays private inside the control and
+                   a consumer never has to name it - and the tree column is an index rather than a column type. -->
+              <TreeDataGrid x:Name="SampleTreeDataGrid" Height="200" HeadersVisibility="Column"
+                            TreeColumnIndex="0" ChildrenPropertyPath="Children">
+                <TreeDataGrid.Columns>
+                  <DataGridTextColumn Header="Work item" Binding="{Binding Name}" MinWidth="220" />
+                  <DataGridTextColumn Header="Owner" Binding="{Binding Owner}" MinWidth="140" />
+                </TreeDataGrid.Columns>
+              </TreeDataGrid>
+              <TextBlock Text="Indent is 16 DIP per level, the runtime's own IndentSize. Unlike the plain grid, a tree column left at Auto lays out at zero width, so every column here carries a minimum; the chevron is drawn by the control inside the tree cell, not by this template. Expanding is a public call here (ExpandAll / IsExpanded), so the gallery's expand evidence is API-driven, not a pointer." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+            </StackPanel>
+
+            <StackPanel x:Name="NavigationPage">
+              <TextBlock Text="Navigation" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="The Gallery sidebar is a FluentNavigationView." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Focus and selection" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Use Up, Down, Home, and End to move focus between destinations. Press Enter or Space to select the focused destination." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <TextBlock Text="The selection marker stays with the active page until a destination is activated." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="One moving indicator" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Move between menu and footer destinations to see the indicator stretch and settle. Rapid selection changes retarget the visible bar." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <WrapPanel Margin="0,16,0,0">
+                    <Button x:Name="JumpOverviewButton" Content="Go to Overview" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="JumpSettingsButton" Content="Go to Settings" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Adaptive pane" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Expanded or compact" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Resize below 800 DIPs or use the pane toggle. Settings rows also stack when space is limited." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <Button x:Name="TogglePaneButton" Content="Toggle pane" Style="{StaticResource DefaultButtonStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Tab view" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <ToggleButton x:Name="TabViewAddToggle" Content="Add button" IsChecked="True" Margin="0,0,8,8" />
+                    <Button x:Name="TabViewSelectFirstButton" Content="Select first" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentTabView x:Name="SampleTabView" Margin="-16,12,-16,0" Height="190" SelectedIndex="0" IsAddButtonVisible="True">
+                    <fluent:FluentTabView.TabItems>
+                      <fluent:FluentTabViewItem Header="Document">
+                        <TextBlock Text="The line under the strip stops at a selected tab: its own piece collapses, the two neighbours shorten by 2 DIPs, and the 4 DIP corner hooks are drawn in the line's colour so the tab reads as grown out of the surface below." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="Icon">
+                        <fluent:FluentTabViewItem.Icon>
+                          <TextBlock Text="&#xE8A5;" FontFamily="Segoe Fluent Icons" FontSize="16" />
+                        </fluent:FluentTabViewItem.Icon>
+                        <TextBlock Text="An icon column is 16 DIPs and disappears entirely when a tab has no icon, so the header's left inset stays where the text is." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="No close" IsClosable="False">
+                        <TextBlock Text="Without a close button the header takes the 8 DIP right inset back." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                      <fluent:FluentTabViewItem Header="Disabled" IsEnabled="False">
+                        <TextBlock Text="A disabled tab keeps the resting fill and loses only its label." Margin="12" TextWrapping="Wrap" Style="{StaticResource BodyTextBlockStyle}" />
+                      </fluent:FluentTabViewItem>
+                    </fluent:FluentTabView.TabItems>
+                  </fluent:FluentTabView>
+                  <TextBlock x:Name="TabViewReadout" Text="Document selected." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="Clicking a tab selects it and Ctrl+Tab moves the selection; the arrow keys only move focus, because upstream sets SingleSelectionFollowsFocus=False on the strip. Closing a tab raises TabCloseRequested and removes nothing until this page asks for it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Pips pager" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <CheckBox x:Name="PagerVertical" Content="Vertical" Margin="0,0,8,8" />
+                    <CheckBox x:Name="PagerHiddenArrows" Content="Hide the arrows" Margin="0,0,8,8" />
+                    <Button x:Name="PagerNextButton" Content="Next page" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentPipsPager x:Name="SlidesPager" NumberOfPages="10" MaxVisiblePips="5"
+                                          PreviousButtonVisibility="Visible" NextButtonVisibility="Visible"
+                                          HorizontalAlignment="Center" Margin="0,12,0,0" />
+                  <TextBlock x:Name="PagerReadout" Text="Page 1." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="Ten pages in a five-pip window: the row generates all ten pips and the viewport is clamped to what MaxVisiblePips allows, which is upstream's rule rather than a paging one. The arrows move a single page and disable themselves at the ends; a pip is chosen by clicking it, and the arrow keys only move focus. The readout is built from the control's own values, because this markup parser drops an attribute it does not recognise instead of rejecting it." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Breadcrumb bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="BreadcrumbPushButton" Content="Push a level" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="BreadcrumbPopButton" Content="Pop one" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Slider x:Name="BreadcrumbWidthSlider" Minimum="160" Maximum="760" Value="760" Width="240" VerticalAlignment="Center" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentBreadcrumbBar x:Name="TrailBar" Width="760" HorizontalAlignment="Left" Margin="0,12,0,0" />
+                  <TextBlock x:Name="BreadcrumbReadout" Text="Four levels." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="The row keeps the last crumb and as many of the ones before it as fit, and everything that does not fit moves behind the ellipsis - so dragging the width slider collapses the head of the path and brings it back, which is upstream's rule read straight off its layout: the floor is the ellipsis and the last crumb, and crumbs are packed with no spacing. The last crumb is plain text rather than a button, so clicking it reports nothing, and the ellipsis reports nothing either: it only opens its list." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="SurfacesPage">
+              <TextBlock Text="Surfaces" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Two containers whose look comes from the theme kernel: an expander the control operates for you, and an info bar that had to become an own type before any of its colours could be themed." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Expander" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Expander x:Name="SampleExpander" Header="Weekly digest" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <StackPanel>
+                      <TextBlock Text="The body is any content at all. The control writes the content part's visibility and rotates the chevron, so nothing on this page animates either of them." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                      <CheckBox x:Name="ExpanderBodyCheck" Content="State inside the body survives a collapse" Margin="0,8,0,0" />
+                    </StackPanel>
+                  </Expander>
+                  <TextBlock Text="Click the header, or Tab to the expander and press Space. The expander itself is the focusable element: the framework installs its own click handler on the header part, so a toggle button in that slot would answer one click twice." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="ExpanderReadout" Text="Collapsed." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Info bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="SeverityInformationalButton" Content="Informational" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeveritySuccessButton" Content="Success" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeverityWarningButton" Content="Warning" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="SeverityErrorButton" Content="Error" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="ShowInfoBarButton" Content="Show again" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="InfoBarClosableToggle" Content="Closable" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="InfoBarIconToggle" Content="Icon" IsChecked="True" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentInfoBar x:Name="SampleInfoBar" Margin="0,12,0,0" Title="Weekly digest ready" Message="Nine new items are waiting. Closing this bar raises CloseButtonClick, which is the base class's own event." Severity="Informational">
+                    <fluent:FluentInfoBar.ActionButton>
+                      <Button Content="Open" Style="{StaticResource SubtleButtonStyle}" />
+                    </fluent:FluentInfoBar.ActionButton>
+                  </fluent:FluentInfoBar>
+                  <TextBlock Text="Every fill here is an upstream row: the four severity backgrounds alias the system fill colours, so severity, icon disc, border and both text colours follow the theme. The icon is a 16 DIP disc carrying the upstream glyph and the close button is a Path rather than a SymbolIcon." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="InfoBarReadout" Text="Nothing closed yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Content dialog" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="DialogThreeButton" Content="Three buttons" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="DialogTwoButton" Content="Two buttons" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="DialogOneButton" Content="Only Cancel" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="DialogDefaultToggle" Content="Default is primary" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="DialogFullSizeToggle" Content="Full size" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="This card holds no dialog element on purpose: 26.10.9 hosts a shown ContentDialog in the window's own overlay layer and refuses to open one that is already placed in a tree, so the dialog is built on the click. Under the Astra template it is a smoke layer, a 24 DIP gutter, a card capped at 548 with the overlay corner radius, and a 20 SemiBold title over the body. The control owns the card's width and maps the app's own MaxWidth onto it, so the template's cap is the resting value rather than a limit an app cannot pass. The title strip and the command row each carry their own half of that 8 DIP arc: a border here rounds what it fills and never clips a child, so a square band running to the card's edge paints the corner back on." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="DialogReadout" Text="Nothing shown yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Teaching tip" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="TipShowButton" Content="Show the tip" Style="{StaticResource AccentButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="TipSideButton" Content="Point from the right" Margin="0,0,8,8" />
+                    <Button x:Name="TipNoTargetButton" Content="Point at nothing" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="TipTailToggle" Content="Tail" IsChecked="True" Margin="0,0,8,8" />
+                    <ToggleButton x:Name="TipButtonsToggle" Content="Both buttons" IsChecked="True" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <fluent:FluentTeachingTip x:Name="SampleTeachingTip" Title="You can press Enter here" Subtitle="The tip belongs to the button beside it." Content="Upstream draws this card in code; Astra writes it as a template over a Popup, and the control only decides which edge the tail sits on." ActionButtonContent="Got it" CloseButtonContent="Dismiss" />
+                  <TextBlock Text="The card is 320 DIP wide at rest and capped at 336 like upstream's, and the 8 DIP band the tail grid reserves outside it is what lets the control put the tail's point exactly on the anchor's edge: a tip placed above its target sits its container's height away, not that height minus eight. The border loses whichever edge the tail sits on, so the seam under the triangle is the fill rather than a hairline crossing it. Preferred sides that would push the card out of the window fall back to one that fits, and the tail moves with the result." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="TipReadout" Text="Not shown." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Cards" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="WinUI 3 has no Card control - no runtime class, no template, no theme dictionary - and its Gallery composes cards from a Border, the stroke row and a background tier. That recipe is what this page already uses for every card on it, so the three tiers below are the same three rows the rest of the page paints with." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" />
+                  <WrapPanel Margin="0,12,0,0">
+                    <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160" Margin="0,0,8,8">
+                      <TextBlock Text="Default" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                    <Border Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160" Margin="0,0,8,8">
+                      <TextBlock Text="Secondary" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                    <Border Background="{ThemeResource CardBackgroundFillColorTertiaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="4" Padding="16,12" Width="160">
+                      <TextBlock Text="Tertiary" Style="{StaticResource CaptionTextBlockStyle}" />
+                    </Border>
+                  </WrapPanel>
+                  <TextBlock Text="CardBorderStyle carries the recipe: the default fill, the stroke row at 1 DIP, ControlCornerRadius and 16 DIP of padding. Upstream's sample card rounds at 8 and its tiles at 4; this page keeps 4 on its section containers, so the corner claim is deliberately the tile row rather than the CardPage row." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="StatusPage">
+              <TextBlock Text="Status" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="State the user reads but does not operate. The bar below is the framework's own control wearing our template; what follows on this page will be the types this runtime does not have at all." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Progress bar" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Slider x:Name="ProgressValueSlider" Minimum="0" Maximum="100" Value="40" Width="280" HorizontalAlignment="Left" />
+                  <ProgressBar x:Name="SampleProgressBar" Value="40" Margin="0,12,0,0" />
+                  <ProgressBar x:Name="VerticalProgressBar" Orientation="Vertical" Height="60" Value="60" Margin="0,12,0,0" HorizontalAlignment="Left" />
+                  <CheckBox x:Name="IndeterminateCheck" Content="Indeterminate" Margin="0,12,0,0" />
+                  <TextBlock x:Name="ProgressReadout" Text="40 of 100." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                  <TextBlock Text="The filled bar is three DIP tall and the rail behind it one, which is upstream's own geometry; dragging the slider moves the end of the fill because the control sizes that part and the template only hands it a band to land in. Checking indeterminate is honest about this runtime: the block stops moving, because the slide upstream animates has no route here." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Progress ring" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <StackPanel Orientation="Horizontal">
+                    <fluent:FluentProgressRing x:Name="SampleProgressRing" IsIndeterminate="False" Value="40" />
+                    <fluent:FluentProgressRing x:Name="SpinningRing" Margin="20,0,0,0" />
+                    <fluent:FluentProgressRing x:Name="BigRing" IsIndeterminate="False" Value="40" Width="64" Height="64" Margin="20,0,0,0" />
+                    <fluent:FluentProgressRing x:Name="QuietRing" IsActive="False" Margin="20,0,0,0" />
+                  </StackPanel>
+                  <TextBlock x:Name="RingReadout" Text="Ring: 40 of 100." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,12,0,0" />
+                  <TextBlock Text="This runtime has no ProgressRing and no animated-visual player, so the ring is a type of ours that draws its own arc: radius and stroke come out of the two Lottie canvases upstream ships (they differ, and the ring keeps that), a determinate arc is regenerated whenever the value moves, and the spin is a frame loop writing the arc's start angle - an animation clock never reaches a transform here. The second ring is indeterminate, the third is the same control at 64 DIP, and the fourth is inactive: it holds its place and paints nothing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="InfoBadge" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Background="{StaticResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="16,12">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <fluent:FluentInfoBadge />
+                    <fluent:FluentInfoBadge Style="{StaticResource AttentionIconInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource InformationalDotInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource SuccessDotInfoBadgeStyle}" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource CautionValueInfoBadgeStyle}" Value="12" Margin="12,0,0,0" />
+                    <fluent:FluentInfoBadge Style="{StaticResource CriticalValueInfoBadgeStyle}" Value="120" Margin="12,0,0,0" />
+                  </StackPanel>
+                  <TextBlock Text="The runtime has no InfoBadge either, so this is our type: the four display kinds come from Value and Icon exactly as upstream's C++ walks them, the pill radius is half the measured height, and the five severities are the sixteen style keys transcribed verbatim. Two of them show a number - which is the honest limit of this card: a glyph run never reaches a capture on this runtime, so the digits are asserted in the tree (text, visibility, foreground) and not in the picture." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+
+              <TextBlock Text="Rating control" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <fluent:FluentRatingControl x:Name="SampleRating" />
+                  <fluent:FluentRatingControl Value="3.5" Caption="3.5 out of 5" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="4" IsReadOnly="True" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="2" MaxRating="10" Margin="0,12,0,0" />
+                  <fluent:FluentRatingControl Value="5" IsEnabled="False" Margin="0,12,0,0" />
+                  <TextBlock Text="The runtime has no RatingControl, so this is our type. A star is drawn at upstream's 32 and shown at half, which is the resting value of the composition scale upstream puts on every item - this runtime gives an item no visual to animate, so the same 0.5 and the same quadratic lift toward 0.8 under a mouse (1.0 under a finger) are evaluated in code. Half stars are cut by a ClipToBounds host rather than upstream's Clip, which paints nothing here. What this card cannot show is the ink of the star itself: a glyph run reaches no capture on this runtime, so the size, the pitch and the crop are asserted in the tree - and the row really is 17 wide per star at a pitch of 25, which is the number the pointer maths divide by." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+
+              <TextBlock Text="Icons" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <StackPanel Orientation="Horizontal">
+                    <SymbolIcon Symbol="Add" />
+                    <SymbolIcon Symbol="Setting" Margin="12,0,0,0" />
+                    <FontIcon Glyph="&#xE710;" FontSize="20" Margin="12,0,0,0" />
+                    <FontIcon Glyph="&#xE713;" FontSize="32" Margin="12,0,0,0" />
+                    <PathIcon Data="M 0,0 L 16,0 L 16,16 L 0,16 Z" Width="16" Height="16" Margin="12,0,0,0" />
+                    <PathIcon Data="M 0,16 L 8,0 L 16,16 Z" Width="20" Height="20" Margin="12,0,0,0" />
+                  </StackPanel>
+                  <TextBlock Text="These three are the runtime's own types, and this card deliberately ships no style for them: an icon here derives from FrameworkElement rather than Control, so there is no template to hand it - upstream builds the visual in C++ and publishes no default style either. What was measured instead: the symbol box is a constant 20 DIP whatever the symbol, the font icon's box is its font size, and the path icon is the only member whose ink a capture can actually see, which is why it is the one drawn as a solid figure. The honest limits are in docs/astra/audits/icon-family.md - the symbol enum here paints the same glyph as upstream for 167 of the 171 names both sides share, four of them a different one, and the icon font cannot be published as a resource row at all on this runtime, so every template repeats the family name as a literal." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                </StackPanel>
+              </Border>
+
+              <TextBlock Text="Divider" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <TextBlock Text="Two lines of type, one rule between them." Style="{StaticResource BodyTextBlockStyle}" />
+                  <Separator />
+                  <TextBlock Text="The rule is the runtime's own Separator, carrying the palette's divider token at 1 DIP." Style="{StaticResource BodyTextBlockStyle}" />
+                  <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                    <TextBlock Text="Left" VerticalAlignment="Center" />
+                    <Separator Orientation="Vertical" Height="24" Margin="12,0" />
+                    <TextBlock Text="Right" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <TextBlock Text="WinUI has no Divider control at the commit this rewrite is pinned to, so the look here is built from the two things that commit does carry: the DividerStrokeColorDefault token and the 1 DIP thickness every divider-shaped template in it shares. The box the line sits in - 12 DIP across on the running axis - is the runtime's own measurement, not an upstream number, and the line is drawn by the control itself because a 1 DIP Rectangle prints nothing on this runtime at all." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="MenusPage">
+              <TextBlock Text="Menus" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Two menu shapes in one runtime: the WPF-style Menu / MenuItem pair, which 26.10.9 paints itself, and the WinUI-named MenuBar, MenuFlyout and MenuFlyoutItem family, which takes a template for its surface. Even there the row content is the control's own paint - label, accelerator text, check mark, chevron and rule - so Astra's skin stops at the surface and the icon slot, and presenting either of those twice is the ghost this page used to show." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Bars" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <Menu x:Name="SampleMenu" HorizontalAlignment="Left">
+                    <MenuItem Header="File">
+                      <MenuItem Header="New tab" IsCheckable="True" />
+                      <MenuItem Header="Close window" />
+                    </MenuItem>
+                    <MenuItem Header="Edit">
+                      <MenuItem Header="Copy" IsEnabled="False" />
+                    </MenuItem>
+                  </Menu>
+                  <MenuBar x:Name="SampleMenuBar" Margin="0,12,0,0" />
+                  <TextBlock Text="Both bars read MenuBar's rows for their surface and label. The items inside the first one are the honest gap: a MenuItem stores a Template and never builds one, so its colours come from a style while its highlight, check mark and submenu arrow stay the framework's own drawing." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="MenuBarReadout" Text="No bar item opened yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+              <TextBlock Text="Flyout and context menu" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <WrapPanel>
+                    <Button x:Name="ShowFlyoutButton" Content="Open the flyout" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="ShowContextMenuButton" Content="Open the context menu" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The flyout is built in code because 26.10.9 gives a plain Button no Flyout property: MenuFlyout.ShowAt(target) is the door. Its items carry every state this runtime can reach - hover, disable, checked - and no others, so the pressed and submenu-opened rows upstream publishes are not published here either." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="MenuReadout" Text="Nothing chosen yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="CommandBarPage">
+              <TextBlock Text="Command bar" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="The one family in Astra that arrives with a theme already underneath it: 26.10.9 ships its own implicit styles for the three app-bar elements and paints its bar from nine rows of its own, so this page is mostly what a shadowed row buys - and one surface a shadow cannot reach." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="A bar with commands" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel Margin="16">
+                  <CommandBar x:Name="SampleCommandBar" HorizontalAlignment="Left" />
+                  <WrapPanel Margin="0,12,0,0">
+                    <Button x:Name="CommandBarOpenButton" Content="Open the overflow" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="CommandBarCompactButton" Content="Compact the buttons" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                    <Button x:Name="CommandBarClearButton" Content="Clear the check" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+                  </WrapPanel>
+                  <TextBlock Text="The icons, labels, 68 DIP width, the 64 DIP cell with its icon 16 below the top edge, the highlight inset 2,6,2,6 and the accent fill of the checked toggle are ours: the framework's own skin measured 44 wide with a 10 pixel label, a 20 DIP icon box and a purple foreground. That highlight carries no brush fade on purpose - a nested transitioning border kept its accent in every property and offscreen read yet painted nothing in the composited window. The bar's own surface and its overflow list are the honest gap - that control stores a Template and never builds one, so only the rows its code reads can be steered, and the overflow row was measured back out of the publication list because no pixel of it moved." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                  <TextBlock x:Name="CommandBarReadout" Text="Nothing invoked yet." Style="{StaticResource CaptionTextBlockStyle}" Margin="0,8,0,0" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+
+            <StackPanel x:Name="SettingsPage">
+              <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}" />
+              <TextBlock Text="Change the Gallery appearance while keeping control state." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <TextBlock Text="Appearance" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Theme" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Choose a theme or follow Windows." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="ThemeComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Light" />
+                    <ComboBoxItem Content="Dark" />
+                    <ComboBoxItem Content="Use system setting" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="440">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Accent color" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Apply one accent across actions and selection." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <ComboBox x:Name="AccentComboBox" Width="160" VerticalAlignment="Center">
+                    <ComboBoxItem Content="Default" />
+                    <ComboBoxItem Content="Blue" />
+                    <ComboBoxItem Content="Violet" />
+                    <ComboBoxItem Content="Green" />
+                  </ComboBox>
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Motion" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12" />
+              <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                <fluent:FluentSettingsRow Margin="16" StackAtWidth="360">
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Reduce motion" Style="{StaticResource BodyTextBlockStyle}" />
+                    <TextBlock Text="Settle navigation immediately, turn off the page entrance, and rewrite the three published animation durations to zero, so a hover or a press snaps instead of easing. A transition already running keeps its clock, and a control built while this is on is born still." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                  </StackPanel>
+                  <fluent:FluentToggleSwitch x:Name="ReduceMotionSwitch" Style="{StaticResource FluentToggleSwitchStyle}" VerticalAlignment="Center" />
+                </fluent:FluentSettingsRow>
+              </Border>
+              <TextBlock Text="Windows animation preferences are also respected." Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" Margin="0,8,0,0" />
+              <WrapPanel Margin="0,16,0,0">
+                <Button x:Name="ReplayEntranceButton" Content="Replay page entrance" Style="{StaticResource DefaultButtonStyle}" Margin="0,0,8,8" />
+                <Button x:Name="RestoreDefaultsButton" Content="Restore appearance" Style="{StaticResource SubtleButtonStyle}" Margin="0,0,8,8" />
+              </WrapPanel>
+            </StackPanel>
+          </Grid>
+        </ScrollViewer>
+        <Border Grid.Row="2" Margin="24,0,24,16" Background="{StaticResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{StaticResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+          <Grid Margin="12">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Live output" Style="{StaticResource CaptionTextBlockStyle}" />
+              <TextBlock x:Name="LiveOutput" Text="Ready. Choose a control to try it." Style="{StaticResource BodyTextBlockStyle}" TextWrapping="Wrap" Margin="0,4,0,0" />
+            </StackPanel>
+            <Button x:Name="ClearOutputButton" Grid.Column="1" Content="Clear" Style="{StaticResource SubtleButtonStyle}" VerticalAlignment="Top" Margin="12,0,0,0" />
+            <!-- Generated from Catalog.json, so the parity claim cannot outlive the styles it describes. One
+                 TextBlock rather than two siblings, and a fixed-height scroll host: a wrapping TextBlock that
+                 is measured at a wider constraint than it is arranged at reports fewer lines than it paints,
+                 and the sibling below it is then placed on top of the overflow (spike/VisualQA/out/inputs.png,
+                 spike/TextWrapProbe case E). The height here does not depend on that measure. -->
+            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" MaxHeight="96" Margin="0,10,0,0"
+                          VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+              <TextBlock x:Name="ParityStatus" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+            </ScrollViewer>
+          </Grid>
+        </Border>
+      </Grid>
+    </fluent:FluentNavigationView>
 </Window>

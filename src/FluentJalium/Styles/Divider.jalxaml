@@ -1,0 +1,30 @@
+<!-- No upstream file to transcribe. The pinned WinUI commit (19e3bdc) has no `Divider` control at all: `git
+     ls-files | grep -i divider` returns zero files and `git grep "\bDivider\b"` over *.idl/*.h finds only
+     unrelated comments (audits/divider.md §1 lists what was searched). What that commit does carry is the token
+     this style consumes - `DividerStrokeColorDefault` / `DividerStrokeColorDefaultBrush` in
+     Common_themeresources_any.xaml (:257/:347/:471, blob ca07acb962a7c018a174bf28dcd0e945b13ddb4d), already
+     transcribed by the palette layer - and seven templates that draw the same visual role for other controls.
+     Those seven are the only geometry authority available here, and every one of them is 1 DIP thick:
+     AppBarSeparator (:20-52), the menu separator (:727-737), the split-item divider (:606), the date picker
+     spacers (:291-304), the time picker spacers (:294-305), NavigationViewItemSeparator (NavigationView.xaml
+     :572-605) and the tab separator (TabView.xaml :553). None of them carries a thickness of its own for a
+     general divider to inherit, and no margin is common to more than one role, so this style sets the one
+     number all seven agree on and leaves the box to the runtime (see the two Known Gaps in the audit).
+     The host is Jalium's own `Separator`, not an own type: spike/DividerProbe mode surface measured it as
+     `Separator : Control` with three own dependency properties - `Orientation`, `StrokeBrush`,
+     `StrokeThickness` - declaring its own `OnRender`, arriving with `Style`/`Template` null and
+     `IsHitTestVisible=False` already. Mode shape then measured the two things that decided the form: the
+     control's own stroke honours both `StrokeBrush` and `StrokeThickness` (#A3A3A4 at the default, 4 inked
+     rows at thickness 4), and a `ControlTemplate` on a `Separator` also realizes - so the line can come from
+     the framework's drawing or from a templated element, and the shorter of the two is the one shipped here. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style TargetType="Separator">
+    <!-- Upstream's name verbatim. The row itself belongs to the palette layer (ThemeResources/Light|Dark), whose
+         high-contrast story is a re-point of this very brush at Common_themeresources_any.xaml:471, so no
+         HighContrast branch is written here - the same accounting every other control file gets. -->
+    <Setter Property="StrokeBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+    <!-- The number all seven same-role templates carry. Written rather than inherited because the runtime's own
+         default happens to be 1 too: the value is the contract, and AstraDividerTests reads it back. -->
+    <Setter Property="StrokeThickness" Value="1" />
+  </Style>
+</ResourceDictionary>

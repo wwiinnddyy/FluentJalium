@@ -1,0 +1,40 @@
+<!-- WinUI 3 BreadcrumbBar_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     af094a1594bb76d73034e91d8c6e9677d7c67e15. Its token surface is 29 rows in each of three sections
+     (Default 5-33, Light 36-64, HighContrast 67-95); Default and Light are identical name for name and target for
+     target, so what is transcribed here serves both. 10 of the 29 rows are published. The other 19 are held out for
+     two different reasons, and the difference matters: six cannot be parsed or resolved by this pipeline at all (two
+     x:String glyphs, one x:FontWeight, one x:Double, one alias of an x:Double row this layer does not publish, and
+     one alias of a palette brush the Astra palette has no row for), and thirteen are rows nothing in this port reads -
+     the four Current* twins of a state the last crumb can never enter, the seven that belong to an ellipsis list
+     this layer renders with the menu family rather than with crumb-styled items, and the two that dress that list's
+     surface. Both kinds are named in docs/astra/audits/breadcrumb-bar.md and asserted absent by
+     AstraBreadcrumbBarTests.Rows_this_runtime_cannot_carry_stay_out_of_the_public_set; the gate in
+     AstraResourceKeyTests.Transcribed_control_rows_are_read_by_a_template is what makes the second kind visible
+     instead of silent. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The only metric in the set that survives as a row: the glyph size next to it (BreadcrumbBarChevronFontSize,
+       12) is an x:Double, so it arrives as a literal in Styles/BreadcrumbBar.jalxaml the way every other x:Double
+       metric in this layer does. -->
+  <Thickness x:Key="BreadcrumbBarChevronPadding">2,0</Thickness>
+  <!-- Five foreground aliases for an ordinary crumb, read by the nested button's three pointer states and its focus
+       state. The five Current* twins are not here: upstream reaches them only through states of the last crumb's own
+       button, and that button is collapsed - so of that set only the resting colour is published, because writing it
+       is the one thing the LastItem state actually does. -->
+  <StaticResource x:Key="BreadcrumbBarNormalForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="BreadcrumbBarHoverForegroundBrush" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="BreadcrumbBarPressedForegroundBrush" ResourceKey="TextFillColorTertiaryBrush" />
+  <StaticResource x:Key="BreadcrumbBarDisabledForegroundBrush" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="BreadcrumbBarFocusForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="BreadcrumbBarCurrentNormalForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="BreadcrumbBarForegroundBrush" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- Two literal transparent brushes rather than aliases: they are SolidColorBrush rows in Default and Light and
+       SystemControlTransparentBrush aliases in HighContrast, so the value type is what changes between sections.
+       Every theme reads transparent either way, which is the only thing the row has to answer for. -->
+  <SolidColorBrush x:Key="BreadcrumbBarBackgroundBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="BreadcrumbBarBorderBrush" Color="Transparent" />
+  <!-- The ellipsis flyout's three rows are all held out: the surface and the padding of that list come from the menu
+       family's already-translated keys, and its background aliases AcrylicBackgroundFillColorDefaultBrush, which the
+       Astra palette carries no row for. The seven BreadcrumbBarEllipsisDropDownItem* rows go the same way - the
+       entries are MenuFlyoutItems, and restyling them from a crumb token would mean overwriting the menu family's
+       own state cells with a local value. -->
+</ResourceDictionary>

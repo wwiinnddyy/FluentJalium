@@ -1,0 +1,15 @@
+theme dictionaries=38
+
+=== F. the 12 DIP gutter: what makes the two gaps equal ===
+  no attributes (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Auto vertical (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Visible vertical (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Auto + overlay bars (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Auto + autohide (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  overlay + autohide (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Auto overflow 50 (50 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  overlay overflow 50 (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  padding on viewer (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Hidden vertical (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed
+  Hidden + overlay (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed
+  Disabled + overlay (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed

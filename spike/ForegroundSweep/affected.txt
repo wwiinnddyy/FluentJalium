@@ -1,0 +1,135 @@
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(390,74): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(431,80): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(448,83): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(454,79): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(459,82): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(198,32): warning CS8605: 取消装箱可能为 null 的值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(223,58): warning CS8602: 解引用可能出现空引用。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(511,35): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(538,83): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs(551,85): warning CS8604: “Color AstraAppBarTests.ColorOf(Brush brush)”中的形参“brush”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(593,33): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(594,35): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraContentDialogTests.cs(595,31): warning CS8601: 可能的 null 引用赋值。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(243,24): warning CS8600: 将 null 文本或可能的 null 值转换为不可为 null 类型。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(244,30): warning CS8602: 解引用可能出现空引用。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(968,24): warning CS8604: “DependencyObject? AstraMenuTests.HostOf(DependencyObject root)”中的形参“root”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(991,36): warning CS8604: “List<string> AstraMenuTests.TextsIn(DependencyObject root)”中的形参“root”可能传入 null 引用实参。 [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs(651,13): warning xUnit2029: Do not use Assert.Empty to check if a value does not exist in a collection. Use Assert.DoesNotContain instead. (https://xunit.net/xunit.analyzers/rules/xUnit2029) [C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\FluentJalium.Tests.csproj]
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:01.88]     FluentJalium.Tests.AstraSelectionTests.The_radio_style_writes_upstream_seven_properties_in_every_state_cell [FAIL]
+  失败 FluentJalium.Tests.AstraSelectionTests.The_radio_style_writes_upstream_seven_properties_in_every_state_cell [7 ms]
+  错误消息:
+   System.InvalidOperationException : unchecked + pointer over: no RadioLabel.Foreground setter; the cell carries .Foreground, RadioRoot.Background, .BorderBrush, RadioRing.Background, RadioRing.BorderBrush, RadioDot.Fill, RadioDot.Stroke, RadioDot.Width, RadioDot.Height
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraSelectionTests.AssertCell(List`1 triggers, String label, ValueTuple`2[] conditions, List`1 wanted) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraSelectionTests.cs:line 451
+   at FluentJalium.Tests.AstraSelectionTests.<>c.<The_radio_style_writes_upstream_seven_properties_in_every_state_cell>b__9_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraSelectionTests.cs:line 206
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraSelectionTests.The_radio_style_writes_upstream_seven_properties_in_every_state_cell() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraSelectionTests.cs:line 164
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:02.21]     FluentJalium.Tests.AstraNumberBoxTests.A_headerless_numberbox_does_not_pay_the_headers_gap [FAIL]
+  失败 FluentJalium.Tests.AstraNumberBoxTests.A_headerless_numberbox_does_not_pay_the_headers_gap [50 ms]
+  错误消息:
+   System.InvalidCastException : Unable to cast object of type 'Jalium.UI.Controls.ContentControl' to type 'Jalium.UI.Controls.ContentPresenter'.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraNumberBoxTests.<A_headerless_numberbox_does_not_pay_the_headers_gap>b__19_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNumberBoxTests.cs:line 377
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraNumberBoxTests.A_headerless_numberbox_does_not_pay_the_headers_gap() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNumberBoxTests.cs:line 374
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:14.82]     FluentJalium.Tests.AstraMenuTests.A_state_cell_writes_the_row_upstream_writes(key: "DefaultMenuFlyoutItemStyle", condition: "IsEnabled=False", property: "Foreground", row: "MenuFlyoutItemForegroundDisabled") [FAIL]
+  失败 FluentJalium.Tests.AstraMenuTests.A_state_cell_writes_the_row_upstream_writes(key: "DefaultMenuFlyoutItemStyle", condition: "IsEnabled=False", property: "Foreground", row: "MenuFlyoutItemForegroundDisabled") [< 1 ms]
+  错误消息:
+   Assert.NotNull() Failure: Value is null
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraMenuTests.<>c__DisplayClass22_0.<A_state_cell_writes_the_row_upstream_writes>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 397
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.A_state_cell_writes_the_row_upstream_writes(String key, String condition, String property, String row) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 393
+   at InvokeStub_AstraMenuTests.A_state_cell_writes_the_row_upstream_writes(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:31.67]     FluentJalium.Tests.AstraComboBoxTests.Both_combo_templates_carry_one_cell_per_upstream_state [FAIL]
+  失败 FluentJalium.Tests.AstraComboBoxTests.Both_combo_templates_carry_one_cell_per_upstream_state [2 ms]
+  错误消息:
+   System.InvalidOperationException : SelectedIndex=-1: no PART_SelectionPresenter.Foreground setter; the cell carries self.Foreground
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraComboBoxTests.AssertCell(List`1 cells, String condition, ValueTuple`3[] wanted) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 806
+   at FluentJalium.Tests.AstraComboBoxTests.<Both_combo_templates_carry_one_cell_per_upstream_state>b__8_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 186
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraComboBoxTests.Both_combo_templates_carry_one_cell_per_upstream_state() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 171
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:31.72]     FluentJalium.Tests.AstraComboBoxTests.The_combo_style_reads_upstreams_surface_rows [FAIL]
+[xUnit.net 00:00:32.27]     FluentJalium.Tests.AstraComboBoxTests.An_item_shows_the_pill_only_when_it_is_selected [FAIL]
+[xUnit.net 00:00:32.27]     FluentJalium.Tests.AstraComboBoxTests.An_unselected_combo_takes_the_placeholder_row_and_a_selected_one_lets_go [FAIL]
+  失败 FluentJalium.Tests.AstraComboBoxTests.The_combo_style_reads_upstreams_surface_rows [44 ms]
+  错误消息:
+   System.InvalidOperationException : SelectedIndex=-1 carries no PART_SelectionPresenter.Foreground setter.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraComboBoxTests.CellProperty(ControlTemplate template, String condition, String part, String property) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 784
+   at FluentJalium.Tests.AstraComboBoxTests.<>c__DisplayClass9_0.<The_combo_style_reads_upstreams_surface_rows>b__18() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 311
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraComboBoxTests.<The_combo_style_reads_upstreams_surface_rows>b__9_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 300
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraComboBoxTests.The_combo_style_reads_upstreams_surface_rows() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 287
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraComboBoxTests.An_item_shows_the_pill_only_when_it_is_selected [27 ms]
+  错误消息:
+   System.InvalidOperationException : IsMouseOver=True carries no ContentPresenter.Foreground setter.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraComboBoxTests.CellProperty(ControlTemplate template, String condition, String part, String property) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 784
+   at FluentJalium.Tests.AstraComboBoxTests.<An_item_shows_the_pill_only_when_it_is_selected>b__15_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 576
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraComboBoxTests.An_item_shows_the_pill_only_when_it_is_selected() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 560
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  失败 FluentJalium.Tests.AstraComboBoxTests.An_unselected_combo_takes_the_placeholder_row_and_a_selected_one_lets_go [< 1 ms]
+  错误消息:
+   System.InvalidOperationException : SelectedIndex=-1 carries no PART_SelectionPresenter.Foreground setter.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraComboBoxTests.CellProperty(ControlTemplate template, String condition, String part, String property) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 784
+   at FluentJalium.Tests.AstraComboBoxTests.<An_unselected_combo_takes_the_placeholder_row_and_a_selected_one_lets_go>b__12_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 440
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraComboBoxTests.An_unselected_combo_takes_the_placeholder_row_and_a_selected_one_lets_go() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 438
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:00:34.05]     FluentJalium.Tests.AstraComboBoxTests.An_editable_combo_loads_the_chip_and_a_disabled_one_beats_every_cell [FAIL]
+  失败 FluentJalium.Tests.AstraComboBoxTests.An_editable_combo_loads_the_chip_and_a_disabled_one_beats_every_cell [378 ms]
+  错误消息:
+   System.InvalidOperationException : SelectedIndex=-1 carries no PART_SelectionPresenter.Foreground setter.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraComboBoxTests.CellProperty(ControlTemplate template, String condition, String part, String property) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 784
+   at FluentJalium.Tests.AstraComboBoxTests.<An_editable_combo_loads_the_chip_and_a_disabled_one_beats_every_cell>b__14_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 536
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraComboBoxTests.An_editable_combo_loads_the_chip_and_a_disabled_one_beats_every_cell() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraComboBoxTests.cs:line 508
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+失败!  - 失败:     8，通过:   251，已跳过:     0，总计:   259，持续时间: 33 s - FluentJalium.Tests.dll (net10.0)

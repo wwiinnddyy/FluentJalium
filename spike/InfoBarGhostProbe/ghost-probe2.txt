@@ -1,0 +1,77 @@
+=== R. what InfoBar declares itself ===
+  InfoBar base chain: InfoBar -> ContentControl -> Control -> FrameworkElement -> UIElement -> Visual -> DependencyObject -> DispatcherObject -> Object
+  --- InfoBar declared members ---
+    M private Void <OnApplyTemplate>b__54_0(Object, RoutedEventArgs)
+    M private Void DrawCloseButton(DrawingContext, Double, Double, Color)
+    M private Void DrawIcon(DrawingContext, Double, Double, Color)
+    M private ValueTuple`2 GetSeverityBrushes()
+    M private ValueTuple`3 GetSeverityColors()
+    M protected virtual Size MeasureOverride(Size)
+    M public virtual Void OnApplyTemplate()
+    M protected virtual AutomationPeer OnCreateAutomationPeer()
+    M private Void OnMouseDownHandler(Object, MouseButtonEventArgs)
+    M protected virtual Void OnRender(DrawingContext)
+    M private Color ResolveColor(String, Color)
+    M private SolidColorBrush ResolveSolidColorBrush(String, SolidColorBrush)
+    F private Button _closeButton
+    F private Rect _closeButtonRect
+    F private Pen _closePen
+    F private Color _closePenColor
+    F private Pen _iconPen
+    F private Color _iconPenColor
+    F private Border _rootBorder
+  --- the paint virtual, walked up the chain ---
+    InfoBar: virtual Void OnRender(Jalium.UI.Media.DrawingContext)
+    ContentControl: no OnRender declared
+    Control: no OnRender declared
+    UIElement: no OnRender declared
+=== I. string literals the framework's own methods carry (IL ldstr) ===
+  InfoBar.OnApplyTemplate ldstr: RootBorder | PART_CloseButton
+      members touched: 
+  InfoBar.OnRender ldstr: 
+      members touched: 
+  InfoBar.MeasureOverride ldstr: 
+      members touched: 
+  InfoBar.OnMouseDownHandler ldstr: 
+      members touched: 
+  Expander.OnApplyTemplate ldstr: PART_HeaderBorder | PART_ContentBorder | PART_Chevron
+      members touched: 
+=== T. tree shape each variant actually built ===
+  native: template=null children=0 actual=420x64
+  shipped: template=ControlTemplate children=1 actual=420x64
+    FluentInfoBar 420x64
+      Border "ContentRoot" 420x64
+        Grid 418x62
+          Grid "IconArea" 16x16
+            Ellipse "IconBackground" 16x16
+            TextBlock "IconGlyph" 16x16 text=""
+          StackPanel "Panel" 324x69.6
+            TextBlock "Title" 324x19.8 text="shipped style"
+            TextBlock "Message" 324x19.8 text="message line"
+            ContentPresenter "ActionArea" 0x0 content=null
+          ContentPresenter 0x0 content=null
+          Button "PART_CloseButton" 38x38
+            Grid 38x38
+              Border "Surface" 38x38
+                ContentPresenter 14x16 content=Path
+                  Path 16x16
+              Border "FocusOutline" 36x36
+                Border 32x32
+  opaque: template=ControlTemplate children=1 actual=420x64
+  opaqueNative: template=ControlTemplate children=0 actual=420x64
+  silentOpaque: template=ControlTemplate children=1 actual=420x64
+=== P. pixel attribution ===
+  native: 420x64 distinct=18 lime=0 ink=26816
+      top: #16283Fx26334  #0A84FFx310  #000000x56  #536071x44  #0A83FCx16  #162A43x16
+  shipped: 420x64 distinct=36 lime=0 ink=1308
+      top: #FFFFFFx25304  #202020x880  #0A84FFx314  #60CDFFx142  #F6F6F8x37  #0B85FFx16
+  opaque: 420x64 distinct=25 lime=26390 ink=26860
+      top: #00FF00x26390  #0A84FFx296  #43FC43x44  #00FD05x16  #0A86FBx16  #7BFA7Cx16
+  opaqueNative: 420x64 distinct=18 lime=0 ink=26816
+      top: #16283Fx26334  #0A84FFx310  #000000x56  #536071x44  #0A83FCx16  #162A43x16
+  silentOpaque: 420x64 distinct=1 lime=26880 ink=26880
+      top: #00FF00x26880
+  loudText: 420x48 distinct=14 lime=0 ink=1072
+      top: #FFFFFFx19080  #202020x864  #0A84FFx178  #000000x8  #212121x6  #191919x4
+  silentText: 420x48 distinct=7 lime=0 ink=936
+      top: #FFFFFFx19208  #202020x904  #000000x12  #212121x12  #191919x8  #6C6C6Cx8

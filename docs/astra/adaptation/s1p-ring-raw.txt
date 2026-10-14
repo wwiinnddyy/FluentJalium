@@ -1,0 +1,243 @@
+RingProbe transcripts, 2026-09-21, runtime 26.10.9. Modes `all` (surface, ink, anim, xform, motion) and `surface2` (the base-type and geometry surface an own control compiles against).
+Source: spike/RingProbe/Program.cs; readings quoted in docs/astra/audits/progress-ring.md and adaptation/00 S1-p.
+
+theme dictionaries=57
+
+=== A. shape and geometry types this runtime exports ===
+  ProgressRing       ABSENT
+  LottiePlayer       ABSENT
+  Lottie             ABSENT
+  Ellipse            Jalium.UI.Shapes.Ellipse [Jalium.UI.Managed] Ellipse < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Path               Jalium.UI.Shapes.Path [Jalium.UI.Managed] Path < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Line               Jalium.UI.Shapes.Line [Jalium.UI.Managed] Line < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Polyline           Jalium.UI.Shapes.Polyline [Jalium.UI.Managed] Polyline < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Polygon            Jalium.UI.Shapes.Polygon [Jalium.UI.Managed] Polygon < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Rectangle          Jalium.UI.Shapes.Rectangle [Jalium.UI.Managed] Rectangle < Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Shape              Jalium.UI.Shapes.Shape [Jalium.UI.Managed] Shape < FrameworkElement < UIElement < Visual < DependencyObject < DispatcherObject
+  Geometry           Jalium.UI.Media.Geometry [Jalium.UI.Managed] Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  PathGeometry       Jalium.UI.Media.PathGeometry [Jalium.UI.Managed] PathGeometry < Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  StreamGeometry     Jalium.UI.Media.StreamGeometry [Jalium.UI.Managed] StreamGeometry < Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  PathFigure         Jalium.UI.Media.PathFigure [Jalium.UI.Managed] PathFigure < Animatable < Freezable < DependencyObject < DispatcherObject
+  ArcSegment         Jalium.UI.Media.ArcSegment [Jalium.UI.Managed] ArcSegment < PathSegment < Animatable < Freezable < DependencyObject < DispatcherObject
+  EllipseGeometry    Jalium.UI.Media.EllipseGeometry [Jalium.UI.Managed] EllipseGeometry < Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  LineSegment        Jalium.UI.Media.LineSegment [Jalium.UI.Managed] LineSegment < PathSegment < Animatable < Freezable < DependencyObject < DispatcherObject
+  GeometryGroup      Jalium.UI.Media.GeometryGroup [Jalium.UI.Managed] GeometryGroup < Geometry < Animatable < Freezable < DependencyObject < DispatcherObject
+  RotateTransform    Jalium.UI.Media.RotateTransform [Jalium.UI.Managed] RotateTransform < Transform < GeneralTransform < Animatable < Freezable < DependencyObject < DispatcherObject
+  DoubleCollection   Jalium.UI.Media.DoubleCollection [Jalium.UI.Managed] DoubleCollection < Freezable < DependencyObject < DispatcherObject
+  Gauge              ABSENT
+  Arc                ABSENT
+  Donut              ABSENT
+  PieSlice           ABSENT
+  Sector             ABSENT
+  RingArc            ABSENT
+  RingGeometry       ABSENT
+  PieRingArc         ABSENT
+  --- Shape: stroke / dash / angle / data surface ---
+    AreAnyTouchesCaptured      Boolean (UIElement)
+    AreAnyTouchesCapturedWithin Boolean (UIElement)
+    IsMouseCaptured            Boolean (UIElement)
+    IsMouseCaptureWithin       Boolean (UIElement)
+    IsStylusCaptured           Boolean (UIElement)
+    IsStylusCaptureWithin      Boolean (UIElement)
+    Stroke                     Brush (Shape)
+    StrokeDashArray            DoubleCollection (Shape)
+    StrokeDashCap              PenLineCap (Shape)
+    StrokeDashOffset           Double (Shape)
+    StrokeEndLineCap           PenLineCap (Shape)
+    StrokeLineJoin             PenLineJoin (Shape)
+    StrokeMiterLimit           Double (Shape)
+    StrokeStartLineCap         PenLineCap (Shape)
+    StrokeThickness            Double (Shape)
+    TouchesCaptured            IEnumerable`1 (UIElement)
+    TouchesCapturedWithin      IEnumerable`1 (UIElement)
+  --- Ellipse: stroke / dash / angle / data surface ---
+    AreAnyTouchesCaptured      Boolean (UIElement)
+    AreAnyTouchesCapturedWithin Boolean (UIElement)
+    IsMouseCaptured            Boolean (UIElement)
+    IsMouseCaptureWithin       Boolean (UIElement)
+    IsStylusCaptured           Boolean (UIElement)
+    IsStylusCaptureWithin      Boolean (UIElement)
+    Stroke                     Brush (Shape)
+    StrokeDashArray            DoubleCollection (Shape)
+    StrokeDashCap              PenLineCap (Shape)
+    StrokeDashOffset           Double (Shape)
+    StrokeEndLineCap           PenLineCap (Shape)
+    StrokeLineJoin             PenLineJoin (Shape)
+    StrokeMiterLimit           Double (Shape)
+    StrokeStartLineCap         PenLineCap (Shape)
+    StrokeThickness            Double (Shape)
+    TouchesCaptured            IEnumerable`1 (UIElement)
+    TouchesCapturedWithin      IEnumerable`1 (UIElement)
+  --- Path: stroke / dash / angle / data surface ---
+    AreAnyTouchesCaptured      Boolean (UIElement)
+    AreAnyTouchesCapturedWithin Boolean (UIElement)
+    Data                       Geometry (Path)
+    IsMouseCaptured            Boolean (UIElement)
+    IsMouseCaptureWithin       Boolean (UIElement)
+    IsStylusCaptured           Boolean (UIElement)
+    IsStylusCaptureWithin      Boolean (UIElement)
+    Stroke                     Brush (Shape)
+    StrokeDashArray            DoubleCollection (Shape)
+    StrokeDashCap              PenLineCap (Shape)
+    StrokeDashOffset           Double (Shape)
+    StrokeEndLineCap           PenLineCap (Shape)
+    StrokeLineJoin             PenLineJoin (Shape)
+    StrokeMiterLimit           Double (Shape)
+    StrokeStartLineCap         PenLineCap (Shape)
+    StrokeThickness            Double (Shape)
+    TouchesCaptured            IEnumerable`1 (UIElement)
+    TouchesCapturedWithin      IEnumerable`1 (UIElement)
+  --- any exported type whose name mentions an arc, a sector or a dash ---
+    DashStyles               [Jalium.UI.Managed] DashStyles
+    DashStyle                [Jalium.UI.Managed] DashStyle < Animatable < Freezable < DependencyObject < DispatcherObject
+    ArcSegment               [Jalium.UI.Managed] ArcSegment < PathSegment < Animatable < Freezable < DependencyObject < DispatcherObject
+    PenDashCap               [Jalium.UI.Managed] PenDashCap < Enum < ValueType
+
+=== B. each candidate geometry: parsed, read back, then measured for ink ===
+  FullRing           size=60x60 shape=Ellipse stroke=#FF101010 thickness=3 dash=null dashOffset=0 dashCap=Flat data=null
+  FullRing: ink=556 bbox=50x50@(5,5) rows=[5:14,6:20,7:24,8:24,9:16,10:14,11:12,12:10,13:10,14:10,15:10,16:10,17:8,18:10,19:8,20:10,21:8,22:8,23:8,24:8,25:8,26:8,27:8,28:6,29:6,30:6,31:6,32:8,33:8,34:8,35:8,36:8,37:8,38:8,39:10,40:8,41:10,42:8,43:10,44:10,45:10,46:10,47:10,48:12,49:14,50:16,51:24,52:24,53:20,54:14]
+  DashArc            size=60x60 shape=Ellipse stroke=#FF101010 thickness=3 dash=[20 200] dashOffset=0 dashCap=Flat data=null
+  DashArc: ink=556 bbox=50x50@(5,5) rows=[5:14,6:20,7:24,8:24,9:16,10:14,11:12,12:10,13:10,14:10,15:10,16:10,17:8,18:10,19:8,20:10,21:8,22:8,23:8,24:8,25:8,26:8,27:8,28:6,29:6,30:6,31:6,32:8,33:8,34:8,35:8,36:8,37:8,38:8,39:10,40:8,41:10,42:8,43:10,44:10,45:10,46:10,47:10,48:12,49:14,50:16,51:24,52:24,53:20,54:14]
+  DashArcMoved       size=60x60 shape=Ellipse stroke=#FF101010 thickness=3 dash=[20 200] dashOffset=40 dashCap=Flat data=null
+  DashArcMoved: ink=556 bbox=50x50@(5,5) rows=[5:14,6:20,7:24,8:24,9:16,10:14,11:12,12:10,13:10,14:10,15:10,16:10,17:8,18:10,19:8,20:10,21:8,22:8,23:8,24:8,25:8,26:8,27:8,28:6,29:6,30:6,31:6,32:8,33:8,34:8,35:8,36:8,37:8,38:8,39:10,40:8,41:10,42:8,43:10,44:10,45:10,46:10,47:10,48:12,49:14,50:16,51:24,52:24,53:20,54:14]
+  MiniLanguageArc    size=60x60 shape=Path stroke=#FF101010 thickness=3 dash=null dashOffset=0 dashCap=Flat data=PathGeometry
+  MiniLanguageArc: ink=620 bbox=54x54@(3,3) rows=[3:10,4:18,5:22,6:26,7:20,8:16,9:14,10:14,11:12,12:11,13:10,14:10,15:10,16:8,17:10,18:8,19:9,20:8,21:10,22:8,23:8,24:8,25:8,26:8,27:8,28:8,29:8,30:8,31:8,32:8,33:8,34:8,35:8,36:8,37:8,38:10,39:8,40:9,41:8,42:10,43:8,44:10,45:10,46:10,47:11,48:12,49:14,50:14,51:16,52:20,53:26,54:22,55:18,56:10]
+  ExplicitArc        size=60x60 shape=Path stroke=#FF101010 thickness=3 dash=null dashOffset=0 dashCap=Flat data=PathGeometry
+  ExplicitArc: no ink
+  EllipseGeometryArc size=60x60 shape=Path stroke=#FF101010 thickness=3 dash=null dashOffset=0 dashCap=Flat data=EllipseGeometry
+  EllipseGeometryArc: ink=628 bbox=54x54@(3,3) rows=[3:10,4:18,5:22,6:26,7:20,8:16,9:16,10:14,11:12,12:12,13:10,14:10,15:10,16:8,17:10,18:8,19:10,20:8,21:10,22:8,23:8,24:8,25:8,26:8,27:8,28:8,29:8,30:8,31:8,32:8,33:8,34:8,35:8,36:8,37:8,38:10,39:8,40:10,41:8,42:10,43:8,44:10,45:10,46:10,47:12,48:12,49:14,50:16,51:16,52:20,53:26,54:22,55:18,56:10]
+  DashCapRound       size=60x60 shape=Ellipse stroke=#FF101010 thickness=6 dash=[18 200] dashOffset=0 dashCap=Round data=null
+  DashCapRound: ink=948 bbox=50x50@(5,5) rows=[5:14,6:20,7:24,8:28,9:30,10:32,11:32,12:24,13:22,14:20,15:18,16:18,17:16,18:16,19:16,20:16,21:16,22:14,23:16,24:14,25:14,26:14,27:14,28:14,29:12,30:12,31:14,32:14,33:14,34:14,35:14,36:16,37:14,38:16,39:16,40:16,41:16,42:16,43:18,44:18,45:20,46:22,47:24,48:32,49:32,50:30,51:28,52:24,53:20,54:14]
+
+=== C. animation and static-change readings on the dash route ===
+  dash offset            StrokeDashOffsetProperty: 0 -> 41.85016 -> 82.91944000000001
+  dash array             StrokeDashArrayProperty: 20,200 -> 20,200 -> 20,200
+  thickness              StrokeThicknessProperty: 3 -> 3.77230725 -> 5.57080675
+  opacity                OpacityProperty: 1 -> 0.32791127500000006 -> 0.5570749
+  width                  WidthProperty: 50 -> 36.3240375 -> 42.6490625
+  static offset 0: ink=816 bbox=44x50@(8,5) rows=[5:12,6:16,7:20,8:24,9:26,10:28,11:22,12:20,13:18,14:16,15:16,16:14,17:14,18:14,19:14,20:14,21:12,22:14,23:14,24:12,25:12,26:14,27:14,28:14,29:14,30:14,31:14,32:14,33:14,34:12,35:12,36:14,37:14,38:12,39:14,40:14,41:14,42:14,43:14,44:16,45:16,46:18,47:20,48:22,49:28,50:26,51:24,52:20,53:16,54:12]
+  static offset 40: ink=816 bbox=44x50@(8,5) rows=[5:12,6:16,7:20,8:24,9:26,10:28,11:22,12:20,13:18,14:16,15:16,16:14,17:14,18:14,19:14,20:14,21:12,22:14,23:14,24:12,25:12,26:14,27:14,28:14,29:14,30:14,31:14,32:14,33:14,34:12,35:12,36:14,37:14,38:12,39:14,40:14,41:14,42:14,43:14,44:16,45:16,46:18,47:20,48:22,49:28,50:26,51:24,52:20,53:16,54:12]
+  static offset 95: ink=816 bbox=44x50@(8,5) rows=[5:12,6:16,7:20,8:24,9:26,10:28,11:22,12:20,13:18,14:16,15:16,16:14,17:14,18:14,19:14,20:14,21:12,22:14,23:14,24:12,25:12,26:14,27:14,28:14,29:14,30:14,31:14,32:14,33:14,34:12,35:12,36:14,37:14,38:12,39:14,40:14,41:14,42:14,43:14,44:16,45:16,46:18,47:20,48:22,49:28,50:26,51:24,52:20,53:16,54:12]
+  read back after writes: StrokeDashOffset=95
+
+=== D. static RotateTransform on a shape ===
+  rotate 0: ink=816 bbox=44x50@(8,5) rows=[5:12,6:16,7:20,8:24,9:26,10:28,11:22,12:20,13:18,14:16,15:16,16:14,17:14,18:14,19:14,20:14,21:12,22:14,23:14,24:12,25:12,26:14,27:14,28:14,29:14,30:14,31:14,32:14,33:14,34:12,35:12,36:14,37:14,38:12,39:14,40:14,41:14,42:14,43:14,44:16,45:16,46:18,47:20,48:22,49:28,50:26,51:24,52:20,53:16,54:12]
+  transform read back Angle=90 Center=25,25
+  rotate 90: ink=814 bbox=51x43@(8,5) rows=[5:15,6:21,7:25,8:29,9:32,10:35,11:27,12:22,13:20,14:19,15:17,16:16,17:16,18:14,19:14,20:14,21:13,22:13,23:14,24:13,25:13,26:13,27:13,28:13,29:13,30:13,31:13,32:14,33:14,34:15,35:15,36:16,37:17,38:19,39:22,40:24,41:31,42:34,43:31,44:28,45:24,46:19,47:11]
+  transform read back Angle=180 Center=25,25
+  rotate 180: ink=808 bbox=43x50@(16,5) rows=[5:11,6:17,7:20,8:23,9:25,10:28,11:23,12:19,13:18,14:17,15:15,16:16,17:15,18:14,19:14,20:13,21:14,22:13,23:13,24:14,25:13,26:13,27:12,28:12,29:12,30:12,31:12,32:12,33:13,34:13,35:14,36:13,37:13,38:14,39:13,40:14,41:14,42:15,43:16,44:15,45:17,46:18,47:19,48:23,49:28,50:25,51:23,52:20,53:17,54:11]
+  mini-language arc, re-read: ink=620 bbox=54x54@(3,3) rows=[3:10,4:18,5:22,6:26,7:20,8:16,9:14,10:14,11:12,12:11,13:10,14:10,15:10,16:8,17:10,18:8,19:9,20:8,21:10,22:8,23:8,24:8,25:8,26:8,27:8,28:8,29:8,30:8,31:8,32:8,33:8,34:8,35:8,36:8,37:8,38:10,39:8,40:9,41:8,42:10,43:8,44:10,45:10,46:10,47:11,48:12,49:14,50:14,51:16,52:20,53:26,54:22,55:18,56:10]
+
+=== E. repaint and motion routes for an arc of our own making ===
+  mounted: cell=60x60 arc=Path data=PathGeometry
+  E0 markup 359.9-degree arc: ink=620 bbox=54x54@(3,3) rows=[3:10,4:18,5:22,6:26,7:20,8:16,9:14,10:14,11:12,12:11,13:10,14:10,15:10,16:8,17:10,18:8,19:9,20:8,21:10,22:8,23:8,24:8,25:8,26:8,27:8,28:8,29:8,30:8,31:8,32:8,33:8,34:8,35:8,36:8,37:8,38:10,39:8,40:9,41:8,42:10,43:8,44:10,45:10,46:10,47:11,48:12,49:14,50:14,51:16,52:20,53:26,54:22,55:18,56:10]
+  Geometry.Parse(string): present
+  PathGeometry.Parse(string): ABSENT
+  StreamGeometry.Parse(string): ABSENT
+  assigned 90-degree: data read back as PathGeometry
+  E2 code Data 90-degree: ink=169 bbox=29x29@(3,3) rows=[3:2,4:4,5:4,6:4,7:4,8:4,9:4,10:4,11:4,12:4,13:5,14:4,15:5,16:4,17:5,18:4,19:5,20:5,21:5,22:6,23:6,24:7,25:8,26:8,27:10,28:14,29:13,30:11,31:6]
+  assigned 359.9-degree: data read back as PathGeometry
+  E2 code Data 359.9-degree: ink=620 bbox=54x54@(3,3) rows=[3:10,4:18,5:22,6:26,7:20,8:16,9:14,10:14,11:12,12:11,13:10,14:10,15:10,16:8,17:10,18:8,19:9,20:8,21:10,22:8,23:8,24:8,25:8,26:8,27:8,28:8,29:8,30:8,31:8,32:8,33:8,34:8,35:8,36:8,37:8,38:10,39:8,40:9,41:8,42:10,43:8,44:10,45:10,46:10,47:11,48:12,49:14,50:14,51:16,52:20,53:26,54:22,55:18,56:10]
+  assigned 135-degree: data read back as PathGeometry
+  E2 code Data 135-degree: ink=248 bbox=30x47@(10,3) rows=[3:2,4:4,5:5,6:5,7:5,8:4,9:5,10:5,11:4,12:5,13:4,14:4,15:5,16:4,17:4,18:4,19:4,20:4,21:4,22:4,23:4,24:4,25:4,26:4,27:4,28:4,29:4,30:5,31:4,32:4,33:5,34:4,35:5,36:5,37:4,38:5,39:5,40:5,41:6,42:6,43:7,44:8,45:10,46:15,47:14,48:11,49:7]
+    point ctor Double -> 30,5
+    point ctor Double -> 5,30
+  E3 built geometry: figures=1 segments=1 segmentPoint=5,30
+  E3 code-built PathFigure+ArcSegment: ink=169 bbox=29x29@(3,3) rows=[3:6,4:11,5:13,6:14,7:10,8:8,9:8,10:7,11:6,12:6,13:5,14:5,15:5,16:4,17:5,18:4,19:5,20:4,21:5,22:4,23:4,24:4,25:4,26:4,27:4,28:4,29:4,30:4,31:2]
+  after 10 frames Angle read back 370
+  E4 loop frame 10: ink=159 bbox=31x25@(0,8) rows=[8:2,9:4,10:4,11:4,12:4,13:4,14:5,15:4,16:5,17:4,18:5,19:4,20:5,21:5,22:5,23:5,24:6,25:6,26:7,27:8,28:11,29:17,30:15,31:12,32:8]
+  after 30 frames Angle read back 1110
+  E4 loop frame 30: ink=113 bbox=25x17@(0,17) rows=[17:1,18:3,19:4,20:5,21:4,22:5,23:5,24:5,25:6,26:6,27:7,28:8,29:10,30:15,31:13,32:10,33:6]
+  E5 figures read back: PathFigureCollection count=0
+  E5 PathFigure.Segments markup: no ink
+
+theme dictionaries=57
+
+=== F. the base type and the geometry surface an own control has to compile against ===
+  --- RangeBase (abstract, Public, Abstract, BeforeFieldInit) ---
+    ctor() protected
+    Double         GetValueRatio() protected
+    Void           NotifyCoercedValueChanged(Double, Double, Double, Double) protected
+    Void           OnMaximumChanged(Double, Double) protected virtual
+    Void           OnMinimumChanged(Double, Double) protected virtual
+    Void           OnValueChanged(Double, Double) protected virtual
+    prop Double             LargeChange public
+    prop Double             Maximum public
+    prop Double             Minimum public
+    prop Double             SmallChange public
+    prop Double             Value public
+  --- Geometry (abstract, Public, Abstract, BeforeFieldInit) ---
+    ctor() protected
+    Geometry       Clone() public
+    Geometry       CloneCurrentValue() public
+    Boolean        FillContains(Point) public virtual
+    Boolean        FillContains(Point, Double, ToleranceType) public virtual
+    Boolean        FillContains(Geometry) public
+    Boolean        FillContains(Geometry, Double, ToleranceType) public
+    IntersectionDetail FillContainsWithDetail(Geometry) public virtual
+    IntersectionDetail FillContainsWithDetail(Geometry, Double, ToleranceType) public virtual
+    Double         GetArea() public virtual
+    Double         GetArea(Double, ToleranceType) public virtual
+    PathGeometry   GetFlattenedPathGeometry() public virtual
+    PathGeometry   GetFlattenedPathGeometry(Double, ToleranceType) public virtual
+    PathGeometry   GetOutlinedPathGeometry() public
+    PathGeometry   GetOutlinedPathGeometry(Double, ToleranceType) public virtual
+    Rect           GetRenderBounds(Pen) public
+    Rect           GetRenderBounds(Pen, Double, ToleranceType) public virtual
+    PathGeometry   GetWidenedPathGeometry(Pen) public
+    PathGeometry   GetWidenedPathGeometry(Pen, Double, ToleranceType) public virtual
+    Boolean        IsEmpty() public virtual
+    Boolean        MayHaveCurves() public virtual
+    Boolean        ShouldSerializeTransform() public
+    Boolean        StrokeContains(Pen, Point) public virtual
+    Boolean        StrokeContains(Pen, Point, Double, ToleranceType) public
+    IntersectionDetail StrokeContainsWithDetail(Pen, Geometry) public virtual
+    IntersectionDetail StrokeContainsWithDetail(Pen, Geometry, Double, ToleranceType) public
+    String         System.IFormattable.ToString(String, IFormatProvider) protected virtual
+    String         ToString() public virtual
+    String         ToString(IFormatProvider) public
+    Point          TransformPoint(Point) protected
+    prop Rect               Bounds public readonly
+    prop Transform          Transform public
+  --- RotateTransform (concrete, Public, Sealed, BeforeFieldInit) ---
+    ctor() public
+    ctor(Double) public
+    ctor(Double, Double, Double) public
+    RotateTransform Clone() public
+    RotateTransform CloneCurrentValue() public
+    Freezable      CreateInstanceCore() protected virtual
+    prop Double             Angle public
+    prop Double             CenterX public
+    prop Double             CenterY public
+    prop Matrix             Value public readonly
+  --- Path (concrete, Public, Sealed) ---
+    ctor() public
+    Size           ArrangeOverride(Size) protected virtual
+    Void           EnsureRenderedGeometry() protected
+    Size           GetNaturalSize() protected
+    Pen            GetOrCreatePen() protected
+    Size           MeasureOverride(Size) protected virtual
+    Void           OnRender(DrawingContext) protected virtual
+    prop Geometry           Data public
+    prop Geometry           DefiningGeometry protected readonly
+    prop Transform          GeometryTransform public readonly
+    prop Geometry           RenderedGeometry public readonly
+  --- Shape (abstract, Public, Abstract, BeforeFieldInit) ---
+    ctor() protected
+    Double         GetStrokeThickness() protected
+    Void           OnStrokeDashArrayChanged(Object, EventArgs) protected
+    prop Geometry           DefiningGeometry protected readonly
+    prop Brush              Fill public
+    prop Transform          GeometryTransform public readonly
+    prop Boolean            IsPenNoOp protected readonly
+    prop Geometry           RenderedGeometry public readonly
+    prop Stretch            Stretch public
+    prop Brush              Stroke public
+    prop DoubleCollection   StrokeDashArray public
+    prop PenLineCap         StrokeDashCap public
+    prop Double             StrokeDashOffset public
+    prop PenLineCap         StrokeEndLineCap public
+    prop PenLineJoin        StrokeLineJoin public
+    prop Double             StrokeMiterLimit public
+    prop PenLineCap         StrokeStartLineCap public
+    prop Double             StrokeThickness public

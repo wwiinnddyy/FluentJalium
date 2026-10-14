@@ -1,0 +1,9 @@
+round1 == surfaces area 1877x1240 dark-in-both 0 light-in-both 0
+round1 == settings area 1877x1240 dark-in-both 0 light-in-both 0
+round2 == surfaces area 1877x1240 dark-in-both 0 light-in-both 0
+round2 == settings area 1877x1240 dark-in-both 0 light-in-both 0
+=== artifacts
+-rw-r--r-- 1 lincu 197609  10850 Sep 23 17:00 probe-r1-settings-mask.png
+-rw-r--r-- 1 lincu 197609  10850 Sep 23 16:59 probe-r1-surfaces-mask.png
+-rw-r--r-- 1 lincu 197609  10850 Sep 23 17:01 probe-r2-settings-mask.png
+-rw-r--r-- 1 lincu 197609  10850 Sep 23 17:00 probe-r2-surfaces-mask.png

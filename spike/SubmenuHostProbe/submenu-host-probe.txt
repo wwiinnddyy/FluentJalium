@@ -1,0 +1,56 @@
+=== ambient handles, and the submenu read after each neighbour teardown ===
+
+P  baseline                 : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+   P read: IsSubmenuOpen before=False after=True popupOpen=True writes=1
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.MutateValue(DependencyProperty dp, ValueMutation mutateCore, Boolean notifyBinding, Boolean allowAutoTransition) <- at Jalium.UI.DependencyObject.SetValueCore(DependencyProperty dp, Object value) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e)
+
+F  flyout shown+hidden      : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+   after flyout teardown    : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+   F read: IsSubmenuOpen before=False after=True popupOpen=True writes=1
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.MutateValue(DependencyProperty dp, ValueMutation mutateCore, Boolean notifyBinding, Boolean allowAutoTransition) <- at Jalium.UI.DependencyObject.SetValueCore(DependencyProperty dp, Object value) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e)
+
+N  neighbour shown          : active=0xD90FC4 foreground=0x7014A host=0xC20E7E mainWindow=host
+   neighbour closed         : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+   N read: IsSubmenuOpen before=False after=True popupOpen=True writes=1
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.MutateValue(DependencyProperty dp, ValueMutation mutateCore, Boolean notifyBinding, Boolean allowAutoTransition) <- at Jalium.UI.DependencyObject.SetValueCore(DependencyProperty dp, Object value) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e)
+
+A  host.Activate()          : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+   A read: IsSubmenuOpen before=False after=True popupOpen=True writes=1
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.MutateValue(DependencyProperty dp, ValueMutation mutateCore, Boolean notifyBinding, Boolean allowAutoTransition) <- at Jalium.UI.DependencyObject.SetValueCore(DependencyProperty dp, Object value) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e)
+
+=== how many frames between mounting the Menu and the click landing ===
+   0 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+   1 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+   2 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+   3 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+   4 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+   6 frame(s) before the click: realized=parent=StackPanel children=0 read=True writes=1
+
+=== the submenu is up, then a ContentDialog is shown on the same thread ===
+   submenu up            : read=True popupOpen=True
+   dialog shown          : dialogVisible=Visible read=False popupOpen=False writes=10
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e) <- at Jalium.UI.Input.MouseButtonEventArgs.InvokeEventHandler(Delegate handler, Object target) <- at Jalium.UI.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+
+=== the submenu is up, then another window takes the foreground ===
+   roots left open by earlier readings: 0 (closed before this reading)
+   submenu up            : read=True popupOpen=True
+   neighbour takes focus  : active=0x1230EF0 foreground=0x7014A host=0xC20E7E mainWindow=host read=False popupOpen=False writes=2
+      IsSubmenuOpen False->True :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnMouseDownHandler(Object sender, MouseButtonEventArgs e) <- at Jalium.UI.Input.MouseButtonEventArgs.InvokeEventHandler(Delegate handler, Object target) <- at Jalium.UI.RoutedEventArgs.InvokeHandler(Delegate handler, Object target)
+      IsSubmenuOpen True->False :: at Jalium.UI.DependencyObject.OnPropertyChanged(DependencyPropertyChangedEventArgs e) <- at Jalium.UI.DependencyObject.SetValue(DependencyProperty dp, Object value) <- at Jalium.UI.Controls.MenuItem.set_IsSubmenuOpen(Boolean value) <- at Jalium.UI.Controls.MenuItem.OnSubmenuPopupClosed(Object sender, EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.OnClosed(EventArgs e) <- at Jalium.UI.Controls.Primitives.Popup.ClosePopup()
+   back on the host       : active=0xC20E7E foreground=0x7014A host=0xC20E7E mainWindow=host
+
+=== the submenu is up, then a flyout's own window is torn down around it ===
+   roots left open by earlier readings: 0 (closed before this reading)
+   submenu up            : read=True popupOpen=True
+   flyout over the submenu: flyoutOpen=True read=True writes=0
+   flyout hidden         : read=True popupOpen=True writes=0
+

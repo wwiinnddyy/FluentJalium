@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway TabView / TabControl census. Not referenced by FluentJalium.slnx.
+       The stage-5 objective says TabView gets its own type, but the last three batches proved the opposite
+       assumption twice: InfoBar "cannot be templated" turned out to be one unopened protected switch, and the
+       TreeView batch found the runtime does export the native type. So nothing here is typed against a guessed
+       class: the probe reflects by simple name, mounts what exists through the parser, swaps a template into it
+       and tries to move selection without OS input - all before any markup ships. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>TabViewProbe</RootNamespace>
+    <AssemblyName>TabViewProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,204 @@
+=== 1. every ldstr that loads one of the target names, on the shipped assemblies ===
+assemblies: Jalium.UI.Managed, Jalium.UI.Xaml
+HIT Jalium.UI.Managed!Jalium.UI.SystemFonts.get_CaptionFontSizeKey [static] -> CaptionFontSize
+     full literals: CaptionFontSize
+HIT Jalium.UI.Managed!Jalium.UI.SystemFonts.TryGetResource [static] -> CaptionFontSize
+     full literals: IconFontSize , MenuFontSize , IconFontFamily , IconFontWeight , MenuFontFamily , MenuFontWeight , StatusFontSize , IconFontStyle , MenuFontStyle , IconFontTextD...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Colors_jalxaml.Build [static] -> TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent
+     full literals: Key , Dark , TextFillColorPrimary , #F5F5F7 , TextFillColorSecondary , #D1D1D6 , TextFillColorTertiary , #AEAEB2 , TextFillColorDisabled , #636366 , TextFillCol...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Button_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , ControlBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Calendar_jalxaml.Build [static] -> TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent
+     full literals: Property , IsMouseOver , True , BorderBrush , Value , ControlBorderHover , Triggers , IsKeyboardFocusWithin , ControlBorderFocused , IsEnabled , False , Backgro...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Containers_jalxaml.Build [static] -> CaptionFontSize
+     full literals: Property , BorderBrush , Value , ControlBorder , Foreground , TextPrimary , Padding , 14,10,14,10 , CornerRadius , 12 , MinHeight , 52 , ToastForeground , 14 , ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml.Build [static] -> TextOnAccent
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml.Build [static] -> TextOnAccent | BodyFontFamily
+     full literals: Key , ContentDialogAccentButtonStyle , Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , AccentBrush , TextOnAccent , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DiffViewer_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DockLayout_jalxaml.Build [static] -> CaptionFontSize
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , DockContentBackground , TabStripBackground , DockTabStripBackground , TabStripBord...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_HexEditor_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_JsonTreeViewer_jalxaml.Build [static] -> BodyFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Navigation_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , HorizontalContentAlignment , Stretch , VerticalConte...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Primitives_jalxaml.Build [static] -> CaptionFontSize | CaptionFontSize
+     full literals: Key , DefaultFocusVisualStyle , Property , IsHitTestVisible , False , Focusable , BorderBrush , Value , FocusStrokeColorOuterBrush , BorderThickness , 3 , Templ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_PropertyGrid_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Key , PropertyGridToolbarButtonStyle , Property , IsMouseOver , True , Foreground , Value , TextFillColorPrimaryBrush , Triggers , Background , SubtleFillColorT...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TabControl_jalxaml.Build [static] -> CaptionFontSize | BodyFontFamily | CaptionFontSize | BodyFontFamily
+     full literals: Property , IsKeyboardFocused , True , TabStripBorderBrush , Value , ControlBorderFocused , Triggers , IsEnabled , False , Background , ControlBackgroundDisabled...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Terminal_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , TerminalBackground , TerminalForeground , BorderBrush , SurfaceStroke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TextControls_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TitleBar_jalxaml.Build [static] -> CaptionFontSize | BodyFontFamily | TextOnAccent
+     full literals: Property , Background , Value , TitleBarBackground , Foreground , TitleBarText , FontSize , CaptionFontSize , FontFamily , BodyFontFamily , FontWeight , Medium ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml.Build [static] -> TextOnAccent | BodyFontFamily | TextOnAccent
+     full literals: Property , IsChecked , True , Foreground , Value , TextOnAccent , Triggers , IsEnabled , False , TextDisabled , Background , ControlBackground , TextPrimary , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml.Build [static] -> TextOnAccent
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Windows_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , {x:Null}
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.ResolveSelectedTextBrush -> TextOnAccent
+     full literals: TextOnAccent
+HIT Jalium.UI.Managed!Jalium.UI.Controls.SwipeControl.ResolveSwipeItemForeground -> TextOnAccent
+     full literals: TextOnAccent , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.BuildHighContrastVariant [static] -> TextOnAccent
+     full literals: SystemAccentColor , SystemAccentColorLight1 , SystemAccentColorLight2 , SystemAccentColorLight3 , SystemAccentColorDark1 , SystemAccentColorDark2 , SystemAccent...
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.BuildTypographyDictionary [static] -> DisplayFontFamily | BodyFontFamily | MonoFontFamily | BodyFontSize | CaptionFontSize | SmallFontSize
+     full literals: DisplayFontFamily , BodyFontFamily , MonoFontFamily , BodyFontSize , CaptionFontSize , SmallFontSize
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveSelectedForegroundBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSelectionIndicatorBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__3 -> CaptionFontSize
+     full literals: Name , PART_HeaderBorder , Background , BorderBrush , ControlBorder , Padding , ColumnDefinitions , PART_SortIndicator , Foreground , TextSecondary , FontSize ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> BodyFontFamily
+     full literals: Name , PART_Root , PART_Overlay , Background , SmokeFillColorDefaultBrush , PART_DialogCard , BackdropEffect , BorderBrush , BorderThickness , CornerRadius , Co...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> CaptionFontSize
+     full literals: Name , Root , Background , CornerRadius , Padding , IconPresenter , Content , Icon , LabelText , Text , Label , FontSize , CaptionFontSize , Foreground
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> CaptionFontSize
+     full literals: Name , Root , Background , CornerRadius , Padding , IconPresenter , Content , Icon , LabelText , Text , Label , FontSize , CaptionFontSize , Foreground , Checke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextOnAccent | TextOnAccent
+     full literals: Name , RootBorder , CheckBoxBorder , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , BorderThickness ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> TextOnAccent
+     full literals: Name , RootBorder , OuterCircle , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , PressedOverlay , Fil...
+
+=== 2. per-target hit count (0 means no by-name read in code on this runtime) and which types hold it ===
+CaptionFontSize             13  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Containers_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DockLayout_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_...
+BodyFontSize                 1  in Jalium.UI.Controls.Themes.ThemeManager
+SmallFontSize                1  in Jalium.UI.Controls.Themes.ThemeManager
+DisplayFontFamily            1  in Jalium.UI.Controls.Themes.ThemeManager
+BodyFontFamily              28  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Button_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml+<>c__DisplayClass1_0, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Manag...
+MonoFontFamily               5  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DiffViewer_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_HexEditor_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Terminal_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Cont...
+CaptionTextBlockFontSize     0  in -
+TextOnAccent                24  in Jalium.UI.Controls.Calendar, Jalium.UI.Controls.Primitives.CalendarDayButton, Jalium.UI.Controls.Primitives.DataGridRowHeader, Jalium.UI.Controls.SwipeControl, Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Colors_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Calendar_jalxaml, Jalium.UI.Managed.__J...
+
+=== 3. is the name ALSO a direct ThemeColors member? an alias row cannot reach that shape ===
+holder Jalium.UI.Controls.ThemeColors: absent
+holder Jalium.UI.Controls.Themes.ThemeColors:
+  CaptionFontSize          property=False field=False read=null value=-
+  BodyFontSize             property=False field=False read=null value=-
+  SmallFontSize            property=False field=False read=null value=-
+  DisplayFontFamily        property=False field=False read=null value=-
+  BodyFontFamily           property=False field=False read=null value=-
+  MonoFontFamily           property=False field=False read=null value=-
+  CaptionTextBlockFontSize property=False field=False read=null value=-
+  TextOnAccent             property=False field=False read=null value=-
+=== 1. every ldstr that loads one of the target names, on the shipped assemblies ===
+assemblies: Jalium.UI.Managed, Jalium.UI.Xaml
+HIT Jalium.UI.Managed!Jalium.UI.SystemFonts.get_CaptionFontSizeKey [static] -> CaptionFontSize
+     full literals: CaptionFontSize
+HIT Jalium.UI.Managed!Jalium.UI.SystemFonts.TryGetResource [static] -> CaptionFontSize
+     full literals: IconFontSize , MenuFontSize , IconFontFamily , IconFontWeight , MenuFontFamily , MenuFontWeight , StatusFontSize , IconFontStyle , MenuFontStyle , IconFontTextD...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Colors_jalxaml.Build [static] -> TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent
+     full literals: Key , Dark , TextFillColorPrimary , #F5F5F7 , TextFillColorSecondary , #D1D1D6 , TextFillColorTertiary , #AEAEB2 , TextFillColorDisabled , #636366 , TextFillCol...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Button_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , ControlBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Calendar_jalxaml.Build [static] -> TextOnAccent | TextOnAccent | TextOnAccent | TextOnAccent
+     full literals: Property , IsMouseOver , True , BorderBrush , Value , ControlBorderHover , Triggers , IsKeyboardFocusWithin , ControlBorderFocused , IsEnabled , False , Backgro...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Containers_jalxaml.Build [static] -> CaptionFontSize
+     full literals: Property , BorderBrush , Value , ControlBorder , Foreground , TextPrimary , Padding , 14,10,14,10 , CornerRadius , 12 , MinHeight , 52 , ToastForeground , 14 , ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml.Build [static] -> TextOnAccent
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml.Build [static] -> TextOnAccent | BodyFontFamily
+     full literals: Key , ContentDialogAccentButtonStyle , Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , AccentBrush , TextOnAccent , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DiffViewer_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DockLayout_jalxaml.Build [static] -> CaptionFontSize
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , DockContentBackground , TabStripBackground , DockTabStripBackground , TabStripBord...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_HexEditor_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_JsonTreeViewer_jalxaml.Build [static] -> BodyFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.65 , Triggers , Background , LayerFillColorDefaultBrush , TextFillColorPrimaryBru...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Navigation_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , HorizontalContentAlignment , Stretch , VerticalConte...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Primitives_jalxaml.Build [static] -> CaptionFontSize | CaptionFontSize
+     full literals: Key , DefaultFocusVisualStyle , Property , IsHitTestVisible , False , Focusable , BorderBrush , Value , FocusStrokeColorOuterBrush , BorderThickness , 3 , Templ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_PropertyGrid_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Key , PropertyGridToolbarButtonStyle , Property , IsMouseOver , True , Foreground , Value , TextFillColorPrimaryBrush , Triggers , Background , SubtleFillColorT...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TabControl_jalxaml.Build [static] -> CaptionFontSize | BodyFontFamily | CaptionFontSize | BodyFontFamily
+     full literals: Property , IsKeyboardFocused , True , TabStripBorderBrush , Value , ControlBorderFocused , Triggers , IsEnabled , False , Background , ControlBackgroundDisabled...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Terminal_jalxaml.Build [static] -> MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , TerminalBackground , TerminalForeground , BorderBrush , SurfaceStroke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TextControls_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | BodyFontFamily | MonoFontFamily
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , ControlBorder , Borde...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TitleBar_jalxaml.Build [static] -> CaptionFontSize | BodyFontFamily | TextOnAccent
+     full literals: Property , Background , Value , TitleBarBackground , Foreground , TitleBarText , FontSize , CaptionFontSize , FontFamily , BodyFontFamily , FontWeight , Medium ...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml.Build [static] -> TextOnAccent | BodyFontFamily | TextOnAccent
+     full literals: Property , IsChecked , True , Foreground , Value , TextOnAccent , Triggers , IsEnabled , False , TextDisabled , Background , ControlBackground , TextPrimary , B...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_TreeDataGrid_jalxaml.Build [static] -> TextOnAccent
+     full literals: Property , IsEnabled , False , Foreground , Value , TextDisabled , Opacity , 0.56 , Triggers , Background , SurfaceBackground , TextPrimary , BorderBrush , Cont...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Windows_jalxaml.Build [static] -> BodyFontFamily | BodyFontFamily | BodyFontFamily
+     full literals: Property , Background , Value , WindowBackground , Foreground , TextPrimary , FontFamily , BodyFontFamily , {x:Null}
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Calendar.ResolveSelectedTextBrush -> TextOnAccent
+     full literals: TextOnAccent
+HIT Jalium.UI.Managed!Jalium.UI.Controls.SwipeControl.ResolveSwipeItemForeground -> TextOnAccent
+     full literals: TextOnAccent , TextPrimary
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.BuildHighContrastVariant [static] -> TextOnAccent
+     full literals: SystemAccentColor , SystemAccentColorLight1 , SystemAccentColorLight2 , SystemAccentColorLight3 , SystemAccentColorDark1 , SystemAccentColorDark2 , SystemAccent...
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Themes.ThemeManager.BuildTypographyDictionary [static] -> DisplayFontFamily | BodyFontFamily | MonoFontFamily | BodyFontSize | CaptionFontSize | SmallFontSize
+     full literals: DisplayFontFamily , BodyFontFamily , MonoFontFamily , BodyFontSize , CaptionFontSize , SmallFontSize
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.CalendarDayButton.ResolveSelectedForegroundBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Controls.Primitives.DataGridRowHeader.ResolveSelectionIndicatorBrush -> TextOnAccent
+     full literals: TextOnAccent , TextOnAccentFillColorPrimaryBrush
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0.<Build>b__3 -> CaptionFontSize
+     full literals: Name , PART_HeaderBorder , Background , BorderBrush , ControlBorder , Padding , ColumnDefinitions , PART_SortIndicator , Foreground , TextSecondary , FontSize ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> BodyFontFamily
+     full literals: Name , PART_Root , PART_Overlay , Background , SmokeFillColorDefaultBrush , PART_DialogCard , BackdropEffect , BorderBrush , BorderThickness , CornerRadius , Co...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml+<>c__DisplayClass1_0.<Build>b__0 -> CaptionFontSize
+     full literals: Name , Root , Background , CornerRadius , Padding , IconPresenter , Content , Icon , LabelText , Text , Label , FontSize , CaptionFontSize , Foreground
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_MenusToolbars_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> CaptionFontSize
+     full literals: Name , Root , Background , CornerRadius , Padding , IconPresenter , Content , Icon , LabelText , Text , Label , FontSize , CaptionFontSize , Foreground , Checke...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__1 -> TextOnAccent | TextOnAccent
+     full literals: Name , RootBorder , CheckBoxBorder , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , BorderThickness ,...
+HIT Jalium.UI.Managed!Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_ToggleControls_jalxaml+<>c__DisplayClass1_0.<Build>b__2 -> TextOnAccent
+     full literals: Name , RootBorder , OuterCircle , TransitionProperty , Background, BorderBrush , TransitionDuration , 0:0:0.12 , Background , BorderBrush , PressedOverlay , Fil...
+
+=== 2. per-target hit count (0 means no by-name read in code on this runtime) and which types hold it ===
+CaptionFontSize             13  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Containers_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DataGrid_jalxaml+<>c__DisplayClass1_0, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DockLayout_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_...
+BodyFontSize                 1  in Jalium.UI.Controls.Themes.ThemeManager
+SmallFontSize                1  in Jalium.UI.Controls.Themes.ThemeManager
+DisplayFontFamily            1  in Jalium.UI.Controls.Themes.ThemeManager
+BodyFontFamily              28  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Button_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Dialogs_jalxaml+<>c__DisplayClass1_0, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Manag...
+MonoFontFamily               5  in Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_DiffViewer_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_HexEditor_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Terminal_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Cont...
+CaptionTextBlockFontSize     0  in -
+TextOnAccent                24  in Jalium.UI.Controls.Calendar, Jalium.UI.Controls.Primitives.CalendarDayButton, Jalium.UI.Controls.Primitives.DataGridRowHeader, Jalium.UI.Controls.SwipeControl, Jalium.UI.Controls.Themes.ThemeManager, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Colors_jalxaml, Jalium.UI.Managed.__JalxamlGenerated._Dict_Jalium_UI_Managed_Themes_Controls_Calendar_jalxaml, Jalium.UI.Managed.__J...
+
+=== 3. is the name ALSO a direct ThemeColors member? an alias row cannot reach that shape ===
+holder Jalium.UI.Controls.ThemeColors: absent
+holder Jalium.UI.Controls.Themes.ThemeColors:
+  CaptionFontSize          property=False field=False read=null value=-
+  BodyFontSize             property=False field=False read=null value=-
+  SmallFontSize            property=False field=False read=null value=-
+  DisplayFontFamily        property=False field=False read=null value=-
+  BodyFontFamily           property=False field=False read=null value=-
+  MonoFontFamily           property=False field=False read=null value=-
+  CaptionTextBlockFontSize property=False field=False read=null value=-
+  TextOnAccent             property=False field=False read=null value=-
+
+### 3b. which static holder exposes the name directly — a read an alias row cannot redirect ###
+CaptionFontSize            ThemeColors=-  SystemFonts:prop=Double 12  ThemeManager=-  SystemParameters=-
+BodyFontSize               ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+SmallFontSize              ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+DisplayFontFamily          ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+BodyFontFamily             ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+MonoFontFamily             ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+CaptionTextBlockFontSize   ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+TextOnAccent               ThemeColors=-  SystemFonts=-  ThemeManager=-  SystemParameters=-
+
+### 4. what the name resolves to at application scope, and with what CLR type ###
+CaptionFontSize            Double 10
+BodyFontSize               Double 12
+SmallFontSize              Double 8
+DisplayFontFamily          FontFamily Microsoft YaHei UI
+BodyFontFamily             FontFamily Microsoft YaHei UI
+MonoFontFamily             FontFamily Cascadia Code
+CaptionTextBlockFontSize   null
+TextOnAccent               SolidColorBrush ##FFFFFFFF instance=0x343CC64

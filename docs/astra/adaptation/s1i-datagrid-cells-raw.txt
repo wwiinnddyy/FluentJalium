@@ -1,0 +1,44 @@
+theme dictionaries=46
+
+=== G. bound cell content under Astra's style ===
+  our DataGrid style live=True
+  cell content=TextBlock size=120x32 selected=False padding=10,5,10,5 minH=32 hca=Left text="Row 1" textSize=43.45x19.78 textFg=#FFFFFFFF textFs=14
+  cell content=TextBlock size=120x32 selected=False padding=10,5,10,5 minH=32 hca=Left text="10" textSize=18.42x19.78 textFg=#FFFFFFFF textFs=14
+  cell content=TextBlock size=120x32 selected=False padding=10,5,10,5 minH=32 hca=Left text="Row 2" textSize=43.45x19.78 textFg=#FFFFFFFF textFs=14
+  cell content=TextBlock size=120x32 selected=False padding=10,5,10,5 minH=32 hca=Left text="20" textSize=18.42x19.78 textFg=#FFFFFFFF textFs=14
+  content parent chain: TextBlock#6295
+  live presenter=ContentPresenter#65862 itsContentSame=yes
+  cell template: type=Jalium.UI.Controls.ControlTemplate hash=3718621 target=Jalium.UI.Controls.DataGridCell
+    xaml=<Border xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="PART_CellBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">         <ContentPresenter Name="ContentPresenter" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" ContentStringFormat="{TemplateBinding ContentStringFormat}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" RecognizesAccessKey="True" />       </Border>
+  row template: type=Jalium.UI.Controls.ControlTemplate hash=43756808
+    xaml=
+  auto-generated grid: cells=4 presenters=8 texts=10
+    cell[0] content=TextBlock
+    DataGridCell  size=120x32 desired=120,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x31 desired=68.4462890625,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+  first cell tree (bound columns):
+    DataGridCell  size=120x32 desired=120,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x31 desired=68.4462890625,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+  first row tree (bound columns):
+    DataGridRow  size=406x32 desired=260,32
+    Border 'PART_RowBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,0,1 size=406x32 desired=260,33
+    StackPanel 'PART_CellsPanel'  size=406x31 desired=260,32
+    StackPanel  size=406x32 desired=260,32
+    DataGridCell  size=120x32 desired=120,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x31 desired=68.4462890625,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=47.45x19.78 desired=47.4462890625,19.7802734375
+    TextBlock text="Row 1" size=43.45x19.78 desired=47.4462890625,19.7802734375
+    DataGridCell  size=120x32 desired=120,32
+    Border 'PART_CellBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,0 size=119x31 desired=43.419921875,29.7802734375
+    ContentPresenter 'ContentPresenter' content=Jalium.UI.Controls.TextBlock vis=Visible size=22.42x19.78 desired=22.419921875,19.7802734375
+    TextBlock text="10" size=18.42x19.78 desired=22.419921875,19.7802734375
+    DataGridRowHeader  size=20x32 desired=20,32
+    Border 'PART_RowHeaderBorder' bg=#00FFFFFF r=0,0,0,0 bt=0,0,1,1 size=20x32 desired=21.0400390625,32
+    Grid  size=19x31 desired=20.0400390625,31
+    ContentPresenter 'ContentPresenter' content=Row { Name = Row 1, Value = 10 } vis=Visible size=19x31 desired=20.0400390625,31
+    TextBlock text="Row { Name = Row 1, Value = 10 }" size=19x31 desired=20.0400390625,31
+    DataGridDetailsPresenter content=null vis=Collapsed size=0x0 desired=0,0

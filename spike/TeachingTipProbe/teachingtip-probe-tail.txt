@@ -1,0 +1,21 @@
+theme dictionaries=35 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== D. tail geometry, GridLength rows, trigger writes and popup placement ===
+  dictionary parsed; rows: TailShort=8, TailMargin=10
+  merge into a shown tree -> ok
+  D1: Jalium.UI.Shapes.Polygon Shape built
+      .Points = 0,0 10,10 20,0
+      .Fill = SolidColorBrush(#FF336699)
+      .Stroke = SolidColorBrush(#FFAABBCC)
+      .StrokeThickness = 1
+  D2: column widths via {ThemeResource} = * | * | * | * | *   (upstream wants 8 | 10 | * | 10 | 8)
+  D3: resting Points=0,0 10,10 20,0 Grid.Row=4 Grid.Column=2
+  D3: ok
+      after Tag=X -> Points=10,0 0,10 10,20 Grid.Row=2 Grid.Column=0
+  D4: Popup.Placement is Jalium.UI.Controls.Primitives.PlacementMode with Absolute, Relative, Bottom, Center, Right, AbsolutePoint, RelativePoint, Mouse, MousePoint, Left, Top, Custom
+      reads back Bottom
+      .HorizontalOffset = 3
+      .VerticalOffset = -4
+      .AllowsTransparency = True
+      .PlacementTarget = null
+      card: not realized (Popup.Placement=Bottom was set from markup, IsOpen was not)

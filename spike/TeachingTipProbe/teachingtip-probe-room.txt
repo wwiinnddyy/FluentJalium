@@ -1,0 +1,6 @@
+theme dictionaries=36 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== G. layout room: where the rule under a stacked tip lands ===
+  closed: tip desired 0x0 actual 500x0 | below x=0 y=20 | stack x=103.14 y=216
+  open:   tip desired 0x0 actual 500x0 | below x=0 y=20
+  re-opened with a target: tip desired 0x0 actual 500x0 | below x=0 y=20

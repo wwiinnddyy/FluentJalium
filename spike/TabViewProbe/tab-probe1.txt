@@ -1,0 +1,234 @@
+=== R. framework rows, before Astra is applied ===
+  dictionaries walked=4 keys=0: 
+  upstream names by lookup: TabViewBackground=null  TabViewItemHeaderBackgroundSelected=null  TabViewItemMinHeight=null  TabViewHeaderPadding=null
+=== R. framework rows, after Astra is applied ===
+  dictionaries walked=47 keys=0: 
+  upstream names by lookup: TabViewBackground=null  TabViewItemHeaderBackgroundSelected=null  TabViewItemMinHeight=null  TabViewHeaderPadding=null
+  Astra dictionaries=42
+
+=== Q. what the runtime exports for tabs ===
+  Jalium.UI.Documents.Table : Block : TextElement : FrameworkContentElement : ContentElement  (abstract=False, sealed=True)
+    declared properties (3): CellSpacing, Columns, RowGroups
+    dependency properties (1): CellSpacing
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableColumn : FrameworkContentElement : ContentElement : DependencyObject : DispatcherObject  (abstract=False, sealed=False)
+    declared properties (2): Background, Width
+    dependency properties (2): Background, Width
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableColumnCollection : Object  (abstract=False, sealed=True)
+    declared properties (6): Capacity, Count, IsReadOnly, IsSynchronized, Item, SyncRoot
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableRowGroup : TextElement : FrameworkContentElement : ContentElement : DependencyObject  (abstract=False, sealed=True)
+    declared properties (1): Rows
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableRowGroupCollection : Object  (abstract=False, sealed=True)
+    declared properties (6): Capacity, Count, IsReadOnly, IsSynchronized, Item, SyncRoot
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableRow : TextElement : FrameworkContentElement : ContentElement : DependencyObject  (abstract=False, sealed=True)
+    declared properties (1): Cells
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableRowCollection : Object  (abstract=False, sealed=True)
+    declared properties (6): Capacity, Count, IsReadOnly, IsSynchronized, Item, SyncRoot
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableCell : TextElement : FrameworkContentElement : ContentElement : DependencyObject  (abstract=False, sealed=True)
+    declared properties (10): Blocks, BorderBrush, BorderThickness, ColumnSpan, FlowDirection, LineHeight, LineStackingStrategy, Padding, RowSpan, TextAlignment
+    dependency properties (9): BorderBrush, BorderThickness, ColumnSpan, FlowDirection, LineHeight, LineStackingStrategy, Padding, RowSpan, TextAlignment
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.TableCellCollection : Object  (abstract=False, sealed=True)
+    declared properties (6): Capacity, Count, IsReadOnly, IsSynchronized, Item, SyncRoot
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.DocumentStructures.TableStructure : SemanticBasicElement : BlockElement : Object  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.DocumentStructures.TableRowGroupStructure : SemanticBasicElement : BlockElement : Object  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.DocumentStructures.TableRowStructure : SemanticBasicElement : BlockElement : Object  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Documents.DocumentStructures.TableCellStructure : SemanticBasicElement : BlockElement : Object  (abstract=False, sealed=False)
+    declared properties (2): ColumnSpan, RowSpan
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Input.TabletDevice : InputDevice : DispatcherObject : Object  (abstract=False, sealed=True)
+    declared properties (9): ActiveSource, Id, Name, ProductId, StylusDevices, SupportedStylusPointProperties, TabletHardwareCapabilities, Target, Type
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Input.Tablet : Object  (abstract=True, sealed=True)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Input.TabletDeviceCollection : Object  (abstract=False, sealed=False)
+    declared properties (4): Count, IsSynchronized, Item, SyncRoot
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Input.TabletDeviceType : Enum : ValueType : Object  (abstract=False, sealed=True)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Input.TabletHardwareCapabilities : Enum : ValueType : Object  (abstract=False, sealed=True)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Controls.TabControl : Selector : ItemsControl : Control : FrameworkElement  (abstract=False, sealed=False)
+    declared properties (12): ContentStringFormat, ContentTemplate, ContentTemplateSelector, IsSwipeEnabled, SelectedContent, SelectedContentStringFormat, SelectedContentTemplate, SelectedContentTemplateSelector, TabStripBackground, TabStripBorderBrush, TabStripHeight, TabStripPlacement
+    dependency properties (12): ContentStringFormat, ContentTemplate, ContentTemplateSelector, IsSwipeEnabled, SelectedContent, SelectedContentStringFormat, SelectedContentTemplate, SelectedContentTemplateSelector, TabStripBackground, TabStripBorderBrush, TabStripHeight, TabStripPlacement
+    part-name constants: none
+    render/template hooks: OnRender, get_ContentTemplate, get_ContentTemplateSelector, get_SelectedContentTemplate, get_SelectedContentTemplateSelector, set_ContentTemplate, set_ContentTemplateSelector
+  Jalium.UI.Controls.TabItem : HeaderedContentControl : ContentControl : Control : FrameworkElement  (abstract=False, sealed=False)
+    declared properties (6): HoverBackground, IndicatorBrush, IndicatorHeight, IsSelected, SelectedBackground, TabStripPlacement
+    dependency properties (6): HoverBackground, IndicatorBrush, IndicatorHeight, IsSelected, SelectedBackground, TabStripPlacement
+    part-name constants: none
+    render/template hooks: OnContentTemplateChanged, OnContentTemplateSelectorChanged, OnRender
+  Jalium.UI.Controls.Primitives.TabPanel : Panel : FrameworkElement : UIElement : Visual  (abstract=False, sealed=False)
+    declared properties (1): TabStripPlacement
+    dependency properties (1): TabStripPlacement
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Automation.Peers.TabControlAutomationPeer : SelectorAutomationPeer : ItemsControlAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer  (abstract=False, sealed=False)
+    declared properties (2): CanSelectMultiple, IsSelectionRequired
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Automation.Peers.TabItemAutomationPeer : SelectorItemAutomationPeer : ItemAutomationPeer : AutomationPeer : DispatcherObject  (abstract=False, sealed=False)
+    declared properties (2): IsSelected, SelectionContainer
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Automation.Peers.TableAutomationPeer : TextElementAutomationPeer : ContentTextAutomationPeer : FrameworkContentElementAutomationPeer : ContentElementAutomationPeer  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Automation.Peers.TableCellAutomationPeer : TextElementAutomationPeer : ContentTextAutomationPeer : FrameworkContentElementAutomationPeer : ContentElementAutomationPeer  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+  Jalium.UI.Automation.Peers.TabItemWrapperAutomationPeer : FrameworkElementAutomationPeer : UIElementAutomationPeer : AutomationPeer : DispatcherObject  (abstract=False, sealed=False)
+    declared properties (0): 
+    dependency properties (0): 
+    part-name constants: none
+    render/template hooks: none
+
+=== S. parse succeeded ===
+  type=Jalium.UI.Controls.TabControl
+
+=== S. realized tree, resting ===
+  host TabControl: tmpl=null bg=#FF1C1C1E border=#FF48484A fg=#FFF5F5F7 padding=0,0,0,0 minH=0 desired=420x160 size=420x160
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null sel= 420x160
+      StackPanel 420x36
+        TabItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=null sel=True 60x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 tmpl=null sel=False 60x36
+        TabItem bg=#FF242426 fg=#FF636366 tmpl=null sel=False 70x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" 65.82x19.78
+  TabItem containers realized: 3
+     item TabItem: tmpl=null bg=#00FFFFFF border=- fg=#FFF5F5F7 padding=14,8,14,8 minH=36 desired=60x36 size=60x36
+     parts: 
+     item TabItem: tmpl=null bg=#00FFFFFF border=- fg=#FFD1D1D6 padding=14,8,14,8 minH=36 desired=60x36 size=60x36
+     parts: 
+     item TabItem: tmpl=null bg=#FF242426 border=- fg=#FF636366 padding=14,8,14,8 minH=36 desired=70x36 size=70x36
+     parts: 
+
+=== T. does an assigned template take over? ===
+  parsed templates: host=ControlTemplate item=ControlTemplate
+  assign host: ok
+  assign item: ok
+  assign item: ok
+  assign item: ok
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=set sel= 420x160
+      StackPanel 420x36
+        TabItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=set sel=True 60x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 tmpl=set sel=False 60x36
+        TabItem bg=#FF242426 fg=#FF636366 tmpl=set sel=False 70x36
+      ContentPresenter 65.82x19.78
+        TextBlock text="body one" 65.82x19.78
+  probe host part present: False, item part present: False
+
+=== U. selection: property, then a synthesized key ===
+  rest: SelectedIndex=0 SelectedItem="one"
+  set SelectedIndex=1: ok
+  after: SelectedIndex=1 item0.IsSelected=False item1.IsSelected=True
+    TabControl bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=set sel= 420x160
+      StackPanel 420x36
+        TabItem bg=#00FFFFFF fg=#FFD1D1D6 tmpl=set sel=False 60x36
+        TabItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=set sel=True 60x36
+        TabItem bg=#FF242426 fg=#FF636366 tmpl=set sel=False 70x36
+      ContentPresenter 65.52x19.78
+        TextBlock text="body two" 65.52x19.78
+  visible body texts: "body two"
+  focus the host: ok
+  synthesized KeyDown Right: MissingMethodException: Constructor on type 'Jalium.UI.Input.KeyEventArgs' not found.
+    after: SelectedIndex=1
+  synthesized KeyDown Left: MissingMethodException: Constructor on type 'Jalium.UI.Input.KeyEventArgs' not found.
+    after: SelectedIndex=1
+  synthesized KeyDown Tab: MissingMethodException: Constructor on type 'Jalium.UI.Input.KeyEventArgs' not found.
+    after: SelectedIndex=1
+
+=== V. what the framework wrote as local values ===
+  host: Background local=False Foreground local=False BorderBrush local=False Padding local=False
+    rest: bg=#FF1C1C1E fg=#FFF5F5F7 border=#FF48484A padding=0,0,0,0 corner=0,0,0,0 minH=0
+  item0: Background local=False Foreground local=False BorderBrush local=False Padding local=False
+    rest: bg=#00FFFFFF fg=#FFD1D1D6 border=- padding=14,8,14,8 corner=0,0,0,0 minH=36
+  item1: Background local=False Foreground local=False BorderBrush local=False Padding local=False
+    rest: bg=#00FFFFFF fg=#FFF5F5F7 border=- padding=14,8,14,8 corner=0,0,0,0 minH=36
+  item2: Background local=False Foreground local=False BorderBrush local=False Padding local=False
+    rest: bg=#FF242426 fg=#FF636366 border=- padding=14,8,14,8 corner=0,0,0,0 minH=36
+
+  window (depth 4) after everything:
+    Window bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=null sel= 886.29x693.14
+      StackPanel 838.29x613.14
+        TabControl bg=#FF1C1C1E fg=#FFF5F5F7 tmpl=set sel= 420x160
+          StackPanel 420x36
+            TabItem bg=#00FFFFFF fg=#FFD1D1D6 tmpl=set sel=False 60x36
+            TabItem bg=#00FFFFFF fg=#FFF5F5F7 tmpl=set sel=True 60x36
+            TabItem bg=#FF242426 fg=#FF636366 tmpl=set sel=False 70x36
+          ContentPresenter 65.52x19.78
+            TextBlock text="body two" 65.52x19.78
+      TitleBar bg=#FF202020 fg=#FFFFFFFF tmpl=set sel= 886.29x32
+        Border 'PART_RootBorder' bg=#FF202020 radius=0,0,0,0 886.29x32
+          DockPanel 886.29x32
+            TitleBarButton 'PART_CloseButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set sel= 46x32
+            TitleBarButton 'PART_MaximizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set sel= 46x32
+            TitleBarButton 'PART_MinimizeButton' bg=#00FFFFFF fg=#FFFFFFFF tmpl=set sel= 46x32
+            ContentPresenter 'PART_RightWindowCommandsHost' 0x0 [hidden]
+            DockPanel 730.29x32
+      AdornerLayer 886.29x693.14
+      OverlayLayer 886.29x693.14
+        DebugHudOverlay bg=#EB101016 radius=6,6,6,6 0x0 [hidden]
+          StackPanel 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+            TextBlock text="Layout 0.0ms   Render 0.0ms   Present 0.0ms   Total 0.0ms" 0x0 [hidden]
+            StackPanel 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]
+            TextBlock text="" 0x0 [hidden]

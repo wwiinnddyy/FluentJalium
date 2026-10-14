@@ -5,16 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="10.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -25,40 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The localization gate reads both hosts' markup and registers both catalogs. UiText is process-wide
+         static state, so the two projects it shares with are referenced rather than duplicated in the test. -->
     <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
-    <ProjectReference Include="..\..\src\FluentJalium.WinUI\FluentJalium.WinUI.csproj" />
+    <ProjectReference Include="..\..\src\FluentJalium.Localization\FluentJalium.Localization.csproj" />
     <ProjectReference Include="..\..\samples\FluentJalium.Gallery\FluentJalium.Gallery.csproj" />
-  </ItemGroup>
-
-  <!-- The original Gallery was intentionally removed and replaced with a Jalxaml-first
-       implementation. These tests target deleted catalog/page types; keep them out of the
-       default test build until their assertions are migrated to the new Gallery contract. -->
-  <ItemGroup>
-    <Compile Remove="Controls\CollectionControlsTests.cs" />
-    <Compile Remove="Controls\ControlExampleLayoutTests.cs" />
-    <Compile Remove="Controls\InteractionControlsTests.cs" />
-    <Compile Remove="FluentAdvancedSelectionPropertyTests.cs" />
-    <Compile Remove="FluentChartControlsTests.cs" />
-    <Compile Remove="FluentContentLayoutControlsTests.cs" />
-    <Compile Remove="FluentDataInspectorTests.cs" />
-    <Compile Remove="FluentDateTimeControlsTests.cs" />
-    <Compile Remove="FluentDisclosureControlsTests.cs" />
-    <Compile Remove="FluentGalleryCatalogTests.cs" />
-    <Compile Remove="FluentInteractionControlsTests.cs" />
-    <Compile Remove="FluentMaterialRecipeTests.cs" />
-    <Compile Remove="FluentMenuControlsTests.cs" />
-    <Compile Remove="FluentNotificationStatusTests.cs" />
-    <Compile Remove="FluentSettingsVisualTemplateTests.cs" />
-    <Compile Remove="FluentShellControlsTests.cs" />
-    <Compile Remove="FluentTextInputControlsTests.cs" />
-    <Compile Remove="FluentVisualControlsTests.cs" />
-    <Compile Remove="GalleryHomeTilesTests.cs" />
-    <Compile Remove="GalleryHostPageLayoutTests.cs" />
-    <Compile Remove="GalleryImplementedControlsTests.cs" />
-    <Compile Remove="GalleryItemPageTests.cs" />
-    <Compile Remove="GallerySampleCodeRegistryShim.cs" />
-    <Compile Remove="GallerySampleSourceRegistryTests.cs" />
-    <Compile Remove="TempPortProbe.cs" />
+    <ProjectReference Include="..\..\samples\FluentJalium.Launcher\FluentJalium.Launcher.csproj" />
   </ItemGroup>
 
 </Project>

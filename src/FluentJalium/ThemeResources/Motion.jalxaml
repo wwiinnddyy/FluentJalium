@@ -1,0 +1,23 @@
+<!-- WinUI 19e3bdc3c: the animation durations upstream publishes and our templates now read -
+     ControlFasterAnimationDuration / ControlFastAnimationDuration from CommonStyles/
+     Common_themeresources_any.xaml:606,604 and SplitViewPaneAnimationOpenDuration from
+     SplitView/SplitView_themeresources.xaml:10, the row the NavigationView pane opens on. Upstream writes
+     all three as <x:String>; this reader stores that row without error and hands the consumer the framework
+     default instead of the value (spike/MotionProbe [2]: every <x:String> duration row reads back 180ms, the
+     UIElement.TransitionDuration default, in all four consumer shapes), so the names and numbers are kept and
+     only the row type moves to the framework's own Duration. Values are upstream's literal text.
+     Only three rows, because only three are read: upstream's ControlNormalAnimationDuration 250,
+     ControlFastAnimationAfterDuration 168, ControlFastOutSlowInKeySpline and the ScrollBar / ScrollViewer /
+     ComboBox / SplitView rows that are not 200ms all ride in with the batch that consumes them, and the
+     key-consumption gate fails an idle row on purpose. A spline row is not on that list for a different
+     reason: this runtime's transitions take a TransitionTimingFunction enum, not a KeySpline, so there is no
+     property a spline could land on.
+     Why a duration row is the reduce-motion lever: UIElement reads TransitionDuration at the moment a
+     transition would start and returns "no transition" for anything at or below zero, and a write to a live
+     theme row re-resolves inside an already-realised template (spike/MotionProbe [3b],[4]). So
+     FluentThemeManager.ReduceMotion replaces these three rows with 0 rather than walking the visual tree. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Duration x:Key="ControlFasterAnimationDuration">00:00:00.083</Duration>
+  <Duration x:Key="ControlFastAnimationDuration">00:00:00.167</Duration>
+  <Duration x:Key="SplitViewPaneAnimationOpenDuration">00:00:00.2</Duration>
+</ResourceDictionary>

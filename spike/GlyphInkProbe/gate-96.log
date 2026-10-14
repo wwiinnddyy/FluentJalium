@@ -1,0 +1,170 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:43.34
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:05:57.75]     FluentJalium.Tests.AstraRatingControlTests.Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left [FAIL]
+  失败 FluentJalium.Tests.AstraRatingControlTests.Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left [326 ms]
+  错误消息:
+   Assert.Equal() Failure: Values are not within 3 decimal places
+Expected: 0.5 (rounded from 0.5)
+Actual:   0.79700000000000004 (rounded from 0.7972061224489797)
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraRatingControlTests.<Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left>b__23_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraRatingControlTests.cs:line 410
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraRatingControlTests.Each_cell_is_the_star_ink_box_scaled_to_half_and_pulled_flush_left() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraRatingControlTests.cs:line 399
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:07:31.78]     FluentJalium.Tests.AstraNavigationTests.The_indicator_measures_what_the_animator_centres_on [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.The_indicator_measures_what_the_animator_centres_on [954 ms]
+  错误消息:
+   Assert.Multiple() Failure: Multiple failures were encountered
+---- Assert.Equal() Failure: Values are not within tolerance 0.01
+Expected: 16
+Actual:   16.121948300899458
+---- Assert.Equal() Failure: Values are not within tolerance 0.01
+Expected: 16
+Actual:   16.121948300899458
+  堆栈跟踪:
+  Inner stack traces:
+----- Inner Stack Trace #1 (Xunit.Sdk.EqualException) -----
+   at FluentJalium.Tests.AstraNavigationTests.<>c__DisplayClass12_0.<The_indicator_measures_what_the_animator_centres_on>b__2() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 293
+----- Inner Stack Trace #2 (Xunit.Sdk.EqualException) -----
+   at FluentJalium.Tests.AstraNavigationTests.<>c__DisplayClass12_0.<The_indicator_measures_what_the_animator_centres_on>b__3() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 294
+[xUnit.net 00:07:33.35]     FluentJalium.Tests.AstraNavigationTests.Selecting_a_pane_item_moves_pixels_without_a_brand_green [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.Selecting_a_pane_item_moves_pixels_without_a_brand_green [1 s]
+  错误消息:
+   a pane never settled: selected 2 rounds / resting 13 rounds
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraNavigationTests.<>c.<Selecting_a_pane_item_moves_pixels_without_a_brand_green>b__10_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 248
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraNavigationTests.Selecting_a_pane_item_moves_pixels_without_a_brand_green() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 238
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:07:41.30]     FluentJalium.Tests.AstraMenuTests.The_sub_items_own_paint_follows_the_theme [FAIL]
+  失败 FluentJalium.Tests.AstraMenuTests.The_sub_items_own_paint_follows_the_theme [1 s]
+  错误消息:
+   'the sub item's surface' expected no surface brush, but 1 element(s) carry one: implicit/no-template@232x34=#09000000.
+  堆栈跟踪:
+     at FluentJalium.Tests.Pixel.PixelHarness.AssertNoSurfaceLands(FrameworkElement subject, Color plate, Int32 width, Int32 height, String claim) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\Pixel\PixelHarness.cs:line 285
+   at FluentJalium.Tests.AstraMenuTests.<>c.<The_sub_items_own_paint_follows_the_theme>b__43_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 1036
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.The_sub_items_own_paint_follows_the_theme() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 1023
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:07:44.84]     FluentJalium.Tests.AstraMenuTests.The_flyout_item_paints_its_own_surface_row [FAIL]
+  失败 FluentJalium.Tests.AstraMenuTests.The_flyout_item_paints_its_own_surface_row [351 ms]
+  错误消息:
+   the item's resting fill row did not reach pixels; top=#F5F5F7x8020 #000000x1100
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraMenuTests.<>c.<The_flyout_item_paints_its_own_surface_row>b__39_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 923
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraMenuTests.The_flyout_item_paints_its_own_surface_row() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraMenuTests.cs:line 913
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:07:46.35]     FluentJalium.Tests.AstraListViewTests.A_selected_row_that_is_also_disabled_keeps_its_fill_and_lowers_the_pill [FAIL]
+  失败 FluentJalium.Tests.AstraListViewTests.A_selected_row_that_is_also_disabled_keeps_its_fill_and_lowers_the_pill [1 s]
+  错误消息:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   0
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraListViewTests.<>c.<A_selected_row_that_is_also_disabled_keeps_its_fill_and_lowers_the_pill>b__22_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraListViewTests.cs:line 397
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraListViewTests.A_selected_row_that_is_also_disabled_keeps_its_fill_and_lowers_the_pill() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraListViewTests.cs:line 386
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:07:51.44]     FluentJalium.Tests.AstraListViewTests.The_selection_mode_still_governs_how_many_rows_are_selected [FAIL]
+  失败 FluentJalium.Tests.AstraListViewTests.The_selection_mode_still_governs_how_many_rows_are_selected [1 s]
+  错误消息:
+   Assert.Equal() Failure: Values differ
+Expected: 2
+Actual:   1
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraListViewTests.<>c.<The_selection_mode_still_governs_how_many_rows_are_selected>b__23_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraListViewTests.cs:line 422
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraListViewTests.The_selection_mode_still_governs_how_many_rows_are_selected() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraListViewTests.cs:line 410
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:09:16.92]     FluentJalium.Tests.AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name(frameworkName: "TextSecondary", isRead: True) [FAIL]
+  失败 FluentJalium.Tests.AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name(frameworkName: "TextSecondary", isRead: True) [429 ms]
+  错误消息:
+   the row's own text did not reach pixels before the probe; top=#F5F5F7x7966 #F3F3F3x1100 #5D5D5Ex16 #F3F3F4x8
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraFrameworkNameResolutionTests.<>c__DisplayClass12_1.<The_flyout_rows_own_text_is_painted_from_the_secondary_text_name>b__1() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraFrameworkNameResolutionTests.cs:line 365
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraFrameworkNameResolutionTests.<>c__DisplayClass12_0.<The_flyout_rows_own_text_is_painted_from_the_secondary_text_name>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraFrameworkNameResolutionTests.cs:line 363
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name(String frameworkName, Boolean isRead) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraFrameworkNameResolutionTests.cs:line 346
+   at InvokeStub_AstraFrameworkNameResolutionTests.The_flyout_rows_own_text_is_painted_from_the_secondary_text_name(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:12:58.76]     FluentJalium.Tests.AstraAppBarTests.LabelPosition_names_two_states_and_moves_neither [FAIL]
+  失败 FluentJalium.Tests.AstraAppBarTests.LabelPosition_names_two_states_and_moves_neither [669 ms]
+  错误消息:
+   Assert.Equal() Failure: Values differ
+Expected: #00FFFFFF
+Actual:   sc#0.018339802, 0.48037228, 0.48037228, 0.48037228
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraAppBarTests.<>c.<LabelPosition_names_two_states_and_moves_neither>b__25_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs:line 522
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraAppBarTests.LabelPosition_names_two_states_and_moves_neither() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs:line 502
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+[xUnit.net 00:12:59.87]     FluentJalium.Tests.AstraAppBarTests.Renaming_the_parts_still_works_because_no_name_is_read [FAIL]
+  失败 FluentJalium.Tests.AstraAppBarTests.Renaming_the_parts_still_works_because_no_name_is_read [608 ms]
+  错误消息:
+   Assert.Equal() Failure: Values differ
+Expected: 1
+Actual:   3
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraAppBarTests.<>c.<Renaming_the_parts_still_works_because_no_name_is_read>b__29_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs:line 633
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraAppBarTests.Renaming_the_parts_still_works_because_no_name_is_read() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraAppBarTests.cs:line 612
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+
+失败!  - 失败:    10，通过:  1584，已跳过:     0，总计:  1594，持续时间: 13 m 24 s - FluentJalium.Tests.dll (net10.0)
+Invoke-Step : test suite (structure, resource keys, theme runtime) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:49 �ַ�: 5
++     Invoke-Step 'test suite (structure, resource keys, theme runtime) ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

@@ -1,0 +1,8 @@
+=== the calendar family, mounted resting and again with a probe installed under TextOnAccent ===
+calibration (does this walk see a tree at all?): Button: tpl=no-template tree=4 size=140x32 types[Grid,Border,ContentPresenter,TextBlock]
+Calendar     resting : days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]
+Calendar     withProbe: days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]
+DatePicker   resting : days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]
+DatePicker   withProbe: days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]
+TimePicker   resting : days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]
+TimePicker   withProbe: days=0 tree=0 size=420x360 tpl=no-template selectedRead=0 probePainted=0 selectedInk= probeOnAnyBrushProperty=0 - types[-]

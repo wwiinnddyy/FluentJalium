@@ -1,0 +1,20 @@
+<!-- Jalium's window-chrome hooks, tinted with WinUI 3 semantics.
+     The eight TitleBar* names are declared by the framework's own implicit TitleBar/TitleBarButton
+     styles (Jalium.UI.Controls/Themes/Controls/TitleBar.jalxaml in the sibling tree; the names are
+     present in the 26.10.9 assembly) and default to a macOS-flavoured palette. The colour each one
+     takes here is the upstream WinUI 3 TitleBar brush with the same role, from
+     TitleBar_themeresources.xaml @19e3bdc3c, blob b22068a7909c99426a1f1811e227db4ad11baa1c.
+     See audits/window-shell.md for the two close-button hooks deliberately left alone. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Every line resolves to a palette object the kernel re-tints in place, so the chrome follows the
+       theme flip and the high-contrast decision already made for the key below it. -->
+  <StaticResource x:Key="TitleBarText" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TitleBarGlyph" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="TitleBarButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="TitleBarButtonHover" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="TitleBarButtonPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <!-- Upstream paints the title bar with the window backdrop, which this runtime leaves unset, so the
+       surface takes the solid base the backdrop itself falls back to: SolidBackgroundFillColorBase is
+       #F3F3F3 light / #202020 dark, and #F3F3F3 is also the WinUI 3 page background. -->
+  <StaticResource x:Key="TitleBarBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
+</ResourceDictionary>

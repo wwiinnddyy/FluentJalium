@@ -1,0 +1,228 @@
+<!-- Astra command-bar styles: the three app-bar elements and the bar surface.
+     The row names are WinUI 3's (ThemeResources/AppBar.jalxaml); this file is where they become pixels.
+     Unlike every earlier surface batch, the framework already ships an implicit style for three of the four
+     types here - AppBarButton, AppBarToggleButton and AppBarSeparator - and both halves of that matter:
+       * an implicit style of ours wins over the framework's for any control built after the theme is
+         installed, so the templates below are the effective ones (spike/AppBarProbe pass 3 read the template
+         object back by ReferenceEquals on a button created after the merge);
+       * the framework's own style paints from nine rows of its own, and a row we publish under one of those
+         names is what reaches the parts of the family we cannot retemplate - which is the CommandBar: it
+         stores a Template and never builds one, exactly like MenuItem, so its surface, its 40x32 ellipsis
+         button and its overflow popup stay code-drawn and follow only the three rows its code reads.
+     26.10.9's own geometry is not upstream's either: its app-bar button measured 44 wide by its own content,
+     stretched to the full window width, with a 10-pixel label and a 20x20 icon box, against upstream's 68
+     wide, 12-pixel label and 16-tall content box. That is the reason for a template of ours rather than the
+     row shadow alone.
+     Upstream's VisualStateGroup to this runtime's cell list, per type. The runtime has no visual-state
+     manager at all - pass 5 found no VisualStateManager type in Jalium.UI.Controls, and a template that
+     declares VisualStateManager.VisualStateGroups throws "Property 'VisualStateGroups' not found on type
+     'Grid'" when it is instantiated into a shown window (a standalone dictionary parse answers ok because a
+     template parses lazily) - so every state becomes a condition cell:
+       AppBarButton          CommonStates Normal/PointerOver/Pressed/Disabled -> IsMouseOver / IsPressed / IsEnabled=False
+                             ApplicationViewStates Compact, LabelCollapsed     -> IsCompact (measured to fire; the
+                                label leaves the layout and the inner border takes upstream's 2,6,2,22 compact margin)
+       AppBarToggleButton    CommonStates + CheckStates Normal/Checked         -> IsMouseOver / IsPressed / IsEnabled=False / IsChecked
+       AppBarSeparator       (none)                                            -> no cells; upstream has none either
+       CommandBar            DisplayModeStates, AvailableCommandsStates,
+                             DynamicOverflowStates                             -> unreachable: no template is built, so
+                                nothing here can watch IsOpen or ClosedDisplayMode
+     Cell order is the precedence: hover, then press, then checked (upstream's checked surface wins over its
+     hover pair, which no single condition can express), then disabled last so it wins over all of them.
+     What is not here, and why: the nine checked-pointer-over / checked-pressed / checked-disabled rows, the five
+     highlight-overlay rows and the eight check-glyph rows need two conditions at once; the button's five
+     chevron rows, its four submenu-opened rows and the twelve accelerator-text rows of both families have no
+     property on these types to carry them; the LabelOnRight
+     family waits for a state nothing here can name - CommandBarLabelPosition is Default/Collapsed on both
+     sides, and pass 5 measured that neither member moves a label or a padding by itself, while the
+     side-by-side layout upstream picks is the bar's own DefaultLabelPosition, on a control that never builds
+     a template (AstraAppBarTests.LabelPosition_names_two_states_and_moves_neither); and
+     the whole overflow layout (label beside a check glyph in a 48-tall list row) has no flag to watch, so a
+     secondary command keeps its bar geometry here. audits/app-bar.md keeps the list with its measurement. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium">
+
+  <!-- ============ AppBarButton ============ -->
+  <Style x:Key="DefaultAppBarButtonStyle" TargetType="AppBarButton">
+    <Setter Property="Background" Value="{ThemeResource AppBarButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource AppBarButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <!-- Upstream's 68 is a literal on the style, not a row, in the file this transcription came from. -->
+    <Setter Property="Width" Value="68" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="AppBarButton">
+        <!-- Upstream splits this into three elements and the split is the spacing: Root carries no fill,
+             AppBarButtonInnerBorder is the highlight and sits 2,6,2,6 inside the cell (so the hover rect has a
+             visible gap to its neighbours), and ContentRoot holds the geometry from the row
+             AppBarThemeMinHeight=64 - an x:Double this reader cannot parse, so 64 rides here as a literal.
+             The old shape put the highlight on the whole cell and vertically centred the icon, which is what
+             made the bar measure 40 and the labels sit where WinUI's do not.
+             Upstream also fades the highlight brush over 0.083s, and that fade is here. An earlier pass of
+             this batch removed it on the measurement that a checked toggle painted no accent in a composited
+             window with the attribute and 9108 pixels without it; both numbers came from grabs of a surface
+             that had not drawn yet, and the same page measured with a blank-frame gate gives 8832 pixels of
+             #60CDFF either way. adaptation/00 S0-r carries the correction, audits/app-bar.md the method. -->
+        <Grid Name="Root" Background="Transparent">
+          <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
+                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}"
+                  />
+          <Grid Name="ContentRoot" MinHeight="64">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+              <!-- Upstream's ContentViewbox is Height-only (AppBarButtonContentHeight=16) with the collapsed
+                   margin 0,16,0,2, so the glyph box starts 16 below the cell top and the label follows it. -->
+              <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
+                       Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+              </Viewbox>
+              <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
+                         FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
+                         Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPointerOver}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushPressed}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundPressed}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarButtonBackgroundDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarButtonBorderBrushDisabled}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarButtonForegroundDisabled}" />
+          </Trigger>
+          <!-- Upstream's Compact writes the inner border margin, and its LabelCollapsed writes the same 48
+               (AppBarThemeCompactHeight) onto ContentRoot while hiding the label; IsCompact is one property
+               here, so one cell does both. -->
+          <Trigger Property="IsCompact" Value="True">
+            <Setter TargetName="LabelText" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Margin" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="ContentRoot" Property="MinHeight" Value="48" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="AppBarButton" BasedOn="{StaticResource DefaultAppBarButtonStyle}" />
+
+  <!-- ============ AppBarToggleButton ============ -->
+  <Style x:Key="DefaultAppBarToggleButtonStyle" TargetType="AppBarToggleButton">
+    <Setter Property="Background" Value="{ThemeResource AppBarToggleButtonBackground}" />
+    <Setter Property="Foreground" Value="{ThemeResource AppBarToggleButtonForeground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+    <Setter Property="Width" Value="68" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="AppBarToggleButton">
+        <Grid Name="Root" Background="Transparent">
+          <Border Name="AppBarButtonInnerBorder" Margin="{ThemeResource AppBarButtonInnerBorderMargin}"
+                  Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                  TransitionProperty="Background, BorderBrush" TransitionDuration="{ThemeResource ControlFasterAnimationDuration}"
+                  />
+          <Grid Name="ContentRoot" MinHeight="64">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+              <Viewbox Name="ContentViewbox" Height="16" HorizontalAlignment="Center"
+                       Margin="{ThemeResource AppBarButtonContentViewboxCollapsedMargin}">
+                <ContentPresenter Name="Content" Content="{TemplateBinding Icon}"
+                        fluent:IconInk.Carrier="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                        fluent:IconInk.Icon="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}" />
+              </Viewbox>
+              <!-- Upstream declares this margin as AppBarToggleButtonTextLabelMargin; same 2,0,2,8 value, and
+                   this implementation reads the button row so only one of the two names is published. -->
+              <TextBlock Name="LabelText" Text="{TemplateBinding Label}" Foreground="{TemplateBinding Foreground}"
+                         FontSize="12" TextAlignment="Center" TextWrapping="Wrap"
+                         Margin="{ThemeResource AppBarButtonTextLabelMargin}" />
+            </StackPanel>
+          </Grid>
+        </Grid>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPointerOver}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPointerOver}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundPointerOver}" />
+          </Trigger>
+          <Trigger Property="IsPressed" Value="True">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundPressed}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushPressed}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundPressed}" />
+          </Trigger>
+          <!-- Upstream reveals no glyph in the bar: the accent fill is the checked mark, and the overflow
+               glyph belongs to the list layout this runtime cannot select. -->
+          <Trigger Property="IsChecked" Value="True">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundChecked}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushChecked}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundChecked}" />
+          </Trigger>
+          <Trigger Property="IsEnabled" Value="False">
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Background" Value="{ThemeResource AppBarToggleButtonBackgroundDisabled}" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="BorderBrush" Value="{ThemeResource AppBarToggleButtonBorderBrushDisabled}" />
+            <Setter TargetName="LabelText" Property="Foreground" Value="{ThemeResource AppBarToggleButtonForegroundDisabled}" />
+          </Trigger>
+          <Trigger Property="IsCompact" Value="True">
+            <Setter TargetName="LabelText" Property="Visibility" Value="Collapsed" />
+            <Setter TargetName="AppBarButtonInnerBorder" Property="Margin" Value="{ThemeResource AppBarButtonInnerBorderCompactMargin}" />
+            <Setter TargetName="ContentRoot" Property="MinHeight" Value="48" />
+          </Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="AppBarToggleButton" BasedOn="{StaticResource DefaultAppBarToggleButtonStyle}" />
+
+  <!-- ============ AppBarSeparator ============ -->
+  <Style x:Key="DefaultAppBarSeparatorStyle" TargetType="AppBarSeparator">
+    <Setter Property="Foreground" Value="{ThemeResource AppBarSeparatorForeground}" />
+    <Setter Property="Padding" Value="{ThemeResource AppBarSeparatorMargin}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="AppBarSeparator">
+        <!-- Upstream's RootGrid carries a 1-wide rule filled from Foreground, with the half-device corner
+             radius the row list publishes as an unparsable double and so rides here as a literal. The 2,8,2,8
+             is the rule's margin, not the control's, and there is no MinHeight: the bar's row height is what
+             makes it 48 tall inside a 64 cell. It is a Border where upstream has a Rectangle because a 1-DIP
+             Rectangle inks nothing on this renderer - measured in audits/divider.md §6 clause 4. -->
+        <Grid Name="RootGrid">
+          <Border Name="SeparatorRectangle" Width="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
+                  Margin="{TemplateBinding Padding}"
+                  CornerRadius="0.5" Background="{TemplateBinding Foreground}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style TargetType="AppBarSeparator" BasedOn="{StaticResource DefaultAppBarSeparatorStyle}" />
+
+  <!-- ============ CommandBar: colour and geometry only, because no template is ever built ============ -->
+  <Style x:Key="DefaultCommandBarStyle" TargetType="CommandBar">
+    <Setter Property="Background" Value="{ThemeResource CommandBarBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource CommandBarBorderBrush}" />
+    <Setter Property="Foreground" Value="{ThemeResource CommandBarForeground}" />
+    <!-- Upstream's CommandBarBorderThicknessOpen is 1 and its overflow presenter's border is the same; the
+         bar here draws one border for both states, so the thicker pair is the honest transcription. -->
+    <Setter Property="BorderThickness" Value="0,0,0,1" />
+    <Setter Property="Padding" Value="4,0,0,0" />
+    <Setter Property="MinHeight" Value="48" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Top" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+  </Style>
+  <Style TargetType="CommandBar" BasedOn="{StaticResource DefaultCommandBarStyle}" />
+
+</ResourceDictionary>

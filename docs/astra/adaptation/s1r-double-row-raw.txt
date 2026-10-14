@@ -1,0 +1,80 @@
+# §S1-r 原始读数（阶段 6 第四段 InfoBadge，2026-09-21）
+
+三组量：
+1. `spike/DoubleRowProbe`（mode spellings）——数值令牌行能不能被这份 reader 带住，逐个写法量。
+   每份候选单独成字典、走库自身的路（`XamlReader.Load(Stream)`，因为 §S1-q 第 3 条量到
+   `XamlReader.Parse` 的独立元素里 `{ThemeResource}` 根本不解析），然后读回三次：
+   字典里直读、并入 `Application.Resources` 后读、经样式 setter `{ThemeResource N}` 落到
+   `MinHeight`（数值腿）与 `Padding`（`Thickness` 正对照腿）后从上屏按钮读回。
+2. 同工程（mode pertheme）——把候选行放进 `ThemeDictionaries` 的 Light/Dark 两份里换主题读，
+   问的是"一条能随主题变的数值行"到底存不存在（InfoBadge 的 `InfoBadgeIconHeight` 8/9 正需要这个形状）。
+3. 一次性的像素判据（临时诊断，跑完删除）——模板里的数字、裸 `TextBlock` 的字形，在 `Render` 与
+   `Host` 两条捕获通路上各印出多少。判据本身不属于 InfoBadge，但它决定了 InfoBadge 的"像素"列能主张什么，
+   所以记在这里。
+
+## 1 逐个写法的读数（mode spellings）
+
+x:Double: LOAD-FAIL XamlParseException: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+sys:Double(runtime): dict[N]=Double=0
+sys:Double(runtime): merged app[N]=Double=0
+sys:Double(runtime): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+sys:Double(corelib): dict[N]=Double=0
+sys:Double(corelib): merged app[N]=Double=0
+sys:Double(corelib): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+sys:Double(corelib,4.5): dict[N]=Double=0
+sys:Double(corelib,4.5): merged app[N]=Double=0
+sys:Double(corelib,4.5): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+sys:String(corelib): dict[N]=String=4
+sys:String(corelib): merged app[N]=String=4
+sys:String(corelib): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+sys:String(4,4,4,4): dict[N]=String=4,4,4,4
+sys:String(4,4,4,4): merged app[N]=String=4,4,4,4
+sys:String(4,4,4,4): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+sys:TimeSpan(corelib): dict[N]=TimeSpan=00:00:00
+sys:TimeSpan(corelib): merged app[N]=TimeSpan=00:00:00
+sys:TimeSpan(corelib): consume -> MinHeight=0 Padding=0,0,0,0 (detached 0/0,0,0,0)
+Thickness(control): dict[N]=Thickness=4,4,4,4
+Thickness(control): merged app[N]=Thickness=4,4,4,4
+Thickness(control): consume -> MinHeight=0 Padding=4,4,4,4 (detached 0/4,4,4,4)
+
+要点：
+- `x:Double` 仍是整份字典解析失败（与 §S0-b、§S1-o 第 5 条一致）。
+- `clr-namespace:System` 两种 assembly 写法（`System.Runtime` 转发壳与 `System.Private.CoreLib` 真身）**行为相同**：
+  元素解析通过、`dict[N]` 的类型是对的（`Double`），值却是 0——文件里写 4 / 4.5 都不带住。
+  `sys:Int32` 之前用 `Parse` 量过同样读回 0，`sys:TimeSpan` 读回 `00:00:00`。
+- 只有 `sys:String` 把元素文本带住（"4"、"4,4,4,4" 原样读回），但把它喂给数值属性时 `MinHeight` 仍是 0，
+  喂给 `Padding` 也仍是 `0,0,0,0`——应用期也没有字符串→值类型转换。
+- 正对照成立：`Thickness` 行 → `Padding=4,4,4,4`，说明 `{ThemeResource}` 这条消费腿本身是活的。
+  同一次运行里 `MinHeight` 腿对 `Thickness` 行读回 0 是类型不匹配的正确行为。
+
+## 2 主题字典里的读数（mode pertheme，Light=8 / Dark=9）
+
+pertheme sys:Double(corelib): light -> Double=0 / dark -> Double=0
+pertheme sys:Double(runtime): light -> Double=0 / dark -> Double=0
+pertheme sys:Int32(corelib): light -> Int32=0 / dark -> Int32=0
+pertheme sys:String(corelib): light -> String=8 / dark -> String=9
+pertheme Thickness(control): light -> Thickness=8,8,8,8 / dark -> Thickness=9,9,9,9
+
+要点：`ThemeDictionaries` 的切换本身是好的——能随主题变的写法是 `String`/`Thickness`/`CornerRadius`，
+不能的是任何数值 CLR 类型（值恒 0）。所以"数值随主题不同"这个形状在这份 reader 里没有承载体。
+
+## 3 字形墨的两条通路（临时诊断，跑完删除）
+
+直接捕获 `PixelHarness.Render`（DIP 边界）：
+plain(white on accent)=#0078D4x960 | nested(white on accent in a Grid)=#0078D4x960 | white on #202020=#202020x960 | badge=#0078D4x920 #000000x40 | text fg=#E4000000 text box=14.9013671875x14 badge box=60x16 visible=True
+
+整窗合成 `PixelHarness.Host`（同一次运行里的先后两图）：
+hosted=#000000x102245 #F3F3F3x12848 #FFFFFFx2744 #0078D4x838 #92C5EDx44 #6DB2E6x44 hostFg=#FFFFFFFF
+dot=838 value=838 dotTop=#000000x102245 #F3F3F3x12848 #FFFFFFx2744 #0078D4x838 #92C5EDx44 #6DB2E6x44
+valueTop=#000000x102245 #F3F3F3x12848 #FFFFFFx2744 #0078D4x838 #92C5EDx44 #6DB2E6x44
+灰底面板一张图（白字裸 TextBlock + Value=12 徽章并排）：
+host accent=279 white=0 top=#000000x99486 #F3F3F3x12848 #808080x6118 #0078D4x288 #1A1A1Ax30 #585858x19 #B5B5B5x19 #F1F1F1x16
+（把徽章换成只有白字裸 TextBlock 的那一行：#808080 6118→6136、#0078D4 288→279，`#FFFFFF` 恒为 0，
+窗口自身的 #585858x19 / #B5B5B5x19 / #F1F1F1x16 三个键不随文本增减）
+
+要点：
+- 第一次那行 `text fg=#E4000000` 是本段发现的第二处缺陷：模板部件**不继承**控件前景色，
+  读到的是框架默认深色；修法是 `Foreground="{TemplateBinding Foreground}"`，修后读回 `#FFFFFFFF`。
+- 修好之后数字仍然 0 墨；裸 `TextBlock` 白字在两条通路上也 0 墨；`dot` 与 `value` 两张 Host 图**逐键相同**。
+  所以"字形不到达捕获"不是模板问题、不是符号字体问题，是这个基座的两条捕获通路都拿不到文本层。
+  §S1-m 当初把 pip 的无墨归给"只有字形的视觉"，这条读数把范围放宽到**任何文本**。

@@ -1,0 +1,188 @@
+=== baseline, no mutation: the four facts on the shipped wiring
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.28
+baseline-build-exit=0
+consumed-dll 32fd956e89c65e561a17388917d425fecc9c09e2 previous 953435b1a226e93d1487e61b618d7c264026da51 changed=True
+已通过! - 失败:     0，通过:     4，已跳过:     0，总计:     4，持续时间: 8 s - FluentJalium.Tests.dll (net10.0)
+baseline-test-exit=0
+
+=== LEG nobind -> AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to
+2026-09-23T08:43:02Z
+applied nobind on IconInk.cs (1 line(s), snapshot IconInk.cs.snap)
+--- before
++++ after
+@@ -39 +39 @@
+-            BindingOperations.SetBinding(icon, IconElement.ForegroundProperty, new Binding("Foreground") { Source = carrier });
++            { } // MUTANT:nobind - the carrier's ink is never handed to the icon
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.97
+consumed-dll cbb5a855177416c24c9f0edbfb6ce5ffdf0ac55b previous 32fd956e89c65e561a17388917d425fecc9c09e2 changed=True
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:05.40]     FluentJalium.Tests.AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to [2 s]
+  错误消息:
+   light: the pane icon carries <null> while its item moved to #E4000000 - the icon is not being handed the item's ink, so it keeps whatever it last drew.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraNavigationTests.AssertIcon(IconElement icon, FluentNavigationItem item, String when) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 478
+   at FluentJalium.Tests.AstraNavigationTests.<>c.<A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to>b__15_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 397
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraNavigationTests.A_live_theme_switch_moves_a_pane_icon_onto_the_ink_its_item_moved_to() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 392
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 2 s - FluentJalium.Tests.dll (net10.0)
+nobind TEST-exit=1 (1 expected: the fact is red without its mechanism)
+reverted nobind: IconInk.cs is byte-identical to its snapshot
+nobind REVERT-exit=0
+
+=== LEG noguard -> AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it
+2026-09-23T08:43:21Z
+applied noguard on IconInk.cs (1 line(s), snapshot IconInk.cs.snap)
+--- before
++++ after
+@@ -38 +38 @@
+-        if (ownInk is null || ReferenceEquals(ownInk, DependencyProperty.UnsetValue))
++        if (ownInk is null || ReferenceEquals(ownInk, DependencyProperty.UnsetValue) || true)
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:05.34
+consumed-dll 1e4fd9f8434b42dcf24300dd7ec69a8aed14e518 previous cbb5a855177416c24c9f0edbfb6ce5ffdf0ac55b changed=True
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:07.81]     FluentJalium.Tests.AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it [3 s]
+  错误消息:
+   Assert.Same() Failure: Values are not the same instance
+Expected: SolidColorBrush(#FF336699)
+Actual:   SolidColorBrush(#E4000000)
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraNavigationTests.<>c.<A_pane_icon_that_arrives_with_its_own_ink_keeps_it>b__16_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 421
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraNavigationTests.A_pane_icon_that_arrives_with_its_own_ink_keeps_it() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 416
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 3 s - FluentJalium.Tests.dll (net10.0)
+noguard TEST-exit=1 (1 expected: the fact is red without its mechanism)
+reverted noguard: IconInk.cs is byte-identical to its snapshot
+noguard REVERT-exit=0
+
+=== LEG noappbarink -> AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink
+2026-09-23T08:43:41Z
+applied noappbarink on AppBar.jalxaml (2 line(s), snapshot AppBar.jalxaml.snap)
+--- before
++++ after
+@@ -82 +82 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+@@ -143 +143 @@
+-                        fluent:IconInk.Source="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
++                         />
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:06.89
+consumed-dll 94274cf6b98f6c37a8f53508e93d720c79e6e09f previous 1e4fd9f8434b42dcf24300dd7ec69a8aed14e518 changed=True
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:14.61]     FluentJalium.Tests.AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink [FAIL]
+  失败 FluentJalium.Tests.AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink [5 s]
+  错误消息:
+   light: the hosted icon carries <null> while its AppBarButton is at #E4000000 - the icon is not handed the carrier's ink, so it keeps whatever it last drew.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraIconFamilyTests.AssertInk(IconElement icon, Control carrier, String when) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraIconFamilyTests.cs:line 341
+   at FluentJalium.Tests.AstraIconFamilyTests.<>c.<A_template_that_hosts_an_icon_hands_it_the_carrier_ink>b__16_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraIconFamilyTests.cs:line 321
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraIconFamilyTests.A_template_that_hosts_an_icon_hands_it_the_carrier_ink() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraIconFamilyTests.cs:line 314
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 5 s - FluentJalium.Tests.dll (net10.0)
+noappbarink TEST-exit=1 (1 expected: the fact is red without its mechanism)
+reverted noappbarink: AppBar.jalxaml is byte-identical to its snapshot
+noappbarink REVERT-exit=0
+
+=== LEG notoggleink -> AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch
+2026-09-23T08:44:12Z
+applied notoggleink on Navigation.jalxaml (1 line(s), snapshot Navigation.jalxaml.snap)
+--- before
++++ after
+@@ -196 +196 @@
+-                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
++                             />
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:11.70
+consumed-dll 6c58626e4806e911d1552194e22d4728ea0e1c25 previous 94274cf6b98f6c37a8f53508e93d720c79e6e09f changed=True
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:00:04.81]     FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch [FAIL]
+  失败 FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch [2 s]
+  错误消息:
+   light: the pane toggle glyph carries <null> while its button is at #E4000000 - the glyph is not handed the button's ink, so it keeps whatever it last drew.
+  堆栈跟踪:
+     at FluentJalium.Tests.AstraNavigationTests.AssertGlyph(IconElement glyph, Control carrier, String when) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 457
+   at FluentJalium.Tests.AstraNavigationTests.<>c.<The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch>b__17_0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 443
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.<>c__DisplayClass7_0.<Run>b__0() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 61
+--- End of stack trace from previous location ---
+   at FluentJalium.Tests.AstraThemeRuntimeFixture.Run(Action work) in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraThemeRuntimeTests.cs:line 66
+   at FluentJalium.Tests.AstraNavigationTests.The_pane_toggle_glyph_carries_the_button_ink_through_a_live_switch() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraNavigationTests.cs:line 437
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+失败!  - 失败:     1，通过:     0，已跳过:     0，总计:     1，持续时间: 2 s - FluentJalium.Tests.dll (net10.0)
+notoggleink TEST-exit=1 (1 expected: the fact is red without its mechanism)
+reverted notoggleink: Navigation.jalxaml is byte-identical to its snapshot
+notoggleink REVERT-exit=0
+
+=== tree after the run (must show only the fix, no MUTANT markers)
+marker-grep-exit=0 (1 = none left)
+ M src/FluentJalium/Controls/Navigation/FluentNavigationItem.cs
+ M src/FluentJalium/Styles/AppBar.jalxaml
+ M src/FluentJalium/Styles/Menus.jalxaml
+ M src/FluentJalium/Styles/Navigation.jalxaml
+ M src/FluentJalium/Styles/TabView.jalxaml
+?? src/FluentJalium/Controls/IconInk.cs

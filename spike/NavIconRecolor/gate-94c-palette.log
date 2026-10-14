@@ -1,0 +1,3 @@
+Light : 83 source colors, 101 resolved brushes; checked=True
+Dark : 83 source colors, 101 resolved brushes; checked=True
+HighContrast : 101 mapped keys; upstream keys held back because the palette has no entry for them [AccentControlElevationBorderBrush CircleElevationBorderBrush ControlElevationBorderBrush]; checked=True

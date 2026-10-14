@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway flyout double-paint probe. The menu batch gave MenuFlyoutItem, ToggleMenuFlyoutItem,
+       MenuFlyoutSubItem and MenuFlyoutSeparator templates of our own, and the census says all four also
+       declare OnRender. spike/MenuBarGhostProbe measured that a MenuBarItem paints its own Title (our
+       template's second label cost 828 bright pixels), so the opened flyout is the same question: does a
+       templated item still paint the text the framework already paints? This opens a real flyout on a shown
+       window, renders the presenter it grafts into the overlay layer, and counts the label pixels twice: once
+       with the shipped items, once with each item's OnRender suppressed. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FlyoutGhostProbe</RootNamespace>
+    <AssemblyName>FlyoutGhostProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

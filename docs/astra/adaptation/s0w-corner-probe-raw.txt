@@ -1,0 +1,24 @@
+== radius 12, square child: surface 60x60 Clip=-
+    (0,0) #FF0000
+    (1,1) #FF0000
+    (2,2) #FF0000
+    (4,4) #FF0000
+    (12,0) #FF0000
+    (30,1) #FF0000
+    (30,30) #FF0000
+== radius 12, no child: surface 60x60 Clip=-
+    (0,0) #0000FF
+    (1,1) #0000FF
+    (2,2) #0000FF
+    (4,4) #FFFFFF
+    (12,0) #FFFFFF
+    (30,1) #FFFFFF
+    (30,30) #FFFFFF
+== radius 0, square child (control): surface 60x60 Clip=-
+    (0,0) #FF0000
+    (1,1) #FF0000
+    (2,2) #FF0000
+    (4,4) #FF0000
+    (12,0) #FF0000
+    (30,1) #FF0000
+    (30,30) #FF0000

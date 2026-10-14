@@ -1,0 +1,179 @@
+S1-b raw output - what a TeachingTip host can and cannot do on 26.10.9
+=====================================================================
+Source: spike/TeachingTipProbe (modes all, tail, place, tip, room, parent), run serially on the same machine as the
+xunit suite. Each mode prints its own header; the "theme dictionaries=" count differs between passes because
+the batch added ThemeResources/TeachingTip.jalxaml and Styles/TeachingTip.jalxaml between them (34 -> 35 -> 36).
+WinUI reference: ../microsoft-ui-xaml commit 19e3bdc3ccf3361393d623d3a5d2667cb8f33229,
+controls/dev/TeachingTip/TeachingTip.xaml (blob 50cc6d2d6cb7648df90e21faa0cc9e6aa816a9bd) and TeachingTip.cpp.
+Nothing below is edited: these are the lines the probe wrote.
+
+
+===== mode all: A primitives, B row types, C a Popup inside a template =====
+theme dictionaries=34 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== A. primitives a TeachingTip template would need (by simple name, across the loaded UI assemblies) ===
+  Polygon = Jalium.UI.Shapes.Polygon : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Polyline = Jalium.UI.Shapes.Polyline : Shape | public=True abstract=False | own DPs[Points] | parameterless ctor=yes
+  Path = Jalium.UI.Shapes.Path : Shape | public=True abstract=False | own DPs[Data] | parameterless ctor=yes
+  Line = Jalium.UI.Shapes.Line : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Rectangle = Jalium.UI.Shapes.Rectangle : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Ellipse = Jalium.UI.Shapes.Ellipse : Shape | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Shape = Jalium.UI.Shapes.Shape : FrameworkElement | public=True abstract=True | own DPs[Fill,Stroke,StrokeThickness] | parameterless ctor=none
+  Popup = Jalium.UI.Controls.Primitives.Popup : FrameworkElement | public=True abstract=False | own DPs[IsOpen,Child,Placement,PlacementTarget,HorizontalOffset,VerticalOffset,AllowsTransparency] | parameterless ctor=yes
+  PopupRoot = Jalium.UI.Controls.Primitives.PopupRoot : Decorator | public=False abstract=False | own DPs[] | parameterless ctor=none
+  ContentControl = Jalium.UI.Controls.ContentControl : Control | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Grid = Jalium.UI.Controls.Grid : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  StackPanel = Jalium.UI.Controls.StackPanel : Panel | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  ScrollViewer = Jalium.UI.Controls.ScrollViewer : ContentControl | public=True abstract=False | own DPs[HorizontalOffset,VerticalOffset] | parameterless ctor=yes
+  TextBlock = Jalium.UI.Controls.TextBlock : FrameworkElement | public=True abstract=False | own DPs[] | parameterless ctor=yes
+  Border = Jalium.UI.Controls.Border : Decorator | public=True abstract=False | own DPs[CornerRadius] | parameterless ctor=yes
+  Button = Jalium.UI.Controls.Button : ButtonBase | public=True abstract=False | own DPs[] | parameterless ctor=yes
+
+=== B. resource row types through XamlReader.Parse (the route Astra's dictionaries take) ===
+    one row per parse: a dictionary that throws once loses every row in it, which is what S0-b's
+    'x:Double is unreachable' reading hid - through this loader it is not dropped, it is fatal.
+  GridLength: GridLength = 8
+  x:Double: parse THREW XamlParseException: Cannot resolve type 'Double' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+  x:Int32: parse THREW XamlParseException: Cannot resolve type 'Int32' in namespace 'http://schemas.microsoft.com/winfx/2006/xaml'.
+  Thickness: Thickness = 0,12,0,0
+  CornerRadius: CornerRadius = 8,8,8,8
+  SolidColorBrush: SolidColorBrush = SolidColorBrush(#0DFFFFFF)
+  StaticResource alias: SolidColorBrush = SolidColorBrush(#FFFFFFFF)
+  FontFamily: FontFamily =
+  GridLength star: GridLength = *
+  through the theme pipeline for comparison: OverlayCornerRadius=8,8,8,8 TextFillColorPrimaryBrush=SolidColorBrush(#FFFFFFFF)
+
+=== C. can a ContentControl-derived type host a Popup inside its template? ===
+  template assigned: True; measured desired 200,60
+  after pump: tip 200x60, visual children 1
+  tree:
+    popup-shaped: Popup 200x60
+    total nodes walked=45
+
+  now opening the popup that the template holds:
+    found Jalium.UI.Controls.Primitives.Popup
+    set IsOpen=true -> ok
+    IsOpen reads True
+    PopupCard 140x44, ancestors: Border < PopupRoot < OverlayLayer
+  tree:
+    popup-shaped: Popup 200x60
+    popup-shaped: PopupRoot 140x44
+    total nodes walked=47
+
+
+===== mode tail: D1 a Polygon a state can write, D2 row landing, D3 trigger precedence, D4 the enum =====
+theme dictionaries=35 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== D. tail geometry, GridLength rows, trigger writes and popup placement ===
+  dictionary parsed; rows: TailShort=8, TailMargin=10
+  merge into a shown tree -> ok
+  D1: Jalium.UI.Shapes.Polygon Shape built
+      .Points = 0,0 10,10 20,0
+      .Fill = SolidColorBrush(#FF336699)
+      .Stroke = SolidColorBrush(#FFAABBCC)
+      .StrokeThickness = 1
+  D2: column widths via {ThemeResource} = * | * | * | * | *   (upstream wants 8 | 10 | * | 10 | 8)
+  D3: resting Points=0,0 10,10 20,0 Grid.Row=4 Grid.Column=2
+  D3: ok
+      after Tag=X -> Points=10,0 0,10 10,20 Grid.Row=2 Grid.Column=0
+  D4: Popup.Placement is Jalium.UI.Controls.Primitives.PlacementMode with Absolute, Relative, Bottom, Center, Right, AbsolutePoint, RelativePoint, Mouse, MousePoint, Left, Top, Custom
+      reads back Bottom
+      .HorizontalOffset = 3
+      .VerticalOffset = -4
+      .AllowsTransparency = True
+      .PlacementTarget = null
+      card: not realized (Popup.Placement=Bottom was set from markup, IsOpen was not)
+
+
+===== mode place: E where each Placement value anchors the card, and what an offset adds to it =====
+theme dictionaries=35 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== E. popup placement anchors, offsets and auto-sized child ===
+  target at (100x40) reads origin x=200 y=150
+
+  Relative 0,0: ok
+      card 120x50; relative to target -> x=-0.29 y=-0.29
+
+  Relative 50,50: ok
+      card 120x50; relative to target -> x=50 y=50
+
+  Relative -120,-50 (one card away, up-left): ok
+      card 120x50; relative to target -> x=-120.29 y=-50
+
+  Bottom 0,0: ok
+      card 120x50; relative to target -> x=-0.29 y=39.71
+
+  Top 0,0: ok
+      card 120x50; relative to target -> x=-0.29 y=-50
+
+  Left 0,0: ok
+      card 120x50; relative to target -> x=-120.29 y=-0.29
+
+  Right 0,0: ok
+      card 120x50; relative to target -> x=99.71 y=-0.29
+
+  Center 0,0: ok
+      card 120x50; relative to target -> x=-10 y=-5.43
+
+
+===== mode tip: F the shipped control, its built tree, and where the card actually lives =====
+theme dictionaries=36 overlayCornerRadius=8,8,8,8 textPrimary=SolidColorBrush(#FFFFFFFF)
+
+=== F. FluentTeachingTip built by its own style ===
+
+  closed: style=assigned template=True effective=Top border=1,1,1,0 tip 658.29x160 children=1
+    popup IsOpen=False offsets=-160,-40 child=Border
+    the popup's own child holds Container:Border 0x0, TailOcclusionGrid:Grid 0x0, ContentRootGrid:Grid 0x0,
+      TitlesStackPanel:StackPanel 0x0, TitleTextBlock:TextBlock 0x0, SubtitleTextBlock:TextBlock 0x0,
+      MainContentPresenter:ContentPresenter 0x0, ButtonPanel:Grid 0x0, PART_ActionButton:Button 0x0,
+      PART_CloseButton:Button 0x0, TailPolygon:Polygon 0x0        (names only, all sizes 0x0; full line in the log)
+    ancestors of that child: Border
+
+  open: style=assigned template=True effective=Right border=0,1,1,1 tip 658.29x160 children=1
+    popup IsOpen=True offsets=100,-64.060546875 child=Border
+    the popup's own child holds Container:Border 320x168.12, TailOcclusionGrid:Grid 320x168.12,
+      ContentRootGrid:Grid 304x152.12, TitlesStackPanel:StackPanel 268x39.56, TitleTextBlock:TextBlock 268x19.78,
+      SubtitleTextBlock:TextBlock 268x19.78, MainContentPresenter:ContentPresenter 152.43x19.78,
+      ButtonPanel:Grid 268x44.78, PART_ActionButton:Button 130x32.78, PART_CloseButton:Button 130x32.78,
+      TailPolygon:Polygon 9x21                                     (button Surface/FocusOutline rows elided)
+    ancestors of that child: Border < PopupRoot < PopupWindow
+
+  Read the two size lines together: the card realizes at 320x168.12 and the control's own slot in the probe
+  window is 658.29x160. Neither is "the room the tip takes on the page", and the first draft of this batch
+  quoted the 320x168 as if it were - see mode room below.
+
+
+===== mode room: G does a MeasureOverride that returns nothing move anything? =====
+Run twice against the two builds of FluentTeachingTip, same probe, same machine. The committed
+spike/TeachingTipProbe/teachingtip-probe-room.txt holds build 1's run (the shipped one); the override was then
+installed, the mode re-run, and the control built again without it.
+
+build 1 - no override (base ContentControl.MeasureOverride):
+  closed: tip desired 0x0 actual 500x0 | below x=0 y=20 | stack x=103.14 y=216
+  open:   tip desired 0x0 actual 500x0 | below x=0 y=20
+  re-opened with a target: tip desired 0x0 actual 500x0 | below x=0 y=20
+
+build 2 - override present, returning new Size():
+  closed: tip desired 0x0 actual 500x0 | below x=0 y=20 | stack x=103.14 y=216
+  open:   tip desired 0x0 actual 500x0 | below x=0 y=20
+  re-opened with a target: tip desired 0x0 actual 500x0 | below x=0 y=20
+
+Identical in every column. A Popup that roots a template contributes 0x0 to its host whether it is closed or
+showing a card, so the override was dead code and is not in the shipped control. The same A/B ran through the
+xunit fact A_tip_holds_no_layout_room_and_still_realizes_its_card, which passed against both builds for the same
+reason; it stays in the suite as a guard on the template's root, not as proof of a fix.
+
+
+===== mode parent: H how the control finds its own window =====
+The structural gate AstraGateTests.Theme_kernel_stays_free_of_repair_loops_and_reflection keeps a render-tree
+walk out of product code, so the fit check that decides whether a side has room needs another route.
+
+=== H. reaching the host window from inside a control ===
+  FrameworkElement.Parent: FluentTeachingTip < Grid < StackPanel < Window
+  Application.Current.MainWindow: Window
+  same instance as the shown window: True
+  tip is inside MainWindow.Content: True
+
+The logical chain reaches the window, so FindWindow walks FrameworkElement.Parent. MainWindow is recorded as an
+alternative that would have been wrong: it names one window for the whole app, so in a second-window scenario it
+would clip the card against the wrong bounds, while the parent chain follows whichever window hosts the tip.

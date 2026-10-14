@@ -1,0 +1,101 @@
+# spike/PointerProbe 原始读数。运行时 NuGet Jalium.UI 26.10.9，Windows 26.10.9，dpiScale=1.75，
+# 主题 Light，真实 Application.Run + 已上屏窗口（Topmost，420x320，client origin 887,350）+
+# CompositionTarget.Rendering 推帧。指针输入走 user32 SetCursorPos（不是设置属性）：
+# 框架看到的是真实 WM_MOUSEMOVE，所以 IsMouseOver 由输入管线自己置起来。
+#
+# 模式：默认只有 hover，不发送任何按键；"swap" 是鼠标无关的刷对象替换实验；
+# "press" 会真的按下左键（可能点到用户桌面上的任何东西），**本文件里没有 press 读数：这一模式从未运行**。
+#
+# 颜色约定：休息位=品红 FF00FF（ControlFillColorDefault 哨兵），悬停=绿 00FF00（Secondary），
+# 按下=橙 FFA500（Tertiary，未运行所以没有读数）。探针把这三个调色板刷就地改色，样式触发器带的
+# 是上游别名键（ButtonBackground/ButtonBackgroundPointerOver），所以绿/品红出现在像素里就等于
+# "别名→调色板→触发器→模板面→光栅器"整条通路走通。
+# top= 是按数量降序的前 4 个 #RRGGBBxN；按钮 200x44=8800 像素，主体 8296，其余是 1px 边框与抗锯齿。
+# 判据：某状态色 >=4000 px 才算落到；标 "旧二进制" 的 run 打印里还没有 bg= 字段（后加的）。
+
+## run 1（旧二进制：固定帧数捕获，无状态等待）
+rest    : IsMouseOver=False IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+target  : client=(887,350) scale=1.75 -> screen=(1237,634)
+hover   : IsMouseOver=True  IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+cursor  : asked=(1237,634) actual=(1272,655)
+away    : IsMouseOver=False IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+FAIL hover fill: expected >=4000 pixels of #00FF00, got 0
+RESULT fail
+
+## run 2（加了"等状态成立再捕获"，还没有稳定捕获；这次光标确实落在按钮上）
+style DefaultButtonStyle: setters=3 triggers=3 basedOn=ButtonBase
+  trigger IsMouseOver owner=UIElement value=True
+  trigger IsPressed   owner=UIElement value=True
+  trigger IsEnabled   owner=UIElement value=False
+style AccentButtonStyle: setters=3 triggers=3 basedOn=ButtonBase
+  trigger IsMouseOver owner=UIElement value=True
+  trigger IsPressed   owner=UIElement value=True
+  trigger IsEnabled   owner=UIElement value=False
+button.Style=null(implicit) triggers=-1
+bg before: SolidColorBrush
+rest    : IsMouseOver=False IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+target  : client=(887,350) scale=1.75 -> screen=(1237,634)
+hover   : IsMouseOver=False IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+cursor  : asked=(1237,634) actual=(1237,634)
+away    : IsMouseOver=True  IsPressed=False 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+FAIL hover fill: expected >=4000 pixels of #00FF00, got 0
+RESULT fail
+
+## run 3（读属性已支持 bg=：控件的 Background 已经是悬停刷，像素还是休息位）
+rest    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover   : IsMouseOver=True  IsPressed=False bg=#00FF00 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover2  : IsMouseOver=False               bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+cursor  : asked=(1237,634) actual=(1478,702)
+away    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+FAIL hover fill: expected >=4000 pixels of #00FF00, got 0
+RESULT fail
+
+## run 4（同 run 3，外加逐层定位：模板面刷、InvalidateVisual、无过渡模板对照）
+rest    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover   : IsMouseOver=True  IsPressed=False bg=#00FF00 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover2  : IsMouseOver=False               bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+part    : surfaceBorder bg=#FF00FF
+invalid : IsMouseOver=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+plain   : rest bg=#FF00FF 200x44 distinct=2 top=#FF00FFx8316 #000000x484
+plainHov: IsMouseOver=True bg=#00FF00 200x44 distinct=2 top=#00FF00x8316 #000000x484
+cursor  : asked=(1237,634) actual=(4,4)
+away    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+FAIL hover fill: expected >=4000 pixels of #00FF00, got 0
+RESULT fail
+
+## run 5（pass：悬停色真的落到像素，离手后回到休息位）
+rest    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover   : IsMouseOver=True  IsPressed=False bg=#00FF00 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+hover2  : IsMouseOver=True                bg=#00FF00 200x44 distinct=7 top=#00FF00x8296 #00E300x456 #000000x12 #00E200x12
+part    : surfaceBorder bg=#00FF00
+invalid : IsMouseOver=False               bg=#FF00FF 200x44 distinct=7 top=#E482E4x8296 #CB74CBx456 #000000x12 #CA73CAx12
+plain   : rest bg=#00FF00 200x44 distinct=2 top=#00FF00x8316 #000000x484
+plainHov: IsMouseOver=True bg=#00FF00 200x44 distinct=2 top=#00FF00x8316 #000000x484
+cursor  : asked=(1237,634) actual=(4,4)
+away    : IsMouseOver=False IsPressed=False bg=#FF00FF 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+RESULT pass
+
+## swap（鼠标无关：首帧渲染后再换一个新的刷对象，模板面是否采纳）
+transitioned rest : 200x44 distinct=7 top=#FF00FFx8296 #E300E3x456 #000000x12 #E200E2x12
+plain        rest : 200x44 distinct=2 top=#FF00FFx8316 #000000x484
+transitioned swap : part bg=#00FF00 200x44 distinct=7 top=#00FF00x8296 #00E300x456 #000000x12 #00E200x12
+plain        swap : 200x44 distinct=2 top=#00FF00x8316 #000000x484
+VERDICT transitionedAdopted=True plainAdopted=True
+
+# ## 这些读数支持什么
+# - SetCursorPos 级别的真实指针移动会置起 UIElement.IsMouseOver（触发器 owner 就是 UIElement，
+#   不是被遮蔽的副本），进而让样式触发器把悬停刷交给控件，最后落到像素（run 5 的 hover2/part 两行）。
+# - 带 TransitionProperty="Background" 的模板面在首帧之后仍然会采纳新的刷对象（swap 的 transitioned 行），
+#   和没有过渡的模板一样（plainAdopted=True），所以状态换刷不依赖"就地改色"这一条通路。
+# - plain（无过渡）模板只有一个裸 Border、没有文字与焦点框，所以 distinct=2；带过渡的按钮 distinct=7，
+#   多出来的 #00E300/#00E200/#000000 与休息位的 #E300E3/#E200E2/#000000 同结构，是文字与边框的抗锯齿，
+#   不是混合中间值——所以 distinct 数量不能当"是否停在过渡中"的判据。
+#
+# ## 这些读数不支持什么（我一度误读的地方）
+# - run 3/4 的"属性绿、像素品红"不是框架缺陷：那两次 cursor 行显示物理光标在推帧期间自己走掉了
+#   （asked=1237,634 而 actual=1478,702 / 4,4），hover2 读到 IsMouseOver=False 就是这个原因。
+#   同一时间有人在动这只鼠标，所以这个通路不能进常跑闸口。
+# - run 5 的 invalid 行 #E482E4（品红↔绿的中间值）证明过渡动画真的在跑：固定帧数捕获会采到混合中的画面。
+#   判据必须是"重复捕获直到两张图一致"，不是"等 N 帧"。
+# - 按下/释放分支（IsPressed、橙色 FFA500）没有任何读数：需要 SendInput 真按键，会点到用户桌面上
+#   任何东西，未经同意不运行。键盘（空格/回车激活）与触摸路径同样未测。

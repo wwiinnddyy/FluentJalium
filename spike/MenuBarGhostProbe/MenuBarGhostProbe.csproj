@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Throwaway menu-bar double-paint probe. spike/VisualQA/out/menus.png shows the MenuBar's own items
+       ("View", "Help") painted twice with a few pixels of offset while the Menu's items ("File", "Edit")
+       are single, and both bars carry a stray horizontal rule no WinUI bar has. This answers, in one run,
+       who the second painter is: the bar's OnRender, the item's OnRender, or our template. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>MenuBarGhostProbe</RootNamespace>
+    <AssemblyName>MenuBarGhostProbe</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultJalxamlItems>false</EnableDefaultJalxamlItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <PackageReference Include="Jalium.UI.Desktop" Version="26.10.9" />
+    <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+  </ItemGroup>
+</Project>

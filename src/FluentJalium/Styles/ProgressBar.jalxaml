@@ -1,0 +1,81 @@
+<!-- WinUI 3 ProgressBar.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT), blob
+     5f188ab8b3d45632d74a90b742299e0412e45feb: one implicit style with ten setters (:4-13) and a template
+     (:14-176) whose eleven VisualStates live in a single CommonStates group. The host is the framework's own
+     ProgressBar (RangeBase < Control), not an own type: spike/ProgressProbe mode B measured that it already
+     ships a template whose PART_Indicator the control re-sizes proportionally to Value (25% of 300 measured
+     75x-, 100% measured 300x-), and mode C measured that the alternative routes are not equivalent - a
+     {TemplateBinding Value} on the indicator's Width gives the value in DIP, not a proportion. So the look is a
+     retemplating job and AGENTS.md's "only a demonstrated behaviour gap gets a type" keeps this file on the
+     native control. Row-by-row state mapping, the host's own geometry contract and every deviation:
+     docs/astra/audits/progress-bar.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style TargetType="ProgressBar">
+    <!-- Nine of upstream's ten setters, in its order. The tenth is Padding (:12, read by ProgressBarRoot), which
+         this layer does not set because the bar has no chrome for padding to move. Maximum=100, IsTabStop=False
+         and VerticalAlignment=Center are upstream's and stay; MinHeight=3 is the value of upstream's
+         ProgressBarMinHeight row, written as a property here because this reader cannot parse an x:Double row. -->
+    <Setter Property="Foreground" Value="{ThemeResource ProgressBarForeground}" />
+    <Setter Property="Background" Value="{ThemeResource ProgressBarBackground}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource ProgressBarBorderThemeThickness}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource ProgressBarBorderBrush}" />
+    <Setter Property="MinHeight" Value="3" />
+    <Setter Property="Maximum" Value="100" />
+    <Setter Property="IsTabStop" Value="False" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="CornerRadius" Value="{ThemeResource ProgressBarCornerRadius}" />
+    <Setter Property="Template"><ControlTemplate TargetType="ProgressBar">
+      <!-- Upstream's ProgressBarRoot (:156) also carries a Padding and an inner Border whose Clip is bound to
+           TemplateSettings.ClipRect (:157, written by ProgressBar.cpp:246). This runtime has no
+           ProgressBarTemplateSettings at all - mode A read the type as ABSENT, and the control exposes no
+           TemplateSettings property - so the clip layer is dropped rather than faked: the band below needs no
+           clip because the indicator is sized by the host instead of being slid under a fixed window. -->
+      <Grid Name="LayoutRoot">
+        <Border Name="ProgressBarRoot" BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <!-- The band is the whole adaptation, and it is a measured one. Mode E put Height=4 and
+               VerticalAlignment=Center on the indicator itself: the host wrote Height=NaN and
+               VerticalAlignment=Stretch over them and the bar filled the control's whole 40 DIP box. Nesting the
+               two parts inside a grid that carries the size instead gives the same proportionality with the band
+               under our control (75x4 at 25% of a 300-wide bar, ink in exactly the band's rows), and the height
+               still follows MinHeight the way upstream's Grid Height="{TemplateBinding MinHeight}" does. -->
+          <Grid Name="Band" Height="{TemplateBinding MinHeight}" VerticalAlignment="Center">
+            <!-- Upstream's rail is the 1 DIP row of ProgressBarTrackHeight; the filled bar is the band's full
+                 height, which is why the two differ by a factor of three and neither is a surface of its own. -->
+            <Border Name="PART_Track" Height="1" VerticalAlignment="Center"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{ThemeResource ProgressBarTrackCornerRadius}" />
+            <Border Name="PART_Indicator" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+          </Grid>
+        </Border>
+      </Grid>
+      <ControlTemplate.Triggers>
+        <!-- One cell, and it is ours rather than upstream's: the audit's ProgressBar.idl declares no Orientation
+             property, so the reference template has no vertical shape to copy - while this host's ProgressBar
+             does carry Orientation (mode E read it, and the framework's own template draws a vertical bar with
+             it). Without this cell our style would silently break every vertical bar the host could draw, so the
+             cross-axis swap is written here and asserted in AstraProgressBarTests, and it is labelled a host
+             extra rather than parity. Both "Auto" and "NaN" parse to the unset sentinel on this runtime (mode H
+             measured each on each element); "Auto" is written on both so the file uses one spelling.
+             The other ten states upstream reaches are not representable here: Error/Paused/UpdatingError need the
+             ShowError/ShowPaused properties this type does not have (mode E: both ABSENT), and the Indeterminate
+             family needs a slide that this runtime cannot animate - mode F measured animations on
+             TranslateTransform.XProperty and RotateTransform.AngleProperty never advance while Width and
+             Canvas.Left do, and a Storyboard read out of markup comes back with zero children. What the host
+             paints for IsIndeterminate instead is a static block one third of the way across (mode B: the same
+             90x40 footprint after two frames and after forty), which the Known Gaps section records. -->
+        <Trigger Property="Orientation" Value="Vertical">
+          <Setter TargetName="Band" Property="Height" Value="Auto" />
+          <Setter TargetName="Band" Property="Width" Value="{TemplateBinding MinHeight}" />
+          <Setter TargetName="Band" Property="VerticalAlignment" Value="Stretch" />
+          <Setter TargetName="Band" Property="HorizontalAlignment" Value="Center" />
+          <Setter TargetName="PART_Track" Property="Height" Value="Auto" />
+          <Setter TargetName="PART_Track" Property="Width" Value="1" />
+          <Setter TargetName="PART_Track" Property="VerticalAlignment" Value="Stretch" />
+          <Setter TargetName="PART_Track" Property="HorizontalAlignment" Value="Center" />
+        </Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+  </Style>
+</ResourceDictionary>

@@ -1,0 +1,116 @@
+[EXPERIMENTAL] 8 public members carry [Experimental]
+[EXPERIMENTAL] .ThemeMode [TypeInfo] -> Experimental(WPF0001)
+[EXPERIMENTAL] .ThemeModeConverter [TypeInfo] -> Experimental(WPF0001)
+[EXPERIMENTAL] Jalium.UI.Application.ThemeMode [Property] -> Experimental(WPF0001)
+[EXPERIMENTAL] Jalium.UI.Window.ThemeMode [Property] -> Experimental(WPF0001)
+[RD] public instance/static surface: .ctor, Add, BeginInit, Changed, ChangedWithKeys, Clear, Contains, ContainsKey, CopyTo, Count, CurrentThemeKey, DeferNotifications, DeferrableContent, EndInit, FindName, GetEnumerator, InvalidatesImplicitDataTemplateResources, IsFixedSize, IsReadOnly, Item, Keys, MergedDictionaries, RegisterName, Remove, ResourcesChangedEventArgs, Source, SourceLoader, ThemeDictionaries, TryGetValue, UnregisterName, Values, add_Changed, add_ChangedWithKeys, get_Count, get_CurrentThemeKey, get_DeferrableContent, get_InvalidatesImplicitDataTemplateResources, get_IsFixedSize, get_IsReadOnly, get_Item, get_Keys, get_MergedDictionaries, get_Source, get_SourceLoader, get_ThemeDictionaries, get_Values, remove_Changed, remove_ChangedWithKeys, set_CurrentThemeKey, set_DeferrableContent, set_InvalidatesImplicitDataTemplateResources, set_Item, set_Source, set_SourceLoader
+[RD] Method InvalidateMergedLookupCaches isPublic=False calls=[Interlocked.Increment [System.Private.CoreLib]]
+[RD] Method NotifyKeysChanged isPublic=False calls=[ArgumentNullException.ThrowIfNull [System.Private.CoreLib], ResourceDictionary.OnChangedForKeys <private>]
+[RD] Property CurrentThemeKey isPublic=True calls=[]
+[MISS] Jalium.UI.Managed:Application.OnThemeModeChanged not found
+[CALLS] Application.set_ThemeMode [public] -> 16 distinct
+[  ] Application.ApplyCachedSystemThemePreference <private>
+[  ] Application.ApplyWindowsSystemThemePreference <private>
+[  ] OperatingSystem.IsWindows [System.Private.CoreLib]
+[  ] ThemeManager.ApplyTheme
+[  ] ThemeMode.get_Dark
+[  ] ThemeMode.get_Light
+[  ] ThemeMode.get_None
+[  ] ThemeMode.get_System
+[  ] ThemeMode.op_Equality
+[CALLS] Application.NotifyThemeResourcesChanged [internal] -> 8 distinct
+[  ] Application.<NotifyThemeResourcesChanged>g__SafeNotifyThemeResourcesChangedFromRoot|94_0 <internal>
+[  ] Application.get_MainWindow
+[  ] PopupWindow.SnapshotOpenPopupWindows <internal>
+[  ] ResourceLookup.InvalidateResourceCache
+[  ] Window.SnapshotOpenWindows <internal>
+[  ] virt EventHandler.Invoke [System.Private.CoreLib]
+[CALLS] ThemeManager.ApplyTheme [public] -> 9 distinct
+[  ] CompositionTarget.RequestImmediateFrame <internal>
+[  ] Enum.IsDefined [System.Private.CoreLib]
+[  ] Object.Equals [System.Private.CoreLib]
+[  ] ResourceDictionary.get_CurrentThemeKey
+[  ] ResourceDictionary.set_CurrentThemeKey
+[  ] ThemeManager.ForceThemeRefresh <private>
+[  ] ThemeManager.GetEffectiveThemeKey <private>
+[  ] ThemeManager.get_CurrentTheme
+[  ] ThemeManager.set_CurrentTheme <private>
+[CALLS] ThemeManager.ApplyAccent [public] -> 8 distinct
+[  ] Color.op_Equality
+[  ] ThemeManager.BuildAccentDictionary <private>
+[  ] ThemeManager.CompleteTargetedThemeRefresh <private>
+[  ] ThemeManager.ForceThemeRefresh <private>
+[  ] ThemeManager.ReplaceManagedDictionary <private>
+[  ] ThemeManager.UpdateAccentDictionaryInPlace <private>
+[  ] ThemeManager.get_CurrentAccentColor
+[  ] ThemeManager.set_CurrentAccentColor <private>
+[CALLS] ThemeManager.ApplyBrandTheme [public] -> 16 distinct
+[  ] Application.get_Resources
+[  ] ArgumentNullException.ThrowIfNull [System.Private.CoreLib]
+[  ] ThemeManager.ApplyAccent
+[  ] ThemeManager.ApplyTheme
+[  ] ThemeManager.ApplyTypography
+[  ] ThemeManager.ForceThemeRefresh <private>
+[  ] ThemeManager.get_CurrentBodyFontFamily
+[  ] ThemeManager.get_CurrentDisplayFontFamily
+[  ] ThemeManager.get_CurrentMonospaceFontFamily
+[  ] virt BrandThemeOptions.get_AccentColor
+[  ] virt BrandThemeOptions.get_BodyFontFamily
+[  ] virt BrandThemeOptions.get_DisplayFontFamily
+[  ] virt BrandThemeOptions.get_MonoFontFamily
+[  ] virt BrandThemeOptions.get_Theme
+[  ] virt IDisposable.Dispose [System.Private.CoreLib]
+[  ] virt ResourceDictionary.DeferNotifications
+[CALLS] ThemeManager.Initialize [public] -> 34 distinct
+[  ] ArgumentNullException.ThrowIfNull [System.Private.CoreLib]
+[  ] Nullable`1.get_HasValue [System.Private.CoreLib]
+[  ] Nullable`1.get_Value [System.Private.CoreLib]
+[  ] ResourceDictionary.set_CurrentThemeKey
+[  ] ResourceDictionaryDiagnostics.RegisterGenericResourceDictionary <internal>
+[  ] ThemeManager.BuildAccentDictionary <private>
+[  ] ThemeManager.BuildTypographyDictionary <private>
+[  ] ThemeManager.DetachManagedDictionaries <private>
+[  ] ThemeManager.EnsureManagedDictionariesAttached <private>
+[  ] ThemeManager.EnsurePlatformIntegrationLoaded <private>
+[  ] ThemeManager.EnsureXamlLoaderRegistered <private>
+[  ] ThemeManager.ForceThemeRefresh <private>
+[  ] ThemeManager.GetEffectiveThemeKey <private>
+[  ] ThemeManager.InvalidateThemeStyleCache <private>
+[  ] ThemeManager.LoadGenericTheme <private>
+[  ] ThemeManager.SyncThemeFromCurrentThemeKey <private>
+[  ] ThemeManager.TryGetPlatformAccent <private>
+[  ] ThemeManager.get_CurrentAccentColor
+[  ] ThemeManager.get_CurrentBodyFontFamily
+[  ] ThemeManager.get_CurrentBodyFontSize
+[  ] ThemeManager.get_CurrentDisplayFontFamily
+[  ] ThemeManager.get_CurrentMonospaceFontFamily
+[  ] ThemeManager.get_XamlLoader
+[  ] ThemeManager.set_CurrentAccentColor <private>
+[  ] virt Application.get_Resources
+[  ] virt Collection`1.Add [System.Private.CoreLib]
+[  ] virt ResourceDictionary.get_MergedDictionaries
+[CALLS] ThemeManager.InvalidateThemeStyleCache [private] -> 3 distinct
+[  ] Monitor.Enter [System.Private.CoreLib]
+[  ] Monitor.Exit [System.Private.CoreLib]
+[  ] Volatile.Write [System.Private.CoreLib]
+[CALLS] ThemeManager.LoadGenericTheme [private] -> 5 distinct
+[  ] ThemeManager.get_ControlsAssembly
+[  ] ThemeManager.get_XamlLoader
+[  ] virt Func`4.Invoke [System.Private.CoreLib]
+[  ] virt IDisposable.Dispose [System.Private.CoreLib]
+[CALLS] ThemeManager.Reset [internal] -> 11 distinct
+[  ] DynamicResourceBindingOperations.ResetRegistryForTesting <internal>
+[  ] ResourceDictionary.set_CurrentThemeKey
+[  ] ResourceDictionaryDiagnostics.UnregisterGenericResourceDictionary <internal>
+[  ] ThemeManager.DetachManagedDictionaries <private>
+[  ] ThemeManager.InvalidateThemeStyleCache <private>
+[  ] ThemeManager.set_CurrentAccentColor <private>
+[  ] ThemeManager.set_CurrentBodyFontFamily <private>
+[  ] ThemeManager.set_CurrentBodyFontSize <private>
+[  ] ThemeManager.set_CurrentDisplayFontFamily <private>
+[  ] ThemeManager.set_CurrentMonospaceFontFamily <private>
+[  ] ThemeManager.set_CurrentTheme <private>
+[THEMEMODE] props: Dark, Light, None, System, Value
+[THEMEMODE] attrs: NullableContextAttribute, NullableAttribute, IsReadOnlyAttribute, ExperimentalAttribute
+[THEMEMODE] Window.SystemBackdrop get=public set=public
+[THEMEMODE] Window.ThemeMode get=public set=public

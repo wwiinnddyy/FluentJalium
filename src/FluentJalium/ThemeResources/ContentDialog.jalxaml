@@ -1,0 +1,25 @@
+<!-- WinUI 3 ContentDialog_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob 9cd8150fff8c216319e2d5515b538cfab5b397d5, Light/Default branch (lines 5-20).
+     Upstream declares sixteen rows; this dictionary publishes the ten a template on this runtime can
+     actually read - six alias rows and four Thickness rows - and holds the other six back for the reason
+     written on each: ContentDialogMinWidth / MaxWidth / MinHeight / MaxHeight are x:Double rows, which this
+     markup reader cannot parse (adaptation/00, and the same wall the NumberBox and MenuFlyout batches hit),
+     so 320 / 548 / 184 / 756 ride as literals on the one Border that needs them; ContentDialogButtonSpacing
+     is a GridLength and has the same problem one row earlier in the file, so the 8 DIP gap between dialog
+     buttons is a literal on its column; and ContentDialogBorderWidth is published because a Thickness of 1
+     parses here even though the width is the only numeric row upstream shares with the borderless ones.
+     The High Contrast branch of these rows is not transcribed because the façade has no high-contrast entry
+     point (adaptation/00 "高对比度：公开管线里没有入口"), and every one of its values differs from Light only
+     in the system-colour targets. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="ContentDialogBorderWidth">1</Thickness>
+  <Thickness x:Key="ContentDialogTitleMargin">0,0,0,12</Thickness>
+  <Thickness x:Key="ContentDialogPadding">24</Thickness>
+  <Thickness x:Key="ContentDialogSeparatorThickness">0,0,0,1</Thickness>
+  <StaticResource x:Key="ContentDialogForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ContentDialogBackground" ResourceKey="SolidBackgroundFillColorBaseBrush" />
+  <StaticResource x:Key="ContentDialogSmokeFill" ResourceKey="SmokeFillColorDefaultBrush" />
+  <StaticResource x:Key="ContentDialogTopOverlay" ResourceKey="LayerFillColorAltBrush" />
+  <StaticResource x:Key="ContentDialogBorderBrush" ResourceKey="SurfaceStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ContentDialogSeparatorBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+</ResourceDictionary>

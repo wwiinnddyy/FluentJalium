@@ -1,0 +1,39 @@
+==> restore
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+==> build (Debug)
+  FluentJalium -> C:\git\Jalium\FluentJalium\src\FluentJalium\bin\Debug\net10.0-windows\FluentJalium.dll
+  FluentJalium.Tests -> C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll
+  FluentJalium.Gallery -> C:\git\Jalium\FluentJalium\samples\FluentJalium.Gallery\bin\Debug\net10.0-windows\FluentJalium.Gallery.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:03.64
+==> test suite (structure, resource keys, theme runtime)
+C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\bin\Debug\net10.0-windows\FluentJalium.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+[xUnit.net 00:01:22.79]     FluentJalium.Tests.AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has [FAIL]
+  失败 FluentJalium.Tests.AstraTeachingTipTests.A_side_with_no_room_for_the_card_loses_to_one_that_has [4 s]
+  错误消息:
+   Assert.Multiple() Failure: Multiple failures were encountered
+---- Assert.Equal() Failure: Values differ
+Expected: Bottom
+Actual:   Top
+---- the flipped card did not move to the anchor's bottom edge: -185.9
+  堆栈跟踪:
+  Inner stack traces:
+----- Inner Stack Trace #1 (Xunit.Sdk.EqualException) -----
+   at FluentJalium.Tests.AstraTeachingTipTests.<>c__DisplayClass20_0.<A_side_with_no_room_for_the_card_loses_to_one_that_has>b__1() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraTeachingTipTests.cs:line 487
+----- Inner Stack Trace #2 (Xunit.Sdk.TrueException) -----
+   at FluentJalium.Tests.AstraTeachingTipTests.<A_side_with_no_room_for_the_card_loses_to_one_that_has>b__20_2() in C:\git\Jalium\FluentJalium\tests\FluentJalium.Tests\AstraTeachingTipTests.cs:line 488
+
+失败!  - 失败:     1，通过:  1590，已跳过:     0，总计:  1591，持续时间: 7 m 39 s - FluentJalium.Tests.dll (net10.0)
+Invoke-Step : test suite (structure, resource keys, theme runtime) failed with exit code 1
+����λ�� C:\git\Jalium\FluentJalium\tools\Test-AstraGates.ps1:49 �ַ�: 5
++     Invoke-Step 'test suite (structure, resource keys, theme runtime) ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,Invoke-Step
+ 

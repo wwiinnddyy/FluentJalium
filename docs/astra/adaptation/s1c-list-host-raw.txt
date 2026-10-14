@@ -1,0 +1,279 @@
+S1-c raw output - what a list host and its item containers can and cannot do on 26.10.9
+======================================================================================
+Source: spike/ListProbe (one pass of mode "all": A types, B mounted stock tree, C retemplating the host,
+D 1000-item virtualization, E selection surface, F the gutter sweep, G container-style routes, H the rest of
+the container contract, I our own item template). Run before any list product code existed, on the same
+machine as the xunit suite.
+WinUI reference: ../microsoft-ui-xaml commit 19e3bdc3ccf3361393d623d3a5d2667cb8f33229,
+controls/dev/CommonStyles/ListBox_themeresources.xaml (blob df9ca8dfe48b7cd4487b24b4f7954c7a74e683f8) for the
+rows and both templates, and dxaml/xcp/dxaml/themes/generic.xaml:243/300-304 for what the SystemControl*
+targets those rows alias actually resolve to.
+Method reference: ../ModernWpf commit 23555a6c00623b2f80e67f20d7f1df49a1d28ad8, ModernWpf/Styles/ListBox.xaml
+and Styles/ListBoxItem.xaml.
+Nothing below is edited: these are the lines the probe wrote.
+
+theme dictionaries=36
+
+=== A. what the runtime exports for lists (by simple name over the loaded Jalium.UI assemblies) ===
+  ItemsControl = Jalium.UI.Controls.ItemsControl : Control | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: AlternationCountProperty, AlternationIndexProperty, DisplayMemberPathProperty, GroupStyleSelectorProperty, HasItemsProperty, IsGroupingProperty, IsTextSearchCaseSensitiveProperty, IsTextSearchEnabledProperty, ItemBindingGroupProperty, ItemContainerStyleProperty, ItemContainerStyleSelectorProperty, ItemStringFormatProperty, ItemTemplateProperty, ItemTemplateSelectorProperty, ItemsPanelProperty, ItemsSourceProperty
+  ListBox = Jalium.UI.Controls.ListBox : Selector | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, SelectionMode, SelectedIndex, SelectedItem, SelectedItems, IsSynchronizedWithCurrentItem, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: SelectedItemsProperty, SelectionModeProperty
+  ListBoxItem = Jalium.UI.Controls.ListBoxItem : ContentControl | public=True abstract=False | ctor=True
+      see-surface: IsSelected, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: IsSelectedProperty
+  ListView = Jalium.UI.Controls.ListView : ListBox | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, SelectionMode, SelectedIndex, SelectedItem, SelectedItems, IsSynchronizedWithCurrentItem, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: ViewProperty
+  ListViewItem = Jalium.UI.Controls.ListViewItem : ListBoxItem | public=True abstract=False | ctor=True
+      see-surface: IsSelected, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: 
+  GridView = Jalium.UI.Controls.GridView : ViewBase | public=True abstract=False | ctor=True
+      see-surface: none
+      own DPs: AllowsColumnReorderProperty, ColumnCollectionProperty, ColumnHeaderContainerStyleProperty, ColumnHeaderContextMenuProperty, ColumnHeaderStringFormatProperty, ColumnHeaderTemplateProperty, ColumnHeaderTemplateSelectorProperty, ColumnHeaderToolTipProperty
+  TreeView = Jalium.UI.Controls.TreeView : ItemsControl | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, SelectedItem, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: SelectedItemProperty, SelectedValuePathProperty, SelectedValueProperty
+  TreeViewItem = Jalium.UI.Controls.TreeViewItem : HeaderedItemsControl | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, IsSelected, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: IsExpandedProperty, IsSelectedProperty, IsSelectionActiveProperty
+  VirtualizingStackPanel = Jalium.UI.Controls.VirtualizingStackPanel : VirtualizingPanel | public=True abstract=False | ctor=True
+      see-surface: Background, VirtualizationMode
+      own DPs: OrientationProperty, SpacingProperty
+  StackPanel = Jalium.UI.Controls.StackPanel : Panel | public=True abstract=False | ctor=True
+      see-surface: Background
+      own DPs: OrientationProperty, SpacingProperty
+  ScrollViewer = Jalium.UI.Controls.ScrollViewer : ContentControl | public=True abstract=False | ctor=True
+      see-surface: HorizontalScrollBarVisibility, VerticalScrollBarVisibility, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: CanContentScrollProperty, ComputedHorizontalScrollBarVisibilityProperty, ComputedVerticalScrollBarVisibilityProperty, ContentHorizontalOffsetProperty, ContentVerticalOffsetProperty, ExtentHeightProperty, ExtentWidthProperty, FillViewportProperty, HorizontalOffsetProperty, HorizontalScrollBarVisibilityProperty, IsDeferredScrollingEnabledProperty, IsOverlayScrollBarEnabledProperty, IsScrollBarAutoHideEnabledProperty, IsScrollInertiaEnabledProperty, PanningDecelerationProperty, PanningModeProperty, PanningRatioProperty, ScrollInertiaDurationMsProperty, ScrollableHeightProperty, ScrollableWidthProperty, VerticalOffsetProperty, VerticalScrollBarVisibilityProperty, ViewportHeightProperty, ViewportWidthProperty
+  Selector = Jalium.UI.Controls.Primitives.Selector : ItemsControl | public=True abstract=True | ctor=False
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, SelectedIndex, SelectedItem, IsSynchronizedWithCurrentItem, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: IsSelectedProperty, IsSelectionActiveProperty, IsSynchronizedWithCurrentItemProperty, SelectedIndexProperty, SelectedItemProperty, SelectedValuePathProperty, SelectedValueProperty
+  DataGrid = Jalium.UI.Controls.DataGrid : MultiSelector | public=True abstract=False | ctor=True
+      see-surface: Items, ItemsSource, ItemTemplate, ItemContainerStyle, ItemsPanel, SelectionMode, SelectedIndex, SelectedItem, SelectedItems, IsSynchronizedWithCurrentItem, HorizontalScrollBarVisibility, VerticalScrollBarVisibility, Padding, BorderBrush, BorderThickness, Background, Foreground
+      own DPs: AlternatingRowBackgroundProperty, AreRowDetailsFrozenProperty, AutoGenerateColumnsProperty, CanUserAddRowsProperty, CanUserDeleteRowsProperty, CanUserReorderColumnsProperty, CanUserResizeColumnsProperty, CanUserResizeRowsProperty, CanUserSortColumnsProperty, CellStyleProperty, CellsPanelHorizontalOffsetProperty, ClipboardCopyModeProperty, ColumnHeaderHeightProperty, ColumnHeaderStyleProperty, ColumnWidthProperty, CurrentCellProperty, CurrentColumnProperty, CurrentItemProperty, DragIndicatorStyleProperty, DropLocationIndicatorStyleProperty, EnableColumnVirtualizationProperty, EnableRowVirtualizationProperty, FrozenColumnCountProperty, GridLinesVisibilityProperty, HeadersVisibilityProperty, HorizontalGridLinesBrushProperty, HorizontalScrollBarVisibilityProperty, IsReadOnlyProperty, MaxColumnWidthProperty, MinColumnWidthProperty, MinRowHeightProperty, NewItemMarginProperty, NonFrozenColumnsViewportHorizontalOffsetProperty, RowBackgroundProperty, RowDetailsTemplateProperty, RowDetailsTemplateSelectorProperty, RowDetailsVisibilityModeProperty, RowHeaderActualWidthProperty, RowHeaderStyleProperty, RowHeaderTemplateProperty, RowHeaderTemplateSelectorProperty, RowHeaderWidthProperty, RowHeightProperty, RowStyleProperty, RowStyleSelectorProperty, RowValidationErrorTemplateProperty, SelectionModeProperty, SelectionUnitProperty, VerticalGridLinesBrushProperty, VerticalScrollBarVisibilityProperty
+
+  SelectionMode: Single, Multiple, Extended
+  VirtualizationMode: Standard, Recycling
+  ScrollMode: NOT EXPORTED
+
+=== B. a mounted ListBox: what tree the framework builds, and what it calls its parts ===
+  style=null template=True items-panel=True container-style=null list 260x180
+
+  ListBox 260x180
+    Grid 260x180
+      Border 'PART_OuterBorder' 260x180
+        ScrollViewer 254x174
+          ItemsPresenter 242x174
+            VirtualizingStackPanel 242x174
+              ListBoxItem 242x33.78
+                Grid 242x33.78
+                  Border 'PART_BackgroundBorder' 242x33.78
+                    ContentPresenter 44.75x19.78
+                      TextBlock 44.75x19.78
+              ListBoxItem 242x33.78
+                Grid 242x33.78
+                  Border 'PART_BackgroundBorder' 242x33.78
+                    ContentPresenter 44.75x19.78
+                      TextBlock 44.75x19.78
+              ListBoxItem 242x33.78
+                Grid 242x33.78
+                  Border 'PART_BackgroundBorder' 242x33.78
+                    ContentPresenter 44.75x19.78
+                      TextBlock 44.75x19.78
+              ListBoxItem 242x33.78
+                Grid 242x33.78
+                  Border 'PART_BackgroundBorder' 242x33.78
+                    ContentPresenter 44.75x19.78
+                      TextBlock 44.75x19.78
+              ListBoxItem 242x33.78
+                Grid 242x33.78
+                  Border 'PART_BackgroundBorder' 242x33.78
+                    ContentPresenter 44.75x19.78
+                      TextBlock 44.75x19.78
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 0x12
+                Border 'ThumbBorder' 0x12
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+          ScrollBar 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+            Track 0x0
+              RepeatButton 0x0
+                Border 0x0
+              Thumb 12x0
+                Border 'ThumbBorder' 12x0
+              RepeatButton 0x0
+                Border 0x0
+            RepeatButton 0x0
+              Border 'PART_ButtonRoot' 0x0
+                Path 'PART_Arrow' 0x0
+  containers found: 5
+  first item surface: ListBoxItem 242x33.78 at x=3 y=3 bg=SolidColorBrush(#00FFFFFF)
+  item own DPs: IsSelectedProperty
+
+=== C. assigning a parsed ControlTemplate to ListBox ===
+  ContentControl.UseTemplateContentManagement declared on: ContentControl
+  bare ItemsPresenter: assigned=True tree=1 items-presenters=1 containers=4 list 260x180
+  items host is a StackPanel: assigned=True tree=1 items-presenters=0 containers=0 list 260x180
+  renamed presenter: assigned=True tree=1 items-presenters=0 containers=4 list 260x180
+  upstream-shaped: assigned=True tree=1 items-presenters=1 containers=4 list 260x180
+
+      ListBox 260x180
+        Border 'Border' 260x180
+          ScrollViewer 'SV' 258x178
+            ItemsPresenter 'ItemsPresenter' 246x178
+              VirtualizingStackPanel 246x178
+                ListBoxItem 246x33.78
+                  Grid 246x33.78
+                    Border 'PART_BackgroundBorder' 246x33.78
+                      ContentPresenter 44.75x19.78
+                        TextBlock 44.75x19.78
+                ListBoxItem 246x33.78
+                  Grid 246x33.78
+                    Border 'PART_BackgroundBorder' 246x33.78
+                      ContentPresenter 44.75x19.78
+                        TextBlock 44.75x19.78
+                ListBoxItem 246x33.78
+                  Grid 246x33.78
+                    Border 'PART_BackgroundBorder' 246x33.78
+                      ContentPresenter 44.75x19.78
+                        TextBlock 44.75x19.78
+                ListBoxItem 246x33.78
+                  Grid 246x33.78
+                    Border 'PART_BackgroundBorder' 246x33.78
+                      ContentPresenter 44.75x19.78
+                        TextBlock 44.75x19.78
+            ScrollBar 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+              Track 0x0
+                RepeatButton 0x0
+                  Border 0x0
+                Thumb 0x12
+                  Border 'ThumbBorder' 0x12
+                RepeatButton 0x0
+                  Border 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+            ScrollBar 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+              Track 0x0
+                RepeatButton 0x0
+                  Border 0x0
+                Thumb 12x0
+                  Border 'ThumbBorder' 12x0
+                RepeatButton 0x0
+                  Border 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+
+=== D. 1000 items in a 260x180 list: realized containers and the width asymmetry ===
+  items=1000 containers-in-tree=11 scroll-viewer-children=1
+  is-virtualizing on the items panel: found VirtualizingStackPanel
+  width ledger (S0-u asymmetry): list=260x180 item=242x33.78 item-origin=3,3 left-gap=3 right-gap=15
+  ScrollBar parts: ScrollBar 12x174 visible=Visible; ScrollBar 0x0 visible=Collapsed
+  after scrolling down: called ScrollToVerticalOffset(400); content=ItemsPresenter; first container 242x33.78
+
+=== E. selection surface: properties, keyboard handling, automation providers ===
+  SelectedIndex after add: -1
+  set SelectedIndex=2 -> ok
+  reads SelectedIndex=2 SelectedItem=String
+  container own DPs of interest: IsSelectedProperty
+  SelectionMode on list: Single
+  set SelectionMode=Single -> ok, reads Single
+  set SelectionMode=Multiple -> ok, reads Multiple
+  set SelectionMode=Extended -> ok, reads Extended
+  handlers declared on ListBox: GetSelectionValueAtIndex, HandleArrowKey, HandleDragSelect, HandleSpaceKey, OnKeyDownHandler, OnMouseDownHandler, SelectAll, SelectExtended, SelectItem, SelectMultiple, SelectRange, SelectSingle, SetSelectedItems, TryResolveSelectionItem, UpdateContainerSelection, get_SelectedItems, get_SelectionMode, set_SelectionMode
+  automation peer: ListBoxAutomationPeer
+  item peer: ListBoxItemAutomationPeer implements ISelectionItemProvider, IVirtualizedItemProvider, IScrollItemProvider
+
+=== F. the 12 DIP gutter: what makes the two gaps equal ===
+  no attributes (5 items): item=246x33.78 at 1,1 left=1 right=13 bars=0x0/Collapsed 0x0/Collapsed
+  Auto vertical (5 items): item=246x33.78 at 1,1 left=1 right=13 bars=0x0/Collapsed 0x0/Collapsed
+  Visible vertical (5 items): item=246x33.78 at 1,1 left=1 right=13 bars=12x178/Visible 0x0/Collapsed
+  Auto + overlay bars (5 items): item=258x33.78 at 1,1 left=1 right=1 bars=0x0/Collapsed 0x0/Collapsed
+  Auto + autohide (5 items): item=246x33.78 at 1,1 left=1 right=13 bars=0x0/Collapsed 0x0/Collapsed
+  overlay + autohide (5 items): item=258x33.78 at 1,1 left=1 right=1 bars=0x0/Collapsed 0x0/Collapsed
+  Auto overflow 50 (50 items): item=246x33.78 at 1,1 left=1 right=13 bars=12x178/Visible 0x0/Collapsed
+  overlay overflow 50 (50 items): item=258x33.78 at 1,1 left=1 right=1 bars=40x178/Visible 0x0/Collapsed
+  padding on viewer (5 items): item=258x33.78 at 1,1 left=1 right=1 bars=0x0/Collapsed 0x0/Collapsed
+
+=== G. how a container style arrives: implicit type key, ItemContainerStyle, or both ===
+  implicit dictionary parse: ResourceDictionary, app lookup of typeof(ListBoxItem) before merge: Style
+  standalone style parse: Style
+  baseline plain: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78
+  app-implicit only: style=null bg=SolidColorBrush(#FFAD1457) padding=31,7,31,7 size=258x35.78 | app lookup after merge: Style
+  plain list re-read after the merge (already-realized containers): style=null bg=SolidColorBrush(#FFAD1457) padding=31,7,31,7 size=258x35.78
+  implicit + explicit: style=assigned bg=SolidColorBrush(#FF00695C) padding=5,1,5,1 size=258x30
+  explicit only: style=assigned bg=SolidColorBrush(#FF00695C) padding=5,1,5,1 size=258x30
+  implicit dictionary gone, re-read of the implicit list: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78
+
+=== H. container-route leftovers: ItemContainerTheme, window-scope dictionaries, type-key lookup ===
+  ItemContainerTheme on ListBox: not exported
+  ItemContainerStyle declared on: inherited, not declared
+  before: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78
+  window-merged, new list: style=null bg=SolidColorBrush(#FFAD1457) padding=31,7,31,7 size=258x35.78
+  window-merged, list mounted before the merge: style=null bg=SolidColorBrush(#FFAD1457) padding=31,7,31,7 size=258x35.78
+  after removing the window dictionary: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78
+  TryFindResource(typeof(ListBoxItem)) on the container: Style
+
+=== I. our own ListBoxItem template on a generated container ===
+  stock resting: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78 | fill part: SolidColorBrush(#00FFFFFF)
+  stock selected: style=null bg=SolidColorBrush(#00FFFFFF) padding=10,6,10,6 size=258x33.78 | fill part: SolidColorBrush(#99680081) | list SelectedIndex=0 | container IsSelected=True
+  item template dictionary parse: ResourceDictionary
+  ours resting: style=null bg=SolidColorBrush(#00FFFFFF) padding=12,9,12,12 size=258x40.78 | highlight part: SolidColorBrush(#00FFFFFF)
+
+      ListBoxItem 258x40.78
+        Grid 258x40.78
+          Border 'LayoutRoot' 258x40.78
+          ContentPresenter 'ContentPresenter' 234x19.78
+            TextBlock 234x19.78
+  ours selected: style=null bg=SolidColorBrush(#00FFFFFF) padding=12,9,12,12 size=258x40.78 | highlight part: SolidColorBrush(#FF0078D4) | container IsSelected=True
+  container surface after select: is-selected=True content=Item 1 text=Item 1 padding=12,9,12,12 corner=4,4,4,4 min-height=34
+  geometry: list=260 item=258x40.78 left=1 right=1
+  highlight fill geometry: LayoutRoot 258x40.78 at x=1 y=1
+  IsHighlighted on ListBoxItem: not exported
+  IsSelectionActive on ListBoxItem: not exported
+  IsPressed on ListBoxItem: not exported
+
+
+===== second pass: the same mode F sweep AFTER Styles/ListBoxes.jalxaml shipped =====
+Re-run of mode gutter with the list and item implicit styles live. The rows are now 40.78 tall (the row padding row landed), which makes five rows
+overflow a 180 DIP viewport, so the bar shows in more variants than the first pass. The three new rows at the
+bottom answer the carry-forward question: Hidden reserves nothing, so the combo dropdown and the suggestion list
+already sit at 0/0 - the 12 DIP reservation only bites surfaces that ask for Auto or Visible.
+
+theme dictionaries=38
+
+=== F. the 12 DIP gutter: what makes the two gaps equal ===
+  no attributes (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Auto vertical (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Visible vertical (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  Auto + overlay bars (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Auto + autohide (5 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  overlay + autohide (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Auto overflow 50 (50 items): item=248x40.78 at 0,0 left=0 right=12 bars=12x180/Visible 0x0/Collapsed
+  overlay overflow 50 (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  padding on viewer (5 items): item=260x40.78 at 0,0 left=0 right=0 bars=40x180/Visible 0x0/Collapsed
+  Hidden vertical (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed
+  Hidden + overlay (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed
+  Disabled + overlay (50 items): item=260x40.78 at 0,0 left=0 right=0 bars=0x0/Collapsed 0x0/Collapsed

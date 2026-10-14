@@ -1,0 +1,8 @@
+=== does a StaticResource alias row carry a Double to a live FontSize? ===
+app scope: CaptionFontSize=Double 10 SmallFontSize=Double 8 TextBlock.FontSize default=14
+SystemFonts.CaptionFontSize at rest : Double 12
+resting            : leg=no alias row FontSize=10 app-resolves=Double 10
+parsed row           : Double 8 (keys=1)
+with alias merged    : leg=alias merged FontSize=8 app-resolves=Double 8 SystemFonts.CaptionFontSize=Double 12
+after retargeting the source to 6: CaptionFontSize=Double 8 SmallFontSize=Double 6 (a live alias would follow, a copy would not)
+after alias removed  : leg=alias removed FontSize=10 app-resolves=Double 10

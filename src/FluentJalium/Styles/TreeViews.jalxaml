@@ -1,0 +1,177 @@
+<!-- WinUI 3 TreeView_themeresources.xaml @19e3bdc3c (MIT), blob 8e7a107255310706dda5e4e5ca6edf99b6b14eb9, plus
+     TreeView.xaml blob 9f419035a19cc68910b97cec4fd5ce264cdfefde (DefaultTreeViewStyle 9-30) and TreeViewItem.xaml
+     blob e6655da4feacad75dd68395ec2ddb231e6ad5cfb (MUX_TreeViewItemStyle 3-153, cell matrix 17-128, parts 130-147).
+     Jalium 26.10.9 part and behaviour contracts come from spike/TreeViewProbe (adaptation/s1e-treeview-raw.txt);
+     the row-by-row mapping and the eight withheld rows are docs/astra/audits/treeview.md. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The host. Upstream's whole template body is one TreeViewList (a ListViewBase this runtime does not export)
+       and its style reads no colour row at all, so the surface stays transparent and no ListBox row is borrowed
+       here - unlike the ListView host, which had to borrow four (audits/listview.md §1). What is NOT copied is
+       upstream's IsTabStop=False (TreeView.xaml:10): that value is safe there because the focusable part is the
+       inner list, and this runtime's host has no such part - the rows take focus themselves (spike/TreeViewProbe
+       mode I: the stock tree contains no focusable toggle at all). Copying it would leave the tree unreachable by
+       Tab, so the switch stays at the runtime default and the deviation is recorded in audits/treeview.md §5.1. -->
+  <Style x:Key="DefaultTreeViewStyle" TargetType="TreeView">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="Template"><ControlTemplate TargetType="TreeView">
+      <Border Name="LayoutRoot" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}">
+        <!-- The three scroll switches ride as literals because an attached-name setter never reaches the part
+             (adaptation/00 S1-c 5, re-read on this host). IsOverlayScrollBarEnabled carries the margin defect the
+             user has reported twice: the stock tree measured left=1 right=13 and reserves the same 12 DIP for a
+             bar that is not even showing (S0-u, S1-c 7, S1-d 5). With the switch on, both gaps measure equal here
+             too, at 5 roots and at 50. -->
+        <ScrollViewer Name="ScrollViewer" Focusable="False" Padding="{TemplateBinding Padding}"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      IsOverlayScrollBarEnabled="True">
+          <ItemsPresenter Name="ItemsPresenter" />
+        </ScrollViewer>
+      </Border>
+    </ControlTemplate></Setter>
+  </Style>
+  <Style TargetType="TreeView" BasedOn="{StaticResource DefaultTreeViewStyle}" />
+
+  <!-- The item. Upstream's MUX_TreeViewItemStyle is BasedOn DefaultListViewItemStyle and its eight CommonStates
+       cells write four things only: the root Grid's Background and BorderBrush, the ContentPresenter's Foreground,
+       and the pill's Fill plus Opacity. Three of those four routes exist here; the Foreground one does not, and
+       that is why the eight foreground rows are consumed by the Style.Triggers block at the bottom of this style
+       instead of by the template: ContentPresenter has no Foreground member on this runtime, so a template cell
+       aimed at it parses, loads, and writes nothing forever (probe mode K, adaptation/00 S1-e 7). Writing the
+       state on the container's own Foreground does reach the generated text, by property inheritance, and does so
+       one row at a time - both measured. -->
+  <Style x:Key="DefaultTreeViewItemStyle" TargetType="TreeViewItem">
+    <Setter Property="Foreground" Value="{ThemeResource TreeViewItemForeground}" />
+    <Setter Property="Background" Value="{ThemeResource TreeViewItemBackground}" />
+    <Setter Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{ThemeResource TreeViewItemBorderThemeThickness}" />
+    <Setter Property="Padding" Value="0" />
+    <!-- TreeViewItemMinHeight is an x:Double row, which this reader cannot parse, so 28 rides as a literal. The
+         header line's height is made of two other upstream numbers rather than this one: the presenter's own
+         TreeViewItemContentHeight 20 plus TreeViewItemPresenterPadding's 3 and 5, which add up to 28 exactly as
+         upstream intends - the measured ContentBorder is 28 tall against the runtime default of 40. -->
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="Template"><ControlTemplate TargetType="TreeViewItem">
+      <!-- Two rows, because this container is also the host of its children: the runtime's TreeViewItem is the
+           nested shape (TreeViewItem : HeaderedItemsControl), where WinUI's is one row in a flattened list. Only
+           the first row carries the fill, so hovering a parent highlights the parent and not its subtree. -->
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border Name="ContentBorder" Grid.Row="0" MinHeight="28"
+                Margin="{ThemeResource TreeViewItemPresenterMargin}"
+                Padding="{ThemeResource TreeViewItemPresenterPadding}"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{ThemeResource ControlCornerRadius}">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!-- The pill: upstream's exact geometry read off TreeViewItem.xaml:130 (Width 3, Height 16,
+                 RadiusX/Y 2, left-aligned, vertically centred, resting Opacity 0), and the only row in the list
+                 family where those numbers were readable at all - ListViewItemPresenter is C++ and hides the same
+                 four (S1-d 9). Opacity is what the cells move. -->
+            <Rectangle Name="SelectionIndicator" Width="3" Height="16" RadiusX="2" RadiusY="2"
+                       Fill="{ThemeResource TreeViewItemSelectionIndicatorForeground}"
+                       Opacity="0" HorizontalAlignment="Left" VerticalAlignment="Center" IsHitTestVisible="False" />
+            <!-- The chevron. Two measurements had to land before this cell could be written: a template part
+                 named Expander hooks nothing on this runtime (toggling one left IsExpanded untouched, probe mode F
+                 variant 2), and the stock template has no ToggleButton at all - so the only route from a template
+                 to the property is a two-way TemplatedParent binding, which was measured to carry both directions
+                 (mode F variant 3, and mode K re-confirming the click route end to end). A Transparent
+                 ToggleButton is the hit target and the glyphs sit above it unhittable, because upstream draws a
+                 glyph pair and toggles their visibility (CollapsedGlyph / ExpandedGlyph, TreeViewItem.xaml:144-145). -->
+            <Grid Grid.Column="0" Width="20">
+              <!-- The hit target sizes itself because leaving it to the toggle style costs 12 DIP of row height:
+                   our Fluent ToggleButton brings MinHeight 32, which measured 40 on a row upstream draws at 28
+                   (spike/TreeViewProbe pass-2 mount). -->
+              <ToggleButton Name="ChevronHitTarget" Width="20" Height="20" MinHeight="0" Focusable="False"
+                            Background="Transparent" BorderThickness="0" IsHitTestVisible="True"
+                            IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+              <Grid Width="12" Height="12" HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False">
+                <Path Name="CollapsedGlyph" Data="M 1.5,0 L 6.5,5 L 1.5,10" Width="12" Height="12" Stretch="Uniform"
+                      Stroke="{TemplateBinding Foreground}" StrokeThickness="1.2" />
+                <Path Name="ExpandedGlyph" Data="M 0,1.5 L 5,6.5 L 10,1.5" Width="12" Height="12" Stretch="Uniform"
+                      Stroke="{TemplateBinding Foreground}" StrokeThickness="1.2" Visibility="Collapsed" />
+              </Grid>
+            </Grid>
+            <!-- No Foreground here on purpose: the presenter has no such property to write (see the note above the
+                 style), and the text it builds picks the container's Foreground up by inheritance. -->
+            <ContentPresenter Name="ContentPresenter" Grid.Column="1" MinHeight="20"
+                              Content="{TemplateBinding Header}"
+                              ContentTemplate="{TemplateBinding HeaderTemplate}"
+                              ContentStringFormat="{TemplateBinding HeaderStringFormat}"
+                              Margin="{TemplateBinding Padding}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+              <!-- Navigation and list text does not wrap - the standing requirement since ComboBox: a wrapped row
+                   changes the tree's row height, and WinUI's row never does. -->
+              <ContentPresenter.Resources>
+                <Style TargetType="TextBlock">
+                  <Setter Property="TextWrapping" Value="NoWrap" />
+                </Style>
+              </ContentPresenter.Resources>
+            </ContentPresenter>
+          </Grid>
+        </Border>
+        <!-- The children. A nested host is required and required BY TYPE: a template without an ItemsPresenter
+             realised 2 containers out of 3 nodes and never grew on expand, while renaming it changed nothing
+             (probe mode C; the same contract held for ListBox and ListView - S1-c 2, S1-d 2). The 16 DIP left
+             inset is the indent, and it is the only route available: no dependency property carries the depth, a
+             full public and attached-DP diff between a level-1 and a level-2 row showing nothing but IsExpanded,
+             Header and layout bookkeeping (mode I). The runtime's own stock spacer measured the same 16, so the
+             step is upstream's, not ours. What the nesting costs is recorded in audits/treeview.md §5.3: the
+             child's fill narrows by 16 DIP per level, where WinUI's row spans the list. -->
+        <ItemsPresenter Name="ChildHost" Grid.Row="1" Margin="16,0,0,0" />
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundPointerOver}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushPointerOver}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundPointerOver}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundPointerOver}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundPointerOver}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="0" /></Trigger>
+        <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundPressed}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushPressed}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundPressed}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundPressed}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundPressed}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="0" /></Trigger>
+        <Trigger Property="IsSelected" Value="True"><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundSelected}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushSelected}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelected}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelected}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForeground}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /></Trigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundSelectedPointerOver}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushSelectedPointerOver}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedPointerOver}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedPointerOver}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundPointerOver}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /></MultiTrigger>
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseCaptureWithin" Value="True" /></MultiTrigger.Conditions><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundSelectedPressed}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushSelectedPressed}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedPressed}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedPressed}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundPressed}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /></MultiTrigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundDisabled}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushDisabled}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundDisabled}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundDisabled}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundDisabled}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="0" /></Trigger>
+        <!-- Upstream keeps a SelectedDisabled state of its own (TreeViewItem.xaml:84-94): a selected row that is
+             also disabled stays filled and keeps its pill, in the disabled colours. Triggers are additive on this
+             reader and the later writer takes the value, so this cell goes after the two it overrides. -->
+        <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter TargetName="ContentBorder" Property="Background" Value="{ThemeResource TreeViewItemBackgroundSelectedDisabled}" /><Setter TargetName="ContentBorder" Property="BorderBrush" Value="{ThemeResource TreeViewItemBorderBrushSelectedDisabled}" /><Setter TargetName="CollapsedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedDisabled}" /><Setter TargetName="ExpandedGlyph" Property="Stroke" Value="{ThemeResource TreeViewItemForegroundSelectedDisabled}" /><Setter TargetName="SelectionIndicator" Property="Fill" Value="{ThemeResource TreeViewItemSelectionIndicatorForegroundDisabled}" /><Setter TargetName="SelectionIndicator" Property="Opacity" Value="1" /></MultiTrigger>
+        <!-- The two tree cells. Collapsing hides the children rather than destroying them, which is what the
+             runtime itself does (after a parent was collapsed again its child containers were still in the tree,
+             mode E), and gating the host by visibility is the route that survived all four resting-value shapes
+             measured in mode J. A leaf keeps its 20 DIP column and hides its glyph - Hidden, not Collapsed, so the
+             labels of leaves and siblings still line up. -->
+        <Trigger Property="IsExpanded" Value="False"><Setter TargetName="ChildHost" Property="Visibility" Value="Collapsed" /></Trigger>
+        <Trigger Property="IsExpanded" Value="True"><Setter TargetName="CollapsedGlyph" Property="Visibility" Value="Collapsed" /><Setter TargetName="ExpandedGlyph" Property="Visibility" Value="Visible" /></Trigger>
+        <Trigger Property="HasItems" Value="False"><Setter TargetName="ChevronHitTarget" Property="Visibility" Value="Hidden" /><Setter TargetName="CollapsedGlyph" Property="Visibility" Value="Hidden" /><Setter TargetName="ExpandedGlyph" Property="Visibility" Value="Hidden" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter>
+    <!-- The eight foreground rows, on the container rather than on the presenter. Seven of them are state cells
+         and the eighth is the resting setter at the top of this style; the pairing with the template cells above
+         is one-for-one on the states, so a row's text and its fill always move together. -->
+    <Style.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundPointerOver}" /></Trigger>
+      <Trigger Property="IsMouseCaptureWithin" Value="True"><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundPressed}" /></Trigger>
+      <Trigger Property="IsSelected" Value="True"><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundSelected}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseOver" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundSelectedPointerOver}" /></MultiTrigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsMouseCaptureWithin" Value="True" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundSelectedPressed}" /></MultiTrigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundDisabled}" /></Trigger>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsSelected" Value="True" /><Condition Property="IsEnabled" Value="False" /></MultiTrigger.Conditions><Setter Property="Foreground" Value="{ThemeResource TreeViewItemForegroundSelectedDisabled}" /></MultiTrigger>
+    </Style.Triggers>
+  </Style>
+  <!-- Implicit, not ItemContainerStyle: the container style reaches generated containers through the type key.
+       On this family the container's own Style property does read non-null (the runtime ships its own implicit
+       TreeViewItem style, probe mode B) - unlike ListBox and ListViewItem, where it stayed null - so nothing in
+       the tests asserts "no style was applied"; they assert the effect, and the merge order is what makes ours
+       win, since our dictionaries are applied before any container exists. -->
+  <Style TargetType="TreeViewItem" BasedOn="{StaticResource DefaultTreeViewItemStyle}" />
+</ResourceDictionary>

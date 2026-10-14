@@ -1,0 +1,35 @@
+<!-- WinUI 3 SplitButton_themeresources.xaml @19e3bdc3ccf3361393d623d3a5d2667cb8f33229 (MIT),
+     blob e9601d1f29cd59aa5fe7b7f0ebb49ef9c836ac19, Light/Default branch (lines 5-35).
+     Fifteen alias rows (two of them a documented elevation-stroke substitution) plus SplitButtonBorderThemeThickness and SplitButtonPadding, transcribed so an app
+     restyles a split button by upstream's name and never by ours. Each alias resolves to the palette object
+     the kernel re-tints in place, so the Light/Dark flip and the high-contrast decision travel through it.
+     Fourteen upstream rows are deliberately NOT here yet: the thirteen *Checked* rows (four Background, four
+     Foreground, four BorderBrush and CheckedDivider) belong to ToggleSplitButton, which 26.10.9 does not
+     ship (spike/SplitButtonProbe), and SplitButtonInAppBarUnfocusedPointerOver belongs to
+     SplitButtonCommandBarStyle, which the CommandBar batch reads. A key we publish is a promise that
+     overriding it reaches pixels, so they come back with the batch that consumes them (audits/splitbutton.md).
+     SplitButtonPrimaryButtonSize / SplitButtonSecondaryButtonSize are x:Double rows and this runtime's reader
+     cannot parse that element, so 35 rides as a literal in the template that needs it. -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Thickness x:Key="SplitButtonBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="SplitButtonPadding">11,6,11,7</Thickness>
+  <StaticResource x:Key="SplitButtonBackground" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="SplitButtonBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="SplitButtonBackgroundPressed" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="SplitButtonBackgroundDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <StaticResource x:Key="SplitButtonForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="SplitButtonForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="SplitButtonForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="SplitButtonForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="SplitButtonForegroundSecondary" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="SplitButtonForegroundSecondaryPressed" ResourceKey="TextFillColorTertiaryBrush" />
+  <!-- Deviation, the same one the button dictionary records: upstream points these two at
+       ControlElevationBorderBrush, a gradient, and a gradient cannot ride the kernel's in-place retint
+       (ThemeResources/ComboBox.jalxaml). The nearest token the palette carries is the one the button family
+       already uses, so rest and hover borders share an instance and have no distinguishable pixels here. -->
+  <StaticResource x:Key="SplitButtonBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="SplitButtonBorderBrushPointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="SplitButtonBorderBrushPressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="SplitButtonBorderBrushDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="SplitButtonBorderBrushDivider" ResourceKey="ControlStrokeColorDefaultBrush" />
+</ResourceDictionary>

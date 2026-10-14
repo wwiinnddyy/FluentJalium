@@ -1,0 +1,107 @@
+raw readings from spike/IconFamilyProbe (in-proc, real Application + shown window + CompositionTarget.Rendering frames, RenderTargetBitmap captures over a 64x64 white field)
+program: spike/IconFamilyProbe/Program.cs | run: 2026-09-21 | runtime: Jalium.UI 26.10.9, .NET 10, Impeller
+
+[[1] mounted]
+
+[SymbolIcon{Add}] desired=20x20 actual=306.29x201.14 visual children=0
+
+[SymbolIcon{Add}]   Foreground=<null>; declared FontSize? no
+
+[FontIcon{E710,20}] desired=20x20 actual=306.29x201.14 visual children=0
+
+[FontIcon{E710,20}]   Foreground=<null>; declared FontSize? FontSize
+
+[PathIcon{line}] desired=20x20 actual=306.29x201.14 visual children=0
+
+[PathIcon{line}]   Foreground=<null>; declared FontSize? no
+
+[SymbolIcon{Remove}] desired=20x20 actual=306.29x201.14 visual children=0
+
+[SymbolIcon{Remove}]   Foreground=<null>; declared FontSize? no
+
+[SymbolIcon{Add after a live change}] child text now = "<none>" U+003C 006E 006F 006E 0065 003E; before the change it was "<none>" U+003C 006E 006F 006E 0065 003E
+
+[[2] markup]
+
+[SymbolIcon by name] type=SymbolIcon symbol=Add (0xE710) glyph=<n/a> children=0 desired=20x20 children-after-layout=[]
+
+[SymbolIcon by hex] type=SymbolIcon symbol=Add (0xE710) glyph=<n/a> children=0 desired=20x20 children-after-layout=[]
+
+[FontIcon] type=FontIcon symbol=<n/a> glyph="§J" U+E710 children=0 desired=20x20 children-after-layout=[]
+
+[PathIcon] type=PathIcon symbol=<n/a> glyph=<n/a> children=0 desired=20x20 children-after-layout=[]
+
+[unknown symbol name] type=SymbolIcon symbol=Cancel (0xE711) glyph=<n/a> children=0 desired=20x20 children-after-layout=[]
+
+[[3] ink]
+
+[SymbolIcon{Add}] over a 64x64 white field: non-white px=0, accent-ish px=0, icon desired=20x20
+
+[FontIcon{E710}] over a 64x64 white field: non-white px=0, accent-ish px=0, icon desired=20x20
+
+[PathIcon{line}] over a 64x64 white field: non-white px=0, accent-ish px=0, icon desired=20x20
+
+[PathIcon{20x20 solid block}] accent-ish px=4096 (expected near 400 if a fill prints)
+
+[[4] control]
+
+[TextBlock plain text] non-white=0, accent=0, ink box=<empty>, desired=25.52x27.4, actual=64x64
+
+[TextBlock glyph U+E710] non-white=0, accent=0, ink box=<empty>, desired=22x22, actual=64x64
+
+[SymbolIcon default brush] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[SymbolIcon accent brush] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[FontIcon accent brush] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[Border 20x20 accent] non-white=400, accent=400, ink box=20x20 at 22,22, desired=20x20, actual=20x20
+
+[PathIcon closed block] non-white=4096, accent=4096, ink box=64x64 at 0,0, desired=20x20, actual=64x64
+
+[PathIcon closed block, 20x20 explicit] non-white=400, accent=400, ink box=20x20 at 0,0, desired=20x20, actual=20x20
+
+[[4b] does the box follow the content?]
+
+[TextBlock glyph at 8] non-white=0, accent=0, ink box=<empty>, desired=10x10, actual=64x64
+
+[FontIcon at 8] non-white=0, accent=0, ink box=<empty>, desired=8x8, actual=64x64
+
+[TextBlock glyph at 20] non-white=0, accent=0, ink box=<empty>, desired=22x22, actual=64x64
+
+[FontIcon at 20] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[TextBlock glyph at 40] non-white=0, accent=0, ink box=<empty>, desired=42x42, actual=64x64
+
+[FontIcon at 40] non-white=0, accent=0, ink box=<empty>, desired=40x40, actual=64x64
+
+[SymbolIcon Add] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[SymbolIcon GlobalNavButton] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[SymbolIcon Calories] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[SymbolIcon Delete] non-white=0, accent=0, ink box=<empty>, desired=20x20, actual=64x64
+
+[ProbeIcon : IconElement override] non-white=0, accent=0, ink box=<empty>, desired=24x24, actual=64x64
+
+[subclass] MeasureOverride called 1 time(s), base desired=0x0
+
+[SymbolIcon members] Symbol
+
+[FontIcon members] Glyph, FontFamily, FontSize
+
+[IconElement methods]
+
+[[5] hosted]
+
+[SymbolIcon as Button.Content] icon appears in the button's visual tree: True; icon desired=20x20
+
+[SymbolIcon as Button.Content]         ContentPresenter desired=20x20
+
+[SymbolIcon as Button.Content]           SymbolIcon desired=20x20
+
+[FontIcon as Button.Content] icon appears in the button's visual tree: True; icon desired=20x20
+
+[PathIcon as Button.Content] icon appears in the button's visual tree: True; icon desired=20x20
+

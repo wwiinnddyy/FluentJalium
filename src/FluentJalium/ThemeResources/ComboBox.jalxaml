@@ -1,0 +1,151 @@
+<!-- WinUI 3 ComboBox_themeresources.xaml @19e3bdc3c (MIT), blob 4578f4c9b2e32fc701ca803aba51c032f9c23ead.
+     Its ThemeDictionaries are Default (lines 4-108), High Contrast (109-213) and Light (214-318), and unlike
+     the Slider file all three scopes carry the SAME 103 keys: 61 current-generation alias rows, 35 legacy
+     *ThemeBrush rows from the Windows 8.1 era, 6 more alias rows and one Thickness. The Light block's 61+7
+     current-generation rows are byte-identical to Default's - the two scopes differ only in the legacy
+     hexes - so one scope-independent alias layer covers both, which is how this dictionary is shaped.
+     The 35 legacy rows are out of scope (no current template reads them), leaving 68 current rows; 59 of
+     them (58 alias brushes plus ComboBoxDropdownBorderPadding) are transcribed here and the nine that are
+     not are named at the bottom with what was measured about each. audits/combobox.md records the High
+     Contrast branch (whose targets are all SystemControl* brushes our palette-level remap approximates
+     rather than matches). -->
+<ResourceDictionary xmlns="http://schemas.jalium.ui/2024" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Metric rows. Upstream keeps 29 of these outside the ThemeDictionaries (lines 320-348); only the
+       Thickness and CornerRadius rows can be declared, because this reader cannot parse an x:Double,
+       x:Int32 or x:String resource (measured with the Slider batch) - the eleven numeric rows therefore
+       ride as literals in the templates and are listed at the bottom. ComboBoxDropdownBorderPadding is
+       inside the ThemeDictionaries upstream (lines 107/212/317, value 0 in all three scopes); it is a
+       Thickness, so it is declared and sits with its siblings. -->
+  <Thickness x:Key="ComboBoxBorderThemeThickness">1</Thickness>
+  <Thickness x:Key="ComboBoxDropdownBorderThickness">1</Thickness>
+  <Thickness x:Key="ComboBoxBackgroundBorderThicknessFocused">2</Thickness>
+  <Thickness x:Key="ComboBoxItemThemePadding">11,5,11,7</Thickness>
+  <Thickness x:Key="ComboBoxDropdownContentMargin">0,4</Thickness>
+  <!-- Correction: an earlier note in audits/textbox-passwordbox.md called this key invented. It is not -
+       it is upstream's own row at line 341. What was wrong was the VALUE: this slot carried the Button's
+       11,5,11,6 because the row was copied from Metrics.jalxaml, where the ComboBox rows were parked
+       before the per-control dictionaries existed. Upstream's 12,5,0,7 has zero on the right because the
+       38-DIP chevron column is a sibling, not padding. -->
+  <Thickness x:Key="ComboBoxPadding">12,5,0,7</Thickness>
+  <Thickness x:Key="ComboBoxEditableTextPadding">11,5,38,6</Thickness>
+  <!-- Upstream's own typo in the key name (a missing "h" in "Highlight", line 343). Kept verbatim: the
+       rule for this layer is that a name an app overrides has to be the name WinUI ships. -->
+  <CornerRadius x:Key="ComboBoxHiglightBorderCornerRadius">7</CornerRadius>
+  <CornerRadius x:Key="ComboBoxDropDownButtonBackgroundCornerRadius">4</CornerRadius>
+  <CornerRadius x:Key="ComboBoxItemCornerRadius">3</CornerRadius>
+  <CornerRadius x:Key="ComboBoxItemPillCornerRadius">1.5</CornerRadius>
+  <Thickness x:Key="ComboBoxDropdownBorderPadding">0</Thickness>
+
+  <!-- Item rows, upstream lines 5-31 in the same order. The nine ComboBoxItemBorderBrush* rows are read
+       by the item template's root Border exactly as upstream reads them; upstream also gives that Border a
+       BorderThickness of nothing (the style sets no BorderThickness, so it stays 0), which makes those
+       nine setters paint nothing in every theme. They are kept because a parity claim about the key names
+       has to survive the state map, and the inertness is recorded in the audit. -->
+  <StaticResource x:Key="ComboBoxItemForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundSelected" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundSelectedPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundSelectedPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxItemForegroundSelectedDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxItemBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundSelected" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundSelectedPressed" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundSelectedPointerOver" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBackgroundSelectedDisabled" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushDisabled" ResourceKey="SubtleFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushSelected" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPressed" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushSelectedPointerOver" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxItemBorderBrushSelectedDisabled" ResourceKey="SubtleFillColorSecondaryBrush" />
+
+  <!-- Control rows, upstream lines 32-65. Deviation (value): ComboBoxBorderBrush and its PointerOver twin
+       point at ControlElevationBorderBrush, a gradient, and a gradient cannot ride the in-place retint
+       model, so both take the solid stop the button and slider borders already use
+       (audits/button.md deviation 2, audits/slider.md). -->
+  <StaticResource x:Key="ComboBoxBackground" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxBackgroundPressed" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxBackgroundDisabled" ResourceKey="ControlFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxBackgroundFocused" ResourceKey="ControlFillColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxBackgroundBorderBrushFocused" ResourceKey="FocusStrokeColorOuterBrush" />
+  <StaticResource x:Key="ComboBoxForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxForegroundPointerOver" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxForegroundPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxForegroundFocused" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxForegroundFocusedPressed" ResourceKey="TextFillColorPrimaryBrush" />
+  <!-- The placeholder is the framework's own TextBlock inside PART_SelectionPresenter, drawn with the
+       control's Foreground unless a template cell overrides the presenter (measured: at SelectedIndex = -1
+       the injected TextBlock reads #E4000000, i.e. TextFillColorPrimary). Five of the six upstream rows
+       are consumed through cells that condition on SelectedIndex = -1 - the one signal this runtime gives
+       for "nothing is selected" that a trigger can actually match. Two measured findings sit behind that
+       shape: an empty-string condition never matches here (Value="" leaves the cell inert, so Text="" was
+       tried first and did not fire), and SelectionBoxItem is not null while the placeholder shows - the
+       framework puts the placeholder string IN it, which is how it renders. -->
+  <StaticResource x:Key="ComboBoxPlaceHolderForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxPlaceHolderForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxPlaceHolderForegroundPressed" ResourceKey="TextFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocused" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxPlaceHolderForegroundFocusedPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxBorderBrushPointerOver" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxBorderBrushPressed" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxBorderBrushDisabled" ResourceKey="ControlStrokeColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxDropDownGlyphForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxDropDownGlyphForegroundDisabled" ResourceKey="TextFillColorDisabledBrush" />
+  <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocused" ResourceKey="TextFillColorSecondaryBrush" />
+  <!-- Deviation (value): upstream's target is the legacy SystemControlHighlightAltBaseMediumHighBrush,
+       which is not one of our palette keys and is only reachable in High Contrast anyway; the same brush
+       the focused glyph already uses stands in. -->
+  <StaticResource x:Key="ComboBoxDropDownGlyphForegroundFocusedPressed" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxDropDownForeground" ResourceKey="TextFillColorPrimaryBrush" />
+  <StaticResource x:Key="ComboBoxDropDownBackground" ResourceKey="AcrylicInAppFillColorDefaultBrush" />
+  <StaticResource x:Key="ComboBoxDropDownBorderBrush" ResourceKey="SurfaceStrokeColorFlyoutBrush" />
+
+  <!-- Tail rows, upstream lines 101-106: the chevron chip. It only exists in editable mode upstream
+       (x:Load=False plus the EditableModeStates group), and this template gates it the same way. -->
+  <StaticResource x:Key="ComboBoxDropDownBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxDropDownBackgroundPointerPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxFocusedDropDownBackgroundPointerOver" ResourceKey="ControlFillColorTertiaryBrush" />
+  <StaticResource x:Key="ComboBoxFocusedDropDownBackgroundPointerPressed" ResourceKey="ControlAltFillColorQuarternaryBrush" />
+  <StaticResource x:Key="ComboBoxEditableDropDownGlyphForeground" ResourceKey="TextFillColorSecondaryBrush" />
+  <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="AccentFillColorDefaultBrush" />
+
+  <!-- Not transcribed, with the measured reason for each:
+       ComboBoxHeaderForeground / ComboBoxHeaderForegroundDisabled (2 rows) and ComboBoxTopHeaderMargin,
+         ComboBoxHeaderThemeMargin, ComboBoxHeaderThemeFontWeight (3 metric rows) - Jalium's ComboBox
+         exposes 11 declared dependency properties and none of them is a Header (measured by reflection;
+         same finding as the Slider batch), so there is no header presenter to paint.
+       ComboBoxLightDismissOverlayBackground (1) - the runtime's Popup has IsLightDismissEnabled but no
+         overlay brush slot, so the row has nowhere to be set.
+       ComboBoxBackgroundBorderBrushUnfocused (1) - upstream itself never reads it: 3 declarations, 0
+         references in the whole 814-line file (measured by counting occurrences).
+       ComboBoxBackgroundUnfocused (1) - read only by the High Contrast block's ComboBoxBackgroundFocused
+         alias; no template consumes it, and the two rows hold the same value in every scope.
+       ComboBoxPlaceHolderForegroundDisabled (1) - disabling makes the runtime write its own local
+         Foreground (#FFAEAEB2, measured) on the ComboBox itself; the placeholder reaches that value by
+         inheritance and a template cell cannot outrank a local value on the control. Third instance of
+         that bill after the mounted TextBox's Foreground and the PasswordBox's resting Background, and it
+         also bounds ComboBoxForegroundDisabled: the surfaces and the glyph take it, the text of a mounted
+         combo does not.
+       ComboBoxItem{Background,BorderBrush,Foreground}SelectedUnfocused (3) - upstream shows these when
+         the selected item is drawn without combo focus. This runtime closes the dropdown on focus loss, so
+         the item is never visible while unfocused; the ComboBox owns IsSelectionActive, not the item, so
+         no cell of an item template can condition on it.
+       Numeric metric rows that ride as literals instead (measured: unparsable as resources):
+         ComboBoxArrowThemeFontSize 21, ComboBoxThemeMinWidth 64, ComboBoxPopupThemeMinWidth 80,
+         ComboBoxPopupThemeTouchMinWidth 240, ComboBoxItemPillHeight 16, ComboBoxItemPillWidth 3,
+         ComboBoxItemPillMinScale 0.625, ComboBoxMinHeight 32, ComboBoxPopupMaxNumberOfItems 15,
+         ComboBoxPopupMaxNumberOfItemsThatCanBeShownOnOneSide 7, ComboBoxItemScaleAnimationDuration
+         00:00:00.167. ComboBoxItemThemeTouchPadding / ...GameControllerPadding and
+         ComboBoxPlaceholderTextThemeFontWeight have no InputMode state to hang on in this runtime, and
+         ComboBoxPopupBorderThemeThickness belongs to the legacy popup. -->
+</ResourceDictionary>

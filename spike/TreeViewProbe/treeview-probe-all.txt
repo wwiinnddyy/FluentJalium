@@ -1,0 +1,280 @@
+theme dictionaries=40
+our ListView styles are live: ListViewItemStyle=True
+our ListBox styles are live: ListBoxStyle=True
+TreeViewItem type: Jalium.UI.Controls.TreeViewItem base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+
+=== A. exported tree types, base chains and property surfaces ===
+  TreeView: Jalium.UI.Controls.TreeView abstract=False base=TreeView : ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  TreeViewItem: Jalium.UI.Controls.TreeViewItem abstract=False base=TreeViewItem : HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual
+  TreeViewList: NOT EXPORTED by Jalium.UI.Managed
+  TreeViewNode: NOT EXPORTED by Jalium.UI.Managed
+  TreeViewItemPresenter: NOT EXPORTED by Jalium.UI.Managed
+  TreeViewItemTemplateSettings: NOT EXPORTED by Jalium.UI.Managed
+  HeaderedItemsControl: Jalium.UI.Controls.HeaderedItemsControl abstract=False base=HeaderedItemsControl : ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  ItemsControl: Jalium.UI.Controls.ItemsControl abstract=False base=ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject
+  Selector: Jalium.UI.Controls.Primitives.Selector abstract=True base=Selector : ItemsControl : Control : FrameworkElement : UIElement : Visual : DependencyObject
+  ListBox: Jalium.UI.Controls.ListBox abstract=False base=ListBox : Selector : ItemsControl : Control : FrameworkElement : UIElement : Visual
+  HierarchicalDataTemplate: Jalium.UI.HierarchicalDataTemplate abstract=False base=HierarchicalDataTemplate : DataTemplate : FrameworkTemplate : DispatcherObject : Object
+  DataTemplate: Jalium.UI.DataTemplate abstract=False base=DataTemplate : FrameworkTemplate : DispatcherObject : Object
+  ToggleButton: Jalium.UI.Controls.Primitives.ToggleButton abstract=False base=ToggleButton : ButtonBase : ContentControl : Control : FrameworkElement : UIElement : Visual
+  CheckBox: Jalium.UI.Controls.CheckBox abstract=False base=CheckBox : ToggleButton : ButtonBase : ContentControl : Control : FrameworkElement : UIElement
+  Expander: Jalium.UI.Controls.Expander abstract=False base=Expander : HeaderedContentControl : ContentControl : Control : FrameworkElement : UIElement : Visual
+  VirtualizingStackPanel: Jalium.UI.Controls.VirtualizingStackPanel abstract=False base=VirtualizingStackPanel : VirtualizingPanel : Panel : FrameworkElement : UIElement : Visual : DependencyObject
+  ItemsPresenter: Jalium.UI.Controls.ItemsPresenter abstract=False base=ItemsPresenter : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object
+  ContentPresenter: Jalium.UI.Controls.ContentPresenter abstract=False base=ContentPresenter : FrameworkElement : UIElement : Visual : DependencyObject : DispatcherObject : Object
+  TreeView own DPs: SelectedItem, SelectedValue, SelectedValuePath
+  TreeView public properties (declared only): 3: SelectedItem, SelectedValue, SelectedValuePath
+  TreeViewItem own DPs: IsExpanded, IsSelected, IsSelectionActive
+  TreeViewItem public properties (declared only): 4: HasItems, IsExpanded, IsSelected, IsSelectionActive
+
+  WinUI TreeView / TreeViewItem members this runtime does or does not carry:
+  TreeView:
+    ItemsSource: property=IEnumerable dp=ItemsSource event=-
+    IsTabStop: property=Boolean dp=IsTabStop event=-
+    Background: property=Brush dp=Background event=-
+    BorderBrush: property=Brush dp=BorderBrush event=-
+    BorderThickness: property=Thickness dp=BorderThickness event=-
+    Padding: property=Thickness dp=Padding event=-
+    CornerRadius: property=CornerRadius dp=CornerRadius event=-
+    absent: SelectionMode, SelectedNode, ExpandAll, CollapseAll, FlattenOutsideScrollViewer, GetContainerFromItem, ContainerFromIndex, ItemInvoked, NodeExpanding, NodeCollapsed, NodeExpanded, NodeInvoking, SelectionChanged, MultiSelect, IsMultiSelectEnabled, ItemContainer
+  TreeViewItem:
+    IsExpanded: property=Boolean dp=IsExpanded event=-
+    HasItems: property=Boolean dp=HasItems event=-
+    Header: property=Object dp=Header event=-
+    HeaderTemplate: property=DataTemplate dp=HeaderTemplate event=-
+    IsSelected: property=Boolean dp=IsSelected event=-
+    Expanded: property=- dp=- event=yes
+    Collapsed: property=- dp=- event=yes
+    Items: property=ItemCollection dp=- event=-
+    Padding: property=Thickness dp=Padding event=-
+    MinHeight: property=Double dp=MinHeight event=-
+    absent: PreviewExpanded, CollapsedGlyph, ExpandedGlyph, GlyphBrush, GlyphOpacity, GlyphSize, MultiSelectIsEnabled, TreeViewItemTemplateSettings, SelectOnExpansion, Marker, Content
+  implicit style lookup for the tree types: TreeView=Jalium.UI.Style TreeViewItem=Jalium.UI.Style
+  stock TreeView theme-style key: threw KeyNotFoundException: Resource key 'DefaultTreeViewStyle' not found.
+  our ListView item style as a reuse candidate: ListViewItem
+
+=== B. a mounted stock tree: nesting, collapse, parts, containers ===
+
+    TreeView 300x220
+      Grid 300x220
+        Border 'RootBorder' 300x220
+          ScrollViewer 'PART_ScrollViewer' 298x218
+            ItemsPresenter 286x206
+              VirtualizingStackPanel 286x206
+                TreeViewItem 286x28
+                  StackPanel 286x28
+                    Border 'PART_HeaderBorder' 286x28
+                      Grid 286x28
+                        Grid 'PART_IndentSpacer' 0x28
+                        Grid 'PART_ExpanderBorder' 16x28
+                          Path 'PART_ExpanderArrow' 8x8
+                        ContentPresenter 'PART_Header' 45.44x19.78
+                          TextBlock "Parent" 45.44x19.78
+                    ItemsPresenter 'PART_ItemsHost' 0x0
+                TreeViewItem 286x28
+                  StackPanel 286x28
+                    Border 'PART_HeaderBorder' 286x28
+                      Grid 286x28
+                        Grid 'PART_IndentSpacer' 0x28
+                        Grid 'PART_ExpanderBorder' 0x0
+                          Path 'PART_ExpanderArrow' 0x0
+                        ContentPresenter 'PART_Header' 80.29x19.78
+                          TextBlock "Sibling root" 80.29x19.78
+                    ItemsPresenter 'PART_ItemsHost' 0x0
+            ScrollBar 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+              Track 0x0
+                RepeatButton 0x0
+                  Border 0x0
+                Thumb 0x12
+                  Border 'ThumbBorder' 0x12
+                RepeatButton 0x0
+                  Border 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+            ScrollBar 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+              Track 0x0
+                RepeatButton 0x0
+                  Border 0x0
+                Thumb 12x0
+                  Border 'ThumbBorder' 12x0
+                RepeatButton 0x0
+                  Border 0x0
+              RepeatButton 0x0
+                Border 'PART_ButtonRoot' 0x0
+                  Path 'PART_Arrow' 0x0
+  named parts in tree: Border:RootBorder, ScrollViewer:PART_ScrollViewer, Border:PART_HeaderBorder, Grid:PART_IndentSpacer, Grid:PART_ExpanderBorder, Path:PART_ExpanderArrow, ContentPresenter:PART_Header, ItemsPresenter:PART_ItemsHost, Border:PART_ButtonRoot, Path:PART_Arrow, Border:ThumbBorder
+  containers in the visual tree (collapsed roots): 2
+  first container: TreeViewItem 286x28 style=Jalium.UI.Style padding=6,3,6,3 min-height=0 background=#00FFFFFF header=Parent
+  header text host: presenter Content=Parent textBlock=Parent
+    set IsExpanded=True -> True
+  expand parent (IsExpanded=true): containers=5 childTwoExpanded=True
+  expand grandchild level: containers=7 rows=4
+  collapse parent again: containers=7
+  after collapse: containers=7
+  select the first row through its own property: container.IsSelected=True tree.SelectedItem=Parent
+  selected row brushes: [op=1 vis=Visible] Border.PART_HeaderBorder=#99680081; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Collapsed] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Collapsed] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] 
+  accent in effect: #FF60CDFF
+  item panels in the stock tree: VirtualizingStackPanel(286x206), StackPanel(286x168), StackPanel(286x140), StackPanel(286x28), StackPanel(286x0), StackPanel(286x84), StackPanel(286x56), StackPanel(286x28), StackPanel(286x28), StackPanel(286x28), StackPanel(286x0), StackPanel(286x28), StackPanel(286x0)
+
+=== C. our host template on a TreeView: lock, item host, scroll host ===
+  assign ours: ok
+  after assign: containers=3 layoutRoot=1 scrollViewer=1 itemsPresenter=4
+  expand first: containers=5
+  assign a template with the ItemsPresenter renamed: ok
+  containers with the host renamed: 2
+  assign a template with no item host: ok
+  containers without an ItemsPresenter: 0
+  assign a template with no ScrollViewer: ok
+  containers without a ScrollViewer: 2 host=300x220 first=300x28
+  ItemsPanel knob: type=ItemsPanelTemplate current=ItemsPanelTemplate
+  attached ScrollViewer setters in a style: merge=ok
+
+=== D. an application-level implicit TreeViewItem style, both nesting levels ===
+  resting padding before: 6,3,6,3
+  merge into application resources: ok
+  expand so level 2 exists: containers=2
+  level 1 container after merge: TreeViewItem Style=set padding=6,3,6,3 background=#00FFFFFF header=Parent
+  level 2 container after merge: TreeViewItem Style=set padding=6,3,6,3 background=#00FFFFFF header=Child 1
+  ItemContainerStyle on the tree: null
+  ItemContainerStyle wins over the implicit route? margin=0,0,0,0 padding=6,3,6,3
+  level 1 after removal: padding=6,3,6,3
+
+=== E. which upstream TreeViewItem signals exist on this container ===
+  IsExpanded: dp=True clr=Boolean read=False
+  IsSelected: dp=True clr=Boolean read=False
+  HasItems: dp=True clr=Boolean read=True
+  IsMouseOver: dp=True clr=Boolean read=False
+  IsMouseCaptureWithin: dp=True clr=Boolean read=False
+  IsEnabled: dp=True clr=Boolean read=True
+  IsFocused: dp=True clr=Boolean read=False
+  IsSelectionActive: dp=True clr=Boolean read=False
+  Header: dp=True clr=Object read=Parent
+  Items: dp=False clr=ItemCollection read=Jalium.UI.Controls.ItemCollection
+  HorizontalContentAlignment: dp=True clr=HorizontalAlignment read=Left
+  VerticalContentAlignment: dp=True clr=VerticalAlignment read=Top
+  CornerRadius: dp=True clr=CornerRadius read=8,8,8,8
+  Padding: dp=True clr=Thickness read=6,3,6,3
+  MinHeight: dp=True clr=Double read=0
+  absent: IsPointerOver, IsPressed, Marker, SelectOnExpansion
+  HasItems on a parent vs a leaf: parent=True leaf=False
+  IsExpanded both directions: collapsed=2 expanded=3 recollapsed=3
+  selection exclusivity through the control: after row0=True,False,False after rowLast=False,False,True tree.SelectedItem=Leaf root
+  keyboard-ish focus flag: row disabled opacity ledger: [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] Path.PART_ExpanderArrow=#FF636366; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FF636366; [op=1 vis=Visible] [op=1 vis=Collapsed] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] Border.PART_HeaderBorder=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Collapsed] Path.PART_ExpanderArrow=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Collapsed] 
+
+=== F. five TreeViewItem templates: who drives IsExpanded, who hosts children ===
+  --- variant: header only
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=2 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=2
+    a ToggleButton exists in the template: NO
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] 
+    row geometry: 286x19.78
+  --- variant: named Expander, no gate
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: +|Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=4 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=4
+    a ToggleButton exists in the template: yes
+    toggle the chevron through its click path: via=peer isCheckedBefore=False toggle.IsChecked=True item.IsExpanded=False containers=4
+    item -> toggle direction: item.IsExpanded=True toggle.IsChecked=True
+    toggle.IsChecked written directly: toggle.IsChecked=False item.IsExpanded=True containers=4
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Expander=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Expander=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Expander=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] 
+    row geometry: 286x65.56
+  --- variant: two-way binding on IsExpanded
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: +|Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=4 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=4
+    a ToggleButton exists in the template: yes
+    toggle the chevron through its click path: via=peer isCheckedBefore=False toggle.IsChecked=True item.IsExpanded=True containers=4
+    item -> toggle direction: item.IsExpanded=True toggle.IsChecked=True
+    toggle.IsChecked written directly: toggle.IsChecked=False item.IsExpanded=False containers=4
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Chevron=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Chevron=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Chevron=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] 
+    row geometry: 286x65.56
+  --- variant: template trigger gates the child host
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: +|Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=2 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=2
+    a ToggleButton exists in the template: yes
+    toggle the chevron through its click path: via=peer isCheckedBefore=False toggle.IsChecked=True item.IsExpanded=True containers=2
+    item -> toggle direction: item.IsExpanded=True toggle.IsChecked=True
+    toggle.IsChecked written directly: toggle.IsChecked=False item.IsExpanded=False containers=2
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] ToggleButton.Chevron=#0FFFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] Border.Surface=#0FFFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFFFFFFF; [op=1 vis=Visible] Border.FocusOutline=#FFFFFFFF; [op=0 vis=Visible] Border.=#B3000000; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Collapsed] 
+    row geometry: 286x32.78
+  --- variant: no child host at all
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=2 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=2
+    a ToggleButton exists in the template: NO
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] 
+    row geometry: 286x19.78
+  --- variant: ItemsPresenter renamed
+    merge: ok
+    containers at rest: 2 parentHeader=Parent
+    header text rendered: Parent
+    HasItems/IsExpanded reads: HasItems=True IsExpanded=False
+    set IsExpanded=True -> True
+    set IsExpanded=true directly: containers=4 IsExpanded=True
+    set IsExpanded=False -> False
+    set IsExpanded=false again: containers=4
+    a ToggleButton exists in the template: NO
+    set IsSelected=True -> True
+    select the row through its own property: brushes: Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] TreeViewItem.=#00FFFFFF; [op=1 vis=Visible] Grid.=#00FFFFFF; [op=1 vis=Visible] [op=1 vis=Visible] TextBlock.=#FFF5F5F7; [op=1 vis=Visible] [op=1 vis=Visible] [op=1 vis=Visible] 
+    row geometry: 286x39.56
+
+=== G. the per-level indent on the nested shape ===
+  expand the root: containers=3
+  stock tree, rows expanded: 
+    L1 row@1,1 286x51.09 header@23,5.11
+    L2 row@1,29 286x28 header@39,33.11
+    Other root row@1,52.09 286x28 header@7,56.2
+  named parts: Border:RootBorder, ScrollViewer:PART_ScrollViewer, Border:PART_HeaderBorder, Grid:PART_IndentSpacer, Grid:PART_ExpanderBorder, Path:PART_ExpanderArrow, ContentPresenter:PART_Header, ItemsPresenter:PART_ItemsHost, Border:PART_ButtonRoot, Path:PART_Arrow, Border:ThumbBorder
+  toggle-button parts in the tree: 0
+  expand the roots: containers=3
+  our host template, same content: 
+    L1 row@1,1 298x56
+    L2 row@1,29 298x28
+    Other root row@1,57 298x28
+
+=== H. the 12 DIP right gutter on a stock tree and on our own template ===
+  stock TreeView, 5 roots: host=300x220 item=286x28 left=1 right=13 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  our template + overlay, 5 roots: host=300x220 item=298x28 left=1 right=1 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  our template, overlay off, 5 roots: host=300x220 item=286x28 left=1 right=13 bars=[ScrollBar 0x0 vis=Collapsed ScrollBar 0x0 vis=Collapsed]
+  stock TreeView, 50 roots: host=300x220 item=286x28 left=1 right=13 bars=[ScrollBar 12x206 vis=Visible ScrollBar 0x0 vis=Collapsed]
+  our template + overlay, 50 roots: host=300x220 item=298x28 left=1 right=1 bars=[ScrollBar 40x218 vis=Visible ScrollBar 0x0 vis=Collapsed]
+  our template, overlay off, 50 roots: host=300x220 item=286x28 left=1 right=13 bars=[ScrollBar 12x218 vis=Visible ScrollBar 0x0 vis=Collapsed]
