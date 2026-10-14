@@ -8,6 +8,14 @@ The old implementation remains available on branch `new` at `d03b377`.
   theme facade and the load manifest), `Controls/` and `Motion/` (types for demonstrated behavior gaps).
   "Astra" stays the name of this rewrite, not a directory. No retired FW types or compatibility
   parser belongs in the new runtime.
+- `src/FluentJalium.Localization` is a host library, not part of the product's theme surface: the runtime
+  text catalog, the logical-tree sweep that applies it, and the settings file. It carries no style and
+  no control, and neither host may reimplement a second mechanism beside it. `docs/astra/launcher.md`
+  records the contract; a string added to a page and not registered fails
+  `tests/FluentJalium.Tests/Localization/LocalizationCoverageTests.cs`.
+- `samples/FluentJalium.Launcher` is the transition host and opens the Gallery in-process, so the
+  Gallery must not depend on it, and a Gallery change that makes its window un-constructible from
+  another entry point breaks the handoff. See `docs/astra/launcher.md`.
 - Use native Jalium controls with `.jalxaml` templates. Add a custom control only for a demonstrated behavior gap.
 - Runtime authority is NuGet Jalium.UI **26.10.9**; a sibling source tree is reference only and may be newer.
 - WinUI reference: `../microsoft-ui-xaml`, commit `19e3bdc3ccf3361393d623d3a5d2667cb8f33229`.

@@ -43,19 +43,29 @@ application.Run(window);
 dotnet restore FluentJalium.slnx
 dotnet build FluentJalium.slnx --configuration Release --no-restore
 dotnet test  tests/FluentJalium.Tests --configuration Release --no-build
+dotnet run --project samples/FluentJalium.Launcher   # 启动器：选渲染器/实现器/质量/主题/语言，再进入画廊
 dotnet run --project samples/FluentJalium.Gallery
 
 powershell -File tools/Sync-AstraPalette.ps1 -Check   # 调色板与上游 pin 的漂移闸口
 ```
 
+启动器是过渡期宿主，`docs/astra/launcher.md` 记录了五项设置的生效时机、交接时序、本地化方案与已知缺口。
+开关：`--page <id>` 指定画廊页面，`--lang zh|en` 覆盖已保存的语言，`--skip-launcher` 直接进入画廊。
+
 若构建报 MSB3021/MSB3027「文件正被另一进程使用」，那不是编译错误：先结束残留的
-`testhost` 与 `FluentJalium.Gallery` 进程。
+`testhost` 与 `FluentJalium.Launcher` / `FluentJalium.Gallery` 进程。
 
 ## 上游 authority
 
 - 行为与外观基准：`microsoft-ui-xaml` commit `19e3bdc3ccf3361393d623d3a5d2667cb8f33229`。
 - 适配方法参考：`ModernWpf` commit `23555a6c00623b2f80e67f20d7f1df49a1d28ad8`（`v1.0.0-rc.1`）。
 - 运行时基准是 NuGet `Jalium.UI` **26.10.9**；同级的源码树只是参考，可能更新。
+
+下一版本线跟进 `26.11.*`，包含 Preview。运行
+`powershell -File tools/Update-JaliumPackages.ps1 -Check` 查询已发布的共同版本，
+去掉 `-Check` 则在还原和串行 Release 构建成功后更新统一版本。
+截至 2026-10-05，26.11 预览代码已合并，但 NuGet 尚未发包；CSS 等新特性与升级边界见
+[26.11 预览跟进记录](docs/astra/jalium-26.11-preview.md)。
 
 逐控件的上游文件证据、适配偏差与已知缺口记录在 `docs/astra/`。署名见 `THIRD-PARTY-NOTICES.md`。
 

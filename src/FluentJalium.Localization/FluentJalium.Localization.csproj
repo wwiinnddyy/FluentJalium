@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>
+    <RootNamespace>FluentJalium.Localization</RootNamespace>
+    <AssemblyName>FluentJalium.Localization</AssemblyName>
+    <Description>Runtime text catalog, logical-tree text binding, and launcher settings persistence for FluentJalium hosts.</Description>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Jalium.UI.Controls" Version="$(JaliumPackageVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>FluentJalium.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+</Project>

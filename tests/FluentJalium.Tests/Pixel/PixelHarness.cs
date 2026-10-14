@@ -52,7 +52,14 @@ internal static class PixelHarness
         internal int PaintedPixels => Histogram.Where(static entry => entry.Key != 0).Sum(static entry => entry.Value);
 
         internal string Top(int count) => string.Join(" ", Histogram.OrderByDescending(static entry => entry.Value)
-            .Take(count).Select(static entry => $"#{entry.Key:X6}x{entry.Value}"));
+            .Take(count).Select(static entry => $"#{entry.Key:X6}x{entry.Value}")) + (Drift.Length > 0 ? " | " + Drift : "");
+
+        /// <summary>
+        /// Where the last two captures of a failed settle disagreed, and the state of the host window and the
+        /// real mouse at that moment. Empty on a settled sample. <see cref="Top"/> appends it, so every
+        /// "capture never settled" message localizes its own instability instead of only naming the colours.
+        /// </summary>
+        internal string Drift { get; init; } = "";
     }
 
     internal static uint PixelKey(Color color) => (uint)(color.R << 16 | color.G << 8 | color.B);
@@ -378,6 +385,18 @@ internal static class PixelHarness
     {
         if (_host is not null)
         {
+            // A host the desktop parked renders zero frames, and every real-window assertion downstream of it
+            // starves. Measured live: a 23-failure cascade whose drift line read
+            // "host ... at=(-18285.71,-18285.71)" - the OS minimized position (-32000 px at 1.75 DPI).
+            // Restore the same window rather than building a fresh one: only the first shown window on a
+            // thread receives rendered frames, so a replacement would capture black from here on.
+            if (_host.WindowState == WindowState.Minimized || !_host.IsVisible)
+            {
+                _host.WindowState = WindowState.Normal;
+                _host.Show();
+                Pump(8);
+            }
+
             if (_host.Width < width + 64) _host.Width = width + 64;
             if (_host.Height < height + 64) _host.Height = height + 64;
             return _host;
@@ -410,28 +429,57 @@ internal static class PixelHarness
     /// Re-renders until the picture stops changing, because a themed brush animates into place. A
     /// blank capture never counts as settled: an unstyled-at-yet control reads as uniform black, and
     /// treating that as stable is how the first harness mistook "not painted" for "theme ignored".
+    /// When the settle fails the last two grabs are diffed, so the failure message carries where the
+    /// picture kept moving rather than only that it did.
     /// </summary>
-    private static Sample Capture(Func<Sample> grab)
+    private static Sample Capture(Func<(Sample Sample, byte[] Pixels)> grab)
     {
         var started = Stopwatch.GetTimestamp();
         var deadline = started + Stopwatch.Frequency * SettleBudgetMilliseconds / 1000;
-        Sample? previous = null;
+        Sample? latest = null;
+        byte[]? latestPixels = null;
+        Sample? earlier = null;
+        byte[]? earlierPixels = null;
+        var framesDelivered = 0;
         var round = 0;
         for (round = 1; round <= MaxRounds; round++)
         {
-            Pump(FramesPerRound);
-            var current = grab();
-            if (previous is not null && current.PaintedPixels > 0 && SamePicture(current, previous))
+            framesDelivered += Pump(FramesPerRound);
+            var (current, currentPixels) = grab();
+            if (latest is not null && current.PaintedPixels > 0 && SamePicture(current, latest))
                 return current with { Rounds = round, Stable = true, CaptureMilliseconds = Elapsed(started) };
-            previous = current;
+            earlier = latest;
+            earlierPixels = latestPixels;
+            latest = current;
+            latestPixels = currentPixels;
             if (Stopwatch.GetTimestamp() > deadline) break;
+        }
+
+        // A deadline break that never reached a second grab is not a verdict: one Pump call can outlast the
+        // whole settle budget on a loaded machine (its watchdog fires after the fraction of the budget that
+        // remained), leaving the settle question unasked. Zero delivered frames is the safe case to re-ask
+        // it cheaply: a subject whose scene graph produced no render events has no clock that could still be
+        // moving its picture, so two grabs back to back decide it. A subject that did take frames keeps the
+        // old failure, because a transition may simply have been mid-flight.
+        if (latest is not null && earlier is null && framesDelivered == 0 && latest.PaintedPixels > 0)
+        {
+            var (confirmation, confirmationPixels) = grab();
+            if (confirmation.PaintedPixels > 0 && SamePicture(confirmation, latest))
+            {
+                return confirmation with { Rounds = round, Stable = true, CaptureMilliseconds = Elapsed(started) };
+            }
+
+            earlierPixels = latestPixels;
+            latestPixels = confirmationPixels;
+            latest = confirmation;
         }
 
         // The round count and the clock survive the failure now, because the two shapes of "not settled" read
         // identically without them: a picture that really keeps changing spends many rounds, while a picture that
         // is perfectly still but starved of frames runs out of the budget after one or two - and the second one is
         // this harness's own fault, not the subject's.
-        return (previous ?? new Sample(0, 0, [])) with { Rounds = round, Stable = false, CaptureMilliseconds = Elapsed(started) };
+        var failed = (latest ?? new Sample(0, 0, [])) with { Rounds = round, Stable = false, CaptureMilliseconds = Elapsed(started) };
+        return failed with { Drift = DescribeDrift(earlierPixels, latestPixels, failed.Width, failed.Height, round, framesDelivered) };
     }
 
     private static int Elapsed(long started) => (int)Stopwatch.GetElapsedTime(started).TotalMilliseconds;
@@ -508,9 +556,9 @@ internal static class PixelHarness
         return delivered;
     }
 
-    private static Sample CaptureRaw(Visual target, int width, int height)
+    private static (Sample Sample, byte[] Pixels) CaptureRaw(Visual target, int width, int height)
     {
-        if (width <= 0 || height <= 0) return new Sample(0, 0, [], 0, false);
+        if (width <= 0 || height <= 0) return (new Sample(0, 0, [], 0, false), []);
 
         var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormat.Bgr32);
         bitmap.Render(target);
@@ -522,10 +570,90 @@ internal static class PixelHarness
         var histogram = new Dictionary<uint, int>();
         for (var offset = 0; offset + 3 < buffer.Length; offset += bytesPerPixel)
         {
-            var key = (uint)(buffer[offset + 2] << 16 | buffer[offset + 1] << 8 | buffer[offset]);
+            var key = PixelKeyAt(buffer, offset);
             histogram[key] = histogram.GetValueOrDefault(key) + 1;
         }
 
-        return new Sample(width, height, histogram, 0, false);
+        return (new Sample(width, height, histogram, 0, false), buffer);
+    }
+
+    private static uint PixelKeyAt(byte[] buffer, int offset) =>
+        (uint)(buffer[offset + 2] << 16 | buffer[offset + 1] << 8 | buffer[offset]);
+
+    /// <summary>
+    /// What a failed settle still knows: where the last two grabs disagreed (pixel count, bounding box, the
+    /// colour flips that dominate), and the context the #35/#47/#90 family hides in - the host window's own
+    /// state and where the real mouse sat. Both halves are best effort: this is a failure message, so it must
+    /// never throw a second exception over the one that matters.
+    /// </summary>
+    private static string DescribeDrift(byte[]? earlier, byte[]? latest, int width, int height, int rounds, int frames)
+    {
+        var context = $"rounds={rounds} frames={frames} | " + HostContext();
+        if (earlier is null || latest is null || earlier.Length != latest.Length || width <= 0)
+        {
+            return context;
+        }
+
+        var flips = new Dictionary<(uint From, uint To), int>();
+        var drift = 0;
+        int minX = int.MaxValue, minY = int.MaxValue, maxX = -1, maxY = -1;
+        for (var offset = 0; offset + 3 < latest.Length; offset += 4)
+        {
+            var from = PixelKeyAt(earlier, offset);
+            var to = PixelKeyAt(latest, offset);
+            if (from == to) continue;
+            drift++;
+            flips[(from, to)] = flips.GetValueOrDefault((from, to)) + 1;
+            var pixel = offset / 4;
+            var x = pixel % width;
+            var y = pixel / width;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+        }
+
+        if (drift == 0)
+        {
+            // Cannot happen through the histogram path - equal bytes make equal histograms - so say so.
+            return $"pixel-identical grabs with unequal histograms? | {context}";
+        }
+
+        var topFlips = string.Join(" ", flips.OrderByDescending(static entry => entry.Value).Take(6)
+            .Select(static entry => $"#{entry.Key.From:X6}>#{entry.Key.To:X6}x{entry.Value}"));
+        return $"{drift}px drift bbox=({minX},{minY})..({maxX},{maxY}) flips {topFlips} | {context}";
+    }
+
+    private static string HostContext()
+    {
+        try
+        {
+            var cursor = GetCursorPos(out var point) ? $"cursor=({point.X},{point.Y})" : "cursor=unreadable";
+            if (_host is null)
+            {
+                return $"host=none {cursor}";
+            }
+
+            var scale = _host.DpiScale;
+            var inside = GetCursorPos(out point)
+                && point.X >= _host.Left * scale && point.X < (_host.Left + _host.Width) * scale
+                && point.Y >= _host.Top * scale && point.Y < (_host.Top + _host.Height) * scale;
+            return $"host visible={_host.IsVisible} loaded={_host.IsLoaded} state={_host.WindowState} " +
+                   $"at=({_host.Left},{_host.Top}) {_host.ActualWidth}x{_host.ActualHeight} dpi={scale} " +
+                   $"{cursor}{(inside ? " INSIDE-host" : "")} title='{_host.Title}'";
+        }
+        catch (Exception)
+        {
+            return "host=unreadable";
+        }
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out NativePoint point);
+
+    private struct NativePoint
+    {
+        public int X;
+        public int Y;
     }
 }

@@ -1,0 +1,98 @@
+<Window xmlns="http://schemas.jalium.ui/2024"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:fluent="clr-namespace:FluentJalium.Controls;assembly=FluentJalium"
+        x:Class="FluentJalium.Launcher.LauncherWindow"
+        Title="Fluent Design System in Jalium.UI"
+        Width="1000" Height="440" MinWidth="900" MinHeight="420"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize" ShowInTaskbar="True"
+        TitleBarStyle="Custom" TitleBarHeight="76"
+        IsShowTitle="False" IsShowIcon="False"
+        IsShowMinimizeButton="False" IsShowMaximizeButton="False" IsShowCloseButton="False"
+        SystemBackdrop="None" UseLayoutRounding="True"
+        Foreground="{StaticResource TextFillColorPrimaryBrush}">
+
+  <!-- The header is the framework's title bar, not a strip drawn above the content: the window keeps WS_CAPTION
+       and removes the visual caption in WM_NCCALCSIZE, so the whole band is one native drag region with snap
+       layouts and touch intact. The framework's own caption glyphs and text are off; the band carries this
+       window's header instead, and ApplyAppearance paints it the same solid fill as the client area so the two
+       read as one surface. No Mica and no transparency - the background is the theme's solid page fill. -->
+  <Window.LeftWindowCommands>
+    <!-- The title block starts 22 DIP in, which puts its left edge on the same column as the dropdowns below:
+         the title bar's own template insets its content by 18, and the body grid insets by 40. Without the
+         adjustment the window has two left margins and the header reads as a separate bar again. -->
+    <StackPanel x:Name="HeaderCommands" Orientation="Horizontal" VerticalAlignment="Center" Margin="22,0,0,0">
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock x:Name="HeaderTitle" Text="Fluent Design System in Jalium.UI"
+                   FontSize="26" FontWeight="SemiBold" />
+        <TextBlock x:Name="HeaderSubtitle" Text="Pick a renderer and a language, then launch."
+                   FontSize="12" Margin="0,2,0,0"
+                   Foreground="{StaticResource TextFillColorSecondaryBrush}" />
+      </StackPanel>
+    </StackPanel>
+  </Window.LeftWindowCommands>
+
+  <Window.RightWindowCommands>
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+      <Button x:Name="MinimizeButton" Content="&#x2013;" Width="44" Height="34" FontSize="14"
+              Style="{StaticResource SubtleButtonStyle}" />
+      <Button x:Name="MaximizeButton" Content="&#x25A1;" Width="44" Height="34" FontSize="13"
+              Style="{StaticResource SubtleButtonStyle}" />
+      <Button x:Name="CloseButton" Content="&#x2715;" Width="44" Height="34" FontSize="13"
+              Style="{StaticResource SubtleButtonStyle}" />
+    </StackPanel>
+  </Window.RightWindowCommands>
+
+  <Grid x:Name="Page" Margin="40,20,40,30">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+
+    <!-- The three primary settings and the launch button are siblings in one right-aligned row, the settings to
+         the button's left. Row 0 here is a star, so a settings block that measured wider than its share would
+         slide under the button rather than push it; as siblings each takes its own space. -->
+    <StackPanel x:Name="SecondaryRow" Orientation="Horizontal" HorizontalAlignment="Left">
+      <StackPanel Width="200" Margin="0,0,20,0">
+        <TextBlock x:Name="QualityLabel" Text="Rendering quality" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,6" />
+        <ComboBox x:Name="QualityChoice" Height="36" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Width="200" Margin="0,0,20,0">
+        <TextBlock x:Name="ThemeLabel" Text="Theme" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,6" />
+        <ComboBox x:Name="ThemeChoice" Height="36" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Width="200" VerticalAlignment="Top">
+        <TextBlock x:Name="MotionLabel" Text="Reduce motion" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,4" />
+        <Border Height="36" VerticalAlignment="Top">
+          <fluent:FluentToggleSwitch x:Name="MotionToggleElement" Style="{StaticResource FluentToggleSwitchStyle}" />
+        </Border>
+      </StackPanel>
+    </StackPanel>
+
+    <!-- One line, and it says which settings are live and which are waiting for the next window. The runtime
+         reads the backend and the anti-aliasing mode once per render target, so claiming otherwise here would
+         be the one lie this window can tell. -->
+    <StackPanel x:Name="StatusStrip" Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,20">
+      <TextBlock x:Name="RuntimeStatusText" Style="{StaticResource BodyStrongTextBlockStyle}"
+                 TextTrimming="CharacterEllipsis" />
+      <TextBlock x:Name="PendingStatusText" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,2,0,0" />
+    </StackPanel>
+
+    <StackPanel x:Name="PrimaryRow" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+      <StackPanel Width="220" Margin="0,0,20,0" VerticalAlignment="Bottom">
+        <TextBlock x:Name="BackendLabel" Text="Renderer" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,6" />
+        <ComboBox x:Name="BackendChoice" Height="44" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Width="220" Margin="0,0,20,0" VerticalAlignment="Bottom">
+        <TextBlock x:Name="EngineLabel" Text="Path engine" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,6" />
+        <ComboBox x:Name="EngineChoice" Height="44" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <StackPanel Width="200" Margin="0,0,28,0" VerticalAlignment="Bottom">
+        <TextBlock x:Name="LanguageLabel" Text="Language" Style="{StaticResource CaptionTextBlockStyle}" Margin="0,0,0,6" />
+        <ComboBox x:Name="LanguageChoice" Height="44" HorizontalAlignment="Stretch" />
+      </StackPanel>
+      <Button x:Name="StartButton" Content="Start" Style="{StaticResource AccentButtonStyle}"
+              MinWidth="180" Height="44" FontSize="16" VerticalAlignment="Bottom" />
+    </StackPanel>
+  </Grid>
+</Window>

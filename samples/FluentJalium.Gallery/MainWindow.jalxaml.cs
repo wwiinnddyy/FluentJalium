@@ -1,4 +1,5 @@
 using FluentJalium.Controls;
+using FluentJalium.Localization;
 using FluentJalium.Themes;
 using Jalium.UI;
 using Jalium.UI.Automation;
@@ -13,6 +14,15 @@ public partial class MainWindow : Window
     private readonly Dictionary<FluentNavigationItem, FrameworkElement> _pages;
     private readonly Dictionary<FluentNavigationItem, string> _pageIds = [];
     private readonly GalleryCatalog _catalog = GalleryCatalog.Load();
+    private readonly TextSweeper _sweeper = new();
+
+    // Content the tree walk cannot reach: a MenuFlyout's and a ContextMenu's items live on objects rather than in
+    // the visual tree, and the command bar's buttons are generated. Held here so a language change can rewrite
+    // them without rebuilding the collections and duplicating every row.
+    private readonly List<Action> _dynamicTextWriters = [];
+    private List<string> _unresolvedTokens = [];
+    private bool _compactCommandBar;
+
     private FluentThemeVariant _theme = FluentThemeVariant.System;
     private bool _syncControls = true;
     private bool _loaded;
@@ -81,12 +91,21 @@ public partial class MainWindow : Window
         WireMotion();
         SetAccessibleNames();
 
+        // The catalog is process-wide and idempotent, and it is registered here rather than in Program.cs because
+        // the launcher shows this window in-process without ever calling that entry point.
+        GalleryText.Register();
+
         ProfileChoice.SelectedItem = ProfileChoice.Items[0];
         ThemeChoice.SelectedItem = ThemeChoice.Items[2];
         AccentChoice.SelectedItem = AccentChoice.Items[0];
         MotionPreference.IsChecked = FluentThemeManager.ReduceMotion;
         Navigation.SelectedItem = (FluentNavigationItem)OverviewItem!;
         _syncControls = false;
+
+        // Every page was built by InitializeComponent but only one is attached, so the sweep is told about the
+        // detached ones explicitly - a walk from the window would reach the Overview page and nothing else.
+        UiText.LanguageChanged += ApplyLanguage;
+        ApplyLanguage();
 
         FluentThemeManager.Changed += ApplyAppearance;
         ApplyAppearance();
@@ -102,8 +121,34 @@ public partial class MainWindow : Window
         {
             _loaded = false;
             FluentThemeManager.Changed -= ApplyAppearance;
+            UiText.LanguageChanged -= ApplyLanguage;
             Navigation.SelectionChanged -= OnNavigationChanged;
         };
+    }
+
+    /// <summary>
+    /// Writes the current catalog language over the whole window, all thirteen pages, and the content that lives on
+    /// objects rather than in the tree. Safe to call at any time; the sweep writes from the text the markup authored
+    /// rather than from what is currently on screen, so switching twice returns to English.
+    /// </summary>
+    private void ApplyLanguage()
+    {
+        _sweeper.Apply(this);
+        _sweeper.Apply(_pages.Values);
+        foreach (var write in _dynamicTextWriters)
+        {
+            write();
+        }
+
+        ApplyRuntimeReadouts();
+    }
+
+    private void ApplyRuntimeReadouts()
+    {
+        WriteThemeStatus();
+        WriteMotionReadout();
+        WriteTokenReadout();
+        WriteParityStatus();
     }
 
     /// <summary>
@@ -115,15 +160,14 @@ public partial class MainWindow : Window
     private void WireTokens()
     {
         var host = (WrapPanel)TokenSwatchHost!;
-        var readout = (TextBlock)TokenReadout!;
         var outline = Application.Current?.TryFindResource("ControlStrokeColorDefaultBrush") as Brush;
-        var missing = new List<string>();
+        _unresolvedTokens = [];
 
         foreach (var key in TokenCatalog.BrushTokens)
         {
             if (Application.Current?.TryFindResource(key) is not Brush brush)
             {
-                missing.Add(key);
+                _unresolvedTokens.Add(key);
                 continue;
             }
 
@@ -139,9 +183,23 @@ public partial class MainWindow : Window
             host.Children.Add(card);
         }
 
-        readout.Text = missing.Count == 0
-            ? $"{TokenCatalog.BrushTokens.Length} palette tokens resolved, {host.Children.Count} painted, none missing."
-            : $"{host.Children.Count} of {TokenCatalog.BrushTokens.Length} tokens painted; unresolved: {string.Join(", ", missing)}";
+        WriteTokenReadout();
+    }
+
+    private void WriteTokenReadout()
+    {
+        if (TokenSwatchHost is not Panel host || TokenReadout is not TextBlock readout)
+        {
+            return;
+        }
+
+        // The sentence counts what is on screen and names what is not, so a token that stops resolving shows up as
+        // a hole in the grid and in this line at the same time.
+        readout.Text = _unresolvedTokens.Count == 0
+            ? UiText.T("{0} palette tokens resolved, {1} painted, none missing.",
+                TokenCatalog.BrushTokens.Length, host.Children.Count)
+            : UiText.T("{0} of {1} tokens painted; unresolved: {2}",
+                host.Children.Count, TokenCatalog.BrushTokens.Length, string.Join(", ", _unresolvedTokens));
     }
 
     /// <summary>
@@ -234,14 +292,31 @@ public partial class MainWindow : Window
         var share = new AppBarButton { Label = "Share", Icon = new SymbolIcon { Symbol = Symbol.Share } };
         var disabled = new AppBarButton { Label = "Delete", Icon = new SymbolIcon { Symbol = Symbol.Delete }, IsEnabled = false };
         var without = new AppBarButton { Label = "No icon" };
+        var properties = new AppBarButton { Label = "Properties" };
+        var history = new AppBarButton { Label = "Version history" };
         bar.PrimaryCommands.Add(save);
         bar.PrimaryCommands.Add(bold);
         bar.PrimaryCommands.Add(share);
         bar.PrimaryCommands.Add(new AppBarSeparator());
         bar.PrimaryCommands.Add(disabled);
         bar.PrimaryCommands.Add(without);
-        bar.SecondaryCommands.Add(new AppBarButton { Label = "Properties" });
-        bar.SecondaryCommands.Add(new AppBarButton { Label = "Version history" });
+        bar.SecondaryCommands.Add(properties);
+        bar.SecondaryCommands.Add(history);
+
+        // The generated rows are on the bar, not in a tree the sweeper walks, so their labels are rewritten here.
+        _dynamicTextWriters.Add(() =>
+        {
+            save.Label = UiText.T("Save");
+            bold.Label = UiText.T("Bold");
+            share.Label = UiText.T("Share");
+            disabled.Label = UiText.T("Delete");
+            without.Label = UiText.T("No icon");
+            properties.Label = UiText.T("Properties");
+            history.Label = UiText.T("Version history");
+            ((Button)CommandBarCompactButton!).Content = _compactCommandBar
+                ? UiText.T("Show the labels")
+                : UiText.T("Compact the buttons");
+        });
 
         save.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Save invoked - the fill under the label is AppBarButtonBackground, and the press that lights it is the IsPressed cell.";
         share.Click += (_, _) => ((TextBlock)CommandBarReadout!).Text = "Share invoked through the same routed handler a click reaches.";
@@ -260,15 +335,18 @@ public partial class MainWindow : Window
         ((Button)CommandBarCompactButton!).Click += (_, _) =>
         {
             compact = !compact;
+            _compactCommandBar = compact;
             foreach (var element in bar.PrimaryCommands.OfType<AppBarButton>())
             {
                 element.IsCompact = compact;
             }
 
-            ((Button)CommandBarCompactButton!).Content = compact ? "Show the labels" : "Compact the buttons";
+            ((Button)CommandBarCompactButton!).Content = compact
+                ? UiText.T("Show the labels")
+                : UiText.T("Compact the buttons");
             ((TextBlock)CommandBarReadout!).Text = compact
-                ? "IsCompact dropped every label - the one application-view state this runtime exposes as a property a cell can watch."
-                : "Labels back: the side-by-side layout upstream has is picked by the bar's DefaultLabelPosition, and the bar never builds a template of ours, so no label position but this one is reachable.";
+                ? UiText.T("IsCompact dropped every label - the one application-view state this runtime exposes as a property a cell can watch.")
+                : UiText.T("Labels back: the side-by-side layout upstream has is picked by the bar's DefaultLabelPosition, and the bar never builds a template of ours, so no label position but this one is reachable.");
         };
 
         ((Button)CommandBarClearButton!).Click += (_, _) =>
@@ -590,7 +668,7 @@ public partial class MainWindow : Window
 
         tip.Opened += (_, _) => readout.Text = reason + $" Card on {tip.EffectivePlacement}, " +
             $"{(tip.Target is null ? "no target" : "target " + tip.Target.GetType().Name)}.";
-        tip.Closed += (_, _) => readout.Text = "Closed. " + reason;
+        tip.Closed += (_, _) => readout.Text = UiText.T("Closed.") + " " + reason;
         tip.ActionButtonClick += (_, _) =>
         {
             // Upstream's action button announces itself and leaves the card open; closing here is this page's choice.
@@ -831,6 +909,40 @@ public partial class MainWindow : Window
     /// <summary>Page id to mount on start-up instead of Overview. Must be set before Show().</summary>
     public void SetStartPage(string pageId) => _startPageId = pageId;
 
+    /// <summary>
+    /// Theme to start on instead of following the system. Must be set before Show().
+    /// </summary>
+    /// <remarks>
+    /// A host that shows this window in-process - the launcher does, after handing over a renderer - has no
+    /// command line to pass a preference through, and the field is private because the window owns it. This is the
+    /// same shape as <see cref="SetStartPage"/>: staged, not applied, because the constructor ends by applying
+    /// <see cref="FluentThemeVariant.System"/> and the two calls would otherwise fight. The combo box is moved
+    /// under the same guard the appearance wiring uses, so staging the value does not read as the user choosing it.
+    /// </remarks>
+    public void SetTheme(FluentThemeVariant theme)
+    {
+        _theme = theme;
+        _syncControls = true;
+        try
+        {
+            // Combo order is the enum order: Light, Dark, System.
+            var index = theme switch
+            {
+                FluentThemeVariant.Light => 0,
+                FluentThemeVariant.Dark => 1,
+                _ => 2,
+            };
+            if (index < ThemeChoice.Items.Count)
+            {
+                ThemeChoice.SelectedItem = ThemeChoice.Items[index];
+            }
+        }
+        finally
+        {
+            _syncControls = false;
+        }
+    }
+
     public void NavigateToPage(string pageId)
     {
         foreach (var pair in _pageIds)
@@ -881,23 +993,40 @@ public partial class MainWindow : Window
 
         if (_catalog.Controls.Length == 0)
         {
-            status.Text = "Catalog.json did not reach the output folder, so no parity claim on this page is checked.";
+            status.Text = UiText.T("Catalog.json did not reach the output folder, so no parity claim on this page is checked.");
             return;
         }
 
         if (!_pageIds.TryGetValue(item, out var pageId))
         {
-            status.Text = $"{item.Content} is not in the catalog.";
+            status.Text = UiText.T("{0} is not in the catalog.", item.Content);
             return;
         }
 
         var onPage = _catalog.OnPage(pageId);
-        var title = _catalog.Page(pageId)?.Title ?? pageId;
+        var title = LocalizedCatalogTitle(pageId);
         var claim = onPage.Length == 0
-            ? $"{title} · composes the {_catalog.Controls.Length} restyled types listed on their own pages"
-            : $"{title} · {string.Join(", ", onPage.Select(control => $"{control.Name} {control.Parity}"))} · {onPage.Length} of {_catalog.Controls.Length} restyled types";
+            ? UiText.T("{0} · composes the {1} restyled types listed on their own pages", title, _catalog.Controls.Length)
+            : UiText.T("{0} · {1} · {2} of {3} restyled types",
+                title,
+                string.Join(", ", onPage.Select(control => $"{control.Name} {control.Parity}")),
+                onPage.Length,
+                _catalog.Controls.Length);
         var open = _catalog.GapsLine(pageId);
-        status.Text = open.Length == 0 ? claim : $"{claim}\nNot claimed: {open}";
+        status.Text = open.Length == 0
+            ? claim
+            : UiText.Format("{0}\n{1}", [claim, UiText.T("Not claimed: {0}", open)]);
+    }
+
+    /// <summary>
+    /// The catalog's page title, translated. <c>Catalog.json</c> is the English source of record and is read by the
+    /// parity tests as such, so the Chinese titles live in <see cref="GalleryText"/> rather than in a second copy of
+    /// the data file, and a page the map does not cover falls back to the catalog's own title.
+    /// </summary>
+    private string LocalizedCatalogTitle(string pageId)
+    {
+        var english = _catalog.Page(pageId)?.Title ?? pageId;
+        return UiText.HasChinese(english) ? UiText.T(english) : english;
     }
 
     private void ApplyAppearance()
@@ -909,8 +1038,17 @@ public partial class MainWindow : Window
             titleBar.Background = Background;
             titleBar.Foreground = Foreground;
         }
-        ((TextBlock)ThemeStatus!).Text = $"{_theme} · {(FluentThemeManager.AnimationsEnabled ? "Motion on" : "Reduced motion")}";
+
+        WriteThemeStatus();
     }
+
+    /// <summary>Rewrites the theme/motion line. Separate from <see cref="ApplyAppearance"/> because a language
+    /// change moves it without touching the palette.</summary>
+    private void WriteThemeStatus() =>
+        ((TextBlock)ThemeStatus!).Text = UiText.T("{0} · {1}", _theme,
+            FluentThemeManager.AnimationsEnabled ? UiText.T("Motion on") : UiText.T("Reduced motion"));
+
+    private void WriteParityStatus() => ShowParity(Navigation.SelectedItem);
 
     private void Report(string message)
     {
@@ -918,8 +1056,8 @@ public partial class MainWindow : Window
     }
 
     private static string Describe(object? item) => item is ContentControl control
-        ? control.Content?.ToString() ?? "None"
-        : item?.ToString() ?? "None";
+        ? control.Content?.ToString() ?? UiText.T("None")
+        : item?.ToString() ?? UiText.T("None");
 
     private static int SelectedIndex(ComboBox combo)
     {

@@ -22,7 +22,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The localization gate reads both hosts' markup and registers both catalogs. UiText is process-wide
+         static state, so the two projects it shares with are referenced rather than duplicated in the test. -->
     <ProjectReference Include="..\..\src\FluentJalium\FluentJalium.csproj" />
+    <ProjectReference Include="..\..\src\FluentJalium.Localization\FluentJalium.Localization.csproj" />
+    <ProjectReference Include="..\..\samples\FluentJalium.Gallery\FluentJalium.Gallery.csproj" />
+    <ProjectReference Include="..\..\samples\FluentJalium.Launcher\FluentJalium.Launcher.csproj" />
   </ItemGroup>
 
 </Project>
